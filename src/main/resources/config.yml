@@ -1,0 +1,45 @@
+# this file is a config file. Admin only.
+result-items:
+  first: # test section
+    material: iron_block #need
+    amount: 2 #need -> 0 < amount < common sense
+
+    name: #option
+    lore: #option
+    enchants: #option
+    break: #option -> true or false
+    flags: #option -> read JavaDoc
+
+  second:
+    material: gold_ingot
+    amount: 10
+
+
+recipe-list:
+  - stone-to-iron
+  - iron-to-gold
+
+recipe-materials-list:
+  - first
+  - second
+  - third
+  - forth
+  - fifth
+
+recipe-materials:
+  first:
+    material: coal # need
+    amount: 1 # need (default:1 -> when you set this over 1, rarely occur errors.
+
+  second:
+    material: stone
+    amount: 1
+
+recipe-items:
+  stone-to-iron:
+    size: 3 # 3 <= size <= 6 (int)
+    result: first
+    recipe:
+      - second,second,second
+      - second,null,second
+      - second,second,second
