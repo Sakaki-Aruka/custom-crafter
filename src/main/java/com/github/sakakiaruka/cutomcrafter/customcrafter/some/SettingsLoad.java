@@ -2,7 +2,9 @@ package com.github.sakakiaruka.cutomcrafter.customcrafter.some;
 
 import com.github.sakakiaruka.cutomcrafter.customcrafter.CustomCrafter;
 import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.Recipe;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
 
@@ -68,10 +70,14 @@ public class SettingsLoad {
     private ItemStack getResultItem(String name){
         String path = "result-items."+name;
         String material = config.getString(path+".material");
-        ItemStack item = new ItemStack(Material.getMaterial(material));
-        int amount = config.getInt(path+".amount");
-        item.setAmount(amount);
-        return item;
+        try{
+            ItemStack item = new ItemStack(Material.getMaterial(material));
+            int amount = config.getInt(path+".amount");
+            item.setAmount(amount);
+            return item;
+        }catch (Exception e){
+            return null;
+        }
     }
 
     private int getTotal(Map<Integer,List<ItemStack>> input){
@@ -86,4 +92,6 @@ public class SettingsLoad {
         }
         return count;
     }
+
+    
 }

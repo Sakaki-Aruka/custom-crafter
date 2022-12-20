@@ -10,8 +10,8 @@ import java.util.*;
 
 public class CreateInventory {
     public static Inventory inv(int size){
-        Inventory result = Bukkit.createInventory(null,size*9);
-        for(int i=0;i<size*9;i++){
+        Inventory result = Bukkit.createInventory(null,54,"CustomCrafter");
+        for(int i=0;i<54;i++){ // 54 = 9slots * 6lines
             result.setItem(i,blank());
         }
 
@@ -30,11 +30,21 @@ public class CreateInventory {
         List<ItemStack> list = new ArrayList<>();
         sizes.entrySet().forEach(s->list.add(s.getValue()));
         list.add(ci.make());
+        list.add(new ItemStack(Material.AIR));
 
+        for(int i=1;i<=5;i++){
+            int slot = i*9-1; // i*9-1 = most right slot in each line.
+            ItemStack button = list.get(i-1);
+            result.setItem(slot,button);
+        }
+
+        /*
         for(int i=size*9-4;i<size*9;i++){
             int j = Math.abs(4-(size*9-i));
             result.setItem(i,list.get(j));
         }
+
+         */
 
         return result;
     }
