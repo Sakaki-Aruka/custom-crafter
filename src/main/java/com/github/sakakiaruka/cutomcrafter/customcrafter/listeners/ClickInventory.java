@@ -1,5 +1,6 @@
 package com.github.sakakiaruka.cutomcrafter.customcrafter.listeners;
 
+import com.github.sakakiaruka.cutomcrafter.customcrafter.listeners.clickInventorysMethods.Search;
 import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.Recipe;
 import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.RecipePlace;
 import org.bukkit.Bukkit;
@@ -45,7 +46,7 @@ public class ClickInventory implements Listener {
                     player.playSound(player, Sound.BLOCK_PISTON_EXTEND,1.0f,1.0f);
                     // write search and drop result-items.
                     ItemStack result;
-                    if((result = search(inventory,player))!=null){
+                    if((result = new Search().search(inventory,player))!=null && result!=new ItemStack(Material.AIR)){
                         Inventory init = inv(size/9);
                         init.setItem(size-9-1,result); // size-9-1 = under right corner + 1Line
                         return;
@@ -197,96 +198,4 @@ public class ClickInventory implements Listener {
         return map;
     }
 
-    private ItemStack search(Inventory inventory,Player player){
-        int size = guiOpening.get(player);
-        int total = 0;
-        List<RecipePlace> rps = new ArrayList<>();
-        for(int i=0;i<size;i++){
-            for(int j=0;j<size;j++){
-                try{
-                    RecipePlace rp = new RecipePlace(i,j,inventory.getItem(i*9+j));
-                    rps.add(rp);
-                    total++;
-                }catch (Exception e){
-                    RecipePlace rp = new RecipePlace(i,j,null);
-                    rps.add(rp);
-                }
-            }
-        }
-
-        List<Recipe> rs = new ArrayList<>();
-        for(Recipe r:recipes){
-            if(r.getTotal()==total){
-                rs.add(r);
-            }
-        }
-        if(rs.isEmpty()) {
-            return null; // no suggest recipes are there.
-        }
-
-        for(Recipe r:rs){
-            if (checkDiff(r.toRecipePlace(r),rps)){
-                return r.getResult();
-            }
-        }
-        return null;
-
-    }
-
-    private boolean checkDiff(List<RecipePlace> model, List<RecipePlace> real){
-        if(model.size()!=real.size()){
-            return false;
-        }
-        int xDiff = 0;
-        int yDiff = 0;
-        for(int i=0;i<model.size();i++){
-            int mx = model.get(i).getX();
-            int rx = real.get(i).getX();
-
-            int my = model.get(i).getY();
-            int ry = real.get(i).getY();
-
-            if(model.get(i).getItem()!=real.get(i).getItem()){
-                return false;
-            }
-
-            if(i==0){
-                xDiff = Math.abs(mx-rx);
-                yDiff = Math.abs(my-ry);
-            }else{
-                if(Math.abs(mx-rx)!=xDiff || Math.abs(my-ry)!=yDiff){
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    private ItemStack getVanillaItem(Inventory inventory,int size,Player player){
-        List<Integer> craftingSlots = getTableSlots(size);
-        Map<Integer,List<ItemStack>> coordinate = new HashMap<>();
-
-        int before = craftingSlots.get(0);
-        for(int i:craftingSlots){
-            List<ItemStack> items = new ArrayList<>();
-            ItemStack item = inventory.getItem(i);
-            int distance = Math.abs(i-before);
-            if(distance>1){
-                int key = coordinate.size();
-                coordinate.put(key,items);
-                items.clear();
-            }else{
-                items.add(item);
-            }
-        }
-        ItemStack[] check = new ItemStack[9];
-        for(Map.Entry<Integer,List<ItemStack>> entry:coordinate.entrySet()){
-            for(int i=0;i<3;i++){
-                check[entry.getKey()+i] = entry.getValue().get(i);
-            }
-        }
-        World world = player.getWorld();
-        ItemStack result = Bukkit.craftItem(check,world,player);
-        return result;
-    }
 }
