@@ -1,23 +1,25 @@
 package com.github.sakakiaruka.cutomcrafter.customcrafter.some;
 
 import com.github.sakakiaruka.cutomcrafter.customcrafter.CustomCrafter;
-import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.Recipe;
-import org.bukkit.Bukkit;
+import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.MultiKeys;
+import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.OriginalRecipe;
+import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.RecipeMaterial;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 
 public class SettingsLoad {
     private static CustomCrafter cc;
     private static FileConfiguration config;
-    public static List<com.github.sakakiaruka.cutomcrafter.customcrafter.objects.Recipe> recipes = new ArrayList<>();
+    public static List<OriginalRecipe> recipes = new ArrayList<>();
+
+    private Map<String,RecipeMaterial> recipeMaterialMap = new HashMap<>();
     public void set(){
         cc = CustomCrafter.getInstance();
         load();
@@ -25,73 +27,91 @@ public class SettingsLoad {
 
     private void load(){
         config = cc.getConfig();
-        List<String> recipeList = config.getStringList("recipe-list");
-
-        for(String s:recipeList){
-            recipes.add(this.getRecipe(s));
-        }
+        //List<String> resultsItemNames = config.getStringList("result-items");
+        List<String> recipeNames = config.getStringList("recipe-list");
+        //List<String> recipeMaterialNames = config.getStringList("recipe-materials-list");
+        Map<String,ItemStack> results = getResult(recipeNames);
+        originalRecipeMake(recipeNames,results);
     }
 
-    private Recipe getRecipe(String recipeName){
-        String path = "recipe-items."+recipeName;
-        int size = config.getInt(path+"size");
-        List<String> lines = config.getStringList(path+".recipe");
-        Map<Integer,List<ItemStack>> map = new HashMap<>();
+    private Map<String,ItemStack> getResult(List<String> list){
+        String path = "result-item.";
+        Map<String,ItemStack> map = new HashMap<>();
+        for(String s:list){
+            if(s.equalsIgnoreCase("null")){
+                map.put(s,null);
+                continue;
+            }
+            ItemStack item = new ItemStack(Material.getMaterial(config.getString(path+s+".material").toUpperCase()));
+            item.setAmount(config.getInt(path+s+".amount"));
+            ItemMeta meta = item.getItemMeta();
+
+            try{
+                meta.setDisplayName(config.getString(path+s+".name"));
+                meta.setLore(config.getStringList(path+s+".lore"));
+                item.addUnsafeEnchantments(getEnchantments(s));
+                addItemFlags(s,meta);
+                setUnbreakable(s,meta);
+                item.setItemMeta(meta);
+            }catch (Exception e){
+                System.out.println("Config load error occurred.");
+            }
+            map.put(s,item);
+        }
+        return map;
+    }
+
+    private void originalRecipeMake(List<String> recipeNames,Map<String,ItemStack> map){
+        for(String s:recipeNames){
+            String recipePath = "recipes."+s;
+            String recipeName = s;
+            int size = config.getInt(recipePath+".size");
+            int total = recipeMaterialMap.get(s).getMapSize();
+            ItemStack result = map.get(config.getString(recipePath+".result"));
+            getRecipeMaterial(recipeName,map,size);
+            OriginalRecipe originalRecipe = new OriginalRecipe(result,size,total,recipeMaterialMap.get(recipeName),recipeName);
+            recipes.add(originalRecipe);
+        }
+        return;
+    }
+
+    private void getRecipeMaterial(String recipeName,Map<String,ItemStack> recipeMaterials,int size){
+        List<String> list = config.getStringList("recipes."+recipeName+".recipe");
         for(int i=0;i<size;i++){
-            List<ItemStack> stacks = new ArrayList<>();
-            for(String s: lines.get(i).split(",")){
-                ItemStack item = this.getRecipeItem(s);
-                stacks.add(item);
-            }
-            map.put(i,stacks);
-        }
-
-        int total = this.getTotal(map);
-        ItemStack result = this.getResultItem(config.getString(path+".result"));
-
-        com.github.sakakiaruka.cutomcrafter.customcrafter.objects.Recipe recipe = new com.github.sakakiaruka.cutomcrafter.customcrafter.objects.Recipe(size,total,map,result);
-        return recipe;
-
-    }
-
-    private ItemStack getRecipeItem(String name){
-        String path = "recipe-materials."+name;
-        String material = config.getString(path+".material");
-        if(material.equalsIgnoreCase("null")){
-            return null;
-        }
-        ItemStack item = new ItemStack(Material.getMaterial(material));
-        int amount = config.getInt(path+".amount");
-        item.setAmount(amount);
-
-        return item;
-    }
-
-    private ItemStack getResultItem(String name){
-        String path = "result-items."+name;
-        String material = config.getString(path+".material");
-        try{
-            ItemStack item = new ItemStack(Material.getMaterial(material));
-            int amount = config.getInt(path+".amount");
-            item.setAmount(amount);
-            return item;
-        }catch (Exception e){
-            return null;
-        }
-    }
-
-    private int getTotal(Map<Integer,List<ItemStack>> input){
-        int count = 0;
-        for(Map.Entry<Integer,List<ItemStack>> entry:input.entrySet()){
-            List<ItemStack> list = entry.getValue();
-            for(ItemStack i:list){
-                if(!i.equals(null)){
-                    count++;
-                }
+            for(int j=0;j<size;j++){
+                MultiKeys key = new MultiKeys(i,j);
+                ItemStack item = recipeMaterials.get(Arrays.asList(list.get(i).split(",")).get(j));
+                RecipeMaterial material = new RecipeMaterial(key,item);
+                recipeMaterialMap.put(recipeName,material);
             }
         }
-        return count;
+
     }
 
-    
+    private Map<Enchantment,Integer> getEnchantments(String resultItemName){
+        String path = "result-item."+resultItemName+".enchants";
+        List<String> list = config.getStringList(path);
+        Map<Enchantment,Integer> map = new HashMap<>();
+        for(String s:list){
+            List<String> raw = Arrays.asList(s.split(" "));
+            int level = Integer.valueOf(raw.get(1));
+            Enchantment enchant = Enchantment.getByName(raw.get(0));
+            map.put(enchant,level);
+        }
+        return map;
+    }
+
+    private void addItemFlags(String resultItemName,ItemMeta meta){
+        String path = "result-item."+resultItemName+".flags";
+        List<String> list = config.getStringList(path);
+        for(String s:list){
+            meta.addItemFlags(ItemFlag.valueOf(s.toUpperCase()));
+        }
+    }
+
+    private void setUnbreakable(String resultItemName,ItemMeta meta){
+        String path = "result-item."+resultItemName+".break";
+        boolean bool = config.getBoolean(path);
+        meta.setUnbreakable(bool);
+    }
 }

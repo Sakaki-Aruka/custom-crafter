@@ -21,6 +21,12 @@ public class RecipeMaterial {
         map = in;
     }
 
+    public RecipeMaterial(MultiKeys key,ItemStack item){
+        map = new HashMap<MultiKeys,ItemStack>(){{
+            put(key,item);
+        }};
+    }
+
     public RecipeMaterial(){}
 
     public Map<MultiKeys,ItemStack> getRecipeMaterial(){

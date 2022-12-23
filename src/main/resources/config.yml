@@ -1,18 +1,28 @@
 # this file is a config file. Admin only.
+#name: #option
+#lore: #option
+#enchants: #option
+#break: #option -> true or false
+#flags: #option -> read JavaDoc
 result-items:
+  - first
+  - second
+result-item:
   first: # test section
     material: iron_block #need
     amount: 2 #need -> 0 < amount < common sense
 
-    name: #option
-    lore: #option
-    enchants: #option
-    break: #option -> true or false
-    flags: #option -> read JavaDoc
-
   second:
     material: gold_ingot
     amount: 10
+
+    lore:
+      - line 1
+      - line 2
+    enchants:
+      - mending 10
+    flags:
+      - hide_dye
 
 
 recipe-list:
@@ -22,9 +32,6 @@ recipe-list:
 recipe-materials-list:
   - first
   - second
-  - third
-  - forth
-  - fifth
 
 recipe-materials:
   first:
@@ -35,7 +42,7 @@ recipe-materials:
     material: stone
     amount: 1
 
-recipe-items:
+recipes:
   stone-to-iron:
     size: 3 # 3 <= size <= 6 (int)
     result: first
@@ -43,3 +50,11 @@ recipe-items:
       - second,second,second
       - second,null,second
       - second,second,second
+  iron-to-gold:
+    size: 4
+    result: second
+    recipe:
+      - first,first,null,null
+      - null,null,null,first
+      - first,first,null,null
+      - null,null,first,first

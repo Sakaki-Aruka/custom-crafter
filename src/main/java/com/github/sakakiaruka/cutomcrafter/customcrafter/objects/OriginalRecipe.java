@@ -10,13 +10,15 @@ public class OriginalRecipe {
     private ItemStack result;
     private int size;
     private int total;
+    private String recipeName;
     private RecipeMaterial rm;
     private Map<Material,Integer> amountRelation;
-    public OriginalRecipe(ItemStack result,int size,int total,RecipeMaterial rm){
+    public OriginalRecipe(ItemStack result,int size,int total,RecipeMaterial rm,String recipeName){
         this.result = result;
         this.size = size;
         this.rm = rm;
         this.total = total;
+        this.recipeName = recipeName;
     }
 
     public ItemStack getResult(){
