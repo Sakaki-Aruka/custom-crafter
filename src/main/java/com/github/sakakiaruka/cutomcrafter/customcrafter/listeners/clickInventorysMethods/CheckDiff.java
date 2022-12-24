@@ -1,23 +1,21 @@
 package com.github.sakakiaruka.cutomcrafter.customcrafter.listeners.clickInventorysMethods;
 
 import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.MultiKeys;
-import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.OriginalRecipe;
+import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.RecipeMaterial;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CheckDiff {
-    public boolean diff(OriginalRecipe model,OriginalRecipe input){
-        int modelSize = model.getSize();
-        int inputSize = input.getSize();
-        int modelRecipeMaterialSize = model.getRecipeMaterial().getMapSize();
-        int inputRecipeMaterialSize = input.getRecipeMaterial().getMapSize();
+    public boolean diff(RecipeMaterial model, RecipeMaterial input,int modelSize,int inputSize){
+        int modelRecipeMaterialSize = model.getMapSize();
+        int inputRecipeMaterialSize = input.getMapSize();
         if(modelSize != inputSize
         && modelRecipeMaterialSize != inputRecipeMaterialSize)
             return false; // size not match
 
-        List<MultiKeys> modelMultiKeys = model.getRecipeMaterial().getCoordinateList();
-        List<MultiKeys> inputMultiKeys = input.getRecipeMaterial().getCoordinateList();
+        List<MultiKeys> modelMultiKeys = model.getCoordinateList();
+        List<MultiKeys> inputMultiKeys = input.getCoordinateList();
 
         List<Integer> xDiffs = new ArrayList<>();
         List<Integer> yDiffs = new ArrayList<>();
