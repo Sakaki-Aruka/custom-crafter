@@ -44,13 +44,19 @@ public class ClickInventory implements Listener {
             // click crafting-gui
             if(slot == absSize-1-9*2){ // click make button(anvil)
                 player.playSound(player, Sound.BLOCK_PISTON_EXTEND,1.0f,1.0f);
+
+                if(!inventory.getItem(absSize-9).equals(null)){
+                    // result slot is full.
+                    return;
+                }
+
                 ItemStack result;
                 if((result = new Search().search(inventory,player))!=null
                         && result.getType().equals(Material.AIR)){
-                    inventory.setItem(slot,result); // to set a crafted-item
+                    inventory.setItem(absSize-1-9*1,result); // to set a crafted-item
                 }else{
                     result = new SearchVanillaItem().getVanillaItem(inventory,size,player);
-                    inventory.setItem(slot,result);
+                    inventory.setItem(absSize-1-9*1,result);
                 }
                 return;
             }else if(slot == absSize-1*9){
