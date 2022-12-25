@@ -29,11 +29,18 @@ public class ClickInventory implements Listener {
             return;
         }
 
+
         Inventory inventory = event.getClickedInventory();
         int slot = event.getRawSlot();
         int size = guiOpening.get(player);
         int absSize = 54;
         if(slot < absSize){
+            if(!event.getClick().equals(ClickType.LEFT)
+                    || !event.getClick().equals(ClickType.RIGHT)){
+                event.setCancelled(true);
+                return;
+            }
+
             // click crafting-gui
             if(slot == absSize-1-9*2){ // click make button(anvil)
                 player.playSound(player, Sound.BLOCK_PISTON_EXTEND,1.0f,1.0f);
@@ -90,7 +97,8 @@ public class ClickInventory implements Listener {
         }else if(slot >= absSize){
             // click players inventory
             if(!event.getClick().equals(ClickType.LEFT)
-                    || !event.getClick().equals(ClickType.RIGHT)){
+                    || !event.getClick().equals(ClickType.RIGHT)||
+            !event.getClick().equals(ClickType.SHIFT_LEFT)){
                 event.setCancelled(true);
                 return;
             }

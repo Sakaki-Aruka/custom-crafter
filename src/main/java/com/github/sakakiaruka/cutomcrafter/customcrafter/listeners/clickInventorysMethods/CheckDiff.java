@@ -26,10 +26,8 @@ public class CheckDiff {
             xDiffs.add(xDiff);
             yDiffs.add(yDiff);
         }
-        if(this.isConsistency(xDiffs) && this.isConsistency(yDiffs)){
-            return true;
-        }
-        return false;
+
+        return this.isConsistency(xDiffs) && this.isConsistency(yDiffs);
     }
 
     private boolean isConsistency(List<Integer> list){
