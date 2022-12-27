@@ -29,10 +29,6 @@ public class OpenCrafter extends BukkitRunnable implements Listener{
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event){
 
-        if(!event.getClickedBlock().getType().equals(Material.CRAFTING_TABLE)){
-            return;
-        }
-
         if(!event.getClickedBlock().equals(null) && event.getClickedBlock().getType().equals(Material.CRAFTING_TABLE)){
             Location location = event.getClickedBlock().getLocation();
             for(double d=0;d<(2*Math.PI);d+=degrees){

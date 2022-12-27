@@ -27,14 +27,13 @@ result-item:
       - line 1
       - line 2
     enchants:
-      - mending 10
+      - mending,10
+      - luck,2
     flags:
       - hide_dye
 
 
-recipe-list:
-  - stone-to-iron
-  - iron-to-gold
+
 
 recipe-materials-list:
   - first
@@ -49,6 +48,10 @@ recipe-materials:
     material: stone
     amount: 1
 
+recipe-list:
+  - stone-to-iron
+  - iron-to-gold
+  -
 recipes:
   stone-to-iron:
     size: 3 # 3 <= size <= 6 (int)
