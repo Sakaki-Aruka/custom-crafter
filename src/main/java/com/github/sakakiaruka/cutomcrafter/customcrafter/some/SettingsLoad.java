@@ -88,6 +88,7 @@ public class SettingsLoad {
 
     }
 
+    @Deprecated
     private Map<Enchantment,Integer> getEnchantments(String resultItemName){
         String path = "result-item."+resultItemName+".enchants";
         List<String> list = config.getStringList(path);

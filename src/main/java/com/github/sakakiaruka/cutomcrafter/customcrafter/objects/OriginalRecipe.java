@@ -33,6 +33,10 @@ public class OriginalRecipe {
         return total;
     }
 
+    public String getRecipeName(){
+        return recipeName;
+    }
+
     public RecipeMaterial getRecipeMaterial(){
         return rm;
     }
@@ -54,7 +58,4 @@ public class OriginalRecipe {
         }
         return map;
     }
-
-
-
 }

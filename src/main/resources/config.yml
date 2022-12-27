@@ -4,6 +4,13 @@
 #enchants: #option
 #break: #option -> true or false
 #flags: #option -> read JavaDoc
+
+# --- name rule ---
+# Do not use space character.
+# Do not use "null" except when you want to mean "no-item".
+# Do not name that the length less than 3.
+# Have to use sentences.
+######
 result-items:
   - first
   - second
