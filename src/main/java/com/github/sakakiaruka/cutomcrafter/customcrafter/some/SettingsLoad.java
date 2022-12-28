@@ -30,11 +30,12 @@ public class SettingsLoad {
         getOriginalRecipeList();
     }
 
+    @Deprecated
     private void getRecipeResults(){
         List<String> names = config.getStringList("result-items");
         for(String s:names){
             String name = s;
-            String path = "result-items."+name+".";
+            String path = "result-item."+name+".";
             ItemStack item = new ItemStack(Material.valueOf(config.getString(path+"material").toUpperCase()));
             item.setAmount(config.getInt(path+"amount"));
             ItemMeta meta = item.getItemMeta();
@@ -101,7 +102,6 @@ public class SettingsLoad {
                         return;
                     }
                     rp.put(key,material);
-
                 }
             }
 

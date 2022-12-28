@@ -1,6 +1,5 @@
 package com.github.sakakiaruka.cutomcrafter.customcrafter.listeners;
 
-import com.github.sakakiaruka.cutomcrafter.customcrafter.CustomCrafter;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;

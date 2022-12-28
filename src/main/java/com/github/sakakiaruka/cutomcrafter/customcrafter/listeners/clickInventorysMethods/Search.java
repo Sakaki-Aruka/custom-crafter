@@ -3,7 +3,6 @@ package com.github.sakakiaruka.cutomcrafter.customcrafter.listeners.clickInvento
 import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.MultiKeys;
 import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.OriginalRecipe;
 import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.RecipeMaterial;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -42,6 +41,7 @@ public class Search {
         System.out.println("[CustomCrafter Debug Message];matched items are here. -> "+results);
         System.out.println("we will only return item to you that a first item of the return items list.");
 
+        if(results.isEmpty())return null;
         return results.get(0);
 
     }

@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class RecipeMaterial {
 
-    private Map<MultiKeys,ItemStack> map;
+    private Map<MultiKeys,ItemStack> map = new HashMap<>();
     public RecipeMaterial(int key1, int key2, ItemStack material){
         MultiKeys mk = new MultiKeys(key1,key2);
         map = new HashMap<MultiKeys,ItemStack>(){{
@@ -27,7 +27,8 @@ public class RecipeMaterial {
         }};
     }
 
-    public RecipeMaterial(){}
+    public RecipeMaterial(){
+    }
 
     public Map<MultiKeys,ItemStack> getRecipeMaterial(){
         return map;

@@ -16,19 +16,22 @@ public class Transition {
     public Inventory transition(Inventory before,int newer,int beforeSize){
         List<ItemStack> stacks = new ArrayList<>();
         for(int i:new ClickInventory().getTableSlots(beforeSize)){
+            if(before.getItem(i)==null
+            || before.getItem(i).getType().equals(Material.AIR))continue;
             ItemStack item = before.getItem(i);
             stacks.add(item);
         }
-        List<ItemStack> normals = new ArrayList<>();
         Inventory inventory = inv(newer);
+        if(stacks.isEmpty()){
+            return inventory;
+        }
+        List<ItemStack> normals = new ArrayList<>();
         if(stacks.size() > Math.pow(newer,2)){
             //overflow
             List<ItemStack> overflow = new ArrayList<>();
-            for(int i=0;i<stacks.size();i++){
-                if(before.getItem(i)==null || before.getItem(i).getType().equals(Material.AIR))continue;
-                if(i>Math.pow(newer,2)){
-                    overflow.add(before.getItem(i));
-                }
+            for(int i=stacks.size()-1;i>Math.pow(newer,2);i--){
+                overflow.add(stacks.get(i));
+                stacks.remove(i);
             }
             ItemStack bundle = new ItemStack(Material.BUNDLE);
             BundleMeta meta = (BundleMeta)bundle.getItemMeta();
@@ -39,16 +42,17 @@ public class Transition {
             inventory.setItem(newer*9-2,bundle);
 
         }
-        for(int i=0;i<newer;i++){
-            normals.add(stacks.get(i));
-        }
+        stacks.forEach(s->normals.add(s));
 
         int count = 0;
         for(int i:new ClickInventory().getTableSlots(newer)){
-            inventory.setItem(i,stacks.get(count));
-            count++;
+            try{
+                inventory.setItem(i,stacks.get(count));
+                count++;
+            }catch (Exception e){
+                break;
+            }
         }
         return inventory;
-
     }
 }
