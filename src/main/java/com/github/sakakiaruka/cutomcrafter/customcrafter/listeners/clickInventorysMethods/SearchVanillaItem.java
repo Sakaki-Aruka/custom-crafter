@@ -92,7 +92,7 @@ public class SearchVanillaItem {
         int _final = -1;
         for(Map.Entry<Integer,List<ItemStack>> entry:map.entrySet()){
             for(ItemStack item:entry.getValue()){
-                if(!item.equals(null) && !item.getType().equals(Material.AIR)){
+                if(item!=(null) && !item.getType().equals(Material.AIR)){
                     _final = entry.getKey();
                 }
             }

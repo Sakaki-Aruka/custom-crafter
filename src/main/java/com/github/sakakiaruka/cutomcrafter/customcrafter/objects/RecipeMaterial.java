@@ -2,14 +2,11 @@ package com.github.sakakiaruka.cutomcrafter.customcrafter.objects;
 
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class RecipeMaterial {
 
-    private Map<MultiKeys,ItemStack> map = new HashMap<>();
+    private Map<MultiKeys,ItemStack> map = new LinkedHashMap<>();
     public RecipeMaterial(int key1, int key2, ItemStack material){
         MultiKeys mk = new MultiKeys(key1,key2);
         map = new HashMap<MultiKeys,ItemStack>(){{

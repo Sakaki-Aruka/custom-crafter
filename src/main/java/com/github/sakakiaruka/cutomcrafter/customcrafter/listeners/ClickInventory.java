@@ -1,8 +1,10 @@
 package com.github.sakakiaruka.cutomcrafter.customcrafter.listeners;
 
+import com.github.sakakiaruka.cutomcrafter.customcrafter.listeners.clickInventorysMethods.InputToOriginalRecipe;
 import com.github.sakakiaruka.cutomcrafter.customcrafter.listeners.clickInventorysMethods.Search;
 import com.github.sakakiaruka.cutomcrafter.customcrafter.listeners.clickInventorysMethods.SearchVanillaItem;
 import com.github.sakakiaruka.cutomcrafter.customcrafter.listeners.clickInventorysMethods.Transition;
+import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.MultiOriginalRecipe;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -17,6 +19,7 @@ import org.bukkit.inventory.meta.BundleMeta;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static com.github.sakakiaruka.cutomcrafter.customcrafter.listeners.OpenCrafter.guiOpening;
 
@@ -51,25 +54,34 @@ public class ClickInventory implements Listener {
                 // click make button(anvil)
                 player.playSound(player, Sound.BLOCK_PISTON_EXTEND,1.0f,1.0f);
 
-                if(inventory.getItem(absSize-9)!=null){
+                if(inventory.getItem(absSize-1-9)!=null){
                     // result slot is full.
                     event.setCancelled(true);
                     return;
                 }
 
                 ItemStack result;
-                if((result = new Search().search(inventory,player))!=null
-                        && result.getType().equals(Material.AIR)){
-                    inventory.setItem(absSize-1-9*1,result); // to set a crafted-item
+                MultiOriginalRecipe mop;
+                if((mop = new Search().search(new InputToOriginalRecipe().main(inventory,size),player))!=null
+                        && !mop.getOriginalRecipe().getResult().getType().equals(Material.AIR)){
+                    tableClear(inventory,size);
+                    ItemStack resultItem = mop.getOriginalRecipe().getResult();
+                    resultItem.setAmount(mop.getAmount());
+                    inventory.setItem(absSize-1-9*1,resultItem); // to set a crafted-item
+                    for(Map.Entry<Integer,ItemStack> entry:mop.getRemaining().entrySet()){
+                        inventory.setItem(entry.getKey(),entry.getValue());//set remaining items
+                    }
+
                 }else{
                     result = new SearchVanillaItem().getVanillaItem(inventory,size,player);
                     inventory.setItem(absSize-1-9*1,result);
                 }
+                event.setCancelled(true);
                 return;
-            }else if(slot == absSize-1*9){
+            }else if(slot == 44){
                 //result slot
                 if(inventory.getItem(slot)!=null
-                        || inventory.getItem(slot).getType().equals(Material.AIR)){
+                        && !inventory.getItem(slot).getType().equals(Material.AIR)){
                     if(player.getInventory().firstEmpty()==-1){
                         //a player has no empty slot
                         player.getWorld().dropItem(player.getLocation(),
@@ -78,6 +90,8 @@ public class ClickInventory implements Listener {
                         //a player has empty slot
                         player.getInventory().setItem(player.getInventory().firstEmpty(),inventory.getItem(slot));
                     }
+                    inventory.setItem(slot,new ItemStack(Material.AIR));
+                    event.setCancelled(true);
                     return;
                 }
             }else if((slot+1)%9==0 && slot < 3*9 && slot+1 > 0){
@@ -142,6 +156,12 @@ public class ClickInventory implements Listener {
             }
         }
         return slots;
+    }
+
+    private void tableClear(Inventory inventory,int size){
+        for(int i:getTableSlots(size)){
+            inventory.clear(i);
+        }
     }
 
 }

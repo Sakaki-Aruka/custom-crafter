@@ -3,7 +3,9 @@ package com.github.sakakiaruka.cutomcrafter.customcrafter.objects;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class OriginalRecipe {
@@ -19,6 +21,14 @@ public class OriginalRecipe {
         this.rm = rm;
         this.total = total;
         this.recipeName = recipeName;
+    }
+
+    public OriginalRecipe(int size,int total,RecipeMaterial rm){
+        this.recipeName = "unknown";
+        this.result = new ItemStack(Material.AIR);
+        this.rm = rm;
+        this.total = total;
+        this.size = size;
     }
 
     public ItemStack getResult(){
@@ -39,6 +49,14 @@ public class OriginalRecipe {
 
     public RecipeMaterial getRecipeMaterial(){
         return rm;
+    }
+
+    public List<Material> getRawMaterials(){
+        List<Material> result = new ArrayList<>();
+        for(Map.Entry<MultiKeys, ItemStack> entry:rm.getRecipeMaterial().entrySet()){
+            if(!result.contains(entry.getValue().getType()))result.add(entry.getValue().getType());
+        }
+        return result;
     }
 
     private Map<Material,Integer> getAmountRelation(){
