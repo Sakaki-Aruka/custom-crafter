@@ -31,11 +31,6 @@ public class InputToOriginalRecipe {
             }
         }
 
-        //debug
-        for(Map.Entry<MultiKeys,ItemStack> entry:rm.getRecipeMaterial().entrySet()){
-            System.out.println("item:"+entry.getValue().getType()+" / "+entry.getValue().getAmount());
-        }
-
         if(amounts.isEmpty())return null;
         OriginalRecipe original = new OriginalRecipe(size,getTotal(amounts),rm);
         int originalRecipeAmount = getMinimum(amounts);

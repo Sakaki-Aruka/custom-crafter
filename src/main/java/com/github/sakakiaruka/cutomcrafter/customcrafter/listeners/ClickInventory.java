@@ -26,9 +26,6 @@ public class ClickInventory implements Listener {
     public void onInventoryClick(InventoryClickEvent event){
         Player player = Bukkit.getPlayer(event.getWhoClicked().getUniqueId());
 
-        //debug
-        System.out.println("raw slot:"+event.getRawSlot());
-
         if(!guiOpening.containsKey(player)){
             //not open crafting-gui
             return;

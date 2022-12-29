@@ -36,16 +36,10 @@ public class OpenCrafter extends BukkitRunnable implements Listener{
                 double y = location.getY()-1;
                 Location loc = new Location(location.getWorld(), x,y,z);
 
-                //debug
-                System.out.println("loc block:"+loc.getBlock().getType()+" / xyz:"+x+","+y+","+z);
-
                 if(!loc.getBlock().getType().equals(baseBlock)){
                     return;
                 }
             }
-
-            //debug
-            System.out.println("finished");
 
             int size = 3;
             long delay = 3; // tick

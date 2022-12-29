@@ -12,8 +12,6 @@ public class InventoryOpen implements Listener {
     public void onInventoryOpen(InventoryOpenEvent event){
         Player player = (Player) event.getPlayer();
         if(isTransitionMode.contains(player)){
-            //debug
-            System.out.println("isTransitionMode tag was removed.");
 
             isTransitionMode.remove(player);
         }
