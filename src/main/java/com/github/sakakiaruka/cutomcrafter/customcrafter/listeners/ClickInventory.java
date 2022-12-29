@@ -1,9 +1,6 @@
 package com.github.sakakiaruka.cutomcrafter.customcrafter.listeners;
 
-import com.github.sakakiaruka.cutomcrafter.customcrafter.listeners.clickInventorysMethods.InputToOriginalRecipe;
-import com.github.sakakiaruka.cutomcrafter.customcrafter.listeners.clickInventorysMethods.Search;
-import com.github.sakakiaruka.cutomcrafter.customcrafter.listeners.clickInventorysMethods.SearchVanillaItem;
-import com.github.sakakiaruka.cutomcrafter.customcrafter.listeners.clickInventorysMethods.Transition;
+import com.github.sakakiaruka.cutomcrafter.customcrafter.listeners.clickInventorysMethods.*;
 import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.MultiOriginalRecipe;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -73,7 +70,7 @@ public class ClickInventory implements Listener {
                     }
 
                 }else{
-                    result = new SearchVanillaItem().getVanillaItem(inventory,size,player);
+                    result = new SearchVanilla().isThreeSquared(inventory,size,player);
                     inventory.setItem(absSize-1-9*1,result);
                 }
                 event.setCancelled(true);
