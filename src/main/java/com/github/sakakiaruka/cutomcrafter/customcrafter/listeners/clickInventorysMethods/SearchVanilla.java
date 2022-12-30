@@ -1,6 +1,5 @@
 package com.github.sakakiaruka.cutomcrafter.customcrafter.listeners.clickInventorysMethods;
 
-import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.MultiKeys;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -42,7 +41,7 @@ public class SearchVanilla {
         int yDistance = Math.abs(up - down);
         int xDistance = Math.abs(left - right);
 
-        if (xDistance > 3 || yDistance > 3) return null; //bigger distance
+        if (xDistance >= 3 || yDistance >= 3) return null; //bigger distance
 
         ItemStack[] items = new ItemStack[9];
         List<ItemStack> itemsArr = new ArrayList<>();

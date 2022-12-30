@@ -55,35 +55,40 @@ public class ClickInventory implements Listener {
                 }
 
                 ItemStack result;
-                MultiOriginalRecipe mop;
-                if((mop = new Search().search(new InputToOriginalRecipe().main(inventory,size),player))!=null
+                //MultiOriginalRecipe mop;
+                /**if((mop = new Search().search(new InputToOriginalRecipe().main(inventory,size),player))!=null
                         && !mop.getOriginalRecipe().getResult().getType().equals(Material.AIR)){
-                    tableClear(inventory,size);
-                    ItemStack resultItem = mop.getOriginalRecipe().getResult();
-                    resultItem.setAmount(mop.getAmount());
-                    inventory.setItem(absSize-1-9*1,resultItem); // to set a crafted-item
-                    for(Map.Entry<Integer,ItemStack> entry:mop.getRemaining().entrySet()){
-                        inventory.setItem(entry.getKey(),entry.getValue());//set remaining items
-                    }
+                    //custom recipe found
+                    /**tableClear(inventory,size);
+                     * debug
 
+                    ItemStack resultItem = mop.getOriginalRecipe().getResult();
+                    //resultItem.setAmount(mop.getAmount());
+                    inventory.setItem(absSize-1-9*1,resultItem); // to set a crafted-item
+                    /**
+                     * for(Map.Entry<Integer,ItemStack> entry:mop.getRemaining().entrySet()){
+                     *                         inventory.setItem(entry.getKey(),entry.getValue());//set remaining items
+                     *                     }
+                     */
+                if(new Search().search(inventory,size)!=null){
+                    //custom recipe item found
+                    result = new Search().search(inventory,size);
                 }else{
+                    //vanilla item found
                     result = new SearchVanilla().isThreeSquared(inventory,size,player);
-                    inventory.setItem(absSize-1-9*1,result);
                 }
+                inventory.setItem(absSize-1-9*1,result);
+                if(inventory.getItem(44)!=null
+                && !inventory.getItem(44).equals(Material.AIR))
+                    new ItemsSubtract().main(inventory,size,1);
                 event.setCancelled(true);
                 return;
             }else if(slot == 44){
                 //result slot
                 if(inventory.getItem(slot)!=null
                         && !inventory.getItem(slot).getType().equals(Material.AIR)){
-                    if(player.getInventory().firstEmpty()==-1){
-                        //a player has no empty slot
-                        player.getWorld().dropItem(player.getLocation(),
-                                inventory.getItem(slot));
-                    }else{
-                        //a player has empty slot
-                        player.getInventory().setItem(player.getInventory().firstEmpty(),inventory.getItem(slot));
-                    }
+                    ItemStack result = inventory.getItem(slot);
+                    resultTake(player.getInventory(),result,player);
                     inventory.setItem(slot,new ItemStack(Material.AIR));
                     event.setCancelled(true);
                     return;
@@ -156,6 +161,28 @@ public class ClickInventory implements Listener {
         for(int i:getTableSlots(size)){
             inventory.clear(i);
         }
+    }
+
+    private void resultTake(Inventory inventory,ItemStack item,Player player){
+        int add = item.getAmount();
+        int max = item.getMaxStackSize();
+        for(int i=0;i<36;i++){
+            ItemStack real;
+            if(inventory.getItem(i)==null)continue;
+            if(inventory.getItem(i).getType().equals(Material.AIR))continue;
+            if((real = inventory.getItem(i)).equals(item)){
+                int amount = real.getAmount();
+                if(amount+add <= max){
+                    real.setAmount(amount+add);
+                    add =0;
+                }else if(amount+add > max){
+                    real.setAmount(max);
+                    add = max - amount;
+                }
+            }
+            if(add==0)return;
+        }
+        player.getWorld().dropItem(player.getLocation(),item);
     }
 
 }

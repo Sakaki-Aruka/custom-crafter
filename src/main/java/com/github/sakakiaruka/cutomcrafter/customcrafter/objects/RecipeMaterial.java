@@ -14,6 +14,12 @@ public class RecipeMaterial {
         }};
     }
 
+    public String toString(){
+        StringBuilder sb = new StringBuilder();
+        map.entrySet().forEach(s->sb.append(String.format("key:%s | Item:%s\n",s.getKey().getKeys(),s.getValue())));
+        return sb.toString();
+    }
+
     public RecipeMaterial(Map<MultiKeys,ItemStack> in){
         map = in;
     }

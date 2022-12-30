@@ -51,7 +51,6 @@ recipe-materials:
 recipe-list:
   - stone-to-iron
   - iron-to-gold
-  -
 recipes:
   stone-to-iron:
     size: 3 # 3 <= size <= 6 (int)

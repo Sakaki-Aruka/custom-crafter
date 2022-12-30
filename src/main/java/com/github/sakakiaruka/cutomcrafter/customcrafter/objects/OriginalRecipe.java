@@ -31,6 +31,10 @@ public class OriginalRecipe {
         this.size = size;
     }
 
+    public String toString(){
+        return String.format("Name:%s | size:%d | recipeMaterial:%s | total:%d | result:%s",recipeName,size,rm.toString(),total,result.toString());
+    }
+
     public ItemStack getResult(){
         return result;
     }

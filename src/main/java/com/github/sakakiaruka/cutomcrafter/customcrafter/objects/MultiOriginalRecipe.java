@@ -15,6 +15,10 @@ public class MultiOriginalRecipe {
         this.remaining = remaining;
     }
 
+    public String toString(){
+        return String.format("amount:%d | OriginalRecipe:%s | remaining:%s",amount,originalRecipe.toString(),remaining);
+    }
+
     public int getAmount() {
         return amount;
     }
