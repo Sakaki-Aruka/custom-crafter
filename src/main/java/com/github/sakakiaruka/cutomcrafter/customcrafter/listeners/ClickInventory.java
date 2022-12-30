@@ -55,21 +55,6 @@ public class ClickInventory implements Listener {
                 }
 
                 ItemStack result;
-                //MultiOriginalRecipe mop;
-                /**if((mop = new Search().search(new InputToOriginalRecipe().main(inventory,size),player))!=null
-                        && !mop.getOriginalRecipe().getResult().getType().equals(Material.AIR)){
-                    //custom recipe found
-                    /**tableClear(inventory,size);
-                     * debug
-
-                    ItemStack resultItem = mop.getOriginalRecipe().getResult();
-                    //resultItem.setAmount(mop.getAmount());
-                    inventory.setItem(absSize-1-9*1,resultItem); // to set a crafted-item
-                    /**
-                     * for(Map.Entry<Integer,ItemStack> entry:mop.getRemaining().entrySet()){
-                     *                         inventory.setItem(entry.getKey(),entry.getValue());//set remaining items
-                     *                     }
-                     */
                 if(new Search().search(inventory,size)!=null){
                     //custom recipe item found
                     result = new Search().search(inventory,size);
