@@ -16,6 +16,7 @@ public class Search {
 
     public ItemStack search(Inventory inventory,int size){
         RecipeMaterial real = getRecipeMaterial(inventory,size);
+        if(real.isEmpty())return null;
         List<ItemStack> list = new ArrayList<>();
         for(OriginalRecipe recipe:recipes){
 

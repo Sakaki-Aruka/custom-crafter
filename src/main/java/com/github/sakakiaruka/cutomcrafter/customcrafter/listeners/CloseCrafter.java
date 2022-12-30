@@ -42,6 +42,9 @@ public class CloseCrafter implements Listener {
                     continue;
                 }
             }
+            if(inventory.getItem(44)!=null && !inventory.getItem(44).getType().equals(Material.AIR)){
+                player.getWorld().dropItem(player.getLocation(),inventory.getItem(44));
+            }
         }
     }
 }

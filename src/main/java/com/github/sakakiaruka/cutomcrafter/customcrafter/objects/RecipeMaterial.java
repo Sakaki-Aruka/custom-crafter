@@ -1,5 +1,6 @@
 package com.github.sakakiaruka.cutomcrafter.customcrafter.objects;
 
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
@@ -49,6 +50,15 @@ public class RecipeMaterial {
     public int getMapSize(){
         Map<MultiKeys,ItemStack> map = this.map;
         return map.size();
+    }
+
+    public boolean isEmpty(){
+        for (Map.Entry<MultiKeys,ItemStack> entry:map.entrySet()){
+            if(entry.getValue()!=null){
+                if(!entry.getValue().getType().equals(Material.AIR))return false;
+            }
+        }
+        return true;
     }
 
     public List<MultiKeys> getCoordinateList(){
