@@ -111,7 +111,13 @@ public class ClickInventory implements Listener {
                 }
                 inventory.setItem(slot,new ItemStack(Material.AIR));
                 return;
-            }else if(getTableSlots(size).contains(slot))return; // click crafting slots
+            }else if(getTableSlots(size).contains(slot)){
+                //click crafting table
+                if(inventory.getItem(44)!=null && !inventory.getItem(44).getType().equals(Material.AIR)){
+                    inventory.setItem(44,new ItemStack(Material.AIR));
+                }
+                return;
+            }
             event.setCancelled(true);
 
         }else if(slot >= absSize){

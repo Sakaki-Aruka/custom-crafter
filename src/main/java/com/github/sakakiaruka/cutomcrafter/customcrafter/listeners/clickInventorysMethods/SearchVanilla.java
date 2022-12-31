@@ -6,8 +6,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.util.*;
 
 public class SearchVanilla {
@@ -22,13 +20,8 @@ public class SearchVanilla {
         }
 
         for (int i : itemCoordinates) {
-            BigDecimal target = BigDecimal.valueOf(i);
-            BigDecimal ratio = BigDecimal.valueOf(9);
-            BigDecimal result = target.divide(ratio, 1, RoundingMode.FLOOR);
-            int integer = result.intValue();
-            int decimal = BigDecimal.valueOf(result.doubleValue()*10 - integer*10).intValue();
-            integerPart.add(integer);
-            decimalPart.add(decimal);
+            integerPart.add(i/9);
+            decimalPart.add(i%9);
         }
         if(integerPart.isEmpty())return null;
         Collections.sort(integerPart);
