@@ -1,7 +1,6 @@
 package com.github.sakakiaruka.cutomcrafter.customcrafter.listeners;
 
 import com.github.sakakiaruka.cutomcrafter.customcrafter.listeners.clickInventorysMethods.*;
-import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.MultiOriginalRecipe;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -12,16 +11,17 @@ import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BundleMeta;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static com.github.sakakiaruka.cutomcrafter.customcrafter.listeners.OpenCrafter.guiOpening;
 
 public class ClickInventory implements Listener {
     public static List<Player> isTransitionMode = new ArrayList<>();
+    public static final int bundleSlot = 34;
+    public static final int anvilSlot = 35;
+    public static final int resultSlot = 44;
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event){
         Player player = Bukkit.getPlayer(event.getWhoClicked().getUniqueId());
@@ -35,6 +35,13 @@ public class ClickInventory implements Listener {
         int slot = event.getRawSlot();
         int size = guiOpening.get(player);
         final int absSize = 54;
+
+
+        if(slot<0){
+            event.setCancelled(true);
+            return;
+        }
+
         if(slot < absSize){
             if(!event.getClick().equals(ClickType.LEFT)){
                 if(!event.getClick().equals(ClickType.RIGHT)){
@@ -44,12 +51,18 @@ public class ClickInventory implements Listener {
             }
 
             // click crafting-gui
-            if(slot == absSize-1-9*2){
+            if(slot == anvilSlot){
                 // click make button(anvil)
                 player.playSound(player, Sound.BLOCK_PISTON_EXTEND,1.0f,1.0f);
 
                 if(inventory.getItem(absSize-1-9)!=null){
                     // result slot is full.
+                    event.setCancelled(true);
+                    return;
+                }
+
+                if(event.getClick().equals(ClickType.RIGHT)){
+                    new BatchCreate().main(player,inventory,size);
                     event.setCancelled(true);
                     return;
                 }
@@ -62,59 +75,35 @@ public class ClickInventory implements Listener {
                     //vanilla item found
                     result = new SearchVanilla().isThreeSquared(inventory,size,player);
                 }
-                inventory.setItem(absSize-1-9*1,result);
-                if(inventory.getItem(44)!=null
-                && !inventory.getItem(44).equals(Material.AIR))
+                if(result==null){
+                    event.setCancelled(true);
+                    return;
+                }
+                if(!result.getType().equals(Material.AIR)){
+                    inventory.setItem(absSize-1-9*1,result);
                     new ItemsSubtract().main(inventory,size,1);
+                }
                 event.setCancelled(true);
                 return;
-            }else if(slot == 44){
+            }else if(slot == resultSlot){
                 //result slot
-                if(inventory.getItem(slot)!=null
-                        && !inventory.getItem(slot).getType().equals(Material.AIR)){
+                if(new ItemStackComparison().notEmpty(inventory.getItem(slot))){
                     ItemStack result = inventory.getItem(slot);
                     resultTake(player.getInventory(),result,player);
                     inventory.setItem(slot,new ItemStack(Material.AIR));
                     event.setCancelled(true);
                     return;
                 }
-            }else if((slot+1)%9==0 && slot < 3*9 && slot+1 > 0){
-                //crafting table size change (3*9 = 3lines * 9slots
-                Material mode;
-                if(inventory.getItem(slot)==null){
-                    event.setCancelled(true);
-                    return;
-                }
-                if((mode = inventory.getItem(slot).getType())==Material.AIR){
-                    event.setCancelled(true);
-                    return;
-                }
-                if(mode.equals(Material.NETHERITE_BLOCK)){
-                    close(6,size,inventory,player);
-                }else if(mode.equals(Material.DIAMOND_BLOCK)){
-                    close(5,size,inventory,player);
-                }else if(mode.equals(Material.EMERALD_BLOCK)){
-                    close(4,size,inventory,player);
-                }else if(mode.equals(Material.REDSTONE_BLOCK)){
-                    close(3,size,inventory,player);
-                }
-                return;
-            }else if(slot == absSize-2
-                    && inventory.getItem(slot).getType().equals(Material.BUNDLE)
-                    && event.getClick().equals(ClickType.RIGHT)){
-                ItemStack bundle = inventory.getItem(slot);
-                BundleMeta meta = (BundleMeta) bundle.getItemMeta();
-                List<ItemStack> bundleItems = meta.getItems();
-                for(ItemStack item:bundleItems){
-                    if(item==null || item.equals(Material.AIR))continue;
-                    player.getWorld().dropItem(player.getLocation(),item);
-                }
-                inventory.setItem(slot,new ItemStack(Material.AIR));
+            }
+            else if(new Transition().transitionCondition(slot,inventory.getItem(7),event.getClick())) {
+                //click overflow items
+                new Transition().dropItems(inventory.getItem(7),player);
+                inventory.setItem(7,new ItemStack(Material.BLACK_STAINED_GLASS_PANE));
                 return;
             }else if(getTableSlots(size).contains(slot)){
                 //click crafting table
-                if(inventory.getItem(44)!=null && !inventory.getItem(44).getType().equals(Material.AIR)){
-                    inventory.setItem(44,new ItemStack(Material.AIR));
+                if(new ItemStackComparison().notEmpty(inventory.getItem(resultSlot))){
+                    inventory.setItem(resultSlot,new ItemStack(Material.AIR));
                 }
                 return;
             }
@@ -146,12 +135,6 @@ public class ClickInventory implements Listener {
             }
         }
         return slots;
-    }
-
-    private void tableClear(Inventory inventory,int size){
-        for(int i:getTableSlots(size)){
-            inventory.clear(i);
-        }
     }
 
     private void resultTake(Inventory inventory,ItemStack item,Player player){

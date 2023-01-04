@@ -19,6 +19,7 @@ public class SettingsLoad {
     private static CustomCrafter cc;
     private static FileConfiguration config;
     public static List<OriginalRecipe> recipes = new ArrayList<>();
+    public static Material baseBlock;
 
     private Map<String,ItemStack> recipeResults = new HashMap<>();
     private Map<String,ItemStack> recipeMaterials = new HashMap<>();
@@ -28,6 +29,7 @@ public class SettingsLoad {
         getRecipeResults();
         getRecipeMaterials();
         getOriginalRecipeList();
+        getBaseBlockMaterial();
     }
 
     @Deprecated
@@ -113,6 +115,12 @@ public class SettingsLoad {
             OriginalRecipe originalRecipe = new OriginalRecipe(result,size,total,rp,name);
             recipes.add(originalRecipe);
         }
+    }
+
+    private void getBaseBlockMaterial(){
+        String s = config.getString("base").toUpperCase();
+        Material m = Material.getMaterial(s);
+        baseBlock = m;
     }
 
 }

@@ -1,7 +1,10 @@
 package com.github.sakakiaruka.cutomcrafter.customcrafter.listeners.clickInventorysMethods;
 
 import com.github.sakakiaruka.cutomcrafter.customcrafter.listeners.ClickInventory;
+import com.github.sakakiaruka.cutomcrafter.customcrafter.some.CreateInventory;
 import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BundleMeta;
@@ -10,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.github.sakakiaruka.cutomcrafter.customcrafter.listeners.ClickInventory.bundleSlot;
 import static com.github.sakakiaruka.cutomcrafter.customcrafter.some.CreateInventory.inv;
 
 public class Transition {
@@ -39,7 +43,7 @@ public class Transition {
             meta.setLore(Arrays.asList("An item container that overflowed."));
             meta.setItems(overflow);
             bundle.setItemMeta(meta);
-            inventory.setItem(newer*9-2,bundle);
+            inventory.setItem(bundleSlot,bundle);
 
         }
         stacks.forEach(s->normals.add(s));
@@ -54,5 +58,19 @@ public class Transition {
             }
         }
         return inventory;
+    }
+
+    public void dropItems(ItemStack bundle, Player player){
+        BundleMeta meta = (BundleMeta) bundle.getItemMeta();
+        for(ItemStack item:meta.getItems()){
+            player.getWorld().dropItem(player.getLocation(),item);
+        }
+    }
+
+    public boolean transitionCondition(int slot,ItemStack item, ClickType click){
+        if(slot!=7)return false;
+        if(!item.getType().equals(Material.BUNDLE))return false;
+        if(!click.equals(ClickType.RIGHT))return false;
+        return true;
     }
 }

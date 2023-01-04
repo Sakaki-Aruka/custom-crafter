@@ -84,4 +84,19 @@ public class RecipeMaterial {
         }
         return stacks;
     }
+
+    public RecipeMaterial recipeMaterialClone(){
+        RecipeMaterial child = new RecipeMaterial();
+        for(Map.Entry<MultiKeys,ItemStack> entry:map.entrySet()){
+            child.put(entry.getKey(),entry.getValue());
+        }
+        return child;
+    }
+
+    public void setAllAmount(int amount){
+        for(Map.Entry<MultiKeys,ItemStack> entry:map.entrySet()){
+            if(entry.getValue().getType()==Material.AIR)continue;
+            entry.getValue().setAmount(amount);
+        }
+    }
 }

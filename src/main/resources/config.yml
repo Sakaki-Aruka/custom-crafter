@@ -11,6 +11,8 @@
 # Do not name that the length less than 3.
 # Have to use sentences.
 ######
+base: gold_block
+
 result-items:
   - first
   - second

@@ -16,12 +16,13 @@ import java.util.Map;
 
 import static com.github.sakakiaruka.cutomcrafter.customcrafter.CustomCrafter.getInstance;
 import static com.github.sakakiaruka.cutomcrafter.customcrafter.some.CreateInventory.inv;
+import static com.github.sakakiaruka.cutomcrafter.customcrafter.some.SettingsLoad.baseBlock;
 
 public class OpenCrafter extends BukkitRunnable implements Listener{
     public static Map<Player,Integer> guiOpening = new HashMap<>();
     private static double degrees = 2*Math.PI / (360 / 45);
     private static double radius = 1;
-    private static Material baseBlock = Material.IRON_BLOCK;
+
     private static List<Player> closes = new ArrayList<>();
     private static Map<Player,Integer> map = new HashMap<>();
 
@@ -41,7 +42,7 @@ public class OpenCrafter extends BukkitRunnable implements Listener{
                 }
             }
 
-            int size = 3;
+            int size = 6;
             long delay = 3; // tick
             Player player = event.getPlayer();
             closes.add(player);

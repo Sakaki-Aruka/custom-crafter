@@ -8,6 +8,9 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
 
+import static com.github.sakakiaruka.cutomcrafter.customcrafter.listeners.ClickInventory.anvilSlot;
+import static com.github.sakakiaruka.cutomcrafter.customcrafter.listeners.ClickInventory.resultSlot;
+
 public class CreateInventory {
     public static Inventory inv(int size){
         Inventory result = Bukkit.createInventory(null,54,"CustomCrafter");
@@ -21,31 +24,8 @@ public class CreateInventory {
             }
         }
         CreateInventory ci = new CreateInventory();
-        Map<Integer,ItemStack> sizes = new HashMap<>();
-        sizes.put(3,ci.redstone());
-        sizes.put(4,ci.emerald());
-        sizes.put(5,ci.diamond());
-        sizes.put(6,ci.netherite());
-        sizes.remove(size); // remove slot that a player is opening
-        List<ItemStack> list = new ArrayList<>();
-        sizes.entrySet().forEach(s->list.add(s.getValue()));
-        list.add(ci.make());
-        list.add(new ItemStack(Material.AIR));
-
-        for(int i=1;i<=5;i++){
-            int slot = i*9-1; // i*9-1 = most right slot in each line.
-            ItemStack button = list.get(i-1);
-            result.setItem(slot,button);
-        }
-
-        /*
-        for(int i=size*9-4;i<size*9;i++){
-            int j = Math.abs(4-(size*9-i));
-            result.setItem(i,list.get(j));
-        }
-
-         */
-
+        result.setItem(anvilSlot,ci.make());
+        result.setItem(resultSlot,new ItemStack(Material.AIR));
         return result;
     }
 
@@ -68,21 +48,5 @@ public class CreateInventory {
 
     private ItemStack make(){
         return this.itemEdit("anvil",Arrays.asList("Making items"),"Make");
-    }
-
-    private ItemStack netherite(){
-        return this.itemEdit("netherite_block",Arrays.asList("6 * 6 Crafting"),"6");
-    }
-
-    private ItemStack diamond(){
-        return this.itemEdit("diamond_block",Arrays.asList("5 * 5 Crafting"),"5");
-    }
-
-    private ItemStack emerald(){
-        return this.itemEdit("emerald_block",Arrays.asList("4 * 4 Crafting"),"4");
-    }
-
-    private ItemStack redstone(){
-        return this.itemEdit("redstone_block",Arrays.asList("3 * 3 Crafting"),"3");
     }
 }

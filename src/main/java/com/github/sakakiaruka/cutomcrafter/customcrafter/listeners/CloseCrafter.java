@@ -22,8 +22,7 @@ public class CloseCrafter implements Listener {
             guiOpening.remove(player);
             Inventory inventory = event.getInventory();
             ItemStack in;
-            if(!(in = inventory.getItem(inventory.getSize()-2)).getType().equals(null)
-            && in.equals(Material.BUNDLE)){
+            if((in = inventory.getItem(7))!=null && in.equals(Material.BUNDLE)){
                 try{
                     BundleMeta bm = (BundleMeta) in.getItemMeta();
                     List<ItemStack> list = bm.getItems();
