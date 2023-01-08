@@ -1,0 +1,24 @@
+base ; カスタムクラフターを起動するために、作業台の下3*3の範囲に設置しなくてはいけないブロック名
+
+result-items ; result-item(カスタムレシピの完成品)名のリスト
+result-item;
+	material ; result-itemのマテリアル
+	amount ; result-itemの数
+
+	===(Option)===
+	lore ; result-itemの説明文のリスト
+	enchants ;result-itemに付与されているエンチャントのリスト(enchant-name,level の順で指定)
+	flags ; result-itemに付与されているItem-Flagのリスト
+
+recipe-material-list ; カスタムレシピで使用する素材名のリスト(Nullは名前として使用不可)
+
+recipe-materials ;
+	material ; 素材のマテリアル
+	amount ; 素材の数(推奨値=1)
+
+recipe-list ; カスタムレシピの名前のリスト
+
+recipes ;
+	size ; カスタムレシピの正方サイズ(3 <= size <= 6)
+	result ; カスタムレシピのresult-item(result-itemsに記載しているものに限る)
+	recipe ; レシピの配置 ("null" はアイテムがない状態を示す)
