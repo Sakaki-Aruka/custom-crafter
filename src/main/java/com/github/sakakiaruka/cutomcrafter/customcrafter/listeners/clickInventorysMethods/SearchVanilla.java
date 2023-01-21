@@ -1,5 +1,6 @@
 package com.github.sakakiaruka.cutomcrafter.customcrafter.listeners.clickInventorysMethods;
 
+import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.MultiKeys;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -36,10 +37,10 @@ public class SearchVanilla {
 
         if (xDistance >= 3 || yDistance >= 3) return null; //bigger distance
 
-        ItemStack[] items = new ItemStack[9];
-        List<ItemStack> itemsArr = new ArrayList<>();
+        ItemStack[] items;
+        /*List<ItemStack> itemsArr = new ArrayList<>();
 
-        for (int y = up; y < up+3 && y <size; y++) {
+        *//*for (int y = up; y < up+3 && y <size; y++) {
             for (int x = left; x < left+3 && x < size; x++) {
 
                 int rawSlot = x+y*9;
@@ -54,8 +55,11 @@ public class SearchVanilla {
         for (int i = 0; i < 9 && i<itemsArr.size(); i++) {
             items[i] = itemsArr.get(i);
         }
-        int leftRightDelta = Math.abs(left-right);
-        if(leftRightDelta < 2)items = remapping(items,leftRightDelta); //remapping
+
+        if(xDistance < 2 || yDistance < 2){
+            items = remapping(inventory,up,left); //remapping
+        }*/
+        items = remapping(inventory,up,left);
         ItemStack result = Bukkit.craftItem(items,player.getWorld(),player);
         return result;
     }
@@ -69,9 +73,7 @@ public class SearchVanilla {
         }
         return result;
     }
-
-
-    private ItemStack[] remapping(ItemStack[] list,int LRDistance){
+    /*private ItemStack[] remapping(ItemStack[] list,int LRDistance){
         ItemStack[] result = new ItemStack[9];
         List<ItemStack> items = new ArrayList<>(Arrays.asList(list));
         List<Integer> modifySlots = null;
@@ -85,4 +87,39 @@ public class SearchVanilla {
         }
         return result;
     }
+*/
+    private ItemStack[] remapping(Inventory inventory,int up,int left){
+        List<Integer> table = new ArrayList<>();
+
+        List<ItemStack> preResult = new ArrayList<>();
+        ItemStack[] result = new ItemStack[9];
+
+        for(int y=0;y<6;y++){
+            for(int x=0;x<6;x++){
+                table.add(y*9+x);
+            }
+        }
+
+        for(int y=up;y<(up+3);y++){
+            for(int x=left;x<(left+3);x++){
+                int coordinate = x+y*9;
+                if(!table.contains(coordinate)){
+                    preResult.add(new ItemStack(Material.AIR));
+                    continue;
+                }
+                if(inventory.getItem(coordinate)==null
+                || inventory.getItem(coordinate).getType().equals(Material.AIR)){
+                    preResult.add(new ItemStack(Material.AIR));
+                    continue;
+                }
+                preResult.add(inventory.getItem(coordinate));
+            }
+        }
+
+        for(int i=0;i<9;i++){
+            result[i] = preResult.get(i);
+        }
+        return result;
+    }
 }
+

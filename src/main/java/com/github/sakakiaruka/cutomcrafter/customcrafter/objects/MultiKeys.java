@@ -20,4 +20,10 @@ public class MultiKeys {
     public int getKey2(){
         return key2;
     }
+
+    public boolean same(MultiKeys target){
+        if(this.key1!=target.getKey1())return false;
+        if(this.key2!=target.getKey2())return false;
+        return true;
+    }
 }
