@@ -37,29 +37,7 @@ public class SearchVanilla {
 
         if (xDistance >= 3 || yDistance >= 3) return null; //bigger distance
 
-        ItemStack[] items;
-        /*List<ItemStack> itemsArr = new ArrayList<>();
-
-        *//*for (int y = up; y < up+3 && y <size; y++) {
-            for (int x = left; x < left+3 && x < size; x++) {
-
-                int rawSlot = x+y*9;
-                if (inventory.getItem(rawSlot) != null) {
-                    itemsArr.add(inventory.getItem(rawSlot));
-                    continue;
-                }
-                itemsArr.add(null);
-            }
-        }
-
-        for (int i = 0; i < 9 && i<itemsArr.size(); i++) {
-            items[i] = itemsArr.get(i);
-        }
-
-        if(xDistance < 2 || yDistance < 2){
-            items = remapping(inventory,up,left); //remapping
-        }*/
-        items = remapping(inventory,up,left);
+        ItemStack[] items = remapping(inventory,up,left);
         ItemStack result = Bukkit.craftItem(items,player.getWorld(),player);
         return result;
     }
@@ -73,21 +51,7 @@ public class SearchVanilla {
         }
         return result;
     }
-    /*private ItemStack[] remapping(ItemStack[] list,int LRDistance){
-        ItemStack[] result = new ItemStack[9];
-        List<ItemStack> items = new ArrayList<>(Arrays.asList(list));
-        List<Integer> modifySlots = null;
-        if(LRDistance==1)modifySlots = new ArrayList<>(Arrays.asList(2,5,8));
-        if(LRDistance==0)modifySlots = new ArrayList<>(Arrays.asList(1,2,4,5,7,8));
-        for(int i:modifySlots){
-            if(items.get(i)!=null)items.add(i,null);
-        }
-        for(int i=0;i<9;i++){
-            result[i] = items.get(i);
-        }
-        return result;
-    }
-*/
+
     private ItemStack[] remapping(Inventory inventory,int up,int left){
         List<Integer> table = new ArrayList<>();
 
