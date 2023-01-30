@@ -16,6 +16,8 @@ base: gold_block
 result-items:
   - first
   - second
+  - emerald
+  - big-torch
 result-item:
   first: # test section
     material: iron_block #need
@@ -34,12 +36,43 @@ result-item:
     flags:
       - hide_dye
 
+  emerald:
+    material: emerald
+    amount: 3
+    display-name: "This item is an emerald."
 
+  big-torch:
+    material: torch
+    amount: 10
+    display-name: "BIG_TORCH"
+
+
+
+material-category:
+  - test
+  - logs
+
+material-category-contents:
+  test:
+    - diamond_ore
+    - diamond
+
+  logs:
+    - oak_log
+    - spruce_log
+    - birch_log
+    - jungle_log
+    - dark_oak_log
+    - acacia_log
+    - crimson_stem
+    - warped_stem
 
 
 recipe-materials-list:
   - first
   - second
+  - third
+  - logs
 
 recipe-materials:
   first:
@@ -50,9 +83,19 @@ recipe-materials:
     material: stone
     amount: 1
 
+  third:
+    mixed-material: test
+    amount: 1
+
+  logs:
+    mixed-material: logs
+    amount: 1
+
 recipe-list:
   - stone-to-iron
   - iron-to-gold
+  - diamond-to-emerald
+  - big-torch
 recipes:
   stone-to-iron:
     size: 3 # 3 <= size <= 6 (int)
@@ -61,6 +104,7 @@ recipes:
       - second,second,second
       - second,null,second
       - second,second,second
+
   iron-to-gold:
     size: 4
     result: second
@@ -69,3 +113,19 @@ recipes:
       - null,null,null,first
       - first,first,null,null
       - null,null,first,first
+
+  diamond-to-emerald:
+    size: 3
+    result: emerald
+    recipe:
+      - null,third,null
+      - null,null,third
+      - third,third,third
+
+  big-torch:
+    size: 3
+    result : big-torch
+    recipe:
+      - first,first,first
+      - logs,logs,logs
+      - logs,logs,logs

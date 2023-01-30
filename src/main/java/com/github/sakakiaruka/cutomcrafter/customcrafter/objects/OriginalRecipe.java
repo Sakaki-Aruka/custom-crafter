@@ -32,7 +32,7 @@ public class OriginalRecipe {
     }
 
     public String toString(){
-        return String.format("Name:%s | size:%d | recipeMaterial:%s | total:%d | result:%s",recipeName,size,rm.toString(),total,result.toString());
+        return String.format("Name:%s | size:%d | recipeMaterial:%s | total:%d | result:%s",recipeName,size,rm.recipeMaterialInfo(),total,result.toString());
     }
 
     public ItemStack getResult(){

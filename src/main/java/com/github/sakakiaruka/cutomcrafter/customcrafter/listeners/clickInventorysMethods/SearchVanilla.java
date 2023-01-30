@@ -1,6 +1,5 @@
 package com.github.sakakiaruka.cutomcrafter.customcrafter.listeners.clickInventorysMethods;
 
-import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.MultiKeys;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;

@@ -1,5 +1,6 @@
 package com.github.sakakiaruka.cutomcrafter.customcrafter.listeners.clickInventorysMethods;
 
+import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.MixedMaterial;
 import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.MultiKeys;
 import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.OriginalRecipe;
 import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.RecipeMaterial;
@@ -9,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
+import static com.github.sakakiaruka.cutomcrafter.customcrafter.some.SettingsLoad.mixedCategories;
 import static com.github.sakakiaruka.cutomcrafter.customcrafter.some.SettingsLoad.recipes;
 
 public class Search {
@@ -22,22 +24,43 @@ public class Search {
 
             RecipeMaterial model = recipe.getRecipeMaterial();
 
-            //debug
-            System.out.println("===debug===");
-            System.out.println(String.format("[total] real:%d | model:%d",getTotal(real),getTotal(model)));
-            System.out.println(String.format("[Set] real:%s | model:%s",getMaterialSet(real),getMaterialSet(model)));
-            System.out.println(String.format("[Squire Size] real:%d | model:%d",getSquareSize(real),getSquareSize(model)));
-            System.out.println("[isCongruence] "+isCongruence(real,model));
+//            //debug
+//            System.out.println("===debug===");
+//            System.out.println(String.format("[total] real:%d | model:%d",getTotal(real),getTotal(model)));
+//            System.out.println(String.format("[Set] real:%s | model:%s",getMaterialSet(real),getMaterialSet(model)));
+//            System.out.println(String.format("[Squire Size] real:%d | model:%d",getSquareSize(real),getSquareSize(model)));
+//            System.out.println("[isCongruence] "+isCongruence(real,model));
 
-            if(getTotal(real)!=recipe.getTotal())continue;
-            if(!getMaterialSet(real).equals(getMaterialSet(model)))continue;
-            if(getSquareSize(real)!=getSquareSize(model))continue;
-            if(!isCongruence(real,model))continue;
-            list.add(recipe.getResult());
+            if(containsMixedMaterial(model)){
+
+                //debug
+                System.out.println("found MixedMaterialRecipe.");
+
+                if(getTotal(real)!=recipe.getTotal())continue;
+                if(getSquareSize(real)!=getSquareSize(model))continue;
+                if(!isMaterialSetCongruence(model,real))continue;
+
+                RecipeMaterial rewrittenRecipe = getRewrittenRecipeMaterial(model,real);
+
+                //debug
+                System.out.println("real rm : "+real.recipeMaterialInfo());
+                System.out.println("rewritten rm : "+rewrittenRecipe.recipeMaterialInfo());
+
+                if(!isCongruence(real,rewrittenRecipe))continue;
+                list.add(recipe.getResult());
+
+            }else{
+                if(getTotal(real)!=recipe.getTotal())continue;
+                if(!getMaterialSet(real).equals(getMaterialSet(model)))continue;
+                if(getSquareSize(real)!=getSquareSize(model))continue;
+                if(!isCongruence(real,model))continue;
+                list.add(recipe.getResult());
+            }
+
         }
 
-        //debug
-        System.out.println("custom-search results:"+list);
+//        //debug
+//        System.out.println("custom-search results:"+list);
 
         if(list.isEmpty())return null;
         return list.get(0);
@@ -179,4 +202,77 @@ public class Search {
         return Math.max(xDiff,yDiff)+1;
     }
 
+    // --- for MixedMaterial methods --- //
+    private boolean containsMixedMaterial(RecipeMaterial model){
+        for(Map.Entry<MultiKeys,ItemStack> entry: model.getRecipeMaterial().entrySet()){
+            if(entry.getValue() instanceof MixedMaterial)return true;
+        }
+        return false;
+    }
+
+    private boolean isMaterialSetCongruence(RecipeMaterial model,RecipeMaterial real){
+        List<ItemStack> modelList = getItemStackList(model);
+        List<ItemStack> realList = getItemStackList(real);
+
+        List<Integer> mixedPlace = getMixedPlace(modelList);
+
+        int trueCounter = 0;
+        for(int number : mixedPlace){
+            String stringKey = ((MixedMaterial)modelList.get(number)).getMaterialCategory();
+            List<Material> materials = mixedCategories.get(stringKey);
+            Material realMaterial = realList.get(number).getType();
+            for(Material material : materials){
+                if(material.equals(realMaterial)){
+                    trueCounter++;
+                    break;
+                }
+            }
+        }
+
+        return mixedPlace.size()==trueCounter;
+    }
+
+    private List<ItemStack> getItemStackList(RecipeMaterial in){
+        List<ItemStack> list = new ArrayList<>();
+        for(Map.Entry<MultiKeys,ItemStack> entry : in.getRecipeMaterial().entrySet()){
+            if(entry.getValue()==null)continue;
+            if(entry.getValue().getType().equals(Material.AIR))continue;
+            list.add(entry.getValue());
+        }
+        return list;
+    }
+
+    private List<Integer> getMixedPlace(List<ItemStack> in){
+        List<Integer> list = new ArrayList<>();
+        for(int i=0;i<in.size();i++){
+            if(!(in.get(i) instanceof MixedMaterial))continue;
+            list.add(i);
+        }
+        return list;
+    }
+
+    private RecipeMaterial getRewrittenRecipeMaterial(RecipeMaterial model,RecipeMaterial real){
+        RecipeMaterial recipeMaterial = new RecipeMaterial();
+        List<ItemStack> reals = getItemStackList(real);
+        for(Map.Entry<MultiKeys,ItemStack> entry : model.getRecipeMaterial().entrySet()){
+            if(entry.getValue()==null){
+                addAir(recipeMaterial,entry.getKey());
+                continue;
+            }
+            if(entry.getValue().getType().equals(Material.AIR)){
+                addAir(recipeMaterial,entry.getKey());
+                continue;
+            }
+
+            ItemStack item = reals.get(0);
+            reals.remove(0); //remove object at index 0.
+            MultiKeys key = entry.getKey();
+            recipeMaterial.put(key,item);
+        }
+        return recipeMaterial;
+    }
+
+    private void addAir(RecipeMaterial in,MultiKeys key){
+        in.put(key,new ItemStack(Material.AIR));
+    }
 }

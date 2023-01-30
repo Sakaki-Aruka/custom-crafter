@@ -1,6 +1,7 @@
 package com.github.sakakiaruka.cutomcrafter.customcrafter.some;
 
 import com.github.sakakiaruka.cutomcrafter.customcrafter.CustomCrafter;
+import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.MixedMaterial;
 import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.MultiKeys;
 import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.OriginalRecipe;
 import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.RecipeMaterial;
@@ -20,16 +21,19 @@ public class SettingsLoad {
     private static FileConfiguration config;
     public static List<OriginalRecipe> recipes = new ArrayList<>();
     public static Material baseBlock;
+    public static Map<String,List<Material>> mixedCategories = new HashMap<>();
 
     private Map<String,ItemStack> recipeResults = new HashMap<>();
     private Map<String,ItemStack> recipeMaterials = new HashMap<>();
     public void set(){
         cc = CustomCrafter.getInstance();
         config = cc.getConfig();
+        getCategories();
         getRecipeResults();
         getRecipeMaterials();
         getOriginalRecipeList();
         getBaseBlockMaterial();
+
     }
 
     @Deprecated
@@ -62,6 +66,11 @@ public class SettingsLoad {
                 }
             }
 
+            if(config.contains(path+"display-name")){
+                String displayName = config.getString(path+"display-name");
+                meta.setDisplayName(displayName);
+            }
+
             item.setItemMeta(meta);
             recipeResults.put(name,item);
         }
@@ -72,9 +81,21 @@ public class SettingsLoad {
         for(String s:materials){
             String name = s;
             String path = "recipe-materials."+name+".";
-            ItemStack item = new ItemStack(Material.valueOf(config.getString(path+"material").toUpperCase()));
-            item.setAmount(config.getInt(path+"amount"));
-            recipeMaterials.put(name,item);
+            try{
+                ItemStack item = new ItemStack(Material.valueOf(config.getString(path+"material").toUpperCase()));
+
+                item.setAmount(config.getInt(path+"amount"));
+                recipeMaterials.put(name,item);
+
+            }catch (Exception e){
+                String category = config.getString(  path+"mixed-material");
+                Material material = mixedCategories.get(category).get(0);
+
+                MixedMaterial item = new MixedMaterial(category,material,1);
+                item.setAmount(config.getInt(path+"amount"));
+                recipeMaterials.put(name,item);
+
+            }
         }
     }
 
@@ -121,6 +142,17 @@ public class SettingsLoad {
         String s = config.getString("base").toUpperCase();
         Material m = Material.getMaterial(s);
         baseBlock = m;
+    }
+
+    private void getCategories(){
+        List<String> categories = config.getStringList("material-category");
+        for(String s : categories){
+            String key = s;
+            List<Material> value = new ArrayList<>();
+            List<String> materials = config.getStringList("material-category-contents."+s);
+            materials.forEach(y->value.add(Material.getMaterial(y.toUpperCase())));
+            mixedCategories.put(key,value);
+        }
     }
 
 }

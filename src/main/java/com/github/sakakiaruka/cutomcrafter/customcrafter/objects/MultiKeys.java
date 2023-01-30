@@ -26,4 +26,9 @@ public class MultiKeys {
         if(this.key2!=target.getKey2())return false;
         return true;
     }
+
+    public MultiKeys copy(){
+        MultiKeys key = new MultiKeys(key1,key2);
+        return key;
+    }
 }

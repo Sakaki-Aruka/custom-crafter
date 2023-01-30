@@ -15,7 +15,7 @@ public class RecipeMaterial {
         }};
     }
 
-    public String toString(){
+    public String recipeMaterialInfo(){
         StringBuilder sb = new StringBuilder();
         map.entrySet().forEach(s->sb.append(String.format("key:%s | Item:%s\n",s.getKey().getKeys(),s.getValue())));
         return sb.toString();
@@ -42,8 +42,7 @@ public class RecipeMaterial {
         map.put(multiKeys,itemStack);
     }
 
-    public ItemStack getItemStack(RecipeMaterial rm,MultiKeys keys){
-        Map<MultiKeys,ItemStack> map = rm.getRecipeMaterial();
+    public ItemStack getItemStack(MultiKeys keys){
         return map.get(keys);
     }
 
@@ -70,20 +69,6 @@ public class RecipeMaterial {
         return keyList;
     }
 
-    public ItemStack[] formatVanilla(RecipeMaterial rm){
-        int size = 3;
-        ItemStack[] stacks = new ItemStack[9];
-        for(int i=0;i<size;i++){
-            for(int j=0;j<size;j++){
-                int x =i;
-                int y = j;
-                MultiKeys key = new MultiKeys(x,y);
-                ItemStack temporaryStack = rm.getItemStack(rm,key);
-                stacks[i+j] = temporaryStack;
-            }
-        }
-        return stacks;
-    }
 
     public RecipeMaterial recipeMaterialClone(){
         RecipeMaterial child = new RecipeMaterial();
@@ -98,5 +83,11 @@ public class RecipeMaterial {
             if(entry.getValue().getType()==Material.AIR)continue;
             entry.getValue().setAmount(amount);
         }
+    }
+
+    public List<MultiKeys> getMultiKeysList(){
+        List<MultiKeys> list = new ArrayList<>();
+        map.entrySet().forEach(s->list.add(s.getKey()));
+        return list;
     }
 }
