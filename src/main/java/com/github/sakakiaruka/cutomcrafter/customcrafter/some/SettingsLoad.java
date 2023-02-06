@@ -1,10 +1,7 @@
 package com.github.sakakiaruka.cutomcrafter.customcrafter.some;
 
 import com.github.sakakiaruka.cutomcrafter.customcrafter.CustomCrafter;
-import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.MixedMaterial;
-import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.MultiKeys;
-import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.OriginalRecipe;
-import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.RecipeMaterial;
+import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -185,10 +182,6 @@ public class SettingsLoad {
                 recipesAmount.put(top_amount,new ArrayList<>(Arrays.asList(original)));
             }
             // --- about amount end --- //
-
-            //debug
-            System.out.println(original.getRecipeName());
-
         }
     }
 
