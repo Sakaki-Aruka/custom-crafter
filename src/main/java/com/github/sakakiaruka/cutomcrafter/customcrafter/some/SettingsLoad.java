@@ -23,6 +23,9 @@ public class SettingsLoad {
     public static Material baseBlock;
     public static Map<String,List<Material>> mixedCategories = new HashMap<>();
 
+    public static Map<Material,List<OriginalRecipe>> recipesMaterial = new HashMap<>();
+    public static Map<Integer,List<OriginalRecipe>> recipesAmount = new HashMap<>();
+
     private Map<String,ItemStack> recipeResults = new HashMap<>();
     private Map<String,ItemStack> recipeMaterials = new HashMap<>();
     public void set(){
@@ -32,6 +35,7 @@ public class SettingsLoad {
         getRecipeResults();
         getRecipeMaterials();
         getOriginalRecipeList();
+        originalRecipesSort();
         getBaseBlockMaterial();
 
     }
@@ -152,6 +156,39 @@ public class SettingsLoad {
             List<String> materials = config.getStringList("material-category-contents."+s);
             materials.forEach(y->value.add(Material.getMaterial(y.toUpperCase())));
             mixedCategories.put(key,value);
+        }
+    }
+
+    private void originalRecipesSort(){
+        for(OriginalRecipe original : recipes){
+            RecipeMaterial rm = original.getRecipeMaterial();
+            int top_amount = rm.getLargestAmount();
+            Material top_material = rm.getLargestMaterial();
+
+            // --- about material --- //
+            if(recipesMaterial.containsKey(top_material)){
+                List<OriginalRecipe> originals = recipesMaterial.get(top_material);
+                originals.add(original);
+                recipesMaterial.put(top_material,originals);
+            }else{
+                recipesMaterial.put(top_material,new ArrayList<>(Arrays.asList(original)));
+            }
+
+            // --- about material end --- //
+
+            // --- about amount --- //
+            if(recipesAmount.containsKey(top_amount)){
+                List<OriginalRecipe> originals = recipesAmount.get(top_amount);
+                originals.add(original);
+                recipesAmount.put(top_amount,originals);
+            }else{
+                recipesAmount.put(top_amount,new ArrayList<>(Arrays.asList(original)));
+            }
+            // --- about amount end --- //
+
+            //debug
+            System.out.println(original.getRecipeName());
+
         }
     }
 

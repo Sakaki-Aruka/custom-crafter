@@ -118,6 +118,44 @@ public class RecipeMaterial {
         return copied;
     }
 
+    public Material getLargestMaterial(){
+        Map<Material,Integer> relation = new HashMap<>();
+        for(Map.Entry<MultiKeys,ItemStack> entry:map.entrySet()){
+            Material m = entry.getValue().getType();
+            int i = entry.getValue().getAmount();
+            if(m.equals(Material.AIR))continue;
+            if(relation.containsKey(m)){
+                relation.put(m,relation.get(m)+i);
+            }else{
+                relation.put(m,i);
+            }
+        }
 
+        Material material = Material.AIR;
+        int integer = 0;
+        for(Map.Entry<Material,Integer> entry:relation.entrySet()){
+            if(entry.getValue() > integer){
+                integer = entry.getValue();
+                material = entry.getKey();
+            }else if(entry.getValue() == integer){
+                ArrayList<String> temp = new ArrayList<>(Arrays.asList(material.name(),entry.getKey().name()));
+                Collections.sort(temp);
+                material = Material.valueOf(temp.get(0));
+                integer = relation.get(material);
+            }
+        }
+        return material;
+    }
+
+    public int getLargestAmount(){
+        RecipeMaterial rm = new RecipeMaterial(map);
+        Material largest = rm.getLargestMaterial();
+        int result = 0;
+        for(Map.Entry<MultiKeys,ItemStack> entry: map.entrySet()){
+            if(!entry.getValue().getType().equals(largest))continue;
+            result += entry.getValue().getAmount();
+        }
+        return result;
+    }
 
 }

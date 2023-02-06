@@ -31,7 +31,7 @@ public class OriginalRecipe {
         this.size = size;
     }
 
-    public String toString(){
+    public String info(){
         return String.format("Name:%s | size:%d | recipeMaterial:%s | total:%d | result:%s",recipeName,size,rm.recipeMaterialInfo(),total,result.toString());
     }
 

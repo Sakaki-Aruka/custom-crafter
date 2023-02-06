@@ -10,8 +10,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
-import static com.github.sakakiaruka.cutomcrafter.customcrafter.some.SettingsLoad.mixedCategories;
-import static com.github.sakakiaruka.cutomcrafter.customcrafter.some.SettingsLoad.recipes;
+import static com.github.sakakiaruka.cutomcrafter.customcrafter.some.SettingsLoad.*;
 
 public class Search {
     public List<ItemStack> search(Inventory inventory,int size){
@@ -19,7 +18,25 @@ public class Search {
         if(real.isEmpty())return null;
         List<ItemStack> list = new ArrayList<>();
 
-        for(OriginalRecipe original:recipes){
+        Set<OriginalRecipe> originals = new HashSet<>();
+        Material top_material = real.getLargestMaterial();
+        int top_amount = real.getLargestAmount();
+
+        if(recipesMaterial.get(top_material) == null
+        && recipesAmount.get(top_amount) == null)return null;
+
+        if(recipesMaterial.get(top_material) != null)recipesMaterial.get(top_material).forEach(s->originals.add(s)); // material
+        if(recipesAmount.get(top_amount) != null)recipesAmount.get(top_amount).forEach(s->originals.add(s)); // amount
+        if(originals.isEmpty())return null;
+
+        //debug
+        System.out.println("original amount:"+originals.size());
+        for(OriginalRecipe o:originals){
+            System.out.println("original name:"+o.getRecipeName());
+        }
+
+
+        for(OriginalRecipe original:originals){
             RecipeMaterial model = original.getRecipeMaterial();
 
             if(getTotal(model) != getTotal(real))continue;
