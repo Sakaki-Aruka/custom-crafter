@@ -68,9 +68,11 @@ public class ClickInventory implements Listener {
                 }
 
                 ItemStack result;
+                //debug
                 if(new Search().search(inventory,size)!=null){
                     //custom recipe item found
-                    result = new Search().search(inventory,size);
+                    //debug
+                    result = new Search().search(inventory,size).get(0);
                 }else{
                     //vanilla item found
                     result = new SearchVanilla().isThreeSquared(inventory,size,player);

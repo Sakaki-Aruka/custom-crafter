@@ -14,176 +14,57 @@ import static com.github.sakakiaruka.cutomcrafter.customcrafter.some.SettingsLoa
 import static com.github.sakakiaruka.cutomcrafter.customcrafter.some.SettingsLoad.recipes;
 
 public class Search {
-
-
-    public ItemStack search(Inventory inventory,int size){
-        RecipeMaterial real = getRecipeMaterial(inventory,size);
+    public List<ItemStack> search(Inventory inventory,int size){
+        RecipeMaterial real = toRecipeMaterial(inventory,size);
         if(real.isEmpty())return null;
         List<ItemStack> list = new ArrayList<>();
-        for(OriginalRecipe recipe:recipes){
 
-            RecipeMaterial model = recipe.getRecipeMaterial();
+        for(OriginalRecipe original:recipes){
+            RecipeMaterial model = original.getRecipeMaterial();
 
-//            //debug
-//            System.out.println("===debug===");
-//            System.out.println(String.format("[total] real:%d | model:%d",getTotal(real),getTotal(model)));
-//            System.out.println(String.format("[Set] real:%s | model:%s",getMaterialSet(real),getMaterialSet(model)));
-//            System.out.println(String.format("[Squire Size] real:%d | model:%d",getSquareSize(real),getSquareSize(model)));
-//            System.out.println("[isCongruence] "+isCongruence(real,model));
+            if(getTotal(model) != getTotal(real))continue;
+            if(getSquareSize(model) != getSquareSize(real))continue;
 
             if(containsMixedMaterial(model)){
+                // MixedMaterial
 
-                //debug
-                System.out.println("found MixedMaterialRecipe.");
-
-                if(getTotal(real)!=recipe.getTotal())continue;
-                if(getSquareSize(real)!=getSquareSize(model))continue;
+                if(!isSameFigure(model,real))continue;
                 if(!isMaterialSetCongruence(model,real))continue;
-
-                RecipeMaterial rewrittenRecipe = getRewrittenRecipeMaterial(model,real);
-
-                //debug
-                System.out.println("real rm : "+real.recipeMaterialInfo());
-                System.out.println("rewritten rm : "+rewrittenRecipe.recipeMaterialInfo());
-
-                if(!isCongruence(real,rewrittenRecipe))continue;
-                list.add(recipe.getResult());
+                RecipeMaterial confirmed;
+                if(model.getMapSize() != real.getMapSize()){
+                    confirmed = getDownSizedRecipeMaterial(real,getSquareSize(model));
+                }else{
+                    confirmed = real.copy();
+                }
+                if(!isSameMultiKey(model.getMultiKeysList(),confirmed.getMultiKeysList()))continue;
+                list.add(original.getResult());
 
             }else{
-                if(getTotal(real)!=recipe.getTotal())continue;
-                if(!getMaterialSet(real).equals(getMaterialSet(model)))continue;
-                if(getSquareSize(real)!=getSquareSize(model))continue;
-                if(!isCongruence(real,model))continue;
-                list.add(recipe.getResult());
+                // Normal Recipe
+                if(!getMaterialSet(model).equals(getMaterialSet(real)))continue;
+                if(!isCongruence(model,real))continue;
+                list.add(original.getResult());
             }
-
         }
-
-//        //debug
-//        System.out.println("custom-search results:"+list);
 
         if(list.isEmpty())return null;
-        return list.get(0);
-    }
-
-    private RecipeMaterial getRecipeMaterial(Inventory inventory,int size){
-        Map<Integer,MultiKeys> relation = new HashMap<>();
-        List<Integer> tables = new ArrayList<>();
-        for(int y=0;y<size;y++){
-            for(int x=0;x<size;x++){
-                relation.put(x+y*9,new MultiKeys(x,y));
-                tables.add(x+y*9);
-            }
-        }
-        RecipeMaterial rm = new RecipeMaterial();
-        for(int i:tables){
-            ItemStack item;
-            if(inventory.getItem(i)==null){
-                item=new ItemStack(Material.AIR);
-            }else{
-                item=inventory.getItem(i);
-                if(item.getAmount()<1)item.setAmount(1);
-            }
-            rm.put(relation.get(i),item);
-        }
-        return rm;
-    }
-
-    private RecipeMaterial remapping(RecipeMaterial recipeMaterial,int size){
-        RecipeMaterial result = new RecipeMaterial();
-
-        MultiKeys first=null;
-        for(Map.Entry<MultiKeys,ItemStack> entry:recipeMaterial.getRecipeMaterial().entrySet()){
-            if(entry.getValue()==null)continue;
-            if(entry.getValue().getType().equals(Material.AIR))continue;
-            first = entry.getKey();
-            break;
-        }
-        if(first==null)return recipeMaterial;
-        int xTop = first.getKey1();
-        int yTop = first.getKey2();
-        int xUnder = xTop+size;
-        int yUnder = yTop+size;
-        for(int y=yTop;y<yUnder;y++){
-            for(int x=xTop;x<xUnder;x++){
-                ItemStack item;
-                MultiKeys key = new MultiKeys(x,y);
-                if(recipeMaterial.getRecipeMaterial().get(key)==null){
-                    item = new ItemStack(Material.AIR);
-                }else{
-                    item = recipeMaterial.getRecipeMaterial().get(key);
-                }
-                result.put(key,item);
-            }
-        }
-        return result;
-    }
-
-    private boolean isCongruence(RecipeMaterial real,RecipeMaterial model){
-        List<MultiKeys> realList = toSortedList(real);
-        List<MultiKeys> modelList = toSortedList(model);
-        if(realList.size()!= modelList.size()){
-            int size = getSquareSize(model);
-            realList = toSortedList(remapping(real,size));
-        }
-
-        if(realList.size()!=modelList.size())return false;
-
-        int key1Diff = Math.abs(realList.get(0).getKey1() - modelList.get(0).getKey1());
-        int key2Diff = Math.abs(realList.get(0).getKey2() - modelList.get(0).getKey2());
-        for(int i=1;i<realList.size();i++){
-            //not match
-            if(key1Diff != Math.abs(realList.get(i).getKey1() - modelList.get(i).getKey1()))return false;
-            if(key2Diff != Math.abs(realList.get(i).getKey2() - modelList.get(i).getKey2()))return false;
-
-        }
-
-        return true;
-    }
-
-
-    private List<MultiKeys> toSortedList(RecipeMaterial in){
-        List<MultiKeys> list = new ArrayList<>();
-        in.getRecipeMaterial().entrySet().forEach(s->list.add(s.getKey()));
-
-        HashMap<Integer,List<MultiKeys>> map = new HashMap<>();
-        for(int i=0;i<list.size();i++){
-            List<MultiKeys> int1_List = new ArrayList<>();
-            for(int j=0;j<list.size();j++){
-                if(list.get(i).getKey1()==i)int1_List.add(list.get(i));
-            }
-            map.put(i,int1_List);
-        }
-
-        List<Integer> shuffle = new ArrayList<>();
-        map.keySet().forEach(s->shuffle.add(s));
-        Collections.sort(shuffle);
-
         return list;
     }
 
+    // --- common processes --- //
     private int getTotal(RecipeMaterial in){
-        int result = 0;
-        for(Map.Entry<MultiKeys,ItemStack> entry:in.getRecipeMaterial().entrySet()){
-            if(entry.getValue()==null)continue;
-            if(entry.getValue().getType().equals(Material.AIR))continue;
-            int amount = entry.getValue().getAmount();
-            if(amount>1)amount=1;
-            result += amount;
+        int total = 0;
+        for(ItemStack item : in.getItemStackListNoAir()){
+            total += item.getAmount();
         }
-        return result;
+        return total;
     }
 
-    private Set<Material> getMaterialSet(RecipeMaterial in){
-        Set<Material> set = new HashSet<>();
-        for(Map.Entry<MultiKeys,ItemStack> entry:in.getRecipeMaterial().entrySet()){
-            if(entry.getValue()==null)continue;
-            if(entry.getValue().getType().equals(Material.AIR))continue;
-            set.add(entry.getValue().getType());
-        }
+    private Set<ItemStack> getMaterialSet(RecipeMaterial in){
+        Set<ItemStack> set = new HashSet<>();
+        in.getItemStackListNoAir().forEach(s->set.add(s));
         return set;
     }
-
 
     private int getSquareSize(RecipeMaterial in){
         List<Integer> x = new ArrayList<>();
@@ -194,52 +75,144 @@ public class Search {
             x.add(entry.getKey().getKey1());
             y.add(entry.getKey().getKey2());
         }
+
         Collections.sort(x);
         Collections.sort(y);
-
-        int xDiff = Math.abs(x.get(0)-x.get(x.size()-1));
-        int yDiff = Math.abs(y.get(0)-y.get(y.size()-1));
-        return Math.max(xDiff,yDiff)+1;
+        int width = Math.abs(x.get(0) - x.get(x.size()-1));
+        int length = Math.abs(y.get(0) - y.get(y.size()-1));
+        return Math.max(width,length);
     }
 
-    // --- for MixedMaterial methods --- //
+    private boolean isCongruence(RecipeMaterial model,RecipeMaterial real){
+        RecipeMaterial confirmed;
+        if(model.getMapSize() != real.getMapSize()){
+            confirmed = getDownSizedRecipeMaterial(real,getSquareSize(model));
+        }else{
+            confirmed = real.copy();
+        }
+
+        List<ItemStack> models = model.getItemStackList();
+        List<ItemStack> reals = confirmed.getItemStackList();
+
+        if(models.size() != reals.size())return false;
+
+        for(int i=0;i<models.size();i++){
+            if(!models.get(i).equals(reals.get(i)))return false;
+        }
+        return true;
+    }
+
+    // --- common processes end --- //
+
+    private RecipeMaterial getDownSizedRecipeMaterial(RecipeMaterial in,int size){
+        RecipeMaterial recipeMaterial = new RecipeMaterial();
+        List<MultiKeys> keys = in.getMultiKeysList();
+
+        MultiKeys top = null;
+        for(MultiKeys m : keys){
+            if(in.getItemStack(m).getType().equals(Material.AIR))continue;
+            top = m;
+            break;
+        }
+
+        int x_top = top.getKey1();
+        int y_top = top.getKey2();
+
+        for(int y=0;y<=size;y++){
+            for(int x=0;x<=size;x++){
+                MultiKeys pullKey = new MultiKeys((x+x_top),(y+y_top));
+
+                ItemStack item = in.getItemStack(pullKey);
+                MultiKeys key = new MultiKeys(x,y);
+                recipeMaterial.put(key,item);
+            }
+        }
+
+        return recipeMaterial;
+    }
+
     private boolean containsMixedMaterial(RecipeMaterial model){
-        for(Map.Entry<MultiKeys,ItemStack> entry: model.getRecipeMaterial().entrySet()){
-            if(entry.getValue() instanceof MixedMaterial)return true;
+        for(Map.Entry<MultiKeys,ItemStack> entry : model.getRecipeMaterial().entrySet()){
+            if(entry.getValue() instanceof MixedMaterial) return true;
         }
         return false;
     }
 
+    private RecipeMaterial toRecipeMaterial(Inventory inventory,int size){
+        RecipeMaterial recipeMaterial = new RecipeMaterial();
+        for(int y=0;y<size;y++){
+            for(int x=0;x<size;x++){
+                MultiKeys key = new MultiKeys(x,y);
+                ItemStack item;
+                int slot = x+y*9;
+                if(inventory.getItem(slot)==null){
+                    item = new ItemStack(Material.AIR);
+                }else if(inventory.getItem(slot).getType().equals(Material.AIR)){
+                    item = new ItemStack(Material.AIR);
+                }else{
+                    item = inventory.getItem(slot);
+                }
+
+                recipeMaterial.put(key,item);
+            }
+        }
+        return recipeMaterial;
+    }
+
+    // --- for MixedMaterial methods --- //
+
+    private boolean isSameFigure(RecipeMaterial model,RecipeMaterial real){
+        List<MultiKeys> models = removeAir(model, model.getMultiKeysList());
+        List<MultiKeys> reals = removeAir(real,real.getMultiKeysList());
+
+        if(models.size() != reals.size())return false;
+
+        int x_gap = Math.abs(models.get(0).getKey1() - reals.get(0).getKey1());
+        int y_gap = Math.abs(models.get(0).getKey2() - reals.get(0).getKey2());
+        for(int i=0;i<models.size();i++){
+            int horizontalGap = Math.abs(models.get(i).getKey1() - reals.get(i).getKey1());
+            int verticalGap = Math.abs(models.get(i).getKey2() - reals.get(i).getKey2());
+            if(horizontalGap != x_gap)return false;
+            if(verticalGap != y_gap)return false;
+        }
+        return true;
+    }
+
+    private List<MultiKeys> removeAir(RecipeMaterial recipeMaterial,List<MultiKeys> keys){
+        List<MultiKeys> result = new ArrayList<>();
+        for(MultiKeys key:keys) {
+            if (recipeMaterial.getItemStack(key) == null)continue;
+            if(recipeMaterial.getItemStack(key).getType().equals(Material.AIR))continue;
+            result.add(key);
+        }
+        return result;
+    }
+
     private boolean isMaterialSetCongruence(RecipeMaterial model,RecipeMaterial real){
-        List<ItemStack> modelList = getItemStackList(model);
-        List<ItemStack> realList = getItemStackList(real);
-
+        List<ItemStack> modelList = model.getItemStackListNoAir();
+        List<ItemStack> realList = real.getItemStackListNoAir();
         List<Integer> mixedPlace = getMixedPlace(modelList);
+        List<Integer> normalPlace = getNormalPlace(modelList);
 
-        int trueCounter = 0;
-        for(int number : mixedPlace){
+        for(int number:normalPlace){
+            ItemStack modelItem = modelList.get(number);
+            ItemStack realItem = realList.get(number);
+            if(!modelItem.equals(realItem))return false;
+        }
+
+        int match = 0;
+        for(int number:mixedPlace){
             String stringKey = ((MixedMaterial)modelList.get(number)).getMaterialCategory();
             List<Material> materials = mixedCategories.get(stringKey);
             Material realMaterial = realList.get(number).getType();
-            for(Material material : materials){
+            for(Material material:materials){
                 if(material.equals(realMaterial)){
-                    trueCounter++;
+                    match++;
                     break;
                 }
             }
         }
-
-        return mixedPlace.size()==trueCounter;
-    }
-
-    private List<ItemStack> getItemStackList(RecipeMaterial in){
-        List<ItemStack> list = new ArrayList<>();
-        for(Map.Entry<MultiKeys,ItemStack> entry : in.getRecipeMaterial().entrySet()){
-            if(entry.getValue()==null)continue;
-            if(entry.getValue().getType().equals(Material.AIR))continue;
-            list.add(entry.getValue());
-        }
-        return list;
+        return mixedPlace.size()==match;
     }
 
     private List<Integer> getMixedPlace(List<ItemStack> in){
@@ -251,28 +224,22 @@ public class Search {
         return list;
     }
 
-    private RecipeMaterial getRewrittenRecipeMaterial(RecipeMaterial model,RecipeMaterial real){
-        RecipeMaterial recipeMaterial = new RecipeMaterial();
-        List<ItemStack> reals = getItemStackList(real);
-        for(Map.Entry<MultiKeys,ItemStack> entry : model.getRecipeMaterial().entrySet()){
-            if(entry.getValue()==null){
-                addAir(recipeMaterial,entry.getKey());
-                continue;
-            }
-            if(entry.getValue().getType().equals(Material.AIR)){
-                addAir(recipeMaterial,entry.getKey());
-                continue;
-            }
-
-            ItemStack item = reals.get(0);
-            reals.remove(0); //remove object at index 0.
-            MultiKeys key = entry.getKey();
-            recipeMaterial.put(key,item);
+    private List<Integer> getNormalPlace(List<ItemStack> in){
+        List<Integer> list = new ArrayList<>();
+        for(int i=0;i<in.size();i++){
+            if(in.get(i) instanceof MixedMaterial) continue;
+            list.add(i);
         }
-        return recipeMaterial;
+        return list;
     }
 
-    private void addAir(RecipeMaterial in,MultiKeys key){
-        in.put(key,new ItemStack(Material.AIR));
+    private boolean isSameMultiKey(List<MultiKeys> model,List<MultiKeys> confirmed){
+        if(model.size() != confirmed.size())return false;
+        for(int i=0;i<model.size();i++){
+            MultiKeys modelKey = model.get(i);
+            MultiKeys confirmedKey = confirmed.get(i);
+            if(!modelKey.same(confirmedKey))return false;
+        }
+        return true;
     }
 }

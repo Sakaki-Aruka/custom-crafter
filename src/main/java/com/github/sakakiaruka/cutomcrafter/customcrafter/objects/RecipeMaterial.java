@@ -1,6 +1,7 @@
 package com.github.sakakiaruka.cutomcrafter.customcrafter.objects;
 
 import org.bukkit.Material;
+import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
@@ -43,7 +44,10 @@ public class RecipeMaterial {
     }
 
     public ItemStack getItemStack(MultiKeys keys){
-        return map.get(keys);
+        for(Map.Entry<MultiKeys,ItemStack> entry: map.entrySet()){
+            if(entry.getKey().same(keys))return entry.getValue();
+        }
+        return new ItemStack(Material.AIR);
     }
 
     public int getMapSize(){
@@ -60,14 +64,6 @@ public class RecipeMaterial {
         return true;
     }
 
-    public List<MultiKeys> getCoordinateList(){
-        Map<MultiKeys,ItemStack> map = this.map;
-        List<MultiKeys> keyList = new ArrayList<>();
-        for(Map.Entry<MultiKeys,ItemStack> entry:map.entrySet()){
-            keyList.add(entry.getKey());
-        }
-        return keyList;
-    }
 
 
     public RecipeMaterial recipeMaterialClone(){
@@ -90,4 +86,38 @@ public class RecipeMaterial {
         map.entrySet().forEach(s->list.add(s.getKey()));
         return list;
     }
+
+    public List<ItemStack> getItemStackListNoAir(){
+        // the list that returns does not contain AIR and null
+        List<ItemStack> list = new ArrayList<>();
+        for(Map.Entry<MultiKeys,ItemStack> entry: map.entrySet()){
+            if(entry.getValue()==null)continue;
+            if(entry.getValue().getType().equals(Material.AIR))continue;
+            list.add(entry.getValue());
+        }
+        return list;
+    }
+
+    public List<ItemStack> getItemStackList(){
+        // the list that returns that contains AIR
+        List<ItemStack> list = new ArrayList<>();
+        for(Map.Entry<MultiKeys, ItemStack> entry:map.entrySet()){
+            ItemStack item;
+            if(entry.getValue()==null){
+                item = new ItemStack(Material.AIR);
+            }else{
+                item = entry.getValue();
+            }
+            list.add(item);
+        }
+        return list;
+    }
+
+    public RecipeMaterial copy(){
+        RecipeMaterial copied = new RecipeMaterial(map);
+        return copied;
+    }
+
+
+
 }

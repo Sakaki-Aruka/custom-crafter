@@ -1,5 +1,7 @@
 package com.github.sakakiaruka.cutomcrafter.customcrafter.objects;
 
+import java.util.List;
+
 public class MultiKeys {
 
     private int key1;
@@ -31,4 +33,5 @@ public class MultiKeys {
         MultiKeys key = new MultiKeys(key1,key2);
         return key;
     }
+
 }
