@@ -97,6 +97,7 @@ recipe-list:
   - iron-to-gold
   - diamond-to-emerald
   - big-torch
+  - peculiar
 
 recipes:
   stone-to-iron:
@@ -132,20 +133,19 @@ recipes:
       - logs,logs,logs
       - logs,logs,logs
 
+  peculiar:
+    size: 3
+    result: emerald
+    recipe:
+      - null,null,null
+      - null,first,null
+      - null,first,null
+
 peculiar-list:
   - test-pec
 
 peculiar-recipes:
   test-pec:
-    regexUse: true
-    returnableUse: true
-    amorphousUse: true
-    requireRegex: ".{1-10}_ingot"
+    requireRegex: ".{1-10}"
     resultRegex: "{regex0}_pickaxe"
-    returnItems:
-      - first  #in result-items
-    enumType: neighbor
-    amorphous:
-      result: emerald  #in result-items
-      items:
-        - first,10  #in recipe-materials-list
+    recipeMaterial: peculiar

@@ -19,13 +19,14 @@ public class SettingsLoad {
     public static List<OriginalRecipe> recipes = new ArrayList<>();
     public static Material baseBlock;
     public static Map<String,List<Material>> mixedCategories = new HashMap<>();
-    public static List<PeculiarRecipeMaterial> peculiarRecipeMaterialList = new ArrayList<>();
 
     public static Map<Material,List<OriginalRecipe>> recipesMaterial = new HashMap<>();
     public static Map<Integer,List<OriginalRecipe>> recipesAmount = new HashMap<>();
+    public static List<Peculiar> peculiarList = new ArrayList<>();
 
     private Map<String,ItemStack> recipeResults = new HashMap<>();
     private Map<String,ItemStack> recipeMaterials = new HashMap<>();
+    private Map<String,OriginalRecipe> nameAndOriginalRecipe = new HashMap<>();
     public void set(){
         cc = CustomCrafter.getInstance();
         config = cc.getConfig();
@@ -35,8 +36,7 @@ public class SettingsLoad {
         getOriginalRecipeList();
         originalRecipesSort();
         getBaseBlockMaterial();
-        getPeculiarRecipes();
-
+        getPeculiarRecipe();
     }
 
     @Deprecated
@@ -138,6 +138,7 @@ public class SettingsLoad {
             }
             OriginalRecipe originalRecipe = new OriginalRecipe(result,size,total,rp,name);
             recipes.add(originalRecipe);
+            nameAndOriginalRecipe.put(originalRecipe.getRecipeName(),originalRecipe);
         }
     }
 
@@ -187,50 +188,15 @@ public class SettingsLoad {
         }
     }
 
-    private void getPeculiarRecipes(){
-        List<String> peculiarList = config.getStringList("peculiar-list");
-        for(String s:peculiarList){
-            String path = "peculiar-recipes."+s+".";
-            boolean regexUse = config.getBoolean(path+"regexUse");
-            boolean returnableUse = config.getBoolean(path+"returnableUse");
-            boolean amorphousUse = config.getBoolean(path+"returnableUse");
-
-            String requireRegex = null;
-            String resultRegex = null;
-            List<ItemStack> returnItems = null;
-            AmorphousRecipe amorphous = null;
-
-            if(regexUse){
-                //regex parameter collect
-                requireRegex = config.getString(path+"requireRegex");
-                resultRegex = config.getString(path+"resultRegex");
-            }
-
-            if(returnableUse){
-                //return items collect
-                List<String> list = config.getStringList(path+"returnItems");
-                returnItems = new ArrayList<>();
-                for(String str:list){
-                    returnItems.add(recipeResults.get(str));
-                }
-            }
-
-            if(amorphousUse){
-                //amorphous recipe make
-                AmorphousEnum enumType = AmorphousEnum.valueOf(config.getString(path+"enumType").toUpperCase());
-                Map<ItemStack,Integer> map = new HashMap<>();
-                List<String> list = config.getStringList(path+"amorphous.items");
-                for(String str:list){
-                    List<String> itemAndAmount = new ArrayList<>(Arrays.asList(str.split(",")));
-                    ItemStack item = recipeMaterials.get(itemAndAmount.get(0));
-                    int amount = Integer.valueOf(itemAndAmount.get(1));
-                    map.put(item,amount);
-                }
-                amorphous = new AmorphousRecipe(enumType,map);
-            }
-
-            PeculiarRecipeMaterial peculiar = new PeculiarRecipeMaterial(regexUse,requireRegex,resultRegex,returnableUse,returnItems,amorphousUse,amorphous);
-            peculiarRecipeMaterialList.add(peculiar);
+    private void getPeculiarRecipe(){
+        List<String> peculiarNameList = config.getStringList("peculiar-list");
+        for(String name:peculiarNameList){
+            String path = "peculiar-recipes."+name+".";
+            String requireRegex = config.getString(path+"requireRegex");
+            String resultRegex = config.getString(path+"resultRegex");
+            RecipeMaterial rm = nameAndOriginalRecipe.get(config.getString(path+"recipeMaterial")).getRecipeMaterial();
+            Peculiar peculiar = new Peculiar(rm,requireRegex,resultRegex);
+            peculiarList.add(peculiar);
         }
     }
 

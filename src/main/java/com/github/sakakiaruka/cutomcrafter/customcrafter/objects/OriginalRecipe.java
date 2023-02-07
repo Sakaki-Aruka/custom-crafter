@@ -88,4 +88,28 @@ public class OriginalRecipe {
         }
         return map;
     }
+
+    public void setRm(RecipeMaterial rm) {
+        this.rm = rm;
+    }
+
+    public void setResult(ItemStack result) {
+        this.result = result;
+    }
+
+    public void setSize(int size) {
+        this.size = size;
+    }
+
+    public void setTotal(int total) {
+        this.total = total;
+    }
+
+    public void setRecipeName(String recipeName) {
+        this.recipeName = recipeName;
+    }
+
+    public void setAmountRelation(Map<Material, Integer> amountRelation) {
+        this.amountRelation = amountRelation;
+    }
 }

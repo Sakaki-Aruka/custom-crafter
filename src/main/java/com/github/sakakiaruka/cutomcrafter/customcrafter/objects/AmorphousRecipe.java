@@ -1,5 +1,6 @@
 package com.github.sakakiaruka.cutomcrafter.customcrafter.objects;
 
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
@@ -28,5 +29,14 @@ public class AmorphousRecipe extends RecipeMaterial{
 
     public void setMaterials(Map<ItemStack, Integer> materials) {
         this.materials = materials;
+    }
+
+    public int getTotalItems(){
+        int result = 0;
+        for(Map.Entry<ItemStack,Integer> entry:materials.entrySet()){
+            if(entry.getKey().getType().equals(Material.AIR))continue;
+            result += entry.getValue();
+        }
+        return result;
     }
 }

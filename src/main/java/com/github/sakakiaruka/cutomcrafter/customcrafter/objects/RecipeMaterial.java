@@ -158,4 +158,13 @@ public class RecipeMaterial {
         return result;
     }
 
+    public int getTotalItems(){
+        int result = 0;
+        for(Map.Entry<MultiKeys,ItemStack> entry:map.entrySet()){
+            if(entry.getValue().getType().equals(Material.AIR))continue;
+            result += entry.getValue().getAmount();
+        }
+        return result;
+    }
+
 }

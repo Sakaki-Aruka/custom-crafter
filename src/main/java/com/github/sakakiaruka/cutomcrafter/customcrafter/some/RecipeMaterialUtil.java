@@ -1,5 +1,6 @@
 package com.github.sakakiaruka.cutomcrafter.customcrafter.some;
 
+import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.AmorphousRecipe;
 import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.MultiKeys;
 import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.RecipeMaterial;
 import org.bukkit.inventory.ItemStack;
@@ -9,6 +10,7 @@ import java.util.List;
 
 public class RecipeMaterialUtil {
     public String graphicalCoordinate(RecipeMaterial rm){
+        if(rm instanceof AmorphousRecipe)return "Cannot migrate from AmorphousRecipe.";
         int size = (int)Math.round(Math.sqrt(rm.getRecipeMaterial().size()));
         List<String> names = toStringList(rm.getItemStackList());
         int longest = longestCharaLen(names);
