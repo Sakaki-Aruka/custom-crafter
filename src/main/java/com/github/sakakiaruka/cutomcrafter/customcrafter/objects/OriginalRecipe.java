@@ -15,12 +15,12 @@ public class OriginalRecipe {
     private String recipeName;
     private RecipeMaterial rm;
     private Map<Material,Integer> amountRelation;
-    public OriginalRecipe(ItemStack result,int size,int total,RecipeMaterial rm,String recipeName){
-        this.result = result;
-        this.size = size;
-        this.rm = rm;
-        this.total = total;
-        this.recipeName = recipeName;
+    public OriginalRecipe(){
+        this.result = null;
+        this.size = -1;
+        this.rm = null;
+        this.total = -1;
+        this.recipeName = null;
     }
 
     public OriginalRecipe(int size,int total,RecipeMaterial rm){
@@ -29,6 +29,14 @@ public class OriginalRecipe {
         this.rm = rm;
         this.total = total;
         this.size = size;
+    }
+
+    public OriginalRecipe(ItemStack result,int size,int total,RecipeMaterial rm,String recipeName){
+        this.result = result;
+        this.size = size;
+        this.total = total;
+        this.rm = rm;
+        this.recipeName = recipeName;
     }
 
     public String info(){

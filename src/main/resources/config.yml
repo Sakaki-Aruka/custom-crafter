@@ -18,6 +18,7 @@ result-items:
   - second
   - emerald
   - big-torch
+  - empty-bucket
 result-item:
   first: # test section
     material: iron_block #need
@@ -96,6 +97,7 @@ recipe-list:
   - iron-to-gold
   - diamond-to-emerald
   - big-torch
+
 recipes:
   stone-to-iron:
     size: 3 # 3 <= size <= 6 (int)
@@ -130,3 +132,20 @@ recipes:
       - logs,logs,logs
       - logs,logs,logs
 
+peculiar-list:
+  - test-pec
+
+peculiar-recipes:
+  test-pec:
+    regexUse: true
+    returnableUse: true
+    amorphousUse: true
+    requireRegex: ".{1-10}_ingot"
+    resultRegex: "{regex0}_pickaxe"
+    returnItems:
+      - first  #in result-items
+    enumType: neighbor
+    amorphous:
+      result: emerald  #in result-items
+      items:
+        - first,10  #in recipe-materials-list

@@ -36,10 +36,6 @@ public class Search {
                 // MixedMaterial
                 if(!new MixedMaterialMethods().main(model,real))continue;
 
-            }else if(containsAmorphousRecipe(model)){
-                // AmorphousRecipe
-                if(!new Amorphous().main((AmorphousRecipe) model,real))continue;
-
             }else{
                 // Normal Recipe
                 if(!new Normal().main(model,real))continue;
