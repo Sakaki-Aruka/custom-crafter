@@ -1,8 +1,5 @@
 package com.github.sakakiaruka.cutomcrafter.customcrafter.listeners.clickInventorysMethods;
 
-import com.github.sakakiaruka.cutomcrafter.customcrafter.listeners.clickInventorysMethods.searchMethods.Amorphous;
-import com.github.sakakiaruka.cutomcrafter.customcrafter.listeners.clickInventorysMethods.searchMethods.MixedMaterialMethods;
-import com.github.sakakiaruka.cutomcrafter.customcrafter.listeners.clickInventorysMethods.searchMethods.Normal;
 import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.*;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
@@ -30,33 +27,11 @@ public class Search {
         if(originals.isEmpty())return null;
 
         for(OriginalRecipe original:originals){
-            RecipeMaterial model = original.getRecipeMaterial();
-
-            if(containsMixedMaterial(model)){
-                // MixedMaterial
-                if(!new MixedMaterialMethods().main(model,real))continue;
-
-            }else{
-                // Normal Recipe
-                if(!new Normal().main(model,real))continue;
-
-            }
-            list.add(original.getResult());
+            //
         }
 
         if(list.isEmpty())return null;
         return list;
-    }
-
-    private boolean containsMixedMaterial(RecipeMaterial model){
-        for(Map.Entry<MultiKeys,ItemStack> entry : model.getRecipeMaterial().entrySet()){
-            if(entry.getValue() instanceof MixedMaterial) return true;
-        }
-        return false;
-    }
-
-    private boolean containsAmorphousRecipe(RecipeMaterial in){
-        return in instanceof AmorphousRecipe;
     }
 
     private RecipeMaterial toRecipeMaterial(Inventory inventory,int size){

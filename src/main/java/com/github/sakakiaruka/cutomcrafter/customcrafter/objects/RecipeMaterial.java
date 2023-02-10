@@ -6,10 +6,12 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
-public class RecipeMaterial {
+public class RecipeMaterial{
 
     private Map<MultiKeys,ItemStack> map = new LinkedHashMap<>();
-    public RecipeMaterial(int key1, int key2, ItemStack material){
+    private List<ItemStack> returnableItems;
+    public RecipeMaterial(int key1, int key2, ItemStack material,List<ItemStack> list){
+        returnableItems = list;
         MultiKeys mk = new MultiKeys(key1,key2);
         map = new HashMap<MultiKeys,ItemStack>(){{
             put(mk,material);
@@ -24,15 +26,30 @@ public class RecipeMaterial {
 
     public RecipeMaterial(Map<MultiKeys,ItemStack> in){
         map = in;
+        returnableItems = new ArrayList<>();
     }
 
     public RecipeMaterial(MultiKeys key,ItemStack item){
         map = new HashMap<MultiKeys,ItemStack>(){{
             put(key,item);
         }};
+        returnableItems = new ArrayList<>();
     }
 
     public RecipeMaterial(){
+        returnableItems = new ArrayList<>();
+    }
+
+    public List<ItemStack> getReturnableItems() {
+        return returnableItems;
+    }
+
+    public void setReturnableItems(List<ItemStack> returnableItems) {
+        this.returnableItems = returnableItems;
+    }
+
+    public void addReturnableItems(ItemStack item){
+        this.returnableItems.add(item);
     }
 
     public Map<MultiKeys,ItemStack> getRecipeMaterial(){
@@ -84,6 +101,15 @@ public class RecipeMaterial {
     public List<MultiKeys> getMultiKeysList(){
         List<MultiKeys> list = new ArrayList<>();
         map.entrySet().forEach(s->list.add(s.getKey()));
+        return list;
+    }
+
+    public List<MultiKeys> getMultiKeysListNoAir(){
+        List<MultiKeys> list = new ArrayList<>();
+        for(Map.Entry<MultiKeys,ItemStack> entry:map.entrySet()){
+            if(entry.getValue().getType().equals(Material.AIR))continue;
+            list.add(entry.getKey());
+        }
         return list;
     }
 

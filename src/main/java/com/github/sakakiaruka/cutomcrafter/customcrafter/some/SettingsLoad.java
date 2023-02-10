@@ -195,7 +195,8 @@ public class SettingsLoad {
             String requireRegex = config.getString(path+"requireRegex");
             String resultRegex = config.getString(path+"resultRegex");
             RecipeMaterial rm = nameAndOriginalRecipe.get(config.getString(path+"recipeMaterial")).getRecipeMaterial();
-            Peculiar peculiar = new Peculiar(rm,requireRegex,resultRegex);
+            int matcherPlace = config.getInt(path+"matcherQuantity");
+            Peculiar peculiar = new Peculiar(rm,requireRegex,resultRegex,matcherPlace);
             peculiarList.add(peculiar);
         }
     }

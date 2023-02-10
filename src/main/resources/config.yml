@@ -147,5 +147,6 @@ peculiar-list:
 peculiar-recipes:
   test-pec:
     requireRegex: ".{1-10}"
-    resultRegex: "{regex0}_pickaxe"
+    resultRegex: "{regex}_pickaxe"
     recipeMaterial: peculiar
+    matcherPlace: 1

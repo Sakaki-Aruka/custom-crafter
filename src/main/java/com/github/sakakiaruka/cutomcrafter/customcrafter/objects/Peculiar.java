@@ -6,13 +6,15 @@ public class Peculiar extends OriginalRecipe{
     private PeculiarEnum enumType;
     private String requireRegex;
     private String resultRegex;
+    private int matcherPlace;
 
-    public Peculiar(RecipeMaterial recipeMaterial,String requireRegex,String resultRegex){
+    public Peculiar(RecipeMaterial recipeMaterial,String requireRegex,String resultRegex,int matcherPlace){
         super.setRm(recipeMaterial);
         super.setTotal(recipeMaterial.getTotalItems());
         this.enumType = this.judge();
         this.requireRegex = requireRegex;
         this.resultRegex = resultRegex;
+        this.matcherPlace = matcherPlace;
     }
 
     public PeculiarEnum judge(){
@@ -50,5 +52,9 @@ public class Peculiar extends OriginalRecipe{
 
     public void setResultRegex(String resultRegex) {
         this.resultRegex = resultRegex;
+    }
+
+    public int getMatcherPlace() {
+        return matcherPlace;
     }
 }

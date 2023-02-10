@@ -3,6 +3,8 @@ package com.github.sakakiaruka.cutomcrafter.customcrafter.objects;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class AmorphousRecipe extends RecipeMaterial{
@@ -11,6 +13,7 @@ public class AmorphousRecipe extends RecipeMaterial{
     private Map<ItemStack,Integer> materials;
 
     public AmorphousRecipe(AmorphousEnum typeEnum,Map<ItemStack,Integer> materials){
+        super();
         this.typeEnum = typeEnum;
         this.materials = materials;
     }
@@ -38,5 +41,13 @@ public class AmorphousRecipe extends RecipeMaterial{
             result += entry.getValue();
         }
         return result;
+    }
+
+    public List<ItemStack> getItemStackListNoAir(){
+        List<ItemStack> list = new ArrayList<>();
+        materials.entrySet().forEach(s->list.add(s.getKey()));
+        ItemStack air = new ItemStack(Material.AIR);
+        if(list.contains(air))list.remove(air);
+        return list;
     }
 }
