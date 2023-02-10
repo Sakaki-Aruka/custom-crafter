@@ -32,7 +32,7 @@ public class BatchCreate {
         Collections.sort(amount);
         if(amount.isEmpty())return;
         int minAmount = amount.get(0);
-        //RecipeMaterialOnly cloned = rm.recipeMaterialClone();
+        //RecipeMaterialProcessHub cloned = rm.recipeMaterialClone();
         rm.setAllAmount(1);
 
         ItemStack result;
