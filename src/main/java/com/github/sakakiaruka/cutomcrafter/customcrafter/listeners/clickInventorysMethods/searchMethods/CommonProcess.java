@@ -1,15 +1,13 @@
 package com.github.sakakiaruka.cutomcrafter.customcrafter.listeners.clickInventorysMethods.searchMethods;
 
+import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.AmorphousEnum;
+import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.AmorphousRecipe;
 import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.MultiKeys;
 import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.RecipeMaterial;
 import org.bukkit.Material;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class CommonProcess {
     public int getTotal(RecipeMaterial in){
@@ -21,34 +19,19 @@ public class CommonProcess {
         return result;
     }
 
-    public int getSquareSize(RecipeMaterial in){
+    public int getSquareSize(RecipeMaterial in) {
         List<MultiKeys> coordinates = in.getMultiKeysListNoAir();
         List<Integer> xs = new ArrayList<>();
         List<Integer> ys = new ArrayList<>();
-        coordinates.forEach(s->{xs.add(s.getKey1());ys.add(s.getKey2());});
+        coordinates.forEach(s -> {
+            xs.add(s.getKey1());
+            ys.add(s.getKey2());
+        });
         Collections.sort(xs);
         Collections.sort(ys);
-        int x = Math.abs(xs.get(0) - xs.get(xs.size()-1))+1;
-        int y = Math.abs(ys.get(0) - ys.get(ys.size()-1))+1;
-        return Math.max(x,y);
-    }
-
-    public RecipeMaterial getRecipeMaterial(Inventory inventory,int size){
-        RecipeMaterial recipeMaterial = new RecipeMaterial();
-        for(int y=0;y<size;y++){
-            for(int x=0;x<size;x++){
-                int index = x+y*9;
-                MultiKeys key = new MultiKeys(x,y);
-                ItemStack item;
-                if(inventory.getItem(index) == null){
-                    item = new ItemStack(Material.AIR);
-                }else{
-                    item = inventory.getItem(index);
-                }
-                recipeMaterial.put(key,item);
-            }
-        }
-        return recipeMaterial;
+        int x = Math.abs(xs.get(0) - xs.get(xs.size() - 1)) + 1;
+        int y = Math.abs(ys.get(0) - ys.get(ys.size() - 1)) + 1;
+        return Math.max(x, y);
     }
 
     public boolean isSameShape(List<MultiKeys> models,List<MultiKeys> reals){
@@ -60,6 +43,41 @@ public class CommonProcess {
             if(models.get(i).getKey2() - reals.get(i).getKey2() != yGap)return false;
         }
         return true;
+    }
+
+    public AmorphousRecipe toAmorphous(RecipeMaterial in){
+        List<ItemStack> list = in.getItemStackListNoAir();
+        Map<ItemStack,Integer> map = new HashMap<>();
+        for(ItemStack item:list){
+            if(map.containsKey(item)){
+                int amount = item.getAmount() + map.get(item);
+                map.put(item,amount);
+            }else{
+                map.put(item,item.getAmount());
+            }
+        }
+        int size = getSquareSize(in);
+        AmorphousEnum enumType;
+        if(size>3)enumType = AmorphousEnum.ANYWHERE;
+        else enumType=AmorphousEnum.NEIGHBOR;
+
+        AmorphousRecipe amorphous = new AmorphousRecipe(enumType,map);
+        return amorphous;
+    }
+
+    public boolean containsMixedMaterial(RecipeMaterial in){
+        return getClassSet(in).contains("MixedMaterial");
+    }
+
+    public boolean containsEnchantedMaterial(RecipeMaterial in){
+        return getClassSet(in).contains("EnchantedMaterial");
+    }
+
+    private Set<String> getClassSet(RecipeMaterial in){
+        List<ItemStack> items = in.getItemStackListNoAir();
+        Set<String> classes = new HashSet<>();
+        items.forEach(s->classes.add(s.getClass().toGenericString()));
+        return classes;
     }
 
 }

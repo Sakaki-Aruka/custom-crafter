@@ -1,6 +1,7 @@
 package com.github.sakakiaruka.cutomcrafter.customcrafter.listeners.clickInventorysMethods.searchMethods.OriginalRecipeProcesses;
 
 import com.github.sakakiaruka.cutomcrafter.customcrafter.listeners.clickInventorysMethods.searchMethods.CommonProcess;
+import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.MixedMaterial;
 import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.OriginalRecipe;
 import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.RecipeMaterial;
 import org.bukkit.inventory.Inventory;
@@ -11,30 +12,34 @@ import java.util.List;
 import java.util.Set;
 
 public class RecipeMaterialProcessHub {
-    public boolean main(OriginalRecipe modelOriginal, Inventory inventory,int size){
+    public boolean main(OriginalRecipe modelOriginal,RecipeMaterial real){
         CommonProcess shared = new CommonProcess();
         RecipeMaterial model = modelOriginal.getRecipeMaterial();
-        RecipeMaterial real = shared.getRecipeMaterial(inventory,size);
 
         if(shared.getTotal(model) != shared.getTotal(real))return false;
         if(shared.getSquareSize(model) != shared.getSquareSize(real))return false;
         if(!shared.isSameShape(model.getMultiKeysListNoAir(),real.getMultiKeysListNoAir()))return false;
 
-        boolean mixedMaterial = containsMixedMaterial(model);
-        boolean enchantedMaterial = containsEnchantedMaterial(model);
+        boolean mixedMaterial = shared.containsMixedMaterial(model);
+        boolean enchantedMaterial = shared.containsEnchantedMaterial(model);
 
-        if(mixedMaterial && !enchantedMaterial){
-            //mixed only
-        }
-        if(!mixedMaterial && enchantedMaterial){
-            //enchanted only
-        }
         if(!mixedMaterial && !enchantedMaterial){
             //recipeMaterial only
             return isSameItems(model,real);
         }
+        if(mixedMaterial && !enchantedMaterial){
+            //mixed only
+            return new MixedMaterialProcess().isSameItems(model,real);
+        }
+        if(!mixedMaterial && enchantedMaterial){
+            //enchanted only
+            return new EnchantedMaterialProcess().isSameItems(model,real);
+        }
         if(mixedMaterial && enchantedMaterial){
             //all
+            if(!new MixedMaterialProcess().isSameItems(model,real))return false;
+            if(!new EnchantedMaterialProcess().isSameItems(model,real))return false;
+            return true;
         }
         return false;
     }
@@ -47,20 +52,5 @@ public class RecipeMaterialProcessHub {
             if(!modelItems.get(i).equals(realItems.get(i)))return false;
         }
         return true;
-    }
-
-    private boolean containsMixedMaterial(RecipeMaterial in){
-        return getClassSet(in).contains("MixedMaterial");
-    }
-
-    private boolean containsEnchantedMaterial(RecipeMaterial in){
-        return getClassSet(in).contains("EnchantedMaterial");
-    }
-
-    private Set<String> getClassSet(RecipeMaterial in){
-        List<ItemStack> items = in.getItemStackListNoAir();
-        Set<String> classes = new HashSet<>();
-        items.forEach(s->classes.add(s.getClass().toGenericString()));
-        return classes;
     }
 }

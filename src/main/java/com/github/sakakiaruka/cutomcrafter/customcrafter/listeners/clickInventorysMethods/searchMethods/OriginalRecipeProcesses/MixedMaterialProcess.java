@@ -11,7 +11,7 @@ import java.util.List;
 import static com.github.sakakiaruka.cutomcrafter.customcrafter.some.SettingsLoad.mixedCategories;
 
 public class MixedMaterialProcess {
-    private boolean isSameItems(RecipeMaterial model, RecipeMaterial real){
+    public boolean isSameItems(RecipeMaterial model, RecipeMaterial real){
         List<Integer> inModel = getMixedPlaceList(model.getItemStackListNoAir());
         List<ItemStack> models = model.getItemStackListNoAir();
         List<ItemStack> reals = real.getItemStackListNoAir();
