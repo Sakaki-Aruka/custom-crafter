@@ -141,12 +141,12 @@ recipes:
       - null,first,null
       - null,first,null
 
-peculiar-list:
-  - test-pec
-
-peculiar-recipes:
-  test-pec:
-    requireRegex: ".{1-10}"
-    resultRegex: "{regex}_pickaxe"
-    recipeMaterial: peculiar
-    matcherPlace: 1
+#peculiar-list:
+#  - test-pec
+#
+#peculiar-recipes:
+#  test-pec:
+#    requireRegex: ".{1-10}_ingot"
+#    resultRegex: "{regex}_pickaxe"
+#    recipeMaterial: peculiar
+#    matcherPlace: 1

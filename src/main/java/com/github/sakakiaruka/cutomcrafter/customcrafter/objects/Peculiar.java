@@ -18,8 +18,8 @@ public class Peculiar extends OriginalRecipe{
     }
 
     public PeculiarEnum judge(){
-        if(super.getRecipeMaterial() instanceof RecipeMaterial)return PeculiarEnum.COORDINATED;
-        return PeculiarEnum.UNCOORDINATED;
+        if(super.getRecipeMaterial() instanceof AmorphousRecipe)return PeculiarEnum.UNCOORDINATED;
+        return PeculiarEnum.COORDINATED;
     }
 
     public String getPeculiarInfo(){

@@ -1,20 +1,22 @@
 package com.github.sakakiaruka.cutomcrafter.customcrafter.listeners.clickInventorysMethods.searchMethods.OriginalRecipeProcesses;
 
 import com.github.sakakiaruka.cutomcrafter.customcrafter.listeners.clickInventorysMethods.searchMethods.CommonProcess;
-import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.MixedMaterial;
 import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.OriginalRecipe;
 import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.RecipeMaterial;
-import org.bukkit.inventory.Inventory;
+import com.github.sakakiaruka.cutomcrafter.customcrafter.some.RecipeMaterialUtil;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class RecipeMaterialProcessHub {
     public boolean main(OriginalRecipe modelOriginal,RecipeMaterial real){
         CommonProcess shared = new CommonProcess();
         RecipeMaterial model = modelOriginal.getRecipeMaterial();
+
+        //debug
+        System.out.println("model:"+new RecipeMaterialUtil().graphicalCoordinate(model));
+        System.out.println("real:"+new RecipeMaterialUtil().graphicalCoordinate(real));
+        System.out.println(String.format("total:%d/%d | size:%d/%d | shape:%s",shared.getTotal(model),shared.getTotal(real),shared.getSquareSize(model),shared.getSquareSize(real),String.valueOf(shared.isSameShape(model.getMultiKeysListNoAir(),real.getMultiKeysListNoAir()))));
 
         if(shared.getTotal(model) != shared.getTotal(real))return false;
         if(shared.getSquareSize(model) != shared.getSquareSize(real))return false;

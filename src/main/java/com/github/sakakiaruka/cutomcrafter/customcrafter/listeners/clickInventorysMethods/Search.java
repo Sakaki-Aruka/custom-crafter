@@ -12,6 +12,10 @@ import static com.github.sakakiaruka.cutomcrafter.customcrafter.some.SettingsLoa
 
 public class Search {
     public List<ItemStack> search(Inventory inventory,int size){
+
+        //debug
+        System.out.println("in Search");
+
         RecipeMaterial real = toRecipeMaterial(inventory,size);
         if(real.isEmpty())return null;
         List<ItemStack> list = new ArrayList<>();
@@ -28,6 +32,10 @@ public class Search {
         if(originals.isEmpty())return null;
 
         for(OriginalRecipe original:originals){
+
+            //debug
+            System.out.println("go to RecipeTypeGuidePost !");
+
             if(!new RecipeTypeGuidePost().main(original,real))continue;
             list.add(original.getResult());
         }
