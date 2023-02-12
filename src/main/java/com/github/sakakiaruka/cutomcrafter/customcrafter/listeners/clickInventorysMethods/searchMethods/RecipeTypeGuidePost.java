@@ -16,10 +16,6 @@ public class RecipeTypeGuidePost {
                 System.out.println("Peculiar Process is very hard to me.");
             }
         }else{
-
-            //debug
-            System.out.println(String.format("model:%s | real:%s",model.getClass(),real.getClass()));
-
             //Original
             if(model.getRecipeMaterial() instanceof AmorphousRecipe){
                 // Original & Amorphous
