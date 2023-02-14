@@ -10,14 +10,13 @@ import org.bukkit.inventory.meta.BundleMeta;
 
 import java.util.List;
 
-import static com.github.sakakiaruka.cutomcrafter.customcrafter.listeners.ClickInventory.isTransitionMode;
 import static com.github.sakakiaruka.cutomcrafter.customcrafter.listeners.OpenCrafter.guiOpening;
 
 public class CloseCrafter implements Listener {
     public void onInventoryClose(InventoryCloseEvent event){
         Player player = (Player) event.getPlayer();
         if(guiOpening.containsKey(player)){
-            if(isTransitionMode.contains(player))return;
+//            if(isTransitionMode.contains(player))return;
             int size = guiOpening.get(player);
             guiOpening.remove(player);
             Inventory inventory = event.getInventory();

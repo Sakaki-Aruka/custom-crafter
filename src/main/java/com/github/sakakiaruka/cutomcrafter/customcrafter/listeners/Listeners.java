@@ -1,12 +1,10 @@
 package com.github.sakakiaruka.cutomcrafter.customcrafter.listeners;
 
-import com.github.sakakiaruka.cutomcrafter.customcrafter.listeners.clickInventorysMethods.InventoryOpen;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryDragEvent;
-import org.bukkit.event.inventory.InventoryOpenEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 public class Listeners implements Listener {
@@ -23,11 +21,6 @@ public class Listeners implements Listener {
     @EventHandler
     public void clickInventory(InventoryClickEvent event){
         new ClickInventory().onInventoryClick(event);
-    }
-
-    @EventHandler
-    public void inventoryOpen(InventoryOpenEvent event){
-        new InventoryOpen().onInventoryOpen(event);
     }
 
     @EventHandler

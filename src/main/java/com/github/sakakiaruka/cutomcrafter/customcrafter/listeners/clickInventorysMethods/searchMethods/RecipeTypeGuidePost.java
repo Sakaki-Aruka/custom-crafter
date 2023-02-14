@@ -6,24 +6,12 @@ import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.*;
 
 public class RecipeTypeGuidePost {
     public boolean main(OriginalRecipe model, RecipeMaterial real){
-        if(model instanceof PeculiarRecipe) {
-            //Peculiar
-            if(model.getRecipeMaterial() instanceof AmorphousRecipe){
-                //Peculiar & Amorphous
-            }else{
-                //Peculiar & RecipeMaterial
-            }
-
-            //Original
+        if (model.getRecipeMaterial() instanceof AmorphousRecipe){
+            // Original & Amorphous
+            return new AmorphousRecipeProcessHub().main(model,real);
         }else{
-            if (model.getRecipeMaterial() instanceof AmorphousRecipe){
-                // Original & Amorphous
-                return new AmorphousRecipeProcessHub().main(model,real);
-            }else{
-                // Original & RecipeMaterial
-                return new RecipeMaterialProcessHub().main(model,real);
-            }
+            // Original & RecipeMaterial
+            return new RecipeMaterialProcessHub().main(model,real);
         }
-        return false;
     }
 }

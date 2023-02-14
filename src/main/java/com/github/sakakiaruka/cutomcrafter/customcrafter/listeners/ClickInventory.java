@@ -18,114 +18,88 @@ import java.util.List;
 import static com.github.sakakiaruka.cutomcrafter.customcrafter.listeners.OpenCrafter.guiOpening;
 
 public class ClickInventory implements Listener {
-    public static List<Player> isTransitionMode = new ArrayList<>();
+    private final int page_size = 54;
+
     public static final int bundleSlot = 34;
     public static final int anvilSlot = 35;
     public static final int resultSlot = 44;
+
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event){
         Player player = Bukkit.getPlayer(event.getWhoClicked().getUniqueId());
-
-        if(!guiOpening.containsKey(player)){
-            //not open crafting-gui
-            return;
-        }
+        if(!guiOpening.containsKey(player))return;
 
         Inventory inventory = event.getClickedInventory();
         int slot = event.getRawSlot();
         int size = guiOpening.get(player);
-        final int absSize = 54;
-
-
+        ClickType type = event.getClick();
         if(slot<0){
             event.setCancelled(true);
             return;
         }
 
-        if(slot < absSize){
-            if(!event.getClick().equals(ClickType.LEFT)){
-                if(!event.getClick().equals(ClickType.RIGHT)){
-                    event.setCancelled(true);
-                    return;
-                }
-            }
+        if(!isPermittedClick(slot,event.getClick())){
+            event.setCancelled(true);
+            return;
+        }
 
-            // click crafting-gui
-            if(slot == anvilSlot){
-                // click make button(anvil)
-                player.playSound(player, Sound.BLOCK_PISTON_EXTEND,1.0f,1.0f);
+        if(slot >= page_size){
+            // click players inventory
+            if(type.equals(ClickType.LEFT))return;
+            if(type.equals(ClickType.RIGHT))return;
+            if(type.equals(ClickType.SHIFT_LEFT))return;
+            event.setCancelled(true);
+            return;
+        }
 
-                if(inventory.getItem(absSize-1-9)!=null){
-                    // result slot is full.
-                    event.setCancelled(true);
-                    return;
-                }
-
-                if(event.getClick().equals(ClickType.RIGHT)){
-                    new BatchCreate().main(player,inventory,size);
-                    event.setCancelled(true);
-                    return;
-                }
-
-                ItemStack result;
-                //debug
-                if(new Search().search(inventory,size)!=null){
-                    //custom recipe item found
-                    //debug
-                    result = new Search().search(inventory,size).get(0);
-                }else{
-                    //vanilla item found
-                    result = new SearchVanilla().isThreeSquared(inventory,size,player);
-                }
-                if(result==null){
-                    event.setCancelled(true);
-                    return;
-                }
-                if(!result.getType().equals(Material.AIR)){
-                    inventory.setItem(absSize-1-9*1,result);
-                    new ItemsSubtract().main(inventory,size,1);
-                }
+        if(slot == anvilSlot){
+            player.playSound(player,Sound.BLOCK_PISTON_EXTEND,1.0f,1.0f);
+            if(inventory.getItem(page_size-1-9)!=null){
+                // result slot is full.
                 event.setCancelled(true);
                 return;
-            }else if(slot == resultSlot){
-                //result slot
-                if(new ItemStackComparison().notEmpty(inventory.getItem(slot))){
-                    ItemStack result = inventory.getItem(slot);
-                    resultTake(player.getInventory(),result,player);
-                    inventory.setItem(slot,new ItemStack(Material.AIR));
-                    event.setCancelled(true);
-                    return;
-                }
             }
-            else if(new Transition().transitionCondition(slot,inventory.getItem(7),event.getClick())) {
-                //click overflow items
-                new Transition().dropItems(inventory.getItem(7),player);
-                inventory.setItem(7,new ItemStack(Material.BLACK_STAINED_GLASS_PANE));
-                return;
-            }else if(getTableSlots(size).contains(slot)){
-                //click crafting table
-                if(new ItemStackComparison().notEmpty(inventory.getItem(resultSlot))){
-                    inventory.setItem(resultSlot,new ItemStack(Material.AIR));
-                }
-                return;
-            }
-            event.setCancelled(true);
 
-        }else if(slot >= absSize){
-            // click players inventory
-            if(event.getClick().equals(ClickType.LEFT))return;
-            if(event.getClick().equals(ClickType.RIGHT))return;
-            if(event.getClick().equals(ClickType.SHIFT_LEFT))return;
-            event.setCancelled(true);
+            if(type.equals(ClickType.RIGHT)){
+                // right click
+                new BatchCreate().main(player,inventory,size);
+                event.setCancelled(true);
+                return;
+            }
+
+            ItemStack result;
+            if(new Search().search(inventory,size)!=null){
+                //normal
+                result = new Search().search(inventory,size).get(0);
+            }else{
+                //vanilla
+                result = new SearchVanilla().isThreeSquared(inventory,size,player);
+            }
+
+            if(result==null){
+                event.setCancelled(true);
+                return;
+            }
+
+            if(!result.getType().equals(Material.AIR)){
+                inventory.setItem(page_size-1-9,result);
+                new ItemsSubtract().main(inventory,size,1);
+            }
+
+        }else if(slot == resultSlot){
+            if(new ItemStackComparison().notEmpty(inventory.getItem(slot))){
+                ItemStack result = inventory.getItem(slot);
+                resultTake(player.getInventory(), result,player);
+                inventory.setItem(slot,new ItemStack(Material.AIR));
+            }
+        }else if(getTableSlots(size).contains(slot)){
+            // click crafting table (Resetting crafting slots when an item are moved by a player.)
+            if(!new ItemStackComparison().notEmpty(inventory.getItem(resultSlot)))return;
+            inventory.setItem(resultSlot,new ItemStack(Material.AIR));
         }
-    }
 
-    private void close(int after,int before,Inventory old,Player player){
-        Inventory newer = new Transition().transition(old,after,before);
-        isTransitionMode.add(player);
-        player.closeInventory();
-        player.openInventory(newer);
-        guiOpening.put(player,after);
+        event.setCancelled(true);
+
     }
 
     public List<Integer> getTableSlots(int size){
@@ -137,6 +111,17 @@ public class ClickInventory implements Listener {
             }
         }
         return slots;
+    }
+
+    private boolean isPermittedClick(int slot,ClickType type){
+        if(slot < page_size){
+            if(!type.equals(ClickType.LEFT)){
+                if(!type.equals(ClickType.RIGHT)){
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     private void resultTake(Inventory inventory,ItemStack item,Player player){
@@ -160,5 +145,4 @@ public class ClickInventory implements Listener {
         }
         player.getWorld().dropItem(player.getLocation(),item);
     }
-
 }
