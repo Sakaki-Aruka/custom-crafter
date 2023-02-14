@@ -22,7 +22,7 @@ public class SettingsLoad {
 
     public static Map<Material,List<OriginalRecipe>> recipesMaterial = new HashMap<>();
     public static Map<Integer,List<OriginalRecipe>> recipesAmount = new HashMap<>();
-    public static List<Peculiar> peculiarList = new ArrayList<>();
+//    public static List<Peculiar> peculiarList = new ArrayList<>();
 
     private Map<String,ItemStack> recipeResults = new HashMap<>();
     private Map<String,ItemStack> recipeMaterials = new HashMap<>();
@@ -36,7 +36,7 @@ public class SettingsLoad {
         getOriginalRecipeList();
         originalRecipesSort();
         getBaseBlockMaterial();
-        getPeculiarRecipe();
+//        getPeculiarRecipe();
     }
 
     @Deprecated
@@ -188,17 +188,17 @@ public class SettingsLoad {
         }
     }
 
-    private void getPeculiarRecipe(){
-        List<String> peculiarNameList = config.getStringList("peculiar-list");
-        for(String name:peculiarNameList){
-            String path = "peculiar-recipes."+name+".";
-            String requireRegex = config.getString(path+"requireRegex");
-            String resultRegex = config.getString(path+"resultRegex");
-            RecipeMaterial rm = nameAndOriginalRecipe.get(config.getString(path+"recipeMaterial")).getRecipeMaterial();
-            int matcherPlace = config.getInt(path+"matcherQuantity");
-            Peculiar peculiar = new Peculiar(rm,requireRegex,resultRegex,matcherPlace);
-            peculiarList.add(peculiar);
-        }
-    }
+//    private void getPeculiarRecipe(){
+//        List<String> peculiarNameList = config.getStringList("peculiar-list");
+//        for(String name:peculiarNameList){
+//            String path = "peculiar-recipes."+name+".";
+//            String requireRegex = config.getString(path+"requireRegex");
+//            String resultRegex = config.getString(path+"resultRegex");
+//            RecipeMaterial rm = nameAndOriginalRecipe.get(config.getString(path+"recipeMaterial")).getRecipeMaterial();
+//            int matcherPlace = config.getInt(path+"matcherQuantity");
+//            Peculiar peculiar = new Peculiar(rm,requireRegex,resultRegex,matcherPlace);
+//            peculiarList.add(peculiar);
+//        }
+//    }
 
 }

@@ -6,18 +6,17 @@ import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.*;
 
 public class RecipeTypeGuidePost {
     public boolean main(OriginalRecipe model, RecipeMaterial real){
-        if(model instanceof Peculiar){
+        if(model instanceof PeculiarRecipe) {
             //Peculiar
-            if(((Peculiar)model).getEnumType().equals(PeculiarEnum.UNCOORDINATED)){
-                //Peculiar & AmorphousRecipe
-                System.out.println("Peculiar Process will implement soon nor, only the God knows.");
+            if(model.getRecipeMaterial() instanceof AmorphousRecipe){
+                //Peculiar & Amorphous
             }else{
                 //Peculiar & RecipeMaterial
-                System.out.println("Peculiar Process is very hard to me.");
             }
-        }else{
+
             //Original
-            if(model.getRecipeMaterial() instanceof AmorphousRecipe){
+        }else{
+            if (model.getRecipeMaterial() instanceof AmorphousRecipe){
                 // Original & Amorphous
                 return new AmorphousRecipeProcessHub().main(model,real);
             }else{
