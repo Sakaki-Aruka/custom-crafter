@@ -187,18 +187,4 @@ public class SettingsLoad {
             // --- about amount end --- //
         }
     }
-
-//    private void getPeculiarRecipe(){
-//        List<String> peculiarNameList = config.getStringList("peculiar-list");
-//        for(String name:peculiarNameList){
-//            String path = "peculiar-recipes."+name+".";
-//            String requireRegex = config.getString(path+"requireRegex");
-//            String resultRegex = config.getString(path+"resultRegex");
-//            RecipeMaterial rm = nameAndOriginalRecipe.get(config.getString(path+"recipeMaterial")).getRecipeMaterial();
-//            int matcherPlace = config.getInt(path+"matcherQuantity");
-//            Peculiar peculiar = new Peculiar(rm,requireRegex,resultRegex,matcherPlace);
-//            peculiarList.add(peculiar);
-//        }
-//    }
-
 }
