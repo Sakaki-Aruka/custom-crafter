@@ -37,8 +37,11 @@ public class BatchCreate {
 
         ItemStack result;
         //debug
-        result = new Search().search(inventory,size).get(0);
-        if(result==null)result=new SearchVanilla().isThreeSquared(inventory,size,player);
+        if(new Search().search(inventory,size)!=null){
+            result = new Search().search(inventory,size).get(0);
+        }else{
+            result = new SearchVanilla().isThreeSquared(inventory,size,player);
+        }
 
         if(result.getType().equals(Material.AIR))return;
         if(result.getAmount()*minAmount <= result.getMaxStackSize()){
