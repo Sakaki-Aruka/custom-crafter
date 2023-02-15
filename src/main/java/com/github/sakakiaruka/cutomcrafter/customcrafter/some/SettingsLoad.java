@@ -22,7 +22,6 @@ public class SettingsLoad {
 
     public static Map<Material,List<OriginalRecipe>> recipesMaterial = new HashMap<>();
     public static Map<Integer,List<OriginalRecipe>> recipesAmount = new HashMap<>();
-//    public static List<Peculiar> peculiarList = new ArrayList<>();
 
     private Map<String,ItemStack> recipeResults = new HashMap<>();
     private Map<String,ItemStack> recipeMaterials = new HashMap<>();
@@ -36,7 +35,6 @@ public class SettingsLoad {
         getOriginalRecipeList();
         originalRecipesSort();
         getBaseBlockMaterial();
-//        getPeculiarRecipe();
     }
 
     @Deprecated

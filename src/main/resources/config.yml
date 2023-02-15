@@ -97,7 +97,6 @@ recipe-list:
   - iron-to-gold
   - diamond-to-emerald
   - big-torch
-  - peculiar
 
 recipes:
   stone-to-iron:
@@ -133,20 +132,6 @@ recipes:
       - logs,logs,logs
       - logs,logs,logs
 
-  peculiar:
-    size: 3
-    result: emerald
-    recipe:
-      - null,null,null
-      - null,first,null
-      - null,first,null
 
-#peculiar-list:
-#  - test-pec
-#
-#peculiar-recipes:
-#  test-pec:
-#    requireRegex: ".{1-10}_ingot"
-#    resultRegex: "{regex}_pickaxe"
-#    recipeMaterial: peculiar
-#    matcherPlace: 1
+wget:
+  - "https://github."
