@@ -1,21 +1,29 @@
 package com.github.sakakiaruka.cutomcrafter.customcrafter.some;
 
-import com.github.sakakiaruka.cutomcrafter.customcrafter.CustomCrafter;
 import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.*;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.Plugin;
+import com.github.sakakiaruka.cutomcrafter.customcrafter.CustomCrafter;
+import org.bukkit.Material;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.inventory.ItemStack;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Stream;
 
+import static com.github.sakakiaruka.cutomcrafter.customcrafter.CustomCrafter.getInstance;
 
 public class SettingsLoad {
     private static CustomCrafter cc;
-    private static FileConfiguration config;
+    private static FileConfiguration defaultConfig;
     public static List<OriginalRecipe> recipes = new ArrayList<>();
     public static Material baseBlock;
     public static Map<String,List<Material>> mixedCategories = new HashMap<>();
@@ -23,53 +31,95 @@ public class SettingsLoad {
     public static Map<Material,List<OriginalRecipe>> recipesMaterial = new HashMap<>();
     public static Map<Integer,List<OriginalRecipe>> recipesAmount = new HashMap<>();
 
-    private Map<String,ItemStack> recipeResults = new HashMap<>();
+    private Map<String, ItemStack> recipeResults = new HashMap<>();
     private Map<String,ItemStack> recipeMaterials = new HashMap<>();
     private Map<String,OriginalRecipe> nameAndOriginalRecipe = new HashMap<>();
+    private Map<String, EnchantedMaterial> enchantedMaterials = new HashMap<>();
+    private Plugin plugin = getInstance();
+
     public void set(){
-        cc = CustomCrafter.getInstance();
-        config = cc.getConfig();
-        getCategories();
-        getRecipeResults();
-        getRecipeMaterials();
-        getOriginalRecipeList();
-        originalRecipesSort();
-        getBaseBlockMaterial();
+
+        cc = getInstance();
+        defaultConfig = cc.getConfig();
+
+        // Get element paths from the default config file
+        Path baseBlockPath = Paths.get(defaultConfig.getString("baseBlock"));
+        Path resultItemsPath = Paths.get(defaultConfig.getString("resultItems"));
+        Path materialCategoryPath = Paths.get(defaultConfig.getString("materialCategory"));
+        Path recipeMaterialPath = Paths.get(defaultConfig.getString("recipeMaterials"));
+        Path recipesPath = Paths.get(defaultConfig.getString("recipes"));
+
+        // Directory check
+        configFileDirectoryCheck(baseBlockPath);
+        configFileDirectoryCheck(resultItemsPath);
+        configFileDirectoryCheck(materialCategoryPath);
+        configFileDirectoryCheck(recipeMaterialPath);
+        configFileDirectoryCheck(recipeMaterialPath);
+        configFileDirectoryCheck(recipesPath);
+
+        getFilesFromTheSea();
+
+        // Get data from each files
+        getBaseBlock(getFiles(baseBlockPath));
+        getResultItems(getFiles(resultItemsPath));
+        getMaterialCategory(getFiles(materialCategoryPath));
+        getRecipeMaterials(getFiles(recipeMaterialPath));
+        getOriginalRecipes(getFiles(recipesPath));
+        originalRecipeSort();
+    }
+
+    private List<Path> getFiles(Path path){
+        Stream<Path> paths;
+        try{
+            paths = Files.list(path);
+        }catch (Exception e){
+            System.out.println("Custom-Crafter Error: Cannot get files from "+path);
+            return null;
+        }
+
+        List<Path> result = new ArrayList<>();
+        paths.forEach(s->result.add(s));
+        return result;
+    }
+
+    private void getBaseBlock(List<Path> paths){
+        FileConfiguration config = YamlConfiguration.loadConfiguration(paths.get(0).toFile());
+        String materialName = config.getString("material").toUpperCase();
+        baseBlock = Material.valueOf(materialName);
     }
 
     @Deprecated
-    private void getRecipeResults(){
-        List<String> names = config.getStringList("result-items");
-        for(String s:names){
-            String name = s;
-            String path = "result-item."+name+".";
-            ItemStack item = new ItemStack(Material.valueOf(config.getString(path+"material").toUpperCase()));
-            item.setAmount(config.getInt(path+"amount"));
+    private void getResultItems(List<Path> paths){
+        for(Path path:paths){
+            FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
+            ItemStack item = new ItemStack(Material.valueOf(config.getString("material").toUpperCase()));
+            item.setAmount(config.getInt("amount"));
             ItemMeta meta = item.getItemMeta();
+            String name = config.getString("name");
 
-            if(config.contains(path+"lore")){
-                //set lore
-                meta.setLore(config.getStringList(path+"lore"));
+            if(config.contains("lore")){
+                meta.setLore(config.getStringList("lore"));
             }
-            if(config.contains(path+"enchants")){
-                //set enchantments
-                List<String> raw = config.getStringList(path+"enchants");
-                for(String t:raw){
-                    Enchantment enchant = Enchantment.getByName(Arrays.asList(t.split(",")).get(0).toUpperCase());
-                    item.addUnsafeEnchantment(enchant,Integer.valueOf(Arrays.asList(t.split(",")).get(1)));
-                }
-            }
-            if(config.contains(path+"flags")){
-                //set ItemFlags
-                List<String> raw = config.getStringList(path+"flags");
-                for(String t:raw){
-                    meta.addItemFlags(ItemFlag.valueOf(t.toUpperCase()));
+
+            if(config.contains("enchants")){
+                List<String> raw = config.getStringList("enchants");
+                for(String s:raw){
+                    List<String> jumble = Arrays.asList(s.split(","));
+                    Enchantment enchant = Enchantment.getByName(jumble.get(0).toUpperCase());
+                    int level = Integer.valueOf(jumble.get(1));
+                    item.addUnsafeEnchantment(enchant,level);
                 }
             }
 
-            if(config.contains(path+"display-name")){
-                String displayName = config.getString(path+"display-name");
-                meta.setDisplayName(displayName);
+            if(config.contains("flags")){
+                List<String> flags = config.getStringList("flags");
+                for (String s:flags){
+                    meta.addItemFlags(ItemFlag.valueOf(s.toUpperCase()));
+                }
+            }
+
+            if(config.contains("display-name")){
+                meta.setDisplayName(config.getString("display-name"));
             }
 
             item.setItemMeta(meta);
@@ -77,87 +127,101 @@ public class SettingsLoad {
         }
     }
 
-    private void getRecipeMaterials(){
-        List<String> materials = config.getStringList("recipe-materials-list");
-        for(String s:materials){
-            String name = s;
-            String path = "recipe-materials."+name+".";
+    private void getMaterialCategory(List<Path> paths){
+        for (Path path:paths){
+            FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
+            String name = config.getString("name");
+            List<Material> value = new ArrayList<>();
+            List<String> materials = config.getStringList("contents");
+            materials.forEach(s->value.add(Material.getMaterial(s.toUpperCase())));
+            mixedCategories.put(name,value);
+        }
+    }
+
+    private void getRecipeMaterials(List<Path> paths){
+        for (Path path:paths){
+            FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
+            String name = config.getString("name");
             try{
-                ItemStack item = new ItemStack(Material.valueOf(config.getString(path+"material").toUpperCase()));
-
-                item.setAmount(config.getInt(path+"amount"));
+                ItemStack item = new ItemStack(Material.valueOf(config.getString("material").toUpperCase()));
+                item.setAmount(config.getInt("amount"));
                 recipeMaterials.put(name,item);
-
             }catch (Exception e){
-                String category = config.getString(  path+"mixed-material");
-                Material material = mixedCategories.get(category).get(0);
+                if(config.contains("mixed-material")){
+                    String category = config.getString("mixed-material");
+                    Material material = mixedCategories.get(category).get(0);
 
-                MixedMaterial item = new MixedMaterial(category,material,1);
-                item.setAmount(config.getInt(path+"amount"));
-                recipeMaterials.put(name,item);
+                    MixedMaterial item = new MixedMaterial(category,material,1);
+                    item.setAmount(config.getInt("amount"));
+                    recipeMaterials.put(name,item);
+                }else if(config.contains("enchants")){
+                    //enchanted material
+                    getEnchantedMaterials(path);
+                }
 
             }
         }
     }
 
-    private void getOriginalRecipeList(){
-        List<String> originals = config.getStringList("recipe-list");
-        for(String s:originals){
-            String path = "recipes."+s+".";
-            String name = s;
-            int size = config.getInt(path+"size");
-            ItemStack result = recipeResults.get(config.getString(path+"result"));
+    @Deprecated
+    private void getEnchantedMaterials(Path path){
+        FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
+        String name = config.getString("name");
+        EnchantedMaterial item = new EnchantedMaterial();
+        item.setType(Material.valueOf(config.getString("material").toUpperCase()));
+        item.setAmount(config.getInt("amount"));
 
-            List<String> itemArr = config.getStringList(path+"recipe");
-            RecipeMaterial rp = new RecipeMaterial();
-            for(int i=0;i<size;i++){
-                List<String> list = Arrays.asList(itemArr.get(i).split(","));
-                for(int j=0;j<size;j++){
-                    int x = j;
-                    int y = i;
+        List<String> list = config.getStringList("enchants");
+        for (String s:list){
+            List<String> data = Arrays.asList(s.split(","));
+            if(data.size()!=3)return;
+            Enchantment enchant = Enchantment.getByName(data.get(0).toUpperCase());
+            int level = Integer.valueOf(data.get(1));
+            EnchantedMaterialEnum enumType = EnchantedMaterialEnum.valueOf(data.get(2).toUpperCase());
+
+            IntegratedEnchant integrated = new IntegratedEnchant(enchant,level);
+            item.put(integrated,enumType);
+        }
+        recipeMaterials.put(name,item);
+    }
+
+    private void getOriginalRecipes(List<Path> paths){
+        for (Path path:paths){
+            FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
+            String name = config.getString("name");
+            int size = config.getInt("size");
+            ItemStack result = recipeResults.get(config.getString("result"));
+
+            List<String> itemArr = config.getStringList("recipe");
+            RecipeMaterial rm = new RecipeMaterial();
+            for(int y=0;y<size;y++){
+                List<String> list = Arrays.asList(itemArr.get(y).split(","));
+                for (int x=0;x<size;x++){
                     MultiKeys key = new MultiKeys(x,y);
                     ItemStack material;
-                    if(list.get(j).equalsIgnoreCase("null")){
+                    if(list.get(x).equalsIgnoreCase("null")){
                         material = new ItemStack(Material.AIR);
-                    }else if(recipeMaterials.containsKey(list.get(j))){
-                        material = recipeMaterials.get(list.get(j));
+                    }else if(recipeMaterials.containsKey(list.get(x))){
+                        material = recipeMaterials.get(list.get(x));
                     }else{
-                        Bukkit.getLogger().info("cc config load error.");
+                        Bukkit.getLogger().info("Custom-Crafter config load error.");
                         return;
                     }
-                    rp.put(key,material);
+                    rm.put(key,material);
                 }
             }
-
             int total = 0;
-            for(Map.Entry<MultiKeys,ItemStack> entry:rp.getRecipeMaterial().entrySet()){
+            for(Map.Entry<MultiKeys,ItemStack> entry:rm.getRecipeMaterial().entrySet()){
                 if(entry.getValue().getType().equals(Material.AIR))continue;
-                total++;
+                total+=entry.getValue().getAmount();
             }
-            OriginalRecipe originalRecipe = new OriginalRecipe(result,size,total,rp,name);
+            OriginalRecipe originalRecipe = new OriginalRecipe(result,size,total,rm,name);
             recipes.add(originalRecipe);
             nameAndOriginalRecipe.put(originalRecipe.getRecipeName(),originalRecipe);
         }
     }
 
-    private void getBaseBlockMaterial(){
-        String s = config.getString("base").toUpperCase();
-        Material m = Material.getMaterial(s);
-        baseBlock = m;
-    }
-
-    private void getCategories(){
-        List<String> categories = config.getStringList("material-category");
-        for(String s : categories){
-            String key = s;
-            List<Material> value = new ArrayList<>();
-            List<String> materials = config.getStringList("material-category-contents."+s);
-            materials.forEach(y->value.add(Material.getMaterial(y.toUpperCase())));
-            mixedCategories.put(key,value);
-        }
-    }
-
-    private void originalRecipesSort(){
+    private void originalRecipeSort(){
         for(OriginalRecipe original : recipes){
             RecipeMaterial rm = original.getRecipeMaterial();
             int top_amount = rm.getLargestAmount();
@@ -185,4 +249,46 @@ public class SettingsLoad {
             // --- about amount end --- //
         }
     }
+
+    private void getFilesFromTheSea(){
+        if(!defaultConfig.contains("download"))return;
+        if(defaultConfig.getStringList("download").isEmpty())return;
+
+        List<String> failed = new ArrayList<>();
+        for(String command: defaultConfig.getStringList("download")){
+            if(command.isEmpty())return;
+            ProcessBuilder builder = new ProcessBuilder(Arrays.asList(command.split(" ")));
+            Process process;
+            try{
+                process = builder.start();
+                process.waitFor();
+            }catch (Exception e){
+                System.out.println("===");
+                System.out.println("Custom-Crafter Config File Loader (downloader) error.");
+                System.out.println("An Exception occurred when start the process.");
+                System.out.println("Process : "+command);
+                System.out.println("Current Directory:"+Paths.get("").toUri());
+                e.printStackTrace();
+                System.out.println("===");
+                failed.add(command);
+            }
+
+        }
+        defaultConfig.set("download",failed);
+        getInstance().saveConfig();
+    }
+
+    private void configFileDirectoryCheck(Path path){
+        if(path.toFile().exists() && path.toFile().isDirectory())return;
+        if(!path.toFile().exists()){
+            //not exist
+            File dir = new File(path.toUri());
+            dir.mkdir();
+            System.out.println(String.format("Not found the directory->\"%s\".%nSo, the system made the directory named that.",path.toUri().toString()));
+        }else if(!path.toFile().isDirectory()){
+            System.out.println(String.format("The path ->\"%s\" is not directory.",path.toUri().toString()));
+            System.out.println("Fix this problem before to use this plugin.");
+        }
+    }
+
 }

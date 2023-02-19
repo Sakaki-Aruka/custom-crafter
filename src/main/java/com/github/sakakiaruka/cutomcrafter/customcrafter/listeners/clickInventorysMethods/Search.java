@@ -8,7 +8,9 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
-import static com.github.sakakiaruka.cutomcrafter.customcrafter.some.SettingsLoad.*;
+import static com.github.sakakiaruka.cutomcrafter.customcrafter.some.SettingsLoad.recipesAmount;
+import static com.github.sakakiaruka.cutomcrafter.customcrafter.some.SettingsLoad.recipesMaterial;
+
 
 public class Search {
     public List<ItemStack> search(Inventory inventory,int size){

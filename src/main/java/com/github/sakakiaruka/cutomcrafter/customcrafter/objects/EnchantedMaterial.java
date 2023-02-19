@@ -9,6 +9,7 @@ import java.util.Map;
 public class EnchantedMaterial extends ItemStack {
     private Map<IntegratedEnchant,EnchantedMaterialEnum> relation;
     public EnchantedMaterial(){
+        super();
         this.relation = new HashMap<>();
     }
 

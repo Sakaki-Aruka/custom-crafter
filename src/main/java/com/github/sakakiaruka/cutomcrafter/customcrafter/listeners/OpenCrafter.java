@@ -18,6 +18,7 @@ import static com.github.sakakiaruka.cutomcrafter.customcrafter.CustomCrafter.ge
 import static com.github.sakakiaruka.cutomcrafter.customcrafter.some.CreateInventory.inv;
 import static com.github.sakakiaruka.cutomcrafter.customcrafter.some.SettingsLoad.baseBlock;
 
+
 public class OpenCrafter extends BukkitRunnable implements Listener{
     public static Map<Player,Integer> guiOpening = new HashMap<>();
     private static double degrees = 2*Math.PI / (360 / 45);

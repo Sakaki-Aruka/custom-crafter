@@ -13,6 +13,7 @@ import java.util.Map;
 
 import static com.github.sakakiaruka.cutomcrafter.customcrafter.some.SettingsLoad.recipes;
 
+
 public class CheckObject implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command command,String label,String[] args){

@@ -4,4 +4,6 @@ public enum EnchantedMaterialEnum {
     NotStrict,
     OnlyEnchant,
     Strict;
+
+    private EnchantedMaterialEnum(){}
 }
