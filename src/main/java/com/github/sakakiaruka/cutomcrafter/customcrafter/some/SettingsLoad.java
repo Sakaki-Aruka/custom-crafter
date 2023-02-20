@@ -11,6 +11,7 @@ import com.github.sakakiaruka.cutomcrafter.customcrafter.CustomCrafter;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.nio.file.Files;
@@ -21,7 +22,7 @@ import java.util.stream.Stream;
 
 import static com.github.sakakiaruka.cutomcrafter.customcrafter.CustomCrafter.getInstance;
 
-public class SettingsLoad {
+public class SettingsLoad extends BukkitRunnable {
     private static CustomCrafter cc;
     private static FileConfiguration defaultConfig;
     public static List<OriginalRecipe> recipes = new ArrayList<>();
@@ -36,6 +37,14 @@ public class SettingsLoad {
     private Map<String,OriginalRecipe> nameAndOriginalRecipe = new HashMap<>();
     private Map<String, EnchantedMaterial> enchantedMaterials = new HashMap<>();
     private Plugin plugin = getInstance();
+
+    //=== for runnable task ===
+    private List<String> downloadUri;
+    private List<String> failed = new ArrayList<>();
+    private int returnCode = -1;
+    private int times = 0;
+    private int threshold;
+    private int load_interval;
 
     public void set(){
 
@@ -57,16 +66,54 @@ public class SettingsLoad {
         configFileDirectoryCheck(recipeMaterialPath);
         configFileDirectoryCheck(recipesPath);
 
-        getFilesFromTheSea();
+        //getFilesFromTheSea();
+        if(defaultConfig.contains("download")){
+            if(!defaultConfig.getStringList("download").isEmpty()){
+                downloadUri = defaultConfig.getStringList("download");
+                threshold = defaultConfig.getInt("download_threshold");
+                load_interval = defaultConfig.getInt("load_interval");
+                this.runTaskAsynchronously(getInstance());
+                defaultConfig.set("download",failed);
+                getInstance().saveConfig();
+            }
+        }
 
-        // Get data from each files
-        getBaseBlock(getFiles(baseBlockPath));
-        getResultItems(getFiles(resultItemsPath));
-        getMaterialCategory(getFiles(materialCategoryPath));
-        getRecipeMaterials(getFiles(recipeMaterialPath));
-        getOriginalRecipes(getFiles(recipesPath));
-        originalRecipeSort();
+        BukkitRunnable main = new BukkitRunnable() {
+            @Override
+            public void run() {
+                // Get data from each files
+                getBaseBlock(getFiles(baseBlockPath));
+                getResultItems(getFiles(resultItemsPath));
+                getMaterialCategory(getFiles(materialCategoryPath));
+                getRecipeMaterials(getFiles(recipeMaterialPath));
+                getOriginalRecipes(getFiles(recipesPath));
+                originalRecipeSort();
+
+                System.out.println("===\nCustom-Crafter data loaded.\n===");
+            }
+        };
+
+        new BukkitRunnable(){
+            @Override
+            public void run(){
+                if(times<=threshold && returnCode==0){
+                    main.runTaskLater(getInstance(),20);
+                    this.cancel();
+                    System.out.println("[CustomCrafter]Config Download complete!");
+                    return;
+                }else if(times>threshold){
+                    System.out.println("[CustomCrafter]Could not load data.");
+                    this.cancel();
+                    return;
+                }
+                System.out.println(String.format("[CustomCrafter]Downloading now... %d/%d",times,threshold));
+                times++;
+            }
+        }.runTaskTimer(getInstance(),20,load_interval);
     }
+
+
+
 
     private List<Path> getFiles(Path path){
         Stream<Path> paths;
@@ -250,12 +297,10 @@ public class SettingsLoad {
         }
     }
 
-    private void getFilesFromTheSea(){
-        if(!defaultConfig.contains("download"))return;
-        if(defaultConfig.getStringList("download").isEmpty())return;
-
-        List<String> failed = new ArrayList<>();
-        for(String command: defaultConfig.getStringList("download")){
+    @Override
+    public void run(){
+        //runnable
+        for(String command: downloadUri){
             if(command.isEmpty())return;
             ProcessBuilder builder = new ProcessBuilder(Arrays.asList(command.split(" ")));
             Process process;
@@ -272,10 +317,8 @@ public class SettingsLoad {
                 System.out.println("===");
                 failed.add(command);
             }
-
         }
-        defaultConfig.set("download",failed);
-        getInstance().saveConfig();
+        returnCode = 0;
     }
 
     private void configFileDirectoryCheck(Path path){

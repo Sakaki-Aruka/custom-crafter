@@ -2,6 +2,7 @@ package com.github.sakakiaruka.cutomcrafter.customcrafter.commands;
 
 import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.MultiKeys;
 import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.OriginalRecipe;
+import com.github.sakakiaruka.cutomcrafter.customcrafter.some.RecipeMaterialUtil;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -28,10 +29,12 @@ public class CheckObject implements CommandExecutor {
             sender.sendMessage("recipeTotal:"+recipe.getTotal());
             sender.sendMessage("===");
 
-            for(Map.Entry<MultiKeys, ItemStack> entry:recipe.getRecipeMaterial().getRecipeMaterial().entrySet()){
-                sender.sendMessage("key:"+entry.getKey().getKeys());
-                sender.sendMessage("item:"+entry.getValue().getType()+" / "+entry.getValue().getAmount());
-            }
+            sender.sendMessage(new RecipeMaterialUtil().graphicalCoordinate(recipe.getRecipeMaterial()));
+
+//            for(Map.Entry<MultiKeys, ItemStack> entry:recipe.getRecipeMaterial().getRecipeMaterial().entrySet()){
+//                sender.sendMessage("key:"+entry.getKey().getKeys());
+//                sender.sendMessage("item:"+entry.getValue().getType()+" / "+entry.getValue().getAmount());
+//            }
         }
         return true;
     }
