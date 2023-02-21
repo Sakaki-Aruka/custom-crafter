@@ -22,23 +22,23 @@ import java.util.stream.Stream;
 
 import static com.github.sakakiaruka.cutomcrafter.customcrafter.CustomCrafter.getInstance;
 
-public class SettingsLoad extends BukkitRunnable {
-    private static CustomCrafter cc;
+public class SettingsLoad {
     private static FileConfiguration defaultConfig;
     public static List<OriginalRecipe> recipes = new ArrayList<>();
     public static Material baseBlock;
     public static Map<String,List<Material>> mixedCategories = new HashMap<>();
 
+    //=== for sort process ===//
     public static Map<Material,List<OriginalRecipe>> recipesMaterial = new HashMap<>();
     public static Map<Integer,List<OriginalRecipe>> recipesAmount = new HashMap<>();
 
+    //=== for data load process ===//
     private Map<String, ItemStack> recipeResults = new HashMap<>();
     private Map<String,ItemStack> recipeMaterials = new HashMap<>();
     private Map<String,OriginalRecipe> nameAndOriginalRecipe = new HashMap<>();
     private Map<String, EnchantedMaterial> enchantedMaterials = new HashMap<>();
-    private Plugin plugin = getInstance();
 
-    //=== for runnable task ===
+    //=== for runnable task ===//
     private List<String> downloadUri;
     private List<String> failed = new ArrayList<>();
     private int returnCode = -1;
@@ -48,8 +48,7 @@ public class SettingsLoad extends BukkitRunnable {
 
     public void set(){
 
-        cc = getInstance();
-        defaultConfig = cc.getConfig();
+        defaultConfig = getInstance().getConfig();
 
         // Get element paths from the default config file
         Path baseBlockPath = Paths.get(defaultConfig.getString("baseBlock"));
@@ -66,13 +65,39 @@ public class SettingsLoad extends BukkitRunnable {
         configFileDirectoryCheck(recipeMaterialPath);
         configFileDirectoryCheck(recipesPath);
 
+        BukkitRunnable downloader = new BukkitRunnable() {
+            @Override
+            public void run() {
+                //runnable
+                for(String command: downloadUri){
+                    if(command.isEmpty())return;
+                    ProcessBuilder builder = new ProcessBuilder(Arrays.asList(command.split(" ")));
+                    Process process;
+                    try{
+                        process = builder.start();
+                        process.waitFor();
+                    }catch (Exception e){
+                        System.out.println("===");
+                        System.out.println("Custom-Crafter Config File Loader (downloader) error.");
+                        System.out.println("An Exception occurred when start the process.");
+                        System.out.println("Process : "+command);
+                        System.out.println("Current Directory:"+Paths.get("").toUri());
+                        e.printStackTrace();
+                        System.out.println("===");
+                        failed.add(command);
+                    }
+                }
+                returnCode = 0;
+            }
+        };
+
         //getFilesFromTheSea();
         if(defaultConfig.contains("download")){
             if(!defaultConfig.getStringList("download").isEmpty()){
                 downloadUri = defaultConfig.getStringList("download");
                 threshold = defaultConfig.getInt("download_threshold");
                 load_interval = defaultConfig.getInt("load_interval");
-                this.runTaskAsynchronously(getInstance());
+                downloader.runTaskAsynchronously(getInstance());
                 defaultConfig.set("download",failed);
                 getInstance().saveConfig();
             }
@@ -110,7 +135,10 @@ public class SettingsLoad extends BukkitRunnable {
                 times++;
             }
         }.runTaskTimer(getInstance(),20,load_interval);
+
+
     }
+
 
 
 
@@ -297,29 +325,8 @@ public class SettingsLoad extends BukkitRunnable {
         }
     }
 
-    @Override
-    public void run(){
-        //runnable
-        for(String command: downloadUri){
-            if(command.isEmpty())return;
-            ProcessBuilder builder = new ProcessBuilder(Arrays.asList(command.split(" ")));
-            Process process;
-            try{
-                process = builder.start();
-                process.waitFor();
-            }catch (Exception e){
-                System.out.println("===");
-                System.out.println("Custom-Crafter Config File Loader (downloader) error.");
-                System.out.println("An Exception occurred when start the process.");
-                System.out.println("Process : "+command);
-                System.out.println("Current Directory:"+Paths.get("").toUri());
-                e.printStackTrace();
-                System.out.println("===");
-                failed.add(command);
-            }
-        }
-        returnCode = 0;
-    }
+
+
 
     private void configFileDirectoryCheck(Path path){
         if(path.toFile().exists() && path.toFile().isDirectory())return;
