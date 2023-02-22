@@ -40,7 +40,7 @@ public class OriginalRecipe {
     }
 
     public String info(){
-        return String.format("Name:%s | size:%d | recipeMaterial:%s | total:%d | result:%s",recipeName,size,rm.recipeMaterialInfo(),total,result.toString());
+        return String.format("Name:%s | size:%d | recipeMaterial:%s | total:%d | result:%s",recipeName,size,rm.info(),total,result.toString());
     }
 
     public ItemStack getResult(){

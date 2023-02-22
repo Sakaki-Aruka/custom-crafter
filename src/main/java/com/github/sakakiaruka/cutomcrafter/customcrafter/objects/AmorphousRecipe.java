@@ -1,13 +1,13 @@
 package com.github.sakakiaruka.cutomcrafter.customcrafter.objects;
 
+import com.github.sakakiaruka.cutomcrafter.customcrafter.interfaces.Recipe;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Stream;
 
-public class AmorphousRecipe extends RecipeMaterial{
+public class AmorphousRecipe extends RecipeMaterial implements Recipe {
 
     private AmorphousEnum typeEnum;
     private Map<ItemStack,Integer> materials;
@@ -49,5 +49,53 @@ public class AmorphousRecipe extends RecipeMaterial{
         ItemStack air = new ItemStack(Material.AIR);
         if(list.contains(air))list.remove(air);
         return list;
+    }
+
+    public Material getLargestMaterial(){
+        List<ItemStack> items = getLargestItemStack();
+        List<String> names = new ArrayList<>();
+        items.forEach(s->names.add(s.getType().name()));
+        Collections.sort(names);
+        return Material.valueOf(names.get(0));
+    }
+
+    public int getLargestAmount(){
+        return getLargestItemStack().get(0).getAmount();
+    }
+
+    public String info(){
+        String enumType = typeEnum.toString();
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("enumType:%s%n",enumType));
+        for(Map.Entry<ItemStack,Integer> entry:materials.entrySet()){
+            String amount = String.valueOf(entry.getValue());
+            String type = entry.getKey().getType().name();
+            String otherData = entry.getKey().getData().toString();
+
+            sb.append(String.format("amount : %s%n",amount));
+            sb.append(String.format("Material Type:%s%n",type));
+            sb.append(String.format("other Data:%s%n",otherData));
+        }
+        return sb.toString();
+    }
+
+    public boolean isEmpty(){
+        return materials.isEmpty();
+    }
+
+    private List<ItemStack> getLargestItemStack(){
+        List<ItemStack> items = new ArrayList<>();
+        for(Map.Entry<ItemStack,Integer> entry:materials.entrySet()){
+            if(items.size()==0){
+                items.add(entry.getKey());
+            }else if(entry.getKey().getAmount()==items.get(0).getAmount()){
+                //same amount
+                items.add(entry.getKey());
+            }else if(entry.getKey().getAmount() > items.get(0).getAmount()){
+                items.clear();
+                items.add(entry.getKey());
+            }
+        }
+        return items;
     }
 }

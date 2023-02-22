@@ -1,12 +1,13 @@
 package com.github.sakakiaruka.cutomcrafter.customcrafter.objects;
 
+import com.github.sakakiaruka.cutomcrafter.customcrafter.interfaces.Recipe;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
-public class RecipeMaterial{
+public class RecipeMaterial implements Recipe {
 
     private Map<MultiKeys,ItemStack> map = new LinkedHashMap<>();
     private List<ItemStack> returnableItems;
@@ -18,7 +19,7 @@ public class RecipeMaterial{
         }};
     }
 
-    public String recipeMaterialInfo(){
+    public String info(){
         StringBuilder sb = new StringBuilder();
         map.entrySet().forEach(s->sb.append(String.format("key:%s | Item:%s\n",s.getKey().getKeys(),s.getValue())));
         return sb.toString();

@@ -65,6 +65,7 @@ public class SettingsLoad {
         configFileDirectoryCheck(recipeMaterialPath);
         configFileDirectoryCheck(recipesPath);
 
+        // === bukkit runnable === //
         BukkitRunnable downloader = new BukkitRunnable() {
             @Override
             public void run() {
@@ -91,18 +92,6 @@ public class SettingsLoad {
             }
         };
 
-        //getFilesFromTheSea();
-        if(defaultConfig.contains("download")){
-            if(!defaultConfig.getStringList("download").isEmpty()){
-                downloadUri = defaultConfig.getStringList("download");
-                threshold = defaultConfig.getInt("download_threshold");
-                load_interval = defaultConfig.getInt("load_interval");
-                downloader.runTaskAsynchronously(getInstance());
-                defaultConfig.set("download",failed);
-                getInstance().saveConfig();
-            }
-        }
-
         BukkitRunnable main = new BukkitRunnable() {
             @Override
             public void run() {
@@ -117,6 +106,27 @@ public class SettingsLoad {
                 System.out.println("===\nCustom-Crafter data loaded.\n===");
             }
         };
+
+
+
+        // === bukkit runnable === //
+
+        //getFilesFromTheSea();
+        if(defaultConfig.contains("download")){
+            if(!defaultConfig.getStringList("download").isEmpty()){
+                downloadUri = defaultConfig.getStringList("download");
+                threshold = defaultConfig.getInt("download_threshold");
+                load_interval = defaultConfig.getInt("load_interval");
+                downloader.runTaskAsynchronously(getInstance());
+                defaultConfig.set("download",failed);
+                getInstance().saveConfig();
+            }else{
+                main.runTaskLater(getInstance(),20);
+                return;
+            }
+        }
+
+
 
         new BukkitRunnable(){
             @Override
@@ -138,8 +148,6 @@ public class SettingsLoad {
 
 
     }
-
-
 
 
 
@@ -263,6 +271,13 @@ public class SettingsLoad {
     private void getOriginalRecipes(List<Path> paths){
         for (Path path:paths){
             FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
+
+            //AmorphousRecipe data get
+            if(config.contains("amorphous")){
+                getAmorphousRecipe(config);
+                continue;
+            }
+
             String name = config.getString("name");
             int size = config.getInt("size");
             ItemStack result = recipeResults.get(config.getString("result"));
@@ -294,6 +309,26 @@ public class SettingsLoad {
             recipes.add(originalRecipe);
             nameAndOriginalRecipe.put(originalRecipe.getRecipeName(),originalRecipe);
         }
+    }
+
+    private void getAmorphousRecipe(FileConfiguration config){
+        String name = config.getString("name");
+        int size = 0;
+        AmorphousEnum enumType = AmorphousEnum.valueOf(config.getString("enum").toUpperCase());
+        List<String> list = config.getStringList("materials");
+        ItemStack result = recipeResults.get(config.getString("result"));
+        Map<ItemStack,Integer> map = new HashMap<>();
+        for(String str:list){
+            List<String> info = Arrays.asList(str.split(","));
+            ItemStack item = recipeMaterials.get(info.get(0));
+            int amount = Integer.valueOf(info.get(1));
+            map.put(item,amount);
+        }
+        AmorphousRecipe amorphous = new AmorphousRecipe(enumType,map);
+        int total = amorphous.getTotalItems();
+        OriginalRecipe originalRecipe = new OriginalRecipe(result,size,total,amorphous,name);
+        recipes.add(originalRecipe);
+        nameAndOriginalRecipe.put(name,originalRecipe);
     }
 
     private void originalRecipeSort(){
