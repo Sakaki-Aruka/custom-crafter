@@ -1,6 +1,5 @@
 package com.github.sakakiaruka.cutomcrafter.customcrafter.listeners.clickInventorysMethods;
 
-import com.github.sakakiaruka.cutomcrafter.customcrafter.listeners.clickInventorysMethods.searchMethods.RecipeTypeGuidePost;
 import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.*;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
@@ -30,14 +29,8 @@ public class Search {
         if(originals.isEmpty())return null;
 
         for(OriginalRecipe original:originals){
-//            if(new CommonProcess().containsRegexRecipeMaterial(original.getRecipeMaterial())){
-//                //contains RegexRecipeMaterial
-//                List<ItemStack> results = new RegexRecipeMaterialProcess().searchRegexRecipe(original.getRecipeMaterial(),real);
-//                if(results.isEmpty())continue;
-//                list.addAll(results);
-//                continue;
-//            }
-            if(!new RecipeTypeGuidePost().main(original,real))continue;
+
+            //
             list.add(original.getResult());
         }
 
