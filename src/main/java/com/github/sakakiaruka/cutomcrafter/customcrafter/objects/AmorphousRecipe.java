@@ -1,13 +1,12 @@
 package com.github.sakakiaruka.cutomcrafter.customcrafter.objects;
 
-import com.github.sakakiaruka.cutomcrafter.customcrafter.interfaces.Recipe;
+import com.github.sakakiaruka.cutomcrafter.customcrafter.interfaces.Materials;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
-import java.util.stream.Stream;
 
-public class AmorphousRecipe extends RecipeMaterial implements Recipe {
+public class AmorphousRecipe extends RecipeMaterial implements Materials {
 
     private AmorphousEnum typeEnum;
     private Map<ItemStack,Integer> materials;

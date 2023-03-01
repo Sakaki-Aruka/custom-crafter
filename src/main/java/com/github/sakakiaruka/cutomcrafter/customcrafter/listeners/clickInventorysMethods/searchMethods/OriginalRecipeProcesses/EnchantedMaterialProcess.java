@@ -13,36 +13,23 @@ import java.util.List;
 import java.util.Map;
 
 public class EnchantedMaterialProcess {
-    public boolean isSameItems(RecipeMaterial model,RecipeMaterial real){
-        List<Integer> inModel = getEnchantedPlaceList(model.getItemStackListNoAir());
-        List<ItemStack> models = model.getItemStackListNoAir();
-        List<ItemStack> reals = real.getItemStackListNoAir();
 
-        for(int i=0;i<models.size();i++){
-            if(inModel.contains(i))continue;
-            if(!models.get(i).equals(reals.get(i)))return false;
-        }
+    public boolean isSameItem(ItemStack model,ItemStack real){
+        Map<Enchantment,Integer> realEnchants = real.getEnchantments();
+        Map<IntegratedEnchant,EnchantedMaterialEnum> modelEnchants = ((EnchantedMaterial)model).getRelation();
 
-        for(int i=0;i< inModel.size();i++){
-            //reals
-            Map<Enchantment,Integer> realEnchants = reals.get(inModel.get(i)).getEnchantments();
-            //models
-            Map<IntegratedEnchant,EnchantedMaterialEnum> enchantsAdvanced = ((EnchantedMaterial)models.get(inModel.get(i))).getRelation();
+        for(Map.Entry<IntegratedEnchant,EnchantedMaterialEnum> entry:modelEnchants.entrySet()){
+            if(entry.getValue().equals(EnchantedMaterialEnum.NotStrict))continue;
+            if(!realEnchants.keySet().contains(entry.getKey().getEnchant()))return false; // not contains needed enchantment
 
-            if(realEnchants.size() != enchantsAdvanced.size())return false;
-            List<IntegratedEnchant> modelEnchants = new ArrayList<>(Arrays.asList(enchantsAdvanced.keySet().toArray(new IntegratedEnchant[0])));
-            List<EnchantedMaterialEnum> enumTypes = (List<EnchantedMaterialEnum>) enchantsAdvanced.values();
+            if(entry.getValue().equals(EnchantedMaterialEnum.OnlyEnchant) &&
+            realEnchants.keySet().contains(entry.getKey().getEnchant())) continue; // real contains needed enchant
 
-            for(int j=0;j<realEnchants.size();j++){
-                EnchantedMaterialEnum enumType = enumTypes.get(i);
-                if(enumType.equals(EnchantedMaterialEnum.NotStrict))continue;
-                Enchantment require = modelEnchants.get(i).getEnchant();
-                if(!realEnchants.keySet().contains(require))return false;
-                if(enumType.equals(EnchantedMaterialEnum.OnlyEnchant))continue;
-                int modelLevel = modelEnchants.get(i).getLevel();
-                int realLevel = realEnchants.get(require);
-                if(modelLevel != realLevel)return false;
-            }
+            if(entry.getValue().equals(EnchantedMaterialEnum.Strict) &&
+            realEnchants.keySet().contains(entry.getKey().getEnchant()) &&
+            realEnchants.get(entry.getKey().getEnchant()) == entry.getKey().getLevel())continue;
+
+            return false;
         }
         return true;
     }

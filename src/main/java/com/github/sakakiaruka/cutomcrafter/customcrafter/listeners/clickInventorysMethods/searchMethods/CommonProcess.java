@@ -1,23 +1,12 @@
 package com.github.sakakiaruka.cutomcrafter.customcrafter.listeners.clickInventorysMethods.searchMethods;
 
-import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.AmorphousEnum;
-import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.AmorphousRecipe;
-import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.MultiKeys;
-import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.RecipeMaterial;
+import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.*;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
 public class CommonProcess {
-    public int getTotal(RecipeMaterial in){
-        int result = 0;
-        for(Map.Entry<MultiKeys, ItemStack> entry:in.getRecipeMaterial().entrySet()){
-            if(entry.getValue().getType().equals(Material.AIR))continue;
-            result+=entry.getValue().getAmount();
-        }
-        return result;
-    }
 
     public int getSquareSize(RecipeMaterial in) {
         List<MultiKeys> coordinates = in.getMultiKeysListNoAir();
@@ -45,6 +34,16 @@ public class CommonProcess {
         return true;
     }
 
+    public RecipeMaterial shapeUp(RecipeMaterial model,RecipeMaterial real){
+        List<MultiKeys> models = model.getMultiKeysListNoAir();
+        List<ItemStack> reals = real.getItemStackListNoAir();
+        RecipeMaterial result = new RecipeMaterial();
+        for(int i=0;i<models.size();i++){
+            result.put(models.get(i),reals.get(i));
+        }
+        return result;
+    }
+
     public AmorphousRecipe toAmorphous(RecipeMaterial in){
         List<ItemStack> list = in.getItemStackListNoAir();
         Map<ItemStack,Integer> map = new HashMap<>();
@@ -66,18 +65,23 @@ public class CommonProcess {
     }
 
     public boolean containsMixedMaterial(RecipeMaterial in){
-        return getClassSet(in).contains("MixedMaterial");
+        return getClassSet(in).contains(MixedMaterial.class);
     }
 
     public boolean containsEnchantedMaterial(RecipeMaterial in){
-        return getClassSet(in).contains("EnchantedMaterial");
+        return getClassSet(in).contains(EnchantedMaterial.class);
     }
 
-    private Set<String> getClassSet(RecipeMaterial in){
+    public boolean containsRegexRecipeMaterial(RecipeMaterial in){
+        return getClassSet(in).contains(RegexRecipeMaterial.class);
+    }
+
+    private Set<Class> getClassSet(RecipeMaterial in){
         List<ItemStack> items = in.getItemStackListNoAir();
-        Set<String> classes = new HashSet<>();
-        items.forEach(s->classes.add(s.getClass().toGenericString()));
+        Set<Class> classes = new HashSet<>();
+        items.forEach(s->classes.add(s.getClass()));
         return classes;
     }
+
 
 }

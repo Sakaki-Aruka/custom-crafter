@@ -5,7 +5,7 @@ import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.Map;
+import java.util.*;
 
 public class AmorphousRecipeProcessHub {
     public boolean main(OriginalRecipe original,RecipeMaterial realMaterial){
@@ -18,28 +18,51 @@ public class AmorphousRecipeProcessHub {
         boolean mixedMaterial = shared.containsMixedMaterial(model);
         boolean enchantedMaterial = shared.containsEnchantedMaterial(model);
 
-        if(!mixedMaterial && !enchantedMaterial){
-            //amorphousRecipe only
-            return model.getMaterials().equals(real.getMaterials());
+        for(ItemStack item:getItemStackList(model)){
+            // real does not contain items
+            if(!real.getMaterials().keySet().contains(item))return false;
+            // if real does not contain amount more than needed
+            if(real.getMaterials().get(item) < model.getMaterials().get(item))return false;
 
+            int amount = real.getMaterials().get(item) - model.getMaterials().get(item);
+            real.getMaterials().put(item,amount);
         }
-        if(mixedMaterial && !enchantedMaterial){
-            //mixedMaterial only
-            return new MixedMaterialProcess().isSameItems(model,real);
 
-        }
-        if(!mixedMaterial && enchantedMaterial){
-            //enchantedMaterial only
-            return new EnchantedMaterialProcess().isSameItems(model,real);
+        for(ItemStack item:getOtherStackList(model)){
+            if(item.getClass().equals(EnchantedMaterial.class)){
+                // enchantedMaterial
+            }else if(item.getClass().equals(RegexRecipeMaterial.class)){
+                // regexRecipeMaterial
 
+            }
         }
-        if(mixedMaterial && enchantedMaterial){
-            //all
-            if(!new MixedMaterialProcess().isSameItems(model,real))return false;
-            if(!new EnchantedMaterialProcess().isSameItems(model,real))return false;
-            return true;
 
-        }
+
+
         return false;
+    }
+
+    private List<ItemStack> getItemStackList(AmorphousRecipe model){
+        List<ItemStack> list = new ArrayList<>();
+        for(Map.Entry<ItemStack,Integer> entry:model.getMaterials().entrySet()){
+            if(entry.getClass().equals(ItemStack.class))list.add(entry.getKey());
+        }
+        return list;
+    }
+
+    private List<ItemStack> getOtherStackList(AmorphousRecipe model){
+        List<ItemStack> list = new ArrayList<>();
+        for(Map.Entry<ItemStack,Integer> entry:model.getMaterials().entrySet()){
+            if(!entry.getClass().equals(ItemStack.class))list.add(entry.getKey());
+        }
+        return list;
+    }
+
+
+    private AmorphousRecipe getConfirmedAmorphousRecipe(AmorphousRecipe model,List<ItemStack> pure){
+        for(ItemStack item:pure){
+            model.getMaterials().remove(item);
+        }
+        return model;
     }
 }

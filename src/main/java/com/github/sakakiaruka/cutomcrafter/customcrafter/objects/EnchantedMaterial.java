@@ -22,6 +22,6 @@ public class EnchantedMaterial extends ItemStack {
     }
 
     public void setBrandNew(){
-        relation.entrySet().forEach(s->relation.remove(s.getKey()));
+        relation.clear();
     }
 }

@@ -5,7 +5,7 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.List;
 
-public interface Recipe {
+public interface Materials {
     public abstract List<ItemStack> getItemStackListNoAir();
     public abstract Material getLargestMaterial();
     public abstract int getLargestAmount();

@@ -15,13 +15,6 @@ public class OriginalRecipe {
     private String recipeName;
     private RecipeMaterial rm;
     private Map<Material,Integer> amountRelation;
-    public OriginalRecipe(){
-        this.result = null;
-        this.size = -1;
-        this.rm = null;
-        this.total = -1;
-        this.recipeName = null;
-    }
 
     public OriginalRecipe(int size,int total,RecipeMaterial rm){
         this.recipeName = "unknown";
