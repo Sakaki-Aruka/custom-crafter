@@ -7,7 +7,10 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 
 import java.util.Map;
@@ -30,12 +33,15 @@ public class CheckObject implements CommandExecutor {
             sender.sendMessage("===");
 
             sender.sendMessage(new RecipeMaterialUtil().graphicalCoordinate(recipe.getRecipeMaterial()));
-
-//            for(Map.Entry<MultiKeys, ItemStack> entry:recipe.getRecipeMaterial().getRecipeMaterial().entrySet()){
-//                sender.sendMessage("key:"+entry.getKey().getKeys());
-//                sender.sendMessage("item:"+entry.getValue().getType()+" / "+entry.getValue().getAmount());
-//            }
         }
         return true;
+    }
+
+    private String formatInfo(ItemMeta meta){
+        StringBuilder builder = new StringBuilder();
+        meta.getEnchants().entrySet().forEach(s->{
+            builder.append(String.format("Enchant : %s | Level : %d %n",s.getKey().toString(),s.getValue()));
+        });
+        return builder.toString();
     }
 }

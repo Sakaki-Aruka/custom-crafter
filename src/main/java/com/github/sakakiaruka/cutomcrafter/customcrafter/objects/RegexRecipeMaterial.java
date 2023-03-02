@@ -1,43 +1,68 @@
 package com.github.sakakiaruka.cutomcrafter.customcrafter.objects;
 
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class RegexRecipeMaterial extends ItemStack {
-    private String regex;
-    private RegexRecipeMaterilEnum enumType;
-    private int quantity;
+    private RegexRecipeMaterialEnum enumType;
+    private String pattern;
+    private int matchPoint;
+    private List<Material> matched;
+    private ItemStack provisional;
 
-    public RegexRecipeMaterial(String regex,RegexRecipeMaterilEnum enumType,int quantity){
-        this.regex = regex;
+    public RegexRecipeMaterial(RegexRecipeMaterialEnum enumType,String pattern,int matchPoint){
         this.enumType = enumType;
-        this.quantity = quantity;
+        this.pattern = pattern;
+        this.matchPoint = matchPoint;
+        this.matched = new ArrayList<>();
+        this.provisional = null;
     }
 
-    public RegexRecipeMaterial(){}
-
-    public String getRegex() {
-        return regex;
+    public ItemStack getProvisional() {
+        return provisional;
     }
 
-    public void setRegex(String regex) {
-        this.regex = regex;
+    public void setProvisional(ItemStack provisional) {
+        this.provisional = provisional;
     }
 
-    public RegexRecipeMaterilEnum getEnumType() {
+    public RegexRecipeMaterialEnum getEnumType() {
         return enumType;
     }
 
-    public void setEnumType(RegexRecipeMaterilEnum enumType) {
+    public void setEnumType(RegexRecipeMaterialEnum enumType) {
         this.enumType = enumType;
     }
 
-    public int getAmount() {
-        return quantity;
+    public String getPattern() {
+        return pattern;
     }
 
-    public void setAmount(int quantity) {
-        this.quantity = quantity;
+    public void setPattern(String pattern) {
+        this.pattern = pattern;
     }
 
+    public List<Material> getMatched() {
+        return matched;
+    }
+
+    public void setMatched(List<Material> matched) {
+        this.matched = matched;
+    }
+
+    public int getMatchPoint() {
+        return matchPoint;
+    }
+
+    public void setMatchPoint(int matchPoint) {
+        this.matchPoint = matchPoint;
+    }
+
+    public void addMatched(Material matched){
+        this.matched.add(matched);
+    }
 }

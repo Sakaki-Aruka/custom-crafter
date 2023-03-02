@@ -2,20 +2,26 @@ package com.github.sakakiaruka.cutomcrafter.customcrafter.listeners.clickInvento
 
 import com.github.sakakiaruka.cutomcrafter.customcrafter.objects.*;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import static com.github.sakakiaruka.cutomcrafter.customcrafter.some.SettingsLoad.recipesAmount;
-import static com.github.sakakiaruka.cutomcrafter.customcrafter.some.SettingsLoad.recipesMaterial;
+import static com.github.sakakiaruka.cutomcrafter.customcrafter.some.SettingsLoad.*;
 
 
 public class Search {
+
+    private List<ItemStack> results = new ArrayList<>();
+    private final int size = 6;
+
     public List<ItemStack> search(Inventory inventory,int size){
         RecipeMaterial real = toRecipeMaterial(inventory,size);
         if(real.isEmpty())return null;
-        List<ItemStack> list = new ArrayList<>();
+
 
         Set<OriginalRecipe> originals = new HashSet<>();
         Material top_material = real.getLargestMaterial();
@@ -29,13 +35,22 @@ public class Search {
         if(originals.isEmpty())return null;
 
         for(OriginalRecipe original:originals){
-
-            //
-            list.add(original.getResult());
+            // Search here
+            if(hasRegexResult(original)){
+                if(getResultsRegexOn(original,inventory) == null)continue;
+                results.addAll(getResultsRegexOn(original,inventory));
+            }else{
+                if(getResultsRegexOff(original,inventory) == null)continue;
+                results.addAll(getResultsRegexOff(original,inventory));
+            }
         }
 
-        if(list.isEmpty())return null;
-        return list;
+        if(results.isEmpty())return null;
+        return results;
+    }
+
+    private boolean hasRegexResult(OriginalRecipe in){
+        return in.getResult().getClass().equals(RegexRecipeMaterial.class);
     }
 
     private RecipeMaterial toRecipeMaterial(Inventory inventory,int size){
@@ -57,5 +72,153 @@ public class Search {
             }
         }
         return recipeMaterial;
+    }
+
+    private int getTotal(RecipeMaterial in){
+        int result = 0;
+        for(Map.Entry<MultiKeys,ItemStack> entry : in.getRecipeMaterial().entrySet()){
+            if(entry.getValue().getType().equals(Material.AIR))continue;
+            result++;
+        }
+        return result;
+    }
+
+    private int getSquareSize(RecipeMaterial in){
+        List<MultiKeys> keys = in.getMultiKeysListNoAir();
+        List<Integer> x = new ArrayList<>();
+        List<Integer> y = new ArrayList<>();
+        keys.forEach(s -> {
+            x.add(s.getKey1());
+            y.add(s.getKey2());
+        });
+        Collections.sort(x);
+        Collections.sort(y);
+        int width = Math.abs(x.get(0) - x.get(x.size()-1)) + 1;
+        int height = Math.abs(y.get(0) - y.get(y.size()-1) + 1);
+        return Math.max(width,height);
+    }
+
+    private boolean isSameShape(List<MultiKeys> models,List<MultiKeys> reals){
+        int xGap = models.get(0).getKey1() - reals.get(0).getKey1();
+        int yGap = models.get(0).getKey2() - reals.get(0).getKey2();
+        int size = models.size();
+        for(int i=1;i<size;i++){
+            if(models.get(i).getKey1() - reals.get(i).getKey1() != xGap)return false;
+            if(models.get(i).getKey2() - reals.get(i).getKey2() != yGap)return false;
+        }
+        return true;
+    }
+
+    private boolean hasRegexMaterial(List<ItemStack> model){
+        for(ItemStack item:model){
+            if(item.getClass().equals(RegexRecipeMaterial.class))return true;
+        }
+        return false;
+    }
+
+    private boolean isSameEnchantedMaterial(ItemStack in,ItemStack real){
+        EnchantedMaterial model = (EnchantedMaterial) in;
+        Map<Enchantment,Integer> enchants = real.getEnchantments();
+        for(Map.Entry<IntegratedEnchant,EnchantedMaterialEnum> entry:model.getRelation().entrySet()){
+            if(entry.getValue().equals(EnchantedMaterialEnum.NotStrict))continue;
+            if(!enchants.containsKey(entry.getKey().getEnchant()))return false;
+            if(entry.getValue().equals(EnchantedMaterialEnum.OnlyEnchant))continue;
+            if(enchants.get(entry.getKey().getEnchant()) != entry.getKey().getLevel())return false;
+        }
+        return true;
+    }
+
+    private boolean isSameMixedMaterial(ItemStack in,ItemStack real){
+        MixedMaterial model = (MixedMaterial) in;
+        Material typeOfReal = real.getType();
+        return mixedCategories.get(model.getMaterialCategory()).contains(typeOfReal);
+    }
+
+    private String isSameRegexRecipeMaterial(ItemStack in,ItemStack real){
+        // if return "", a RegexRecipeMaterial and an ItemStack are not same.
+        RegexRecipeMaterial model = (RegexRecipeMaterial) in;
+        Material typeOfReal = real.getType();
+        if(!model.getMatched().contains(typeOfReal))return "";
+
+        Pattern pattern = Pattern.compile(model.getPattern());
+        Matcher matcher = pattern.matcher(typeOfReal.name());
+        String matched = "";
+        while(matcher.find()){
+            matched = matcher.group(model.getMatchPoint());
+        }
+        return matched;
+    }
+
+    private List<ItemStack> getResultsRegexOn(OriginalRecipe original,Inventory inventory){
+        RecipeMaterial model = original.getRecipeMaterial();
+        RecipeMaterial real = toRecipeMaterial(inventory,size);
+
+        if(original.getRecipeMaterial().getClass().equals(RecipeMaterial.class)){
+            //natural RecipeMaterial
+            if(getTotal(model) != getTotal(real))return null;
+            if(getSquareSize(model) != getSquareSize(real))return null;
+            if(!isSameShape(model.getMultiKeysListNoAir(),real.getMultiKeysListNoAir()))return null;
+
+            List<ItemStack> models = model.getItemStackListNoAir();
+            List<ItemStack> reals = real.getItemStackListNoAir();
+            if(!hasRegexMaterial(models))return null;
+
+            String matched = "";
+            for(int i=0;i<models.size();i++){
+                ItemStack m = models.get(i);
+                ItemStack r = reals.get(i);
+                if(m.getClass().equals(EnchantedMaterial.class)){
+                    if(!isSameEnchantedMaterial(m,r))return null;
+                }else if(m.getClass().equals(MixedMaterial.class)){
+                    if(!isSameMixedMaterial(m,r))return null;
+                }else if(m.getClass().equals(RegexRecipeMaterial.class)){
+                    if(((matched = isSameRegexRecipeMaterial(m,r))) == "")return null;
+                }else if(m.getClass().equals(ItemStack.class)){
+                    if(!m.isSimilar(r))return null;
+                }
+            }
+
+            String resultMaterialName = ((RegexRecipeMaterial)original.getResult()).getPattern();
+            resultMaterialName.replace("{R}",matched);
+            Material resultMaterial = Material.valueOf(resultMaterialName.toUpperCase());
+            ItemStack result = ((RegexRecipeMaterial)original.getResult()).getProvisional();
+            result.setType(resultMaterial); // change result item's Material Type.
+            return Arrays.asList(result);
+
+        }else{
+            //AmorphousRecipe
+        }
+
+
+        //debug
+        return null;
+    }
+
+    private List<ItemStack> getResultsRegexOff(OriginalRecipe original,Inventory inventory){
+        RecipeMaterial model = original.getRecipeMaterial();
+        RecipeMaterial real = toRecipeMaterial(inventory,size);
+
+        if(original.getRecipeMaterial().getClass().equals(RecipeMaterial.class)){
+            // natural RecipeMaterial
+            if(getTotal(model) != getTotal(real))return null;
+            if(getSquareSize(model) != getSquareSize(real))return null;
+            if(!isSameShape(model.getMultiKeysListNoAir(),real.getMultiKeysListNoAir()))return null;
+
+            List<ItemStack> models = model.getItemStackListNoAir();
+            List<ItemStack> reals = real.getItemStackListNoAir();
+
+            for(int i=0;i<models.size();i++){
+                if(!models.get(i).isSimilar(reals.get(i)))return null;
+            }
+            //finish recipeMaterial-check
+            return Arrays.asList(original.getResult());
+
+        }else{
+            // amorphous recipe
+        }
+
+
+        //debug
+        return null;
     }
 }

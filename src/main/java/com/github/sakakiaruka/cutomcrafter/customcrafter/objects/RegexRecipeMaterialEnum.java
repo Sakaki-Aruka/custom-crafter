@@ -1,7 +1,7 @@
 package com.github.sakakiaruka.cutomcrafter.customcrafter.objects;
 
-public enum RegexRecipeMaterilEnum {
+public enum RegexRecipeMaterialEnum {
     MATERIAL,
     RESULT;
-    private RegexRecipeMaterilEnum(){}
+    private RegexRecipeMaterialEnum(){}
 }
