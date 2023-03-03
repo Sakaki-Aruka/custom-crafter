@@ -130,7 +130,7 @@ public class Search {
         // if return "", a RegexRecipeMaterial and an ItemStack are not same.
         RegexRecipeMaterial model = (RegexRecipeMaterial) in;
         Material typeOfReal = real.getType();
-        if(!model.getMatched().contains(typeOfReal))return "";
+        if(!model.getCandidate().contains(typeOfReal))return "";
 
         Pattern pattern = Pattern.compile(model.getPattern());
         Matcher matcher = pattern.matcher(typeOfReal.name());
@@ -246,25 +246,182 @@ public class Search {
                 }
             });
 
-            for(Map.Entry<ItemStack,Integer> entry:amorphousReal.getMaterials().entrySet()){
-                //remove
-                if(entry.getKey().getClass().equals(MixedMaterial.class)){
-                    List<Material> candidate = ((MixedMaterial)entry.getKey()).getCandidate();
-                    if(!containsSet(candidate,relationReal.keySet()))return null;
-
+            for(ItemStack normal:getNormal(amorphousModel)){
+                //normal
+                int amount = relationReal.get(normal.getType()) - normal.getAmount();
+                if(!relationReal.keySet().contains(normal.getType()))return null;
+                if(amount < 0)return null;
+                if(amount ==0){
+                    relationReal.remove(normal.getType());
+                    continue;
                 }
+                relationReal.put(normal.getType(),amount);
             }
 
+            for(ItemStack peculiar:getPeculiar(amorphousModel)){
+                //peculiar
+                int where;
+                List<Material> candidate = peculiar.getClass().equals(MixedMaterial.class) ? ((MixedMaterial)peculiar).getCandidate() : ((RegexRecipeMaterial)peculiar).getCandidate();
+                if((where = containsSet(candidate,relationReal.keySet())) == -1)return null;
+                Material matched = candidate.get(where);
+                int amount;
+                if((amount = relationReal.get(matched) - peculiar.getAmount()) < 0)return null;
+                if(amount == 0){
+                    relationReal.remove(matched);
+                    continue;
+                }
+                relationReal.put(matched,amount);
+            }
+
+            if(!relationReal.isEmpty())return null;
+            // --- finish to check amount similar --- //
+
+            // --- check items detail --- //
+            if(!getEnchantedRealList(amorphousReal).isEmpty()){
+                // enchanted material
+                List<EnchantedMaterial> enchants = getEnchantedList(amorphousModel);
+                List<ItemStack> enchantsReal = getEnchantedRealList(amorphousReal);
+
+                if(enchants.size() != enchantsReal.size())return null;
+                for(EnchantedMaterial e:enchants){
+                    Material m = e.getType();
+                    boolean broken = false;
+                    for(ItemStack item:enchantsReal){
+                        if(!item.getType().equals(m))continue;
+                        if(getEnchantCongruence(e.getRelation(),item.getEnchantments())){
+                            broken = true;
+                            continue;
+                        }
+                        broken = false;
+                    }
+                    if(!broken)return null;
+                }
+            }
+            // --- finish to check items detail --- //
+            return Arrays.asList(original.getResult());
 
         }
-        //debug
-        return null;
     }
 
-    private boolean containsSet(List<Material> candidate,Set<Material> real){
-        for(Material m:real){
-            if(candidate.contains(m))return true;
+    private boolean getEnchantCongruence(Map<IntegratedEnchant,EnchantedMaterialEnum> model,Map<Enchantment,Integer> real){
+        List<Enchantment> onlyEnchants = new ArrayList<>();
+        model.entrySet().forEach(s->{
+            if(s.getValue().equals(EnchantedMaterialEnum.OnlyEnchant)){
+                onlyEnchants.add(s.getKey().getEnchant());
+            }
+        });
+        if(!real.keySet().containsAll(onlyEnchants))return false;
+        onlyEnchants.forEach(s->real.remove(s));
+
+        Map<Enchantment,Integer> strictMode = new HashMap<>();
+        model.entrySet().forEach(s->{
+            if(s.getValue().equals(EnchantedMaterialEnum.Strict)){
+                strictMode.put(s.getKey().getEnchant(),s.getKey().getLevel());
+            }
+        });
+
+        for(Map.Entry<Enchantment,Integer> entry:strictMode.entrySet()){
+            if(!real.containsKey(entry.getKey()))return false; // not found enchant
+            if(real.get(entry.getKey()) != entry.getValue())return false; // not equals the enchantment level
         }
-        return false;
+        return true;
+
+    }
+
+    private List<ItemStack> getNormal(AmorphousRecipe in){
+        List<ItemStack> list = new ArrayList<>();
+        for(Map.Entry<ItemStack,Integer> entry:in.getMaterials().entrySet()){
+            if(entry.getKey().getClass().equals(ItemStack.class)
+            || entry.getKey().getClass().equals(EnchantedMaterial.class)){
+                // normal
+                list.add(entry.getKey());
+            }
+        }
+        return list;
+    }
+
+    private List<EnchantedMaterial> getEnchantedList(AmorphousRecipe in){
+        List<EnchantedMaterial> list = new ArrayList<>();
+        for(Map.Entry<ItemStack,Integer> entry:in.getMaterials().entrySet()){
+            if(entry.getKey().getClass().equals(EnchantedMaterial.class))list.add((EnchantedMaterial) entry.getKey());
+        }
+        return list;
+    }
+
+    private List<ItemStack> getEnchantedRealList(AmorphousRecipe in){
+        List<ItemStack> list = new ArrayList<>();
+        for(Map.Entry<ItemStack,Integer> entry:in.getMaterials().entrySet()){
+            if(entry.getKey().getEnchantments().isEmpty())continue;
+            list.add(entry.getKey());
+        }
+        return list;
+    }
+
+    private String getMatchedString(AmorphousRecipe model,AmorphousRecipe real){
+        List<Material> reals = new ArrayList<>();
+        List<Material> models = new ArrayList<>();
+        List<String> patterns = new ArrayList<>();
+        if(getRegexRecipeMaterialList(model).isEmpty())return null;
+        real.getItemStackListNoAir().forEach(s->reals.add(s.getType()));
+        model.getItemStackListNoAir().forEach(s->models.add(s.getType()));
+        getRegexRecipeMaterialList(model).forEach(s->patterns.add(s.getPattern()));
+
+        if(!isAllSame(patterns))return null;
+        String pattern = patterns.get(0);
+        Pattern p = Pattern.compile(pattern);
+        int place = getRegexRecipeMaterialList(model).get(0).getMatchPoint();
+        int howMatched = 0;
+        String matched = "";
+        for(Material material:reals){
+            String name = material.name();
+            Matcher m = p.matcher(name);
+            String temp = "";
+            while(m.find()){
+                temp = m.group(place);
+            }
+            if(!temp.equals(""))howMatched++;
+        }
+        if(howMatched != 1)return null;
+
+        return matched;
+    }
+
+    private List<RegexRecipeMaterial> getRegexRecipeMaterialList(AmorphousRecipe in){
+        List<RegexRecipeMaterial> list = new ArrayList<>();
+        for(Map.Entry<ItemStack,Integer> entry:in.getMaterials().entrySet()){
+            if(entry.getKey().getClass().equals(RegexRecipeMaterial.class))list.add((RegexRecipeMaterial)entry.getKey());
+        }
+        return list;
+    }
+
+    private boolean isAllSame(List<String> list){
+        if(list.isEmpty())return false;
+        String s = list.get(0);
+        for(String str:list){
+            if(!str.equals(s))return false;
+        }
+        return true;
+    }
+
+    private List<ItemStack> getPeculiar(AmorphousRecipe in){
+        List<ItemStack> list = new ArrayList<>();
+        for(Map.Entry<ItemStack,Integer> entry:in.getMaterials().entrySet()){
+            if(entry.getKey().getClass().equals(RegexRecipeMaterial.class)
+            || entry.getKey().getClass().equals(MixedMaterial.class)){
+                //peculiar
+                list.add(entry.getKey());
+            }
+        }
+        return list;
+    }
+
+    private int containsSet(List<Material> candidate,Set<Material> real){
+        List<Material> reals = new ArrayList<>();
+        real.forEach(s->reals.add(s));
+
+        for(int i=0;i<real.size();i++){
+            if(candidate.contains(reals.get(i)))return i;
+        }
+        return -1;
     }
 }

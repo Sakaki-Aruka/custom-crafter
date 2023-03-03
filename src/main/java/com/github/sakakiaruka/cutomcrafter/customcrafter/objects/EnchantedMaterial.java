@@ -24,4 +24,8 @@ public class EnchantedMaterial extends ItemStack {
     public void setBrandNew(){
         relation.clear();
     }
+
+    public int getAmount(){
+        return super.getAmount();
+    }
 }
