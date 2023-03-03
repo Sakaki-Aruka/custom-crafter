@@ -232,8 +232,39 @@ public class Search {
 
         }else {
             // amorphous recipe
+            AmorphousRecipe amorphousModel = (AmorphousRecipe) model;
+            AmorphousRecipe amorphousReal = toAmorphousRecipe(real);
+
+            //create relation
+            Map<Material,Integer> relationReal = new HashMap<>();
+            amorphousReal.getMaterials().entrySet().forEach(s->{
+                if(relationReal.keySet().contains(s.getKey().getType())){
+                    int amount = relationReal.get(s.getKey().getType()) + s.getKey().getAmount();
+                    relationReal.put(s.getKey().getType(),amount);
+                }else{
+                    relationReal.put(s.getKey().getType(),s.getKey().getAmount());
+                }
+            });
+
+            for(Map.Entry<ItemStack,Integer> entry:amorphousReal.getMaterials().entrySet()){
+                //remove
+                if(entry.getKey().getClass().equals(MixedMaterial.class)){
+                    List<Material> candidate = ((MixedMaterial)entry.getKey()).getCandidate();
+                    if(!containsSet(candidate,relationReal.keySet()))return null;
+
+                }
+            }
+
+
         }
         //debug
         return null;
+    }
+
+    private boolean containsSet(List<Material> candidate,Set<Material> real){
+        for(Material m:real){
+            if(candidate.contains(m))return true;
+        }
+        return false;
     }
 }

@@ -1,12 +1,12 @@
 package com.github.sakakiaruka.cutomcrafter.customcrafter.objects;
 
-import com.github.sakakiaruka.cutomcrafter.customcrafter.interfaces.Materials;
+import com.github.sakakiaruka.cutomcrafter.customcrafter.interfaces.Recipes;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
-public class RecipeMaterial implements Materials {
+public class RecipeMaterial implements Recipes {
 
     private Map<MultiKeys,ItemStack> map = new LinkedHashMap<>();
     private List<ItemStack> returnableItems;

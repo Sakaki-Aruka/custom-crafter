@@ -1,10 +1,15 @@
 package com.github.sakakiaruka.cutomcrafter.customcrafter.objects;
 
+import com.github.sakakiaruka.cutomcrafter.customcrafter.interfaces.Materials;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.List;
 
-public class MixedMaterial extends ItemStack {
+import static com.github.sakakiaruka.cutomcrafter.customcrafter.some.SettingsLoad.mixedCategories;
+
+
+public class MixedMaterial extends ItemStack implements Materials {
     private String materialCategory;
 
     public MixedMaterial(String materialCategory,Material material,int amount){
@@ -19,6 +24,10 @@ public class MixedMaterial extends ItemStack {
 
     public String getMaterialCategory() {
         return materialCategory;
+    }
+
+    public List<Material> getCandidate(){
+        return mixedCategories.get(this.materialCategory);
     }
 
     public String info(){

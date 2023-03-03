@@ -1,5 +1,6 @@
 package com.github.sakakiaruka.cutomcrafter.customcrafter.objects;
 
+import com.github.sakakiaruka.cutomcrafter.customcrafter.interfaces.Materials;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -9,7 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class RegexRecipeMaterial extends ItemStack {
+public class RegexRecipeMaterial extends ItemStack implements Materials {
     private RegexRecipeMaterialEnum enumType;
     private String pattern;
     private int matchPoint;
@@ -48,9 +49,7 @@ public class RegexRecipeMaterial extends ItemStack {
         this.pattern = pattern;
     }
 
-    public List<Material> getMatched() {
-        return matched;
-    }
+
 
     public void setMatched(List<Material> matched) {
         this.matched = matched;
@@ -71,5 +70,9 @@ public class RegexRecipeMaterial extends ItemStack {
     public void initializeMatched(){
         Pattern p = Pattern.compile(this.pattern);
         //debug
+    }
+
+    public List<Material> getCandidate(){
+        return matched;
     }
 }
