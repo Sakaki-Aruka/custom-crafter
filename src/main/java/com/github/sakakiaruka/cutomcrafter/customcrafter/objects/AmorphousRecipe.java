@@ -71,7 +71,7 @@ public class AmorphousRecipe extends RecipeMaterial implements Materials {
             String type = entry.getKey().getType().name();
             String otherData = entry.getKey().getData().toString();
 
-            sb.append(String.format("amount : %s%n",amount));
+            sb.append(String.format("amount:%s%n",amount));
             sb.append(String.format("Material Type:%s%n",type));
             sb.append(String.format("other Data:%s%n",otherData));
         }

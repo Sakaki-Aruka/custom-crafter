@@ -74,14 +74,6 @@ public class Search {
         return recipeMaterial;
     }
 
-    private int getTotal(RecipeMaterial in){
-        int result = 0;
-        for(Map.Entry<MultiKeys,ItemStack> entry : in.getRecipeMaterial().entrySet()){
-            if(entry.getValue().getType().equals(Material.AIR))continue;
-            result++;
-        }
-        return result;
-    }
 
     private int getSquareSize(RecipeMaterial in){
         List<MultiKeys> keys = in.getMultiKeysListNoAir();
@@ -149,13 +141,38 @@ public class Search {
         return matched;
     }
 
+
+    private AmorphousRecipe toAmorphousRecipe(RecipeMaterial in){
+        Map<ItemStack,Integer> map = new LinkedHashMap<>();
+        for(ItemStack item:in.getItemStackListNoAir()){
+            if(map.containsKey(item)){
+                int amount = map.get(item) + item.getAmount();
+                map.put(item,amount);
+            }else{
+                map.put(item,item.getAmount());
+            }
+        }
+
+        int size = getSquareSize(in);
+        AmorphousEnum enumType;
+        if(size <= 3){
+            enumType = AmorphousEnum.NEIGHBOR;
+        }else{
+            enumType = AmorphousEnum.ANYWHERE;
+        }
+
+        AmorphousRecipe result = new AmorphousRecipe(enumType,map);
+        return result;
+    }
+
+
     private List<ItemStack> getResultsRegexOn(OriginalRecipe original,Inventory inventory){
         RecipeMaterial model = original.getRecipeMaterial();
         RecipeMaterial real = toRecipeMaterial(inventory,size);
 
         if(original.getRecipeMaterial().getClass().equals(RecipeMaterial.class)){
             //natural RecipeMaterial
-            if(getTotal(model) != getTotal(real))return null;
+            if(model.getTotalItems() != real.getTotalItems())return null;
             if(getSquareSize(model) != getSquareSize(real))return null;
             if(!isSameShape(model.getMultiKeysListNoAir(),real.getMultiKeysListNoAir()))return null;
 
@@ -200,7 +217,7 @@ public class Search {
 
         if(original.getRecipeMaterial().getClass().equals(RecipeMaterial.class)){
             // natural RecipeMaterial
-            if(getTotal(model) != getTotal(real))return null;
+            if(model.getTotalItems() != real.getTotalItems())return null;
             if(getSquareSize(model) != getSquareSize(real))return null;
             if(!isSameShape(model.getMultiKeysListNoAir(),real.getMultiKeysListNoAir()))return null;
 
@@ -213,11 +230,9 @@ public class Search {
             //finish recipeMaterial-check
             return Arrays.asList(original.getResult());
 
-        }else{
+        }else {
             // amorphous recipe
         }
-
-
         //debug
         return null;
     }

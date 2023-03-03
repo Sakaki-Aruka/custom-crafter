@@ -5,6 +5,8 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 public class RegexRecipeMaterial extends ItemStack {
@@ -64,5 +66,10 @@ public class RegexRecipeMaterial extends ItemStack {
 
     public void addMatched(Material matched){
         this.matched.add(matched);
+    }
+
+    public void initializeMatched(){
+        Pattern p = Pattern.compile(this.pattern);
+        //debug
     }
 }
