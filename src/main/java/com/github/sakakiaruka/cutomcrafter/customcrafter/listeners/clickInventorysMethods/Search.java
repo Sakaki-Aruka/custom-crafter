@@ -204,11 +204,31 @@ public class Search {
 
         }else{
             //AmorphousRecipe
+            AmorphousRecipe amorphousModel = (AmorphousRecipe) model;
+            AmorphousRecipe amorphousReal = toAmorphousRecipe(real);
+            Material replace = null;
+
+            // --- check amount similar --- //
+            if(!getAmountMaterialRelationCongruence(amorphousModel,amorphousReal))return null;
+            // --- finish to check amount similar --- //
+
+            if(!getEnchantedRealList(amorphousReal).isEmpty()){
+                // enchanted material
+                if(!getEnchantedItemDetailCongruence(amorphousModel,amorphousReal))return null;
+            }
+
+            if(!getRegexRecipeMaterialList(amorphousModel).isEmpty()) {
+                // regex recipe material
+                String matched = getMatchedString(amorphousModel, amorphousReal);
+                String resultRegexPattern = ((RegexRecipeMaterial) original.getResult()).getPattern();
+                resultRegexPattern.replace("{R}", matched);
+                replace = Material.valueOf(resultRegexPattern.toUpperCase());
+            }
+            // --- check items detail --- //
+            ItemStack result = ((RegexRecipeMaterial)original.getResult()).getProvisional();
+            result.setType(replace);
+            return Arrays.asList(result);
         }
-
-
-        //debug
-        return null;
     }
 
     private List<ItemStack> getResultsRegexOff(OriginalRecipe original,Inventory inventory){
@@ -235,72 +255,83 @@ public class Search {
             AmorphousRecipe amorphousModel = (AmorphousRecipe) model;
             AmorphousRecipe amorphousReal = toAmorphousRecipe(real);
 
-            //create relation
-            Map<Material,Integer> relationReal = new HashMap<>();
-            amorphousReal.getMaterials().entrySet().forEach(s->{
-                if(relationReal.keySet().contains(s.getKey().getType())){
-                    int amount = relationReal.get(s.getKey().getType()) + s.getKey().getAmount();
-                    relationReal.put(s.getKey().getType(),amount);
-                }else{
-                    relationReal.put(s.getKey().getType(),s.getKey().getAmount());
-                }
-            });
-
-            for(ItemStack normal:getNormal(amorphousModel)){
-                //normal
-                int amount = relationReal.get(normal.getType()) - normal.getAmount();
-                if(!relationReal.keySet().contains(normal.getType()))return null;
-                if(amount < 0)return null;
-                if(amount ==0){
-                    relationReal.remove(normal.getType());
-                    continue;
-                }
-                relationReal.put(normal.getType(),amount);
-            }
-
-            for(ItemStack peculiar:getPeculiar(amorphousModel)){
-                //peculiar
-                int where;
-                List<Material> candidate = peculiar.getClass().equals(MixedMaterial.class) ? ((MixedMaterial)peculiar).getCandidate() : ((RegexRecipeMaterial)peculiar).getCandidate();
-                if((where = containsSet(candidate,relationReal.keySet())) == -1)return null;
-                Material matched = candidate.get(where);
-                int amount;
-                if((amount = relationReal.get(matched) - peculiar.getAmount()) < 0)return null;
-                if(amount == 0){
-                    relationReal.remove(matched);
-                    continue;
-                }
-                relationReal.put(matched,amount);
-            }
-
-            if(!relationReal.isEmpty())return null;
+            // --- check amount similar --- //
+            if(!getAmountMaterialRelationCongruence(amorphousModel,amorphousReal))return null;
             // --- finish to check amount similar --- //
 
             // --- check items detail --- //
             if(!getEnchantedRealList(amorphousReal).isEmpty()){
-                // enchanted material
-                List<EnchantedMaterial> enchants = getEnchantedList(amorphousModel);
-                List<ItemStack> enchantsReal = getEnchantedRealList(amorphousReal);
-
-                if(enchants.size() != enchantsReal.size())return null;
-                for(EnchantedMaterial e:enchants){
-                    Material m = e.getType();
-                    boolean broken = false;
-                    for(ItemStack item:enchantsReal){
-                        if(!item.getType().equals(m))continue;
-                        if(getEnchantCongruence(e.getRelation(),item.getEnchantments())){
-                            broken = true;
-                            continue;
-                        }
-                        broken = false;
-                    }
-                    if(!broken)return null;
-                }
+                if(!getEnchantedItemDetailCongruence(amorphousModel,amorphousReal))return null;
             }
             // --- finish to check items detail --- //
             return Arrays.asList(original.getResult());
 
         }
+    }
+
+    private boolean getEnchantedItemDetailCongruence(AmorphousRecipe amorphousModel,AmorphousRecipe amorphousReal){
+        // enchanted material
+        List<EnchantedMaterial> enchants = getEnchantedList(amorphousModel);
+        List<ItemStack> enchantsReal = getEnchantedRealList(amorphousReal);
+
+        if(enchants.size() != enchantsReal.size())return false;
+        for(EnchantedMaterial e:enchants){
+            Material m = e.getType();
+            boolean broken = false;
+            for(ItemStack item:enchantsReal){
+                if(!item.getType().equals(m))continue;
+                if(getEnchantCongruence(e.getRelation(),item.getEnchantments())){
+                    broken = true;
+                    continue;
+                }
+                broken = false;
+            }
+            if(!broken)return false;
+        }
+        return true;
+    }
+
+    private boolean getAmountMaterialRelationCongruence(AmorphousRecipe amorphousModel,AmorphousRecipe amorphousReal){
+        //create relation
+        Map<Material,Integer> relationReal = new HashMap<>();
+        amorphousReal.getMaterials().entrySet().forEach(s->{
+            if(relationReal.keySet().contains(s.getKey().getType())){
+                int amount = relationReal.get(s.getKey().getType()) + s.getKey().getAmount();
+                relationReal.put(s.getKey().getType(),amount);
+            }else{
+                relationReal.put(s.getKey().getType(),s.getKey().getAmount());
+            }
+        });
+
+        for(ItemStack normal:getNormal(amorphousModel)){
+            //normal
+            int amount = relationReal.get(normal.getType()) - normal.getAmount();
+            if(!relationReal.keySet().contains(normal.getType()))return false;
+            if(amount < 0)return false;
+            if(amount ==0){
+                relationReal.remove(normal.getType());
+                continue;
+            }
+            relationReal.put(normal.getType(),amount);
+        }
+
+        for(ItemStack peculiar:getPeculiar(amorphousModel)){
+            //peculiar
+            int where;
+            List<Material> candidate = peculiar.getClass().equals(MixedMaterial.class) ? ((MixedMaterial)peculiar).getCandidate() : ((RegexRecipeMaterial)peculiar).getCandidate();
+            if((where = containsSet(candidate,relationReal.keySet())) == -1)return false;
+            Material matched = candidate.get(where);
+            int amount;
+            if((amount = relationReal.get(matched) - peculiar.getAmount()) < 0)return false;
+            if(amount == 0){
+                relationReal.remove(matched);
+                continue;
+            }
+            relationReal.put(matched,amount);
+        }
+
+        if(!relationReal.isEmpty())return false;
+        return true;
     }
 
     private boolean getEnchantCongruence(Map<IntegratedEnchant,EnchantedMaterialEnum> model,Map<Enchantment,Integer> real){
