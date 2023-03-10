@@ -70,10 +70,13 @@ public class Search {
             if(getResultsRegexOn(pseudo,inventory) == null)return false;
         }else{
             // not contains regex
-            //debug (making now)
+            if(getResultsRegexOff(pseudo,inventory) == null)return false;
         }
 
+        //batch processing here
 
+
+        return true;
     }
 
     private Map<Material,Integer> getRemovedUnrelated(Map<Material,Integer> map,List<Material> list){
