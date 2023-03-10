@@ -238,10 +238,28 @@ public class SettingsLoad {
                 }else if(config.contains("enchants")){
                     //enchanted material
                     getEnchantedMaterials(path);
+                }else if(config.contains("regex-recipe-material")){
+                    //regex recipe material
+                    getRegexRecipeMaterials(path);
+
                 }
 
             }
         }
+    }
+
+    private void getRegexRecipeMaterials(Path path){
+        FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
+        String name = config.getString("name");
+        ItemStack provisional = new ItemStack(Material.valueOf(config.getString("provisional").toUpperCase()),config.getInt("amount"));
+        int matchPoint = config.getInt("matchPoint");
+        RegexRecipeMaterialEnum enumType = RegexRecipeMaterialEnum.valueOf(config.getString("enumType").toUpperCase());
+        String pattern = config.getString("pattern");
+
+        RegexRecipeMaterial item = new RegexRecipeMaterial(enumType,pattern,matchPoint);
+        item.setProvisional(provisional);
+        recipeMaterials.put(name,item);
+
     }
 
     @Deprecated

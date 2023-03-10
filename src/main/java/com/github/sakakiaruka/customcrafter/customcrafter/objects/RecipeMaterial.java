@@ -180,4 +180,12 @@ public class RecipeMaterial implements Recipes {
         return result;
     }
 
+    public void removeGivenListContent(List<Material> in){
+        List<MultiKeys> removeBuffer = new ArrayList<>();
+        for(Map.Entry<MultiKeys,ItemStack> entry:this.getRecipeMaterial().entrySet()){
+            if(in.contains(entry.getValue().getType()))removeBuffer.add(entry.getKey());
+        }
+        removeBuffer.forEach(s->this.getRecipeMaterial().remove(s));
+    }
+
 }

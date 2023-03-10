@@ -97,4 +97,12 @@ public class AmorphousRecipe extends RecipeMaterial implements Recipes {
         }
         return items;
     }
+
+    public void removeGivenListContent(List<Material> in){
+        List<ItemStack> removeBuffer = new ArrayList<>();
+        for(Map.Entry<ItemStack,Integer> entry:this.getMaterials().entrySet()){
+            if(in.contains(entry.getKey().getType()))removeBuffer.add(entry.getKey());
+        }
+        removeBuffer.forEach(s->this.getMaterials().remove(s));
+    }
 }

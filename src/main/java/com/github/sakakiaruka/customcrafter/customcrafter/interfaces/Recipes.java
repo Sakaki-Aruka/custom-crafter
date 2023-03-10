@@ -12,4 +12,5 @@ public interface Recipes {
     public abstract int getTotalItems();
     public abstract String info();
     public abstract boolean isEmpty();
+    public abstract void removeGivenListContent(List<Material> in);
 }

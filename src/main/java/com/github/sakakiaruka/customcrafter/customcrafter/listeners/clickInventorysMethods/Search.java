@@ -1,7 +1,6 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.listeners.clickInventorysMethods;
 
 import com.github.sakakiaruka.customcrafter.customcrafter.objects.*;
-import com.github.sakakiaruka.customcrafter.customcrafter.some.RecipeMaterialUtil;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
@@ -28,11 +27,15 @@ public class Search {
 
             //Is this method called by "BatchCreate"?
             // if called by BatchCreate, enable to use MassRecipe.
+            boolean massMode = false;
             List<StackTraceElement> stacks = new ArrayList<>(Arrays.asList(new Throwable().getStackTrace()));
             Set<Boolean> bool = new HashSet<>();
             stacks.forEach(s->bool.add(s.getClassName().contains(new BatchCreate().getClass().getSimpleName())));
             if(!bool.contains(true) && original.getRecipeMaterial().getClass().equals(MassRecipe.class)){
                 continue;
+            }else if(bool.contains(true) && original.getRecipeMaterial().getClass().equals(MassRecipe.class)){
+                // MassRecipe process here
+                massMode = true;
             }
 
             if(hasRegexResult(original)){
@@ -53,6 +56,68 @@ public class Search {
     }
 
 
+    private boolean getMassRecipeCongruence(MassRecipe mass,RecipeMaterial real,Inventory inventory){
+        List<Material> unrelated = mass.getUnrelatedAmount();
+
+        RecipeMaterial modifiedModel = mass.getRm();
+        real.removeGivenListContent(unrelated);
+        modifiedModel.removeGivenListContent(unrelated);
+
+        OriginalRecipe pseudo = new OriginalRecipe(mass.getResult(),mass.getRm());
+
+        if(mass.getResult().getClass().equals(RegexRecipeMaterial.class)){
+            // contains regex
+            if(getResultsRegexOn(pseudo,inventory) == null)return false;
+        }else{
+            // not contains regex
+            //debug (making now)
+        }
+
+
+    }
+
+    private Map<Material,Integer> getRemovedUnrelated(Map<Material,Integer> map,List<Material> list){
+        Map<Material,Integer> result = new HashMap<>();
+        for(Map.Entry<Material,Integer> entry: map.entrySet()){
+            if(list.contains(entry.getKey()))continue;
+            Material m = entry.getKey();
+            if(result.containsKey(m))result.put(m,result.get(m) + entry.getValue());
+            else result.put(m,entry.getValue());
+        }
+        return result;
+    }
+
+    private Map<Material,Integer> getItemAmountRelation(RecipeMaterial in){
+        Map<Material,Integer> result = new HashMap<>();
+        if(in.getClass().equals(RecipeMaterial.class)){
+            // natural RecipeMaterial
+            for(Map.Entry<MultiKeys,ItemStack> entry:in.getRecipeMaterial().entrySet()){
+                Material material = entry.getValue().getType();
+                if(material.equals(Material.AIR))continue;
+                if(result.containsKey(material))result.put(material,result.get(material) + entry.getValue().getAmount());
+                else result.put(material,entry.getValue().getAmount());
+            }
+
+            //debug
+            System.out.println("massRecipe (in recipeMaterial) : "+result);
+
+        }else if(in.getClass().equals(AmorphousRecipe.class)){
+            // amorphousRecipeMaterial
+            for(Map.Entry<ItemStack,Integer> entry:((AmorphousRecipe)in).getMaterials().entrySet()){
+                Material material = entry.getKey().getType();
+                if(result.containsKey(material)){
+                    result.put(material,result.get(material) + entry.getValue());
+                }else{
+                    result.put(material,entry.getKey().getAmount());
+                }
+            }
+
+            //debug
+            System.out.println("massRecipe (in AmorphousRecipe) : "+result);
+
+        }
+        return result;
+    }
     private void returnableRecipeProcess(Inventory crafter,ReturnableRecipe returnable){
         // returnable recipe work (modify inventory items)
         Map<Material,Material> returnItems = returnable.getRelatedReturnItems();
@@ -283,25 +348,19 @@ public class Search {
             return Arrays.asList(original.getResult());
 
         }
-//        //debug
-//        System.out.println("cannot search amorphous recipe");
-//        return null;
 
         else {
-            // amorphous recipe
+            // amorphous recipe | regex off
             AmorphousRecipe amorphousModel = (AmorphousRecipe) model;
             AmorphousRecipe amorphousReal = toAmorphousRecipe(real);
 
-            //debug
-            System.out.println(new RecipeMaterialUtil().graphicalCoordinate(amorphousModel));
-            System.out.println(new RecipeMaterialUtil().graphicalCoordinate(amorphousReal));
-
             if(amorphousModel.getTotalItems() != amorphousReal.getTotalItems())return null;
 
-            int types = getVirtualMapped(amorphousReal).keySet().size(); // amount of types
+            int source = getSumForEach(getVirtualMapped(amorphousReal)); // amount of types
             Map<Material,Integer> virtual = getVirtualMapped(amorphousModel);
-            int before = virtual.keySet().size();
-            int ideal = before - types;
+            int before = getSumForEach(virtual);
+            int ideal = before - source;
+
             for(Map.Entry<ItemStack,Integer> entry:amorphousReal.getMaterials().entrySet()){
                 Material material = entry.getKey().getType();
                 int amount = entry.getValue();
@@ -322,8 +381,14 @@ public class Search {
 
             return Arrays.asList(original.getResult());
         }
+    }
 
-
+    private int getSumForEach(Map<Material,Integer> in){
+        int result = 0;
+        for(Map.Entry<Material,Integer> entry : in.entrySet()){
+            result += entry.getValue();
+        }
+        return result;
     }
 
     private boolean getVirtualMappedCongruence(Map<Material,Integer> in,int ideal){
@@ -333,11 +398,7 @@ public class Search {
             if(entry.getValue()==0)buffer.add(entry.getKey());
         }
         buffer.forEach(s->in.remove(s));
-
-        //debug
-        System.out.println("removed virtual mapped : "+in);
-
-        return in.entrySet().size() == ideal;
+        return getSumForEach(in) == ideal;
     }
 
     private Map<Material,Integer> getVirtualMapped(AmorphousRecipe model){
@@ -357,10 +418,6 @@ public class Search {
                 map.put(entry.getKey().getType(),amount);
             }
         }
-
-        //debug
-        System.out.println(String.format("virtual mapped : %s",map));
-
         return map;
     }
 

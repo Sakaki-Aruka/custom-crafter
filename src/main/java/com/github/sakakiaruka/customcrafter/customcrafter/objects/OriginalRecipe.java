@@ -32,6 +32,14 @@ public class OriginalRecipe {
         this.recipeName = recipeName;
     }
 
+    public OriginalRecipe(ItemStack result,RecipeMaterial rm){
+        this.result = result;
+        this.size = -1;
+        this.total = -1;
+        this.recipeName = null;
+        this.rm = rm;
+    }
+
     public String info(){
         return String.format("Name:%s | size:%d | recipeMaterial:%s | total:%d | result:%s",recipeName,size,rm.info(),total,result.toString());
     }
