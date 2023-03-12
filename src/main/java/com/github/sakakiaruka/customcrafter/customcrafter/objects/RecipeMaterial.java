@@ -188,4 +188,12 @@ public class RecipeMaterial implements Recipes {
         removeBuffer.forEach(s->this.getRecipeMaterial().remove(s));
     }
 
+    public int getMinimalAmount(){
+        int result = 129;
+        for(ItemStack item : getItemStackListNoAir()){
+            if(item.getAmount() < result)result = item.getAmount();
+        }
+        return result;
+    }
+
 }

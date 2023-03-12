@@ -1,6 +1,7 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.listeners.clickInventorysMethods;
 
 import com.github.sakakiaruka.customcrafter.customcrafter.objects.*;
+import com.github.sakakiaruka.customcrafter.customcrafter.some.RecipeMaterialUtil;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.Inventory;
@@ -27,7 +28,6 @@ public class Search {
 
             //Is this method called by "BatchCreate"?
             // if called by BatchCreate, enable to use MassRecipe.
-            boolean massMode = false;
             List<StackTraceElement> stacks = new ArrayList<>(Arrays.asList(new Throwable().getStackTrace()));
             Set<Boolean> bool = new HashSet<>();
             stacks.forEach(s->bool.add(s.getClassName().contains(new BatchCreate().getClass().getSimpleName())));
@@ -35,7 +35,12 @@ public class Search {
                 continue;
             }else if(bool.contains(true) && original.getRecipeMaterial().getClass().equals(MassRecipe.class)){
                 // MassRecipe process here
-                massMode = true;
+
+                List<ItemStack> mass;
+                if((mass = getMassRecipeCongruence((MassRecipe) original.getRecipeMaterial(),real,inventory)) == null)return null;
+                //results.addAll(mass);
+
+                return mass;
             }
 
             if(hasRegexResult(original)){
@@ -56,27 +61,56 @@ public class Search {
     }
 
 
-    private boolean getMassRecipeCongruence(MassRecipe mass,RecipeMaterial real,Inventory inventory){
+    private List<ItemStack> getMassRecipeCongruence(MassRecipe mass,RecipeMaterial real,Inventory inventory){
         List<Material> unrelated = mass.getUnrelatedAmount();
+        Set<Material> realSet = new HashSet<>();
+
+        real.getItemStackListNoAir().forEach(s->realSet.add(s.getType()));
+        for(Material m : unrelated){
+            if(!realSet.contains(m))return null;
+        }
 
         RecipeMaterial modifiedModel = mass.getRm();
         real.removeGivenListContent(unrelated);
         modifiedModel.removeGivenListContent(unrelated);
 
         OriginalRecipe pseudo = new OriginalRecipe(mass.getResult(),mass.getRm());
+        List<ItemStack> resultList;
 
         if(mass.getResult().getClass().equals(RegexRecipeMaterial.class)){
             // contains regex
-            if(getResultsRegexOn(pseudo,inventory) == null)return false;
+            if((resultList = getResultsRegexOn(pseudo,inventory)) == null)return null;
         }else{
             // not contains regex
-            if(getResultsRegexOff(pseudo,inventory) == null)return false;
+            if((resultList = getResultsRegexOff(pseudo,inventory)) == null)return null;
         }
 
         //batch processing here
+        if(resultList.isEmpty())return null;
+        int minimalAmount = real.getMinimalAmount();
+        resultList.forEach(s->s.setAmount(minimalAmount));
 
+        //returnable processing here
+        List<ItemStack> returnableItems = new ArrayList<>();
+        if(mass.getRm().getClass().equals(ReturnableRecipe.class))returnableItems = getReturnItemsFromReturnableRecipe((ReturnableRecipe) pseudo);
 
-        return true;
+        new ItemsSubtract().main(inventory,size,minimalAmount);
+        results.clear();
+
+        return resultList;
+    }
+
+    private List<ItemStack> getReturnItemsFromReturnableRecipe(ReturnableRecipe recipe){
+        List<ItemStack> list = recipe.getRecipeMaterial().getItemStackListNoAir();
+        Map<Material,Material> mappedReturnItems = recipe.getRelatedReturnItems();
+        List<ItemStack> result = new ArrayList<>();
+        for(ItemStack item : list){
+            if(!mappedReturnItems.containsKey(item.getType()))continue;
+            int amount = item.getAmount();
+            ItemStack t = new ItemStack(mappedReturnItems.get(item.getType()),amount);
+            result.add(t);
+        }
+        return result;
     }
 
     private Map<Material,Integer> getRemovedUnrelated(Map<Material,Integer> map,List<Material> list){
@@ -313,6 +347,10 @@ public class Search {
     private List<ItemStack> getResultsRegexOff(OriginalRecipe original,Inventory inventory){
         RecipeMaterial model = original.getRecipeMaterial();
         RecipeMaterial real = toRecipeMaterial(inventory,size);
+
+        //debug
+        System.out.println("model:\n"+new RecipeMaterialUtil().graphicalCoordinate(model));
+        System.out.println("real:\n"+new RecipeMaterialUtil().graphicalCoordinate(real));
 
         if(original.getRecipeMaterial().getClass().equals(RecipeMaterial.class)){
             // natural RecipeMaterial
