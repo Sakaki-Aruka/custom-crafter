@@ -14,7 +14,7 @@ import static com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter.g
 
 public class SettingsLoad {
     public static Material baseBlock;
-    public List<Recipe> recipes;
+    public static List<Recipe> recipes;
 
     private static FileConfiguration defaultConfig;
     private static Map<String,Result> results;

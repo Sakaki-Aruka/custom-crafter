@@ -8,15 +8,23 @@ import java.util.List;
 public class Matter {
     private String name;
     private List<Material> candidate;
-    private EnchantWrap warp;
+    private List<EnchantWrap> warp;
     private int amount;
     private boolean mass;
-    public Matter(String name,List<Material> candidate,EnchantWrap warp,int amount,boolean mass){
+    public Matter(String name,List<Material> candidate,List<EnchantWrap> warp,int amount,boolean mass){
         this.name = name;
         this.candidate = candidate;
         this.warp = warp;
         this.amount = amount;
         this.mass = mass;
+    }
+
+    public Matter(List<Material> materials,int amount){
+        this.name = "";
+        this.candidate = materials;
+        this.warp = null;
+        this.amount = amount;
+        this.mass = false;
     }
 
     public String getName() {
@@ -35,11 +43,11 @@ public class Matter {
         this.candidate = candidate;
     }
 
-    public EnchantWrap getWarp() {
+    public List<EnchantWrap> getWarp() {
         return warp;
     }
 
-    public void setWarp(EnchantWrap warp) {
+    public void setWarp(List<EnchantWrap> warp) {
         this.warp = warp;
     }
 
