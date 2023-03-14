@@ -6,14 +6,12 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordinate;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Tag;
-import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.Result;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.sql.Array;
 import java.util.*;
 
 import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.recipes;
@@ -22,23 +20,36 @@ public class Search {
     public void main(Player player, Inventory inventory){
         // normal
         List<Recipe> resultCandidate = new ArrayList<>();
-        for(Recipe recipe : recipes){
+        Recipe:for(Recipe recipe : recipes){
             if(recipe.getTag().equals(Tag.Normal)){
                 //normal
                 Recipe input = toRecipe(inventory);
-                if(getSquareSize(recipe) != getSquareSize(input))return;
-                if(!isSameShape(getCoordinateNoAir(recipe),getCoordinateNoAir(input)))return;
-                if(getTotal(recipe) != getTotal(input))return;
+                if(getSquareSize(recipe) != getSquareSize(input))continue ;
+                if(!isSameShape(getCoordinateNoAir(recipe),getCoordinateNoAir(input)))continue ;
+                if(getTotal(recipe) != getTotal(input))continue ;
 
                 List<Matter> recipeMatters = recipe.getContentsNoAir();
                 List<Matter> inputMatters = input.getContentsNoAir();
                 for(int i=0;i<recipeMatters.size();i++){
-                    if(!isSameMatter(recipeMatters.get(i),inputMatters.get(i)))return;
+                    if(!isSameMatter(recipeMatters.get(i),inputMatters.get(i)))continue Recipe;
                 }
                 resultCandidate.add(recipe);
 
             }else{
                 //amorphous
+                Map<Material,Integer> virtual = getMaterialAmountMap(recipe);
+                Map<Material,Integer> real = getMaterialAmountMap(toRecipe(inventory));
+                int ideal = getMapEachSum(virtual) - getMapEachSum(real);
+
+                for(Map.Entry<Material,Integer> entry:real.entrySet()){
+                    Material m = entry.getKey();
+                    if(!virtual.containsKey(m))continue Recipe; // exit recipe loop
+                    virtual.put(m,virtual.get(m) - entry.getValue());
+                }
+                if(!getAmountCollectionCongruence(virtual))continue;
+                if(getMapEachSum(virtual) != ideal)continue;
+
+
 
                 resultCandidate.add(recipe);
             }
@@ -51,6 +62,32 @@ public class Search {
 
     private void setResultItem(Inventory inventory, List<ItemStack> results){
         // set results
+    }
+
+    private boolean getAmountCollectionCongruence(Map<Material,Integer> map){
+        for(int i:map.values()){
+            if(i < 0)return false;
+        }
+        return true;
+    }
+
+    private Map<Material,Integer> getMaterialAmountMap(Recipe recipe){
+        Map<Material,Integer> map = new HashMap<>();
+        for(Matter matter:recipe.getContentsNoAir()){
+            for(Material material:matter.getCandidate()){
+                if(map.containsKey(material))map.put(material,map.get(material) + matter.getAmount());
+                else map.put(material,matter.getAmount());
+            }
+        }
+        return map;
+    }
+
+    private int getMapEachSum(Map<Material,Integer> map){
+        int result = 0;
+        for(int i:map.values()){
+            result += i;
+        }
+        return result;
     }
 
     private boolean isSameMatter(Matter recipe,Matter input){
