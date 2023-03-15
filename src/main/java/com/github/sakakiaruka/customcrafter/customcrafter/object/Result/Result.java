@@ -11,13 +11,15 @@ public class Result {
     private int amount;
     private Map<String, List<String>> metadata;
     private String nameOrRegex;
+    private int matchPoint;
 
-    public Result(String name,Map<Enchantment,Integer> enchantsInfo,int amount,Map<String,List<String>> metadata,String nameOrRegex){
+    public Result(String name,Map<Enchantment,Integer> enchantsInfo,int amount,Map<String,List<String>> metadata,String nameOrRegex,int matchPoint){
         this.name = name;
         this.enchantsInfo = enchantsInfo;
         this.amount = amount;
         this.metadata = metadata;
         this.nameOrRegex = nameOrRegex;
+        this.matchPoint = matchPoint;
     }
 
     public String getName() {
@@ -58,5 +60,13 @@ public class Result {
 
     public void setNameOrRegex(String nameOrRegex) {
         this.nameOrRegex = nameOrRegex;
+    }
+
+    public int getMatchPoint() {
+        return matchPoint;
+    }
+
+    public void setMatchPoint(int matchPoint) {
+        this.matchPoint = matchPoint;
     }
 }

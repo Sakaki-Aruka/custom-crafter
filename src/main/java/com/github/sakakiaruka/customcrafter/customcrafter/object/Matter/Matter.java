@@ -1,7 +1,6 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.object.Matter;
 
 import org.bukkit.Material;
-import org.bukkit.enchantments.Enchantment;
 
 import java.util.List;
 

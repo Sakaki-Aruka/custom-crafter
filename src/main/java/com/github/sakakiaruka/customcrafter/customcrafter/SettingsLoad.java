@@ -7,14 +7,17 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.Result;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter.getInstance;
 
 public class SettingsLoad {
     public static Material baseBlock;
     public static List<Recipe> recipes;
+    public static List<String> allMaterials;
 
     private static FileConfiguration defaultConfig;
     private static Map<String,Result> results;
@@ -23,6 +26,11 @@ public class SettingsLoad {
     public void load(){
         defaultConfig = getInstance().getConfig();
         new OpenCraftingTable().setCraftingInventory();
+        getAllMaterialsName();
+    }
+
+    private void getAllMaterialsName(){
+        Arrays.stream(Material.values()).forEach(s->allMaterials.add(s.name()));
     }
 
 }
