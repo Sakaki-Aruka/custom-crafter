@@ -22,7 +22,9 @@ import java.util.regex.Pattern;
 import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.allMaterials;
 import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.recipes;
 
+
 public class Search {
+    private static final int resultSlot = 44;
     public void main(Player player, Inventory inventory){
         // normal
         Map<Recipe,Recipe> recipeInputResultMap = new HashMap<>(); //key : Recipe | value : Input
@@ -36,6 +38,7 @@ public class Search {
 
                 List<Matter> recipeMatters = recipe.getContentsNoAir();
                 List<Matter> inputMatters = input.getContentsNoAir();
+                if(recipeMatters.size() != inputMatters.size())continue;
                 for(int i=0;i<recipeMatters.size();i++){
                     if(!isSameMatter(recipeMatters.get(i),inputMatters.get(i)))continue Recipe;
                 }
@@ -71,11 +74,83 @@ public class Search {
         }
 
         //
+        setResultItem(inventory,recipeInputResultMap,player);
 
     }
 
     public void batchSearch(Player player,Inventory inventory){
         // batch
+        List<Object> recipeInputResultAmountList = new ArrayList<>();
+        Recipe input = toRecipe(inventory);
+        Recipe:for(Recipe recipe:recipes){
+            for(Matter matter:recipe.getContentsNoAir()){
+                if(!matter.isMass())continue Recipe;
+            }
+
+            //search here
+            // isMass = true -> skip to "check amount" process
+            if(recipe.getTag().equals(Tag.Normal)){
+                //normal
+                if(getSquareSize(recipe) != getSquareSize(input))continue;
+                if(!isSameShape(getCoordinateNoAir(recipe),getCoordinateNoAir(input)))continue;
+
+                List<Material> without = getWithout(recipe);
+                int withoutMassMatter = getTotalWithoutMassMatter(recipe);
+                int inputAmount  = 0;
+                int minimalAmount = 100;
+                for(Matter matter:input.getContentsNoAir()){
+                    Material m = matter.getCandidate().get(0); //An input candidate is always only one material.
+                    if(without.contains(m))continue;
+                    inputAmount += matter.getAmount();
+                    if(matter.getAmount() < minimalAmount)minimalAmount = matter.getAmount();
+                }
+
+                int amount = inputAmount / withoutMassMatter;
+                if(amount < 1)continue; // not enough
+
+                List<Matter> recipeMatters = recipe.getContentsNoAir();
+                List<Matter> inputMatters = input.getContentsNoAir();
+                if(recipeMatters.size() != inputMatters.size())continue Recipe;
+                for(int i=0;i<recipeMatters.size();i++){
+                    if(recipeMatters.get(i).isMass()){
+                        // if mass true ->
+                        if(!recipeMatters.get(i).getCandidate().containsAll(inputMatters.get(i).getCandidate()))continue Recipe;
+                    }else{
+                        // if mass false ->
+                        Matter rTemp = recipeMatters.get(i);
+                        Matter iTemp = inputMatters.get(i);
+                        if(!rTemp.getCandidate().containsAll(iTemp.getCandidate()))continue Recipe;
+                        if(!getEnchantWrapCongruence(rTemp.getWarp(),iTemp.getWarp()))continue Recipe;
+                    }
+                }
+
+                recipeInputResultAmountList.add(Arrays.asList(recipe,input,minimalAmount));
+
+            }else{
+                //amorphous
+            }
+        }
+    }
+
+    private List<Material> getWithout(Recipe recipe){
+        List<Material> list = new ArrayList<>();
+        for(Matter matter:recipe.getContentsNoAir()){
+            if(matter.isMass())continue;
+            // A candidate have to be composed by only one material.
+            if(matter.getCandidate().size() != 1)continue;
+            Material material = matter.getCandidate().get(0);
+            list.add(material);
+        }
+        return list;
+    }
+
+    private int getTotalWithoutMassMatter(Recipe recipe){
+        int result = 0;
+        for(Matter matter:recipe.getContentsNoAir()){
+            if(matter.isMass())continue;
+            result += matter.getAmount();
+        }
+        return result;
     }
 
     private void setResultItem(Inventory inventory, Map<Recipe,Recipe> candidate,Player player){
@@ -91,8 +166,7 @@ public class Search {
                 // result has definite material
                 Material m = Material.valueOf(recipe.getResult().getNameOrRegex());
                 ItemStack item = new ItemStack(m,recipe.getResult().getAmount());
-                Map<String,List<String>> metadata = recipe.getResult().getMetadata();
-                setMetaData(item,recipe.getResult(),metadata); //set result itemStack's metadata
+                setMetaData(item,recipe.getResult()); //set result itemStack's metadata
                 resultItems.add(item);
             }else{
                 // not contains -> A result has written by regex pattern.
@@ -114,16 +188,33 @@ public class Search {
 
                 Material material = Material.valueOf(list.get(0).toUpperCase());
                 ItemStack item = new ItemStack(material,recipe.getResult().getAmount());
-                setMetaData(item,recipe.getResult(),recipe.getResult().getMetadata()); //set metadata
+                setMetaData(item,recipe.getResult()); //set metadata
                 resultItems.add(item);
             }
 
         }
-        //
+
+        //debug
+        resultItems.forEach(s->System.out.println(String.format("result item : %s",s)));
+
+        ItemStack item = resultItems.get(0);
+        if(inventory.getItem(resultSlot) == null){
+            // empty a result item's slot
+            player.getWorld().dropItem(player.getLocation(),item);
+        }else{
+            if(item.getAmount() > item.getType().getMaxStackSize()){
+                // over the max amount
+                player.getWorld().dropItem(player.getLocation(),item);
+            }else{
+                // in the limit
+                inventory.setItem(resultSlot,item);
+            }
+        }
 
     }
 
-    private void setMetaData(ItemStack item,Result result,Map<String,List<String>> metadata){
+    private void setMetaData(ItemStack item,Result result){
+        Map<String,List<String>> metadata = result.getMetadata();
         ItemMeta meta = item.getItemMeta();
         for(Map.Entry<String,List<String>> e:metadata.entrySet()){
             //metadata set
