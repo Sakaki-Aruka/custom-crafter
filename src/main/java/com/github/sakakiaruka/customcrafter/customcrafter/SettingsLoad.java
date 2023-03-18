@@ -9,9 +9,12 @@ import org.bukkit.Material;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
@@ -25,6 +28,7 @@ public class SettingsLoad {
     public static List<String> allMaterials = new ArrayList<>();
     public static Map<String,Recipe> namedRecipes = new HashMap<>();
 
+    // === for data get methods === //
     private static FileConfiguration defaultConfig;
     private static Map<String,Result> results = new HashMap<>();
     private static Map<String, Matter> matters = new HashMap<>();
@@ -56,6 +60,17 @@ public class SettingsLoad {
         load_interval = defaultConfig.getInt("download_interval");
 
         List<String> failed = new ArrayList<>();
+
+        BukkitRunnable main = new BukkitRunnable() {
+            @Override
+            public void run() {
+                getBaseBlock(getFiles(baseBlockPath));
+                getResult(getFiles(resultPath));
+                getMatter(getFiles(matterPath));
+                getRecipe(getFiles(recipePath));
+                System.out.println("[CustomCrafter] Data loaded!");
+            }
+        };
         BukkitRunnable downloader = new BukkitRunnable() {
             @Override
             public void run() {
@@ -88,7 +103,7 @@ public class SettingsLoad {
                     this.cancel();
                     return;
                 }
-                System.out.println("[CustomCrafter]Downloading now ...");
+                System.out.println("[CustomCrafter] Downloading now ...");
                 times++;
             }
         };
@@ -116,16 +131,60 @@ public class SettingsLoad {
         }
     }
 
-    private void getResult(Path path){
-        //
+    private List<Path> getFiles(Path path){
+        Stream<Path> paths;
+        try{
+            paths = Files.list(path);
+        }catch (Exception e){
+            System.out.println("[CustomCrafter] Error: Cannot get files from "+path);
+            return null;
+        }
+
+        List<Path> list = new ArrayList<>();
+        paths.forEach(s->list.add(s));
+        return list;
     }
 
-    private void getMatter(Path path){
-        //
+    private void getBaseBlock(List<Path> paths){
+        FileConfiguration config = YamlConfiguration.loadConfiguration(paths.get(0).toFile());
+        String name = config.getString("material").toUpperCase();
+        baseBlock = Material.valueOf(name);
     }
 
-    private void getRecipe(Path path){
-        //
+    private void getResult(List<Path> paths){
+        for(Path path:paths){
+            FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
+            String name = config.getString("name");
+            int amount = config.getInt("amount");
+            String nameOrRegex = config.getString("nameOrRegex");
+            int matchPoint = config.getInt("matchPoint"); // default value is -1;
+            Map<Enchantment,Integer> enchantInfo = null;
+            Map<String,List<String>> metadata = null;
+            if(config.contains("enchant")){
+                //TODO : write enchants info collect here.
+            }
+
+            if(config.contains("metadata")){
+                //TODO : write metadata collect here.
+            }
+
+            Result result = new Result(name,enchantInfo,amount,metadata,nameOrRegex,matchPoint);
+            results.put(name,result);
+        }
+    }
+
+    private void getMatter(List<Path> paths){
+        for(Path path:paths){
+            FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
+            //TODO : write matter collect
+        }
+    }
+
+    private void getRecipe(List<Path> paths){
+        for(Path path:paths){
+            FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
+            //TODO : write recipe collect
+        }
     }
 
 }
