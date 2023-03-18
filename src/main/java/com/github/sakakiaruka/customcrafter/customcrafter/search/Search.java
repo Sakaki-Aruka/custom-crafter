@@ -7,7 +7,9 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordina
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Tag;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.Result;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -27,9 +29,12 @@ public class Search {
     private static final int resultSlot = 44;
     public void main(Player player, Inventory inventory){
         // normal
+        Recipe r = null;
+        int amount = 0;
+
         Map<Recipe,Recipe> recipeInputResultMap = new HashMap<>(); //key : Recipe | value : Input
+        Recipe input = toRecipe(inventory);
         Recipe:for(Recipe recipe : recipes){
-            Recipe input = toRecipe(inventory);
             if(recipe.getTag().equals(Tag.Normal)){
                 //normal
                 if(getSquareSize(recipe) != getSquareSize(input))continue ;
@@ -42,7 +47,10 @@ public class Search {
                 for(int i=0;i<recipeMatters.size();i++){
                     if(!isSameMatter(recipeMatters.get(i),inputMatters.get(i)))continue Recipe;
                 }
-                recipeInputResultMap.put(recipe,input);
+                //recipeInputResultMap.put(recipe,input);
+                amount = recipe.getResult().getAmount();
+                r = recipe;
+                break Recipe;
 
             }else{
                 //amorphous
@@ -62,25 +70,29 @@ public class Search {
                 Map<Material,List<Matter>> map = getMaterialMatterRelation(recipe);
                 if(!getEnchantCongruenceAmorphous(map,input))continue;
 
-                recipeInputResultMap.put(recipe,input);
+                //recipeInputResultMap.put(recipe,input);
+                amount = recipe.getResult().getAmount();
+                r = recipe;
+                break Recipe;
             }
         }
 
-        if(recipeInputResultMap.size() > 1){
-            System.out.println("The search system cannot determine a result item.");
-            recipeInputResultMap.entrySet().forEach(s->System.out.println(s.getKey().getName()));
-            System.out.println("The candidate list. ↑");
-            return;
+        Map<Coordinate,Integer> remove = new HashMap<>();
+        for(Map.Entry<Coordinate,Matter> entry:r.getCoordinate().entrySet()){
+            remove.put(entry.getKey(),1);
         }
-
         //
-        setResultItem(inventory,recipeInputResultMap,player);
+        setResultItem(inventory,r,input,player,amount);
+        removeItemAndSetReturnItems(inventory,remove,r.getReturnItems(),player);
 
     }
 
     public void batchSearch(Player player,Inventory inventory){
         // batch
-        List<Object> recipeInputResultAmountList = new ArrayList<>();
+        Recipe result = null;
+        int massAmount = 0;
+        Map<Coordinate,Integer> remove = new HashMap<>();
+
         Recipe input = toRecipe(inventory);
         Recipe:for(Recipe recipe:recipes){
             for(Matter matter:recipe.getContentsNoAir()){
@@ -93,111 +105,189 @@ public class Search {
                 //normal
                 if(getSquareSize(recipe) != getSquareSize(input))continue;
                 if(!isSameShape(getCoordinateNoAir(recipe),getCoordinateNoAir(input)))continue;
+                //
+                List<Material> massList = getMassItems(recipe); // contains isMass(true) items
+                Recipe modified = getMassRemoved(recipe); // contains Recipe that was isMass items removed.
+                Recipe massRemovedInput = getRecipeRemovedMassItems(input,massList); // input(Recipe) removed mass items
 
-                List<Material> without = getWithout(recipe);
-                int withoutMassMatter = getTotalWithoutMassMatter(recipe);
-                int inputAmount  = 0;
-                int minimalAmount = 100;
-                for(Matter matter:input.getContentsNoAir()){
-                    Material m = matter.getCandidate().get(0); //An input candidate is always only one material.
-                    if(without.contains(m))continue;
-                    inputAmount += matter.getAmount();
-                    if(matter.getAmount() < minimalAmount)minimalAmount = matter.getAmount();
-                }
+                List<Matter> recipeMatters = modified.getContentsNoAir();
+                List<Matter> inputMatters = massRemovedInput.getContentsNoAir();
 
-                int amount = inputAmount / withoutMassMatter;
-                if(amount < 1)continue; // not enough
-
-                List<Matter> recipeMatters = recipe.getContentsNoAir();
-                List<Matter> inputMatters = input.getContentsNoAir();
-                if(recipeMatters.size() != inputMatters.size())continue Recipe;
+                if(recipeMatters.size() != inputMatters.size())continue ;
                 for(int i=0;i<recipeMatters.size();i++){
-                    if(recipeMatters.get(i).isMass()){
-                        // if mass true ->
-                        if(!recipeMatters.get(i).getCandidate().containsAll(inputMatters.get(i).getCandidate()))continue Recipe;
-                    }else{
-                        // if mass false ->
-                        Matter rTemp = recipeMatters.get(i);
-                        Matter iTemp = inputMatters.get(i);
-                        if(!rTemp.getCandidate().containsAll(iTemp.getCandidate()))continue Recipe;
-                        if(!getEnchantWrapCongruence(rTemp.getWarp(),iTemp.getWarp()))continue Recipe;
-                    }
+                    if(!isSameMatter(recipeMatters.get(i),inputMatters.get(i)))continue Recipe;
                 }
 
-                recipeInputResultAmountList.add(Arrays.asList(recipe,input,minimalAmount));
+                result = recipe;
+                massAmount = getMinimalAmount(massRemovedInput.getContentsNoAir());
+
+                for(Map.Entry<Coordinate,Matter> entry:recipe.getCoordinate().entrySet()){
+                    if(entry.getValue().getCandidate().get(0).equals(Material.AIR))continue;
+                    remove.put(entry.getKey(),massAmount);
+                }
 
             }else{
                 //amorphous
             }
         }
+
+        setResultItem(inventory,result,input,player,massAmount);
+        removeItemAndSetReturnItems(inventory,remove,result.getReturnItems(),player);
     }
 
-    private List<Material> getWithout(Recipe recipe){
+//    private void setResultItem(Inventory inventory, Map<Recipe,Recipe> candidate,Player player,int amount){
+//        // get result items
+//        List<ItemStack> resultItems = new ArrayList<>();
+//        for(Map.Entry<Recipe,Recipe> entry: candidate.entrySet()){
+//            // key -> Recipe | value -> Input
+//            Recipe recipe = entry.getKey();
+//            Recipe input = entry.getValue();
+//            if(allMaterials.contains(recipe.getResult().getNameOrRegex())
+//            || recipe.getResult().getMatchPoint() == -1
+//            || !recipe.getResult().getNameOrRegex().contains(",")){
+//                // result has definite material
+//                Material m = Material.valueOf(recipe.getResult().getNameOrRegex());
+//                ItemStack item = new ItemStack(m,amount);
+//                setMetaData(item,recipe.getResult()); //set result itemStack's metadata
+//                resultItems.add(item);
+//            }else{
+//                // not contains -> A result has written by regex pattern.
+//                List<String> list = Arrays.asList(recipe.getResult().getNameOrRegex().split(","));
+//                String p = list.get(0);
+//                String replaced = list.get(1);
+//                Pattern pattern = Pattern.compile(p);
+//                List<String> materials = new ArrayList<>();
+//                for(Material m:getContainsMaterials(input)){
+//                    String name = m.name();
+//                    Matcher matcher = pattern.matcher(name);
+//                    if(matcher.find()){
+//                        int point = recipe.getResult().getMatchPoint();
+//                        replaced.replace("{R}",matcher.group(point));
+//                        materials.add(replaced);
+//                    }
+//                }
+//                Collections.sort(materials);
+//
+//                Material material = Material.valueOf(list.get(0).toUpperCase());
+//                ItemStack item = new ItemStack(material,amount);
+//                setMetaData(item,recipe.getResult()); //set metadata
+//                resultItems.add(item);
+//            }
+//
+//        }
+//
+//        //debug
+//        resultItems.forEach(s->System.out.println(String.format("result item : %s",s)));
+//
+//        ItemStack item = resultItems.get(0);
+//        if(inventory.getItem(resultSlot) == null){
+//            // empty a result item's slot
+//            player.getWorld().dropItem(player.getLocation(),item);
+//        }else{
+//            if(item.getAmount() > item.getType().getMaxStackSize()){
+//                // over the max amount
+//                player.getWorld().dropItem(player.getLocation(),item);
+//            }else{
+//                // in the limit
+//                inventory.setItem(resultSlot,item);
+//            }
+//        }
+//
+//    }
+//
+
+    private void removeItemAndSetReturnItems(Inventory inventory,Map<Coordinate,Integer> remove,Map<Material,ItemStack> reverse,Player player){
+        for(Map.Entry<Coordinate,Integer> entry:remove.entrySet()){
+            int slot = entry.getKey().getX() + entry.getKey().getY() * 9;
+            if(reverse.keySet().contains(inventory.getItem(slot))){
+                // return item exist
+                ItemStack returnItem = reverse.get(inventory.getItem(slot).getType());
+                returnItem.setAmount(entry.getValue());
+                if(inventory.getItem(slot).getAmount() > entry.getValue()){
+                    // some items will be remaining
+                    World world = player.getWorld();
+                    Location location = player.getLocation();
+                    world.dropItem(location,returnItem);
+                }else{
+                    // no item remaining
+                    inventory.setItem(slot,returnItem);
+                }
+            }else{
+                // remove items
+                inventory.getItem(slot).setAmount(inventory.getItem(slot).getAmount() - entry.getValue());
+            }
+        }
+    }
+
+    private int getMinimalAmount(List<Matter> matter){
+        int r = 1000;
+        for(Matter m:matter){
+            if(m.getAmount() < r)r = m.getAmount();
+        }
+        return r;
+    }
+
+    private Recipe getRecipeRemovedMassItems(Recipe input,List<Material> list){
+        Map<Coordinate,Matter> m = new HashMap<>();
+        for(Map.Entry<Coordinate,Matter> entry:input.getCoordinate().entrySet()){
+            if(list.containsAll(entry.getValue().getCandidate())){
+                Matter mt = new Matter(entry.getValue().getName(),Arrays.asList(Material.AIR),null,0,false);
+                m.put(entry.getKey(),mt);
+            }else{
+                m.put(entry.getKey(),entry.getValue());
+            }
+        }
+        Recipe r = new Recipe(input.getName(),input.getTag().toString(),m,null,null);
+        return r;
+    }
+    private List<Material> getMassItems(Recipe recipe){
         List<Material> list = new ArrayList<>();
-        for(Matter matter:recipe.getContentsNoAir()){
-            if(matter.isMass())continue;
-            // A candidate have to be composed by only one material.
-            if(matter.getCandidate().size() != 1)continue;
-            Material material = matter.getCandidate().get(0);
-            list.add(material);
+        for(Map.Entry<Coordinate,Matter> entry:recipe.getCoordinate().entrySet()){
+            if(entry.getValue().isMass())list.addAll(entry.getValue().getCandidate());
         }
         return list;
     }
 
-    private int getTotalWithoutMassMatter(Recipe recipe){
-        int result = 0;
-        for(Matter matter:recipe.getContentsNoAir()){
-            if(matter.isMass())continue;
-            result += matter.getAmount();
+    private Recipe getMassRemoved(Recipe recipe){
+        Map<Coordinate,Matter> m = new HashMap<>();
+        for(Map.Entry<Coordinate,Matter> entry:recipe.getCoordinate().entrySet()){
+            if(entry.getValue().isMass())m.put(entry.getKey(),new Matter(Arrays.asList(Material.AIR),0));
+            else m.put(entry.getKey(),entry.getValue());
         }
-        return result;
+        Recipe r = new Recipe(recipe.getName(),recipe.getTag().toString(),m,null,recipe.getResult());
+        return r;
     }
-
-    private void setResultItem(Inventory inventory, Map<Recipe,Recipe> candidate,Player player){
-        // get result items
-        List<ItemStack> resultItems = new ArrayList<>();
-        for(Map.Entry<Recipe,Recipe> entry: candidate.entrySet()){
-            // key -> Recipe | value -> Input
-            Recipe recipe = entry.getKey();
-            Recipe input = entry.getValue();
-            if(allMaterials.contains(recipe.getResult().getNameOrRegex())
-            || recipe.getResult().getMatchPoint() == -1
-            || !recipe.getResult().getNameOrRegex().contains(",")){
-                // result has definite material
-                Material m = Material.valueOf(recipe.getResult().getNameOrRegex());
-                ItemStack item = new ItemStack(m,recipe.getResult().getAmount());
-                setMetaData(item,recipe.getResult()); //set result itemStack's metadata
-                resultItems.add(item);
-            }else{
-                // not contains -> A result has written by regex pattern.
-                List<String> list = Arrays.asList(recipe.getResult().getNameOrRegex().split(","));
-                String p = list.get(0);
-                String replaced = list.get(1);
-                Pattern pattern = Pattern.compile(p);
-                List<String> materials = new ArrayList<>();
-                for(Material m:getContainsMaterials(input)){
-                    String name = m.name();
-                    Matcher matcher = pattern.matcher(name);
-                    if(matcher.find()){
-                        int point = recipe.getResult().getMatchPoint();
-                        replaced.replace("{R}",matcher.group(point));
-                        materials.add(replaced);
-                    }
-                }
-                Collections.sort(materials);
-
-                Material material = Material.valueOf(list.get(0).toUpperCase());
-                ItemStack item = new ItemStack(material,recipe.getResult().getAmount());
-                setMetaData(item,recipe.getResult()); //set metadata
-                resultItems.add(item);
+    private void setResultItem(Inventory inventory,Recipe recipe,Recipe input,Player player,int amount){
+        ItemStack item = null;
+        if(allMaterials.contains(recipe.getResult().getNameOrRegex())
+        || recipe.getResult().getMatchPoint() == -1
+        || !recipe.getResult().getNameOrRegex().contains(",")){
+            // result has defined material
+            Material m = Material.valueOf(recipe.getResult().getNameOrRegex());
+            item = new ItemStack(m,amount);
+            setMetaData(item,recipe.getResult()); //set result itemStack's metadata
+        }else{
+            // not contains -> A result has written by regex pattern.
+            List<String> list = Arrays.asList(recipe.getResult().getNameOrRegex().split(","));
+            String p = list.get(0);
+            String replaced = list.get(1);
+            Pattern pattern = Pattern.compile(p);
+            List<String> materials = new ArrayList<>();
+            for(Material m:getContainsMaterials(input)){
+                String name = m.name();
+                Matcher matcher = pattern.matcher(name);
+                if(!matcher.find())return;
+                int point = recipe.getResult().getMatchPoint();
+                replaced.replace("{R}",matcher.group(point));
+                materials.add(replaced);
             }
+            Collections.sort(materials);
 
+            Material material = Material.valueOf(list.get(0).toUpperCase());
+            item = new ItemStack(material,amount);
         }
 
         //debug
-        resultItems.forEach(s->System.out.println(String.format("result item : %s",s)));
-
-        ItemStack item = resultItems.get(0);
         if(inventory.getItem(resultSlot) == null){
             // empty a result item's slot
             player.getWorld().dropItem(player.getLocation(),item);
