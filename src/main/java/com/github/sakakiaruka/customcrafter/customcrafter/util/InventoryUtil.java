@@ -1,7 +1,10 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+
+import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.*;
 
 public class InventoryUtil {
     public List<Integer> getTableSlots(int size){
@@ -12,6 +15,18 @@ public class InventoryUtil {
                 list.add(result);
             }
         }
+
+        return list;
+    }
+
+    public List<Integer> getBlankCoordinates(int size){
+        List<Integer> list = new ArrayList<>();
+        for(int i=0;i<craftingTableTotalSize;i++){
+            list.add(i);
+        }
+        list.removeAll(getTableSlots(size));
+        list.removeAll(Arrays.asList(craftingTableMakeButton));
+        list.removeAll(Arrays.asList(craftingTableResultSlot));
         return list;
     }
 }

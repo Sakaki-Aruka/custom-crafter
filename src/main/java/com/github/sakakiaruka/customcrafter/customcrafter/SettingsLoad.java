@@ -1,16 +1,18 @@
 package com.github.sakakiaruka.customcrafter.customcrafter;
 
 import com.github.sakakiaruka.customcrafter.customcrafter.listener.OpenCraftingTable;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantStrict;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantWrap;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordinate;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.Result;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.Server;
-import org.bukkit.World;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
@@ -18,11 +20,22 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
 
 import static com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter.getInstance;
 
 public class SettingsLoad {
+
+    // === defined settings values === //
+    public static final int craftingTableSize = 6;
+    public static final int craftingTableResultSlot = 44;
+    public static final int craftingTableMakeButton = 35;
+    public static final int craftingTableTotalSize = 54;
+    public static final int vanillaCraftingSlots = 9;
+    public static final int vanillaCraftingSquareSize = 3;
+
+    // === recipes public values === //
     public static Material baseBlock;
     public static List<Recipe> recipes = new ArrayList<>();
     public static List<String> allMaterials = new ArrayList<>();
@@ -34,14 +47,19 @@ public class SettingsLoad {
     private static Map<String, Matter> matters = new HashMap<>();
 
     // === for runnable task === //
+    private List<String> downloadUri;
+    private List<String> failed = new ArrayList<>();
+
     private int returnCode = -1;
     private int times = 0;
     private int threshold;
     private int load_interval;
 
+
     public void load(){
         defaultConfig = getInstance().getConfig();
         new OpenCraftingTable().setCraftingInventory();
+        main();
         getAllMaterialsName();
     }
 
@@ -49,67 +67,92 @@ public class SettingsLoad {
         Arrays.stream(Material.values()).forEach(s->allMaterials.add(s.name()));
     }
 
-    private void getPaths(){
+    private void main(){
         Path baseBlockPath = Paths.get(defaultConfig.getString("baseBlock"));
-        Path resultPath = Paths.get(defaultConfig.getString("result"));
-        Path matterPath = Paths.get(defaultConfig.getString("matter"));
-        Path recipePath = Paths.get(defaultConfig.getString("recipe"));
-        List<String> downloadUri = defaultConfig.getStringList("download");
-        List<String> downloadErrorMessageList = defaultConfig.getStringList("errorMessages");
-        threshold = defaultConfig.getInt("download_threshold");
-        load_interval = defaultConfig.getInt("download_interval");
+        Path resultPath = Paths.get(defaultConfig.getString("results"));
+        Path matterPath = Paths.get(defaultConfig.getString("matters"));
+        Path recipePath = Paths.get(defaultConfig.getString("recipes"));
+
+        configFileDirectoryCheck(baseBlockPath);
+        configFileDirectoryCheck(resultPath);
+        configFileDirectoryCheck(matterPath);
+        configFileDirectoryCheck(recipePath);
+
 
         List<String> failed = new ArrayList<>();
 
-        BukkitRunnable main = new BukkitRunnable() {
-            @Override
-            public void run() {
-                getBaseBlock(getFiles(baseBlockPath));
-                getResult(getFiles(resultPath));
-                getMatter(getFiles(matterPath));
-                getRecipe(getFiles(recipePath));
-                System.out.println("[CustomCrafter] Data loaded!");
-            }
-        };
+        // --- bukkit runnable --- //
         BukkitRunnable downloader = new BukkitRunnable() {
             @Override
             public void run() {
                 for(String command:downloadUri){
-                    if(command.isEmpty())continue;
+                    if(command.isEmpty())return;
                     ProcessBuilder builder = new ProcessBuilder(Arrays.asList(command.split(" ")));
                     Process process;
                     try{
                         process = builder.start();
                         process.waitFor();
                     }catch (Exception e){
-                        downloadErrorMessageList.forEach(System.out::println);
-                        e.printStackTrace();
+                        Logger logger = Bukkit.getLogger();
+                        logger.info("[CustomCrafter] downloading error.");
+                        logger.info("command : "+command);
                         failed.add(command);
                     }
                 }
+                returnCode = 0;
             }
         };
 
-        BukkitRunnable loader = new BukkitRunnable() {
+        BukkitRunnable main = new BukkitRunnable() {
             @Override
             public void run() {
-                if(times <= threshold && returnCode == 0){
-                    //main.runTaskLater(getInstance(),20);
+                // get data from each files
+                getBaseBlock(getFiles(baseBlockPath));
+                getResult(getFiles(resultPath));
+                getMatter(getFiles(matterPath));
+                getRecipe(getFiles(recipePath));
+
+                Bukkit.getLogger().info("===Custom-Crafter data loaded.===");
+            }
+        };
+
+        // === bukkit runnable finish ===//
+
+        //getFilesFromTheSea (download section)
+        if(defaultConfig.contains("download")){
+            if(defaultConfig.getStringList("download").isEmpty()){
+                // no download files.
+                main.runTaskLater(getInstance(),20l);
+                return;
+            }
+            List<String> downloadUri = defaultConfig.getStringList("download");
+            List<String> downloadErrorMessageList = defaultConfig.getStringList("errorMessages");
+            threshold = defaultConfig.getInt("download_threshold");
+            load_interval = defaultConfig.getInt("download_interval");
+
+            downloader.runTaskAsynchronously(getInstance());
+            defaultConfig.set("download",failed);
+            getInstance().saveConfig();
+        }
+
+        new BukkitRunnable(){
+            @Override
+            public void run(){
+                if(times <= threshold && returnCode==0){
+                    //finish
+                    main.runTaskLater(getInstance(),20); // 1second delay
                     this.cancel();
-                    System.out.println("[CustomCrafter] Configs download was completed!");
+                    Bukkit.getLogger().info("[CustomCrafter] Config Download complete!");
                     return;
                 }else if(times > threshold){
-                    System.out.println("[CustomCrafter] Could not load date.");
+                    Bukkit.getLogger().info("[CustomCrafter] Could not load data.");
                     this.cancel();
                     return;
                 }
-                System.out.println("[CustomCrafter] Downloading now ...");
+                Bukkit.getLogger().info("[CustomCrafter] Downloading now...");
                 times++;
             }
-        };
-
-        loader.runTaskTimer(getInstance(),20,load_interval);
-
+        }.runTaskTimer(getInstance(),20,load_interval);
     }
 
     private void configFileDirectoryCheck(Path path){
@@ -162,10 +205,23 @@ public class SettingsLoad {
             Map<String,List<String>> metadata = null;
             if(config.contains("enchant")){
                 //TODO : write enchants info collect here.
+                for(String s:config.getStringList("enchant")){
+                    List<String> list = Arrays.asList(s.split(","));
+                    Enchantment enchant = Enchantment.getByName(list.get(0).toUpperCase());
+                    int level = Integer.valueOf(list.get(1));
+                    enchantInfo.put(enchant,level);
+                }
             }
 
             if(config.contains("metadata")){
                 //TODO : write metadata collect here.
+                for(String s:config.getStringList("metadata")){
+                    List<String> list = Arrays.asList(s.split(","));
+                    String key = list.get(0);
+                    String value = list.get(1);
+                    if(!metadata.containsKey(key))metadata.put(key,new ArrayList<>());
+                    metadata.get(key).add(value);
+                }
             }
 
             Result result = new Result(name,enchantInfo,amount,metadata,nameOrRegex,matchPoint);
@@ -177,6 +233,29 @@ public class SettingsLoad {
         for(Path path:paths){
             FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
             //TODO : write matter collect
+            String name = config.getString("name");
+            int amount = config.getInt("amount");
+            boolean mass = config.getBoolean("mass");
+            List<Material> candidate = new ArrayList<>();
+            for(String s:config.getStringList("candidate")){
+                candidate.add(Material.getMaterial(s.toUpperCase()));
+            }
+            List<EnchantWrap> wrapList = new ArrayList<>();
+            if(config.contains("enchant")){
+                for(String s:config.getStringList("enchant")){
+                    List<String> list = Arrays.asList(s.split(","));
+                    Enchantment enchant = Enchantment.getByName(list.get(0));
+                    int level = Integer.valueOf(list.get(1));
+                    EnchantStrict strict = EnchantStrict.valueOf(list.get(2).toUpperCase());
+                    EnchantWrap wrap = new EnchantWrap(level,enchant,strict);
+                    wrapList.add(wrap);
+                }
+            }
+
+            if(wrapList.isEmpty())wrapList = null;
+
+            Matter matter = new Matter(name,candidate,wrapList,amount,mass);
+            matters.put(name,matter);
         }
     }
 
@@ -184,6 +263,38 @@ public class SettingsLoad {
         for(Path path:paths){
             FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
             //TODO : write recipe collect
+            String name = config.getString("name");
+            String tag = config.getString("tag").toUpperCase();
+            Result result = results.get(config.getString("result"));
+
+            Map<Coordinate,Matter> coordinates = new LinkedHashMap<>();
+            Map<Material, ItemStack> returns = new HashMap<>();
+
+            int size = config.getStringList("coordinate").size();
+            List<String> l = config.getStringList("coordinate");
+            for(int y=0;y<size;y++){
+                List<String> list = Arrays.asList(l.get(y).split(","));
+                for(int x=0;x<size;x++){
+                    Coordinate coordinate = new Coordinate(x,y);
+                    Matter matter = list.get(x).equalsIgnoreCase("null") ? new Matter(Arrays.asList(Material.AIR),0) : matters.get(list.get(x));
+                    coordinates.put(coordinate,matter);
+                }
+            }
+
+            if(config.contains("returns")){
+                for(String s:config.getStringList("returns")){
+                    List<String> list = Arrays.asList(s.split(","));
+                    Material material = Material.valueOf(list.get(0).toUpperCase());
+                    Material returnMaterial = Material.valueOf(list.get(1).toUpperCase());
+                    int amount = Integer.valueOf(list.get(2));
+                    ItemStack itemStack  = new ItemStack(returnMaterial,amount);
+                    returns.put(material,itemStack);
+                }
+            }
+
+            Recipe recipe = new Recipe(name,tag,coordinates,returns,result);
+            recipes.add(recipe);
+            namedRecipes.put(name,recipe);
         }
     }
 

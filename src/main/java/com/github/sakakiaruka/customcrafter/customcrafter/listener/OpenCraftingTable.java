@@ -1,5 +1,6 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.listener;
 
+import com.github.sakakiaruka.customcrafter.customcrafter.util.InventoryUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -17,13 +18,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import static com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter.getInstance;
-import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.baseBlock;
+import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.*;
 
 public class OpenCraftingTable implements Listener {
     public static List<Player> opening = new ArrayList<>();
-
-    private static double degrees = 2 * Math.PI / (360 / 30);
-    private static double radius = 1;
+    private static final double degrees = 2 * Math.PI / (360 / 30);
+    private static final double radius = 1;
     private static Inventory craftingInventory;
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event){
@@ -51,18 +51,17 @@ public class OpenCraftingTable implements Listener {
     }
 
     public void setCraftingInventory(){
-        Inventory inventory = Bukkit.createInventory(null,9 * 6,"Custom Crafter");
-        //set blanks
-        for(int y=0;y<6;y++){
-            for(int x=0;x<9;x++){
-                if(x < 5)continue;
-                ItemStack blank = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
-                ItemMeta meta = blank.getItemMeta();
-                meta.setDisplayName("blank");
-                blank.setItemMeta(meta);
-                inventory.setItem((x+y*9),blank);
-            }
+        Inventory inventory = Bukkit.createInventory(null,9 * craftingTableSize,"Custom Crafter");
+        ItemStack blank = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
+        ItemMeta meta = blank.getItemMeta();
+        meta.setDisplayName("-");
+        blank.setItemMeta(meta);
+        for(int i=0;i<craftingTableTotalSize;i++){
+            inventory.setItem(i,blank);
         }
+        new InventoryUtil().getTableSlots(craftingTableSize).forEach(s->{
+            inventory.setItem(s,new ItemStack(Material.AIR));
+        });
 
         //set craft button (anvil)
         ItemStack make = new ItemStack(Material.ANVIL);
@@ -70,10 +69,10 @@ public class OpenCraftingTable implements Listener {
         anvilMeta.setDisplayName("§fMake");
         anvilMeta.setLore(Arrays.asList("§fMaking items."));
         make.setItemMeta(anvilMeta);
-        inventory.setItem(35,make);
+        inventory.setItem(craftingTableMakeButton,make);
 
         //set result slot
-        inventory.setItem(44,new ItemStack(Material.AIR));
+        inventory.setItem(craftingTableResultSlot,new ItemStack(Material.AIR));
 
         craftingInventory = inventory;
     }

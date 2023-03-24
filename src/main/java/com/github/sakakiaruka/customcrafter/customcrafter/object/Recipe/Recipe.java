@@ -25,7 +25,7 @@ public class Recipe {
     }
 
     public Recipe(){ //only used for temporary (mainly real) -> tag is "Normal"
-        this.tag = Tag.Normal;
+        this.tag = Tag.NORMAL;
         this.name = "";
         this.coordinate = new HashMap<>();
         this.returnItems = null;
@@ -81,6 +81,26 @@ public class Recipe {
         coordinate.values().forEach(s->{
             if(!s.getCandidate().get(0).equals(Material.AIR))list.add(s);
         });
+        return list;
+    }
+
+    public List<Coordinate> getCoordinateList(){
+        List<Coordinate> list = new ArrayList<>();
+        coordinate.keySet().forEach(s->list.add(s));
+        return list;
+    }
+
+    public List<Matter> getContentsNoDuplicate(){
+        List<Matter> list = new ArrayList<>();
+        List<List<Material>> temporary = new ArrayList<>();
+        temporary.add(new ArrayList<>());
+
+        for(Matter m:coordinate.values()){
+            if(!temporary.contains(m.getCandidate())){
+                list.add(m);
+                temporary.add(m.getCandidate());
+            }
+        }
         return list;
     }
 }

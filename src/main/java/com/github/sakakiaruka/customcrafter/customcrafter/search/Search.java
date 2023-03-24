@@ -21,12 +21,11 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.allMaterials;
-import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.recipes;
+import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.*;
 
 
 public class Search {
-    private static final int resultSlot = 44;
+
     public void main(Player player, Inventory inventory){
         // normal
         Recipe r = null;
@@ -35,7 +34,7 @@ public class Search {
         Map<Recipe,Recipe> recipeInputResultMap = new HashMap<>(); //key : Recipe | value : Input
         Recipe input = toRecipe(inventory);
         Recipe:for(Recipe recipe : recipes){
-            if(recipe.getTag().equals(Tag.Normal)){
+            if(recipe.getTag().equals(Tag.NORMAL)){
                 //normal
                 if(getSquareSize(recipe) != getSquareSize(input))continue ;
                 if(!isSameShape(getCoordinateNoAir(recipe),getCoordinateNoAir(input)))continue ;
@@ -82,8 +81,15 @@ public class Search {
             remove.put(entry.getKey(),1);
         }
         //
-        setResultItem(inventory,r,input,player,amount);
-        removeItemAndSetReturnItems(inventory,remove,r.getReturnItems(),player);
+        if(r != null){
+            // custom recipe found
+            setResultItem(inventory,r,input,player,amount);
+            removeItemAndSetReturnItems(inventory,remove,r.getReturnItems(),player);
+        }else{
+            // no custom recipe found -> search from vanilla recipes
+            new VanillaSearch().main(player,inventory);
+        }
+
 
     }
 
@@ -101,7 +107,7 @@ public class Search {
 
             //search here
             // isMass = true -> skip to "check amount" process
-            if(recipe.getTag().equals(Tag.Normal)){
+            if(recipe.getTag().equals(Tag.NORMAL)){
                 //normal
                 if(getSquareSize(recipe) != getSquareSize(input))continue;
                 if(!isSameShape(getCoordinateNoAir(recipe),getCoordinateNoAir(input)))continue;
@@ -131,70 +137,17 @@ public class Search {
             }
         }
 
-        setResultItem(inventory,result,input,player,massAmount);
-        removeItemAndSetReturnItems(inventory,remove,result.getReturnItems(),player);
+        if(result != null){
+            // custom recipe found
+            setResultItem(inventory,result,input,player,massAmount);
+            removeItemAndSetReturnItems(inventory,remove,result.getReturnItems(),player);
+        }else{
+            // no custom recipe found -> search from vanilla recipes
+            new VanillaSearch().main(player, inventory);
+        }
+
     }
 
-//    private void setResultItem(Inventory inventory, Map<Recipe,Recipe> candidate,Player player,int amount){
-//        // get result items
-//        List<ItemStack> resultItems = new ArrayList<>();
-//        for(Map.Entry<Recipe,Recipe> entry: candidate.entrySet()){
-//            // key -> Recipe | value -> Input
-//            Recipe recipe = entry.getKey();
-//            Recipe input = entry.getValue();
-//            if(allMaterials.contains(recipe.getResult().getNameOrRegex())
-//            || recipe.getResult().getMatchPoint() == -1
-//            || !recipe.getResult().getNameOrRegex().contains(",")){
-//                // result has definite material
-//                Material m = Material.valueOf(recipe.getResult().getNameOrRegex());
-//                ItemStack item = new ItemStack(m,amount);
-//                setMetaData(item,recipe.getResult()); //set result itemStack's metadata
-//                resultItems.add(item);
-//            }else{
-//                // not contains -> A result has written by regex pattern.
-//                List<String> list = Arrays.asList(recipe.getResult().getNameOrRegex().split(","));
-//                String p = list.get(0);
-//                String replaced = list.get(1);
-//                Pattern pattern = Pattern.compile(p);
-//                List<String> materials = new ArrayList<>();
-//                for(Material m:getContainsMaterials(input)){
-//                    String name = m.name();
-//                    Matcher matcher = pattern.matcher(name);
-//                    if(matcher.find()){
-//                        int point = recipe.getResult().getMatchPoint();
-//                        replaced.replace("{R}",matcher.group(point));
-//                        materials.add(replaced);
-//                    }
-//                }
-//                Collections.sort(materials);
-//
-//                Material material = Material.valueOf(list.get(0).toUpperCase());
-//                ItemStack item = new ItemStack(material,amount);
-//                setMetaData(item,recipe.getResult()); //set metadata
-//                resultItems.add(item);
-//            }
-//
-//        }
-//
-//        //debug
-//        resultItems.forEach(s->System.out.println(String.format("result item : %s",s)));
-//
-//        ItemStack item = resultItems.get(0);
-//        if(inventory.getItem(resultSlot) == null){
-//            // empty a result item's slot
-//            player.getWorld().dropItem(player.getLocation(),item);
-//        }else{
-//            if(item.getAmount() > item.getType().getMaxStackSize()){
-//                // over the max amount
-//                player.getWorld().dropItem(player.getLocation(),item);
-//            }else{
-//                // in the limit
-//                inventory.setItem(resultSlot,item);
-//            }
-//        }
-//
-//    }
-//
 
     private void removeItemAndSetReturnItems(Inventory inventory,Map<Coordinate,Integer> remove,Map<Material,ItemStack> reverse,Player player){
         for(Map.Entry<Coordinate,Integer> entry:remove.entrySet()){
@@ -288,7 +241,7 @@ public class Search {
         }
 
         //debug
-        if(inventory.getItem(resultSlot) == null){
+        if(inventory.getItem(craftingTableResultSlot) == null){
             // empty a result item's slot
             player.getWorld().dropItem(player.getLocation(),item);
         }else{
@@ -297,7 +250,7 @@ public class Search {
                 player.getWorld().dropItem(player.getLocation(),item);
             }else{
                 // in the limit
-                inventory.setItem(resultSlot,item);
+                inventory.setItem(craftingTableResultSlot,item);
             }
         }
 
@@ -501,8 +454,8 @@ public class Search {
 
     private Recipe toRecipe(Inventory inventory){
         Recipe recipe = new Recipe();
-        for(int y=0;y<6;y++){
-            for(int x=0;x<6;x++){
+        for(int y=0;y<craftingTableSize;y++){
+            for(int x=0;x<craftingTableSize;x++){
                 int i = x+y*9;
                 Matter matter = inventory.getItem(i)==null
                         ? new Matter(Arrays.asList(Material.AIR),0)

@@ -2,9 +2,6 @@ package com.github.sakakiaruka.customcrafter.customcrafter.object.Matter;
 
 import org.bukkit.enchantments.Enchantment;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class EnchantWrap {
     private int level;
     private Enchantment enchant;
