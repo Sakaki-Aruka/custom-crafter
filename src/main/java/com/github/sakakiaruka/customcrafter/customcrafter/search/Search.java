@@ -76,18 +76,20 @@ public class Search {
             }
         }
 
-        Map<Coordinate,Integer> remove = new HashMap<>();
-        for(Map.Entry<Coordinate,Matter> entry:r.getCoordinate().entrySet()){
-            remove.put(entry.getKey(),1);
-        }
+
         //
         if(r != null){
             // custom recipe found
+            Map<Coordinate,Integer> remove = new HashMap<>();
+            for(Map.Entry<Coordinate,Matter> entry:r.getCoordinate().entrySet()){
+                remove.put(entry.getKey(),1);
+            }
+
             setResultItem(inventory,r,input,player,amount);
-            removeItemAndSetReturnItems(inventory,remove,r.getReturnItems(),player);
+//            removeItemAndSetReturnItems(inventory,remove,r.getReturnItems(),player);
         }else{
             // no custom recipe found -> search from vanilla recipes
-            new VanillaSearch().main(player,inventory);
+            new VanillaSearch().main(player,inventory,false);
         }
 
 
@@ -140,37 +142,15 @@ public class Search {
         if(result != null){
             // custom recipe found
             setResultItem(inventory,result,input,player,massAmount);
-            removeItemAndSetReturnItems(inventory,remove,result.getReturnItems(),player);
+//            removeItemAndSetReturnItems(inventory,remove,result.getReturnItems(),player);
         }else{
             // no custom recipe found -> search from vanilla recipes
-            new VanillaSearch().main(player, inventory);
+            new VanillaSearch().main(player, inventory,true);
         }
 
     }
 
 
-    private void removeItemAndSetReturnItems(Inventory inventory,Map<Coordinate,Integer> remove,Map<Material,ItemStack> reverse,Player player){
-        for(Map.Entry<Coordinate,Integer> entry:remove.entrySet()){
-            int slot = entry.getKey().getX() + entry.getKey().getY() * 9;
-            if(reverse.keySet().contains(inventory.getItem(slot))){
-                // return item exist
-                ItemStack returnItem = reverse.get(inventory.getItem(slot).getType());
-                returnItem.setAmount(entry.getValue());
-                if(inventory.getItem(slot).getAmount() > entry.getValue()){
-                    // some items will be remaining
-                    World world = player.getWorld();
-                    Location location = player.getLocation();
-                    world.dropItem(location,returnItem);
-                }else{
-                    // no item remaining
-                    inventory.setItem(slot,returnItem);
-                }
-            }else{
-                // remove items
-                inventory.getItem(slot).setAmount(inventory.getItem(slot).getAmount() - entry.getValue());
-            }
-        }
-    }
 
     private int getMinimalAmount(List<Matter> matter){
         int r = 1000;
@@ -239,6 +219,8 @@ public class Search {
             Material material = Material.valueOf(list.get(0).toUpperCase());
             item = new ItemStack(material,amount);
         }
+
+        whatMaking.put(player.getUniqueId(),item.getType());
 
         //debug
         if(inventory.getItem(craftingTableResultSlot) == null){
@@ -425,6 +407,7 @@ public class Search {
 
     private int getSquareSize(Recipe recipe){
         List<Coordinate> list = getCoordinateNoAir(recipe);
+        if(list.isEmpty())return -1;
         if(list.get(0).getX() < 0 || list.get(0).getY() < 0)return -1;
 
         List<Integer> x = new ArrayList<>();
@@ -460,6 +443,8 @@ public class Search {
                 Matter matter = inventory.getItem(i)==null
                         ? new Matter(Arrays.asList(Material.AIR),0)
                         : new Matter(Arrays.asList(inventory.getItem(i).getType()),inventory.getItem(i).getAmount());
+
+                if(inventory.getItem(i) == null)continue;
                 matter.setWarp(getEnchantWrap(inventory.getItem(i))); //set enchantments information
                 recipe.addCoordinate(x,y,matter);
             }

@@ -9,42 +9,94 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.*;
 
 public class VanillaSearch {
-    public void main(Player player, Inventory inventory){
+    public void main(Player player, Inventory inventory,boolean batchBool){
         List<Coordinate> coordinates = getCoordinateList(inventory);
         if(coordinates.isEmpty())return;
         if(coordinates.size() > vanillaCraftingSlots)return;
         if(getSquareSize(coordinates) > vanillaCraftingSquareSize)return;
 
-        ItemStack result = Bukkit.craftItem(getItemStacks(inventory,coordinates.get(0)),player.getWorld(),player);
+        ItemStack[] itemStack = getItemStacks(inventory,coordinates.get(0));
+        ItemStack[] itemStacks = itemStack.clone();
+        ItemStack result = Bukkit.craftItem(itemStack,player.getWorld(),player);
+
+        //debug
+        System.out.println(result == null ? "null" : result);
+        Arrays.stream(itemStacks).forEach(s->{
+            String name = s == null ? "null" : s.getType().name();
+            int amount = s == null ? -1 : s.getAmount();
+            System.out.printf("name : %s | amount : %d%n",name,amount);
+        });
+
         if(result == null)return;
         if(result.getType().equals(Material.AIR))return;
+        whatMaking.put(player.getUniqueId(),result.getType());
+
+        InventoryUtil util = new InventoryUtil();
+        if(batchBool) {
+            // needed batch process
+            int minimal = getMinimalAmount(itemStacks);
+            result.setAmount(result.getAmount() * minimal);
+
+        }else{
+            // not needed batch process
+
+            //debug
+            System.out.println("not batch");
+
+        }
 
         if(result.getAmount() > result.getType().getMaxStackSize()){
             // amount over
             player.getWorld().dropItem(player.getLocation(),result);
+            inventory.setItem(craftingTableResultSlot,new ItemStack(Material.AIR));
         }else{
             inventory.setItem(craftingTableResultSlot,result);
         }
 
     }
 
+    private int getMinimalAmount(ItemStack[] items){
+        List<Integer> list = new ArrayList<>();
+        Arrays.stream(items).forEach(s->{
+
+            //debug
+            System.out.println("test : "+s);
+
+            if(s != null && !s.getType().equals(Material.AIR)){
+                list.add(s.getAmount());
+            }
+        });
+        if(list.isEmpty())return -1;
+        Collections.sort(list);
+        return list.get(0);
+    }
+
+
     private ItemStack[] getItemStacks(Inventory inventory,Coordinate start){
         ItemStack[] items = new ItemStack[vanillaCraftingSlots];
         int counter = 0;
         for(int y=start.getY();y < start.getY()+3;y++){
             for(int x=start.getX();x < start.getX()+3;x++){
+                if(y >= craftingTableSize || x >= craftingTableSize){
+                    // over the crafting tables coordinates
+                    items[counter] = new ItemStack(Material.AIR);
+                    counter++;
+                    continue;
+                }
                 int slot = x + y*vanillaCraftingSlots;
                 items[counter] = inventory.getItem(slot) == null ? new ItemStack(Material.AIR) : inventory.getItem(slot);
                 counter++;
 
                 //debug
-                System.out.println(String.format("itemStack[9] -> slot[%d] : %s",counter,inventory.getItem(slot).getType().name()));
+                String name = inventory.getItem(slot) == null ? "AIR": inventory.getItem(slot).getType().name();
+                System.out.printf("itemStack[9] -> slot[%d] : %s%n",counter,name);
 
 
             }

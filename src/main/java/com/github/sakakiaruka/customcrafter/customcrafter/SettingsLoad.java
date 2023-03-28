@@ -41,6 +41,9 @@ public class SettingsLoad {
     public static List<String> allMaterials = new ArrayList<>();
     public static Map<String,Recipe> namedRecipes = new HashMap<>();
 
+    // === for crafting data manage === //
+    public static Map<UUID,Material> whatMaking = new HashMap<>();
+
     // === for data get methods === //
     private static FileConfiguration defaultConfig;
     private static Map<String,Result> results = new HashMap<>();
@@ -78,8 +81,6 @@ public class SettingsLoad {
         configFileDirectoryCheck(matterPath);
         configFileDirectoryCheck(recipePath);
 
-
-        List<String> failed = new ArrayList<>();
 
         // --- bukkit runnable --- //
         BukkitRunnable downloader = new BukkitRunnable() {
@@ -125,7 +126,7 @@ public class SettingsLoad {
                 main.runTaskLater(getInstance(),20l);
                 return;
             }
-            List<String> downloadUri = defaultConfig.getStringList("download");
+            downloadUri = defaultConfig.getStringList("download");
             List<String> downloadErrorMessageList = defaultConfig.getStringList("errorMessages");
             threshold = defaultConfig.getInt("download_threshold");
             load_interval = defaultConfig.getInt("download_interval");

@@ -7,6 +7,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.craftingTableResultSlot;
 import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.craftingTableSize;
@@ -24,11 +25,11 @@ public class CloseCraftingTable implements Listener {
             if(inventory.getItem(i)==null)continue;
             if(inventory.getItem(i).getType().equals(Material.AIR))continue;
             player.getWorld().dropItem(player.getLocation(),inventory.getItem(i));
+            inventory.setItem(i,new ItemStack(Material.AIR));
         }
 
-        if(inventory.getItem(craftingTableResultSlot)==null)return;
-        if(inventory.getItem(craftingTableResultSlot).getType().equals(Material.AIR))return;
-        player.getWorld().dropItem(player.getLocation(),inventory.getItem(craftingTableResultSlot));
+        if(inventory.getItem(craftingTableResultSlot) != null)player.getWorld().dropItem(player.getLocation(),inventory.getItem(craftingTableResultSlot));
+        inventory.setItem(craftingTableResultSlot,new ItemStack(Material.AIR));
 
     }
 }
