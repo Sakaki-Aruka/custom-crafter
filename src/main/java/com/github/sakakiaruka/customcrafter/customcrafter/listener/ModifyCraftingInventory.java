@@ -52,15 +52,17 @@ public class ModifyCraftingInventory implements Listener {
         if (slot == craftingTableMakeButton){
             // click make button
             event.setCancelled(true);
+            // replace old result items
+            if(inventory.getItem(craftingTableResultSlot) != null){
+                player.getWorld().dropItem(player.getLocation(),inventory.getItem(craftingTableResultSlot));
+                inventory.setItem(craftingTableResultSlot,new ItemStack(Material.AIR));
+            }
             if(clickType.equals(ClickType.RIGHT)){
                 // batch
                 new Search().batchSearch(player,inventory);
                 // result item is null
                 if(whatMaking.get(player.getUniqueId()) == null)return;
                 int minimal = getMinimalAmount(inventory);
-
-                //debug
-                System.out.println("minimal @Modify : "+minimal);
 
                 util.decrementMaterials(inventory,player,minimal);
             }

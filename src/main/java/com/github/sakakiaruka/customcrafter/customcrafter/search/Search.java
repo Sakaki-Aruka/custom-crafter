@@ -31,10 +31,13 @@ public class Search {
         Recipe r = null;
         int amount = 0;
 
-        Map<Recipe,Recipe> recipeInputResultMap = new HashMap<>(); //key : Recipe | value : Input
         Recipe input = toRecipe(inventory);
         Recipe:for(Recipe recipe : recipes){
             if(recipe.getTag().equals(Tag.NORMAL)){
+
+                //debug
+                System.out.println(String.format("square : %d & %d | shape : %b | total : %d & %d",getSquareSize(recipe),getSquareSize(input),isSameShape(getCoordinateNoAir(recipe),getCoordinateNoAir(input)),getTotal(recipe),getTotal(input)));
+
                 //normal
                 if(getSquareSize(recipe) != getSquareSize(input))continue ;
                 if(!isSameShape(getCoordinateNoAir(recipe),getCoordinateNoAir(input)))continue ;
@@ -196,7 +199,7 @@ public class Search {
         || recipe.getResult().getMatchPoint() == -1
         || !recipe.getResult().getNameOrRegex().contains(",")){
             // result has defined material
-            Material m = Material.valueOf(recipe.getResult().getNameOrRegex());
+            Material m = Material.valueOf(recipe.getResult().getNameOrRegex().toUpperCase());
             item = new ItemStack(m,amount);
             setMetaData(item,recipe.getResult()); //set result itemStack's metadata
         }else{
@@ -240,6 +243,7 @@ public class Search {
 
     private void setMetaData(ItemStack item,Result result){
         Map<String,List<String>> metadata = result.getMetadata();
+        if(metadata == null || metadata.isEmpty())return;
         ItemMeta meta = item.getItemMeta();
         for(Map.Entry<String,List<String>> e:metadata.entrySet()){
             //metadata set
@@ -352,6 +356,7 @@ public class Search {
     }
 
     private boolean getEnchantWrapCongruence(List<EnchantWrap> recipe,List<EnchantWrap> input){
+        if(recipe == null)return true;
         for(EnchantWrap wrap:recipe){
             if(wrap.getStrict().equals(EnchantStrict.NotStrict))continue;
             if(!getEnchantmentList(input).contains(wrap.getEnchant()))return false;
@@ -386,6 +391,7 @@ public class Search {
         return list;
     }
 
+    //TODO : rewrite to sorted coordinate
     private List<Coordinate> getCoordinateNoAir(Recipe recipe){
         List<Coordinate> list = new ArrayList<>();
         for(Map.Entry<Coordinate,Matter> entry:recipe.getCoordinate().entrySet()){
@@ -426,9 +432,19 @@ public class Search {
     private boolean isSameShape(List<Coordinate> models,List<Coordinate> reals){
         int xGap = models.get(0).getX() - reals.get(0).getX();
         int yGap = models.get(0).getY() - reals.get(0).getY();
+
+        //debug
+        System.out.println(String.format("xGap : %d | yGap : %d | size(model) : %d | size (reals) : %d",xGap,yGap,models.size(),reals.size()));
+        models.forEach(s->System.out.println(String.format("models(X) : %d | models(Y) : %d",s.getX(),s.getY())));
+        reals.forEach(s->System.out.println(String.format("reals(X) : %d | reals(Y) : %d",s.getX(),s.getY())));
+
         if(models.size() != reals.size())return false;
         int size = models.size();
         for(int i=1;i<size;i++){
+
+            //debug
+            System.out.println(String.format("xGap* : %d | yGap* : %d",models.get(i).getX() - reals.get(i).getX(),models.get(i).getY() - reals.get(i).getY()));
+
             if(models.get(i).getX() - reals.get(i).getX() != xGap)return false;
             if(models.get(i).getY() - reals.get(i).getY() != yGap)return false;
         }

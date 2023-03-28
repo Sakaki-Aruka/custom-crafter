@@ -26,13 +26,6 @@ public class VanillaSearch {
         ItemStack[] itemStacks = itemStack.clone();
         ItemStack result = Bukkit.craftItem(itemStack,player.getWorld(),player);
 
-        //debug
-        System.out.println(result == null ? "null" : result);
-        Arrays.stream(itemStacks).forEach(s->{
-            String name = s == null ? "null" : s.getType().name();
-            int amount = s == null ? -1 : s.getAmount();
-            System.out.printf("name : %s | amount : %d%n",name,amount);
-        });
 
         if(result == null)return;
         if(result.getType().equals(Material.AIR))return;
@@ -47,8 +40,6 @@ public class VanillaSearch {
         }else{
             // not needed batch process
 
-            //debug
-            System.out.println("not batch");
 
         }
 
@@ -65,9 +56,6 @@ public class VanillaSearch {
     private int getMinimalAmount(ItemStack[] items){
         List<Integer> list = new ArrayList<>();
         Arrays.stream(items).forEach(s->{
-
-            //debug
-            System.out.println("test : "+s);
 
             if(s != null && !s.getType().equals(Material.AIR)){
                 list.add(s.getAmount());
@@ -94,9 +82,9 @@ public class VanillaSearch {
                 items[counter] = inventory.getItem(slot) == null ? new ItemStack(Material.AIR) : inventory.getItem(slot);
                 counter++;
 
-                //debug
-                String name = inventory.getItem(slot) == null ? "AIR": inventory.getItem(slot).getType().name();
-                System.out.printf("itemStack[9] -> slot[%d] : %s%n",counter,name);
+//                //debug
+//                String name = inventory.getItem(slot) == null ? "AIR": inventory.getItem(slot).getType().name();
+//                System.out.printf("itemStack[9] -> slot[%d] : %s%n",counter,name);
 
 
             }

@@ -5,10 +5,9 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.Result;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.craftingTableSize;
 
 public class Recipe {
     private String name;
@@ -27,7 +26,7 @@ public class Recipe {
     public Recipe(){ //only used for temporary (mainly real) -> tag is "Normal"
         this.tag = Tag.NORMAL;
         this.name = "";
-        this.coordinate = new HashMap<>();
+        this.coordinate = new LinkedHashMap<>();
         this.returnItems = null;
         this.result = null;
     }
