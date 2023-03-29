@@ -8,9 +8,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Tag;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.Result;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.InventoryUtil;
-import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -50,30 +48,53 @@ public class Search {
                 for(int i=0;i<recipeMatters.size();i++){
                     if(!isSameMatter(recipeMatters.get(i),inputMatters.get(i)))continue Recipe;
                 }
-                //recipeInputResultMap.put(recipe,input);
+
                 amount = recipe.getResult().getAmount();
                 r = recipe;
                 break Recipe;
 
             }else{
                 //amorphous
-                Map<Material,Integer> virtual = getMaterialAmountMap(recipe);
-                Map<Material,Integer> real = getMaterialAmountMap(input);
-                int ideal = getMapEachSum(virtual) - getMapEachSum(real);
+                if(getTotal(recipe) != getTotal(input))continue;
+                if(!getAllCandidateNoDuplicate(recipe).containsAll(getAllCandidateNoDuplicate(input)))continue;
 
-                for(Map.Entry<Material,Integer> entry:real.entrySet()){
-                    Material m = entry.getKey();
-                    if(!virtual.containsKey(m))continue Recipe; // exit recipe loop
-                    virtual.put(m,virtual.get(m) - entry.getValue());
+                int inputTotal = 0;
+                Map<Material,Integer> relation = new HashMap<>();
+                input.getContentsNoAir().forEach(s->{
+                    Material material = s.getCandidate().get(0);
+                    if(!relation.containsKey(s.getCandidate().get(0))) relation.put(material,0);
+                    int i = relation.get(s.getCandidate().get(0)) + s.getAmount();
+                    relation.put(material,i);
+                    increment(inputTotal,s.getAmount());
+                });
+
+                int virtualTotal = 0;
+                Map<Material,Integer> virtual = new HashMap<>();
+                recipe.getContentsNoAir().forEach(s->{
+                    s.getCandidate().forEach(t->{
+                        if(!virtual.containsKey(t)){
+                            virtual.put(t,s.getAmount());
+                            increment(virtualTotal,s.getAmount());
+                        }else{
+                            int i = virtual.get(t) + s.getAmount();
+                            virtual.put(t,i);
+                            increment(virtualTotal,s.getAmount());
+                        }
+                    });
+                });
+
+                int ideal = virtualTotal - inputTotal;
+                for(Matter matter:input.getContentsNoAir()){
+                    Material material = matter.getCandidate().get(0);
+                    int i = virtual.get(material) - matter.getAmount();
+                    if(i < 0)continue Recipe;
+                    virtual.put(material,i);
                 }
-                if(!getAmountCollectionCongruence(virtual))continue;
-                if(getMapEachSum(virtual) != ideal)continue;
 
-                // enchantment detail check
-                Map<Material,List<Matter>> map = getMaterialMatterRelation(recipe);
-                if(!getEnchantCongruenceAmorphous(map,input))continue;
+                int temp = 0;
+                for(int i:virtual.values())temp+=i;
+                if(ideal != temp)continue Recipe;
 
-                //recipeInputResultMap.put(recipe,input);
                 amount = recipe.getResult().getAmount();
                 r = recipe;
                 break Recipe;
@@ -98,60 +119,6 @@ public class Search {
 
 
     }
-
-//    public void batchSearch(Player player,Inventory inventory){
-//        // batch
-//        Recipe result = null;
-//        int massAmount = 0;
-//        Map<Coordinate,Integer> remove = new HashMap<>();
-//
-//        Recipe input = toRecipe(inventory);
-//        Recipe:for(Recipe recipe:recipes){
-//            for(Matter matter:recipe.getContentsNoAir()){
-//                if(!matter.isMass())continue Recipe;
-//            }
-//
-//            //search here
-//            // isMass = true -> skip to "check amount" process
-//            if(recipe.getTag().equals(Tag.NORMAL)){
-//                //normal
-//                if(getSquareSize(recipe) != getSquareSize(input))continue;
-//                if(!isSameShape(getCoordinateNoAir(recipe),getCoordinateNoAir(input)))continue;
-//                //
-//                List<Material> massList = getMassItems(recipe); // contains isMass(true) items
-//                Recipe modified = getMassRemoved(recipe); // contains Recipe that was isMass items removed.
-//                Recipe massRemovedInput = getRecipeRemovedMassItems(input,massList); // input(Recipe) removed mass items
-//
-//                List<Matter> recipeMatters = modified.getContentsNoAir();
-//                List<Matter> inputMatters = massRemovedInput.getContentsNoAir();
-//
-//                if(recipeMatters.size() != inputMatters.size())continue ;
-//                for(int i=0;i<recipeMatters.size();i++){
-//                    if(!isSameMatter(recipeMatters.get(i),inputMatters.get(i)))continue Recipe;
-//                }
-//
-//                result = recipe;
-//                massAmount = getMinimalAmount(massRemovedInput.getContentsNoAir());
-//
-//                for(Map.Entry<Coordinate,Matter> entry:recipe.getCoordinate().entrySet()){
-//                    if(entry.getValue().getCandidate().get(0).equals(Material.AIR))continue;
-//                    remove.put(entry.getKey(),massAmount);
-//                }
-//
-//            }else{
-//                //amorphous
-//            }
-//        }
-//
-//        if(result != null){
-//            // custom recipe found
-//            setResultItem(inventory,result,input,player,massAmount);
-//        }else{
-//            // no custom recipe found -> search from vanilla recipes
-//            new VanillaSearch().main(player, inventory,true);
-//        }
-//
-//    }
 
     public void massSearch(Player player,Inventory inventory){
         // mass (in batch)
@@ -221,38 +188,15 @@ public class Search {
         return list.get(0);
     }
 
-
-
-    private Recipe getRecipeRemovedMassItems(Recipe input,List<Material> list){
-        Map<Coordinate,Matter> m = new HashMap<>();
-        for(Map.Entry<Coordinate,Matter> entry:input.getCoordinate().entrySet()){
-            if(list.containsAll(entry.getValue().getCandidate())){
-                Matter mt = new Matter(entry.getValue().getName(),Arrays.asList(Material.AIR),null,0,false);
-                m.put(entry.getKey(),mt);
-            }else{
-                m.put(entry.getKey(),entry.getValue());
-            }
-        }
-        Recipe r = new Recipe(input.getName(),input.getTag().toString(),m,null,null);
-        return r;
-    }
-    private List<Material> getMassItems(Recipe recipe){
-        List<Material> list = new ArrayList<>();
-        for(Map.Entry<Coordinate,Matter> entry:recipe.getCoordinate().entrySet()){
-            if(entry.getValue().isMass())list.addAll(entry.getValue().getCandidate());
-        }
-        return list;
+    private Set<Material> getAllCandidateNoDuplicate(Recipe recipe){
+        Set<Material> set = new HashSet<>();
+        recipe.getContentsNoAir().forEach(s->{
+            set.addAll(s.getCandidate());
+        });
+        return set;
     }
 
-    private Recipe getMassRemoved(Recipe recipe){
-        Map<Coordinate,Matter> m = new HashMap<>();
-        for(Map.Entry<Coordinate,Matter> entry:recipe.getCoordinate().entrySet()){
-            if(entry.getValue().isMass())m.put(entry.getKey(),new Matter(Arrays.asList(Material.AIR),0));
-            else m.put(entry.getKey(),entry.getValue());
-        }
-        Recipe r = new Recipe(recipe.getName(),recipe.getTag().toString(),m,null,recipe.getResult());
-        return r;
-    }
+
     private void setResultItem(Inventory inventory,Recipe recipe,Recipe input,Player player,int amount){
         ItemStack item = null;
         if(allMaterials.contains(recipe.getResult().getNameOrRegex())
@@ -360,58 +304,6 @@ public class Search {
         return list;
     }
 
-    private boolean getEnchantCongruenceAmorphous(Map<Material,List<Matter>> map,Recipe input){
-        for(Matter matter:input.getContentsNoAir()){ // matter = input
-            List<Matter> list = map.get(matter.getCandidate().get(0));
-            for(int i=0;i<list.size();i++){ // matter = recipe
-                Matter inRecipe = list.get(i);
-                if(getEnchantWrapCongruence(inRecipe.getWarp(),matter.getWarp()))break;
-                if(i == list.size()-1){
-                    // not found match Matter.
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    private Map<Material,List<Matter>> getMaterialMatterRelation(Recipe recipe){
-        Map<Material,List<Matter>> map = new HashMap<>();
-        for(Matter matter:recipe.getContentsNoAir()){
-            List<Material> candidate = matter.getCandidate();
-            candidate.forEach(s->{
-                if(map.containsKey(s))map.get(s).add(matter);
-                else map.put(s,Arrays.asList(matter));
-            });
-        }
-        return map;
-    }
-
-    private boolean getAmountCollectionCongruence(Map<Material,Integer> map){
-        for(int i:map.values()){
-            if(i < 0)return false;
-        }
-        return true;
-    }
-
-    private Map<Material,Integer> getMaterialAmountMap(Recipe recipe){
-        Map<Material,Integer> map = new HashMap<>();
-        for(Matter matter:recipe.getContentsNoAir()){
-            for(Material material:matter.getCandidate()){
-                if(map.containsKey(material))map.put(material,map.get(material) + matter.getAmount());
-                else map.put(material,matter.getAmount());
-            }
-        }
-        return map;
-    }
-
-    private int getMapEachSum(Map<Material,Integer> map){
-        int result = 0;
-        for(int i:map.values()){
-            result += i;
-        }
-        return result;
-    }
 
     private boolean isSameMatter(Matter recipe,Matter input){
         if(!recipe.getCandidate().containsAll(input.getCandidate()))return false;
@@ -531,5 +423,9 @@ public class Search {
             }
         }
         return recipe;
+    }
+
+    private void increment(int input,int plus){
+        input+=plus;
     }
 }
