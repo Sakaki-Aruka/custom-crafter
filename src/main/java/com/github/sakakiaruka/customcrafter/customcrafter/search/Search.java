@@ -7,6 +7,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordina
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Tag;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.Result;
+import com.github.sakakiaruka.customcrafter.customcrafter.util.InventoryUtil;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -98,44 +99,99 @@ public class Search {
 
     }
 
-    public void batchSearch(Player player,Inventory inventory){
-        // batch
+//    public void batchSearch(Player player,Inventory inventory){
+//        // batch
+//        Recipe result = null;
+//        int massAmount = 0;
+//        Map<Coordinate,Integer> remove = new HashMap<>();
+//
+//        Recipe input = toRecipe(inventory);
+//        Recipe:for(Recipe recipe:recipes){
+//            for(Matter matter:recipe.getContentsNoAir()){
+//                if(!matter.isMass())continue Recipe;
+//            }
+//
+//            //search here
+//            // isMass = true -> skip to "check amount" process
+//            if(recipe.getTag().equals(Tag.NORMAL)){
+//                //normal
+//                if(getSquareSize(recipe) != getSquareSize(input))continue;
+//                if(!isSameShape(getCoordinateNoAir(recipe),getCoordinateNoAir(input)))continue;
+//                //
+//                List<Material> massList = getMassItems(recipe); // contains isMass(true) items
+//                Recipe modified = getMassRemoved(recipe); // contains Recipe that was isMass items removed.
+//                Recipe massRemovedInput = getRecipeRemovedMassItems(input,massList); // input(Recipe) removed mass items
+//
+//                List<Matter> recipeMatters = modified.getContentsNoAir();
+//                List<Matter> inputMatters = massRemovedInput.getContentsNoAir();
+//
+//                if(recipeMatters.size() != inputMatters.size())continue ;
+//                for(int i=0;i<recipeMatters.size();i++){
+//                    if(!isSameMatter(recipeMatters.get(i),inputMatters.get(i)))continue Recipe;
+//                }
+//
+//                result = recipe;
+//                massAmount = getMinimalAmount(massRemovedInput.getContentsNoAir());
+//
+//                for(Map.Entry<Coordinate,Matter> entry:recipe.getCoordinate().entrySet()){
+//                    if(entry.getValue().getCandidate().get(0).equals(Material.AIR))continue;
+//                    remove.put(entry.getKey(),massAmount);
+//                }
+//
+//            }else{
+//                //amorphous
+//            }
+//        }
+//
+//        if(result != null){
+//            // custom recipe found
+//            setResultItem(inventory,result,input,player,massAmount);
+//        }else{
+//            // no custom recipe found -> search from vanilla recipes
+//            new VanillaSearch().main(player, inventory,true);
+//        }
+//
+//    }
+
+    public void massSearch(Player player,Inventory inventory){
+        // mass (in batch)
         Recipe result = null;
         int massAmount = 0;
-        Map<Coordinate,Integer> remove = new HashMap<>();
-
         Recipe input = toRecipe(inventory);
-        Recipe:for(Recipe recipe:recipes){
-            for(Matter matter:recipe.getContentsNoAir()){
-                if(!matter.isMass())continue Recipe;
-            }
-
-            //search here
-            // isMass = true -> skip to "check amount" process
+        Top:for(Recipe recipe:recipes){
             if(recipe.getTag().equals(Tag.NORMAL)){
                 //normal
+
+                //debug
+                System.out.println("==========");
+                System.out.println(String.format("square : %d & %d | shape : %b",getSquareSize(recipe),getSquareSize(input),isSameShape(getCoordinateNoAir(recipe),getCoordinateNoAir(input))));
+
                 if(getSquareSize(recipe) != getSquareSize(input))continue;
                 if(!isSameShape(getCoordinateNoAir(recipe),getCoordinateNoAir(input)))continue;
-                //
-                List<Material> massList = getMassItems(recipe); // contains isMass(true) items
-                Recipe modified = getMassRemoved(recipe); // contains Recipe that was isMass items removed.
-                Recipe massRemovedInput = getRecipeRemovedMassItems(input,massList); // input(Recipe) removed mass items
 
-                List<Matter> recipeMatters = modified.getContentsNoAir();
-                List<Matter> inputMatters = massRemovedInput.getContentsNoAir();
+                // TODO: write here
+                // check mass matter is one
+                for(int i=0;i<recipe.getContentsNoAir().size();i++){
+                    Matter recipeMatter = recipe.getContentsNoAir().get(i);
+                    Matter inputMatter = input.getContentsNoAir().get(i);
 
-                if(recipeMatters.size() != inputMatters.size())continue ;
-                for(int i=0;i<recipeMatters.size();i++){
-                    if(!isSameMatter(recipeMatters.get(i),inputMatters.get(i)))continue Recipe;
+                    //debug
+                    System.out.println(String.format("recipe*M : %d | input*M : %d",recipeMatter.getAmount(),inputMatter.getAmount()));
+
+                    if(recipe.getContentsNoAir().get(i).isMass()){
+                        if(inputMatter.getAmount() != 1)continue Top;
+                    }
+
+                    if(inputMatter.getAmount() < recipeMatter.getAmount())continue Top;
                 }
 
                 result = recipe;
-                massAmount = getMinimalAmount(massRemovedInput.getContentsNoAir());
+                massAmount  = getMinimalAmount(result,input);
 
-                for(Map.Entry<Coordinate,Matter> entry:recipe.getCoordinate().entrySet()){
-                    if(entry.getValue().getCandidate().get(0).equals(Material.AIR))continue;
-                    remove.put(entry.getKey(),massAmount);
-                }
+                //debug
+                System.out.println("mass amount : "+massAmount);
+
+                break Top;
 
             }else{
                 //amorphous
@@ -144,24 +200,28 @@ public class Search {
 
         if(result != null){
             // custom recipe found
-            setResultItem(inventory,result,input,player,massAmount);
-//            removeItemAndSetReturnItems(inventory,remove,result.getReturnItems(),player);
+            setResultItem(inventory,result,input,player,massAmount*result.getResult().getAmount());
         }else{
-            // no custom recipe found -> search from vanilla recipes
-            new VanillaSearch().main(player, inventory,true);
+            // not found
+            new VanillaSearch().main(player,inventory,true);
         }
+    }
 
+    private int getMinimalAmount(Recipe recipe,Recipe input){
+        List<Integer> list = new ArrayList<>();
+        for(int i=0;i<recipe.getContentsNoAir().size();i++){
+            if(recipe.getContentsNoAir().get(i).isMass())continue;
+            list.add(input.getContentsNoAir().get(i).getAmount());
+        }
+        //debug
+        System.out.println("minimal amount : "+list);
+
+        if(list.isEmpty())return -1;
+        Collections.sort(list);
+        return list.get(0);
     }
 
 
-
-    private int getMinimalAmount(List<Matter> matter){
-        int r = 1000;
-        for(Matter m:matter){
-            if(m.getAmount() < r)r = m.getAmount();
-        }
-        return r;
-    }
 
     private Recipe getRecipeRemovedMassItems(Recipe input,List<Material> list){
         Map<Coordinate,Matter> m = new HashMap<>();
@@ -223,6 +283,9 @@ public class Search {
             item = new ItemStack(material,amount);
         }
 
+        //debug
+        System.out.println(String.format("material : %s | amount : %d",item.getType().name(),item.getAmount()));
+
         whatMaking.put(player.getUniqueId(),item.getType());
 
         //debug
@@ -238,6 +301,8 @@ public class Search {
                 inventory.setItem(craftingTableResultSlot,item);
             }
         }
+
+        new InventoryUtil().decrementMaterials(inventory,player,getMinimalAmount(recipe,input));
 
     }
 
@@ -391,7 +456,7 @@ public class Search {
         return list;
     }
 
-    //TODO : rewrite to sorted coordinate
+
     private List<Coordinate> getCoordinateNoAir(Recipe recipe){
         List<Coordinate> list = new ArrayList<>();
         for(Map.Entry<Coordinate,Matter> entry:recipe.getCoordinate().entrySet()){
@@ -434,9 +499,9 @@ public class Search {
         int yGap = models.get(0).getY() - reals.get(0).getY();
 
         //debug
-        System.out.println(String.format("xGap : %d | yGap : %d | size(model) : %d | size (reals) : %d",xGap,yGap,models.size(),reals.size()));
-        models.forEach(s->System.out.println(String.format("models(X) : %d | models(Y) : %d",s.getX(),s.getY())));
-        reals.forEach(s->System.out.println(String.format("reals(X) : %d | reals(Y) : %d",s.getX(),s.getY())));
+//        System.out.println(String.format("xGap : %d | yGap : %d | size(model) : %d | size (reals) : %d",xGap,yGap,models.size(),reals.size()));
+//        models.forEach(s->System.out.println(String.format("models(X) : %d | models(Y) : %d",s.getX(),s.getY())));
+//        reals.forEach(s->System.out.println(String.format("reals(X) : %d | reals(Y) : %d",s.getX(),s.getY())));
 
         if(models.size() != reals.size())return false;
         int size = models.size();

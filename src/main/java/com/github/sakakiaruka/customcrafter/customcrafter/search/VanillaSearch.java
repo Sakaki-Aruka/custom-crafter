@@ -36,10 +36,11 @@ public class VanillaSearch {
             // needed batch process
             int minimal = getMinimalAmount(itemStacks);
             result.setAmount(result.getAmount() * minimal);
+            util.decrementMaterials(inventory,player,minimal);
 
         }else{
             // not needed batch process
-
+            util.decrementMaterials(inventory,player,1);
 
         }
 

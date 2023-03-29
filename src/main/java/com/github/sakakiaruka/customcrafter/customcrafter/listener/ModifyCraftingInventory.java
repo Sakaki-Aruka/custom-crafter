@@ -12,6 +12,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
+import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -52,6 +53,14 @@ public class ModifyCraftingInventory implements Listener {
         if (slot == craftingTableMakeButton){
             // click make button
             event.setCancelled(true);
+            // <=== empty checker
+            List<ItemStack> forCheck = new ArrayList<>();
+            for(int i: util.getTableSlots(craftingTableSize)){
+                if(inventory.getItem(i) == null)continue;
+                forCheck.add(inventory.getItem(i));
+            }
+            if(forCheck.isEmpty())return;
+            // empty checker ===>
             // replace old result items
             if(inventory.getItem(craftingTableResultSlot) != null){
                 player.getWorld().dropItem(player.getLocation(),inventory.getItem(craftingTableResultSlot));
@@ -59,19 +68,19 @@ public class ModifyCraftingInventory implements Listener {
             }
             if(clickType.equals(ClickType.RIGHT)){
                 // batch
-                new Search().batchSearch(player,inventory);
+                new Search().massSearch(player,inventory);
                 // result item is null
                 if(whatMaking.get(player.getUniqueId()) == null)return;
                 int minimal = getMinimalAmount(inventory);
 
-                util.decrementMaterials(inventory,player,minimal);
+//                util.decrementMaterials(inventory,player,minimal);
             }
             else if(clickType.equals(ClickType.LEFT)){
                 // normal
                 new Search().main(player,inventory);
                 // result item is null
                 if(whatMaking.get(player.getUniqueId()) == null)return;
-                util.decrementMaterials(inventory,player,1);
+//                util.decrementMaterials(inventory,player,1);
             }
 
 
