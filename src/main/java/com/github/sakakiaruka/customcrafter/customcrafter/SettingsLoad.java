@@ -271,16 +271,33 @@ public class SettingsLoad {
             Map<Coordinate,Matter> coordinates = new LinkedHashMap<>();
             Map<Material, ItemStack> returns = new HashMap<>();
 
-            int size = config.getStringList("coordinate").size();
-            List<String> l = config.getStringList("coordinate");
-            for(int y=0;y<size;y++){
-                List<String> list = Arrays.asList(l.get(y).split(","));
-                for(int x=0;x<size;x++){
-                    Coordinate coordinate = new Coordinate(x,y);
-                    Matter matter = list.get(x).equalsIgnoreCase("null") ? new Matter(Arrays.asList(Material.AIR),0) : matters.get(list.get(x));
-                    coordinates.put(coordinate,matter);
+            if(tag.equalsIgnoreCase("normal")){
+                int size = config.getStringList("coordinate").size();
+                List<String> l = config.getStringList("coordinate");
+                for(int y=0;y<size;y++){
+                    List<String> list = Arrays.asList(l.get(y).split(","));
+                    for(int x=0;x<size;x++){
+                        Coordinate coordinate = new Coordinate(x,y);
+                        Matter matter = list.get(x).equalsIgnoreCase("null") ? new Matter(Arrays.asList(Material.AIR),0) : matters.get(list.get(x));
+                        coordinates.put(coordinate,matter);
+                    }
                 }
+            }else if(tag.equalsIgnoreCase("amorphous")){
+                List<String> l = config.getStringList("coordinate");
+                int x = -1;
+                int count = 0;
+                for(int i=0;i<l.size();i++){
+                    List<String> list = Arrays.asList(l.get(i).split(","));
+                    for(int j=0;j<list.size();j++){
+                        Coordinate coordinate = new Coordinate(x,count);
+                        Matter matter = list.get(j).equalsIgnoreCase("null") ? new Matter(Arrays.asList(Material.AIR),0) : matters.get(list.get(j));
+                        coordinates.put(coordinate,matter);
+                        count++;
+                    }
+                }
+                //
             }
+
 
             if(config.contains("returns")){
                 for(String s:config.getStringList("returns")){
@@ -298,5 +315,7 @@ public class SettingsLoad {
             namedRecipes.put(name,recipe);
         }
     }
+
+
 
 }
