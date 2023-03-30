@@ -272,6 +272,7 @@ public class SettingsLoad {
             Map<Material, ItemStack> returns = new HashMap<>();
 
             if(tag.equalsIgnoreCase("normal")){
+                // normal recipe load
                 int size = config.getStringList("coordinate").size();
                 List<String> l = config.getStringList("coordinate");
                 for(int y=0;y<size;y++){
@@ -283,6 +284,7 @@ public class SettingsLoad {
                     }
                 }
             }else if(tag.equalsIgnoreCase("amorphous")){
+                // amorphous (shapeless) recipe load
                 List<String> l = config.getStringList("coordinate");
                 int x = -1;
                 int count = 0;

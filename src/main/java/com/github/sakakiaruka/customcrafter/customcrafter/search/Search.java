@@ -51,7 +51,7 @@ public class Search {
 
                 amount = recipe.getResult().getAmount();
                 r = recipe;
-                break Recipe;
+                break;
 
             }else{
                 //amorphous
@@ -72,14 +72,10 @@ public class Search {
                 Map<Material,Integer> virtual = new HashMap<>();
                 recipe.getContentsNoAir().forEach(s->{
                     s.getCandidate().forEach(t->{
-                        if(!virtual.containsKey(t)){
-                            virtual.put(t,s.getAmount());
-                            increment(virtualTotal,s.getAmount());
-                        }else{
-                            int i = virtual.get(t) + s.getAmount();
-                            virtual.put(t,i);
-                            increment(virtualTotal,s.getAmount());
-                        }
+                        int i = s.isMass() ? 1 : s.getAmount();
+                        if(virtual.containsKey(t)) i+=virtual.get(t);
+                        virtual.put(t,i);
+                        increment(virtualTotal,i);
                     });
                 });
 
@@ -158,10 +154,77 @@ public class Search {
                 //debug
                 System.out.println("mass amount : "+massAmount);
 
-                break Top;
+                break;
 
             }else{
                 //amorphous
+                // TODO : write here
+
+                if(recipe.getContentsNoAir().size() != input.getContentsNoAir().size())continue;
+                if(!getAllCandidateNoDuplicate(recipe).containsAll(getAllCandidateNoDuplicate(input)))continue;
+
+                int inputTotal = 0;
+                Map<Material,Integer> relation = new HashMap<>();
+                input.getContentsNoAir().forEach(s->{
+                    Material material = s.getCandidate().get(0);
+                    if(!relation.containsKey(s.getCandidate().get(0))) relation.put(material,0);
+                    int i= relation.get(s.getCandidate().get(0)) + s.getAmount();
+                    relation.put(material,i);
+                    increment(inputTotal,s.getAmount());
+                });
+
+                int virtualTotal = 0;
+                int massVirtualTotal = 0;
+                Map<Material,Integer> virtual = new HashMap<>();
+                Map<Material,Integer> massVirtual = new HashMap<>();
+                recipe.getContentsNoAir().forEach(s->{
+                    s.getCandidate().forEach(t->{
+                        if(!s.isMass()){
+                            // no mass
+                            int i = s.getAmount();
+                            if(virtual.containsKey(t)) i += virtual.get(t);
+                            virtual.put(t,i);
+                            increment(virtualTotal,i);
+                        }else{
+                            // mass
+                            int i = 1;
+                            if(massVirtual.containsKey(t)) i += massVirtual.get(t);
+                            massVirtual.put(t,i);
+                            increment(massVirtualTotal,1);
+                        }
+                    });
+                });
+
+                if(inputTotal < virtualTotal)continue;
+
+                for(Matter matter:input.getContentsNoAir()){
+                    Material material = matter.getCandidate().get(0);
+                    if(massVirtual.containsKey(material)){
+                        massVirtual.put(material,massVirtual.get(material) - 1);
+                        continue;
+                    }
+                    int i = virtual.get(material) - matter.getAmount();
+                    virtual.put(material,i);
+                }
+
+                for(int i:massVirtual.values()) if(i != 0)continue Top;
+
+                int recipeTotal = 0;
+                for(Matter m : recipe.getContentsNoAir()){
+                    if(m.isMass())continue;
+                    recipeTotal += m.getAmount();
+                }
+
+                int inputAmount = inputTotal - massVirtualTotal;
+                if(inputAmount % recipeTotal != 0)continue;
+
+                //debug
+                System.out.println("mass amount (amorphous) : "+massAmount);
+
+                result = recipe;
+                massAmount = getMinimalAmount(result,input);
+                break;
+
             }
         }
 
