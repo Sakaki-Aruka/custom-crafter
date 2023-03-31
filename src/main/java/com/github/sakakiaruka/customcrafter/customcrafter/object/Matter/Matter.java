@@ -42,6 +42,10 @@ public class Matter {
         this.candidate = candidate;
     }
 
+    public void addCandidate(List<Material> additional){
+        this.candidate.addAll(additional);
+    }
+
     public List<EnchantWrap> getWarp() {
         return warp;
     }

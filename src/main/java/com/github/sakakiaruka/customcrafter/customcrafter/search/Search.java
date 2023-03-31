@@ -251,7 +251,17 @@ public class Search {
         List<Integer> list = new ArrayList<>();
         for(int i=0;i<recipe.getContentsNoAir().size();i++){
             if(recipe.getContentsNoAir().get(i).isMass())continue;
-            list.add(input.getContentsNoAir().get(i).getAmount());
+            int amount = 0;
+            for(Matter m:input.getContentsNoAir()){
+                if(recipe.getContentsNoAir().get(i).getCandidate().contains(m.getCandidate().get(0))){
+                    amount = m.getAmount();
+                }
+            }
+            list.add(amount);
+            //list.add(input.getContentsNoAir().get(i).getAmount());
+
+            //debug
+            System.out.println("in minimal (Amount) : "+input.getContentsNoAir().get(i).getCandidate());
         }
         //debug
         System.out.println("minimal amount : "+list);
@@ -274,14 +284,18 @@ public class Search {
         ItemStack item = null;
         if(allMaterials.contains(recipe.getResult().getNameOrRegex())
         || recipe.getResult().getMatchPoint() == -1
-        || !recipe.getResult().getNameOrRegex().contains(",")){
+        || !recipe.getResult().getNameOrRegex().contains("@")){
             // result has defined material
             Material m = Material.valueOf(recipe.getResult().getNameOrRegex().toUpperCase());
             item = new ItemStack(m,amount);
             setMetaData(item,recipe.getResult()); //set result itemStack's metadata
         }else{
             // not contains -> A result has written by regex pattern.
-            List<String> list = Arrays.asList(recipe.getResult().getNameOrRegex().split(","));
+            List<String> list = Arrays.asList(recipe.getResult().getNameOrRegex().split("@"));
+
+            //debug
+            System.out.println(String.format("list : %s",list));
+
             String p = list.get(0);
             String replaced = list.get(1);
             Pattern pattern = Pattern.compile(p);
@@ -289,14 +303,28 @@ public class Search {
             for(Material m:getContainsMaterials(input)){
                 String name = m.name();
                 Matcher matcher = pattern.matcher(name);
-                if(!matcher.find())return;
+
+                //debug
+                System.out.println(String.format("replaced : %s | name : %s | matcher : %b | point : %d",replaced,name,matcher.find(),recipe.getResult().getMatchPoint()));
+
+                //if(!matcher.find())continue;
                 int point = recipe.getResult().getMatchPoint();
-                replaced.replace("{R}",matcher.group(point));
+
+                //debug
+                System.out.println("point : "+point);
+                System.out.println("materials : "+materials);
+
+                if(!matcher.find(0))continue;
+
+                replaced = replaced.replace("{R}",matcher.group(point));
                 materials.add(replaced);
             }
             Collections.sort(materials);
 
-            Material material = Material.valueOf(list.get(0).toUpperCase());
+            //debug
+            System.out.println(String.format("materials : %s",materials));
+
+            Material material = Material.valueOf(materials.get(0).toUpperCase());
             item = new ItemStack(material,amount);
         }
 

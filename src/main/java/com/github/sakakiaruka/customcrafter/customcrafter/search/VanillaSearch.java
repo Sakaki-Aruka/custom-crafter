@@ -82,12 +82,6 @@ public class VanillaSearch {
                 int slot = x + y*vanillaCraftingSlots;
                 items[counter] = inventory.getItem(slot) == null ? new ItemStack(Material.AIR) : inventory.getItem(slot);
                 counter++;
-
-//                //debug
-//                String name = inventory.getItem(slot) == null ? "AIR": inventory.getItem(slot).getType().name();
-//                System.out.printf("itemStack[9] -> slot[%d] : %s%n",counter,name);
-
-
             }
         }
         return items;

@@ -21,6 +21,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter.getInstance;
@@ -62,8 +64,8 @@ public class SettingsLoad {
     public void load(){
         defaultConfig = getInstance().getConfig();
         new OpenCraftingTable().setCraftingInventory();
-        main();
         getAllMaterialsName();
+        main();
     }
 
     private void getAllMaterialsName(){
@@ -205,7 +207,6 @@ public class SettingsLoad {
             Map<Enchantment,Integer> enchantInfo = null;
             Map<String,List<String>> metadata = null;
             if(config.contains("enchant")){
-                //TODO : write enchants info collect here.
                 for(String s:config.getStringList("enchant")){
                     List<String> list = Arrays.asList(s.split(","));
                     Enchantment enchant = Enchantment.getByName(list.get(0).toUpperCase());
@@ -215,7 +216,6 @@ public class SettingsLoad {
             }
 
             if(config.contains("metadata")){
-                //TODO : write metadata collect here.
                 for(String s:config.getStringList("metadata")){
                     List<String> list = Arrays.asList(s.split(","));
                     String key = list.get(0);
@@ -233,13 +233,22 @@ public class SettingsLoad {
     private void getMatter(List<Path> paths){
         for(Path path:paths){
             FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
-            //TODO : write matter collect
             String name = config.getString("name");
             int amount = config.getInt("amount");
             boolean mass = config.getBoolean("mass");
             List<Material> candidate = new ArrayList<>();
             for(String s:config.getStringList("candidate")){
-                candidate.add(Material.getMaterial(s.toUpperCase()));
+                if(s.startsWith("R|")){
+                    String pattern = s.substring(2); // remove "R|"
+
+                    //debug
+                    System.out.println(String.format("string : %s | pattern : %s",s,pattern));
+
+                    candidate.addAll(getCandidateFromRegex(pattern));
+                }else{
+                    candidate.add(Material.getMaterial(s.toUpperCase()));
+                }
+
             }
             List<EnchantWrap> wrapList = new ArrayList<>();
             if(config.contains("enchant")){
@@ -253,6 +262,12 @@ public class SettingsLoad {
                 }
             }
 
+            //debug
+            System.out.println("matter name : "+name);
+            for(Material material:candidate){
+                System.out.println(String.format("candidate : %s",material.name()));
+            }
+
             if(wrapList.isEmpty())wrapList = null;
 
             Matter matter = new Matter(name,candidate,wrapList,amount,mass);
@@ -260,10 +275,25 @@ public class SettingsLoad {
         }
     }
 
+    private List<Material> getCandidateFromRegex(String regexPattern){
+        List<Material> list = new ArrayList<>();
+        Pattern pattern = Pattern.compile(regexPattern);
+        for(Material m:Material.values()){
+            String material = m.name();
+            Matcher matcher = pattern.matcher(material);
+            if(!matcher.find())continue;
+            Material matched = Material.valueOf(matcher.group(0).toUpperCase());
+            list.add(matched);
+
+            //debug
+            System.out.println(String.format("pattern : %s | matcher(0) : %s | material : %s",pattern,matcher.group(0),material));
+        }
+        return list;
+    }
+
     private void getRecipe(List<Path> paths){
         for(Path path:paths){
             FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
-            //TODO : write recipe collect
             String name = config.getString("name");
             String tag = config.getString("tag").toUpperCase();
             Result result = results.get(config.getString("result"));
@@ -315,10 +345,6 @@ public class SettingsLoad {
                     ItemStack itemStack  = new ItemStack(returnMaterial,amount);
                     returns.put(material,itemStack);
                 }
-
-                //debug
-                System.out.println("returns : "+config.getStringList("returns"));
-
             }
 
             Recipe recipe = new Recipe(name,tag,coordinates,returns,result);
@@ -326,7 +352,4 @@ public class SettingsLoad {
             namedRecipes.put(name,recipe);
         }
     }
-
-
-
 }
