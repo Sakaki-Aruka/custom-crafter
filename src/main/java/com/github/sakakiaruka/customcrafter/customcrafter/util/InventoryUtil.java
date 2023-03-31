@@ -1,5 +1,6 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.util;
 
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.*;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -56,5 +57,29 @@ public class InventoryUtil {
         ItemStack item = inventory.getItem(craftingTableResultSlot);
         world.dropItem(location,item); // drop
         inventory.setItem(craftingTableResultSlot,new ItemStack(Material.AIR));
+    }
+
+    public void returnItems(Recipe recipe,Inventory inventory, int removeAmount,Player player){
+        if(recipe.getReturnItems().isEmpty())return;
+        List<Material> isMassList = new ArrayList<>();
+        recipe.getContentsNoAir().forEach(s->{
+            if(s.isMass())isMassList.add(s.getCandidate().get(0));
+        });
+
+        for(ItemStack item:inventory){
+            if(item == null)continue;
+            if(!recipe.getReturnItems().containsKey(item.getType()))continue;
+            int returnAmount = recipe.getReturnItems().get(item.getType()).getAmount();
+            if(!isMassList.contains(item.getType())) returnAmount *= removeAmount;
+            ItemStack itemStack = recipe.getReturnItems().get(item.getType()).clone();
+            itemStack.setAmount(returnAmount);
+
+            //debug
+            System.out.println(String.format("returnAmount : %d | removeAmount : %d | returnAmount * removeAmount : %d",returnAmount,removeAmount,returnAmount * removeAmount));
+
+            World world = player.getWorld();
+            Location location = player.getLocation();
+            world.dropItem(location,itemStack);
+        }
     }
 }

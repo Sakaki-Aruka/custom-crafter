@@ -89,11 +89,11 @@ public class Search {
 
                 int temp = 0;
                 for(int i:virtual.values())temp+=i;
-                if(ideal != temp)continue Recipe;
+                if(ideal != temp)continue;
 
                 amount = recipe.getResult().getAmount();
                 r = recipe;
-                break Recipe;
+                break;
             }
         }
 
@@ -106,6 +106,7 @@ public class Search {
                 remove.put(entry.getKey(),1);
             }
 
+            new InventoryUtil().returnItems(r,inventory,1,player);
             setResultItem(inventory,r,input,player,amount);
 //            removeItemAndSetReturnItems(inventory,remove,r.getReturnItems(),player);
         }else{
@@ -230,6 +231,15 @@ public class Search {
 
         if(result != null){
             // custom recipe found
+
+            //debug
+            for(Map.Entry<Material,ItemStack> entry:result.getReturnItems().entrySet()){
+                String target = entry.getKey().name();
+                String returns = entry.getValue().toString();
+                System.out.println(String.format("target : %s | return : %s",target,returns));
+            }
+
+            new InventoryUtil().returnItems(result,inventory,massAmount,player);
             setResultItem(inventory,result,input,player,massAmount*result.getResult().getAmount());
         }else{
             // not found

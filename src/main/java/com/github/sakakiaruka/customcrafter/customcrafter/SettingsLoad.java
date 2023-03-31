@@ -302,6 +302,11 @@ public class SettingsLoad {
 
 
             if(config.contains("returns")){
+                /* 0,1,2
+                * 0 : Material Name (String)
+                * 1 : return Material Name (String)
+                * 2 : return item amount (int)
+                 */
                 for(String s:config.getStringList("returns")){
                     List<String> list = Arrays.asList(s.split(","));
                     Material material = Material.valueOf(list.get(0).toUpperCase());
@@ -310,6 +315,10 @@ public class SettingsLoad {
                     ItemStack itemStack  = new ItemStack(returnMaterial,amount);
                     returns.put(material,itemStack);
                 }
+
+                //debug
+                System.out.println("returns : "+config.getStringList("returns"));
+
             }
 
             Recipe recipe = new Recipe(name,tag,coordinates,returns,result);
