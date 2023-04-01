@@ -12,9 +12,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.sql.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -73,14 +71,12 @@ public class ModifyCraftingInventory implements Listener {
                 if(whatMaking.get(player.getUniqueId()) == null)return;
                 int minimal = getMinimalAmount(inventory);
 
-//                util.decrementMaterials(inventory,player,minimal);
             }
             else if(clickType.equals(ClickType.LEFT)){
                 // normal
                 new Search().main(player,inventory);
                 // result item is null
                 if(whatMaking.get(player.getUniqueId()) == null)return;
-//                util.decrementMaterials(inventory,player,1);
             }
 
 
@@ -106,9 +102,6 @@ public class ModifyCraftingInventory implements Listener {
             if(inventory.getItem(i) == null)continue;
             if(inventory.getItem(i).getType().equals(Material.AIR))continue;
             list.add(inventory.getItem(i).getAmount());
-
-            //debug
-            System.out.println(String.format("material : %s | amount : %d",inventory.getItem(i).getType().name(),inventory.getItem(i).getAmount()));
 
         }
         if(list.isEmpty())return -1;

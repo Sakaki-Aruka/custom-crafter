@@ -97,8 +97,6 @@ public class Search {
             }
         }
 
-
-        //
         if(r != null){
             // custom recipe found
             Map<Coordinate,Integer> remove = new HashMap<>();
@@ -108,7 +106,6 @@ public class Search {
 
             new InventoryUtil().returnItems(r,inventory,1,player);
             setResultItem(inventory,r,input,player,amount);
-//            removeItemAndSetReturnItems(inventory,remove,r.getReturnItems(),player);
         }else{
             // no custom recipe found -> search from vanilla recipes
             new VanillaSearch().main(player,inventory,false);
@@ -125,22 +122,13 @@ public class Search {
         Top:for(Recipe recipe:recipes){
             if(recipe.getTag().equals(Tag.NORMAL)){
                 //normal
-
-                //debug
-                System.out.println("==========");
-                System.out.println(String.format("square : %d & %d | shape : %b",getSquareSize(recipe),getSquareSize(input),isSameShape(getCoordinateNoAir(recipe),getCoordinateNoAir(input))));
-
                 if(getSquareSize(recipe) != getSquareSize(input))continue;
                 if(!isSameShape(getCoordinateNoAir(recipe),getCoordinateNoAir(input)))continue;
 
-                // TODO: write here
                 // check mass matter is one
                 for(int i=0;i<recipe.getContentsNoAir().size();i++){
                     Matter recipeMatter = recipe.getContentsNoAir().get(i);
                     Matter inputMatter = input.getContentsNoAir().get(i);
-
-                    //debug
-                    System.out.println(String.format("recipe*M : %d | input*M : %d",recipeMatter.getAmount(),inputMatter.getAmount()));
 
                     if(recipe.getContentsNoAir().get(i).isMass()){
                         if(inputMatter.getAmount() != 1)continue Top;
@@ -159,7 +147,6 @@ public class Search {
 
             }else{
                 //amorphous
-                // TODO : write here
 
                 if(recipe.getContentsNoAir().size() != input.getContentsNoAir().size())continue;
                 if(!getAllCandidateNoDuplicate(recipe).containsAll(getAllCandidateNoDuplicate(input)))continue;
@@ -231,14 +218,6 @@ public class Search {
 
         if(result != null){
             // custom recipe found
-
-            //debug
-            for(Map.Entry<Material,ItemStack> entry:result.getReturnItems().entrySet()){
-                String target = entry.getKey().name();
-                String returns = entry.getValue().toString();
-                System.out.println(String.format("target : %s | return : %s",target,returns));
-            }
-
             new InventoryUtil().returnItems(result,inventory,massAmount,player);
             setResultItem(inventory,result,input,player,massAmount*result.getResult().getAmount());
         }else{
@@ -258,7 +237,6 @@ public class Search {
                 }
             }
             list.add(amount);
-            //list.add(input.getContentsNoAir().get(i).getAmount());
 
             //debug
             System.out.println("in minimal (Amount) : "+input.getContentsNoAir().get(i).getCandidate());
@@ -316,7 +294,8 @@ public class Search {
 
                 if(!matcher.find(0))continue;
 
-                replaced = replaced.replace("{R}",matcher.group(point));
+                if(replaced.contains("{R}"))replaced = replaced.replace("{R}",matcher.group(point));
+
                 materials.add(replaced);
             }
             Collections.sort(materials);
