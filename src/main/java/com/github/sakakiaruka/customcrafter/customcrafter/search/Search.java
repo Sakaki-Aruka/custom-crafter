@@ -305,6 +305,7 @@ public class Search {
 
             Material material = Material.valueOf(materials.get(0).toUpperCase());
             item = new ItemStack(material,amount);
+            setMetaData(item,recipe.getResult());
         }
 
         //debug
@@ -332,6 +333,10 @@ public class Search {
 
     private void setMetaData(ItemStack item,Result result){
         Map<String,List<String>> metadata = result.getMetadata();
+
+        //debug
+        System.out.println(String.format("metadata : %s",metadata == null ? "null" : metadata));
+
         if(metadata == null || metadata.isEmpty())return;
         ItemMeta meta = item.getItemMeta();
         for(Map.Entry<String,List<String>> e:metadata.entrySet()){
@@ -346,15 +351,12 @@ public class Search {
              * customModelData -> "customModelData:(modelNumber)"
              *
              */
+
+            //debug
+            System.out.println(String.format("key : %s | value : %s | value size : %d",e.getKey(),e.getValue(),e.getValue().size()));
+
             String type = e.getKey();
-            List<String> types = Arrays.asList("lore","displayName","enchantment","itemFlag","unbreakable","customModelData");
             List<String> content = e.getValue();
-            if(!types.contains(type)){
-                //debug
-                System.out.println("This type is not a correct metadata.");
-                System.out.println(String.format("name:%s | content:%s",type,types));
-                continue;
-            }
 
             if(type.equalsIgnoreCase("lore"))meta.setLore(content);
             if(type.equalsIgnoreCase("displayName"))meta.setDisplayName(content.get(0));
@@ -363,8 +365,14 @@ public class Search {
                     List<String> l = Arrays.asList(s.split(","));
                     Enchantment enchant = Enchantment.getByName(l.get(0).toUpperCase());
                     int level = Integer.valueOf(l.get(1));
-                    item.addUnsafeEnchantment(enchant,level);
+                    boolean bool = meta.addEnchant(enchant,level,true);
+                    //debug
+                    System.out.println(String.format("enchant : %s | level : %d | add : %b",enchant,level,bool));
                 }
+
+                //debug
+                System.out.println(String.format("map type : %s",meta.getEnchants().getClass().getSimpleName()));
+
             }
             if(type.equalsIgnoreCase("itemFlag")) content.forEach(s->meta.addItemFlags(ItemFlag.valueOf(s.toUpperCase())));
             if(type.equalsIgnoreCase("unbreakable"))meta.setUnbreakable(Boolean.valueOf(content.get(0)));

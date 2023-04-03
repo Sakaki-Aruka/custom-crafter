@@ -207,7 +207,13 @@ public class SettingsLoad {
             Map<Enchantment,Integer> enchantInfo = null;
             Map<String,List<String>> metadata = null;
             if(config.contains("enchant")){
+                enchantInfo = new HashMap<>();
                 for(String s:config.getStringList("enchant")){
+                    /*
+                    * 0,1
+                    * 0 : enchantment name (String | lower case OK)
+                    * 1 : enchantment level (int)
+                     */
                     List<String> list = Arrays.asList(s.split(","));
                     Enchantment enchant = Enchantment.getByName(list.get(0).toUpperCase());
                     int level = Integer.valueOf(list.get(1));
@@ -216,10 +222,16 @@ public class SettingsLoad {
             }
 
             if(config.contains("metadata")){
+                metadata = new HashMap<>();
                 for(String s:config.getStringList("metadata")){
+                    /*
+                    * 0,1
+                    * 0 : key (String | lore, displayName, enchantment (deprecated), itemFlag, customModelData
+                    * 1 : value (Object | List<String>, String, Enchantment & int, boolean, int
+                     */
                     List<String> list = Arrays.asList(s.split(","));
                     String key = list.get(0);
-                    String value = list.get(1);
+                    String value = String.join(",",list.subList(1,list.size()));
                     if(!metadata.containsKey(key))metadata.put(key,new ArrayList<>());
                     metadata.get(key).add(value);
                 }
