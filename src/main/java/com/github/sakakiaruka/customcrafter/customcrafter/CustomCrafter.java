@@ -1,9 +1,7 @@
 package com.github.sakakiaruka.customcrafter.customcrafter;
 
-import com.github.sakakiaruka.customcrafter.customcrafter.commands.CheckObject;
-import com.github.sakakiaruka.customcrafter.customcrafter.listeners.Listeners;
-
-import com.github.sakakiaruka.customcrafter.customcrafter.some.SettingsLoad;
+import com.github.sakakiaruka.customcrafter.customcrafter.command.Check;
+import com.github.sakakiaruka.customcrafter.customcrafter.listener.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class CustomCrafter extends JavaPlugin {
@@ -15,9 +13,9 @@ public final class CustomCrafter extends JavaPlugin {
         // Plugin startup logic
         saveDefaultConfig();
         this.instance = this;
-        new SettingsLoad().set();
-        getServer().getPluginManager().registerEvents(new Listeners(),this);
-        getCommand("cc").setExecutor(new CheckObject());
+        new SettingsLoad().load();
+        getCommand("cc").setExecutor(new Check());
+        getServer().getPluginManager().registerEvents(new Listener(),this);
     }
 
     @Override

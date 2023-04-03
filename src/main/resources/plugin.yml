@@ -5,8 +5,8 @@ api-version: 1.19
 authors: [ SakakiAruka ]
 commands:
   cc:
-    permission: cc.main
+    permission: cc.op
 
 permissions:
-  cc:
+  cc.op:
     default: op

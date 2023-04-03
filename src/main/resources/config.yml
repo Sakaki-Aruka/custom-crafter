@@ -1,33 +1,10 @@
-# this file is a config file. Admin only.
-#name: #option
-#lore: #option
-#enchants: #option
-#break: #option -> true or false
-#flags: #option -> read JavaDoc
-
-# --- name rule ---
-# Do not use space character.
-# Do not use "null" except when you want to mean "no-item".
-# Do not name that the length less than 3.
-# Have to use sentences.
-######
-
 baseBlock: "plugins/Custom_Crafter/baseBlock"
-resultItems: "plugins/Custom_Crafter/resultItems"
-materialCategory: "plugins/Custom_Crafter/materialCategory"
-recipeMaterials: "plugins/Custom_Crafter/recipeMaterials"
-recipes: "plugins/Custom_Crafter/recipes"
+result: "plugins/Custom_Crafter/result"
+matter: "plugins/Custom_Crafter/matter"
+recipes: "plugins/Custom_Crafter/recipe"
 
 # Download Settings
 download_threshold: 20
 load_interval: 20
 download:
-  - "wget https://github.com/Sakaki-Aruka/custom-crafter-config/raw/master/baseBlock.yml -P plugins/Custom_Crafter/baseBlock/"
-  - "wget https://github.com/Sakaki-Aruka/custom-crafter-config/raw/master/recipe-material-second.yml -P plugins/Custom_Crafter/recipeMaterials/"
-  - "wget https://github.com/Sakaki-Aruka/custom-crafter-config/raw/master/recipes-stone-to-iron.yml -P plugins/Custom_Crafter/recipes/"
-  - "wget https://github.com/Sakaki-Aruka/custom-crafter-config/raw/master/result-item-first.yml -P plugins/Custom_Crafter/resultItems/"
-  - "wget https://github.com/Sakaki-Aruka/custom-crafter-config/raw/master/material-category-logs.yml -P plugins/Custom_Crafter/materialCategory/"
-  - "wget https://github.com/Sakaki-Aruka/custom-crafter-config/raw/master/recipes-big-torch.yml -P plugins/Custom_Crafter/recipes/"
-  - "wget https://github.com/Sakaki-Aruka/custom-crafter-config/raw/master/recipe-material-first.yml -P plugins/Custom_Crafter/recipeMaterials/"
-  - "wget https://github.com/Sakaki-Aruka/custom-crafter-config/raw/master/result-item-big-torch.yml -P plugins/Custom_Crafter/resultItems/"
-  - "wget https://github.com/Sakaki-Aruka/custom-crafter-config/raw/master/recipe-material-logs.yml -P plugins/Custom_Crafter/recipeMaterials/"
+  - ""
