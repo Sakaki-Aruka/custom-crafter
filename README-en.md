@@ -23,7 +23,7 @@ recipes: "plugins/Custom_Crafter/recipe"
 - load_interval (int)
 - download (list | string)
 
-example (default)
+example
 ```yaml
 download_threshold: 20
 load_interval: 20
@@ -90,7 +90,6 @@ Optional sections
 - metadata
 
 ### metadata
-An enchant section is set about enchantments data. (list)  
 You can set data of
 - DisplayName (string)
 - Enchantment (string,int)
@@ -113,7 +112,7 @@ metadata:
   - "unbreakable,true"
 ```
 
-# about Recipe
+## about Recipe
 Need section
 - name: a name of a recipe. (string)
 - tag : a type of a recipe. (string | normal or amorphous)
