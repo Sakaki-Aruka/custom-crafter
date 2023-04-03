@@ -265,6 +265,12 @@ public class SettingsLoad {
             List<EnchantWrap> wrapList = new ArrayList<>();
             if(config.contains("enchant")){
                 for(String s:config.getStringList("enchant")){
+                    /*
+                    * 0,1,2
+                    * 0 : enchant name (String)
+                    * 1 : enchant level (int)
+                    * 2 : enchant strict (String -> input, notStrict, onlyEnchant, strict)
+                     */
                     List<String> list = Arrays.asList(s.split(","));
                     Enchantment enchant = Enchantment.getByName(list.get(0));
                     int level = Integer.valueOf(list.get(1));

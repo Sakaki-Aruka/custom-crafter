@@ -36,4 +36,11 @@ public class EnchantWrap {
         this.strict = strict;
     }
 
+    public String info(){
+        String e = enchant == null ? "null" : enchant.toString();
+        int lv = enchant == null ? -1 : level;
+        String s = enchant == null ? "null (Strict)" : strict.toString();
+        return String.format("Enchant : %s | Level : %d | Strict : %s",e,lv,s);
+    }
+
 }

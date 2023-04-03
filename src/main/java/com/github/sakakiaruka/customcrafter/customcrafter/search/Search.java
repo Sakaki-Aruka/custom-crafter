@@ -365,9 +365,7 @@ public class Search {
                     List<String> l = Arrays.asList(s.split(","));
                     Enchantment enchant = Enchantment.getByName(l.get(0).toUpperCase());
                     int level = Integer.valueOf(l.get(1));
-                    boolean bool = meta.addEnchant(enchant,level,true);
-                    //debug
-                    System.out.println(String.format("enchant : %s | level : %d | add : %b",enchant,level,bool));
+                    meta.addEnchant(enchant,level,true);
                 }
 
                 //debug
@@ -402,10 +400,17 @@ public class Search {
 
     private boolean getEnchantWrapCongruence(List<EnchantWrap> recipe,List<EnchantWrap> input){
         if(recipe == null)return true;
+
+        //debug
+        recipe.forEach(s->System.out.println(s.info()));
+        System.out.println("===");
+        input.forEach(s->System.out.println(s.info()));
+
         for(EnchantWrap wrap:recipe){
-            if(wrap.getStrict().equals(EnchantStrict.NotStrict))continue;
+            if(wrap.getStrict().equals(EnchantStrict.NOTSTRICT))continue;
+            if(getEnchantmentList(input) == null)continue;
             if(!getEnchantmentList(input).contains(wrap.getEnchant()))return false;
-            if(wrap.getStrict().equals(EnchantStrict.OnlyEnchant))continue;
+            if(wrap.getStrict().equals(EnchantStrict.ONLYENCHANT))continue;
 
             EnchantWrap w = null;
             for(EnchantWrap t:input){
@@ -426,7 +431,7 @@ public class Search {
         List<EnchantWrap> list = new ArrayList<>();
         Map<Enchantment,Integer> map = item.getEnchantments();
         if(map.isEmpty())return null;
-        EnchantStrict strict = EnchantStrict.Input;
+        EnchantStrict strict = EnchantStrict.INPUT;
         for(Map.Entry<Enchantment,Integer> entry:map.entrySet()){
             Enchantment enchant = entry.getKey();
             int level = entry.getValue();
