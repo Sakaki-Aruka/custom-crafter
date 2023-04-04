@@ -226,26 +226,42 @@ public class Search {
         }
     }
 
+//    private int getMinimalAmount(Recipe recipe,Recipe input){
+//        List<Integer> list = new ArrayList<>();
+//        for(int i=0;i<recipe.getContentsNoAir().size();i++){
+//            if(recipe.getContentsNoAir().get(i).isMass())continue;
+//            int amount = 0;
+//            for(Matter m:input.getContentsNoAir()){
+//                if(recipe.getContentsNoAir().get(i).getCandidate().contains(m.getCandidate().get(0))){
+//                    amount = m.getAmount();
+//                }
+//            }
+//            list.add(amount);
+//
+//            //debug
+//            System.out.println("in minimal (Amount) : "+input.getContentsNoAir().get(i).getCandidate());
+//        }
+//        //debug
+//        System.out.println("minimal amount : "+list);
+//
+//        if(list.isEmpty())return -1;
+//        Collections.sort(list);
+//        return list.get(0);
+//    }
+
     private int getMinimalAmount(Recipe recipe,Recipe input){
+        Set<Material> set = recipe.getMassMaterialSet();
         List<Integer> list = new ArrayList<>();
-        for(int i=0;i<recipe.getContentsNoAir().size();i++){
-            if(recipe.getContentsNoAir().get(i).isMass())continue;
-            int amount = 0;
-            for(Matter m:input.getContentsNoAir()){
-                if(recipe.getContentsNoAir().get(i).getCandidate().contains(m.getCandidate().get(0))){
-                    amount = m.getAmount();
-                }
-            }
-            list.add(amount);
-
-            //debug
-            System.out.println("in minimal (Amount) : "+input.getContentsNoAir().get(i).getCandidate());
+        for(Matter matter : input.getContentsNoAir()){
+            if(set.contains(matter.getCandidate().get(0)))continue; // input matter is Mass
+            list.add(matter.getAmount());
         }
-        //debug
-        System.out.println("minimal amount : "+list);
-
         if(list.isEmpty())return -1;
         Collections.sort(list);
+
+        //debug
+        System.out.println(String.format("amount list : %s | minimal amount : %d",list,list.get(0)));
+
         return list.get(0);
     }
 

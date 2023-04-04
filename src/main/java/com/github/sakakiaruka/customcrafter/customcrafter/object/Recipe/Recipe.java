@@ -102,4 +102,12 @@ public class Recipe {
         }
         return list;
     }
+
+    public Set<Material> getMassMaterialSet(){
+        Set<Material> set = new HashSet<>();
+        coordinate.values().forEach(s->{
+            if(s.isMass())set.add(s.getCandidate().get(0));
+        });
+        return set;
+    }
 }
