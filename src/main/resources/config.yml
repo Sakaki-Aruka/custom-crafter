@@ -1,6 +1,6 @@
 baseBlock: "plugins/Custom_Crafter/baseBlock"
-result: "plugins/Custom_Crafter/result"
-matter: "plugins/Custom_Crafter/matter"
+results: "plugins/Custom_Crafter/result"
+matters: "plugins/Custom_Crafter/matter"
 recipes: "plugins/Custom_Crafter/recipe"
 
 # Download Settings
