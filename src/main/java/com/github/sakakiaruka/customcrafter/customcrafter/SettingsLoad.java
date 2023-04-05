@@ -6,6 +6,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantW
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordinate;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.MetadataType;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.Result;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -205,7 +206,7 @@ public class SettingsLoad {
             String nameOrRegex = config.getString("nameOrRegex");
             int matchPoint = config.getInt("matchPoint"); // default value is -1;
             Map<Enchantment,Integer> enchantInfo = null;
-            Map<String,List<String>> metadata = null;
+            Map<MetadataType,List<String>> metadata = null;
             if(config.contains("enchant")){
                 enchantInfo = new HashMap<>();
                 for(String s:config.getStringList("enchant")){
@@ -230,7 +231,7 @@ public class SettingsLoad {
                     * 1 : value (Object | List<String>, String, Enchantment & int, boolean, int
                      */
                     List<String> list = Arrays.asList(s.split(","));
-                    String key = list.get(0);
+                    MetadataType key = MetadataType.valueOf(list.get(0).toUpperCase());
                     String value = String.join(",",list.subList(1,list.size()));
                     if(!metadata.containsKey(key))metadata.put(key,new ArrayList<>());
                     metadata.get(key).add(value);

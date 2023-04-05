@@ -9,11 +9,11 @@ public class Result {
     private String name;
     private Map<Enchantment,Integer> enchantsInfo;
     private int amount;
-    private Map<String, List<String>> metadata;
+    private Map<MetadataType, List<String>> metadata;
     private String nameOrRegex;
     private int matchPoint;
 
-    public Result(String name,Map<Enchantment,Integer> enchantsInfo,int amount,Map<String,List<String>> metadata,String nameOrRegex,int matchPoint){
+    public Result(String name,Map<Enchantment,Integer> enchantsInfo,int amount,Map<MetadataType,List<String>> metadata,String nameOrRegex,int matchPoint){
         this.name = name;
         this.enchantsInfo = enchantsInfo;
         this.amount = amount;
@@ -46,11 +46,11 @@ public class Result {
         this.amount = amount;
     }
 
-    public Map<String, List<String>> getMetadata() {
+    public Map<MetadataType, List<String>> getMetadata() {
         return metadata;
     }
 
-    public void setMetadata(Map<String, List<String>> metadata) {
+    public void setMetadata(Map<MetadataType, List<String>> metadata) {
         this.metadata = metadata;
     }
 

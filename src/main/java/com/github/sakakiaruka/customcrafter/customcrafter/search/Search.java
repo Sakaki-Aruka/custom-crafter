@@ -6,6 +6,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordinate;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Tag;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.MetadataType;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.Result;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.InventoryUtil;
 import org.bukkit.Material;
@@ -325,14 +326,14 @@ public class Search {
     }
 
     private void setMetaData(ItemStack item,Result result){
-        Map<String,List<String>> metadata = result.getMetadata();
+        Map<MetadataType,List<String>> metadata = result.getMetadata();
 
         //debug
         System.out.println(String.format("metadata : %s",metadata == null ? "null" : metadata));
 
         if(metadata == null || metadata.isEmpty())return;
         ItemMeta meta = item.getItemMeta();
-        for(Map.Entry<String,List<String>> e:metadata.entrySet()){
+        for(Map.Entry<MetadataType,List<String>> e:metadata.entrySet()){
             //metadata set
             // metadata -> lore, displayName, enchantment, itemFlag, unbreakable, customModelData
             /*
@@ -348,12 +349,12 @@ public class Search {
             //debug
             System.out.println(String.format("key : %s | value : %s | value size : %d",e.getKey(),e.getValue(),e.getValue().size()));
 
-            String type = e.getKey();
+            MetadataType type = e.getKey();
             List<String> content = e.getValue();
 
-            if(type.equalsIgnoreCase("lore"))meta.setLore(content);
-            if(type.equalsIgnoreCase("displayName"))meta.setDisplayName(content.get(0));
-            if(type.equalsIgnoreCase("enchantment")){
+            if(type.equals(MetadataType.LORE))meta.setLore(content);
+            if(type.equals(MetadataType.DISPLAYNAME))meta.setDisplayName(content.get(0));
+            if(type.equals(MetadataType.ENCHANTMENT)){
                 for(String s:content){
                     List<String> l = Arrays.asList(s.split(","));
                     Enchantment enchant = Enchantment.getByName(l.get(0).toUpperCase());
@@ -365,9 +366,9 @@ public class Search {
                 System.out.println(String.format("map type : %s",meta.getEnchants().getClass().getSimpleName()));
 
             }
-            if(type.equalsIgnoreCase("itemFlag")) content.forEach(s->meta.addItemFlags(ItemFlag.valueOf(s.toUpperCase())));
-            if(type.equalsIgnoreCase("unbreakable"))meta.setUnbreakable(Boolean.valueOf(content.get(0)));
-            if(type.equalsIgnoreCase("customModelData"))meta.setCustomModelData(Integer.valueOf(content.get(0)));
+            if(type.equals(MetadataType.ITEMFLAG)) content.forEach(s->meta.addItemFlags(ItemFlag.valueOf(s.toUpperCase())));
+            if(type.equals(MetadataType.UNBREAKABLE))meta.setUnbreakable(Boolean.valueOf(content.get(0)));
+            if(type.equals(MetadataType.CUSTOMMODELDATA))meta.setCustomModelData(Integer.valueOf(content.get(0)));
         }
         item.setItemMeta(meta);
     }
@@ -394,6 +395,7 @@ public class Search {
     private boolean getEnchantWrapCongruence(List<EnchantWrap> recipe,List<EnchantWrap> input){
         if(recipe == null)return true;
 
+        //TODO : rewrite here
         //debug
         recipe.forEach(s->System.out.println(s.info()));
         System.out.println("===");
