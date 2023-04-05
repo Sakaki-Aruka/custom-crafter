@@ -273,11 +273,15 @@ public class SettingsLoad {
                     * 2 : enchant strict (String -> input, notStrict, onlyEnchant, strict)
                      */
                     List<String> list = Arrays.asList(s.split(","));
-                    Enchantment enchant = Enchantment.getByName(list.get(0));
+                    Enchantment enchant = Enchantment.getByName(list.get(0).toUpperCase());
                     int level = Integer.valueOf(list.get(1));
                     EnchantStrict strict = EnchantStrict.valueOf(list.get(2).toUpperCase());
                     EnchantWrap wrap = new EnchantWrap(level,enchant,strict);
                     wrapList.add(wrap);
+
+                    //debug
+                    System.out.println(String.format("load wrap : %s",wrap.info()));
+                    System.out.println(String.format("list : %s",list));
                 }
             }
 

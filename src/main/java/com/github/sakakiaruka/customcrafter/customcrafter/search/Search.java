@@ -386,9 +386,13 @@ public class Search {
 
 
     private boolean isSameMatter(Matter recipe,Matter input){
+
+        //debug
+        System.out.println(String.format("candidate : %b | amount : %d & %d | wrap : %b",recipe.getCandidate().containsAll(input.getCandidate()),recipe.getAmount(),input.getAmount(),getEnchantWrapCongruence(recipe,input)));
+
         if(!recipe.getCandidate().containsAll(input.getCandidate()))return false;
         if(recipe.getAmount() != input.getAmount())return false;
-        if(!getEnchantWrapCongruence(recipe.getWarp(),input.getWarp()))return false;
+        if(!getEnchantWrapCongruence(recipe,input))return false;
         return true;
     }
 
@@ -416,6 +420,32 @@ public class Search {
         return true;
     }
 
+
+    private boolean getEnchantWrapCongruence(Matter recipe,Matter input){
+
+        //debug
+        if(recipe.hasWrap())recipe.getWrap().forEach(s->System.out.println(s.info()));
+        else System.out.println("recipe has not EnchantWrap");
+        if(input.hasWrap())input.getWrap().forEach(s->System.out.println(s.info()));
+        else System.out.println("input has not EnchantWrap");
+
+        if(!input.hasWrap() && recipe.hasWrap())return false;
+        if(!recipe.hasWrap())return true; // no target
+
+        for(EnchantWrap wrap : recipe.getWrap()){
+            if(wrap.getStrict().equals(EnchantStrict.NOTSTRICT))continue; // not have to check
+            Enchantment recipeEnchant = wrap.getEnchant();
+            List<Enchantment> enchantList = new ArrayList<>();
+            input.getWrap().forEach(s->enchantList.add(s.getEnchant()));
+            if(!enchantList.contains(recipeEnchant))return false;
+            if(wrap.getStrict().equals(EnchantStrict.ONLYENCHANT))continue; //enchant contains check OK
+            int recipeLevel = wrap.getLevel();
+            int inputLevel = input.getEnchantLevel(wrap.getEnchant());
+            if(recipeLevel != inputLevel)return false; // level check failed
+        }
+        return true;
+    }
+
     private List<Enchantment> getEnchantmentList(List<EnchantWrap> wrap){
         List<Enchantment> list = new ArrayList<>();
         wrap.forEach(s->list.add(s.getEnchant()));
@@ -432,6 +462,10 @@ public class Search {
             int level = entry.getValue();
             EnchantWrap wrap = new EnchantWrap(level,enchant,strict);
             list.add(wrap);
+
+            //debug
+            System.out.println("enchant info -> "+wrap.info());
+
         }
         return list;
     }
@@ -478,11 +512,6 @@ public class Search {
         int xGap = models.get(0).getX() - reals.get(0).getX();
         int yGap = models.get(0).getY() - reals.get(0).getY();
 
-        //debug
-//        System.out.println(String.format("xGap : %d | yGap : %d | size(model) : %d | size (reals) : %d",xGap,yGap,models.size(),reals.size()));
-//        models.forEach(s->System.out.println(String.format("models(X) : %d | models(Y) : %d",s.getX(),s.getY())));
-//        reals.forEach(s->System.out.println(String.format("reals(X) : %d | reals(Y) : %d",s.getX(),s.getY())));
-
         if(models.size() != reals.size())return false;
         int size = models.size();
         for(int i=1;i<size;i++){
@@ -506,7 +535,9 @@ public class Search {
                         : new Matter(Arrays.asList(inventory.getItem(i).getType()),inventory.getItem(i).getAmount());
 
                 if(inventory.getItem(i) == null)continue;
-                matter.setWarp(getEnchantWrap(inventory.getItem(i))); //set enchantments information
+                if(inventory.getItem(i).getItemMeta().hasEnchants()) {
+                    matter.setWarp(getEnchantWrap(inventory.getItem(i))); //set enchantments information
+                }
                 recipe.addCoordinate(x,y,matter);
             }
         }
