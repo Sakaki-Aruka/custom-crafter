@@ -125,6 +125,7 @@ public class Search {
                 //normal
                 if(getSquareSize(recipe) != getSquareSize(input))continue;
                 if(!isSameShape(getCoordinateNoAir(recipe),getCoordinateNoAir(input)))continue;
+                if(!isAllCandidateContains(recipe,input))continue;
 
                 // check mass matter is one
                 for(int i=0;i<recipe.getContentsNoAir().size();i++){
@@ -217,6 +218,11 @@ public class Search {
             }
         }
 
+        //debug
+        String name = result == null ? "null" : result.getName() ;
+        int amount = massAmount == 0 ? -1 : massAmount;
+        System.out.println(String.format("recipe name : %s | mass Amount : %d",name,amount));
+
         if(result != null){
             // custom recipe found
             new InventoryUtil().returnItems(result,inventory,massAmount,player);
@@ -225,6 +231,15 @@ public class Search {
             // not found
             new VanillaSearch().main(player,inventory,true);
         }
+    }
+
+    private boolean isAllCandidateContains(Recipe recipe,Recipe input){
+        for(int i=0;i<recipe.getContentsNoAir().size();i++){
+            List<Material> matters = recipe.getContentsNoAir().get(i).getCandidate();
+            Material material = input.getContentsNoAir().get(i).getCandidate().get(0);
+            if(!matters.contains(material))return false;
+        }
+        return true;
     }
 
     private int getMinimalAmount(Recipe recipe,Recipe input){
@@ -396,29 +411,6 @@ public class Search {
         return true;
     }
 
-    private boolean getEnchantWrapCongruence(List<EnchantWrap> recipe,List<EnchantWrap> input){
-        if(recipe == null)return true;
-
-        //TODO : rewrite here
-        //debug
-        recipe.forEach(s->System.out.println(s.info()));
-        System.out.println("===");
-        input.forEach(s->System.out.println(s.info()));
-
-        for(EnchantWrap wrap:recipe){
-            if(wrap.getStrict().equals(EnchantStrict.NOTSTRICT))continue;
-            if(getEnchantmentList(input) == null)continue;
-            if(!getEnchantmentList(input).contains(wrap.getEnchant()))return false;
-            if(wrap.getStrict().equals(EnchantStrict.ONLYENCHANT))continue;
-
-            EnchantWrap w = null;
-            for(EnchantWrap t:input){
-                if(t.getEnchant().equals(wrap.getEnchant()))w = t;
-            }
-            if(wrap.getLevel() != w.getLevel())return false;
-        }
-        return true;
-    }
 
 
     private boolean getEnchantWrapCongruence(Matter recipe,Matter input){
@@ -426,6 +418,7 @@ public class Search {
         //debug
         if(recipe.hasWrap())recipe.getWrap().forEach(s->System.out.println(s.info()));
         else System.out.println("recipe has not EnchantWrap");
+        System.out.println("recipe ↑ --- input ↓");
         if(input.hasWrap())input.getWrap().forEach(s->System.out.println(s.info()));
         else System.out.println("input has not EnchantWrap");
 
