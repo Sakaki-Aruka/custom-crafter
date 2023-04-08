@@ -8,6 +8,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Tag;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.MetadataType;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.Result;
+import com.github.sakakiaruka.customcrafter.customcrafter.util.EnchantUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.InventoryUtil;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -33,6 +34,11 @@ public class Search {
 
         Recipe input = toRecipe(inventory);
         Recipe:for(Recipe recipe : recipes){
+
+            //debug
+            recipe.getContentsNoAir().forEach(s->System.out.println(s.info()));
+            input.getContentsNoAir().forEach(s->System.out.println(s.info()));
+
             if(recipe.getTag().equals(Tag.NORMAL)){
 
                 //debug
@@ -132,11 +138,15 @@ public class Search {
                     Matter recipeMatter = recipe.getContentsNoAir().get(i);
                     Matter inputMatter = input.getContentsNoAir().get(i);
 
+                    //debug
+                    System.out.println(String.format("recipe : %b | input : %b",recipeMatter.hasWrap(),inputMatter.hasWrap()));
+
                     if(recipe.getContentsNoAir().get(i).isMass()){
                         if(inputMatter.getAmount() != 1)continue Top;
                     }
 
                     if(inputMatter.getAmount() < recipeMatter.getAmount())continue Top;
+                    if(!getEnchantWrapCongruence(recipeMatter,inputMatter))continue Top; // enchant check
                 }
 
                 result = recipe;
@@ -412,8 +422,29 @@ public class Search {
     }
 
 
+    private boolean getEnchantWrapCongruenceAmorphousWrap(Recipe recipe,Recipe input){
+        Map<Material,List<List<EnchantWrap>>> inputVirtual = new HashMap<>();
+        for(Matter matter : input.getContentsNoAir()){
+            if(!matter.hasWrap())continue;
+            Material material = matter.getCandidate().get(0);
+            if(inputVirtual.get(material) == null)inputVirtual.put(material,new ArrayList<>());
+            List<EnchantWrap> wrap = matter.getWrap();
+            inputVirtual.get(material).add(wrap);
+        }
 
-    private boolean getEnchantWrapCongruence(Matter recipe,Matter input){
+        // collation with a recipe
+        for(Matter matter : recipe.getContentsNoAir()){
+            if(!matter.hasWrap())continue;
+            for(Material material : matter.getCandidate()){
+                if(inputVirtual.get(material) == null)continue;
+                if(inputVirtual.get(material).isEmpty())continue;
+                List<List<EnchantWrap>> list = inputVirtual.get(material);
+                if(!new EnchantUtil().containsFromDoubleList(list,matter))continue;
+            }
+        }
+    }
+
+    public boolean getEnchantWrapCongruence(Matter recipe,Matter input){
 
         //debug
         if(recipe.hasWrap())recipe.getWrap().forEach(s->System.out.println(s.info()));
