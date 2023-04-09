@@ -239,6 +239,9 @@ public class Search {
                 //debug
                 System.out.println("mass amount (amorphous) : "+massAmount);
 
+                //debug
+                if(!getEnchantWrapCongruenceAmorphousWrap(recipe,input))continue;
+
                 result = recipe;
                 massAmount = getMinimalAmount(result,input);
                 break;
