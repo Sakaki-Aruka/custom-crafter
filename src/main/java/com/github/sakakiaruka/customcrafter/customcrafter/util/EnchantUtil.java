@@ -13,9 +13,9 @@ import java.util.List;
 
 public class EnchantUtil {
 
-    public boolean isWrapContains(List<List<EnchantWrap>> in){
-        //
-    }
+//    public boolean isWrapContains(List<List<EnchantWrap>> in){
+//        //
+//    }
 
     public List<Matter> getTargetMaterialMatters(Recipe recipe, Material target){
         // only for recipe
@@ -45,12 +45,20 @@ public class EnchantUtil {
 
     public boolean containsFromDoubleList(List<List<EnchantWrap>> list, Matter matter){
         if(!matter.hasWrap())return false;
+        if(list.isEmpty())return false;
+
+        //debug
+        System.out.println(String.format("raw data : %s",matter.info()));
 
         for(List<EnchantWrap> l : list){
             Matter dummy = new Matter(Arrays.asList(Material.AIR),0);
             dummy.addAllWrap(l);
 
-            if(!new Search().getEnchantWrapCongruence(dummy,matter))return false;
+            //debug
+            System.out.println(String.format("dummy data : %s",dummy.info()));
+            System.out.println(String.format("wrap congruence : %b",new Search().getEnchantWrapCongruence(matter,dummy)));
+
+            if(!new Search().getEnchantWrapCongruence(matter,dummy))return false;
         }
         return true;
     }

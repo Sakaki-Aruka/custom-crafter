@@ -105,7 +105,7 @@ public class Matter {
         StringBuilder builder = new StringBuilder();
         builder.append(String.format("name : %s\n",name));
         builder.append(String.format("candidate : %s\n",candidate.toString()));
-        builder.append(String.format("wrap : %s\n",hasWrap() ? getAllWrapInfo() : "null"));
+        builder.append(String.format("wrap : %s",hasWrap() ? getAllWrapInfo() : "null\n"));
         builder.append(String.format("amount : %d\n",amount));
         builder.append(String.format("mass : %b\n",isMass()));
         return builder.toString();
