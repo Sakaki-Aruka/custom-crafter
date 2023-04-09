@@ -35,9 +35,9 @@ public class Search {
         Recipe input = toRecipe(inventory);
         Recipe:for(Recipe recipe : recipes){
 
-            //debug
-            recipe.getContentsNoAir().forEach(s->System.out.println(s.info()));
-            input.getContentsNoAir().forEach(s->System.out.println(s.info()));
+//            //debug
+//            recipe.getContentsNoAir().forEach(s->System.out.println(s.info()));
+//            input.getContentsNoAir().forEach(s->System.out.println(s.info()));
 
             if(recipe.getTag().equals(Tag.NORMAL)){
 
@@ -88,10 +88,10 @@ public class Search {
                 int virtualTotal = 0;
                 Map<Material,Integer> virtual = new HashMap<>();
 
-                //debug
-                recipe.getContentsNoAir().forEach(s->{
-                    System.out.println(String.format("matter : %s",s.info()));
-                });
+//                //debug
+//                recipe.getContentsNoAir().forEach(s->{
+//                    System.out.println(String.format("matter : %s",s.info()));
+//                });
 
                 for(Matter matter : recipe.getContentsNoAir()){
                     final boolean mass = matter.isMass();
@@ -469,6 +469,8 @@ public class Search {
         // collation with a recipe
         for(Matter matter : recipe.getContentsNoAir()){
             if(!matter.hasWrap())continue;
+
+            int exitCode = 0;
             for(Material material : matter.getCandidate()){
                 if(inputVirtual.get(material) == null)continue;
                 if(inputVirtual.get(material).isEmpty())continue;
@@ -480,8 +482,10 @@ public class Search {
                 System.out.println(String.format("inputV : %s | list : %s | congruence : %b",inputVirtual,list,new EnchantUtil().containsFromDoubleList(list,matter)));
 
                 //debug
-                return true;
+                exitCode = 1;
+                break;
             }
+            if(exitCode == 0)return false;
         }
 
         //debug
