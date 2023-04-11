@@ -237,7 +237,7 @@ public class Search {
                 if(inputAmount % recipeTotal != 0)continue;
 
                 //debug
-                System.out.println("mass amount (amorphous) : "+massAmount);
+                System.out.println("mass amount (amorphous) : "+getMinimalAmount(recipe,input));
 
                 //debug
                 if(!getEnchantWrapCongruenceAmorphousWrap(recipe,input))continue;
@@ -280,11 +280,16 @@ public class Search {
             if(set.contains(matter.getCandidate().get(0)))continue; // input matter is Mass
             list.add(matter.getAmount());
         }
+
+        //debug
+        System.out.println(String.format("amount list (amorphous) : %s",list));
+        System.out.println(String.format("mass material set : %s",set));
+
         if(list.isEmpty())return -1;
         Collections.sort(list);
 
         //debug
-//        System.out.println(String.format("amount list : %s | minimal amount : %d",list,list.get(0)));
+        System.out.println(String.format("amount list : %s | minimal amount : %d",list,list.get(0)));
 
         return list.get(0);
     }
@@ -350,6 +355,8 @@ public class Search {
 
 //        //debug
 //        System.out.println(String.format("material : %s | amount : %d",item.getType().name(),item.getAmount()));
+        if(item == null)return;
+        if(item.getType().equals(Material.AIR))return;
 
         whatMaking.put(player.getUniqueId(),item.getType());
 
@@ -453,7 +460,7 @@ public class Search {
             inputVirtual.get(material).add(wrap);
         }
 
-        if(inputVirtual.isEmpty())return false;
+        //if(inputVirtual.isEmpty())return false;
         //debug
         System.out.println("=");
         System.out.println(String.format("inputVirtual : %s",inputVirtual));
