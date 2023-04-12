@@ -19,8 +19,11 @@ public class CloseCraftingTable implements Listener {
         Player player = (Player) event.getPlayer();
         if(!opening.contains(player))return; // not opening crafting -> return
         opening.remove(player);
-
         Inventory inventory = event.getInventory();
+        close(player,inventory);
+    }
+
+    public void close(Player player,Inventory inventory){
         for(int i:new InventoryUtil().getTableSlots(craftingTableSize)){
             if(inventory.getItem(i)==null)continue;
             if(inventory.getItem(i).getType().equals(Material.AIR))continue;

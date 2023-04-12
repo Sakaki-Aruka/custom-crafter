@@ -3,6 +3,14 @@ results: "plugins/Custom_Crafter/results"
 matters: "plugins/Custom_Crafter/matters"
 recipes: "plugins/Custom_Crafter/recipes"
 
+# Reload Notice
+notice:
+  - "=========="
+  - ""
+  - "The custom crafter system was reloaded."
+  - ""
+  - "=========="
+
 # Download Settings
 download_threshold: 20
 load_interval: 20

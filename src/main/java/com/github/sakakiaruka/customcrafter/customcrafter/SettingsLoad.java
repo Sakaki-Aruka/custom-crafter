@@ -144,7 +144,7 @@ public class SettingsLoad {
             public void run(){
                 if(times <= threshold && returnCode==0){
                     //finish
-                    main.runTaskLater(getInstance(),20); // 1second delay
+                    main.runTaskLater(getInstance(),20); // 1 second delay
                     this.cancel();
                     Bukkit.getLogger().info("[CustomCrafter] Config Download complete!");
                     return;
@@ -323,6 +323,20 @@ public class SettingsLoad {
 
             Map<Coordinate,Matter> coordinates = new LinkedHashMap<>();
             Map<Material, ItemStack> returns = new HashMap<>();
+            Map<String,String> overrides = new HashMap<>();
+
+            if(config.contains("override")){
+                /* override:
+                *  - cobblestone -> c
+                *  - stone -> s
+                */
+                for(String string : config.getStringList("override")){
+                    List<String> splitter = Arrays.asList(string.split(" -> "));
+                    String source = splitter.get(0);
+                    String shorter = splitter.get(1);
+                    overrides.put(shorter,source);
+                }
+            }
 
             if(tag.equalsIgnoreCase("normal")){
                 // normal recipe load
@@ -332,7 +346,13 @@ public class SettingsLoad {
                     List<String> list = Arrays.asList(l.get(y).split(","));
                     for(int x=0;x<size;x++){
                         Coordinate coordinate = new Coordinate(x,y);
-                        Matter matter = list.get(x).equalsIgnoreCase("null") ? new Matter(Arrays.asList(Material.AIR),0) : matters.get(list.get(x));
+
+                        Matter matter = list.get(x).equalsIgnoreCase("null")
+                                ? new Matter(Arrays.asList(Material.AIR),0)
+                                : matters.containsKey(list.get(x))
+                                    ? matters.get(list.get(x))
+                                    : matters.get(overrides.get(list.get(x)));
+
                         coordinates.put(coordinate,matter);
                     }
                 }

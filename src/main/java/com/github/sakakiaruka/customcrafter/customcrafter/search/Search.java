@@ -438,7 +438,7 @@ public class Search {
     }
 
 
-    private boolean isSameMatter(Matter recipe,Matter input){
+    public boolean isSameMatter(Matter recipe,Matter input){
 
 //        //debug
 //        System.out.println(String.format("candidate : %b | amount : %d & %d | wrap : %b",recipe.getCandidate().containsAll(input.getCandidate()),recipe.getAmount(),input.getAmount(),getEnchantWrapCongruence(recipe,input)));
@@ -501,12 +501,12 @@ public class Search {
 
     public boolean getEnchantWrapCongruence(Matter recipe,Matter input){
 
-        //debug
-        if(recipe.hasWrap())recipe.getWrap().forEach(s->System.out.println(s.info()));
-        else System.out.println("recipe has not EnchantWrap");
-        System.out.println("recipe ↑ --- input ↓");
-        if(input.hasWrap())input.getWrap().forEach(s->System.out.println(s.info()));
-        else System.out.println("input has not EnchantWrap");
+//        //debug
+//        if(recipe.hasWrap())recipe.getWrap().forEach(s->System.out.println(s.info()));
+//        else System.out.println("recipe has not EnchantWrap");
+//        System.out.println("recipe ↑ --- input ↓");
+//        if(input.hasWrap())input.getWrap().forEach(s->System.out.println(s.info()));
+//        else System.out.println("input has not EnchantWrap");
 
         if(!input.hasWrap() && recipe.hasWrap())return false;
         if(!recipe.hasWrap())return true; // no target
