@@ -74,6 +74,11 @@ public class SettingsLoad {
     }
 
     private void main(){
+        results.clear();
+        matters.clear();
+        failed.clear();
+        downloadUri.clear();
+
         Path baseBlockPath = Paths.get(defaultConfig.getString("baseBlock"));
         Path resultPath = Paths.get(defaultConfig.getString("results"));
         Path matterPath = Paths.get(defaultConfig.getString("matters"));

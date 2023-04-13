@@ -58,6 +58,9 @@ public class Check implements CommandExecutor {
             s.closeInventory();
         });
 
+        recipes.clear();
+        namedRecipes.clear();
+
         whatMaking.clear();
         opening.clear();
         CustomCrafter.getInstance().reloadConfig();
