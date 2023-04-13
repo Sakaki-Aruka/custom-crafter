@@ -16,6 +16,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
@@ -508,35 +509,27 @@ public class Search {
 //        if(input.hasWrap())input.getWrap().forEach(s->System.out.println(s.info()));
 //        else System.out.println("input has not EnchantWrap");
 
+        if(recipe.getCandidate().get(0).equals(Material.ENCHANTED_BOOK)){
+            if(!input.getCandidate().get(0).equals(Material.ENCHANTED_BOOK)) return false;
+            //TODO : write here (enchanted book checker)
+        }
+
         if(!input.hasWrap() && recipe.hasWrap())return false;
         if(!recipe.hasWrap())return true; // no target
 
         for(EnchantWrap wrap : recipe.getWrap()){
             if(wrap.getStrict().equals(EnchantStrict.NOTSTRICT))continue; // not have to check
 
-//            //debug
-//            System.out.println("not strict : OK");
-
             Enchantment recipeEnchant = wrap.getEnchant();
             List<Enchantment> enchantList = new ArrayList<>();
             input.getWrap().forEach(s->enchantList.add(s.getEnchant()));
             if(!enchantList.contains(recipeEnchant))return false;
 
-//            //debug
-//            System.out.println("contains : OK");
-
             if(wrap.getStrict().equals(EnchantStrict.ONLYENCHANT))continue; //enchant contains check OK
-
-//            //debug
-//            System.out.println("only enchant : OK");
 
             int recipeLevel = wrap.getLevel();
             int inputLevel = input.getEnchantLevel(wrap.getEnchant());
             if(recipeLevel != inputLevel)return false; // level check failed
-
-//            //debug
-//            System.out.println("strict : OK");
-
         }
         return true;
     }
@@ -628,10 +621,21 @@ public class Search {
                 Matter matter = inventory.getItem(i)==null
                         ? new Matter(Arrays.asList(Material.AIR),0)
                         : new Matter(Arrays.asList(inventory.getItem(i).getType()),inventory.getItem(i).getAmount());
-
                 if(inventory.getItem(i) == null)continue;
                 if(inventory.getItem(i).getItemMeta().hasEnchants()) {
                     matter.setWarp(getEnchantWrap(inventory.getItem(i))); //set enchantments information
+                }
+                // enchanted_book pattern
+                if(inventory.getItem(i).getType().equals(Material.ENCHANTED_BOOK)){
+                    ItemStack item = inventory.getItem(i);
+                    if(((EnchantmentStorageMeta)item.getItemMeta()).getStoredEnchants().isEmpty()) continue;
+                    for(Map.Entry<Enchantment,Integer> entry : ((EnchantmentStorageMeta)item.getItemMeta()).getStoredEnchants().entrySet()){
+                        Enchantment enchant = entry.getKey();
+                        int level = entry.getValue();
+                        EnchantStrict strict = EnchantStrict.INPUT;
+                        EnchantWrap wrap = new EnchantWrap(level,enchant,strict);
+                        matter.addWrap(wrap);
+                    }
                 }
                 recipe.addCoordinate(x,y,matter);
             }
