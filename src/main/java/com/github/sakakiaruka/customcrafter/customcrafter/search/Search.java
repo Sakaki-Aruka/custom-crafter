@@ -6,7 +6,9 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordinate;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Tag;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.MetadataType;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.Result;
+import com.github.sakakiaruka.customcrafter.customcrafter.util.EnchantUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.InventoryUtil;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -32,6 +34,11 @@ public class Search {
 
         Recipe input = toRecipe(inventory);
         Recipe:for(Recipe recipe : recipes){
+
+//            //debug
+//            recipe.getContentsNoAir().forEach(s->System.out.println(s.info()));
+//            input.getContentsNoAir().forEach(s->System.out.println(s.info()));
+
             if(recipe.getTag().equals(Tag.NORMAL)){
 
                 //debug
@@ -58,26 +65,44 @@ public class Search {
                 if(getTotal(recipe) != getTotal(input))continue;
                 if(!getAllCandidateNoDuplicate(recipe).containsAll(getAllCandidateNoDuplicate(input)))continue;
 
+
+                //debug
+                if(!getEnchantWrapCongruenceAmorphousWrap(recipe,input))continue;
+                //debug finish
+
                 int inputTotal = 0;
                 Map<Material,Integer> relation = new HashMap<>();
-                input.getContentsNoAir().forEach(s->{
-                    Material material = s.getCandidate().get(0);
-                    if(!relation.containsKey(s.getCandidate().get(0))) relation.put(material,0);
-                    int i = relation.get(s.getCandidate().get(0)) + s.getAmount();
-                    relation.put(material,i);
-                    increment(inputTotal,s.getAmount());
-                });
+                //TODO fix here
+
+                for(Matter matter : input.getContentsNoAir()){
+                    Material material = matter.getCandidate().get(0);
+                    if(!relation.containsKey(material)) relation.put(material,0);
+                    int i = relation.get(material) + matter.getAmount();
+                    inputTotal+=i;
+
+                    //debug
+                    System.out.println(String.format("input total : %d | i : %d",inputTotal,i));
+
+                }
 
                 int virtualTotal = 0;
                 Map<Material,Integer> virtual = new HashMap<>();
-                recipe.getContentsNoAir().forEach(s->{
-                    s.getCandidate().forEach(t->{
-                        int i = s.isMass() ? 1 : s.getAmount();
-                        if(virtual.containsKey(t)) i+=virtual.get(t);
-                        virtual.put(t,i);
-                        increment(virtualTotal,i);
-                    });
-                });
+
+//                //debug
+//                recipe.getContentsNoAir().forEach(s->{
+//                    System.out.println(String.format("matter : %s",s.info()));
+//                });
+
+                for(Matter matter : recipe.getContentsNoAir()){
+                    final boolean mass = matter.isMass();
+                    final int quantity = matter.getAmount();
+                    for(Material material : matter.getCandidate()){
+                        int i = mass ? 1 : quantity;
+                        if(virtual.containsKey(material)) i+= virtual.get(material);
+                        virtual.put(material,i);
+                        virtualTotal+=i;
+                    }
+                }
 
                 int ideal = virtualTotal - inputTotal;
                 for(Matter matter:input.getContentsNoAir()){
@@ -124,17 +149,22 @@ public class Search {
                 //normal
                 if(getSquareSize(recipe) != getSquareSize(input))continue;
                 if(!isSameShape(getCoordinateNoAir(recipe),getCoordinateNoAir(input)))continue;
+                if(!isAllCandidateContains(recipe,input))continue;
 
                 // check mass matter is one
                 for(int i=0;i<recipe.getContentsNoAir().size();i++){
                     Matter recipeMatter = recipe.getContentsNoAir().get(i);
                     Matter inputMatter = input.getContentsNoAir().get(i);
 
+                    //debug
+                    System.out.println(String.format("recipe : %b | input : %b",recipeMatter.hasWrap(),inputMatter.hasWrap()));
+
                     if(recipe.getContentsNoAir().get(i).isMass()){
                         if(inputMatter.getAmount() != 1)continue Top;
                     }
 
                     if(inputMatter.getAmount() < recipeMatter.getAmount())continue Top;
+                    if(!getEnchantWrapCongruence(recipeMatter,inputMatter))continue Top; // enchant check
                 }
 
                 result = recipe;
@@ -207,7 +237,10 @@ public class Search {
                 if(inputAmount % recipeTotal != 0)continue;
 
                 //debug
-                System.out.println("mass amount (amorphous) : "+massAmount);
+                System.out.println("mass amount (amorphous) : "+getMinimalAmount(recipe,input));
+
+                //debug
+                if(!getEnchantWrapCongruenceAmorphousWrap(recipe,input))continue;
 
                 result = recipe;
                 massAmount = getMinimalAmount(result,input);
@@ -215,6 +248,11 @@ public class Search {
 
             }
         }
+
+        //debug
+        String name = result == null ? "null" : result.getName() ;
+        int amount = massAmount == 0 ? -1 : massAmount;
+        System.out.println(String.format("recipe name : %s | mass Amount : %d",name,amount));
 
         if(result != null){
             // custom recipe found
@@ -226,26 +264,33 @@ public class Search {
         }
     }
 
-    private int getMinimalAmount(Recipe recipe,Recipe input){
-        List<Integer> list = new ArrayList<>();
+    private boolean isAllCandidateContains(Recipe recipe,Recipe input){
         for(int i=0;i<recipe.getContentsNoAir().size();i++){
-            if(recipe.getContentsNoAir().get(i).isMass())continue;
-            int amount = 0;
-            for(Matter m:input.getContentsNoAir()){
-                if(recipe.getContentsNoAir().get(i).getCandidate().contains(m.getCandidate().get(0))){
-                    amount = m.getAmount();
-                }
-            }
-            list.add(amount);
-
-            //debug
-            System.out.println("in minimal (Amount) : "+input.getContentsNoAir().get(i).getCandidate());
+            List<Material> matters = recipe.getContentsNoAir().get(i).getCandidate();
+            Material material = input.getContentsNoAir().get(i).getCandidate().get(0);
+            if(!matters.contains(material))return false;
         }
+        return true;
+    }
+
+    private int getMinimalAmount(Recipe recipe,Recipe input){
+        Set<Material> set = recipe.getMassMaterialSet();
+        List<Integer> list = new ArrayList<>();
+        for(Matter matter : input.getContentsNoAir()){
+            if(set.contains(matter.getCandidate().get(0)))continue; // input matter is Mass
+            list.add(matter.getAmount());
+        }
+
         //debug
-        System.out.println("minimal amount : "+list);
+        System.out.println(String.format("amount list (amorphous) : %s",list));
+        System.out.println(String.format("mass material set : %s",set));
 
         if(list.isEmpty())return -1;
         Collections.sort(list);
+
+        //debug
+        System.out.println(String.format("amount list : %s | minimal amount : %d",list,list.get(0)));
+
         return list.get(0);
     }
 
@@ -272,7 +317,7 @@ public class Search {
             List<String> list = Arrays.asList(recipe.getResult().getNameOrRegex().split("@"));
 
             //debug
-            System.out.println(String.format("list : %s",list));
+//            System.out.println(String.format("list : %s",list));
 
             String p = list.get(0);
             String replaced = list.get(1);
@@ -282,15 +327,15 @@ public class Search {
                 String name = m.name();
                 Matcher matcher = pattern.matcher(name);
 
-                //debug
-                System.out.println(String.format("replaced : %s | name : %s | matcher : %b | point : %d",replaced,name,matcher.find(),recipe.getResult().getMatchPoint()));
+//                //debug
+//                System.out.println(String.format("replaced : %s | name : %s | matcher : %b | point : %d",replaced,name,matcher.find(),recipe.getResult().getMatchPoint()));
 
                 //if(!matcher.find())continue;
                 int point = recipe.getResult().getMatchPoint();
 
-                //debug
-                System.out.println("point : "+point);
-                System.out.println("materials : "+materials);
+//                //debug
+//                System.out.println("point : "+point);
+//                System.out.println("materials : "+materials);
 
                 if(!matcher.find(0))continue;
 
@@ -300,16 +345,18 @@ public class Search {
             }
             Collections.sort(materials);
 
-            //debug
-            System.out.println(String.format("materials : %s",materials));
+//            //debug
+//            System.out.println(String.format("materials : %s",materials));
 
             Material material = Material.valueOf(materials.get(0).toUpperCase());
             item = new ItemStack(material,amount);
             setMetaData(item,recipe.getResult());
         }
 
-        //debug
-        System.out.println(String.format("material : %s | amount : %d",item.getType().name(),item.getAmount()));
+//        //debug
+//        System.out.println(String.format("material : %s | amount : %d",item.getType().name(),item.getAmount()));
+        if(item == null)return;
+        if(item.getType().equals(Material.AIR))return;
 
         whatMaking.put(player.getUniqueId(),item.getType());
 
@@ -332,14 +379,14 @@ public class Search {
     }
 
     private void setMetaData(ItemStack item,Result result){
-        Map<String,List<String>> metadata = result.getMetadata();
+        Map<MetadataType,List<String>> metadata = result.getMetadata();
 
         //debug
         System.out.println(String.format("metadata : %s",metadata == null ? "null" : metadata));
 
         if(metadata == null || metadata.isEmpty())return;
         ItemMeta meta = item.getItemMeta();
-        for(Map.Entry<String,List<String>> e:metadata.entrySet()){
+        for(Map.Entry<MetadataType,List<String>> e:metadata.entrySet()){
             //metadata set
             // metadata -> lore, displayName, enchantment, itemFlag, unbreakable, customModelData
             /*
@@ -352,15 +399,15 @@ public class Search {
              *
              */
 
-            //debug
-            System.out.println(String.format("key : %s | value : %s | value size : %d",e.getKey(),e.getValue(),e.getValue().size()));
+//            //debug
+//            System.out.println(String.format("key : %s | value : %s | value size : %d",e.getKey(),e.getValue(),e.getValue().size()));
 
-            String type = e.getKey();
+            MetadataType type = e.getKey();
             List<String> content = e.getValue();
 
-            if(type.equalsIgnoreCase("lore"))meta.setLore(content);
-            if(type.equalsIgnoreCase("displayName"))meta.setDisplayName(content.get(0));
-            if(type.equalsIgnoreCase("enchantment")){
+            if(type.equals(MetadataType.LORE))meta.setLore(content);
+            if(type.equals(MetadataType.DISPLAYNAME))meta.setDisplayName(content.get(0));
+            if(type.equals(MetadataType.ENCHANTMENT)){
                 for(String s:content){
                     List<String> l = Arrays.asList(s.split(","));
                     Enchantment enchant = Enchantment.getByName(l.get(0).toUpperCase());
@@ -368,13 +415,13 @@ public class Search {
                     meta.addEnchant(enchant,level,true);
                 }
 
-                //debug
-                System.out.println(String.format("map type : %s",meta.getEnchants().getClass().getSimpleName()));
+//                //debug
+//                System.out.println(String.format("map type : %s",meta.getEnchants().getClass().getSimpleName()));
 
             }
-            if(type.equalsIgnoreCase("itemFlag")) content.forEach(s->meta.addItemFlags(ItemFlag.valueOf(s.toUpperCase())));
-            if(type.equalsIgnoreCase("unbreakable"))meta.setUnbreakable(Boolean.valueOf(content.get(0)));
-            if(type.equalsIgnoreCase("customModelData"))meta.setCustomModelData(Integer.valueOf(content.get(0)));
+            if(type.equals(MetadataType.ITEMFLAG)) content.forEach(s->meta.addItemFlags(ItemFlag.valueOf(s.toUpperCase())));
+            if(type.equals(MetadataType.UNBREAKABLE))meta.setUnbreakable(Boolean.valueOf(content.get(0)));
+            if(type.equals(MetadataType.CUSTOMMODELDATA))meta.setCustomModelData(Integer.valueOf(content.get(0)));
         }
         item.setItemMeta(meta);
     }
@@ -391,32 +438,105 @@ public class Search {
     }
 
 
-    private boolean isSameMatter(Matter recipe,Matter input){
+    public boolean isSameMatter(Matter recipe,Matter input){
+
+//        //debug
+//        System.out.println(String.format("candidate : %b | amount : %d & %d | wrap : %b",recipe.getCandidate().containsAll(input.getCandidate()),recipe.getAmount(),input.getAmount(),getEnchantWrapCongruence(recipe,input)));
+
         if(!recipe.getCandidate().containsAll(input.getCandidate()))return false;
         if(recipe.getAmount() != input.getAmount())return false;
-        if(!getEnchantWrapCongruence(recipe.getWarp(),input.getWarp()))return false;
+        if(!getEnchantWrapCongruence(recipe,input))return false;
         return true;
     }
 
-    private boolean getEnchantWrapCongruence(List<EnchantWrap> recipe,List<EnchantWrap> input){
-        if(recipe == null)return true;
+
+    private boolean getEnchantWrapCongruenceAmorphousWrap(Recipe recipe,Recipe input){
+        Map<Material,List<List<EnchantWrap>>> inputVirtual = new HashMap<>();
+        for(Matter matter : input.getContentsNoAir()){
+            if(!matter.hasWrap())continue;
+            Material material = matter.getCandidate().get(0);
+            if(inputVirtual.get(material) == null)inputVirtual.put(material,new ArrayList<>());
+            List<EnchantWrap> wrap = matter.getWrap();
+            inputVirtual.get(material).add(wrap);
+        }
+
+        //if(inputVirtual.isEmpty())return false;
+        //debug
+        System.out.println("=");
+        System.out.println(String.format("inputVirtual : %s",inputVirtual));
+        inputVirtual.entrySet().forEach(s->{
+            System.out.println("==");
+            System.out.println(String.format("key material : %s",s.getKey().name()));
+            s.getValue().forEach(t->{
+                System.out.println("===");
+                t.forEach(u->System.out.println(String.format("u loop : %s",u.info())));
+            });
+        });
+
+        // collation with a recipe
+        for(Matter matter : recipe.getContentsNoAir()){
+            if(!matter.hasWrap())continue;
+
+            int exitCode = 0;
+            for(Material material : matter.getCandidate()){
+                if(inputVirtual.get(material) == null)continue;
+                if(inputVirtual.get(material).isEmpty())continue;
+                List<List<EnchantWrap>> list = inputVirtual.get(material);
+                if(!new EnchantUtil().containsFromDoubleList(list,matter))continue;
+                //TODO : Write here
+
+                //debug
+                System.out.println(String.format("inputV : %s | list : %s | congruence : %b",inputVirtual,list,new EnchantUtil().containsFromDoubleList(list,matter)));
+
+                //debug
+                exitCode = 1;
+                break;
+            }
+            if(exitCode == 0)return false;
+        }
 
         //debug
-        recipe.forEach(s->System.out.println(s.info()));
-        System.out.println("===");
-        input.forEach(s->System.out.println(s.info()));
+        return true;
+    }
 
-        for(EnchantWrap wrap:recipe){
-            if(wrap.getStrict().equals(EnchantStrict.NOTSTRICT))continue;
-            if(getEnchantmentList(input) == null)continue;
-            if(!getEnchantmentList(input).contains(wrap.getEnchant()))return false;
-            if(wrap.getStrict().equals(EnchantStrict.ONLYENCHANT))continue;
+    public boolean getEnchantWrapCongruence(Matter recipe,Matter input){
 
-            EnchantWrap w = null;
-            for(EnchantWrap t:input){
-                if(t.getEnchant().equals(wrap.getEnchant()))w = t;
-            }
-            if(wrap.getLevel() != w.getLevel())return false;
+//        //debug
+//        if(recipe.hasWrap())recipe.getWrap().forEach(s->System.out.println(s.info()));
+//        else System.out.println("recipe has not EnchantWrap");
+//        System.out.println("recipe ↑ --- input ↓");
+//        if(input.hasWrap())input.getWrap().forEach(s->System.out.println(s.info()));
+//        else System.out.println("input has not EnchantWrap");
+
+        if(!input.hasWrap() && recipe.hasWrap())return false;
+        if(!recipe.hasWrap())return true; // no target
+
+        for(EnchantWrap wrap : recipe.getWrap()){
+            if(wrap.getStrict().equals(EnchantStrict.NOTSTRICT))continue; // not have to check
+
+//            //debug
+//            System.out.println("not strict : OK");
+
+            Enchantment recipeEnchant = wrap.getEnchant();
+            List<Enchantment> enchantList = new ArrayList<>();
+            input.getWrap().forEach(s->enchantList.add(s.getEnchant()));
+            if(!enchantList.contains(recipeEnchant))return false;
+
+//            //debug
+//            System.out.println("contains : OK");
+
+            if(wrap.getStrict().equals(EnchantStrict.ONLYENCHANT))continue; //enchant contains check OK
+
+//            //debug
+//            System.out.println("only enchant : OK");
+
+            int recipeLevel = wrap.getLevel();
+            int inputLevel = input.getEnchantLevel(wrap.getEnchant());
+            if(recipeLevel != inputLevel)return false; // level check failed
+
+//            //debug
+//            System.out.println("strict : OK");
+
         }
         return true;
     }
@@ -437,6 +557,10 @@ public class Search {
             int level = entry.getValue();
             EnchantWrap wrap = new EnchantWrap(level,enchant,strict);
             list.add(wrap);
+
+            //debug
+            System.out.println("enchant info -> "+wrap.info());
+
         }
         return list;
     }
@@ -483,11 +607,6 @@ public class Search {
         int xGap = models.get(0).getX() - reals.get(0).getX();
         int yGap = models.get(0).getY() - reals.get(0).getY();
 
-        //debug
-//        System.out.println(String.format("xGap : %d | yGap : %d | size(model) : %d | size (reals) : %d",xGap,yGap,models.size(),reals.size()));
-//        models.forEach(s->System.out.println(String.format("models(X) : %d | models(Y) : %d",s.getX(),s.getY())));
-//        reals.forEach(s->System.out.println(String.format("reals(X) : %d | reals(Y) : %d",s.getX(),s.getY())));
-
         if(models.size() != reals.size())return false;
         int size = models.size();
         for(int i=1;i<size;i++){
@@ -511,7 +630,9 @@ public class Search {
                         : new Matter(Arrays.asList(inventory.getItem(i).getType()),inventory.getItem(i).getAmount());
 
                 if(inventory.getItem(i) == null)continue;
-                matter.setWarp(getEnchantWrap(inventory.getItem(i))); //set enchantments information
+                if(inventory.getItem(i).getItemMeta().hasEnchants()) {
+                    matter.setWarp(getEnchantWrap(inventory.getItem(i))); //set enchantments information
+                }
                 recipe.addCoordinate(x,y,matter);
             }
         }
@@ -519,6 +640,6 @@ public class Search {
     }
 
     private void increment(int input,int plus){
-        input+=plus;
+        input = input + plus;
     }
 }

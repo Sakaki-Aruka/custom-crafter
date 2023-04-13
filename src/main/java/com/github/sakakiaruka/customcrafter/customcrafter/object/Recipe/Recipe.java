@@ -102,4 +102,32 @@ public class Recipe {
         }
         return list;
     }
+
+    public Map<Matter,Integer> getContentsNoDuplicateRelateAmount(){
+        Map<Matter,Integer> map = new HashMap<>();
+        for(Matter matter : coordinate.values()){
+            if(!map.containsKey(matter)) {
+                map.put(matter,1);
+            }else {
+                int i = map.get(matter) + matter.getAmount();
+                map.put(matter,i);
+            }
+        }
+        return map;
+    }
+
+    public Set<Material> getMassMaterialSet(){
+        Set<Material> set = new HashSet<>();
+        coordinate.values().forEach(s->{
+            if(s.isMass())set.add(s.getCandidate().get(0));
+        });
+        return set;
+    }
+
+    public Matter getMatterFromCoordinate(Coordinate c){
+        for(Map.Entry<Coordinate,Matter> entry : coordinate.entrySet()){
+            if(entry.getKey().isSame(c))return entry.getValue();
+        }
+        return null;
+    }
 }

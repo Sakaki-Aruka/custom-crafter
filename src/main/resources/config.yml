@@ -1,7 +1,15 @@
 baseBlock: "plugins/Custom_Crafter/baseBlock"
-results: "plugins/Custom_Crafter/result"
-matters: "plugins/Custom_Crafter/matter"
-recipes: "plugins/Custom_Crafter/recipe"
+results: "plugins/Custom_Crafter/results"
+matters: "plugins/Custom_Crafter/matters"
+recipes: "plugins/Custom_Crafter/recipes"
+
+# Reload Notice
+notice:
+  - "=========="
+  - ""
+  - "The custom crafter system was reloaded."
+  - ""
+  - "=========="
 
 # Download Settings
 download_threshold: 20

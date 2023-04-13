@@ -6,6 +6,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantW
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordinate;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.MetadataType;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.Result;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -73,6 +74,11 @@ public class SettingsLoad {
     }
 
     private void main(){
+        results.clear();
+        matters.clear();
+        failed.clear();
+        downloadUri.clear();
+
         Path baseBlockPath = Paths.get(defaultConfig.getString("baseBlock"));
         Path resultPath = Paths.get(defaultConfig.getString("results"));
         Path matterPath = Paths.get(defaultConfig.getString("matters"));
@@ -143,7 +149,7 @@ public class SettingsLoad {
             public void run(){
                 if(times <= threshold && returnCode==0){
                     //finish
-                    main.runTaskLater(getInstance(),20); // 1second delay
+                    main.runTaskLater(getInstance(),20); // 1 second delay
                     this.cancel();
                     Bukkit.getLogger().info("[CustomCrafter] Config Download complete!");
                     return;
@@ -205,7 +211,7 @@ public class SettingsLoad {
             String nameOrRegex = config.getString("nameOrRegex");
             int matchPoint = config.getInt("matchPoint"); // default value is -1;
             Map<Enchantment,Integer> enchantInfo = null;
-            Map<String,List<String>> metadata = null;
+            Map<MetadataType,List<String>> metadata = null;
             if(config.contains("enchant")){
                 enchantInfo = new HashMap<>();
                 for(String s:config.getStringList("enchant")){
@@ -230,7 +236,7 @@ public class SettingsLoad {
                     * 1 : value (Object | List<String>, String, Enchantment & int, boolean, int
                      */
                     List<String> list = Arrays.asList(s.split(","));
-                    String key = list.get(0);
+                    MetadataType key = MetadataType.valueOf(list.get(0).toUpperCase());
                     String value = String.join(",",list.subList(1,list.size()));
                     if(!metadata.containsKey(key))metadata.put(key,new ArrayList<>());
                     metadata.get(key).add(value);
@@ -272,11 +278,15 @@ public class SettingsLoad {
                     * 2 : enchant strict (String -> input, notStrict, onlyEnchant, strict)
                      */
                     List<String> list = Arrays.asList(s.split(","));
-                    Enchantment enchant = Enchantment.getByName(list.get(0));
+                    Enchantment enchant = Enchantment.getByName(list.get(0).toUpperCase());
                     int level = Integer.valueOf(list.get(1));
                     EnchantStrict strict = EnchantStrict.valueOf(list.get(2).toUpperCase());
                     EnchantWrap wrap = new EnchantWrap(level,enchant,strict);
                     wrapList.add(wrap);
+
+                    //debug
+                    System.out.println(String.format("load wrap : %s",wrap.info()));
+                    System.out.println(String.format("list : %s",list));
                 }
             }
 
@@ -318,6 +328,20 @@ public class SettingsLoad {
 
             Map<Coordinate,Matter> coordinates = new LinkedHashMap<>();
             Map<Material, ItemStack> returns = new HashMap<>();
+            Map<String,String> overrides = new HashMap<>();
+
+            if(config.contains("override")){
+                /* override:
+                *  - cobblestone -> c
+                *  - stone -> s
+                */
+                for(String string : config.getStringList("override")){
+                    List<String> splitter = Arrays.asList(string.split(" -> "));
+                    String source = splitter.get(0);
+                    String shorter = splitter.get(1);
+                    overrides.put(shorter,source);
+                }
+            }
 
             if(tag.equalsIgnoreCase("normal")){
                 // normal recipe load
@@ -327,7 +351,13 @@ public class SettingsLoad {
                     List<String> list = Arrays.asList(l.get(y).split(","));
                     for(int x=0;x<size;x++){
                         Coordinate coordinate = new Coordinate(x,y);
-                        Matter matter = list.get(x).equalsIgnoreCase("null") ? new Matter(Arrays.asList(Material.AIR),0) : matters.get(list.get(x));
+
+                        Matter matter = list.get(x).equalsIgnoreCase("null")
+                                ? new Matter(Arrays.asList(Material.AIR),0)
+                                : matters.containsKey(list.get(x))
+                                    ? matters.get(list.get(x))
+                                    : matters.get(overrides.get(list.get(x)));
+
                         coordinates.put(coordinate,matter);
                     }
                 }

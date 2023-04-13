@@ -23,4 +23,10 @@ public class Coordinate {
     public void setY(int y) {
         this.y = y;
     }
+
+    public boolean isSame(Coordinate coordinate){
+        if(x != coordinate.getX())return false;
+        if(y != coordinate.getY())return false;
+        return true;
+    }
 }
