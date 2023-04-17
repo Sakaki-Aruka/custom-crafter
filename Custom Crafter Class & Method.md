@@ -45,8 +45,8 @@ Custom Crafter Class & Method
 - addCoordinate(int x, int y, Matter matter) | void : 引数の x, y からCoordinate を生成し，Map<Coordinate, Matter> に加える
 - getContentsNoAir() | List<Matter> : candidate が Material.AIR のみである Matter を覗いた coordinate の中身を返す
 - getCoordinateList() | List<Coordinate> : Map<Coordinate, Matter> の鍵だけを返す
-- getContentsNoDuplicate() | List<Matter> : Map<Coordinate, Matter> から重複なしの Matter を入れたリストを返す
-- getContentsNoDuplicateRelateAmount() | Map<Matter, Integer> : getContentsNoDuplicate() で返されるリストの要素それぞれに個数を関係づけた Map を返す
+- getContentsNoDuplicate() | List<Matter> : Map<Coordinate, Matter> から重複なしの Matter を入れたリストを返す.
+- getContentsNoDuplicateRelateAmount() | Map<Matter, Integer> : getContentsNoDuplicate() で返されるリストの要素それぞれに個数を関係づけた Map を返す.
 - getMassMaterialSet() | Set<Material> : mass = true である Matter の candidate を Set に入れて返す．mass = true である Matter が存在しない場合は 初期状態の Set を返す
 - getMatterFromCoordinate(Coordinate c) | Matter : Map<Coordinate, Matter> の中で引数として与えられた Coordinate に関連付けられた Matter を返す．引数に関連付けられたMatter が存在しない場合は Null を返す
 
@@ -112,88 +112,88 @@ Custom Crafter Class & Method
 ## Search (Methods)
 
 ### main(Player player, Inventory inventory) | void
-コンフィグファイルから作成したすべてのカスタムレシピと，カスタムクラフターの画面から取得したアイテムと配置を比較し，すべての要素で一致した最初のレシピを得る．そのレシピに紐づけられた成果物を，プレイヤーが開いているカスタムクラフターの画面，もしくはプレイヤーの座標にドロップする．
-
-全てのカスタムレシピと比較した結果，一致するものが存在しなかった場合には VanillaSearch に処理が引き渡される．
+コンフィグファイルから作成したすべてのカスタムレシピと，カスタムクラフターの画面から取得したアイテムと配置を比較し，すべての要素で一致した最初のレシピを得る．そのレシピに紐づけられた成果物を，プレイヤーが開いているカスタムクラフターの画面，もしくはプレイヤーの座標にドロップする.  
+  
+全てのカスタムレシピと比較した結果，一致するものが存在しなかった場合には VanillaSearch に処理が引き渡される.  
 
 ### massSearch(Player player, Inventory inventory) | void
-複数個のカスタムアイテムを一度に作成するために，カスタムクラフターの作成ボタンを右クリックした場合はこのメソッドが呼び出される．
-個数を調整する処理を除き， main とさして差はない．
+複数個のカスタムアイテムを一度に作成するために，カスタムクラフターの作成ボタンを右クリックした場合はこのメソッドが呼び出される.   
+個数を調整する処理を除き， main とさして差はない.  
 
 ### isAllCandidateContains(Recipe recipe, Recipe input) | boolean
-recipe に含まれるすべての Matter が持つ candidate に input が持つすべての Matter に含まれる candidate が含まれているかどうかを返す．
-
--> 素材の整合性を取得する
+recipe に含まれるすべての Matter が持つ candidate に input が持つすべての Matter に含まれる candidate が含まれているかどうかを返す.  
+  
+-> 素材の整合性を取得する.  
 
 ### getMinimalAmount(Recipe recipe, Recipe input) | int
-input に含まれる Matter のうち，mass = true でないもののうち最も少ないアイテム個数を返す．
-input に含まれる全ての Matter がmass = true である場合は -1 を返す．
+input に含まれる Matter のうち，mass = true でないもののうち最も少ないアイテム個数を返す.  
+input に含まれる全ての Matter がmass = true である場合は -1 を返す.  
 
 ### getAllCandidateNoDuplicate(Recipe recipe) | Set<Material>
-recipe が持つ Matter の Candidate を重複なしの Set にして返す
-全ての Matter が空気である Recipe を引数に与えた場合は，空の Set<Material> を返す
+recipe が持つ Matter の Candidate を重複なしの Set にして返す.  
+全ての Matter が空気である Recipe を引数に与えた場合は，空の Set<Material> を返す.  
 
 ### setResultItem(Inventory inventory, Recipe recipe, Recipe input, Player player, int amount) | void
-recipe に含まれた成果物作成し inventory の成果物スロット，もしくは player の座標にドロップする
+recipe に含まれた成果物作成し inventory の成果物スロット，もしくは player の座標にドロップする.  
 
 ### setMetaData(ItemStack item, Result result) | void
-result に含まれる成果物のメタデータを item に付与する
+result に含まれる成果物のメタデータを item に付与する.  
 
 ### getContainsMaterials(Recipe input) | List<Material>
-input に含まれる全ての Matter が持つ Candidate を重複なしのリストにして返す
-空の Recipe を引数に取った場合，空の List<Material> を返す
+input に含まれる全ての Matter が持つ Candidate を重複なしのリストにして返す.  
+空の Recipe を引数に取った場合，空の List<Material> を返す.
 
 ### isSameMatter(Matter recipe, Matter input) | boolean
-input が持つ情報と recipe が持つ情報が等しいものであるかを返す
-getEnchantWrapCongruence を呼び出す
+input が持つ情報と recipe が持つ情報が等しいものであるかを返す.  
+getEnchantWrapCongruence を呼び出す.  
 
 ### getEnchantWrapCongruenceAmorphousWrap(Recipe recipe, Recipe input) | boolean
-recipe と input のすべての Matter が持つエンチャント情報が等しいものであるかを返す
-EnchantUtil#containsFromDoubleListを呼び出す
+recipe と input のすべての Matter が持つエンチャント情報が等しいものであるかを返す.  
+EnchantUtil#containsFromDoubleListを呼び出す.
 
 ### getEnchantWrapCongruence(Matter recipe, Matter input) | boolean
-recipe と input が持つエンチャント情報が等しいものであるかどうかを返す
+recipe と input が持つエンチャント情報が等しいものであるかどうかを返す.
 
 ### getEnchantmentList(List<EnchantWrap> wrap) | List<Enchantment> 
-wrap に含まれる全ての Enchantment をリストにして返す
+wrap に含まれる全ての Enchantment をリストにして返す.
 
 ### getEnchantWrap(ItemStack item) | List<EnchantWrap>
-item が持つエンチャント情報を EnchantWrap のリストにして返す
-item がエンチャントを含まない場合は Null を返す
+item が持つエンチャント情報を EnchantWrap のリストにして返す.  
+item がエンチャントを含まない場合は Null を返す.
 
 ### getCoordinateNoAir(Recipe recipe) | List<Coordinate>
-recipe が持つすべての配置の情報をリストにして返す
+recipe が持つすべての配置の情報をリストにして返す.
 
 ### getTotal(Recipe recipe) | int
-recipe に含まれる全ての Matter の個数を合計を返す
-なお， Candidate に Material#AIR のみを持つ Matter は個数の合計に加算しない
+recipe に含まれる全ての Matter の個数を合計を返す.  
+なお， Candidate に Material#AIR のみを持つ Matter は個数の合計に加算しない.
 
 ### getSquareSize(Recipe recipe) | int
-アイテムが配置されている範囲を正方形で取得した際の一辺の長さを返す
+アイテムが配置されている範囲を正方形で取得した際の一辺の長さを返す.
 
 ### isSameShape(List<Coordinate> models, List<Coordinate> reals) | boolean
-reals を平行移動した場合 models に重なるかどうかを返す
+reals を平行移動した場合 models に重なるかどうかを返す.
 
 ### toRecipe(Inventory inventory) | Recipe
-inventory から Recipe を作成する
-アイテムが配置されていないスロットは Candidate に Material＃AIR のみを持ち個数が0である Matter に変換される
+inventory から Recipe を作成する.  
+アイテムが配置されていないスロットは Candidate に Material＃AIR のみを持ち個数が0である Matter に変換される.  
 
 ## VanillaSearch (Methods)
 ### main(Player player, Inventory inventory, boolean batchBool) | void
-inventory に含まれるアイテムを長さ9の ItemStack の配列に入れ，それを Bukkit#craftItem へ渡し成果物を得て， player が開いているカスタムクラフターの成果物スロット，もしくは player の座標にドロップする
+inventory に含まれるアイテムを長さ9の ItemStack の配列に入れ，それを Bukkit#craftItem へ渡し成果物を得て， player が開いているカスタムクラフターの成果物スロット，もしくは player の座標にドロップする.    
 
-inventory のアイテム配置を正方形として扱ったときの一辺の長さが 3 を超えた場合はその場で処理を終了する
+inventory のアイテム配置を正方形として扱ったときの一辺の長さが 3 を超えた場合はその場で処理を終了する.
 
 ### getMinimalAmount(ItemStack[] items) | int
-items に含まれる ItemStack の中で最も小さい個数を返す
-items に空気以外のアイテムが含まれていない場合は -1 を返す
+items に含まれる ItemStack の中で最も小さい個数を返す.  
+items に空気以外のアイテムが含まれていない場合は -1 を返す.  
 
 ### getItemStacks(Inventory inventory, Coordinate start) | ItemStack[]
-inventory の中から start が持つ座標を始点とする 3*3 の正方形のスロットのアイテムを，長さ9 の ItemStack の配列に入れる
+inventory の中から start が持つ座標を始点とする 3*3 の正方形のスロットのアイテムを，長さ9 の ItemStack の配列に入れる.  
 start を始点とする 3*3 の範囲がカスタムクラフターのクラフト画面の範囲を飛び出る場合は，対象のスロットのアイテムを `ItemStack item = new Itemstack(Material.AIR);` とする
 
 ### getCoordinateList(Inventory inventory) | List<Coordinate>
-inventory に含まれる空気以外のクラフティングスロットを Coordinate に変換し リストに入れて返す
+inventory に含まれる空気以外のクラフティングスロットを Coordinate に変換し リストに入れて返す.  
 全てのクラフティングスロットにアイテムが配置されていない場合は空の List<Coordinate> を返す
 
 ### getSquareSize(List<Coordinate> list) | int
