@@ -197,4 +197,71 @@ inventory に含まれる空気以外のクラフティングスロットを Coo
 全てのクラフティングスロットにアイテムが配置されていない場合は空の List<Coordinate> を返す
 
 ### getSquareSize(List<Coordinate> list) | int
-list から正方サイズを取得する
+list から正方サイズを取得する  
+
+# Listener  
+## CloseCraftingTable
+### onInventoryClose(InventoryCloseEvent event) | void
+プレイヤーがカスタムクラフターの画面を閉じた際に呼び出される  
+カスタムクラフターの画面を開いているプレイヤーのリストである `opening` から，対象のプレイヤーを削除する.  
+
+### close(Player player, Inventory inventory) | void
+カスタムクラフターの画面にアイテムが残っている場合，プレイヤーの座標にそれらをドロップする.  
+
+## ModifyCraftingInventory
+### onInventoryClick(InventoryClickEvent event) | void
+カスタムクラフターの画面を開いているプレイヤーが，インベントリ内のアイテムを移動させた時に呼び出される.  
+左右クリック，シフト押しながらの左右クリック以外の操作をした場合はイベントをキャンセルして処理を終了する.  
+  
+- 作成スロット(スロットNo.35)をクリックしたとき，成果物スロット(スロットNo.44)のアイテムをプレイヤーの座標にドロップした後にクリックタイプ別の処理を行う.
+  - 左クリックをしたとき，Search#main を呼び出す  
+  - 右クリックをしたとき，Search#massSearch を呼び出す
+
+- 成果物スロットをクリックしたとき，そのスロットにアイテムが存在している場合はそのアイテムをプレイヤーの座標にドロップする.  
+  
+### getMinimalAmount(Inventory inventory) | int
+渡された inventory のクラフティングスロットに存在するアイテムのうち，最も少ないアイテムの個数を返す.  
+クラフティングスロットにアイテムが配置されていない場合, -1 を返す.  
+
+## OpenCraftingTable
+### onPlayerInteract(PlayerInteractEvent event) | void
+プレイヤーが作業台をクリックした際に呼び出される.  
+作業台の1マス下, 作業台を中心として 3*3 の範囲に存在するブロック全てがコンフィグの `baseBlock` で指定されたブロックと一致する場合，2 tick 後にカスタムクラフターの画面をプレイヤーに表示する.  
+### setCraftingInventory() | void
+クラフティングスロット外であることを示す黒ガラス，作成スロットに配置される金床をカスタムクラフターの画面に配置する.  
+作成した画面は onPlayerInteract で呼び出される.  
+SettingsLoad から呼び出される.  
+
+# Data Loader
+## SettingsLoad
+### load() | void
+デフォルトコンフィグを取得して main() を呼び出す.  
+
+### getAllMaterialsName() | void
+Material の全アイテムのアイテム名を文字列にしてリストに入れる.  
+
+### main() | void
+`baseBlock`, `results`, `matters`, `recipes` からそれぞれの設定ファイルを保存しているディレクトリを取得し，Matter, Result, Recipe を取得するメソッドを呼び出す.  
+
+### configFileFirectoryCheck(Path path) | void
+引数で与えられた path がディレクトリであるかを調べる．  
+path が存在しない場合はディレクトリを作成する.  
+path がファイルである場合は警告文をコンソールに出力して，プラグインをアンロードする．  
+
+### getFiles(Path path) | List<Path>
+path に含まれる全てのファイルを取得する
+
+### getBaseBlock(List<Path> paths) | void
+paths から作業台の下に設置しなくてはいけないブロックの名前を取得する.
+
+### getResult(List<Path> paths) | void
+paths から情報を読み取り， Result を作成する.  
+
+### getMatter(List<Path> paths) | void
+paths から情報を読み取り， Matter を作成する.  
+
+### getCandidateFromRegex(String regexpattern) | List<Material>
+regexPattern にマッチする Material をリストに入れて返す.  
+
+### getRecipe(List<Path> paths) | void
+paths から Recipe を作成する.  
