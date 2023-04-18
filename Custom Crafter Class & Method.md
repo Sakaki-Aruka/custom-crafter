@@ -178,6 +178,8 @@ reals を平行移動した場合 models に重なるかどうかを返す.
 inventory から Recipe を作成する.  
 アイテムが配置されていないスロットは Candidate に Material＃AIR のみを持ち個数が0である Matter に変換される.  
 
+--- 
+
 ## VanillaSearch (Methods)
 ### main(Player player, Inventory inventory, boolean batchBool) | void
 inventory に含まれるアイテムを長さ9の ItemStack の配列に入れ，それを Bukkit#craftItem へ渡し成果物を得て， player が開いているカスタムクラフターの成果物スロット，もしくは player の座標にドロップする.    
@@ -199,6 +201,8 @@ inventory に含まれる空気以外のクラフティングスロットを Coo
 ### getSquareSize(List \<Coordinate> list) | int
 list から正方サイズを取得する  
 
+---
+
 # Listener  
 ## CloseCraftingTable
 ### onInventoryClose(InventoryCloseEvent event) | void
@@ -207,6 +211,8 @@ list から正方サイズを取得する
 
 ### close(Player player, Inventory inventory) | void
 カスタムクラフターの画面にアイテムが残っている場合，プレイヤーの座標にそれらをドロップする.  
+
+---
 
 ## ModifyCraftingInventory
 ### onInventoryClick(InventoryClickEvent event) | void
@@ -223,6 +229,8 @@ list から正方サイズを取得する
 渡された inventory のクラフティングスロットに存在するアイテムのうち，最も少ないアイテムの個数を返す.  
 クラフティングスロットにアイテムが配置されていない場合, -1 を返す.  
 
+---
+
 ## OpenCraftingTable
 ### onPlayerInteract(PlayerInteractEvent event) | void
 プレイヤーが作業台をクリックした際に呼び出される.  
@@ -231,6 +239,8 @@ list から正方サイズを取得する
 クラフティングスロット外であることを示す黒ガラス，作成スロットに配置される金床をカスタムクラフターの画面に配置する.  
 作成した画面は onPlayerInteract で呼び出される.  
 SettingsLoad から呼び出される.  
+
+---
 
 # Data Loader
 ## SettingsLoad
@@ -265,3 +275,36 @@ regexPattern にマッチする Material をリストに入れて返す.
 
 ### getRecipe(List \<Path> paths) | void
 paths から Recipe を作成する.  
+
+---
+
+# Util
+## InventoryUtil
+### getTableSlots(int size) | List \<Integer>
+入力された大きさを一辺の大きさとするカスタムクラフターのクラフティングスロットの番号をリストにして返す.  
+
+### getBlankCoordinates(int size) | List \<Integer>
+カスタムクラフターのクラフト画面における黒ガラス板のスロット番号をリストにして返す.  
+
+### decrementMaterials(Inventory inventory, Player player, int amount) | void
+inventory のクラフト画面から amount で指定された量だけアイテムを減らす.
+
+### decrementResult(Inventory inventory, Player player) | void
+inventory の成果物スロットから指定された量だけアイテムを減らす.  
+
+### returnItems(Recipe recipe, Inventory inventory, int removeAmount) | void
+recipe に returnItems が設定されている場合、inventory から減らした量だけ対応するアイテムを player の座標にドロップする.  
+
+---
+
+## EnchantUtil
+### getTargetMaterialMatters(Recipe recipe, Material target) | List \<Matter>
+target を Candidate に含む Matter を　recipe から取得しリストにして返す.  
+recipe に target を含む Matter が存在しない場合には空のリストを返す.  
+
+### getTargetEnchantMatters(Recipe recipe, Enchantment target) | List \<Matter>
+recipe が持つ Matter から target で指定されたエンチャントを EnchantWrap に持つものをリストに入れて返す.
+
+### containsFromDoubleList(List \<List\<EnchantWrap>> list, Matter matter) | boolean
+ダミーデータを作成して Search#getEnchantWrapCongruence に処理を渡し、 list と matter が持つ EnchantWrap の整合性を取得する.  
+Search#main, Search#massSearch の amorphous レシピの処理において呼び出される.
