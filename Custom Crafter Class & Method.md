@@ -3,18 +3,18 @@ Custom Crafter Class & Method
 # Data Class
 ## Matter 
 ### Constructor
-- Matter(String name, List<Material> candidate, List<EnchantWrap> wrap, int amount, boolean mass)
+- Matter(String name, List \<Material> candidate, List \<EnchantWrap> wrap, int amount, boolean mass)
 
-- Matter(List<Material> candidate, int amount)
+- Matter(List \<Material> candidate, int amount)
 
 ### Methods
 - getter(name, candidate, wrap, amount, mass)
 - setter(name, candidate, wrap, amount, mass)
 ---
-- addCandidate(List<Material> add) | void : Candidate のリストに Material を追加する
+- addCandidate(List \<Material> add) | void : Candidate のリストに Material を追加する
 - hasWrap() | boolean : EnchantWrap のリストの中身が1つ以上あるか返す
 - addWrap(EnchantWrap wrap) | void : EnchantWrap のリストに引数で与えられた EnchantWrap を加える
-- addAllWrap(List<EnchantWrap> add) | void : 渡されたリストの中身すべてを EnchantWrap のリストに加える
+- addAllWrap(List \<EnchantWrap> add) | void : 渡されたリストの中身すべてを EnchantWrap のリストに加える
 - isMass() | boolean : この Matter が，mass = true かどうかを返す
 - getEnchantLevel(Enchantment enchant) | int : 引数に与えられたエンチャントが EnchantWrap のリストに含まれる場合はそのレベルを，含まれていない場合は -1 を返す
 - getAllWrapInfo() | String : EnchantWrap のリストの情報を文字列にして返す．EnchantWrap のリストが isEmpty である場合は，空文字列を返す
@@ -24,7 +24,7 @@ Custom Crafter Class & Method
 
 ## Result
 ### Constructor
-- Result(String name, Map<Enchantment, Integer> enchantsInfo, int amount, Map<MetadataType, List<String>> metadata, String nameOrRegex, int matchPoint)
+- Result(String name, Map \<Enchantment, Integer> enchantsInfo, int amount, Map \<MetadataType, List \<String>> metadata, String nameOrRegex, int matchPoint)
 
 ### Methods
 - getter(name, enchantsInfo, amount, metadata, nameOrRegex, matchPoint)
@@ -34,7 +34,7 @@ Custom Crafter Class & Method
 
 ## Recipe
 ### Constructor
-- Recipe(String name, String tag, Map<Coordinate, Matter> coordinate, Map<Material, ItemStack> returnItems, Result result)
+- Recipe(String name, String tag, Map \<Coordinate, Matter> coordinate, Map \<Material, ItemStack> returnItems, Result result)
 
 - Recipe()
 
@@ -42,13 +42,13 @@ Custom Crafter Class & Method
 - getter(name, tag, coordinate, returnItems, result)
 - setter(name, tag, coordinate, returnItems, result)
 ---
-- addCoordinate(int x, int y, Matter matter) | void : 引数の x, y からCoordinate を生成し，Map<Coordinate, Matter> に加える
-- getContentsNoAir() | List<Matter> : candidate が Material.AIR のみである Matter を覗いた coordinate の中身を返す
-- getCoordinateList() | List<Coordinate> : Map<Coordinate, Matter> の鍵だけを返す
-- getContentsNoDuplicate() | List<Matter> : Map<Coordinate, Matter> から重複なしの Matter を入れたリストを返す.
-- getContentsNoDuplicateRelateAmount() | Map<Matter, Integer> : getContentsNoDuplicate() で返されるリストの要素それぞれに個数を関係づけた Map を返す.
-- getMassMaterialSet() | Set<Material> : mass = true である Matter の candidate を Set に入れて返す．mass = true である Matter が存在しない場合は 初期状態の Set を返す
-- getMatterFromCoordinate(Coordinate c) | Matter : Map<Coordinate, Matter> の中で引数として与えられた Coordinate に関連付けられた Matter を返す．引数に関連付けられたMatter が存在しない場合は Null を返す
+- addCoordinate(int x, int y, Matter matter) | void : 引数の x, y からCoordinate を生成し，Map \<Coordinate, Matter> に加える
+- getContentsNoAir() | List \<Matter> : candidate が Material.AIR のみである Matter を覗いた coordinate の中身を返す
+- getCoordinateList() | List \<Coordinate> : Map \<Coordinate, Matter> の鍵だけを返す
+- getContentsNoDuplicate() | List \<Matter> : Map \<Coordinate, Matter> から重複なしの Matter を入れたリストを返す.
+- getContentsNoDuplicateRelateAmount() | Map \<Matter, Integer> : getContentsNoDuplicate() で返されるリストの要素それぞれに個数を関係づけた Map を返す.
+- getMassMaterialSet() | Set \<Material> : mass = true である Matter の candidate を Set に入れて返す．mass = true である Matter が存在しない場合は 初期状態の Set を返す
+- getMatterFromCoordinate(Coordinate c) | Matter : Map \<Coordinate, Matter> の中で引数として与えられた Coordinate に関連付けられた Matter を返す．引数に関連付けられたMatter が存在しない場合は Null を返す
 
 ## EnchantWrap
 ### Constructor
@@ -129,9 +129,9 @@ recipe に含まれるすべての Matter が持つ candidate に input が持�
 input に含まれる Matter のうち，mass = true でないもののうち最も少ないアイテム個数を返す.  
 input に含まれる全ての Matter がmass = true である場合は -1 を返す.  
 
-### getAllCandidateNoDuplicate(Recipe recipe) | Set<Material>
+### getAllCandidateNoDuplicate(Recipe recipe) | Set \<Material>
 recipe が持つ Matter の Candidate を重複なしの Set にして返す.  
-全ての Matter が空気である Recipe を引数に与えた場合は，空の Set<Material> を返す.  
+全ての Matter が空気である Recipe を引数に与えた場合は，空の Set \<Material> を返す.  
 
 ### setResultItem(Inventory inventory, Recipe recipe, Recipe input, Player player, int amount) | void
 recipe に含まれた成果物作成し inventory の成果物スロット，もしくは player の座標にドロップする.  
@@ -139,9 +139,9 @@ recipe に含まれた成果物作成し inventory の成果物スロット，�
 ### setMetaData(ItemStack item, Result result) | void
 result に含まれる成果物のメタデータを item に付与する.  
 
-### getContainsMaterials(Recipe input) | List<Material>
+### getContainsMaterials(Recipe input) | List \<Material>
 input に含まれる全ての Matter が持つ Candidate を重複なしのリストにして返す.  
-空の Recipe を引数に取った場合，空の List<Material> を返す.
+空の Recipe を引数に取った場合，空の List \<Material> を返す.
 
 ### isSameMatter(Matter recipe, Matter input) | boolean
 input が持つ情報と recipe が持つ情報が等しいものであるかを返す.  
@@ -154,14 +154,14 @@ EnchantUtil#containsFromDoubleListを呼び出す.
 ### getEnchantWrapCongruence(Matter recipe, Matter input) | boolean
 recipe と input が持つエンチャント情報が等しいものであるかどうかを返す.
 
-### getEnchantmentList(List<EnchantWrap> wrap) | List<Enchantment> 
+### getEnchantmentList(List \<EnchantWrap> wrap) | List \<Enchantment> 
 wrap に含まれる全ての Enchantment をリストにして返す.
 
-### getEnchantWrap(ItemStack item) | List<EnchantWrap>
+### getEnchantWrap(ItemStack item) | List \<EnchantWrap>
 item が持つエンチャント情報を EnchantWrap のリストにして返す.  
 item がエンチャントを含まない場合は Null を返す.
 
-### getCoordinateNoAir(Recipe recipe) | List<Coordinate>
+### getCoordinateNoAir(Recipe recipe) | List \<Coordinate>
 recipe が持つすべての配置の情報をリストにして返す.
 
 ### getTotal(Recipe recipe) | int
@@ -171,7 +171,7 @@ recipe に含まれる全ての Matter の個数を合計を返す.
 ### getSquareSize(Recipe recipe) | int
 アイテムが配置されている範囲を正方形で取得した際の一辺の長さを返す.
 
-### isSameShape(List<Coordinate> models, List<Coordinate> reals) | boolean
+### isSameShape(List \<Coordinate> models, List \<Coordinate> reals) | boolean
 reals を平行移動した場合 models に重なるかどうかを返す.
 
 ### toRecipe(Inventory inventory) | Recipe
@@ -192,11 +192,11 @@ items に空気以外のアイテムが含まれていない場合は -1 を返�
 inventory の中から start が持つ座標を始点とする 3*3 の正方形のスロットのアイテムを，長さ9 の ItemStack の配列に入れる.  
 start を始点とする 3*3 の範囲がカスタムクラフターのクラフト画面の範囲を飛び出る場合は，対象のスロットのアイテムを `ItemStack item = new Itemstack(Material.AIR);` とする
 
-### getCoordinateList(Inventory inventory) | List<Coordinate>
+### getCoordinateList(Inventory inventory) | List \<Coordinate>
 inventory に含まれる空気以外のクラフティングスロットを Coordinate に変換し リストに入れて返す.  
-全てのクラフティングスロットにアイテムが配置されていない場合は空の List<Coordinate> を返す
+全てのクラフティングスロットにアイテムが配置されていない場合は空の List \<Coordinate> を返す
 
-### getSquareSize(List<Coordinate> list) | int
+### getSquareSize(List \<Coordinate> list) | int
 list から正方サイズを取得する  
 
 # Listener  
@@ -248,20 +248,20 @@ Material の全アイテムのアイテム名を文字列にしてリストに�
 path が存在しない場合はディレクトリを作成する.  
 path がファイルである場合は警告文をコンソールに出力して，プラグインをアンロードする．  
 
-### getFiles(Path path) | List<Path>
+### getFiles(Path path) | List \<Path>
 path に含まれる全てのファイルを取得する
 
-### getBaseBlock(List<Path> paths) | void
+### getBaseBlock(List \<Path> paths) | void
 paths から作業台の下に設置しなくてはいけないブロックの名前を取得する.
 
-### getResult(List<Path> paths) | void
+### getResult(List \<Path> paths) | void
 paths から情報を読み取り， Result を作成する.  
 
-### getMatter(List<Path> paths) | void
+### getMatter(List \<Path> paths) | void
 paths から情報を読み取り， Matter を作成する.  
 
-### getCandidateFromRegex(String regexpattern) | List<Material>
+### getCandidateFromRegex(String regexpattern) | List \<Material>
 regexPattern にマッチする Material をリストに入れて返す.  
 
-### getRecipe(List<Path> paths) | void
+### getRecipe(List \<Path> paths) | void
 paths から Recipe を作成する.  
