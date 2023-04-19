@@ -189,3 +189,24 @@ returns:
 3. 返却するアイテムの個数
 
 の順番で記述してください。また、それはカンマで区切ってください。
+
+---
+
+- override : coordinate で使う Matter の名前を書き換える
+
+Matter の名前があまりにも長い場合，coordinate セクションでの呼び出し名を変更することが出来ます.  
+ただし，変更した呼び出し名を異なる設定ファイル間で共有することは出来ません.
+
+
+設定例
+```yaml
+override :
+  - a_part_of_gryffindor_sword_knife_blade_first,f
+  - a_part_of_gryffindor_sword_knife_blade_second,s
+  - a_part_of_gryffindor_sword_grip,g
+
+coordinate :
+  - null,f,null
+  - null,s,null
+  - null,g,null
+```
