@@ -1,4 +1,13 @@
 # custom crafter
+# 概要
+custom crafter は，既存のアイテムに新しいレシピを追加，カスタムアイテムにレシピを設定することが出来る Spigot 向けプラグインです．  
+使用するには `config.yml` 以外にも yaml ファイルを作成する必要があり，それらファイルを格納しておくためのディレクトリも必要とします.  
+
+本プラグインは MIT ライセンスのもとに配布されます.  
+ライセンス本文は LICENSE.txt に記されています.  
+
+不具合などありましたら，[製作者のTwitter](https://twitter.com/yt0f1), もしくは Discord (ytshiyugh #5820) までご連絡ください.  
+
 # コンフィグファイルの書き方
 ## "config.yml" の書き方
 ### 設定ファイルのパスを指定する
@@ -45,6 +54,7 @@ name: stone
 amount: 1
 mass: false
 candidate: [stone,cobblestone]
+
 ```
 ### オプション設定
 candidate セクションに正規表現を使うことが出来ます。  
@@ -55,6 +65,26 @@ candidate セクションに正規表現を使うことが出来ます。
 candidate: ["R|([a-zA-Z_]{1,20})_CONCRETE_POWDER"]
 ```
 上記の正規表現は各色のコンクリートパウダーを示しています。
+
+---
+enchantセクション  
+#### 記入方法
+この素材に必要とされるエンチャント情報のリスト (リスト形式 | string)  
+要求エンチャント名, 要求レベル, 要求厳格性  の順に，カンマ区切りで記入してください.
+
+- 要求エンチャント名 : [Spigot JavaDoc Enchantment](https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/enchantments/Enchantment.html) を参考に記入してください.
+- 要求レベル名 : 1 ~ 255 の範囲で記入してください.
+- 要求厳格性 : NotStrict, OnlyEnchant, Strict のいずれかから選んで記入してください.
+  - NotStrict : この厳格性が設定されているエンチャントは，素材に付与されていなくても合同であると判断します.
+  - OnlyEnchant : この厳格性が設定されているエンチャントは，素材にこのエンチャントが付与されていればエンチャントレベルが一致しない場合でも合同であると判断します.
+  - Strict : この厳格性が設定されているエンチャントは，素材にこのエンチャントが付与されていて，なおかつエンチャントレベルが一致している場合のみ合同であると判断します.
+
+設定例
+```yaml
+enchant :
+   - luck,2,strict
+```
+上記の例はレベル2の luck (luck_of_the_sea | 宝釣り) を素材に要求しています.
 
 ## 成果物(Result)の設定について
 必須事項
