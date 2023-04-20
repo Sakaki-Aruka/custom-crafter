@@ -19,8 +19,8 @@ custom crafter は，既存のアイテムに新しいレシピを追加，カ�
 設定例　(デフォルトで設定済み)
 ```yaml
 baseBlock: "plugins/Custom_Crafter/baseBlock"
-result: "plugins/Custom_Crafter/result"
-matter: "plugins/Custom_Crafter/matter"
+results: "plugins/Custom_Crafter/result"
+matters: "plugins/Custom_Crafter/matter"
 recipes: "plugins/Custom_Crafter/recipe"
 ```
 
