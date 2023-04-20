@@ -17,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
+import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -77,7 +78,6 @@ public class SettingsLoad {
         results.clear();
         matters.clear();
         failed.clear();
-        downloadUri.clear();
 
         Path baseBlockPath = Paths.get(defaultConfig.getString("baseBlock"));
         Path resultPath = Paths.get(defaultConfig.getString("results"));
@@ -249,7 +249,7 @@ public class SettingsLoad {
     }
 
     private void getMatter(List<Path> paths){
-        for(Path path:paths){
+        Top : for(Path path:paths){
             FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
             String name = config.getString("name");
             int amount = config.getInt("amount");
@@ -263,6 +263,23 @@ public class SettingsLoad {
                     System.out.println(String.format("string : %s | pattern : %s",s,pattern));
 
                     candidate.addAll(getCandidateFromRegex(pattern));
+                }else if (s.equalsIgnoreCase("enchanted_book")){
+                    // enchanted book
+                    if(!candidate.isEmpty()){
+                        //invalid pattern (candidate over only one)
+                        Bukkit.getLogger().info("[Custom Crafter] Matter load fail. - Candidate Quarrel -");
+                        continue Top;
+                    }
+
+                    if(!config.contains("enchant") || config.getStringList("enchant").isEmpty()){
+                        // invalid pattern (enchantments not contained -> identity lost)
+                        Bukkit.getLogger().info("[Custom Crafter] Matter load fail. - Identity Lost -");
+                        continue Top;
+                    }
+
+                    candidate.add(Material.ENCHANTED_BOOK);
+                    break;
+
                 }else{
                     candidate.add(Material.getMaterial(s.toUpperCase()));
                 }
