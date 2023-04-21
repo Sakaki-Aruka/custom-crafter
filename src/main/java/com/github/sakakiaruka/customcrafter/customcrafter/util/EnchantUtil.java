@@ -13,9 +13,6 @@ import java.util.List;
 
 public class EnchantUtil {
 
-//    public boolean isWrapContains(List<List<EnchantWrap>> in){
-//        //
-//    }
 
     public List<Matter> getTargetMaterialMatters(Recipe recipe, Material target){
         // only for recipe

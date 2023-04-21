@@ -36,10 +36,6 @@ public class Search {
         Recipe input = toRecipe(inventory);
         Recipe:for(Recipe recipe : recipes){
 
-//            //debug
-//            recipe.getContentsNoAir().forEach(s->System.out.println(s.info()));
-//            input.getContentsNoAir().forEach(s->System.out.println(s.info()));
-
             if(recipe.getTag().equals(Tag.NORMAL)){
 
                 //debug
@@ -73,7 +69,6 @@ public class Search {
 
                 int inputTotal = 0;
                 Map<Material,Integer> relation = new HashMap<>();
-                //TODO fix here
 
                 for(Matter matter : input.getContentsNoAir()){
                     Material material = matter.getCandidate().get(0);
@@ -89,10 +84,6 @@ public class Search {
                 int virtualTotal = 0;
                 Map<Material,Integer> virtual = new HashMap<>();
 
-//                //debug
-//                recipe.getContentsNoAir().forEach(s->{
-//                    System.out.println(String.format("matter : %s",s.info()));
-//                });
 
                 for(Matter matter : recipe.getContentsNoAir()){
                     final boolean mass = matter.isMass();
@@ -317,9 +308,6 @@ public class Search {
             // not contains -> A result has written by regex pattern.
             List<String> list = Arrays.asList(recipe.getResult().getNameOrRegex().split("@"));
 
-            //debug
-//            System.out.println(String.format("list : %s",list));
-
             String p = list.get(0);
             String replaced = list.get(1);
             Pattern pattern = Pattern.compile(p);
@@ -328,15 +316,8 @@ public class Search {
                 String name = m.name();
                 Matcher matcher = pattern.matcher(name);
 
-//                //debug
-//                System.out.println(String.format("replaced : %s | name : %s | matcher : %b | point : %d",replaced,name,matcher.find(),recipe.getResult().getMatchPoint()));
-
                 //if(!matcher.find())continue;
                 int point = recipe.getResult().getMatchPoint();
-
-//                //debug
-//                System.out.println("point : "+point);
-//                System.out.println("materials : "+materials);
 
                 if(!matcher.find(0))continue;
 
@@ -346,16 +327,12 @@ public class Search {
             }
             Collections.sort(materials);
 
-//            //debug
-//            System.out.println(String.format("materials : %s",materials));
 
             Material material = Material.valueOf(materials.get(0).toUpperCase());
             item = new ItemStack(material,amount);
             setMetaData(item,recipe.getResult());
         }
 
-//        //debug
-//        System.out.println(String.format("material : %s | amount : %d",item.getType().name(),item.getAmount()));
         if(item == null)return;
         if(item.getType().equals(Material.AIR))return;
 
@@ -400,9 +377,6 @@ public class Search {
              *
              */
 
-//            //debug
-//            System.out.println(String.format("key : %s | value : %s | value size : %d",e.getKey(),e.getValue(),e.getValue().size()));
-
             MetadataType type = e.getKey();
             List<String> content = e.getValue();
 
@@ -415,9 +389,6 @@ public class Search {
                     int level = Integer.valueOf(l.get(1));
                     meta.addEnchant(enchant,level,true);
                 }
-
-//                //debug
-//                System.out.println(String.format("map type : %s",meta.getEnchants().getClass().getSimpleName()));
 
             }
             if(type.equals(MetadataType.ITEMFLAG)) content.forEach(s->meta.addItemFlags(ItemFlag.valueOf(s.toUpperCase())));
@@ -440,10 +411,6 @@ public class Search {
 
 
     public boolean isSameMatter(Matter recipe,Matter input){
-
-//        //debug
-//        System.out.println(String.format("candidate : %b | amount : %d & %d | wrap : %b",recipe.getCandidate().containsAll(input.getCandidate()),recipe.getAmount(),input.getAmount(),getEnchantWrapCongruence(recipe,input)));
-
         if(!recipe.getCandidate().containsAll(input.getCandidate()))return false;
         if(recipe.getAmount() != input.getAmount())return false;
         if(!getEnchantWrapCongruence(recipe,input))return false;
@@ -462,17 +429,17 @@ public class Search {
         }
 
         //if(inputVirtual.isEmpty())return false;
-        //debug
-        System.out.println("=");
-        System.out.println(String.format("inputVirtual : %s",inputVirtual));
-        inputVirtual.entrySet().forEach(s->{
-            System.out.println("==");
-            System.out.println(String.format("key material : %s",s.getKey().name()));
-            s.getValue().forEach(t->{
-                System.out.println("===");
-                t.forEach(u->System.out.println(String.format("u loop : %s",u.info())));
-            });
-        });
+//        //debug
+//        System.out.println("=");
+//        System.out.println(String.format("inputVirtual : %s",inputVirtual));
+//        inputVirtual.entrySet().forEach(s->{
+//            System.out.println("==");
+//            System.out.println(String.format("key material : %s",s.getKey().name()));
+//            s.getValue().forEach(t->{
+//                System.out.println("===");
+//                t.forEach(u->System.out.println(String.format("u loop : %s",u.info())));
+//            });
+//        });
 
         // collation with a recipe
         for(Matter matter : recipe.getContentsNoAir()){
@@ -484,7 +451,6 @@ public class Search {
                 if(inputVirtual.get(material).isEmpty())continue;
                 List<List<EnchantWrap>> list = inputVirtual.get(material);
                 if(!new EnchantUtil().containsFromDoubleList(list,matter))continue;
-                //TODO : Write here
 
                 //debug
                 System.out.println(String.format("inputV : %s | list : %s | congruence : %b",inputVirtual,list,new EnchantUtil().containsFromDoubleList(list,matter)));
@@ -501,13 +467,6 @@ public class Search {
     }
 
     public boolean getEnchantWrapCongruence(Matter recipe,Matter input){
-
-//        //debug
-//        if(recipe.hasWrap())recipe.getWrap().forEach(s->System.out.println(s.info()));
-//        else System.out.println("recipe has not EnchantWrap");
-//        System.out.println("recipe ↑ --- input ↓");
-//        if(input.hasWrap())input.getWrap().forEach(s->System.out.println(s.info()));
-//        else System.out.println("input has not EnchantWrap");
 
         if(recipe.getCandidate().get(0).equals(Material.ENCHANTED_BOOK)){
             if(!input.getCandidate().get(0).equals(Material.ENCHANTED_BOOK)) return false;
@@ -550,9 +509,6 @@ public class Search {
             int level = entry.getValue();
             EnchantWrap wrap = new EnchantWrap(level,enchant,strict);
             list.add(wrap);
-
-            //debug
-            System.out.println("enchant info -> "+wrap.info());
 
         }
         return list;
