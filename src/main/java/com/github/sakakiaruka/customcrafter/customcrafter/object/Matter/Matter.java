@@ -2,9 +2,12 @@ package com.github.sakakiaruka.customcrafter.customcrafter.object.Matter;
 
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 public class Matter {
     private String name;
@@ -26,6 +29,32 @@ public class Matter {
         this.wrap = null;
         this.amount = amount;
         this.mass = false;
+    }
+
+    public Matter(Matter matter){
+        this.name = matter.getName();
+        this.candidate = matter.getCandidate();
+        this.wrap = matter.hasWrap() ? matter.getWrap() : null;
+        this.amount = matter.getAmount();
+        this.mass = matter.isMass();
+    }
+
+    public Matter(ItemStack item){
+        this.name = "";
+        this.candidate = Arrays.asList(item.getType());
+        if(item.getItemMeta().hasEnchants()){
+            List<EnchantWrap> list = new ArrayList<>();
+            for(Map.Entry<Enchantment,Integer> entry : item.getItemMeta().getEnchants().entrySet()){
+                int level = entry.getValue();
+                Enchantment enchant = entry.getKey();
+                EnchantStrict strict = EnchantStrict.INPUT;
+                EnchantWrap wrap = new EnchantWrap(level,enchant,strict);
+                list.add(wrap);
+            }
+            this.wrap = list;
+        }
+        this.mass = false;
+        this.amount = item.getAmount();
     }
 
     public String getName() {
