@@ -1,5 +1,7 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.command;
 
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.PotionStrict;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.Potions;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -38,6 +40,8 @@ public class PotionCheck {
         }
 
         Bukkit.getLogger().info(String.format("potion type : %s",pMeta.getBasePotionData().getType()));
+
+        System.out.println(new Potions(item, PotionStrict.INPUT).PotionInfo());
 
     }
 }
