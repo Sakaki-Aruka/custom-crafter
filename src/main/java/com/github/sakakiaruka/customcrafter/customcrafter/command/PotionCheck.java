@@ -23,15 +23,15 @@ public class PotionCheck {
         ItemMeta meta = item.getItemMeta();
         PotionMeta pMeta = (PotionMeta)meta;
         Bukkit.getLogger().info(pMeta.toString());
-        if(pMeta.getBasePotionData().isUpgraded()){
-            Bukkit.getLogger().info("This potion is upgraded.");
-        }
-        if(pMeta.getBasePotionData().isExtended()){
-            Bukkit.getLogger().info("This potion is extended.");
-        }
-        if(pMeta.getBasePotionData().getType().isInstant()){
-            Bukkit.getLogger().info("This potion is instant.");
-        }
+//        if(pMeta.getBasePotionData().isUpgraded()){
+//            Bukkit.getLogger().info("This potion is upgraded.");
+//        }
+//        if(pMeta.getBasePotionData().isExtended()){
+//            Bukkit.getLogger().info("This potion is extended.");
+//        }
+//        if(pMeta.getBasePotionData().getType().isInstant()){
+//            Bukkit.getLogger().info("This potion is instant.");
+//        }
         if(pMeta.hasCustomEffects()){
             Bukkit.getLogger().info("This potion has Custom Effects.");
             for(PotionEffect effect : pMeta.getCustomEffects()){
