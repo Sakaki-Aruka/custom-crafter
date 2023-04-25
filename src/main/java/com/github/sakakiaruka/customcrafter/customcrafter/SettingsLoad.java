@@ -324,7 +324,8 @@ public class SettingsLoad {
 
             //PotionData collect
             if(config.contains("potion") && config.contains("bottleTypeMatch")){
-                matters.put(name,makeDrug(matter,config));
+                Potions potions = makeDrug(matter,config);
+                if(potions != null) matters.put(name,potions);
                 continue;
             }
 
@@ -337,6 +338,10 @@ public class SettingsLoad {
         Map<PotionEffect, PotionStrict> map = new HashMap<>();
         for(String str : config.getStringList("potion")){
             List<String> list = Arrays.asList(str.split(","));
+            if(list.size() != 4) {
+                System.out.println("[Custom Crafter] Potion Configuration Parameter are not enough.");
+                return null;
+            }
             PotionEffectType effectType = PotionEffectType.getByName(list.get(0).toUpperCase());
             int duration = Integer.valueOf(list.get(1));
             int amplifier = Integer.valueOf(list.get(2));
