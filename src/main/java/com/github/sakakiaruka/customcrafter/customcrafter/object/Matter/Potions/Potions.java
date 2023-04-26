@@ -2,6 +2,7 @@ package com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions
 
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.PotionUtil;
+import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
@@ -34,8 +35,18 @@ public class Potions extends Matter{
             }
         }
         PotionData baseData = meta.getBasePotionData();
-        if(!baseData.getType().equals(PotionType.WATER)){
-            int duration = new PotionUtil().getDuration(baseData.getType().getEffectType().getName(), baseData.isUpgraded(), baseData.isExtended());
+        PotionUtil util = new PotionUtil();
+        if(meta.getBasePotionData().getType().equals(PotionType.TURTLE_MASTER)){
+            int duration = util.getDuration("turtle_master",baseData.isUpgraded(),baseData.isExtended(),util.getBottleType(item.getType()));
+            int slowLevel = baseData.isUpgraded() ? 6 : 4;
+            int resistanceLevel = baseData.isUpgraded() ? 4 : 3;
+            PotionEffect slow = new PotionEffect(PotionEffectType.SLOW,duration,slowLevel);
+            PotionEffect resistance = new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,duration,resistanceLevel);
+            map.put(slow,strict);
+            map.put(resistance,strict);
+
+        } else if(!baseData.getType().equals(PotionType.WATER)){
+            int duration = util.getDuration(baseData.getType().getEffectType().getName(), baseData.isUpgraded(), baseData.isExtended(),util.getBottleType(item.getType()));
             int level = baseData.isUpgraded() ? baseData.getType().getMaxLevel() : 1;
             PotionEffect effect = new PotionEffect(baseData.getType().getEffectType(),duration,level);
             map.put(effect,strict);

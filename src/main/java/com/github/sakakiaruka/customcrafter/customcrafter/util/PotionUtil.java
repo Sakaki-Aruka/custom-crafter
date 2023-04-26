@@ -6,13 +6,20 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.PotionStrict;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.Potions;
 import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.Map;
 
 public class PotionUtil {
-    public int getDuration(String key,boolean upgraded,boolean extended){
+    // this string key is "PotionEffectType" 's name
+    public int getDuration(String key,boolean upgraded,boolean extended,PotionBottleType bottleType){
+        if(bottleType.equals(PotionBottleType.LINGERING)){
+            StringBuilder builder = new StringBuilder("LINGERING_");
+            builder.append(key);
+            key = builder.toString();
+        }
         for(PotionDuration pd : PotionDuration.values()){
             if(!pd.toString().equalsIgnoreCase(key)) continue;
             if(upgraded) return pd.getUpgraded();
@@ -29,13 +36,23 @@ public class PotionUtil {
         return null;
     }
 
+    public boolean isPotion(Material material){
+        for(PotionBottleType type : PotionBottleType.values()){
+            if(type.getRelated().equals(material)) return true;
+        }
+        return false;
+    }
 
-    public boolean isSamePotion(Matter recipe, Matter input){
-        Potions r = (Potions) recipe;
-        Potions i = (Potions) input;
+
+    public boolean isSamePotion(Potions recipe, Potions input){
+        Potions r = recipe;
+        Potions i = input;
         if(r.isBottleTypeMatch()){
             if(!r.getBottle().equals(i.getBottle())) return false;
         }
+
+        //debug
+        System.out.println(String.format("recipe : %s\ninput : %s",r.getData().keySet(),i.getData().keySet()));
 
         for(Map.Entry<PotionEffect, PotionStrict> entry : r.getData().entrySet()){
 

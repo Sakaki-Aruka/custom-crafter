@@ -56,7 +56,7 @@ public class SettingsLoad {
     // === for data get methods === //
     private static FileConfiguration defaultConfig;
     private static Map<String,Result> results = new HashMap<>();
-    private static Map<String, Matter> matters = new HashMap<>();
+    public static Map<String, Matter> matters = new HashMap<>();
 
     // === for runnable task === //
     private List<String> downloadUri;
@@ -326,6 +326,10 @@ public class SettingsLoad {
             if(config.contains("potion") && config.contains("bottleTypeMatch")){
                 Potions potions = makeDrug(matter,config);
                 if(potions != null) matters.put(name,potions);
+
+                //debug
+                System.out.println("SettingsLoad Potion : \n"+potions.PotionInfo());
+
                 continue;
             }
 
@@ -344,7 +348,7 @@ public class SettingsLoad {
             }
             PotionEffectType effectType = PotionEffectType.getByName(list.get(0).toUpperCase());
             int duration = Integer.valueOf(list.get(1));
-            int amplifier = Integer.valueOf(list.get(2));
+            int amplifier = Integer.valueOf(list.get(2));//-1 < 0 ? 0 : Integer.valueOf(list.get(2)) -1;
             PotionEffect effect = new PotionEffect(effectType,duration,amplifier);
             PotionStrict strict = PotionStrict.valueOf(list.get(3).toUpperCase());
             map.put(effect,strict);
