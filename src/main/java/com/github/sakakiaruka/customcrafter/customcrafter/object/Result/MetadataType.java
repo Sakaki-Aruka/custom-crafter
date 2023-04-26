@@ -7,5 +7,6 @@ public enum MetadataType {
     ITEMFLAG,
     UNBREAKABLE,
     CUSTOMMODELDATA,
-    POTIONDATA;
+    POTIONDATA,
+    POTIONCOLOR;
 }

@@ -173,6 +173,18 @@ nameOrRegex セクションに正規表現を用いる場合は、「素材の�
 - ItemFlag : 付与したいアイテムフラグ (string)
 - Unbreakable : 耐久無限 (true | false)
 
+---
+以下の項目は `nameOrRegex` に `Potion`,`SplashPotion`,`LingeringPotion` を設定している場合のみ有効になります.  
+上記のアイテム以外を設定している場合はエラーを吐きます.
+- PotionData : エフェクト名, ポーションの効果時間, ポーション効果のレベル (PotionEffectType, int, int)
+  - ポーションの効果時間は tick で指定してください. (1s = 20ticks)
+
+- PotionColor : ポーションに指定する色のRGB (int, int, int) 
+
+> [Enchantment](https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/enchantments/Enchantment.html)  
+> [ItemFlag](https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/inventory/ItemFlag.html)  
+> [PotionEffectType](https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/potion/PotionEffectType.html)
+
 「項目名,データ」の形式で記述してください。  
 また、２つ以上のデータを記述しなくてはいけない場合はカンマで区切ってください。
 
@@ -186,6 +198,8 @@ metadata:
   - "customModelData,1"
   - "itemFlag,hide_enchants"
   - "unbreakable,true"
+  - "potionData,jump,100,2"
+  - "potionColor,255,255,255"
 ```
 ---
 ## レシピ(Recipe)の設定について

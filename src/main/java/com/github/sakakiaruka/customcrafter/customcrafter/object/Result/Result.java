@@ -1,6 +1,7 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.object.Result;
 
 import com.github.sakakiaruka.customcrafter.customcrafter.util.PotionUtil;
+import org.bukkit.Color;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -9,6 +10,7 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -92,6 +94,7 @@ public class Result {
             * unbreakable -> "bool"
             * customModelData -> "modelNumber"
             * potionData -> "PotionEffectType, duration, amplifier(level)". These are separated with ",".
+            * potionColor -> "red, green, blue"
             *
              */
 
@@ -123,6 +126,18 @@ public class Result {
                     PotionMeta potionMeta = (PotionMeta)  meta;
                     potionMeta.addCustomEffect(effect,true);
                 }
+            }
+            if(type.equals(MetadataType.POTIONCOLOR)) {
+                List<Color> colorList = new ArrayList<>();
+                for(String s : content){
+                    List<String> colors = Arrays.asList(s.split(","));
+                    int r = Integer.valueOf(colors.get(0));
+                    int g = Integer.valueOf(colors.get(1));
+                    int b = Integer.valueOf(colors.get(2));
+                    colorList.add(Color.fromRGB(r,g,b));
+                }
+                PotionMeta potionMeta = (PotionMeta) item.getItemMeta();
+                potionMeta.setColor(colorList.get(0));
             }
             item.setItemMeta(meta);
         }

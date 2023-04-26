@@ -237,7 +237,7 @@ public class SettingsLoad {
                 for(String s:config.getStringList("metadata")){
                     /*
                     * 0,1
-                    * 0 : key (String | lore, displayName, enchantment (deprecated), itemFlag, customModelData
+                    * 0 : key (String | lore, displayName, enchantment (deprecated), itemFlag, customModelData, potionData, potionColor
                     * 1 : value (Object | List<String>, String, Enchantment & int, boolean, int
                      */
                     List<String> list = Arrays.asList(s.split(","));
