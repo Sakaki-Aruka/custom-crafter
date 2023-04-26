@@ -8,8 +8,6 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordinate;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Tag;
-import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.MetadataType;
-import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.Result;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.EnchantUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.InventoryUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.PotionUtil;
@@ -17,10 +15,8 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -425,7 +421,14 @@ public class Search {
 
         if(recipe.getCandidate().get(0).equals(Material.ENCHANTED_BOOK)){
             if(!input.getCandidate().get(0).equals(Material.ENCHANTED_BOOK)) return false;
-            //TODO : write here (enchanted book checker)
+
+            for(EnchantWrap wrap : recipe.getWrap()){
+                if(wrap.getStrict().equals(EnchantStrict.NOTSTRICT)) continue;
+                if(!input.contains(wrap.getEnchant())) return false;
+                if(wrap.getStrict().equals(EnchantStrict.ONLYENCHANT)) continue;
+                if(wrap.getLevel() != input.getEnchantLevel(wrap.getEnchant())) return false;
+            }
+            return true;
         }
 
         if(!input.hasWrap() && recipe.hasWrap())return false;

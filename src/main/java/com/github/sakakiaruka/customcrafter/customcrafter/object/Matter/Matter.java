@@ -3,6 +3,7 @@ package com.github.sakakiaruka.customcrafter.customcrafter.object.Matter;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,9 +43,20 @@ public class Matter {
     public Matter(ItemStack item){
         this.name = "";
         this.candidate = Arrays.asList(item.getType());
-        if(item.getItemMeta().hasEnchants()){
+        if(item.getItemMeta().hasEnchants() && !candidate.get(0).equals(Material.ENCHANTED_BOOK)){
             List<EnchantWrap> list = new ArrayList<>();
             for(Map.Entry<Enchantment,Integer> entry : item.getItemMeta().getEnchants().entrySet()){
+                int level = entry.getValue();
+                Enchantment enchant = entry.getKey();
+                EnchantStrict strict = EnchantStrict.INPUT;
+                EnchantWrap wrap = new EnchantWrap(level,enchant,strict);
+                list.add(wrap);
+            }
+            this.wrap = list;
+        }else{
+            // enchanted book
+            List<EnchantWrap> list = new ArrayList<>();
+            for(Map.Entry<Enchantment,Integer> entry : ((EnchantmentStorageMeta)item.getItemMeta()).getStoredEnchants().entrySet()){
                 int level = entry.getValue();
                 Enchantment enchant = entry.getKey();
                 EnchantStrict strict = EnchantStrict.INPUT;
@@ -128,6 +140,14 @@ public class Matter {
         StringBuilder builder = new StringBuilder();
         getWrap().forEach(s->builder.append(s.info()+"\n"));
         return builder.toString();
+    }
+
+    public boolean contains(Enchantment enchantment){
+        if(!hasWrap()) return false;
+        for(EnchantWrap w : wrap){
+            if(w.getEnchant().equals(enchantment)) return true;
+        }
+        return false;
     }
 
     public String info(){
