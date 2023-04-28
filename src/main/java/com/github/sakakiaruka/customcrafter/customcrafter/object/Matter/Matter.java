@@ -53,7 +53,7 @@ public class Matter {
                 list.add(wrap);
             }
             this.wrap = list;
-        }else{
+        }else if(item.getItemMeta().hasEnchants()){
             // enchanted book
             List<EnchantWrap> list = new ArrayList<>();
             for(Map.Entry<Enchantment,Integer> entry : ((EnchantmentStorageMeta)item.getItemMeta()).getStoredEnchants().entrySet()){

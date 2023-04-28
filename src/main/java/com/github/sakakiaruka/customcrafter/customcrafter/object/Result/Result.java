@@ -128,16 +128,15 @@ public class Result {
                 }
             }
             if(type.equals(MetadataType.POTIONCOLOR)) {
-                List<Color> colorList = new ArrayList<>();
                 for(String s : content){
                     List<String> colors = Arrays.asList(s.split(","));
                     int r = Integer.valueOf(colors.get(0));
                     int g = Integer.valueOf(colors.get(1));
                     int b = Integer.valueOf(colors.get(2));
-                    colorList.add(Color.fromRGB(r,g,b));
+
+                    PotionMeta potionMeta = (PotionMeta)meta;
+                    potionMeta.setColor(Color.fromRGB(r,g,b));
                 }
-                PotionMeta potionMeta = (PotionMeta) item.getItemMeta();
-                potionMeta.setColor(colorList.get(0));
             }
             item.setItemMeta(meta);
         }
