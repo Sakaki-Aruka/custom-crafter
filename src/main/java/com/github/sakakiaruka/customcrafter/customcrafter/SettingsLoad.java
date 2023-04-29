@@ -415,11 +415,42 @@ public class SettingsLoad {
                     for(int x=0;x<size;x++){
                         Coordinate coordinate = new Coordinate(x,y);
 
-                        Matter matter = list.get(x).equalsIgnoreCase("null")
-                                ? new Matter(Arrays.asList(Material.AIR),0)
-                                : matters.containsKey(list.get(x))
-                                    ? matters.get(list.get(x))
-                                    : matters.get(overrides.get(list.get(x)));
+//                        Matter matter = list.get(x).equalsIgnoreCase("null")
+//                                ? new Matter(Arrays.asList(Material.AIR),0)
+//                                : matters.containsKey(list.get(x))
+//                                    ? matters.get(list.get(x))
+//                                    : matters.get(overrides.get(list.get(x)));
+
+                        /*
+                        * collect matter example
+                        * "cobblestone" -> this is a normal ItemID and the parameter 'mass' is not true.
+                        * "m-cobblestone" -> this is a normal ItemID and the parameter 'mass' is true.
+                        * "modified_cobblestone" -> this is not a normal ItemID. Have to search from 'matters'.
+                         */
+
+                        String matterName = list.get(x);
+                        Matter matter;
+                        if(matterName.equalsIgnoreCase("null")){
+                            // null
+                            matter = new Matter(Arrays.asList(Material.AIR),0);
+                        }else if(matters.containsKey(matterName)){
+                            // 'matterName' contains 'matters'
+                            matter = matters.get(matterName);
+                        }else if(overrides.containsKey(matterName) && matters.containsKey(overrides.get(matterName))){
+                            // replaced the shorted name and contains 'matters'
+                            matter = matters.get(overrides.get(matterName));
+                        }else if(allMaterials.contains(matterName.toUpperCase())){
+                            // normal material-name
+                            matter = new Matter(Arrays.asList(Material.valueOf(matterName.toUpperCase())),1);
+                        }else if(matterName.startsWith("m-")){
+                            // normal material-name and 'mass = true'
+                            matterName = matterName.replace("m-","").toUpperCase();
+                            matter = new Matter(Arrays.asList(Material.valueOf(matterName)),1,true);
+                        }else {
+                            // replaced to the shorter name (normal material-name)
+                            Material material = Material.valueOf(overrides.get(matterName).toUpperCase());
+                            matter = new Matter(Arrays.asList(material),1);
+                        }
 
                         coordinates.put(coordinate,matter);
                     }
