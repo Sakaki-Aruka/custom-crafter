@@ -85,14 +85,18 @@ public class SettingsLoad {
         failed.clear();
 
         Path baseBlockPath = Paths.get(defaultConfig.getString("baseBlock"));
-        Path resultPath = Paths.get(defaultConfig.getString("results"));
-        Path matterPath = Paths.get(defaultConfig.getString("matters"));
-        Path recipePath = Paths.get(defaultConfig.getString("recipes"));
+
+        List<Path> resultPaths = new ArrayList<>();
+        List<Path> matterPaths = new ArrayList<>();
+        List<Path> recipePaths = new ArrayList<>();
+        defaultConfig.getStringList("results").forEach(s->resultPaths.add(Paths.get(s)));
+        defaultConfig.getStringList("matters").forEach(s->matterPaths.add(Paths.get(s)));
+        defaultConfig.getStringList("recipes").forEach(s->recipePaths.add(Paths.get(s)));
 
         configFileDirectoryCheck(baseBlockPath);
-        configFileDirectoryCheck(resultPath);
-        configFileDirectoryCheck(matterPath);
-        configFileDirectoryCheck(recipePath);
+        resultPaths.forEach(p->configFileDirectoryCheck(p));
+        matterPaths.forEach(p->configFileDirectoryCheck(p));
+        recipePaths.forEach(p->configFileDirectoryCheck(p));
 
 
         // --- bukkit runnable --- //
@@ -122,9 +126,9 @@ public class SettingsLoad {
             public void run() {
                 // get data from each files
                 getBaseBlock(getFiles(baseBlockPath));
-                getResult(getFiles(resultPath));
-                getMatter(getFiles(matterPath));
-                getRecipe(getFiles(recipePath));
+                resultPaths.forEach(p->getResult(getFiles(p)));
+                matterPaths.forEach(p->getMatter(getFiles(p)));
+                recipePaths.forEach(p->getRecipe(getFiles(p)));
 
                 Bukkit.getLogger().info("===Custom-Crafter data loaded.===");
             }

@@ -13,8 +13,8 @@ custom crafter は，既存のアイテムに新しいレシピを追加，カ�
 基本的に `/cc レシピ名` の形で利用します.  
 
 ---
-OP権限を持つプレイヤーのみ，上記のコマンドに加えて `/cc reload` を利用することが出来ます.  
-`/cc reload` を実行すると，
+OP権限を持つプレイヤーのみ，上記のコマンドに加えて `/cc -reload` を利用することが出来ます.  
+`/cc -reload` を実行すると，
 - 開かれているすべてのカスタムクラフターの画面を閉じる
 - `baseBlock`, `matters`, `results`, `recipes` のファイルを再読み込みして展開する
 - プレイヤーにプラグインをリロードしたことを伝える  
@@ -46,17 +46,25 @@ OP権限を持つプレイヤーのみ，上記のコマンドに加えて `/cc 
 # コンフィグファイルの書き方
 ## "config.yml" の書き方
 ### 設定ファイルのパスを指定する
-- baseBlock : 作業台の下に設置する3*3 のブロック名
-- results : 成果物の設定ファイルを置いたディレクトリ
-- matters : クラフト素材の設定ファイルを置いたディレクトリ
-- recipes : レシピの設定ファイルを置いたディレクトリ
+- baseBlock : 作業台の下に設置する3\*3 のブロック名
+- results : 成果物の設定ファイルを置いたディレクトリ (リスト)
+- matters : クラフト素材の設定ファイルを置いたディレクトリ (リスト)
+- recipes : レシピの設定ファイルを置いたディレクトリ (リスト)
+  
+
+`baseBlock` 以外の項目はリスト形式で記述してください  
+コンフィグファイルを配置したディレクトリが各項目につき1つである場合も、リスト形式にしてください。
 
 設定例　(デフォルトで設定済み)
 ```yaml
-baseBlock: "plugins/Custom_Crafter/baseBlock"
-results: "plugins/Custom_Crafter/result"
-matters: "plugins/Custom_Crafter/matter"
-recipes: "plugins/Custom_Crafter/recipe"
+baseBlock: 
+  - "plugins/Custom_Crafter/baseBlock"
+results: 
+  - "plugins/Custom_Crafter/result"
+matters: 
+  - "plugins/Custom_Crafter/matter"
+recipes: 
+  - "plugins/Custom_Crafter/recipe"
 ```
 ---
 ### 設定ファイルに関する情報  
@@ -212,7 +220,7 @@ metadata:
 1. tag について、決められた配置を必要とするレシピでは normal 、不定形レシピでは amorphous としてください。
 2. result については、Result を設定したファイルの name セクションに書いたものと同じ内容を記述してください。
 3.
-   - coordinate については、normal の場合は 1 * 1 から 6 * 6 の正方形で、複数行のリストにして記述してください。
+   - coordinate については、normal の場合は 1\*1 から 6\*6 の正方形で、複数行のリストにして記述してください。
    - amorphous の場合は一行のリストに全ての素材を記述してください。
    - (記述する名前は Matter を設定したファイルの name セクションに書いたものと同じ内容を記述してください)
    - normal の場合、アイテムを必要としない箇所には "null" と記述してください。amorphous の場合には null を記述しないでください。
@@ -239,12 +247,12 @@ coordinate: [stone,stone]
 - returns : 指定のアイテムに対して返却するアイテム
 
 クラフト時に指定したアイテムに対して任意のアイテムを返却することが出来ます。  
-(例：水バケツに対してからのバケツを返却)
+(例：水バケツに対して空のバケツを返却)
 
 設定例
 ```yaml
 returns: 
-  - stone,cobblestone,3
+  - water_bucket,bucket,1
 ```
 
 1. 指定するアイテム名

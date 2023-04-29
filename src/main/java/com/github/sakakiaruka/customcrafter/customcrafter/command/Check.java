@@ -29,7 +29,7 @@ public class Check implements CommandExecutor {
         if(args.length == 0){
             recipes.forEach(s->System.out.println(getGraphicalRecipe(s.getName())));
         }
-        else if(args[0].equalsIgnoreCase("reload")) {
+        else if(args[0].equalsIgnoreCase("-reload")) {
             if(!sender.isOp())return false;
             reload();
         }
