@@ -85,7 +85,7 @@ public class Result {
         ItemMeta meta = item.getItemMeta();
         for(Map.Entry<MetadataType,List<String>> entry : metadata.entrySet()){
             /*
-            * kind of metadata -> lore, displayName, enchantment, itemFlag, unbreakable, customModelData, PotionData
+            * kind of metadata -> lore, displayName, enchantment, itemFlag, unbreakable, customModelData, PotionData, PotionColor
             *
             * lore -> split with ","
             * displayName -> used directly itemName
@@ -94,7 +94,7 @@ public class Result {
             * unbreakable -> "bool"
             * customModelData -> "modelNumber"
             * potionData -> "PotionEffectType, duration, amplifier(level)". These are separated with ",".
-            * potionColor -> "red, green, blue"
+            * potionColor -> "red, green, blue" (RGB)
             *
              */
 

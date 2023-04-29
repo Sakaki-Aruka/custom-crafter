@@ -33,15 +33,6 @@ public class PotionCheck {
         ItemMeta meta = item.getItemMeta();
         PotionMeta pMeta = (PotionMeta)meta;
         Bukkit.getLogger().info(pMeta.toString());
-//        if(pMeta.getBasePotionData().isUpgraded()){
-//            Bukkit.getLogger().info("This potion is upgraded.");
-//        }
-//        if(pMeta.getBasePotionData().isExtended()){
-//            Bukkit.getLogger().info("This potion is extended.");
-//        }
-//        if(pMeta.getBasePotionData().getType().isInstant()){
-//            Bukkit.getLogger().info("This potion is instant.");
-//        }
         if(pMeta.hasCustomEffects()){
             Bukkit.getLogger().info("This potion has Custom Effects.");
             for(PotionEffect effect : pMeta.getCustomEffects()){
@@ -50,22 +41,6 @@ public class PotionCheck {
         }
 
         Bukkit.getLogger().info(String.format("potion type : %s",pMeta.getBasePotionData().getType()));
-
-        System.out.println(new Potions(item, PotionStrict.INPUT).PotionInfo());
-        Potions target;
-        if(matters.get("potion").getClass().equals(Potions.class)){
-            target = (Potions) matters.get("potion");
-            System.out.println(String.format("is same : %b",new PotionUtil().isSamePotion(target,new Potions(item,PotionStrict.INPUT))));
-        }
-
-
-
-//        try{
-//            Matter leftHand = matters.get("potion");
-//            System.out.println(String.format("is same : %b",new PotionUtil().isSamePotion(new Matter(item),leftHand)));
-//        }catch (Exception e){
-//            System.out.println("failed to check.");
-//        }
-
+        System.out.println(String.format("potion : %s",new Potions(item,PotionStrict.INPUT).PotionInfo()));
     }
 }

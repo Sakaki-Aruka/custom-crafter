@@ -1,8 +1,11 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions;
 
+import com.github.sakakiaruka.customcrafter.customcrafter.interfaces.Matters;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantWrap;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.PotionUtil;
 import org.bukkit.Material;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionData;
@@ -11,9 +14,10 @@ import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-public class Potions extends Matter{
+public class Potions extends Matter implements Matters {
     private Map<PotionEffect,PotionStrict> data;
     private PotionBottleType bottle;
     private boolean bottleTypeMatch;
@@ -45,11 +49,15 @@ public class Potions extends Matter{
             map.put(slow,strict);
             map.put(resistance,strict);
 
-        } else if(!baseData.getType().equals(PotionType.WATER)){
+        } else if(!baseData.getType().equals(PotionType.WATER) && !baseData.getType().equals(PotionType.UNCRAFTABLE)){
             int duration = util.getDuration(baseData.getType().getEffectType().getName(), baseData.isUpgraded(), baseData.isExtended(),util.getBottleType(item.getType()));
             int level = baseData.isUpgraded() ? baseData.getType().getMaxLevel() : 1;
             PotionEffect effect = new PotionEffect(baseData.getType().getEffectType(),duration,level);
             map.put(effect,strict);
+        } else {
+            for(PotionEffect effect : meta.getCustomEffects()){
+                map.put(effect,strict);
+            }
         }
         data = map;
         bottle = new PotionUtil().getBottleType(item.getType());
@@ -117,5 +125,77 @@ public class Potions extends Matter{
         }
 
         return -1;
+    }
+
+    public String getName(){
+        return super.getName();
+    }
+
+    public void setName(String name){
+        super.setName(name);
+    }
+
+    public List<Material> getCandidate(){
+        return super.getCandidate();
+    }
+
+    public void setCandidate(List<Material> candidate){
+        super.setCandidate(candidate);
+    }
+
+    public void addCandidate(List<Material> additional){
+        super.addCandidate(additional);
+    }
+
+    public List<EnchantWrap> getWrap(){
+        return super.getWrap();
+    }
+
+    public void setWrap(List<EnchantWrap> wrap){
+        super.setWrap(wrap);
+    }
+
+    public boolean hasWrap(){
+        return super.hasWrap();
+    }
+
+    public void addWrap(EnchantWrap in){
+        super.addWrap(in);
+    }
+
+    public void addAllWrap(List<EnchantWrap> in){
+        super.addAllWrap(in);
+    }
+
+    public int getAmount(){
+        return super.getAmount();
+    }
+
+    public void setAmount(int amount){
+        super.setAmount(amount);
+    }
+
+    public boolean isMass(){
+        return super.isMass();
+    }
+
+    public void setMass(boolean mass){
+        super.setMass(mass);
+    }
+
+    public int getEnchantLevel(Enchantment enchantment){
+        return super.getEnchantLevel(enchantment);
+    }
+
+    public String getAllWrapInfo(){
+        return super.getAllWrapInfo();
+    }
+
+    public boolean contains(Enchantment enchantment){
+        return super.contains(enchantment);
+    }
+
+    public String info(){
+        return super.info();
     }
 }

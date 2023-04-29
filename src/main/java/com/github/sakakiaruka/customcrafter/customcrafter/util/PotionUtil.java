@@ -51,16 +51,15 @@ public class PotionUtil {
             if(!r.getBottle().equals(i.getBottle())) return false;
         }
 
-        //debug
-        System.out.println(String.format("recipe : %s\ninput : %s",r.getData().keySet(),i.getData().keySet()));
-
         for(Map.Entry<PotionEffect, PotionStrict> entry : r.getData().entrySet()){
 
             PotionEffectType effectType = entry.getKey().getType();
 
-            if(!i.hasPotionEffect(entry.getKey().getType())){
-                if(!entry.getValue().equals(PotionStrict.NOT_STRICT)) return false;
+            if(entry.getValue().equals(PotionStrict.NOT_STRICT)){
+                continue;
             }
+
+            if(!i.hasPotionEffect(entry.getKey().getType())) return false;
 
             if(entry.getValue().equals(PotionStrict.ONLY_DURATION)){
                 if(entry.getKey().getDuration() != i.getDuration(effectType)) return false;

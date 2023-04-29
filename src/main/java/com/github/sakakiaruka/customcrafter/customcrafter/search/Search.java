@@ -535,7 +535,7 @@ public class Search {
                 Matter matter = toMatter(inventory,i);
                 if(inventory.getItem(i) == null)continue;
                 if(inventory.getItem(i).getItemMeta().hasEnchants()) {
-                    matter.setWarp(getEnchantWrap(inventory.getItem(i))); //set enchantments information
+                    matter.setWrap(getEnchantWrap(inventory.getItem(i))); //set enchantments information
                 }
                 // enchanted_book pattern
                 if(inventory.getItem(i).getType().equals(Material.ENCHANTED_BOOK)){

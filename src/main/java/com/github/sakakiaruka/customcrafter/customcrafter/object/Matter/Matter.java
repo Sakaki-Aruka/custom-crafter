@@ -1,5 +1,6 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.object.Matter;
 
+import com.github.sakakiaruka.customcrafter.customcrafter.interfaces.Matters;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
@@ -10,7 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-public class Matter {
+public class Matter implements Matters {
     private String name;
     private List<Material> candidate;
     private List<EnchantWrap> wrap;
@@ -44,6 +45,7 @@ public class Matter {
         this.name = "";
         this.candidate = Arrays.asList(item.getType());
         if(item.getItemMeta().hasEnchants() && !candidate.get(0).equals(Material.ENCHANTED_BOOK)){
+            // an enchanted item (not an Enchanted_book)
             List<EnchantWrap> list = new ArrayList<>();
             for(Map.Entry<Enchantment,Integer> entry : item.getItemMeta().getEnchants().entrySet()){
                 int level = entry.getValue();
@@ -53,7 +55,7 @@ public class Matter {
                 list.add(wrap);
             }
             this.wrap = list;
-        }else if(item.getItemMeta().hasEnchants()){
+        }else if(candidate.get(0).equals(Material.ENCHANTED_BOOK)){
             // enchanted book
             List<EnchantWrap> list = new ArrayList<>();
             for(Map.Entry<Enchantment,Integer> entry : ((EnchantmentStorageMeta)item.getItemMeta()).getStoredEnchants().entrySet()){
@@ -93,8 +95,8 @@ public class Matter {
         return wrap;
     }
 
-    public void setWarp(List<EnchantWrap> warp) {
-        this.wrap = warp;
+    public void setWrap(List<EnchantWrap> wrap) {
+        this.wrap = wrap;
     }
 
     public boolean hasWrap(){
