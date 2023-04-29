@@ -4,20 +4,25 @@ import com.github.sakakiaruka.customcrafter.customcrafter.listener.OpenCraftingT
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantStrict;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantWrap;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.PotionBottleType;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.PotionStrict;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.Potions;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordinate;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.MetadataType;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.Result;
+import com.github.sakakiaruka.customcrafter.customcrafter.util.PotionUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
-import java.lang.reflect.Array;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -51,7 +56,7 @@ public class SettingsLoad {
     // === for data get methods === //
     private static FileConfiguration defaultConfig;
     private static Map<String,Result> results = new HashMap<>();
-    private static Map<String, Matter> matters = new HashMap<>();
+    public static Map<String, Matter> matters = new HashMap<>();
 
     // === for runnable task === //
     private List<String> downloadUri;
@@ -232,7 +237,7 @@ public class SettingsLoad {
                 for(String s:config.getStringList("metadata")){
                     /*
                     * 0,1
-                    * 0 : key (String | lore, displayName, enchantment (deprecated), itemFlag, customModelData
+                    * 0 : key (String | lore, displayName, enchantment (deprecated), itemFlag, customModelData, potionData, potionColor
                     * 1 : value (Object | List<String>, String, Enchantment & int, boolean, int
                      */
                     List<String> list = Arrays.asList(s.split(","));
@@ -316,8 +321,45 @@ public class SettingsLoad {
             if(wrapList.isEmpty())wrapList = null;
 
             Matter matter = new Matter(name,candidate,wrapList,amount,mass);
+
+            //PotionData collect
+            if(config.contains("potion") && config.contains("bottleTypeMatch")){
+                Potions potions = makeDrug(matter,config);
+                if(potions != null) matters.put(name,potions);
+
+                //debug
+                System.out.println("SettingsLoad Potion : \n"+potions.PotionInfo());
+
+                continue;
+            }
+
             matters.put(name,matter);
         }
+    }
+
+    private Potions makeDrug(Matter matter, FileConfiguration config){
+        // - PotionEffectType, duration, amplifier, strict
+        Map<PotionEffect, PotionStrict> map = new HashMap<>();
+        for(String str : config.getStringList("potion")){
+            List<String> list = Arrays.asList(str.split(","));
+            if(list.size() != 4) {
+                System.out.println("[Custom Crafter] Potion Configuration Parameter are not enough.");
+                return null;
+            }
+            PotionEffectType effectType = PotionEffectType.getByName(list.get(0).toUpperCase());
+            int duration = Integer.valueOf(list.get(1));
+            int amplifier = Integer.valueOf(list.get(2));//-1 < 0 ? 0 : Integer.valueOf(list.get(2)) -1;
+            PotionEffect effect = new PotionEffect(effectType,duration,amplifier);
+            PotionStrict strict = PotionStrict.valueOf(list.get(3).toUpperCase());
+            map.put(effect,strict);
+        }
+
+        PotionBottleType bottleType = new PotionUtil().getBottleType(matter.getCandidate().get(0));
+        boolean bottleTypeMatch = config.getBoolean("bottleTypeMatch");
+
+        Potions potions = new Potions(matter,map,bottleType,bottleTypeMatch);
+        return potions;
+
     }
 
     private List<Material> getCandidateFromRegex(String regexPattern){

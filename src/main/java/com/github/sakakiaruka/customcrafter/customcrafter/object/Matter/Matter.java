@@ -1,12 +1,17 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.object.Matter;
 
+import com.github.sakakiaruka.customcrafter.customcrafter.interfaces.Matters;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
-public class Matter {
+public class Matter implements Matters {
     private String name;
     private List<Material> candidate;
     private List<EnchantWrap> wrap;
@@ -26,6 +31,44 @@ public class Matter {
         this.wrap = null;
         this.amount = amount;
         this.mass = false;
+    }
+
+    public Matter(Matter matter){
+        this.name = matter.getName();
+        this.candidate = matter.getCandidate();
+        this.wrap = matter.hasWrap() ? matter.getWrap() : null;
+        this.amount = matter.getAmount();
+        this.mass = matter.isMass();
+    }
+
+    public Matter(ItemStack item){
+        this.name = "";
+        this.candidate = Arrays.asList(item.getType());
+        if(item.getItemMeta().hasEnchants() && !candidate.get(0).equals(Material.ENCHANTED_BOOK)){
+            // an enchanted item (not an Enchanted_book)
+            List<EnchantWrap> list = new ArrayList<>();
+            for(Map.Entry<Enchantment,Integer> entry : item.getItemMeta().getEnchants().entrySet()){
+                int level = entry.getValue();
+                Enchantment enchant = entry.getKey();
+                EnchantStrict strict = EnchantStrict.INPUT;
+                EnchantWrap wrap = new EnchantWrap(level,enchant,strict);
+                list.add(wrap);
+            }
+            this.wrap = list;
+        }else if(candidate.get(0).equals(Material.ENCHANTED_BOOK)){
+            // enchanted book
+            List<EnchantWrap> list = new ArrayList<>();
+            for(Map.Entry<Enchantment,Integer> entry : ((EnchantmentStorageMeta)item.getItemMeta()).getStoredEnchants().entrySet()){
+                int level = entry.getValue();
+                Enchantment enchant = entry.getKey();
+                EnchantStrict strict = EnchantStrict.INPUT;
+                EnchantWrap wrap = new EnchantWrap(level,enchant,strict);
+                list.add(wrap);
+            }
+            this.wrap = list;
+        }
+        this.mass = false;
+        this.amount = item.getAmount();
     }
 
     public String getName() {
@@ -52,8 +95,8 @@ public class Matter {
         return wrap;
     }
 
-    public void setWarp(List<EnchantWrap> warp) {
-        this.wrap = warp;
+    public void setWrap(List<EnchantWrap> wrap) {
+        this.wrap = wrap;
     }
 
     public boolean hasWrap(){
@@ -99,6 +142,14 @@ public class Matter {
         StringBuilder builder = new StringBuilder();
         getWrap().forEach(s->builder.append(s.info()+"\n"));
         return builder.toString();
+    }
+
+    public boolean contains(Enchantment enchantment){
+        if(!hasWrap()) return false;
+        for(EnchantWrap w : wrap){
+            if(w.getEnchant().equals(enchantment)) return true;
+        }
+        return false;
     }
 
     public String info(){

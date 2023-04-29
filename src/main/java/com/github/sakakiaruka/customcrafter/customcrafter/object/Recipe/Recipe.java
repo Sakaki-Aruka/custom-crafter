@@ -7,8 +7,6 @@ import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
 
-import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.craftingTableSize;
-
 public class Recipe {
     private String name;
     private Tag tag;

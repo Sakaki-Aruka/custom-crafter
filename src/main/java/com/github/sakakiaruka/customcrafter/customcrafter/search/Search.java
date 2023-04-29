@@ -3,21 +3,20 @@ package com.github.sakakiaruka.customcrafter.customcrafter.search;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantStrict;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantWrap;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.PotionStrict;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.Potions;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordinate;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Tag;
-import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.MetadataType;
-import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.Result;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.EnchantUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.InventoryUtil;
+import com.github.sakakiaruka.customcrafter.customcrafter.util.PotionUtil;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -51,6 +50,9 @@ public class Search {
                 if(recipeMatters.size() != inputMatters.size())continue;
                 for(int i=0;i<recipeMatters.size();i++){
                     if(!isSameMatter(recipeMatters.get(i),inputMatters.get(i)))continue Recipe;
+                    if(!recipeMatters.get(i).getClass().equals(Potions.class) && !inputMatters.get(i).getClass().equals(Potions.class)) continue;
+                    if(!new PotionUtil().isSamePotion((Potions) recipeMatters.get(i),(Potions) inputMatters.get(i)))continue Recipe;
+
                 }
 
                 amount = recipe.getResult().getAmount();
@@ -303,7 +305,8 @@ public class Search {
             // result has defined material
             Material m = Material.valueOf(recipe.getResult().getNameOrRegex().toUpperCase());
             item = new ItemStack(m,amount);
-            setMetaData(item,recipe.getResult()); //set result itemStack's metadata
+            recipe.getResult().setMetaData(item);
+            //setMetaData(item,recipe.getResult()); //set result itemStack's metadata
         }else{
             // not contains -> A result has written by regex pattern.
             List<String> list = Arrays.asList(recipe.getResult().getNameOrRegex().split("@"));
@@ -330,7 +333,8 @@ public class Search {
 
             Material material = Material.valueOf(materials.get(0).toUpperCase());
             item = new ItemStack(material,amount);
-            setMetaData(item,recipe.getResult());
+            recipe.getResult().setMetaData(item);
+            //setMetaData(item,recipe.getResult());
         }
 
         if(item == null)return;
@@ -356,47 +360,6 @@ public class Search {
 
     }
 
-    private void setMetaData(ItemStack item,Result result){
-        Map<MetadataType,List<String>> metadata = result.getMetadata();
-
-        //debug
-        System.out.println(String.format("metadata : %s",metadata == null ? "null" : metadata));
-
-        if(metadata == null || metadata.isEmpty())return;
-        ItemMeta meta = item.getItemMeta();
-        for(Map.Entry<MetadataType,List<String>> e:metadata.entrySet()){
-            //metadata set
-            // metadata -> lore, displayName, enchantment, itemFlag, unbreakable, customModelData
-            /*
-             * lore -> split ",".
-             * displayName -> used directly itemName
-             * enchantment -> a split with enchantment with level is ":", a split with other is ",".
-             * itemFlag -> split ","
-             * unbreakable -> "true" (or "false")
-             * customModelData -> "customModelData:(modelNumber)"
-             *
-             */
-
-            MetadataType type = e.getKey();
-            List<String> content = e.getValue();
-
-            if(type.equals(MetadataType.LORE))meta.setLore(content);
-            if(type.equals(MetadataType.DISPLAYNAME))meta.setDisplayName(content.get(0));
-            if(type.equals(MetadataType.ENCHANTMENT)){
-                for(String s:content){
-                    List<String> l = Arrays.asList(s.split(","));
-                    Enchantment enchant = Enchantment.getByName(l.get(0).toUpperCase());
-                    int level = Integer.valueOf(l.get(1));
-                    meta.addEnchant(enchant,level,true);
-                }
-
-            }
-            if(type.equals(MetadataType.ITEMFLAG)) content.forEach(s->meta.addItemFlags(ItemFlag.valueOf(s.toUpperCase())));
-            if(type.equals(MetadataType.UNBREAKABLE))meta.setUnbreakable(Boolean.valueOf(content.get(0)));
-            if(type.equals(MetadataType.CUSTOMMODELDATA))meta.setCustomModelData(Integer.valueOf(content.get(0)));
-        }
-        item.setItemMeta(meta);
-    }
 
     private List<Material> getContainsMaterials(Recipe input){
         Set<Material> set = new HashSet<>();
@@ -428,18 +391,6 @@ public class Search {
             inputVirtual.get(material).add(wrap);
         }
 
-        //if(inputVirtual.isEmpty())return false;
-//        //debug
-//        System.out.println("=");
-//        System.out.println(String.format("inputVirtual : %s",inputVirtual));
-//        inputVirtual.entrySet().forEach(s->{
-//            System.out.println("==");
-//            System.out.println(String.format("key material : %s",s.getKey().name()));
-//            s.getValue().forEach(t->{
-//                System.out.println("===");
-//                t.forEach(u->System.out.println(String.format("u loop : %s",u.info())));
-//            });
-//        });
 
         // collation with a recipe
         for(Matter matter : recipe.getContentsNoAir()){
@@ -470,7 +421,14 @@ public class Search {
 
         if(recipe.getCandidate().get(0).equals(Material.ENCHANTED_BOOK)){
             if(!input.getCandidate().get(0).equals(Material.ENCHANTED_BOOK)) return false;
-            //TODO : write here (enchanted book checker)
+
+            for(EnchantWrap wrap : recipe.getWrap()){
+                if(wrap.getStrict().equals(EnchantStrict.NOTSTRICT)) continue;
+                if(!input.contains(wrap.getEnchant())) return false;
+                if(wrap.getStrict().equals(EnchantStrict.ONLYENCHANT)) continue;
+                if(wrap.getLevel() != input.getEnchantLevel(wrap.getEnchant())) return false;
+            }
+            return true;
         }
 
         if(!input.hasWrap() && recipe.hasWrap())return false;
@@ -574,12 +532,10 @@ public class Search {
         for(int y=0;y<craftingTableSize;y++){
             for(int x=0;x<craftingTableSize;x++){
                 int i = x+y*9;
-                Matter matter = inventory.getItem(i)==null
-                        ? new Matter(Arrays.asList(Material.AIR),0)
-                        : new Matter(Arrays.asList(inventory.getItem(i).getType()),inventory.getItem(i).getAmount());
+                Matter matter = toMatter(inventory,i);
                 if(inventory.getItem(i) == null)continue;
                 if(inventory.getItem(i).getItemMeta().hasEnchants()) {
-                    matter.setWarp(getEnchantWrap(inventory.getItem(i))); //set enchantments information
+                    matter.setWrap(getEnchantWrap(inventory.getItem(i))); //set enchantments information
                 }
                 // enchanted_book pattern
                 if(inventory.getItem(i).getType().equals(Material.ENCHANTED_BOOK)){
@@ -597,6 +553,18 @@ public class Search {
             }
         }
         return recipe;
+    }
+
+    private Matter toMatter(Inventory inventory,int slot){
+        Matter matter;
+        if(inventory.getItem(slot) == null){
+            matter = new Matter(Arrays.asList(Material.AIR),0);
+        }else if(new PotionUtil().isPotion(inventory.getItem(slot).getType())){
+            matter = new Potions(inventory.getItem(slot), PotionStrict.INPUT);
+        }else{
+            matter = new Matter(inventory.getItem(slot));
+        }
+        return matter;
     }
 
     private void increment(int input,int plus){

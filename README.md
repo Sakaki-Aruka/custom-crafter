@@ -173,6 +173,18 @@ nameOrRegex セクションに正規表現を用いる場合は、「素材の�
 - ItemFlag : 付与したいアイテムフラグ (string)
 - Unbreakable : 耐久無限 (true | false)
 
+---
+以下の項目は `nameOrRegex` に `Potion`,`SplashPotion`,`LingeringPotion` を設定している場合のみ有効になります.  
+上記のアイテム以外を設定している場合はエラーを吐きます.
+- PotionData : エフェクト名, ポーションの効果時間, ポーション効果のレベル (PotionEffectType, int, int)
+  - ポーションの効果時間は tick で指定してください. (1s = 20ticks)
+
+- PotionColor : ポーションに指定する色のRGB (int, int, int) 
+
+> [Enchantment](https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/enchantments/Enchantment.html)  
+> [ItemFlag](https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/inventory/ItemFlag.html)  
+> [PotionEffectType](https://hub.spigotmc.org/javadocs/bukkit/org/bukkit/potion/PotionEffectType.html)
+
 「項目名,データ」の形式で記述してください。  
 また、２つ以上のデータを記述しなくてはいけない場合はカンマで区切ってください。
 
@@ -186,6 +198,8 @@ metadata:
   - "customModelData,1"
   - "itemFlag,hide_enchants"
   - "unbreakable,true"
+  - "potionData,jump,100,2"
+  - "potionColor,255,255,255"
 ```
 ---
 ## レシピ(Recipe)の設定について
@@ -244,15 +258,16 @@ returns:
 - override : coordinate で使う Matter の名前を書き換える
 
 Matter の名前があまりにも長い場合，coordinate セクションでの呼び出し名を変更することが出来ます.  
-ただし，変更した呼び出し名を異なる設定ファイル間で共有することは出来ません.
+ただし，変更した呼び出し名を異なる設定ファイル間で共有することは出来ません.  
+省略前の名称と省略後の名称の間は ` -> ` で区切ってください. 
 
 
 設定例
 ```yaml
 override :
-  - a_part_of_gryffindor_sword_knife_blade_first,f
-  - a_part_of_gryffindor_sword_knife_blade_second,s
-  - a_part_of_gryffindor_sword_grip,g
+  - a_part_of_gryffindor_sword_knife_blade_first -> f
+  - a_part_of_gryffindor_sword_knife_blade_second -> s
+  - a_part_of_gryffindor_sword_grip -> g
 
 coordinate :
   - null,f,null
