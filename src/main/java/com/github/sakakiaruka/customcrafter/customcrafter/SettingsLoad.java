@@ -208,8 +208,7 @@ public class SettingsLoad {
 
     private void getBaseBlock(List<Path> paths){
         FileConfiguration config = YamlConfiguration.loadConfiguration(paths.get(0).toFile());
-        String name = config.getString("material").toUpperCase();
-        baseBlock = Material.valueOf(name);
+        baseBlock = Material.valueOf(config.getString("material").toUpperCase());
     }
 
     private void getResult(List<Path> paths){
@@ -414,12 +413,6 @@ public class SettingsLoad {
                     List<String> list = Arrays.asList(l.get(y).split(","));
                     for(int x=0;x<size;x++){
                         Coordinate coordinate = new Coordinate(x,y);
-
-//                        Matter matter = list.get(x).equalsIgnoreCase("null")
-//                                ? new Matter(Arrays.asList(Material.AIR),0)
-//                                : matters.containsKey(list.get(x))
-//                                    ? matters.get(list.get(x))
-//                                    : matters.get(overrides.get(list.get(x)));
 
                         /*
                         * collect matter example

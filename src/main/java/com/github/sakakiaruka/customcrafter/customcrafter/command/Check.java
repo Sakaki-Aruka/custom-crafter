@@ -33,9 +33,6 @@ public class Check implements CommandExecutor {
             if(!sender.isOp())return false;
             reload();
         }
-        else if(args[0].equalsIgnoreCase("potion")){
-            new PotionCheck().checker((Player) sender);
-        }
         else {
             System.out.println(getGraphicalRecipe(args[0]));
         }
