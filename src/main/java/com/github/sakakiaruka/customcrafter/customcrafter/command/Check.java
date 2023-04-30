@@ -29,12 +29,9 @@ public class Check implements CommandExecutor {
         if(args.length == 0){
             recipes.forEach(s->System.out.println(getGraphicalRecipe(s.getName())));
         }
-        else if(args[0].equalsIgnoreCase("reload")) {
+        else if(args[0].equalsIgnoreCase("-reload")) {
             if(!sender.isOp())return false;
             reload();
-        }
-        else if(args[0].equalsIgnoreCase("potion")){
-            new PotionCheck().checker((Player) sender);
         }
         else {
             System.out.println(getGraphicalRecipe(args[0]));

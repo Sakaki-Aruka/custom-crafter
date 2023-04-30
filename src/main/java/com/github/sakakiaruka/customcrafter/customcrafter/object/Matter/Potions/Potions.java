@@ -81,12 +81,12 @@ public class Potions extends Matter implements Matters {
 
     public String PotionInfo(){
         StringBuilder builder = new StringBuilder();
-        builder.append("=== potion info ===\n");
+        builder.append("=== potion info ===\n\n");
+        builder.append(String.format("bottle type match : %b -> only '%s'\n",bottleTypeMatch,super.getCandidate().get(0).name()));
         for(Map.Entry<PotionEffect, PotionStrict> entry : data.entrySet()){
             PotionEffect effect = entry.getKey();
             builder.append(String.format("effect : %s | duration : %d | amplifier : %d\n",effect.getType(),effect.getDuration(),effect.getAmplifier()));
-            builder.append(String.format("potion strict : %s\n",entry.getValue()));
-            builder.append(String.format("bottle type match : %b\n",bottleTypeMatch));
+            builder.append(String.format("potion strict : %s\n\n",entry.getValue()));
         }
         builder.append("=== potion info END ===\n");
         return builder.toString();
@@ -196,6 +196,6 @@ public class Potions extends Matter implements Matters {
     }
 
     public String info(){
-        return super.info();
+        return super.info()+"\n"+PotionInfo();
     }
 }

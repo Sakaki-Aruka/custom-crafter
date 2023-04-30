@@ -33,6 +33,14 @@ public class Matter implements Matters {
         this.mass = false;
     }
 
+    public Matter(List<Material> materials,int amount, boolean mass){
+        this.name = "";
+        this.candidate = materials;
+        this.wrap = null;
+        this.amount = amount;
+        this.mass = mass;
+    }
+
     public Matter(Matter matter){
         this.name = matter.getName();
         this.candidate = matter.getCandidate();

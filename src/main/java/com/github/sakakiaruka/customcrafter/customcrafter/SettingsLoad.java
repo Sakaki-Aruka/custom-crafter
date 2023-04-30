@@ -85,14 +85,18 @@ public class SettingsLoad {
         failed.clear();
 
         Path baseBlockPath = Paths.get(defaultConfig.getString("baseBlock"));
-        Path resultPath = Paths.get(defaultConfig.getString("results"));
-        Path matterPath = Paths.get(defaultConfig.getString("matters"));
-        Path recipePath = Paths.get(defaultConfig.getString("recipes"));
+
+        List<Path> resultPaths = new ArrayList<>();
+        List<Path> matterPaths = new ArrayList<>();
+        List<Path> recipePaths = new ArrayList<>();
+        defaultConfig.getStringList("results").forEach(s->resultPaths.add(Paths.get(s)));
+        defaultConfig.getStringList("matters").forEach(s->matterPaths.add(Paths.get(s)));
+        defaultConfig.getStringList("recipes").forEach(s->recipePaths.add(Paths.get(s)));
 
         configFileDirectoryCheck(baseBlockPath);
-        configFileDirectoryCheck(resultPath);
-        configFileDirectoryCheck(matterPath);
-        configFileDirectoryCheck(recipePath);
+        resultPaths.forEach(p->configFileDirectoryCheck(p));
+        matterPaths.forEach(p->configFileDirectoryCheck(p));
+        recipePaths.forEach(p->configFileDirectoryCheck(p));
 
 
         // --- bukkit runnable --- //
@@ -122,9 +126,9 @@ public class SettingsLoad {
             public void run() {
                 // get data from each files
                 getBaseBlock(getFiles(baseBlockPath));
-                getResult(getFiles(resultPath));
-                getMatter(getFiles(matterPath));
-                getRecipe(getFiles(recipePath));
+                resultPaths.forEach(p->getResult(getFiles(p)));
+                matterPaths.forEach(p->getMatter(getFiles(p)));
+                recipePaths.forEach(p->getRecipe(getFiles(p)));
 
                 Bukkit.getLogger().info("===Custom-Crafter data loaded.===");
             }
@@ -204,8 +208,7 @@ public class SettingsLoad {
 
     private void getBaseBlock(List<Path> paths){
         FileConfiguration config = YamlConfiguration.loadConfiguration(paths.get(0).toFile());
-        String name = config.getString("material").toUpperCase();
-        baseBlock = Material.valueOf(name);
+        baseBlock = Material.valueOf(config.getString("material").toUpperCase());
     }
 
     private void getResult(List<Path> paths){
@@ -411,11 +414,36 @@ public class SettingsLoad {
                     for(int x=0;x<size;x++){
                         Coordinate coordinate = new Coordinate(x,y);
 
-                        Matter matter = list.get(x).equalsIgnoreCase("null")
-                                ? new Matter(Arrays.asList(Material.AIR),0)
-                                : matters.containsKey(list.get(x))
-                                    ? matters.get(list.get(x))
-                                    : matters.get(overrides.get(list.get(x)));
+                        /*
+                        * collect matter example
+                        * "cobblestone" -> this is a normal ItemID and the parameter 'mass' is not true.
+                        * "m-cobblestone" -> this is a normal ItemID and the parameter 'mass' is true.
+                        * "modified_cobblestone" -> this is not a normal ItemID. Have to search from 'matters'.
+                         */
+
+                        String matterName = list.get(x);
+                        Matter matter;
+                        if(matterName.equalsIgnoreCase("null")){
+                            // null
+                            matter = new Matter(Arrays.asList(Material.AIR),0);
+                        }else if(matters.containsKey(matterName)){
+                            // 'matterName' contains 'matters'
+                            matter = matters.get(matterName);
+                        }else if(overrides.containsKey(matterName) && matters.containsKey(overrides.get(matterName))){
+                            // replaced the shorted name and contains 'matters'
+                            matter = matters.get(overrides.get(matterName));
+                        }else if(allMaterials.contains(matterName.toUpperCase())){
+                            // normal material-name
+                            matter = new Matter(Arrays.asList(Material.valueOf(matterName.toUpperCase())),1);
+                        }else if(matterName.startsWith("m-")){
+                            // normal material-name and 'mass = true'
+                            matterName = matterName.replace("m-","").toUpperCase();
+                            matter = new Matter(Arrays.asList(Material.valueOf(matterName)),1,true);
+                        }else {
+                            // replaced to the shorter name (normal material-name)
+                            Material material = Material.valueOf(overrides.get(matterName).toUpperCase());
+                            matter = new Matter(Arrays.asList(material),1);
+                        }
 
                         coordinates.put(coordinate,matter);
                     }
