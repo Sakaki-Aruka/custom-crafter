@@ -212,6 +212,7 @@ public class SettingsLoad {
     }
 
     private void getResult(List<Path> paths){
+        addAllVanillaMaterial();
         for(Path path:paths){
             FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
             String name = config.getString("name");
@@ -252,6 +253,14 @@ public class SettingsLoad {
             }
 
             Result result = new Result(name,enchantInfo,amount,metadata,nameOrRegex,matchPoint);
+            results.put(name,result);
+        }
+    }
+
+    private void addAllVanillaMaterial(){
+        for(Material material : Material.values()){
+            String name = material.name().toLowerCase();
+            Result result = new Result(name,null,1,null,material.name(),-1);
             results.put(name,result);
         }
     }
