@@ -150,8 +150,8 @@ public class Search {
                     Matter recipeMatter = recipe.getContentsNoAir().get(i);
                     Matter inputMatter = input.getContentsNoAir().get(i);
 
-                    //debug
-                    System.out.println(String.format("recipe : %b | input : %b",recipeMatter.hasWrap(),inputMatter.hasWrap()));
+//                    //debug
+//                    System.out.println(String.format("recipe : %b | input : %b",recipeMatter.hasWrap(),inputMatter.hasWrap()));
 
                     if(recipe.getContentsNoAir().get(i).isMass()){
                         if(inputMatter.getAmount() != 1)continue Top;
@@ -518,8 +518,8 @@ public class Search {
         int size = models.size();
         for(int i=1;i<size;i++){
 
-            //debug
-            System.out.println(String.format("xGap* : %d | yGap* : %d",models.get(i).getX() - reals.get(i).getX(),models.get(i).getY() - reals.get(i).getY()));
+//            //debug
+//            System.out.println(String.format("xGap* : %d | yGap* : %d",models.get(i).getX() - reals.get(i).getX(),models.get(i).getY() - reals.get(i).getY()));
 
             if(models.get(i).getX() - reals.get(i).getX() != xGap)return false;
             if(models.get(i).getY() - reals.get(i).getY() != yGap)return false;
