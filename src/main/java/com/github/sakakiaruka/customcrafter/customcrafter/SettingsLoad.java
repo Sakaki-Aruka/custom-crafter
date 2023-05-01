@@ -354,6 +354,7 @@ public class SettingsLoad {
     private void addNull(){
         Matter matter = new Matter(Arrays.asList(Material.AIR),0);
         matters.put("null",matter);
+        matters.put("NULL",matter);
     }
 
     private Potions makeDrug(Matter matter, FileConfiguration config){
@@ -415,11 +416,14 @@ public class SettingsLoad {
                 */
                 for(String string : config.getStringList("override")){
                     List<String> splitter = Arrays.asList(string.split(" -> "));
-                    String source = splitter.get(0);
+                    String source = splitter.get(0).toUpperCase();
                     String shorter = splitter.get(1);
                     overrides.put(shorter,source);
                 }
             }
+
+            //debug
+            System.out.println("overrides : "+overrides);
 
             if(tag.equalsIgnoreCase("normal")){
                 // normal recipe load
@@ -438,28 +442,7 @@ public class SettingsLoad {
                          */
 
                         String matterName = list.get(x);
-                        Matter matter;
-                        if(matterName.equalsIgnoreCase("null")){
-                            // null
-                            matter = new Matter(Arrays.asList(Material.AIR),0);
-                        }else if(matters.containsKey(matterName)){
-                            // 'matterName' contains 'matters'
-                            matter = matters.get(matterName);
-                        }else if(overrides.containsKey(matterName) && matters.containsKey(overrides.get(matterName))){
-                            // replaced the shorted name and contains 'matters'
-                            matter = matters.get(overrides.get(matterName));
-                        }else if(allMaterials.contains(matterName.toUpperCase())){
-                            // normal material-name
-                            matter = new Matter(Arrays.asList(Material.valueOf(matterName.toUpperCase())),1);
-                        }else if(matterName.startsWith("m-")){
-                            // normal material-name and 'mass = true'
-                            matterName = matterName.replace("m-","").toUpperCase();
-                            matter = new Matter(Arrays.asList(Material.valueOf(matterName)),1,true);
-                        }else {
-                            // replaced to the shorter name (normal material-name)
-                            Material material = Material.valueOf(overrides.get(matterName).toUpperCase());
-                            matter = new Matter(Arrays.asList(material),1);
-                        }
+                        Matter matter = getMatterFromString(matterName,overrides);
 
                         coordinates.put(coordinate,matter);
                     }
@@ -473,7 +456,9 @@ public class SettingsLoad {
                     List<String> list = Arrays.asList(l.get(i).split(","));
                     for(int j=0;j<list.size();j++){
                         Coordinate coordinate = new Coordinate(x,count);
-                        Matter matter = list.get(j).equalsIgnoreCase("null") ? new Matter(Arrays.asList(Material.AIR),0) : matters.get(list.get(j));
+                        String matterName = list.get(j);
+                        Matter matter = getMatterFromString(matterName,overrides);
+
                         coordinates.put(coordinate,matter);
                         count++;
                     }
@@ -502,5 +487,46 @@ public class SettingsLoad {
             recipes.add(recipe);
             namedRecipes.put(name,recipe);
         }
+    }
+
+    private Matter getMatterFromString(String name,Map<String,String> overrides){
+        Matter matter;
+        String upper = name.toUpperCase();
+        if(name.equalsIgnoreCase("null")){
+            // null
+            matter = new Matter(Arrays.asList(Material.AIR),0,false);
+        }else if(matters.containsKey(name)){
+            // 'name' is contained 'matters'
+            matter = matters.get(name);
+        }else if(overrides.containsKey(name) && matters.containsKey(overrides.get(name))){
+            // replaced the shorted name and contained 'matters'.
+            matter = matters.get(overrides.get(name));
+        }else if(allMaterials.contains(upper)){
+            // normal material-name
+            Material material = Material.valueOf(name.toUpperCase());
+            matter = new Matter(Arrays.asList(material),1,false);
+        }else if(overrides.containsKey(name) && allMaterials.contains(overrides.get(name).toUpperCase())){
+            // replaced the shorted name and contained 'allMaterials'
+            Material material = Material.valueOf(overrides.get(name).toUpperCase());
+            matter = new Matter(Arrays.asList(material),1,false);
+        }else if(name.startsWith("m-")){
+            // normal material-name and 'mass=true'
+            name = name.replace("m-","").toUpperCase();
+            Material material = Material.valueOf(name);
+            matter = new Matter(Arrays.asList(material),1,true);
+        }else if (overrides.containsKey(name)){
+            // replaced to the shorted name and contained 'matters'
+            String before = overrides.get(name).replace("m-","").toUpperCase();
+            if(before.equals("NULL")){
+                matter = new Matter(Arrays.asList(Material.AIR),0,false);
+            }else{
+                Material material = Material.valueOf(before);
+                matter = new Matter(Arrays.asList(material),1,true);
+            }
+        }else{
+            // nothing other
+            matter = new Matter(Arrays.asList(Material.AIR),0);
+        }
+        return matter;
     }
 }
