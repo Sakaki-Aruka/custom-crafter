@@ -257,6 +257,8 @@ public class SettingsLoad {
     }
 
     private void getMatter(List<Path> paths){
+        // add Null (for Override)
+        addNull();
         Top : for(Path path:paths){
             FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
             String name = config.getString("name");
@@ -338,6 +340,11 @@ public class SettingsLoad {
 
             matters.put(name,matter);
         }
+    }
+
+    private void addNull(){
+        Matter matter = new Matter(Arrays.asList(Material.AIR),0);
+        matters.put("null",matter);
     }
 
     private Potions makeDrug(Matter matter, FileConfiguration config){
