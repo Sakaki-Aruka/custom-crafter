@@ -5,6 +5,7 @@ import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.potion.PotionEffectType;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ public class DataCheckerUtil {
 
     private final String bar = String.join("",Collections.nCopies(40,"="));
     private final String nl = System.getProperty("line.separator");
-    public String isMatterSafe(Path path){
+    public boolean isMatterSafe(Path path){
         /*
         * matter files checker.
         * checking about name,amount,mass,candidate and optional settings.
@@ -133,14 +134,25 @@ public class DataCheckerUtil {
                 for(String s : settings){
                     List<String> values = Arrays.asList(s.split(","));
                     if(values.size() != 4) throw new Exception("- 'potion' settings have invalid parameters or not enough.");
-                    String errorMessage = "- 'potionEffectType' is not correct."
+                    String errorMessage = "- 'potionEffectType' is not correct.";
+                    for(PotionEffectType effectType : PotionEffectType.values()){
+                        if(effectType.getName().equals(values.get(0).toUpperCase())) errorMessage = "";
+                    }
+                    if(!errorMessage.isEmpty()) appendLn(builder,errorMessage);
+                    int duration = Integer.valueOf(settings.get(1));
+                    int amplifier = Integer.valueOf(settings.get(2));
+                    if(duration < 1 || amplifier < 1) appendLn(builder,"'- 'potion' has an invalid duration or amplifier.");
+                    Boolean.valueOf(settings.get(3));
                 }
+
+
             }catch (Exception e){
-                String errorMessage = e.getMessage().isEmpty() ? "- 'potion' is empty." : e.getMessage();
+                String errorMessage = e.getMessage().isEmpty() ? "- 'potion' section has errors." : e.getMessage();
                 appendLn(builder,errorMessage);
             }
         }
 
+        return hasError(builder.toString());
 
     }
 
@@ -150,10 +162,10 @@ public class DataCheckerUtil {
     }
 
     private boolean hasError(String str){
-        str = str.replace("\n","A");
-        int len = str.length();
-        int templateLen = bar.length()*2 + 1;
-        return len == templateLen;
+        str = str.replace(nl,"A");
+        String model = bar+nl+bar;
+        model = model.replace(nl,"A");
+        return str.length() == model.length();
     }
 
 }
