@@ -1,5 +1,6 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.util;
 
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantStrict;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantWrap;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
@@ -58,5 +59,12 @@ public class EnchantUtil {
             if(!new Search().getEnchantWrapCongruence(matter,dummy))return false;
         }
         return true;
+    }
+
+    public EnchantStrict getStrictByName(String in){
+        for(EnchantStrict es : EnchantStrict.values()){
+            if(in.equals(es.toStr())) return es;
+        }
+        return null;
     }
 }
