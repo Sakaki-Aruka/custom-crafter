@@ -11,6 +11,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordina
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.MetadataType;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.Result;
+import com.github.sakakiaruka.customcrafter.customcrafter.util.DataCheckerUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.PotionUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -270,6 +271,11 @@ public class SettingsLoad {
         addNull();
         Top : for(Path path:paths){
             FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
+
+            //debug
+//            new DataCheckerUtil().isMatterSafe(config);
+            new DataCheckerUtil().matterCheck(new StringBuilder(),config);
+
             String name = config.getString("name");
             int amount = config.getInt("amount");
             boolean mass = config.getBoolean("mass");

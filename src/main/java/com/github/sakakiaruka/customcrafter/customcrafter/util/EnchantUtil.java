@@ -85,4 +85,12 @@ public class EnchantUtil {
         return list;
     }
 
+    public List<String> getEnchantmentStrList(){
+        List<String> list = new ArrayList<>();
+        for(Enchantment enchant : Enchantment.values()){
+            list.add(enchant.getName().toUpperCase());
+        }
+        return list;
+    }
+
 }
