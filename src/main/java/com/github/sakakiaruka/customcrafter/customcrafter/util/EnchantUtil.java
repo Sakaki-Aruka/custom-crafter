@@ -67,4 +67,22 @@ public class EnchantUtil {
         }
         return null;
     }
+
+    public List<String> strValues(){
+        List<String> list = new ArrayList<>();
+        for(EnchantStrict es : EnchantStrict.values()){
+            list.add(es.toStr());
+        }
+        return list;
+    }
+
+    public List<String> strValuesNoInput(){
+        List<String> list = new ArrayList<>();
+        for(EnchantStrict es : EnchantStrict.values()){
+            if(es.equals(EnchantStrict.INPUT)) continue;
+            list.add(es.toStr());
+        }
+        return list;
+    }
+
 }

@@ -10,6 +10,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 public class PotionUtil {
@@ -41,6 +43,23 @@ public class PotionUtil {
             if(type.getRelated().equals(material)) return true;
         }
         return false;
+    }
+
+    public List<String> getPotionEffectTypeStringList(){
+        List<String> list = new ArrayList<>();
+        for(PotionEffectType e : PotionEffectType.values()){
+            list.add(e.getName());
+        }
+        return list;
+    }
+
+    public List<String> getPotionStrictStringList(){
+        List<String> list = new ArrayList<>();
+        for(PotionStrict strict : PotionStrict.values()){
+            if(strict.toStr().equalsIgnoreCase("INPUT")) continue;
+            list.add(strict.toStr());
+        }
+        return list;
     }
 
 

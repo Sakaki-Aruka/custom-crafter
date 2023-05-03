@@ -265,7 +265,7 @@ public class SettingsLoad {
         }
     }
 
-    private void getMatter(List<Path> paths){
+    public void getMatter(List<Path> paths){
         // add Null (for Override)
         addNull();
         Top : for(Path path:paths){
