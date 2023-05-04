@@ -163,7 +163,7 @@ public class Matter implements Matters {
 
     public String info(){
         StringBuilder builder = new StringBuilder();
-        builder.append(String.format("name : %s\n",name));
+        builder.append(String.format("name : %s\n",name.isEmpty() ? candidate.get(0).name() : name));
         builder.append(String.format("candidate : %s\n",candidate.toString()));
         builder.append(String.format("wrap : %s",hasWrap() ? getAllWrapInfo() : "null\n"));
         builder.append(String.format("amount : %d\n",amount));

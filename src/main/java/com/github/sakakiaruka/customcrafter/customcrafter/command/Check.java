@@ -127,7 +127,8 @@ public class Check implements CommandExecutor {
         builder.append(nl+"List : ");
         StringBuilder names = new StringBuilder();
         recipe.getContentsNoDuplicateRelateAmount().entrySet().forEach(s->{
-            names.append(String.format("%s -> %d | ",s.getKey().getName(),s.getValue()));
+            String name = s.getKey().getName().isEmpty() ? s.getKey().getCandidate().get(0).name() : s.getKey().getName();
+            names.append(String.format("%s -> %d | ",name,s.getValue()));
         });
         builder.append(names);
         builder.append(nl);
