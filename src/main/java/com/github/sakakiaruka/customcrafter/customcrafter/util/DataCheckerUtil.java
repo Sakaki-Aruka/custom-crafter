@@ -9,6 +9,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.potion.PotionEffectType;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -18,20 +19,31 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.allMaterials;
+import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.nl;
 import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.matters;
 
 public class DataCheckerUtil {
 
     private final String bar = String.join("",Collections.nCopies(40,"="));
-    private final String nl = System.getProperty("line.separator");
+    private final String shortBar = String.join("",Collections.nCopies(20,"="));
+    //private final String nl = System.getProperty("line.separator");
 
-    public void matterCheck(StringBuilder builder,FileConfiguration config){
+    public void matterCheck(StringBuilder builder, FileConfiguration config, Path path){
         int count = 0;
+        appendLn(builder,bar);
+        appendLn(builder,"Target file is "+path.toString());
+        builder.append(nl);
         if(!nameCheck(config,builder)) count++;
+        builder.append(nl);
         if(!intCheck(config,builder,"amount",64)) count++;
+        builder.append(nl);
         if(!candidateCheck(config,builder)) count++;
+        builder.append(nl);
         if(!massCheck(config, builder)) count++;
-        if(config.contains("enchant")) if(!enchantCheck(config,builder,true,3)) count++;
+        if(config.contains("enchant")) {
+            if(!enchantCheck(config,builder,true,3)) count++;
+            builder.append(nl);
+        }
         if(config.contains("potion")) if(!potionCheck(config,builder)) count++;
         if(count != 0) System.out.println(builder.toString());
     }
@@ -39,16 +51,20 @@ public class DataCheckerUtil {
     private boolean nameCheck(FileConfiguration config,StringBuilder builder){
         if(!config.contains("name")) {
             appendLn(builder,"name -> A section is not found.");
+            appendLn(builder,"  -> Have to write 'name: itemName'.");
             return false;
         }
         String name = config.getString("name");
         if(!name.matches("[a-zA-Z_]+")) {
             appendLn(builder,"name -> This name does not follow the naming rules.");
+            appendLn(builder,"  -> Follow the pattern that is '[a-zA-Z_]+'.");
+            appendLn(builder,"  -> And, do not duplicate with Vanilla item ids.");
             return false;
         }
         for(String str : allMaterials){
             if(name.toUpperCase().equals(str)) {
                 appendLn(builder,"name -> This name conflicts with a vanilla item id.");
+                appendLn(builder,"  -> Do not duplicate with Vanilla item ids.");
                 return false;
             }
         }
@@ -58,6 +74,7 @@ public class DataCheckerUtil {
     private boolean intCheck(FileConfiguration config,StringBuilder builder,String section,int limit){
         if(!config.contains(section)) {
             appendLn(builder,section + " -> A section is not found.");
+            appendLn(builder,String.format("  -> Have to write %s",section));
             return false;
         }
         int amount;
@@ -65,6 +82,7 @@ public class DataCheckerUtil {
             amount = Integer.valueOf(config.getString(section));
         }catch (Exception e){
             appendLn(builder,section + " -> The system cannot cast to integer.");
+            appendLn(builder,"  -> Have to write a number.");
             return false;
         }
 
@@ -78,10 +96,8 @@ public class DataCheckerUtil {
     private boolean massCheck(FileConfiguration config,StringBuilder builder){
         if(!config.contains("mass")) {
             appendLn(builder,"mass -> A section is not found.");
+            appendLn(builder,"  -> Have to write 'mass: true' or 'mass: false'.");
             return false;
-        }
-        if(!Boolean.valueOf(config.getString("mass"))){
-            appendLn(builder,"mass -> This section has an invalid value. (Not bool.)");
         }
         return true;
     }
@@ -90,17 +106,26 @@ public class DataCheckerUtil {
     private boolean candidateCheck(FileConfiguration config,StringBuilder builder){
         if(!config.contains("candidate")) {
             appendLn(builder,"candidate -> A section is not found.");
+            appendLn(builder,"  -> Have to write 'candidate' section.");
             return false;
         }
-        List<String> candidates = config.getStringList("candidate");
+        List<String> candidates;
+        try{
+            candidates = config.getStringList("candidate");
+        }catch (Exception e){
+            appendLn(builder,"candidate -> Settings format error.");
+            appendLn(builder,"  -> This section have to be written by a string list.");
+            return false;
+        }
         if(candidates.isEmpty()) {
             appendLn(builder,"candidate -> The candidate section has no settings.");
+            appendLn(builder,"  -> Have to write more than one settings.");
             return false;
         }
-//        List<String> list = new ArrayList<>();
 
         if(candidates.get(0).startsWith("R|") && candidates.size() != 1){
-            appendLn(builder,"candidate -> Do not write more than one regular expression on this section.");
+            appendLn(builder,"candidate -> Too many regular expression error.");
+            appendLn(builder,"  -> You can write only one regular expression to this section.");
             return false;
         }
 
@@ -121,6 +146,7 @@ public class DataCheckerUtil {
         if(!isRegex){
             if(!allMaterials.contains(pattern.toUpperCase())) {
                 appendLn(builder,section+" -> Not found a correct material name.");
+                appendLn(builder,"  -> You have to write a correct minecraft item id.");
                 return false;
             }
             return true;
@@ -135,10 +161,14 @@ public class DataCheckerUtil {
             }
             if(list.isEmpty()) {
                 appendLn(builder,section+" -> No item IDs from the pattern.");
+                appendLn(builder,"  -> The pattern that is written in this section, does not have any materials.");
+                appendLn(builder,"  -> So, you have to rewrite that to match with some material names.");
                 return false;
             }
         }catch (Exception e){
             appendLn(builder,section+" -> Found an invalid regular expression.");
+            appendLn(builder,"  -> The pattern that is written in this section, does not work as a regular expression pattern.");
+            appendLn(builder,"  -> So you have to rewrite that as a regular expression that works.");
             return false;
         }
         return true;
@@ -149,16 +179,25 @@ public class DataCheckerUtil {
             //appendLn(builder,"enchant -> A section is not found.");
             return true;
         }
-        List<String> enchants = config.getStringList("enchant");
+        List<String> enchants;
+        try{
+            enchants = config.getStringList("enchant");
+        } catch (Exception e){
+            appendLn(builder,"enchant -> Section format error.");
+            appendLn(builder,"  -> This section have to written as a string list.");
+            return false;
+        }
         if(enchants.isEmpty()) {
             appendLn(builder,"enchant -> No enchant settings.");
+            appendLn(builder,"  -> You have to write some settings here about enchantment.");
             return false;
         }
         int count = 0;
         for(String str : enchants){
             List<String> settings = Arrays.asList(str.split(","));
             if(settings.size() != splitter){
-                appendLn(builder,"enchant -> Settings not enough or has a comma that needless.");
+                appendLn(builder,"enchant -> This section has some wrong parameters.");
+                appendLn(builder,splitter == 2 ? "  -> 'EnchantName,Level'" : "  -> 'EnchantName,Level,EnchantStrict'");
                 return false;
             }
             for(Enchantment enchant : Enchantment.values()){
@@ -174,6 +213,7 @@ public class DataCheckerUtil {
 
             if(level < 1){
                 appendLn(builder,"enchant -> An invalid enchant level found.");
+                appendLn(builder,"  -> Do not write a number that is less than 1.");
                 return false;
             }
 
@@ -181,6 +221,7 @@ public class DataCheckerUtil {
                 String s = settings.get(2).toUpperCase();
                 if(!new EnchantUtil().strValuesNoInput().contains(s)){
                     appendLn(builder,"enchant -> An EnchantStrict value is incorrect.");
+                    appendLn(builder,"  -> You can choose EnchantStrict from these -> NotStrict, OnlyEnchant, Strict");
                     return false;
                 }
             }
@@ -199,17 +240,20 @@ public class DataCheckerUtil {
         if(!config.contains("metadata")) return true;
         List<String> settings = config.getStringList("metadata");
         if(settings.isEmpty()) {
-            appendLn(builder,"metadata -> Data not found on from this section.");
+            appendLn(builder,"metadata -> Data not found from this section.");
+            appendLn(builder,"  -> Write data or remove this section.");
             return false;
         }
         for(String s : settings){
             if(!s.contains(",")) {
                 appendLn(builder,"metadata -> The data string splitter(,) is not found in the setting.");
+                appendLn(builder,"  -> Have to write comma to divide a string.");
                 return false;
             }
             List<String> list = Arrays.asList(s.split(","));
             if(!getMetadataTypeStringList().contains(list.get(0).toUpperCase())) {
                 appendLn(builder,"metadata -> This section has an invalid metadata type.");
+                appendLn(builder,"  -> lore, displayName, enchantment, itemFlag, unbreakable, customModelData, potionData, potionColor");
                 return false;
             }
 
@@ -217,20 +261,24 @@ public class DataCheckerUtil {
             if(type.equals(MetadataType.ENCHANTMENT)){
                 if(list.size() != 3){
                     appendLn(builder,"metadata -> An Enchantment data has wrong parameters.");
+                    appendLn(builder,"  -> Have to write two parameters. EnchantName and those level.");
                     return false;
                 }
                 if(!new EnchantUtil().getEnchantmentStrList().contains(list.get(1).toUpperCase())){
                     appendLn(builder,"meta -> An invalid Enchantment found.");
+                    appendLn(builder,"  -> Write correct Enchantment name.");
                     return false;
                 }
                 try{
                     int level = Integer.valueOf(list.get(2));
                     if(level < 1) {
                         appendLn(builder,"metadata -> An invalid enchantment level found.");
+                        appendLn(builder,"  -> Have to write in the range that is 1 to 255.");
                         return false;
                     }
                 }catch (Exception e){
                     appendLn(builder,"metadata -> Enchantment level cannot be casted to Integer.");
+                    appendLn(builder,"  -> Write a number. ");
                     return false;
                 }
             }else if(type.equals(MetadataType.CUSTOMMODELDATA)){
@@ -247,6 +295,7 @@ public class DataCheckerUtil {
             }else if(type.equals(MetadataType.POTIONDATA)){
                 if(list.size() != 4) {
                     appendLn(builder,"metadata -> Potion Data has wrong parameters.");
+                    appendLn(builder,"  -> PotionEffectType, duration, amplifier");
                     return false;
                 }
                 if(!new PotionUtil().getPotionEffectTypeStringList().contains(list.get(1).toUpperCase())){
@@ -268,6 +317,7 @@ public class DataCheckerUtil {
             }else if(type.equals(MetadataType.POTIONCOLOR)){
                 if(list.size() != 4){
                     appendLn(builder,"metadata -> Potion color has wrong parameters.");
+                    appendLn(builder,"  -> Potion color has 3 parameters. Red, Green, Blue");
                     return false;
                 }
                 try{
@@ -276,7 +326,8 @@ public class DataCheckerUtil {
                     int b = Integer.valueOf(list.get(3));
                     List<Integer> color = Arrays.asList(r,g,b);
                     if(Collections.max(color) > 255 || Collections.min(color) < 0){
-                        appendLn(builder,"metadata -> Potion color must be on 0 <--> 255");
+                        appendLn(builder,"metadata -> Out of the color range error.");
+                        appendLn(builder,"  -> Must be in the range 0 <--> 255.");
                         return false;
                     }
                 }catch (Exception e){
@@ -295,6 +346,7 @@ public class DataCheckerUtil {
         }
         if(!config.contains("bottleTypeMatch")) {
             appendLn(builder,"bottleTypeMatch -> A section is not found.");
+            appendLn(builder,"  -> When you write 'potion' section, have to write 'bottleTypeMatch' section.");
             return false;
         }
 
@@ -308,6 +360,7 @@ public class DataCheckerUtil {
             List<String> list = Arrays.asList(str.split(","));
             if(list.size() != 4) {
                 appendLn(builder,"potion -> Potion Settings : not enough or over.");
+                appendLn(builder,"  -> Need 4 parameters : PotionEffectTYpe, duration, amplifier, PotionStrict");
                 return false;
             }
 
@@ -333,6 +386,7 @@ public class DataCheckerUtil {
 
             if(!new PotionUtil().getPotionStrictStringList().contains(list.get(3).toUpperCase())){
                 appendLn(builder,"potion -> PotionStrict is an invalid value.");
+                appendLn(builder,"  -> NotStrict, OnlyDuration, OnlyAmplifier, Strict");
                 return false;
             }
 
@@ -340,41 +394,58 @@ public class DataCheckerUtil {
         return true;
     }
 
-    public void resultCheck(StringBuilder builder,FileConfiguration config){
+    public void resultCheck(StringBuilder builder,FileConfiguration config,Path path){
         int count = 0;
+        appendLn(builder,bar);
+        appendLn(builder,"Target file is "+path.toString());
+        appendLn(builder,nl);
         if(!nameCheck(config,builder)) count++;
+        builder.append(nl);
         if(!intCheck(config,builder,"amount",64)) count++;
+        builder.append(nl);
         // name or regex
-        String s = config.getString("nameOrRegex");
-        boolean isRegex = s.contains("@");
-        String pattern = isRegex ? s.substring(0,s.indexOf("@")) : s;
-        if(!isCorrectNameOrRegex(builder,pattern,isRegex,"nameOrRegex")) count++;
-        if(isRegex) {
-            String afterPattern = s.substring(s.indexOf("@")).replace("{R}","");
-            if(!isCorrectNameOrRegex(builder,afterPattern,true,"nameOrRegex")) {
-                appendLn(builder,"  -> {R} side regular expression has an error.");
-                count++;
-            }
-        }
-        // End name or regex
-        // match point
-        if(isRegex){
-            intCheck(config,builder,"matchPoint",100);
+        if(!config.contains("nameOrRegex")){
+            appendLn(builder,"nameOrRegex -> A section is not found.");
+            builder.append(nl);
         }else{
-            try{
-                int point = Integer.valueOf(config.getString("matchPoint"));
-                if(point != -1) {
-                    appendLn(builder,"matchPoint -> This section must be -1 in this case.");
+            String s = config.getString("nameOrRegex");
+            boolean isRegex = s.contains("@");
+            String pattern = isRegex ? s.substring(0,s.indexOf("@")) : s;
+            if(!isCorrectNameOrRegex(builder,pattern,isRegex,"nameOrRegex")) count++;
+            if(isRegex) {
+                String afterPattern = s.substring(s.indexOf("@")).replace("{R}","");
+                if(!isCorrectNameOrRegex(builder,afterPattern,true,"nameOrRegex")) {
+                    appendLn(builder,"  -> {R} side regular expression has an error.");
+                    count++;
+                }
+            }
+            builder.append(nl);
+            // End name or regex
+            // match point
+            if(isRegex){
+                intCheck(config,builder,"matchPoint",100);
+                builder.append(nl);
+            }else{
+                try{
+                    int point = Integer.valueOf(config.getString("matchPoint"));
+                    if(point != -1) {
+                        appendLn(builder,"matchPoint -> This section must be -1 in this case.");
+                        count ++;
+                    }
+                }catch (Exception e){
+                    appendLn(builder,"matchPoint -> The value cannot be casted to Integer.");
                     count ++;
                 }
-            }catch (Exception e){
-                appendLn(builder,"matchPoint -> The value cannot be casted to Integer.");
-                count ++;
+                builder.append(nl);
             }
+            // End match point
         }
-        // End match point
+
+
         if(!enchantCheck(config,builder,false,2)) count++;
+        builder.append(nl);
         if(!metadataCheck(config,builder)) count++;
+        builder.append(nl);
         if(count != 0) System.out.println(builder.toString());
     }
 

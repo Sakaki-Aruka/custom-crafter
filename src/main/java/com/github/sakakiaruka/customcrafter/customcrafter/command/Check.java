@@ -22,6 +22,7 @@ import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.*;
 import static com.github.sakakiaruka.customcrafter.customcrafter.listener.OpenCraftingTable.opening;
 
 public class Check implements CommandExecutor {
+    private final String nl = System.getProperty("line.separator");
     @Override
     public boolean onCommand(CommandSender sender, Command command,String label,String[] args){
         //no args -> all recipes show
@@ -77,8 +78,8 @@ public class Check implements CommandExecutor {
         if(!namedRecipes.containsKey(recipeName))return "Unknown recipe.";
         Recipe recipe = namedRecipes.get(recipeName);
         StringBuilder builder = new StringBuilder();
-        builder.append(String.format("%s\n\n",String.join("", Collections.nCopies(40,"="))));
-        builder.append(String.format("Recipe Name : %s\n",recipeName));
+        builder.append(String.format("%s%s%s",String.join("", Collections.nCopies(40,"=")),nl,nl));
+        builder.append(String.format("Recipe Name : %s%s",recipeName,nl));
         builder.append(String.format("Tag : %s",recipe.getTag().toString()));
         if(recipe.getTag().equals(Tag.NORMAL)) return normal(builder,recipe);
         return amorphous(builder,recipe);
@@ -88,7 +89,7 @@ public class Check implements CommandExecutor {
     private String normal(StringBuilder builder,Recipe recipe){
         double size = Math.sqrt(recipe.getCoordinate().size());
         Map<Integer,Matter> map = new HashMap<>();
-        builder.append("\n");
+        builder.append(nl);
         for(int y=0;y<size;y++){
             Point : for(int x=0;x<size;x++){
                 Coordinate coordinate = new Coordinate(x,y);
@@ -108,14 +109,14 @@ public class Check implements CommandExecutor {
                 map.put(map.size(),matter);
 
             }
-            builder.append("\n");
+            builder.append(nl);
         }
 
         for(Map.Entry<Integer,Matter> entry : map.entrySet()){
-            builder.append("\n");
-            builder.append(String.format("%02d -> \n",entry.getKey()));
+            builder.append(nl);
+            builder.append(String.format("%02d -> %s",entry.getKey(),nl));
             String info = entry.getValue().info();
-            info = info.replace("\n","\n  ");
+            info = info.replace(nl,nl+"  ");
             builder.append(info);
         }
 
@@ -123,17 +124,17 @@ public class Check implements CommandExecutor {
     }
 
     private String amorphous(StringBuilder builder,Recipe recipe){
-        builder.append("\nList : ");
+        builder.append(nl+"List : ");
         StringBuilder names = new StringBuilder();
         recipe.getContentsNoDuplicateRelateAmount().entrySet().forEach(s->{
             names.append(String.format("%s -> %d | ",s.getKey().getName(),s.getValue()));
         });
         builder.append(names);
-        builder.append("\n");
+        builder.append(nl);
         for(Matter matter : recipe.getContentsNoDuplicate()){
-            builder.append("\n");
+            builder.append(nl);
             String info = matter.info();
-            info = info.replace("\n","\n  ");
+            info = info.replace(nl,nl+"  ");
             builder.append(info);
         }
         return builder.toString();

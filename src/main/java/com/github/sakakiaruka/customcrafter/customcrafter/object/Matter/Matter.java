@@ -108,7 +108,8 @@ public class Matter implements Matters {
     }
 
     public boolean hasWrap(){
-        return wrap != null;
+        if(wrap == null) return false;
+        return wrap.isEmpty();
     }
 
     public void addWrap(EnchantWrap in){

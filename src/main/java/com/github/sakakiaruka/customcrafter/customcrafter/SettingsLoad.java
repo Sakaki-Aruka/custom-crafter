@@ -44,6 +44,7 @@ public class SettingsLoad {
     public static final int craftingTableTotalSize = 54;
     public static final int vanillaCraftingSlots = 9;
     public static final int vanillaCraftingSquareSize = 3;
+    public static final String nl = System.getProperty("line.separator");
 
     // === recipes public values === //
     public static Material baseBlock;
@@ -216,6 +217,10 @@ public class SettingsLoad {
         addAllVanillaMaterial();
         for(Path path:paths){
             FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
+
+            //debug
+            new DataCheckerUtil().resultCheck(new StringBuilder(),config,path);
+
             String name = config.getString("name");
             int amount = config.getInt("amount");
             String nameOrRegex = config.getString("nameOrRegex");
@@ -269,12 +274,13 @@ public class SettingsLoad {
     public void getMatter(List<Path> paths){
         // add Null (for Override)
         addNull();
+        addWaterBottle();
+
         Top : for(Path path:paths){
             FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
 
             //debug
-//            new DataCheckerUtil().isMatterSafe(config);
-            new DataCheckerUtil().matterCheck(new StringBuilder(),config);
+            new DataCheckerUtil().matterCheck(new StringBuilder(),config,path);
 
             String name = config.getString("name");
             int amount = config.getInt("amount");
@@ -360,7 +366,12 @@ public class SettingsLoad {
     private void addNull(){
         Matter matter = new Matter(Arrays.asList(Material.AIR),0);
         matters.put("null",matter);
-        matters.put("NULL",matter);
+        //matters.put("NULL",matter);
+    }
+
+    private void addWaterBottle(){
+        Potions waterBottle = new PotionUtil().water_bottle();
+        matters.put("water_bottle",waterBottle);
     }
 
     private Potions makeDrug(Matter matter, FileConfiguration config){
@@ -404,6 +415,13 @@ public class SettingsLoad {
         return list;
     }
 
+    private boolean containsAllMaterialsIgnoreCase(String in){
+        for(String str : allMaterials){
+            if(in.equalsIgnoreCase(str)) return true;
+        }
+        return false;
+    }
+
     private void getRecipe(List<Path> paths){
         for(Path path:paths){
             FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
@@ -422,7 +440,7 @@ public class SettingsLoad {
                 */
                 for(String string : config.getStringList("override")){
                     List<String> splitter = Arrays.asList(string.split(" -> "));
-                    String source = splitter.get(0).toUpperCase();
+                    String source = containsAllMaterialsIgnoreCase(splitter.get(0)) ? splitter.get(0).toUpperCase() : splitter.get(0);
                     String shorter = splitter.get(1);
                     overrides.put(shorter,source);
                 }

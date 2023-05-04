@@ -7,10 +7,14 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.Potions;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.potion.PotionType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -60,6 +64,17 @@ public class PotionUtil {
             list.add(strict.toStr());
         }
         return list;
+    }
+
+    public Potions water_bottle(){
+        ItemStack item = new ItemStack(Material.POTION);
+        PotionMeta meta = (PotionMeta) item.getItemMeta();
+        PotionType type = PotionType.WATER;
+        PotionData data = new PotionData(type,false,false);
+        meta.setBasePotionData(data);
+        item.setItemMeta(meta);
+        Potions potion = new Potions(item,PotionStrict.STRICT);
+        return potion;
     }
 
 

@@ -2,10 +2,10 @@ package com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions
 
 public enum PotionStrict {
     INPUT("INPUT"),
-    NOT_STRICT("NOT_STRICT"),
+    NOT_STRICT("NOTSTRICT"),
     //ONLY_BOTTLE_TYPE,
-    ONLY_DURATION("ONLY_DURATION"),
-    ONLY_AMPLIFIER("ONLY_AMPLIFIER"),
+    ONLY_DURATION("ONLYDURATION"),
+    ONLY_AMPLIFIER("ONLYAMPLIFIER"),
     //BOTTLE_TYPE_DURATION,
     //BOTTLE_TYPE_AMPLIFIER,
     //DURATION_AMPLIFIER, // Does "DURATION_AMPLIFIER" equal "STRICT" ?
