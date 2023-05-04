@@ -181,7 +181,7 @@ public class SettingsLoad {
             // not exist
             File dir = new File(path.toUri());
             dir.mkdir();
-            System.out.println(String.format("Not found the directory \"%s\".\nSo, the system made the directory named that.",path.toUri().toString()));
+            System.out.println(String.format("Not found the directory \"%s\"."+nl+"So, the system made the directory named that.",path.toUri().toString()));
         }else if(!path.toFile().isDirectory()){
             System.out.println(String.format("The path \"%s\" is not a directory.",path.toUri().toString()));
             System.out.println("You must fix this problem when before you use this plugin.");
@@ -354,7 +354,7 @@ public class SettingsLoad {
                 if(potions != null) matters.put(name,potions);
 
                 //debug
-                System.out.println("SettingsLoad Potion : \n"+potions.PotionInfo());
+                System.out.println("SettingsLoad Potion : "+nl+potions.PotionInfo());
 
                 continue;
             }
