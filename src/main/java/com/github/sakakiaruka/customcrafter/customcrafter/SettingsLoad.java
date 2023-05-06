@@ -57,7 +57,7 @@ public class SettingsLoad {
 
     // === for data get methods === //
     private static FileConfiguration defaultConfig;
-    private static Map<String,Result> results = new HashMap<>();
+    public static Map<String,Result> results = new HashMap<>();
     public static Map<String, Matter> matters = new HashMap<>();
 
     // === for runnable task === //

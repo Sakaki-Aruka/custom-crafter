@@ -534,9 +534,6 @@ public class Search {
         int size = models.size();
         for(int i=1;i<size;i++){
 
-//            //debug
-//            System.out.println(String.format("xGap* : %d | yGap* : %d",models.get(i).getX() - reals.get(i).getX(),models.get(i).getY() - reals.get(i).getY()));
-
             if(models.get(i).getX() - reals.get(i).getX() != xGap)return false;
             if(models.get(i).getY() - reals.get(i).getY() != yGap)return false;
         }

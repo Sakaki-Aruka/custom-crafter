@@ -18,9 +18,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.allMaterials;
-import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.nl;
-import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.matters;
+import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.*;
 
 public class DataCheckerUtil {
 
@@ -447,6 +445,60 @@ public class DataCheckerUtil {
         if(!metadataCheck(config,builder)) count++;
         builder.append(nl);
         if(count != 0) System.out.println(builder.toString());
+    }
+
+    public void recipeCheck(StringBuilder builder,FileConfiguration config, Path path){
+        int count = 0;
+        appendLn(builder,bar);
+        appendLn(builder,"Target file is "+path.toString());
+        appendLn(builder,nl);
+        if(!nameCheck(config,builder)) count++;
+        appendLn(builder,nl);
+        if(!tagCheck(config,builder)) count++;
+        if(!resultSectionCheck(config, builder)) count++;
+
+
+
+    }
+
+    private boolean tagCheck(FileConfiguration config, StringBuilder builder){
+        if(!config.contains("tag")){
+            appendLn(builder,"tag -> A section is not found.");
+            appendLn(builder,"  -> Must write this section. The values are 'normal' and 'amorphous'.");
+            appendLn(builder,nl);
+            return false;
+        }
+        return true;
+    }
+
+    private boolean resultSectionCheck(FileConfiguration config, StringBuilder builder){
+        if(!config.contains("result")) {
+            appendLn(builder,"result -> A section is not found.");
+            appendLn(builder,"  -> Must write this section to use this recipe.");
+            appendLn(builder,nl);
+            return false;
+        }
+
+        String resultName = config.getString("result");
+        for(String ss : results.keySet()){
+            if(ss.equals(resultName)) return true;
+        }
+
+        appendLn(builder,"result -> The result item that you wrote on the config not found from the result items list.");
+        appendLn(builder,"  -> Remember the result file and the spelling.");
+        appendLn(builder,nl);
+        return false;
+    }
+
+    private boolean overrideCheck(FileConfiguration config, StringBuilder builder){
+        if(!config.contains("override")) return true;
+        List<String> overrides = config.getStringList("override");
+        if(overrides.isEmpty()) return true;
+
+        String pattern = "([\\w]+) -> ([\\w]+)";
+        for(String s : overrides){
+            // TODO : write an alert to the wrong patterns
+        }
     }
 
     private void appendLn(StringBuilder builder,String str){
