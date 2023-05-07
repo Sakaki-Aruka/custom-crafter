@@ -425,6 +425,9 @@ public class SettingsLoad {
     private void getRecipe(List<Path> paths){
         for(Path path:paths){
             FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
+
+            new DataCheckerUtil().recipeCheck(new StringBuilder(),config,path);
+
             String name = config.getString("name");
             String tag = config.getString("tag").toUpperCase();
             Result result = results.get(config.getString("result"));
@@ -499,10 +502,16 @@ public class SettingsLoad {
                  */
                 for(String s:config.getStringList("returns")){
                     List<String> list = Arrays.asList(s.split(","));
+                    ItemStack itemStack;
                     Material material = Material.valueOf(list.get(0).toUpperCase());
-                    Material returnMaterial = Material.valueOf(list.get(1).toUpperCase());
-                    int amount = Integer.valueOf(list.get(2));
-                    ItemStack itemStack  = new ItemStack(returnMaterial,amount);
+                    if(list.get(1).equals("water_bottle")){
+                        itemStack = new PotionUtil().water_bottle_ItemStack();
+                    }else{
+                        Material returnMaterial = Material.valueOf(list.get(1).toUpperCase());
+                        int amount = Integer.valueOf(list.get(2));
+                        itemStack  = new ItemStack(returnMaterial,amount);
+                    }
+
                     returns.put(material,itemStack);
                 }
             }

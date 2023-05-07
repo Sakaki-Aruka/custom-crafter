@@ -75,6 +75,16 @@ public class PotionUtil {
         return potion;
     }
 
+    public ItemStack water_bottle_ItemStack(){
+        ItemStack item = new ItemStack(Material.POTION);
+        PotionMeta meta = (PotionMeta) item.getItemMeta();
+        PotionType type = PotionType.WATER;
+        PotionData data = new PotionData(type);
+        meta.setBasePotionData(data);
+        item.setItemMeta(meta);
+        return item;
+    }
+
     public boolean isWaterBottle(Matter matter){
         Potions potion;
         try{

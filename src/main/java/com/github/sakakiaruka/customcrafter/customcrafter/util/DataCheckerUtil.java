@@ -10,10 +10,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.potion.PotionEffectType;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
@@ -456,8 +453,10 @@ public class DataCheckerUtil {
         appendLn(builder,nl);
         if(!tagCheck(config,builder)) count++;
         if(!resultSectionCheck(config, builder)) count++;
-
-
+        if(!overrideCheck(config,builder)) count++;
+        if(!coordinateCheck(config,builder)) count++;
+        if(!returnsCheck(config,builder)) count++;
+        if(count != 0) System.out.println(builder);
 
     }
 
@@ -495,10 +494,120 @@ public class DataCheckerUtil {
         List<String> overrides = config.getStringList("override");
         if(overrides.isEmpty()) return true;
 
+        Map<String,String> relates = new HashMap<>();
+
+        int counter  = 0;
         String pattern = "([\\w]+) -> ([\\w]+)";
         for(String s : overrides){
-            // TODO : write an alert to the wrong patterns
+            if(!s.matches(pattern)){
+                appendLn(builder,String.format("override -> '%s' is not a correct override pattern.",s));
+                appendLn(builder,nl);
+                counter++;
+            }else{
+                // correct pattern
+                List<String> relate = Arrays.asList(s.split(" -> "));
+                String base = relate.get(0);
+                String shorter = relate.get(1);
+                if(relates.containsKey(shorter)){
+                    appendLn(builder,"override -> An override conflict was found.");
+                    appendLn(builder,String.format("  -> Conflicted %s and %s",base,relates.get(shorter)));
+                    appendLn(builder,nl);
+                }else{
+                    relates.put(shorter,base);
+                }
+            }
+
         }
+        if(counter != 0){
+            appendLn(builder,"override -> The override patterns must follow the pattern.");
+            appendLn(builder,"  -> ([\\w]+) -> ([\\w])");
+            appendLn(builder,nl);
+        }
+
+        return counter == 0;
+    }
+
+    private boolean coordinateCheck(FileConfiguration config, StringBuilder builder){
+        if(!config.contains("coordinate")){
+            appendLn(builder,"coordinate -> A section is not found.");
+            appendLn(builder,"  -> You must write this section.");
+            appendLn(builder,nl);
+            return false;
+        }
+        if(config.getStringList("coordinate").isEmpty()){
+            appendLn(builder,"coordinate -> This section is empty.");
+            appendLn(builder,"  -> You must write more information about this recipe.");
+            appendLn(builder,nl);
+            return false;
+        }
+        if(!config.contains("tag")) return false;
+        if(!isTagType(config.getString("tag"))) return false;
+        String tagType = config.getString("tag");
+        if(tagType.equalsIgnoreCase("normal")){
+            int vertical = config.getStringList("coordinate").size();
+            if(vertical > craftingTableSize){
+                appendLn(builder,"coordinate -> Recipe size over the limit.");
+                appendLn(builder,"  -> Recipe size must be in the range that is 1 ~ 6. (Normal)");
+                appendLn(builder,nl);
+                return false;
+            }
+            for(String s : config.getStringList("coordinate")){
+                List<String> list = Arrays.asList(s.split(","));
+                if(list.isEmpty()){
+                    appendLn(builder,"coordinate -> An empty line found.");
+                    appendLn(builder,"  -> You must write anything to 'coordinate' section.");
+                    appendLn(builder,nl);
+                    return false;
+                }
+                if(list.size() != vertical){
+                    appendLn(builder,"coordinate -> The recipe width is invalid.");
+                    appendLn(builder,"  -> When 'tag' is normal, 'coordinate' shape must be a square.");
+                    appendLn(builder,nl);
+                    return false;
+                }
+                if(list.size() > craftingTableSize){
+                    appendLn(builder,"coordinate -> Recipe size over the limit.");
+                    appendLn(builder,"  -> Recipe size must be in the range that is 1 ~ 6. (Normal)");
+                    appendLn(builder,nl);
+                    return false;
+                }
+            }
+        }else{
+            // amorphous
+            if(config.getStringList("coordinate").isEmpty()){
+                appendLn(builder,"coordinate -> An empty line found.");
+                appendLn(builder,"  -> You must write anything to 'coordinate' section.");
+                appendLn(builder,nl);
+                return false;
+            }
+            if(config.getStringList("coordinate").size() > 36){
+                appendLn(builder,"coordinate -> Recipe size over the limit.");
+                appendLn(builder,"  -> Recipe size must be in the range that is 1 ~ 36. (Amorphous)");
+            }
+        }
+        return true;
+    }
+
+    private boolean isTagType(String in){
+        if(in.isEmpty()) return false;
+        if(!in.equalsIgnoreCase("normal") && !in.equalsIgnoreCase("amorphous")) return false;
+        return true;
+    }
+
+    private boolean returnsCheck(FileConfiguration config,StringBuilder builder){
+        if(!config.contains("returns")) return true;
+        if(!config.getStringList("returns").isEmpty()) return true;
+        List<String> returns = config.getStringList("returns");
+        for(String s : returns){
+            List<String> list = Arrays.asList(s.split(","));
+            if(list.size() != 3){
+                appendLn(builder,"returns -> Parameters not enough or over.");
+                appendLn(builder,"  -> TargetMaterial,ReturnMaterial,Amount");
+                appendLn(builder,nl);
+                return false;
+            }
+        }
+        return true;
     }
 
     private void appendLn(StringBuilder builder,String str){
