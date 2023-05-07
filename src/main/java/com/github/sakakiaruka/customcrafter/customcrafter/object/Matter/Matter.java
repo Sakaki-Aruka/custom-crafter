@@ -11,6 +11,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.nl;
+
 public class Matter implements Matters {
     private String name;
     private List<Material> candidate;
@@ -108,7 +110,8 @@ public class Matter implements Matters {
     }
 
     public boolean hasWrap(){
-        return wrap != null;
+        if(wrap == null) return false;
+        return wrap.isEmpty();
     }
 
     public void addWrap(EnchantWrap in){
@@ -148,7 +151,7 @@ public class Matter implements Matters {
     public String getAllWrapInfo(){
         if(!hasWrap())return "";
         StringBuilder builder = new StringBuilder();
-        getWrap().forEach(s->builder.append(s.info()+"\n"));
+        getWrap().forEach(s->builder.append(s.info()+nl));
         return builder.toString();
     }
 
@@ -160,13 +163,33 @@ public class Matter implements Matters {
         return false;
     }
 
+    public Matter copy(){
+        List<Material> candidate = this.candidate;
+        String name = this.name;
+        int amount = this.amount;
+        List<EnchantWrap> wrap = hasWrap() ? this.wrap : null;
+        boolean mass = this.mass;
+        Matter matter = new Matter(name,candidate,wrap,amount,mass);
+        return matter;
+    }
+
+    public Matter oneCopy(){
+        List<Material> candidate = this.candidate;
+        String name = this.name;
+        int amount = 1;
+        List<EnchantWrap> wrap = hasWrap() ? this.wrap : null;
+        boolean mass = this.mass;
+        Matter matter = new Matter(name,candidate,wrap,amount,mass);
+        return matter;
+    }
+
     public String info(){
         StringBuilder builder = new StringBuilder();
-        builder.append(String.format("name : %s\n",name));
-        builder.append(String.format("candidate : %s\n",candidate.toString()));
-        builder.append(String.format("wrap : %s",hasWrap() ? getAllWrapInfo() : "null\n"));
-        builder.append(String.format("amount : %d\n",amount));
-        builder.append(String.format("mass : %b\n",isMass()));
+        builder.append(String.format("name : %s"+nl,name.isEmpty() ? candidate.get(0).name() : name));
+        builder.append(String.format("candidate : %s"+nl,candidate.toString()));
+        builder.append(String.format("wrap : %s",hasWrap() ? getAllWrapInfo() : "null"+nl));
+        builder.append(String.format("amount : %d"+nl,amount));
+        builder.append(String.format("mass : %b"+nl,isMass()));
         return builder.toString();
     }
 }

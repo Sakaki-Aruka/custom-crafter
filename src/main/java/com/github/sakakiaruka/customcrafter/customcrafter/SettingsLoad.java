@@ -11,6 +11,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordina
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.MetadataType;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.Result;
+import com.github.sakakiaruka.customcrafter.customcrafter.util.DataCheckerUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.PotionUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -43,6 +44,7 @@ public class SettingsLoad {
     public static final int craftingTableTotalSize = 54;
     public static final int vanillaCraftingSlots = 9;
     public static final int vanillaCraftingSquareSize = 3;
+    public static final String nl = System.getProperty("line.separator");
 
     // === recipes public values === //
     public static Material baseBlock;
@@ -55,7 +57,7 @@ public class SettingsLoad {
 
     // === for data get methods === //
     private static FileConfiguration defaultConfig;
-    private static Map<String,Result> results = new HashMap<>();
+    public static Map<String,Result> results = new HashMap<>();
     public static Map<String, Matter> matters = new HashMap<>();
 
     // === for runnable task === //
@@ -179,7 +181,7 @@ public class SettingsLoad {
             // not exist
             File dir = new File(path.toUri());
             dir.mkdir();
-            System.out.println(String.format("Not found the directory \"%s\".\nSo, the system made the directory named that.",path.toUri().toString()));
+            System.out.println(String.format("Not found the directory \"%s\"."+nl+"So, the system made the directory named that.",path.toUri().toString()));
         }else if(!path.toFile().isDirectory()){
             System.out.println(String.format("The path \"%s\" is not a directory.",path.toUri().toString()));
             System.out.println("You must fix this problem when before you use this plugin.");
@@ -215,6 +217,10 @@ public class SettingsLoad {
         addAllVanillaMaterial();
         for(Path path:paths){
             FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
+
+            //debug
+            new DataCheckerUtil().resultCheck(new StringBuilder(),config,path);
+
             String name = config.getString("name");
             int amount = config.getInt("amount");
             String nameOrRegex = config.getString("nameOrRegex");
@@ -265,11 +271,17 @@ public class SettingsLoad {
         }
     }
 
-    private void getMatter(List<Path> paths){
+    public void getMatter(List<Path> paths){
         // add Null (for Override)
         addNull();
+        addWaterBottle();
+
         Top : for(Path path:paths){
             FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
+
+            //debug
+            new DataCheckerUtil().matterCheck(new StringBuilder(),config,path);
+
             String name = config.getString("name");
             int amount = config.getInt("amount");
             boolean mass = config.getBoolean("mass");
@@ -342,7 +354,7 @@ public class SettingsLoad {
                 if(potions != null) matters.put(name,potions);
 
                 //debug
-                System.out.println("SettingsLoad Potion : \n"+potions.PotionInfo());
+                System.out.println("SettingsLoad Potion : "+nl+potions.PotionInfo());
 
                 continue;
             }
@@ -354,7 +366,12 @@ public class SettingsLoad {
     private void addNull(){
         Matter matter = new Matter(Arrays.asList(Material.AIR),0);
         matters.put("null",matter);
-        matters.put("NULL",matter);
+        //matters.put("NULL",matter);
+    }
+
+    private void addWaterBottle(){
+        Potions waterBottle = new PotionUtil().water_bottle();
+        matters.put("water_bottle",waterBottle);
     }
 
     private Potions makeDrug(Matter matter, FileConfiguration config){
@@ -398,9 +415,19 @@ public class SettingsLoad {
         return list;
     }
 
+    private boolean containsAllMaterialsIgnoreCase(String in){
+        for(String str : allMaterials){
+            if(in.equalsIgnoreCase(str)) return true;
+        }
+        return false;
+    }
+
     private void getRecipe(List<Path> paths){
         for(Path path:paths){
             FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
+
+            new DataCheckerUtil().recipeCheck(new StringBuilder(),config,path);
+
             String name = config.getString("name");
             String tag = config.getString("tag").toUpperCase();
             Result result = results.get(config.getString("result"));
@@ -416,7 +443,7 @@ public class SettingsLoad {
                 */
                 for(String string : config.getStringList("override")){
                     List<String> splitter = Arrays.asList(string.split(" -> "));
-                    String source = splitter.get(0).toUpperCase();
+                    String source = containsAllMaterialsIgnoreCase(splitter.get(0)) ? splitter.get(0).toUpperCase() : splitter.get(0);
                     String shorter = splitter.get(1);
                     overrides.put(shorter,source);
                 }
@@ -475,10 +502,16 @@ public class SettingsLoad {
                  */
                 for(String s:config.getStringList("returns")){
                     List<String> list = Arrays.asList(s.split(","));
+                    ItemStack itemStack;
                     Material material = Material.valueOf(list.get(0).toUpperCase());
-                    Material returnMaterial = Material.valueOf(list.get(1).toUpperCase());
-                    int amount = Integer.valueOf(list.get(2));
-                    ItemStack itemStack  = new ItemStack(returnMaterial,amount);
+                    if(list.get(1).equals("water_bottle")){
+                        itemStack = new PotionUtil().water_bottle_ItemStack();
+                    }else{
+                        Material returnMaterial = Material.valueOf(list.get(1).toUpperCase());
+                        int amount = Integer.valueOf(list.get(2));
+                        itemStack  = new ItemStack(returnMaterial,amount);
+                    }
+
                     returns.put(material,itemStack);
                 }
             }

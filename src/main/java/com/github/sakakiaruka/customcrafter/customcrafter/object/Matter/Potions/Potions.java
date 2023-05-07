@@ -13,9 +13,9 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.*;
 
 public class Potions extends Matter implements Matters {
     private Map<PotionEffect,PotionStrict> data;
@@ -81,15 +81,21 @@ public class Potions extends Matter implements Matters {
 
     public String PotionInfo(){
         StringBuilder builder = new StringBuilder();
-        builder.append("=== potion info ===\n\n");
-        builder.append(String.format("bottle type match : %b -> only '%s'\n",bottleTypeMatch,super.getCandidate().get(0).name()));
+        builder.append("=== potion info ===");
+        builder.append(nl+nl);
+        builder.append(String.format("bottle type match : %b -> only '%s'"+nl,bottleTypeMatch,super.getCandidate().get(0).name()));
         for(Map.Entry<PotionEffect, PotionStrict> entry : data.entrySet()){
             PotionEffect effect = entry.getKey();
-            builder.append(String.format("effect : %s | duration : %d | amplifier : %d\n",effect.getType(),effect.getDuration(),effect.getAmplifier()));
-            builder.append(String.format("potion strict : %s\n\n",entry.getValue()));
+            builder.append(String.format("effect : %s | duration : %d | amplifier : %d"+nl,effect.getType(),effect.getDuration(),effect.getAmplifier()));
+            builder.append(String.format("potion strict : %s"+nl+nl,entry.getValue()));
         }
-        builder.append("=== potion info END ===\n");
+        builder.append("=== potion info END ==="+nl);
         return builder.toString();
+    }
+
+    public boolean hasAnyCustomEffect(){
+        if(this.data == null) return false;
+        return !data.isEmpty();
     }
 
     public boolean hasPotionEffect(PotionEffectType effectType){
@@ -196,6 +202,25 @@ public class Potions extends Matter implements Matters {
     }
 
     public String info(){
-        return super.info()+"\n"+PotionInfo();
+        return super.info()+nl+PotionInfo();
+    }
+
+    public Potions copy(){
+        Matter matter = super.copy();
+        Map<PotionEffect,PotionStrict> data = hasAnyCustomEffect() ? this.data : null;
+        PotionBottleType bottle = this.bottle;
+        boolean match = this.bottleTypeMatch;
+        Potions potion = new Potions(matter,data,bottle,match);
+        return potion;
+    }
+
+    public Potions oneCopy(){
+        Matter matter = super.copy();
+        matter.setAmount(1);
+        Map<PotionEffect,PotionStrict> data = hasAnyCustomEffect() ? this.data : null;
+        PotionBottleType bottle = this.bottle;
+        boolean match = this.bottleTypeMatch;
+        Potions potion = new Potions(matter,data,bottle,match);
+        return potion;
     }
 }

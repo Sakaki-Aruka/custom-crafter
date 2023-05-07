@@ -50,7 +50,11 @@ public class Search {
                 if(recipeMatters.size() != inputMatters.size())continue;
                 for(int i=0;i<recipeMatters.size();i++){
                     if(!isSameMatter(recipeMatters.get(i),inputMatters.get(i)))continue Recipe;
-                    if(!recipeMatters.get(i).getClass().equals(Potions.class) && !inputMatters.get(i).getClass().equals(Potions.class)) continue;
+                    if(!(recipeMatters.get(i).getClass().equals(Potions.class) && inputMatters.get(i).getClass().equals(Potions.class))) continue;
+
+                    //debug
+                    System.out.println("success");
+
                     if(!new PotionUtil().isSamePotion((Potions) recipeMatters.get(i),(Potions) inputMatters.get(i)))continue Recipe;
 
                 }
@@ -150,8 +154,16 @@ public class Search {
                     Matter recipeMatter = recipe.getContentsNoAir().get(i);
                     Matter inputMatter = input.getContentsNoAir().get(i);
 
-//                    //debug
-//                    System.out.println(String.format("recipe : %b | input : %b",recipeMatter.hasWrap(),inputMatter.hasWrap()));
+
+                    //debug (amount one virtual test)
+                    Matter rOne = recipeMatter.oneCopy();
+                    Matter iOne = inputMatter.oneCopy();
+
+                    if(!isSameMatter(rOne,iOne)) continue Top;
+                    if(!(rOne.getClass().equals(Potions.class) && iOne.getClass().equals(Potions.class))) continue;
+                    if(!new PotionUtil().isSamePotion((Potions)rOne,(Potions) iOne)) continue Top;
+
+                    //debug end (amount one virtual test end)
 
                     if(recipe.getContentsNoAir().get(i).isMass()){
                         if(inputMatter.getAmount() != 1)continue Top;
@@ -374,6 +386,10 @@ public class Search {
 
 
     public boolean isSameMatter(Matter recipe,Matter input){
+
+        //debug
+        System.out.println(String.format("1 %b | 2 %b | 3 %b",recipe.getCandidate().containsAll(input.getCandidate()),recipe.getAmount() == input.getAmount(),getEnchantWrapCongruence(recipe,input)));
+
         if(!recipe.getCandidate().containsAll(input.getCandidate()))return false;
         if(recipe.getAmount() != input.getAmount())return false;
         if(!getEnchantWrapCongruence(recipe,input))return false;
@@ -517,9 +533,6 @@ public class Search {
         if(models.size() != reals.size())return false;
         int size = models.size();
         for(int i=1;i<size;i++){
-
-//            //debug
-//            System.out.println(String.format("xGap* : %d | yGap* : %d",models.get(i).getX() - reals.get(i).getX(),models.get(i).getY() - reals.get(i).getY()));
 
             if(models.get(i).getX() - reals.get(i).getX() != xGap)return false;
             if(models.get(i).getY() - reals.get(i).getY() != yGap)return false;
