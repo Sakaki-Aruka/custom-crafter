@@ -111,14 +111,6 @@ public class PotionUtil {
             if(!recipe.getBottle().equals(input.getBottle())) return false;
             return true;
         }
-//
-//        //debug
-//        System.out.println(String.format("r : %s\ni : %s",r.PotionInfo(),i.PotionInfo()));
-//
-//
-//        if(r.getName().equals("water_bottle")){
-//            if(i.hasAnyCustomEffect()) return false;
-//        }
 
         for(Map.Entry<PotionEffect, PotionStrict> entry : r.getData().entrySet()){
 
@@ -129,6 +121,10 @@ public class PotionUtil {
             }
 
             if(!i.hasPotionEffect(entry.getKey().getType())) return false;
+
+            if(entry.getValue().equals(PotionStrict.ONLY_EFFECT)){
+                if(!i.hasPotionEffect(effectType)) return false;
+            }
 
             if(entry.getValue().equals(PotionStrict.ONLY_DURATION)){
                 if(entry.getKey().getDuration() != i.getDuration(effectType)) return false;
