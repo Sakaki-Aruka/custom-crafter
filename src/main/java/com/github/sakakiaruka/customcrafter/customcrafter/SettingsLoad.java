@@ -19,6 +19,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.permissions.Permission;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -435,6 +436,7 @@ public class SettingsLoad {
             Map<Coordinate,Matter> coordinates = new LinkedHashMap<>();
             Map<Material, ItemStack> returns = new HashMap<>();
             Map<String,String> overrides = new HashMap<>();
+            Permission permission = null;
 
             if(config.contains("override")){
                 /* override:
@@ -516,7 +518,12 @@ public class SettingsLoad {
                 }
             }
 
-            Recipe recipe = new Recipe(name,tag,coordinates,returns,result);
+            if(config.contains("permission") && !config.getString("permission").isEmpty()){
+                // permission
+                permission = new Permission(config.getString("permission"));
+            }
+
+            Recipe recipe = new Recipe(name,tag,coordinates,returns,result,permission);
             recipes.add(recipe);
             namedRecipes.put(name,recipe);
         }

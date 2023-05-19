@@ -4,6 +4,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.Result;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.permissions.Permission;
 
 import java.util.*;
 
@@ -13,12 +14,14 @@ public class Recipe {
     private Map<Coordinate, Matter> coordinate;
     private Map<Material, ItemStack> returnItems;
     private Result result;
-    public Recipe(String name,String tag,Map<Coordinate,Matter> coordinate,Map<Material,ItemStack> returnItems,Result result){
+    private Permission permission;
+    public Recipe(String name,String tag,Map<Coordinate,Matter> coordinate,Map<Material,ItemStack> returnItems,Result result,Permission permission){
         this.name = name;
         this.tag = Tag.valueOf(tag);
         this.coordinate = coordinate;
         this.returnItems = returnItems;
         this.result = result;
+        this.permission = permission;
     }
 
     public Recipe(){ //only used for temporary (mainly real) -> tag is "Normal"
@@ -27,6 +30,7 @@ public class Recipe {
         this.coordinate = new LinkedHashMap<>();
         this.returnItems = null;
         this.result = null;
+        this.permission = null;
     }
 
     public void addCoordinate(int x,int y,Matter matter){
@@ -71,6 +75,18 @@ public class Recipe {
 
     public void setResult(Result result) {
         this.result = result;
+    }
+
+    public Permission getPermission() {
+        return permission;
+    }
+
+    public void setPermission(Permission permission) {
+        this.permission = permission;
+    }
+
+    public boolean isLimited(){
+        return permission != null;
     }
 
     public List<Matter> getContentsNoAir(){
