@@ -34,7 +34,6 @@ public class Search {
 
         Recipe input = toRecipe(inventory);
         Recipe:for(Recipe recipe : recipes){
-            if(recipe.isLimited() && !player.hasPermission(recipe.getPermission())) continue;
             if(recipe.getTag().equals(Tag.NORMAL)){
 
                 //debug
@@ -143,7 +142,6 @@ public class Search {
         int massAmount = 0;
         Recipe input = toRecipe(inventory);
         Top:for(Recipe recipe:recipes){
-            if(recipe.isLimited() && !player.hasPermission(recipe.getPermission())) continue;
             if(recipe.getTag().equals(Tag.NORMAL)){
                 //normal
                 if(getSquareSize(recipe) != getSquareSize(input))continue;

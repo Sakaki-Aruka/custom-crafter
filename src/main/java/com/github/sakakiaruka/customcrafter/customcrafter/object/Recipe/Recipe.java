@@ -1,6 +1,7 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe;
 
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Permission.RecipePermission;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.Result;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -13,9 +14,9 @@ public class Recipe {
     private Tag tag;
     private Map<Coordinate, Matter> coordinate;
     private Map<Material, ItemStack> returnItems;
+    private RecipePermission permission;
     private Result result;
-    private Permission permission;
-    public Recipe(String name,String tag,Map<Coordinate,Matter> coordinate,Map<Material,ItemStack> returnItems,Result result,Permission permission){
+    public Recipe(String name,String tag,Map<Coordinate,Matter> coordinate,Map<Material,ItemStack> returnItems,Result result, RecipePermission permission){
         this.name = name;
         this.tag = Tag.valueOf(tag);
         this.coordinate = coordinate;
@@ -77,15 +78,15 @@ public class Recipe {
         this.result = result;
     }
 
-    public Permission getPermission() {
+    public RecipePermission getPermission() {
         return permission;
     }
 
-    public void setPermission(Permission permission) {
+    public void setPermission(RecipePermission permission) {
         this.permission = permission;
     }
 
-    public boolean isLimited(){
+    public boolean hasPermission(){
         return permission != null;
     }
 
