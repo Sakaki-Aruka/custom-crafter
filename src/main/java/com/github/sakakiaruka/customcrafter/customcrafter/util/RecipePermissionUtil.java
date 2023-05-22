@@ -7,10 +7,15 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import java.nio.file.Path;
 import java.util.*;
 
+import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.nl;
+import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.upperArrow;
+
 public class RecipePermissionUtil{
 
     public static Map<String,RecipePermission> recipePermissionMap = new HashMap<>();
     public static Map<UUID,List<RecipePermission>> playerPermissions = new HashMap<>();
+
+
 
     public void makeRecipePermissionMap(List<RecipePermission> list){
         list.forEach(s-> recipePermissionMap.put(s.getPermissionName(),s));
@@ -52,7 +57,7 @@ public class RecipePermissionUtil{
             List<String> list = Arrays.asList(perm.split("|"));
             String name = list.get(0).replace("name:","");
             String parent = list.get(1).replace("parent:","");
-            RecipePermission permission = new RecipePermission(parent,name);
+            RecipePermission permission = parent.equals("ROOT") ? RecipePermission.ROOT : new RecipePermission(parent,name);
             permissionList.add(permission);
         }
         makeRecipePermissionMap(permissionList);
@@ -136,6 +141,25 @@ public class RecipePermissionUtil{
         RecipePermission parent = recipePermissionMap.get(rp.getParent());
         list.add(parent);
         recourse(parent,list);
+    }
+
+    public String getPermissionTree(RecipePermission perm){
+        StringBuilder builder = new StringBuilder();
+        builder.append(String.format("=== Permission Info ===%s",nl));
+        if(perm.equals(RecipePermission.ROOT)){
+            // only ROOT
+            builder.append(String.format("%s%s - Parent : --- %s - Name : ROOT%s",RecipePermission.ROOT.getPermissionName(),nl,nl,nl));
+            return builder.toString();
+        }
+        List<RecipePermission> permList = new ArrayList<>();
+        recourse(perm,permList);
+        Collections.reverse(permList); // ~,...,ROOT -> ROOT,~,...~
+        for(RecipePermission rp : permList){
+            String arrow = String.join("",Collections.nCopies(permList.indexOf(rp),upperArrow));
+            String data = String.format("%s - Parent : --- %s - Name : %s %s",nl,nl,rp.getPermissionName(),nl);
+            builder.append(String.format("%s%s%s%s%s%s",nl,nl,arrow,nl,data,nl));
+        }
+        return builder.toString();
     }
 
 }

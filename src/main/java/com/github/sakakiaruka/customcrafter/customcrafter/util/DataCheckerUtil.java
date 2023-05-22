@@ -19,10 +19,6 @@ import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.*;
 
 public class DataCheckerUtil {
 
-    private final String bar = String.join("",Collections.nCopies(40,"="));
-    private final String shortBar = String.join("",Collections.nCopies(20,"="));
-    //private final String nl = System.getProperty("line.separator");
-
     public void matterCheck(StringBuilder builder, FileConfiguration config, Path path){
         int count = 0;
         appendLn(builder,bar);

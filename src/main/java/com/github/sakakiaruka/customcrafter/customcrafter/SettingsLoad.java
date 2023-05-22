@@ -36,6 +36,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter.getInstance;
+import static com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil.playerPermissions;
 import static com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil.recipePermissionMap;
 
 public class SettingsLoad {
@@ -48,6 +49,9 @@ public class SettingsLoad {
     public static final int vanillaCraftingSlots = 9;
     public static final int vanillaCraftingSquareSize = 3;
     public static final String nl = System.getProperty("line.separator");
+    public static final String bar = String.join("",Collections.nCopies(40,"="));
+    public static final String shortBar = String.join("",Collections.nCopies(20,"="));
+    public static final String upperArrow = String.format("↑");
 
     // === recipes public values === //
     public static Material baseBlock;
@@ -83,7 +87,7 @@ public class SettingsLoad {
 
     private void recipePermissionLoad(){
 
-        if(defaultConfig.contains("permissions")){
+        if(defaultConfig.contains("permissions") && defaultConfig.contains("relate")){
             // The file that defines RecipePermissions.
             Path path = Paths.get(defaultConfig.getString("permissions"));
             new RecipePermissionUtil().permissionSettingsLoad(path);
@@ -91,6 +95,9 @@ public class SettingsLoad {
             // The file that defines the relate between players and RecipePermissions.
             Path relate = Paths.get(defaultConfig.getString("relate"));
             new RecipePermissionUtil().permissionRelateLoad(relate);
+
+            // Resolve permission duplications.
+            playerPermissions.entrySet().forEach(s-> new RecipePermissionUtil().removePermissionConflicts(s.getValue()));
         }
     }
 

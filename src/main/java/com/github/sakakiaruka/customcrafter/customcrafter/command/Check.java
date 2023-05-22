@@ -34,6 +34,10 @@ public class Check implements CommandExecutor {
             if(!sender.isOp())return false;
             reload();
         }
+        else if(args[0].equalsIgnoreCase("-p")){
+            if(args.length != 2) return false;
+            new PermissionCheck().main(args[1]);
+        }
         else {
             System.out.println(getGraphicalRecipe(args[0]));
         }
