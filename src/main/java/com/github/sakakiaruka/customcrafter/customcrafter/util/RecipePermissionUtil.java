@@ -16,8 +16,17 @@ public class RecipePermissionUtil{
         list.forEach(s-> recipePermissionMap.put(s.getPermissionName(),s));
     }
 
+    // TODO : write a data writer about playerPermissions
     public void permissionRelateLoad(Path path){
         FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
+        /*
+        * (example)
+        * ROOT:
+        *   - 069a79f444e94726a5befca90e38aaf5
+        * Potion:
+        *   - af74a02d19cb445bb07f6866a861f783
+        *
+         */
         for(String key : recipePermissionMap.keySet()){
             if(!config.contains(key)) continue;
             for(String id : config.getStringList(key)){
@@ -30,6 +39,12 @@ public class RecipePermissionUtil{
 
     public void permissionSettingsLoad(Path path){
         // to collect RecipePermission settings from the config file.
+        /*
+        * (example)
+        * permissions:
+        *   - name:Potion|parent:ROOT
+        *   - name:SpeedPotion|parent:Potion
+         */
         FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
         List<String> data = config.getStringList("permissions");
         List<RecipePermission> permissionList = new ArrayList<>();
