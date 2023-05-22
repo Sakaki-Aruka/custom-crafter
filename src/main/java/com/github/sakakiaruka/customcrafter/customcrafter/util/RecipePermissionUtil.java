@@ -19,6 +19,7 @@ public class RecipePermissionUtil{
 
     public void makeRecipePermissionMap(List<RecipePermission> list){
         list.forEach(s-> recipePermissionMap.put(s.getPermissionName(),s));
+        recipePermissionMap.put("ROOT",RecipePermission.ROOT);
     }
 
     // TODO : write a data writer about playerPermissions
@@ -54,10 +55,10 @@ public class RecipePermissionUtil{
         List<String> data = config.getStringList("permissions");
         List<RecipePermission> permissionList = new ArrayList<>();
         for(String perm : data){
-            List<String> list = Arrays.asList(perm.split("|"));
+            List<String> list = Arrays.asList(perm.split("!"));
             String name = list.get(0).replace("name:","");
             String parent = list.get(1).replace("parent:","");
-            RecipePermission permission = parent.equals("ROOT") ? RecipePermission.ROOT : new RecipePermission(parent,name);
+            RecipePermission permission = new RecipePermission(parent,name);
             permissionList.add(permission);
         }
         makeRecipePermissionMap(permissionList);
@@ -152,12 +153,13 @@ public class RecipePermissionUtil{
             return builder.toString();
         }
         List<RecipePermission> permList = new ArrayList<>();
+        permList.add(perm); // add self
         recourse(perm,permList);
         Collections.reverse(permList); // ~,...,ROOT -> ROOT,~,...~
         for(RecipePermission rp : permList){
             String arrow = String.join("",Collections.nCopies(permList.indexOf(rp),upperArrow));
-            String data = String.format("%s - Parent : --- %s - Name : %s %s",nl,nl,rp.getPermissionName(),nl);
-            builder.append(String.format("%s%s%s%s%s%s",nl,nl,arrow,nl,data,nl));
+            String data = String.format("%s - Parent : %s %s - Name : %s %s",nl,rp.getParent(),nl,rp.getPermissionName(),nl);
+            builder.append(String.format("%s%s%s%s",nl,arrow,nl,data));
         }
         return builder.toString();
     }

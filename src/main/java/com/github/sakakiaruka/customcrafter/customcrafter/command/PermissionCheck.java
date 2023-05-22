@@ -7,8 +7,14 @@ import static com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePerm
 
 public class PermissionCheck {
     public void main(String name){
-        if(recipePermissionMap.containsKey(name)) return;
+        if(!recipePermissionMap.containsKey(name)) return;
         RecipePermission perm = recipePermissionMap.get(name);
+
+        //debug
+        System.out.println(recipePermissionMap);
+        System.out.println("name: "+name);
+        System.out.println(perm.toStr());
+
         System.out.println(new RecipePermissionUtil().getPermissionTree(perm));
     }
 }

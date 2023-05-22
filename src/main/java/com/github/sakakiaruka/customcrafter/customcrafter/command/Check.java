@@ -35,7 +35,7 @@ public class Check implements CommandExecutor {
             reload();
         }
         else if(args[0].equalsIgnoreCase("-p")){
-            if(args.length != 2) return false;
+            if(args[1] == null) return false;
             new PermissionCheck().main(args[1]);
         }
         else {

@@ -1,8 +1,10 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.object.Permission;
 
+import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.nl;
+
 public class RecipePermission {
 
-    public static final RecipePermission ROOT = new RecipePermission(null,"ROOT");
+    public static final RecipePermission ROOT = new RecipePermission("NULL","ROOT");
     private String parent;
     private String name;
 
@@ -25,5 +27,12 @@ public class RecipePermission {
 
     public void setPermissionName(String name) {
         this.name = name;
+    }
+
+    public String toStr(){
+        StringBuilder builder = new StringBuilder();
+        builder.append(String.format("parent: %s | name: %s%s",parent,name,nl));
+        return builder.toString();
+
     }
 }
