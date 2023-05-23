@@ -38,6 +38,17 @@ public class PermissionCheck {
 
     private void displayPermissionInfo(String name){
         // /cc -p [permissionName]
+
+        //debug
+        RecipePermissionUtil util = new RecipePermissionUtil();
+        RecipePermission r1 = new RecipePermission("ROOT","CHILD");
+        RecipePermission r2 = new RecipePermission("CHILD","GRAND_CHILD");
+        RecipePermission r3 = new RecipePermission("GRAND_CHILD","GREAT_GRAND_CHILD");
+        RecipePermission rr1 = new RecipePermission("ROOT","CHILD_1");
+        RecipePermission rr2 = new RecipePermission("CHILD_1","CHILD_2");
+        RecipePermission rr3 = new RecipePermission("CHILD_2","CHILD_3");
+        System.out.println(String.format("r1,r2 line: %b | r2,r3: %b | r1,rr1: %b | rr1,rr2: %b | rr1,rr3: %b | r1,rr3: %b",util.isInSameLine(r2,r1),util.isInSameLine(r3,r2), util.isInSameLine(rr1,r1),util.isInSameLine(rr2,rr1), util.isInSameLine(rr3,rr1), util.isInSameLine(rr3,r1)));
+
         RecipePermission perm = recipePermissionMap.get(name);
         System.out.println(new RecipePermissionUtil().getPermissionTree(perm));
     }
