@@ -1,5 +1,6 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.util;
 
+import com.github.sakakiaruka.customcrafter.customcrafter.command.PermissionCheck;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Permission.RecipePermission;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -94,45 +95,40 @@ public class RecipePermissionUtil{
         makeRecipePermissionMap(permissionList);
     }
 
-    public void removePermissionConflicts(List<RecipePermission> list){
-        //
-        Map<Integer,List<RecipePermission>> related = new HashMap<>();
-        for(RecipePermission perm : list){
-            List<RecipePermission> rpList = new ArrayList<>();
-            recourse(perm,rpList);
-            if(!related.containsKey(rpList.size())) related.put(rpList.size(),new ArrayList<>());
-            related.get(rpList.size()).add(perm);
-        }
 
-        related.remove(0); // remove "ROOT"
-
+    public List<RecipePermission> removePermissionDuplications(List<RecipePermission> list){
+        List<RecipePermission> sorted = permissionSort(list);
         Set<RecipePermission> removeBuffer = new HashSet<>();
-        for(Map.Entry<Integer,List<RecipePermission>> entry : related.entrySet()){
-            int gen = entry.getKey();
-            List<RecipePermission> source = entry.getValue();
-            List<RecipePermission> under = new ArrayList<>();
-            for(Map.Entry<Integer,List<RecipePermission>> entry2 : related.entrySet()){
-                if(entry2.getKey() <= gen) continue;
-                under.addAll(entry2.getValue());
-            }
-            for(RecipePermission rp : under){
-                for(RecipePermission rpp : source){
-                    if(inSameTree(rp,rpp)) removeBuffer.add(rp);
-                }
+        for(RecipePermission perm : sorted){
+            int index = sorted.indexOf(perm);
+            for(RecipePermission underPerm : sorted.subList(index+1,sorted.size())){
+                if(inSameTree(perm,underPerm)) removeBuffer.add(underPerm);
             }
         }
 
-        for(RecipePermission perm : removeBuffer){
-            if(list.contains(perm)) list.remove(perm);
+        list.removeAll(removeBuffer);
+        return list;
+    }
+
+    private List<RecipePermission> permissionSort(List<RecipePermission> list){
+        // parents length: short -> long
+        Map<Integer,List<RecipePermission>> map = new TreeMap<>();
+        if(list.isEmpty()) return new ArrayList<>();
+        for(RecipePermission perm : list){
+            List<RecipePermission> l = new ArrayList<>();
+            l.add(perm);
+            recourse(perm,l);
+            if(!map.containsKey(l.size())) map.put(l.size(),new ArrayList<>());
+            map.get(l.size()).add(perm);
         }
+
+        List<RecipePermission> result = new ArrayList<>();
+        for(Map.Entry<Integer,List<RecipePermission>> entry : map.entrySet()){
+            result.addAll(entry.getValue());
+        }
+        return result;
     }
 
-
-    public boolean permContains(RecipePermission target, RecipePermission source){
-        // wrapper
-        if(!inSameTree(target,source)) return false;
-        return isUpper(target, source) || isSame(target, source);
-    }
 
 
     public boolean inSameTree(RecipePermission a, RecipePermission b){
@@ -158,27 +154,17 @@ public class RecipePermissionUtil{
     }
 
 
-    public boolean isUpper(RecipePermission target, RecipePermission source){
-        if(target.getParent().equals(RecipePermission.ROOT.getPermissionName())) {
-            return source.getParent().equals(RecipePermission.ROOT.getPermissionName());
-        }
-        if(!inSameTree(target, source)) return false;
-        List<RecipePermission> targetParents = new ArrayList<>();
-        List<RecipePermission> sourceParents = new ArrayList<>();
-        recourse(target,targetParents);
-        recourse(source,sourceParents);
-        return targetParents.size() > sourceParents.size();
-
+    public boolean isUpper(RecipePermission source, RecipePermission target){
+        // permission order: source > target (true) | source == target (false) | source < target (false)
+        if(source.equals(target)) return false;
+        if(!inSameTree(source,target)) return false;
+        List<RecipePermission> sL = new ArrayList<>();
+        List<RecipePermission> tL = new ArrayList<>();
+        recourse(source,sL);
+        recourse(target,tL);
+        return sL.size() < tL.size(); // parent long -> nearer a bottom of the permission
     }
 
-    public boolean isUnder(RecipePermission target, RecipePermission source){
-        if(!inSameTree(target, source)) return false;
-        return !isUpper(target, source);
-    }
-
-    public boolean isSame(RecipePermission target, RecipePermission source){
-        return target.getPermissionName().equals(source.getPermissionName());
-    }
 
     private void recourse(RecipePermission rp, List<RecipePermission> list){
         if(rp.equals(RecipePermission.ROOT)) return;

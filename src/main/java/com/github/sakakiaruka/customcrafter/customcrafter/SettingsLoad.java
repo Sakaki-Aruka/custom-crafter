@@ -97,7 +97,7 @@ public class SettingsLoad {
             new RecipePermissionUtil().permissionRelateLoad(relate);
 
             // Resolve permission duplications.
-            playerPermissions.entrySet().forEach(s-> new RecipePermissionUtil().removePermissionConflicts(s.getValue()));
+            playerPermissions.entrySet().forEach(s-> new RecipePermissionUtil().removePermissionDuplications(s.getValue()));
         }
     }
 
