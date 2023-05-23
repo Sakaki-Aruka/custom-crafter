@@ -36,7 +36,7 @@ public class Check implements CommandExecutor {
         }
         else if(args[0].equalsIgnoreCase("-p")){
             if(args[1] == null) return false;
-            new PermissionCheck().main(args,(Player) sender);
+            new PermissionCheck().main(args,sender);
         }
         else {
             System.out.println(getGraphicalRecipe(args[0]));

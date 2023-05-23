@@ -117,7 +117,7 @@ public class RecipePermissionUtil{
             }
             for(RecipePermission rp : under){
                 for(RecipePermission rpp : source){
-                    if(isInSameLine(rp,rpp)) removeBuffer.add(rp);
+                    if(inSameTree(rp,rpp)) removeBuffer.add(rp);
                 }
             }
         }
@@ -130,26 +130,39 @@ public class RecipePermissionUtil{
 
     public boolean permContains(RecipePermission target, RecipePermission source){
         // wrapper
-        if(!isInSameLine(target,source)) return false;
+        if(!inSameTree(target,source)) return false;
         return isUpper(target, source) || isSame(target, source);
     }
 
-    public boolean isInSameLine(RecipePermission target, RecipePermission source){
-        List<RecipePermission> targetParents = new ArrayList<>();
-        List<RecipePermission> sourceParents = new ArrayList<>();
-        recourse(target, targetParents);
-        recourse(source, sourceParents);
-        if(targetParents.isEmpty() || sourceParents.isEmpty()) return true; // When either one is "ROOT".
-        for(int i=0;i<Math.min(targetParents.size(), sourceParents.size());i++){
-            if(!targetParents.get(i).getPermissionName().equals(sourceParents.get(i).getPermissionName())) return false;
+
+    public boolean inSameTree(RecipePermission a, RecipePermission b){
+        if(a.equals(b)) return true;
+        List<RecipePermission> as = new ArrayList<>();
+        List<RecipePermission> bs = new ArrayList<>();
+        as.add(a);
+        bs.add(b);
+        recourse(a,as);
+        recourse(b,bs);
+        if(as.isEmpty() || bs.isEmpty()) return true; // When either one is "ROOT"
+
+        RecipePermission point = getLonger(as,bs).equals(as) ? b : a;
+        for(RecipePermission rp : getLonger(as,bs)){
+            if(rp.equals(point)) return true;
         }
-        return true;
+        return false;
     }
+
+    private List<RecipePermission> getLonger(List<RecipePermission> a, List<RecipePermission> b){
+        if(a.size() == b.size()) return a;
+        return a.size() > b.size() ? a : b;
+    }
+
+
     public boolean isUpper(RecipePermission target, RecipePermission source){
         if(target.getParent().equals(RecipePermission.ROOT.getPermissionName())) {
             return source.getParent().equals(RecipePermission.ROOT.getPermissionName());
         }
-        if(!isInSameLine(target, source)) return false;
+        if(!inSameTree(target, source)) return false;
         List<RecipePermission> targetParents = new ArrayList<>();
         List<RecipePermission> sourceParents = new ArrayList<>();
         recourse(target,targetParents);
@@ -159,7 +172,7 @@ public class RecipePermissionUtil{
     }
 
     public boolean isUnder(RecipePermission target, RecipePermission source){
-        if(!isInSameLine(target, source)) return false;
+        if(!inSameTree(target, source)) return false;
         return !isUpper(target, source);
     }
 

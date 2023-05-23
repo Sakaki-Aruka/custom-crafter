@@ -3,6 +3,7 @@ package com.github.sakakiaruka.customcrafter.customcrafter.command;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Permission.RecipePermission;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ import static com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePerm
 import static com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil.recipePermissionMap;
 
 public class PermissionCheck {
-    public void main(String[] args,Player player){
+    public void main(String[] args, CommandSender sender){
 
         String name = args[1];
         if(args.length == 3 && args[1].equals("-p")) {
@@ -28,7 +29,8 @@ public class PermissionCheck {
             displayPlayerPermissions(uuid);
 
         }else if(args[1].equals("-m")){
-            playersPermissionModify(args,player);
+            if(!sender.isOp()) return;
+            playersPermissionModify(args);
 
         }else if(args.length == 2 && recipePermissionMap.containsKey(name)){
             displayPermissionInfo(name);
@@ -47,7 +49,13 @@ public class PermissionCheck {
         RecipePermission rr1 = new RecipePermission("ROOT","CHILD_1");
         RecipePermission rr2 = new RecipePermission("CHILD_1","CHILD_2");
         RecipePermission rr3 = new RecipePermission("CHILD_2","CHILD_3");
-        System.out.println(String.format("r1,r2 line: %b | r2,r3: %b | r1,rr1: %b | rr1,rr2: %b | rr1,rr3: %b | r1,rr3: %b",util.isInSameLine(r2,r1),util.isInSameLine(r3,r2), util.isInSameLine(rr1,r1),util.isInSameLine(rr2,rr1), util.isInSameLine(rr3,rr1), util.isInSameLine(rr3,r1)));
+        recipePermissionMap.put("CHILD",r1);
+        recipePermissionMap.put("GRAND_CHILD",r2);
+        recipePermissionMap.put("CHILD_1",rr1);
+        System.out.println(String.format("r1 -> r2: %b",util.inSameTree(r1,r2)));
+        System.out.println(String.format("r2 -> r1: %b",util.inSameTree(r2,r1)));
+        System.out.println(String.format("rr1 -> r1: %b",util.inSameTree(rr1,r1)));
+//        System.out.println(String.format("r1,r2 line: %b | r2,r3: %b | r1,rr1: %b | rr1,rr2: %b | rr1,rr3: %b | r1,rr3: %b",util.isInSameLine(r2,r1),util.isInSameLine(r3,r2), util.isInSameLine(rr1,r1),util.isInSameLine(rr2,rr1), util.isInSameLine(rr3,rr1), util.isInSameLine(rr3,r1)));
 
         RecipePermission perm = recipePermissionMap.get(name);
         System.out.println(new RecipePermissionUtil().getPermissionTree(perm));
@@ -69,11 +77,10 @@ public class PermissionCheck {
         System.out.println(builder);
     }
 
-    private boolean playersPermissionModify(String[] args,Player player){
+    private boolean playersPermissionModify(String[] args){
         // /cc -p -m [targetPlayerName] [operation] [targetRecipePermission]
         // operation -> [add | remove]
 
-        if(!player.isOp()) return false;
         if(args.length != 5) return false;
         if(!isNamePlayerOnline(args[2])) return false;
         Player target = Bukkit.getPlayer(args[2]);
@@ -95,7 +102,6 @@ public class PermissionCheck {
 
         }
 
-        System.out.println(String.format("target: %s | operation: %s | player: %s",permission.getPermissionName(),operation,player.getName()));
         return true;
     }
 
