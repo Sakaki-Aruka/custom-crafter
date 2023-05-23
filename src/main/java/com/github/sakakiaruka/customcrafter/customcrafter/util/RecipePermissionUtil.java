@@ -3,6 +3,7 @@ package com.github.sakakiaruka.customcrafter.customcrafter.util;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Permission.RecipePermission;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.entity.Player;
 
 import java.nio.file.Path;
 import java.util.*;
@@ -23,6 +24,35 @@ public class RecipePermissionUtil{
     }
 
     // TODO : write a data writer about playerPermissions
+
+    public void playerPermissionWriter(Path path){
+        FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
+        Map<String,List<String>> map = new HashMap<>();
+        for(Map.Entry<UUID,List<RecipePermission>> entry : playerPermissions.entrySet()){
+            UUID player = entry.getKey();
+            for(RecipePermission perm : entry.getValue()){
+                String permStr = perm.getPermissionName();
+                if(!map.containsKey(permStr)) map.put(permStr,new ArrayList<>());
+                map.get(permStr).add(player.toString());
+            }
+        }
+
+        for(Map.Entry<String,List<String>> entry : map.entrySet()){
+            config.set(entry.getKey(),entry.getValue());
+        }
+    }
+
+    public boolean hasPermission(RecipePermission perm, Player player){
+        UUID uuid = player.getUniqueId();
+        if(!playerPermissions.containsKey(uuid)) return false;
+        List<RecipePermission> perms = playerPermissions.get(uuid);
+        for(RecipePermission rp : perms){
+            if(rp.getPermissionName().equals(perm.getPermissionName())) return true;
+        }
+        return false;
+    }
+
+
     public void permissionRelateLoad(Path path){
         FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
         /*
