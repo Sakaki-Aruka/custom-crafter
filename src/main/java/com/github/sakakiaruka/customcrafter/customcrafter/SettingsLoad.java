@@ -7,19 +7,20 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.PotionBottleType;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.PotionStrict;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.Potions;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Permission.RecipePermission;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordinate;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.MetadataType;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.Result;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.DataCheckerUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.PotionUtil;
+import com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.permissions.Permission;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -35,6 +36,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter.getInstance;
+import static com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil.playerPermissions;
+import static com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil.recipePermissionMap;
 
 public class SettingsLoad {
 
@@ -46,6 +49,9 @@ public class SettingsLoad {
     public static final int vanillaCraftingSlots = 9;
     public static final int vanillaCraftingSquareSize = 3;
     public static final String nl = System.getProperty("line.separator");
+    public static final String bar = String.join("",Collections.nCopies(40,"="));
+    public static final String shortBar = String.join("",Collections.nCopies(20,"="));
+    public static final String upperArrow = String.format("↑");
 
     // === recipes public values === //
     public static Material baseBlock;
@@ -74,8 +80,25 @@ public class SettingsLoad {
     public void load(){
         defaultConfig = getInstance().getConfig();
         new OpenCraftingTable().setCraftingInventory();
+        recipePermissionLoad();
         getAllMaterialsName();
         main();
+    }
+
+    private void recipePermissionLoad(){
+
+        if(defaultConfig.contains("permissions") && defaultConfig.contains("relate")){
+            // The file that defines RecipePermissions.
+            Path path = Paths.get(defaultConfig.getString("permissions"));
+            new RecipePermissionUtil().permissionSettingsLoad(path);
+
+            // The file that defines the relate between players and RecipePermissions.
+            Path relate = Paths.get(defaultConfig.getString("relate"));
+            new RecipePermissionUtil().permissionRelateLoad(relate);
+
+            // Resolve permission duplications.
+            playerPermissions.entrySet().forEach(s-> new RecipePermissionUtil().removePermissionDuplications(s.getValue()));
+        }
     }
 
     private void getAllMaterialsName(){
@@ -436,7 +459,7 @@ public class SettingsLoad {
             Map<Coordinate,Matter> coordinates = new LinkedHashMap<>();
             Map<Material, ItemStack> returns = new HashMap<>();
             Map<String,String> overrides = new HashMap<>();
-            Permission permission = null;
+            RecipePermission permission = null;
 
             if(config.contains("override")){
                 /* override:
@@ -518,9 +541,9 @@ public class SettingsLoad {
                 }
             }
 
-            if(config.contains("permission") && !config.getString("permission").isEmpty()){
-                // permission
-                permission = new Permission(config.getString("permission"));
+            if(config.contains("permission")){
+                String key = config.getString("permission");
+                permission = recipePermissionMap.containsKey(key) ? recipePermissionMap.get(key) : null;
             }
 
             Recipe recipe = new Recipe(name,tag,coordinates,returns,result,permission);

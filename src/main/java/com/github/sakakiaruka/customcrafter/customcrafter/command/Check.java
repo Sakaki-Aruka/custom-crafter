@@ -8,6 +8,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordina
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Tag;
 import com.github.sakakiaruka.customcrafter.customcrafter.search.Search;
+import com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -16,6 +17,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.*;
@@ -33,6 +36,10 @@ public class Check implements CommandExecutor {
         else if(args[0].equalsIgnoreCase("-reload")) {
             if(!sender.isOp())return false;
             reload();
+        }
+        else if(args[0].equalsIgnoreCase("-p")){
+            if(args[1] == null) return false;
+            new PermissionCheck().main(args,sender);
         }
         else {
             System.out.println(getGraphicalRecipe(args[0]));
@@ -64,6 +71,15 @@ public class Check implements CommandExecutor {
 
         whatMaking.clear();
         opening.clear();
+
+        FileConfiguration oldConfig = CustomCrafter.getInstance().getConfig();
+        if(oldConfig.contains("relate")){
+            Path relate = Paths.get(oldConfig.getString("relate"));
+            new RecipePermissionUtil().playerPermissionWriter(relate);
+        }
+
+        // ==============
+
         CustomCrafter.getInstance().reloadConfig();
         new SettingsLoad().load();
         FileConfiguration config = CustomCrafter.getInstance().getConfig();
@@ -80,7 +96,8 @@ public class Check implements CommandExecutor {
         StringBuilder builder = new StringBuilder();
         builder.append(String.format("%s%s%s",String.join("", Collections.nCopies(40,"=")),nl,nl));
         builder.append(String.format("Recipe Name : %s%s",recipeName,nl));
-        builder.append(String.format("Tag : %s",recipe.getTag().toString()));
+        builder.append(String.format("Tag : %s%s",recipe.getTag().toString(),nl));
+        builder.append(String.format("RecipePermission : %s%s",recipe.hasPermission() ? recipe.getPermission().getPermissionName() : "NO PERMISSION",nl));
         if(recipe.getTag().equals(Tag.NORMAL)) return normal(builder,recipe);
         return amorphous(builder,recipe);
 
@@ -119,6 +136,8 @@ public class Check implements CommandExecutor {
             info = info.replace(nl,nl+"  ");
             builder.append(info);
         }
+
+
 
         return builder.toString();
     }
