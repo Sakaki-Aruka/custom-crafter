@@ -5,12 +5,14 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantW
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.PotionStrict;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.Potions;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Permission.RecipePermission;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordinate;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Tag;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.EnchantUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.InventoryUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.PotionUtil;
+import com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -34,6 +36,12 @@ public class Search {
 
         Recipe input = toRecipe(inventory);
         Recipe:for(Recipe recipe : recipes){
+
+            if(recipe.hasPermission()){ // permission check
+                RecipePermission source = recipe.getPermission();
+                if(!new RecipePermissionUtil().containsPermission(player, source)) continue;
+            }
+
             if(recipe.getTag().equals(Tag.NORMAL)){
 
                 //debug
@@ -142,6 +150,12 @@ public class Search {
         int massAmount = 0;
         Recipe input = toRecipe(inventory);
         Top:for(Recipe recipe:recipes){
+
+            if(recipe.hasPermission()){ // permission check
+                RecipePermission source = recipe.getPermission();
+                if(!new RecipePermissionUtil().containsPermission(player, source)) continue;
+            }
+
             if(recipe.getTag().equals(Tag.NORMAL)){
                 //normal
                 if(getSquareSize(recipe) != getSquareSize(input))continue;
@@ -385,9 +399,6 @@ public class Search {
 
 
     public boolean isSameMatter(Matter recipe,Matter input){
-
-        //debug
-        System.out.println(String.format("1 %b | 2 %b | 3 %b",recipe.getCandidate().containsAll(input.getCandidate()),recipe.getAmount() == input.getAmount(),getEnchantWrapCongruence(recipe,input)));
 
         if(!recipe.getCandidate().containsAll(input.getCandidate()))return false;
         if(recipe.getAmount() != input.getAmount())return false;

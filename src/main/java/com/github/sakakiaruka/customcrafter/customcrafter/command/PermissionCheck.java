@@ -7,7 +7,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -41,32 +40,6 @@ public class PermissionCheck {
 
     private void displayPermissionInfo(String name){
         // /cc -p [permissionName]
-
-        //debug
-        RecipePermissionUtil util = new RecipePermissionUtil();
-        RecipePermission r1 = new RecipePermission("ROOT","CHILD");
-        RecipePermission r2 = new RecipePermission("CHILD","GRAND_CHILD");
-        RecipePermission r3 = new RecipePermission("GRAND_CHILD","GREAT_GRAND_CHILD");
-        RecipePermission rr1 = new RecipePermission("ROOT","CHILD_1");
-        RecipePermission rr2 = new RecipePermission("CHILD_1","CHILD_2");
-        RecipePermission rr3 = new RecipePermission("CHILD_2","CHILD_3");
-        recipePermissionMap.put("CHILD",r1);
-        recipePermissionMap.put("GRAND_CHILD",r2);
-        recipePermissionMap.put("CHILD_1",rr1);
-        List<RecipePermission> list = new ArrayList<>(Arrays.asList(r1,r2,rr1));
-        List<String> list_str = new ArrayList<>();
-        list.forEach(s->list_str.add(s.getPermissionName()));
-        List<String> modified = new ArrayList<>();
-        new RecipePermissionUtil().removePermissionDuplications(list).forEach(s->modified.add(s.getPermissionName()));
-        System.out.println(String.format("before list: %s",list_str));
-        System.out.println(String.format("after list: %s",modified));
-        System.out.println(String.format("r1 -> r2: %b",util.inSameTree(r1,r2)));
-        System.out.println(String.format("r2 -> r1: %b",util.inSameTree(r2,r1)));
-        System.out.println(String.format("rr1 -> r1: %b",util.inSameTree(rr1,r1)));
-        System.out.println(String.format("r1 > r2: %b",util.isUpper(r1,r2)));
-        System.out.println(String.format("r1 & r1: %b", util.isUpper(r1,r1)));
-        System.out.println(String.format("r1 ? rr1: %b", util.isUpper(r1,rr1)));
-
         RecipePermission perm = recipePermissionMap.get(name);
         System.out.println(new RecipePermissionUtil().getPermissionTree(perm));
     }
@@ -104,14 +77,17 @@ public class PermissionCheck {
             if(new RecipePermissionUtil().hasPermission(permission,target)) return true;
             playerPermissions.get(target.getUniqueId()).add(permission);
             new RecipePermissionUtil().removePermissionDuplications(playerPermissions.get(target.getUniqueId()));
+            System.out.println(String.format("Permission added: %s  Permission: %s%s  Target: %s",nl,permission.getPermissionName(),nl,target.getName()));
 
         }else{
             // remove
             if(!new RecipePermissionUtil().hasPermission(permission,target)) return true;
+            System.out.println(String.format("Permission removed: %s  Permission: %s%s  Target: %s",nl,permission.getPermissionName(),nl,target.getName()));
             playerPermissions.get(target.getUniqueId()).remove(permission);
 
         }
 
+        displayPlayerPermissions(target.getUniqueId());
         return true;
     }
 

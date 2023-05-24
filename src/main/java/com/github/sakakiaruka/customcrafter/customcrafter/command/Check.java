@@ -84,7 +84,8 @@ public class Check implements CommandExecutor {
         StringBuilder builder = new StringBuilder();
         builder.append(String.format("%s%s%s",String.join("", Collections.nCopies(40,"=")),nl,nl));
         builder.append(String.format("Recipe Name : %s%s",recipeName,nl));
-        builder.append(String.format("Tag : %s",recipe.getTag().toString()));
+        builder.append(String.format("Tag : %s%s",recipe.getTag().toString(),nl));
+        builder.append(String.format("RecipePermission : %s%s",recipe.hasPermission() ? recipe.getPermission().getPermissionName() : "NO PERMISSION",nl));
         if(recipe.getTag().equals(Tag.NORMAL)) return normal(builder,recipe);
         return amorphous(builder,recipe);
 
@@ -123,6 +124,8 @@ public class Check implements CommandExecutor {
             info = info.replace(nl,nl+"  ");
             builder.append(info);
         }
+
+
 
         return builder.toString();
     }

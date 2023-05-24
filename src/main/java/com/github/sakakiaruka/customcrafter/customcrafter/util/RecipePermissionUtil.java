@@ -1,6 +1,5 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.util;
 
-import com.github.sakakiaruka.customcrafter.customcrafter.command.PermissionCheck;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Permission.RecipePermission;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -130,7 +129,6 @@ public class RecipePermissionUtil{
     }
 
 
-
     public boolean inSameTree(RecipePermission a, RecipePermission b){
         if(a.equals(b)) return true;
         List<RecipePermission> as = new ArrayList<>();
@@ -163,6 +161,17 @@ public class RecipePermissionUtil{
         recourse(source,sL);
         recourse(target,tL);
         return sL.size() < tL.size(); // parent long -> nearer a bottom of the permission
+    }
+
+    public boolean containsPermission(Player player, RecipePermission target){
+        if(!playerPermissions.containsKey(player.getUniqueId())) return false;
+        if(playerPermissions.get(player.getUniqueId()).isEmpty()) return false;
+        List<RecipePermission> list = playerPermissions.get(player.getUniqueId());
+        for(RecipePermission perm : list){
+            if(!inSameTree(perm,target)) continue;
+            if(isUpper(perm,target) || perm.equals(target)) return true;
+        }
+        return false;
     }
 
 
