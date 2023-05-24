@@ -189,8 +189,7 @@ public class Search {
                 result = recipe;
                 massAmount  = getMinimalAmount(result,input);
 
-                //debug
-                System.out.println("mass amount : "+massAmount);
+
 
                 break;
 
@@ -255,8 +254,6 @@ public class Search {
                 int inputAmount = inputTotal - massVirtualTotal;
                 if(inputAmount % recipeTotal != 0)continue;
 
-                //debug
-                System.out.println("mass amount (amorphous) : "+getMinimalAmount(recipe,input));
 
                 //debug
                 if(!getEnchantWrapCongruenceAmorphousWrap(recipe,input))continue;
@@ -300,15 +297,8 @@ public class Search {
             list.add(matter.getAmount());
         }
 
-        //debug
-        System.out.println(String.format("amount list (amorphous) : %s",list));
-        System.out.println(String.format("mass material set : %s",set));
-
         if(list.isEmpty())return -1;
         Collections.sort(list);
-
-        //debug
-        System.out.println(String.format("amount list : %s | minimal amount : %d",list,list.get(0)));
 
         return list.get(0);
     }
@@ -428,9 +418,6 @@ public class Search {
                 if(inputVirtual.get(material).isEmpty())continue;
                 List<List<EnchantWrap>> list = inputVirtual.get(material);
                 if(!new EnchantUtil().containsFromDoubleList(list,matter))continue;
-
-                //debug
-                System.out.println(String.format("inputV : %s | list : %s | congruence : %b",inputVirtual,list,new EnchantUtil().containsFromDoubleList(list,matter)));
 
                 //debug
                 exitCode = 1;
