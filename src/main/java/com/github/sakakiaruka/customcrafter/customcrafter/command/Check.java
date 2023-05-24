@@ -8,6 +8,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordina
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Tag;
 import com.github.sakakiaruka.customcrafter.customcrafter.search.Search;
+import com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
@@ -16,6 +17,8 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
 import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.*;
@@ -68,6 +71,15 @@ public class Check implements CommandExecutor {
 
         whatMaking.clear();
         opening.clear();
+
+        FileConfiguration oldConfig = CustomCrafter.getInstance().getConfig();
+        if(oldConfig.contains("relate")){
+            Path relate = Paths.get(oldConfig.getString("relate"));
+            new RecipePermissionUtil().playerPermissionWriter(relate);
+        }
+
+        // ==============
+
         CustomCrafter.getInstance().reloadConfig();
         new SettingsLoad().load();
         FileConfiguration config = CustomCrafter.getInstance().getConfig();

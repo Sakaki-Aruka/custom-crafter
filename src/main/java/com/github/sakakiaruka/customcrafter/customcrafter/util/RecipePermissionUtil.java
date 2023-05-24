@@ -1,10 +1,12 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.util;
 
+import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Permission.RecipePermission;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -23,22 +25,34 @@ public class RecipePermissionUtil{
         recipePermissionMap.put("ROOT",RecipePermission.ROOT);
     }
 
-    // TODO : write a data writer about playerPermissions
-
     public void playerPermissionWriter(Path path){
-        FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
         Map<String,List<String>> map = new HashMap<>();
         for(Map.Entry<UUID,List<RecipePermission>> entry : playerPermissions.entrySet()){
-            UUID player = entry.getKey();
             for(RecipePermission perm : entry.getValue()){
                 String permStr = perm.getPermissionName();
                 if(!map.containsKey(permStr)) map.put(permStr,new ArrayList<>());
-                map.get(permStr).add(player.toString());
+                map.get(permStr).add(entry.getKey().toString());
             }
         }
 
+        File file = path.toFile();
+        file.delete();
+        File newFile = new File(path.toString());
+        try{
+            newFile.createNewFile();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        FileConfiguration config = YamlConfiguration.loadConfiguration(newFile);
+
         for(Map.Entry<String,List<String>> entry : map.entrySet()){
+            if(!config.contains(entry.getKey())) config.createSection(entry.getKey());
             config.set(entry.getKey(),entry.getValue());
+            try{
+                config.save(path.toString());
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
     }
 
