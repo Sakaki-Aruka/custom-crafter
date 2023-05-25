@@ -1,6 +1,5 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.util;
 
-import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Permission.RecipePermission;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -15,8 +14,8 @@ import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.up
 
 public class RecipePermissionUtil{
 
-    public static Map<String,RecipePermission> recipePermissionMap = new HashMap<>();
-    public static Map<UUID,List<RecipePermission>> playerPermissions = new HashMap<>();
+    public static Map<String,RecipePermission> recipePermissionMap = Collections.synchronizedMap(new HashMap<>());
+    public static Map<UUID,List<RecipePermission>> playerPermissions = Collections.synchronizedMap(new HashMap<>());
 
 
 
@@ -35,13 +34,13 @@ public class RecipePermissionUtil{
             }
         }
 
-        File file = path.toFile();
-        file.delete();
-        File newFile = new File(path.toString());
+        path.toFile().delete(); // file delete
+        File newFile = new File(path.toString()); // To create a new file. (same name)
         try{
             newFile.createNewFile();
         }catch (Exception e){
             e.printStackTrace();
+            return;
         }
         FileConfiguration config = YamlConfiguration.loadConfiguration(newFile);
 
