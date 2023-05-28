@@ -60,7 +60,7 @@ public class SettingsLoad {
     public static Map<String,Recipe> namedRecipes = new HashMap<>();
 
     // === for crafting data manage === //
-    public static Map<UUID,Material> whatMaking = new HashMap<>();
+    public static Map<UUID,Material> whatMaking = Collections.synchronizedMap(new HashMap<>());
 
     // === for data get methods === //
     private static FileConfiguration defaultConfig;
@@ -97,7 +97,12 @@ public class SettingsLoad {
             new RecipePermissionUtil().permissionRelateLoad(relate);
 
             // Resolve permission duplications.
-            playerPermissions.entrySet().forEach(s-> new RecipePermissionUtil().removePermissionDuplications(s.getValue()));
+            synchronized (playerPermissions) {
+                Iterator<Map.Entry<UUID,List<RecipePermission>>> iterator = playerPermissions.entrySet().iterator();
+                while (iterator.hasNext()) {
+                    new RecipePermissionUtil().removePermissionDuplications(iterator.next().getValue());
+                }
+            }
         }
     }
 

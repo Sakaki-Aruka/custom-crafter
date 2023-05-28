@@ -26,11 +26,14 @@ public class RecipePermissionUtil{
 
     public void playerPermissionWriter(Path path){
         Map<String,List<String>> map = new HashMap<>();
-        for(Map.Entry<UUID,List<RecipePermission>> entry : playerPermissions.entrySet()){
-            for(RecipePermission perm : entry.getValue()){
-                String permStr = perm.getPermissionName();
-                if(!map.containsKey(permStr)) map.put(permStr,new ArrayList<>());
-                map.get(permStr).add(entry.getKey().toString());
+        synchronized (playerPermissions) {
+            Iterator<Map.Entry<UUID,List<RecipePermission>>> iterator = playerPermissions.entrySet().iterator();
+            while (iterator.hasNext()) {
+                for(RecipePermission perm : iterator.next().getValue()) {
+                    String permStr = perm.getPermissionName();
+                    if(!map.containsKey(permStr)) map.put(permStr, new ArrayList<>());
+                    map.get(permStr).add(iterator.next().getKey().toString());
+                }
             }
         }
 
@@ -76,12 +79,17 @@ public class RecipePermissionUtil{
         *   - af74a02d19cb445bb07f6866a861f783
         *
          */
-        for(String key : recipePermissionMap.keySet()){
-            if(!config.contains(key)) continue;
-            for(String id : config.getStringList(key)){
-                UUID uuid = UUID.fromString(id);
-                if(!playerPermissions.containsKey(uuid)) playerPermissions.put(uuid,new ArrayList<>());
-                playerPermissions.get(uuid).add(recipePermissionMap.get(key));
+
+        synchronized (recipePermissionMap) {
+            Iterator<String> iterator = recipePermissionMap.keySet().iterator();
+            while (iterator.hasNext()) {
+                String key = iterator.next();
+                if(!config.contains(key)) continue;
+                for (String id : config.getStringList(key)) {
+                    UUID uuid = UUID.fromString(id);
+                    if(!playerPermissions.containsKey(uuid)) playerPermissions.put(uuid, new ArrayList<>());
+                    playerPermissions.get(uuid).add(recipePermissionMap.get(key));
+                }
             }
         }
     }
