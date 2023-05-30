@@ -526,23 +526,40 @@ public class SettingsLoad {
 
             if(config.contains("returns")){
                 /* 0,1,2
-                * 0 : Material Name (String)
+                * 0 : Material Name (String) or regex pattern
                 * 1 : return Material Name (String)
                 * 2 : return item amount (int)
                  */
+                String PASS_THROUGH_PATTERN = "(?i)pass";
+                String NORMAL_PATTERN = "([a-zA-Z_]+)";
+
                 for(String s:config.getStringList("returns")){
                     List<String> list = Arrays.asList(s.split(","));
                     ItemStack itemStack;
-                    Material material = Material.valueOf(list.get(0).toUpperCase());
+                    List<Material> materials = new ArrayList<>();
+
+                    if(list.get(0).matches(NORMAL_PATTERN)){
+                        materials.add(Material.valueOf(list.get(0).toUpperCase()));
+                    }else{
+                        // regex collect
+                        for(String id : allMaterials){
+                            if(id.matches(list.get(0))) materials.add(Material.valueOf(id));
+                        }
+                    }
+
                     if(list.get(1).equals("water_bottle")){
                         itemStack = new PotionUtil().water_bottle_ItemStack();
+                    }else if(list.get(1).matches(PASS_THROUGH_PATTERN)){
+                        // pass through
+                        int amount = Integer.valueOf(list.get(2));
+                        itemStack = new ItemStack(Material.AIR,amount);
                     }else{
                         Material returnMaterial = Material.valueOf(list.get(1).toUpperCase());
                         int amount = Integer.valueOf(list.get(2));
                         itemStack  = new ItemStack(returnMaterial,amount);
                     }
 
-                    returns.put(material,itemStack);
+                    materials.forEach(x->returns.put(x,itemStack));
                 }
             }
 

@@ -72,14 +72,20 @@ public class InventoryUtil {
             int returnAmount = recipe.getReturnItems().get(item.getType()).getAmount();
             if(!isMassList.contains(item.getType())) returnAmount *= removeAmount;
             ItemStack itemStack = recipe.getReturnItems().get(item.getType()).clone();
-            itemStack.setAmount(returnAmount);
+            if(!itemStack.getType().equals(Material.AIR)) {
+                drop(itemStack,returnAmount,player);
+                continue;
+            }
 
-            //debug
-            System.out.println(String.format("returnAmount : %d | removeAmount : %d | returnAmount * removeAmount : %d",returnAmount,removeAmount,returnAmount * removeAmount));
-
-            World world = player.getWorld();
-            Location location = player.getLocation();
-            world.dropItem(location,itemStack);
+            // pass through return
+            drop(item,returnAmount,player);
         }
+    }
+
+    private void drop(ItemStack item, int returnAmount, Player player) {
+        item.setAmount(returnAmount);
+        World world = player.getWorld();
+        Location location = player.getLocation();
+        world.dropItem(location,item);
     }
 }
