@@ -72,7 +72,10 @@ public class InventoryUtil {
             int returnAmount = recipe.getReturnItems().get(item.getType()).getAmount();
             if(!isMassList.contains(item.getType())) returnAmount *= removeAmount;
             ItemStack itemStack = recipe.getReturnItems().get(item.getType()).clone();
-            if(!itemStack.getType().equals(Material.AIR)) drop(itemStack,returnAmount,player);
+            if(!itemStack.getType().equals(Material.AIR)) {
+                drop(itemStack,returnAmount,player);
+                continue;
+            }
 
             // pass through return
             drop(item,returnAmount,player);

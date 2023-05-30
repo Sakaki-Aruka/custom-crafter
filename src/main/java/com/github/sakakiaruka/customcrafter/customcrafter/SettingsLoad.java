@@ -531,7 +531,7 @@ public class SettingsLoad {
                 * 2 : return item amount (int)
                  */
                 String PASS_THROUGH_PATTERN = "(?i)pass";
-                String NORMAL_PATTERN = "([A-Z_]+)";
+                String NORMAL_PATTERN = "([a-zA-Z_]+)";
 
                 for(String s:config.getStringList("returns")){
                     List<String> list = Arrays.asList(s.split(","));
