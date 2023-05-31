@@ -8,6 +8,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordina
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Tag;
 import com.github.sakakiaruka.customcrafter.customcrafter.search.Search;
+import com.github.sakakiaruka.customcrafter.customcrafter.util.PotionUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -40,6 +41,12 @@ public class Check implements CommandExecutor {
         else if(args[0].equalsIgnoreCase("-p")){
             if(args[1] == null) return false;
             new PermissionCheck().main(args,sender);
+        }
+        else if(args[0].equalsIgnoreCase("-f")){
+            if(args.length == 3) return false;
+            if(!args[1].equalsIgnoreCase("-m")) return false;
+            if(!args[2].equalsIgnoreCase("defaultPotion")) return false;
+            new PotionUtil().makeDefaultPotionFilesWrapper();
         }
         else {
             System.out.println(getGraphicalRecipe(args[0]));

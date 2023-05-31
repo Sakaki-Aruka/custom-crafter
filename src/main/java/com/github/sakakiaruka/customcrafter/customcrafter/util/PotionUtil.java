@@ -6,14 +6,15 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.PotionStrict;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.Potions;
 import org.bukkit.Material;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.io.File;
+import java.nio.file.Path;
+import java.util.*;
 
 public class PotionUtil {
     // this string key is "PotionEffectType" 's name
@@ -143,4 +144,77 @@ public class PotionUtil {
 
         return true;
     }
+
+
+    public void makeDefaultPotionFiles(String basePath, boolean mass, boolean upgraded, boolean extended, PotionStrict strict) {
+        final String NORMAL = String.format("%s/normal/",basePath);
+        final String SPLASH = String.format("%s/splash/",basePath);
+        final String LINGERING = String.format("%s/lingering/",basePath);
+        Map<String,String> paths = new HashMap<>();
+        paths.put("NORMAL",NORMAL);
+        paths.put("SPLASH",SPLASH);
+        paths.put("LINGERING",LINGERING);
+        final String AMOUNT = "1";
+
+        for(PotionEffectType type : PotionEffectType.values()) {
+            for(Map.Entry<String,String> path : paths.entrySet()) {
+                String key = path.getKey();
+                String bottle = key.equals("NORMAL")
+                        ? "potion"
+                        : key.toLowerCase() + "_potion";
+
+                String name = key.equals("NORMAL")
+                        ? type.getName().toLowerCase()
+                        : key.toLowerCase() + "_" + type.getName().toLowerCase();
+
+                // example -> extended_upgraded_speed_lingering_potion
+                if(upgraded) name = "upgraded_" + name;
+                if(extended) name = "extended_" + name;
+
+                File file = new File(path.getValue() + name + ".yml");
+                try{
+                    file.createNewFile();
+                }catch (Exception e){
+                    e.printStackTrace();
+                    continue;
+                }
+
+                Map<String,String> content = new HashMap<>();
+                content.put("name",name);
+                content.put("amount",AMOUNT);
+                content.put("mass",String.valueOf(mass));
+                content.put("candidate",String.format("[%s]",bottle));
+                int duration = getDuration(type.getName(),upgraded,extended, getBottleType(Material.valueOf(bottle.toUpperCase())));
+                content.put("potion",String.format("[\"%s,%d,%d,%s\"]",type.getName(),duration,upgraded ? 1 : 0,strict.toStr()));
+
+                FileConfiguration config = YamlConfiguration.loadConfiguration(file);
+                for(Map.Entry<String,String> entry : content.entrySet()) {
+                    config.set(entry.getKey(),entry.getValue());
+                }
+            }
+        }
+    }
+
+    public void makeDefaultPotionFilesWrapper() {
+        final String BASE_PATH = "plugins/Custom_Crafter/default/potion";
+
+        for(PotionStrict strict : PotionStrict.values()) {
+            for(List<Boolean> b : getDefaultPotionFilesPattern()){
+                makeDefaultPotionFiles(BASE_PATH,b.get(0),b.get(1),b.get(2),strict);
+            }
+        }
+    }
+
+    private Set<List<Boolean>> getDefaultPotionFilesPattern() {
+        // make 8 patterns boolean list
+        Set<List<Boolean>> set = new HashSet<>();
+        for (int i=0;i<8;i++){
+            List<String> l = Arrays.asList(String.format("%03d",Integer.toBinaryString(i)).split(""));
+            List<Boolean> l2 = new ArrayList<>();
+            l.forEach(s->l2.add(Integer.valueOf(s) == 0 ? true : false));
+            set.add(l2);
+        }
+        return set;
+    }
+
 }
