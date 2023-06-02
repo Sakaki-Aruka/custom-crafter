@@ -11,10 +11,20 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.*;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.ObjectStreamException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
+
+import static com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter.getInstance;
+import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.bar;
+import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.nl;
 
 public class PotionUtil {
     // this string key is "PotionEffectType" 's name
@@ -146,7 +156,15 @@ public class PotionUtil {
     }
 
 
-    public void makeDefaultPotionFiles(String basePath, boolean mass, boolean upgraded, boolean extended, PotionStrict strict) {
+    private List<String> getPDNames() {
+        List<String> list = new ArrayList<>();
+        for(PotionDuration pd : PotionDuration.values()) {
+            list.add(pd.getPDName());
+        }
+        return list;
+    }
+
+    private void makeDefaultPotionFiles(String basePath, boolean mass, boolean upgraded, boolean extended, String strict) {
         final String NORMAL = String.format("%s/normal/",basePath);
         final String SPLASH = String.format("%s/splash/",basePath);
         final String LINGERING = String.format("%s/lingering/",basePath);
@@ -154,9 +172,10 @@ public class PotionUtil {
         paths.put("NORMAL",NORMAL);
         paths.put("SPLASH",SPLASH);
         paths.put("LINGERING",LINGERING);
-        final String AMOUNT = "1";
+        final int AMOUNT = 1;
 
         for(PotionEffectType type : PotionEffectType.values()) {
+            if(!getPDNames().contains(type.getName())) continue;
             for(Map.Entry<String,String> path : paths.entrySet()) {
                 String key = path.getKey();
                 String bottle = key.equals("NORMAL")
@@ -171,6 +190,12 @@ public class PotionUtil {
                 if(upgraded) name = "upgraded_" + name;
                 if(extended) name = "extended_" + name;
 
+                try{
+                    Files.createDirectories(Paths.get(path.getValue()));
+                }catch (Exception e){
+                    e.printStackTrace();
+                }
+
                 File file = new File(path.getValue() + name + ".yml");
                 try{
                     file.createNewFile();
@@ -179,42 +204,82 @@ public class PotionUtil {
                     continue;
                 }
 
-                Map<String,String> content = new HashMap<>();
-                content.put("name",name);
-                content.put("amount",AMOUNT);
-                content.put("mass",String.valueOf(mass));
-                content.put("candidate",String.format("[%s]",bottle));
-                int duration = getDuration(type.getName(),upgraded,extended, getBottleType(Material.valueOf(bottle.toUpperCase())));
-                content.put("potion",String.format("[\"%s,%d,%d,%s\"]",type.getName(),duration,upgraded ? 1 : 0,strict.toStr()));
+                List<String> content = new ArrayList<>();
+                content.add("name: "+name + nl);
+                content.add("amount: "+AMOUNT + nl);
+                content.add("mass: "+mass + nl);
+                content.add("candidate: ["+bottle+"]" + nl);
 
-                FileConfiguration config = YamlConfiguration.loadConfiguration(file);
-                for(Map.Entry<String,String> entry : content.entrySet()) {
-                    config.set(entry.getKey(),entry.getValue());
-                }
+                int duration = getDuration(type.getName(),upgraded,extended, getBottleType(Material.valueOf(bottle.toUpperCase())));
+                content.add("potion: " + nl);
+                content.add(String.format("  - %s,%d,%d,%s%s",type.getName(),duration,upgraded ? 1 : 0,strict,nl));
+
+                writerWrapper(content, file);
+
             }
         }
     }
 
     public void makeDefaultPotionFilesWrapper() {
-        final String BASE_PATH = "plugins/Custom_Crafter/default/potion";
+        final String BASE_PATH = "plugins/Custom_Crafter/matters/default/potion";
 
-        for(PotionStrict strict : PotionStrict.values()) {
-            for(List<Boolean> b : getDefaultPotionFilesPattern()){
-                makeDefaultPotionFiles(BASE_PATH,b.get(0),b.get(1),b.get(2),strict);
+        new BukkitRunnable(){
+            @Override
+            public void run() {
+
+                for(String strict : getPotionStrictStringList()) {
+                    for(int i=0;i<8;i++){
+                        List<Boolean> list = new ArrayList<>();
+                        binary(i,list);
+                        if(list.size() < 3) list.addAll(Collections.nCopies(3 -list.size(),false));
+                        makeDefaultPotionFiles(BASE_PATH,list.get(0),list.get(1),list.get(2),strict);
+                    }
+                }
+
+                System.out.println(bar);
+                System.out.println(String.format("[Custom Crafter] Finished creating default potion files."));
+                System.out.println(bar);
+
             }
-        }
+        }.runTaskAsynchronously(getInstance());
+
+
     }
 
-    private Set<List<Boolean>> getDefaultPotionFilesPattern() {
-        // make 8 patterns boolean list
-        Set<List<Boolean>> set = new HashSet<>();
-        for (int i=0;i<8;i++){
-            List<String> l = Arrays.asList(String.format("%03d",Integer.toBinaryString(i)).split(""));
-            List<Boolean> l2 = new ArrayList<>();
-            l.forEach(s->l2.add(Integer.valueOf(s) == 0 ? true : false));
-            set.add(l2);
+    private void binary(int num, List<Boolean> list){
+        if(num == 0 || num == 1) {
+            list.add(num == 0 ? false : true);
+            return;
         }
-        return set;
+        list.add(num % 2 == 0 ? false : true);
+        binary(num / 2,list);
+    }
+
+    private boolean writerWrapper(List<String> list, File file) {
+        FileWriter writer;
+        try{
+            writer = new FileWriter(file);
+        }catch (IOException e){
+            e.printStackTrace();
+            return false;
+        }
+
+        for(String str : list) {
+            try {
+                writer.write(str);
+            } catch (IOException e) {
+                e.printStackTrace();
+                return false;
+            }
+        }
+
+        try{
+            writer.close();
+        } catch (IOException e){
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 
 }

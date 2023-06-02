@@ -43,9 +43,13 @@ public class Check implements CommandExecutor {
             new PermissionCheck().main(args,sender);
         }
         else if(args[0].equalsIgnoreCase("-f")){
-            if(args.length == 3) return false;
+            if(args.length != 3) return false;
             if(!args[1].equalsIgnoreCase("-m")) return false;
             if(!args[2].equalsIgnoreCase("defaultPotion")) return false;
+
+            //debug
+            System.out.println("make default potion");
+
             new PotionUtil().makeDefaultPotionFilesWrapper();
         }
         else {
