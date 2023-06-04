@@ -24,7 +24,6 @@ public class OpenCraftingTable implements Listener {
     public static List<Player> opening = new ArrayList<>();
     private static final double degrees = 2 * Math.PI / (360 / 30);
     private static final double radius = 1;
-    private static Inventory craftingInventory;
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event){
         if(event.getClickedBlock()==null)return;
@@ -43,14 +42,14 @@ public class OpenCraftingTable implements Listener {
         new BukkitRunnable(){
             @Override
             public void run(){
-                event.getPlayer().openInventory(craftingInventory);
+                event.getPlayer().openInventory(setCraftingInventory());
                 opening.add(event.getPlayer());
             }
         }.runTaskLater(getInstance(),2l);
 
     }
 
-    public void setCraftingInventory(){
+    public Inventory setCraftingInventory(){
         Inventory inventory = Bukkit.createInventory(null,9 * craftingTableSize,"Custom Crafter");
         ItemStack blank = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
         ItemMeta meta = blank.getItemMeta();
@@ -73,7 +72,6 @@ public class OpenCraftingTable implements Listener {
 
         //set result slot
         inventory.setItem(craftingTableResultSlot,new ItemStack(Material.AIR));
-
-        craftingInventory = inventory;
+        return inventory;
     }
 }

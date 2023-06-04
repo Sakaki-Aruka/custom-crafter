@@ -79,7 +79,6 @@ public class SettingsLoad {
 
     public void load(){
         defaultConfig = getInstance().getConfig();
-        new OpenCraftingTable().setCraftingInventory();
         recipePermissionLoad();
         getAllMaterialsName();
         main();
