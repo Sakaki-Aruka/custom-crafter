@@ -93,26 +93,14 @@ public class InventoryUtil {
         for(Map.Entry<Matter, Integer> entry : virtual.entrySet()) {
             for(Matter matter : list) {
                 if(!matter.sameCandidate(entry.getKey())) continue;
-//                int i = entry.getValue() - (mass ? 1 : matter.getAmount());
-//                virtual.put(matter,i);
 
-                int ii = (buf.containsKey(entry.getKey()) ? entry.getValue() : 0) - entry.getValue() - (mass ? 1 : matter.getAmount());
+                int ii = (buf.containsKey(entry.getKey()) ? entry.getValue() : 0)  - (mass ? 1 : matter.getAmount());
                 buf.put(entry.getKey(),ii);
             }
         }
 
         for(Map.Entry<Matter, Integer> entry : buf.entrySet()) {
-            virtual.put(entry.getKey(),virtual.get(entry.getKey()) - entry.getValue());
+            virtual.put(entry.getKey(),virtual.get(entry.getKey()) + entry.getValue());
         }
-
-//        Iterator<Map.Entry<Matter, Integer>> iterator = virtual.entrySet().iterator();
-//        while (iterator.hasNext()) {
-//            for(Matter matter : list) {
-//                if(! iterator.next().getKey().sameCandidate(matter)) continue;
-//                int i = iterator.next().getValue();
-//                i -= mass ? 1 : matter.getAmount();
-//                virtual.put(iterator.next().getKey(),i);
-//            }
-//        }
     }
 }
