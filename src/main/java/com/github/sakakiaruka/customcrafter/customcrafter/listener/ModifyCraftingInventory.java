@@ -65,8 +65,8 @@ public class ModifyCraftingInventory implements Listener {
                 inventory.setItem(craftingTableResultSlot,new ItemStack(Material.AIR));
             }
             if(clickType.equals(ClickType.RIGHT)){
-                // batch
-                new Search().massSearch(player,inventory);
+                // mass
+                new Search().massSearch(player,inventory,false);
                 // result item is null
                 if(whatMaking.get(player.getUniqueId()) == null)return;
                 int minimal = getMinimalAmount(inventory);
@@ -74,7 +74,7 @@ public class ModifyCraftingInventory implements Listener {
             }
             else if(clickType.equals(ClickType.LEFT)){
                 // normal
-                new Search().main(player,inventory);
+                new Search().massSearch(player,inventory,true);
                 // result item is null
                 if(whatMaking.get(player.getUniqueId()) == null)return;
             }

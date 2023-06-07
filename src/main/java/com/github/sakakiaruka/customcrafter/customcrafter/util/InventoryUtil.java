@@ -38,7 +38,7 @@ public class InventoryUtil {
         return list;
     }
 
-    public void decrementMaterials(Inventory inventory, Player player, int amount){
+    public void decrementMaterials(Inventory inventory, int amount){
         // decrement crafting tables material
         // amount -> decrement amount
         List<Integer> slots = getTableSlots(craftingTableSize);
