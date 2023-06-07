@@ -1,5 +1,6 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.util;
 
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.*;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -8,9 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.*;
 
@@ -87,5 +86,33 @@ public class InventoryUtil {
         World world = player.getWorld();
         Location location = player.getLocation();
         world.dropItem(location,item);
+    }
+
+    public void snatchFromVirtual(Map<Matter, Integer> virtual, List<Matter> list, boolean mass) {
+        Map<Matter, Integer> buf = new HashMap<>();
+        for(Map.Entry<Matter, Integer> entry : virtual.entrySet()) {
+            for(Matter matter : list) {
+                if(!matter.sameCandidate(entry.getKey())) continue;
+//                int i = entry.getValue() - (mass ? 1 : matter.getAmount());
+//                virtual.put(matter,i);
+
+                int ii = (buf.containsKey(entry.getKey()) ? entry.getValue() : 0) - entry.getValue() - (mass ? 1 : matter.getAmount());
+                buf.put(entry.getKey(),ii);
+            }
+        }
+
+        for(Map.Entry<Matter, Integer> entry : buf.entrySet()) {
+            virtual.put(entry.getKey(),virtual.get(entry.getKey()) - entry.getValue());
+        }
+
+//        Iterator<Map.Entry<Matter, Integer>> iterator = virtual.entrySet().iterator();
+//        while (iterator.hasNext()) {
+//            for(Matter matter : list) {
+//                if(! iterator.next().getKey().sameCandidate(matter)) continue;
+//                int i = iterator.next().getValue();
+//                i -= mass ? 1 : matter.getAmount();
+//                virtual.put(iterator.next().getKey(),i);
+//            }
+//        }
     }
 }

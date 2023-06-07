@@ -74,66 +74,67 @@ public class Search {
 
             }else{
                 //amorphous
+//
+//                if(recipe.getContentsNoAir().size() != input.getContentsNoAir().size())continue;
+//                if(!getAllCandidateNoDuplicate(recipe).containsAll(getAllCandidateNoDuplicate(input)))continue;
+//
+//                int inputTotal = 0;
+//                Map<Material,Integer> relation = new HashMap<>();
+//
+//                for(Matter matter : input.getContentsNoAir()) {
+//                    Material material = matter.getCandidate().get(0);
+//                    if(!relation.containsKey(material)) relation.put(material,0);
+//                    int i = relation.get(material) + matter.getAmount();
+//                    relation.put(material,i);
+//                    inputTotal += matter.getAmount();
+//                }
+//
+//                int virtualTotal = 0;
+//                int massVirtualTotal = 0;
+//                Map<Material,Integer> virtual = new HashMap<>();
+//                Map<Material,Integer> massVirtual = new HashMap<>();
+//
+//                for(Matter matter : recipe.getContentsNoAir()) {
+//                    for(Material candidate : matter.getCandidate()) {
+//                        int i = matter.isMass() ? 1 : matter.getAmount();
+//                        if(matter.isMass()){
+//                            // mass
+//                            if(massVirtual.containsKey(candidate)) i += massVirtual.get(candidate);
+//                            massVirtual.put(candidate,i);
+//                            massVirtualTotal += i;
+//                        }else{
+//                            // not mass
+//                            if(virtual.containsKey(candidate)) i += virtual.get(candidate);
+//                            virtual.put(candidate,i);
+//                            virtualTotal += i;
+//                        }
+//                    }
+//                }
+//
+//                if(inputTotal < virtualTotal)continue;
+//
+//                for(Matter matter:input.getContentsNoAir()){
+//                    Material material = matter.getCandidate().get(0);
+//                    if(massVirtual.containsKey(material)){
+//                        massVirtual.put(material,massVirtual.get(material) - 1);
+//                        continue;
+//                    }
+//                    int i = virtual.get(material) - matter.getAmount();
+//                    virtual.put(material,i);
+//                }
+//
+//                for(int i:massVirtual.values()) if(i != 0)continue Top;
+//
+//                int recipeTotal = 0;
+//                for(Matter m : recipe.getContentsNoAir()){
+//                    if(m.isMass())continue;
+//                    recipeTotal += m.getAmount();
+//                }
+//
+//                int inputAmount = inputTotal - massVirtualTotal;
+//                if(inputAmount % recipeTotal != 0)continue;
 
-                if(recipe.getContentsNoAir().size() != input.getContentsNoAir().size())continue;
-                if(!getAllCandidateNoDuplicate(recipe).containsAll(getAllCandidateNoDuplicate(input)))continue;
-
-                int inputTotal = 0;
-                Map<Material,Integer> relation = new HashMap<>();
-
-                for(Matter matter : input.getContentsNoAir()) {
-                    Material material = matter.getCandidate().get(0);
-                    if(!relation.containsKey(material)) relation.put(material,0);
-                    int i = relation.get(material) + matter.getAmount();
-                    relation.put(material,i);
-                    inputTotal += matter.getAmount();
-                }
-
-                int virtualTotal = 0;
-                int massVirtualTotal = 0;
-                Map<Material,Integer> virtual = new HashMap<>();
-                Map<Material,Integer> massVirtual = new HashMap<>();
-
-                for(Matter matter : recipe.getContentsNoAir()) {
-                    for(Material candidate : matter.getCandidate()) {
-                        int i = matter.isMass() ? matter.getAmount() : 1;
-                        if(matter.isMass()){
-                            // mass
-                            if(massVirtual.containsKey(candidate)) i += massVirtual.get(candidate);
-                            massVirtual.put(candidate,i);
-                            massVirtualTotal += i;
-                        }else{
-                            // not mass
-                            if(virtual.containsKey(candidate)) i += virtual.get(candidate);
-                            virtual.put(candidate,i);
-                            virtualTotal += i;
-                        }
-                    }
-                }
-
-                if(inputTotal < virtualTotal)continue;
-
-                for(Matter matter:input.getContentsNoAir()){
-                    Material material = matter.getCandidate().get(0);
-                    if(massVirtual.containsKey(material)){
-                        massVirtual.put(material,massVirtual.get(material) - 1);
-                        continue;
-                    }
-                    int i = virtual.get(material) - matter.getAmount();
-                    virtual.put(material,i);
-                }
-
-                for(int i:massVirtual.values()) if(i != 0)continue Top;
-
-                int recipeTotal = 0;
-                for(Matter m : recipe.getContentsNoAir()){
-                    if(m.isMass())continue;
-                    recipeTotal += m.getAmount();
-                }
-
-                int inputAmount = inputTotal - massVirtualTotal;
-                if(inputAmount % recipeTotal != 0)continue;
-
+                if(!searchAmorphous(recipe,inventory)) continue;
 
                 //debug
                 if(!getEnchantWrapCongruenceAmorphousWrap(recipe,input))continue;
@@ -144,21 +145,83 @@ public class Search {
             break;
         }
 
-//        //debug
-//        String name = result == null ? "null" : result.getName() ;
-//        int amount = massAmount == 0 ? -1 : massAmount;
-//        System.out.println(String.format("recipe name : %s | mass Amount : %d",name,amount));
 
         if(result != null){
             // custom recipe found
             new InventoryUtil().returnItems(result,inventory,massAmount,player);
-            int quantity = isOneCraft ? 1 : massAmount * result.getResult().getAmount();
+            int quantity = (isOneCraft ? 1 : massAmount) * result.getResult().getAmount();
             setResultItem(inventory,result,input,player,quantity,isOneCraft);
         }else{
             // not found
             new VanillaSearch().main(player,inventory,true);
         }
     }
+
+    private boolean searchAmorphous(Recipe recipe, Inventory inventory) {
+        Recipe input = toRecipe(inventory);
+        if(recipe.getContentsNoAir().size() != input.getContentsNoAir().size()) return false;
+        if(!getAllCandidateNoDuplicate(recipe).containsAll(getAllCandidateNoDuplicate(input))) return false;
+
+        List<Matter> massList = getMassOrNotList(recipe,true);
+        List<Matter> normalList = getMassOrNotList(recipe,false);
+        Map<Matter, Integer> virtual = getVirtual(input);
+
+        int vTotal = 0;
+        for (Map.Entry<Matter, Integer> entry : virtual.entrySet()) {
+            vTotal += entry.getKey().getAmount();
+        }
+
+        new InventoryUtil().snatchFromVirtual(virtual,massList,true);
+        new InventoryUtil().snatchFromVirtual(virtual,normalList,false);
+        if(containsMinus(virtual)) return false;
+
+        int normalListTotal = 0;
+        for(Matter matter : normalList) {
+            normalListTotal += matter.getAmount();
+        }
+
+        int virtualValuesTotal = 0;
+        for(int i : virtual.values()) {
+            virtualValuesTotal += i;
+        }
+
+        return (virtualValuesTotal == (massList.size() + normalListTotal));
+
+    }
+
+
+    private boolean containsMinus(Map<Matter,Integer> virtual) {
+        for(int i : virtual.values()) {
+            if(i < 0) return true;
+        }
+        return false;
+    }
+
+    private List<Matter> getMassOrNotList(Recipe recipe, boolean mass) {
+        List<Matter> result = new ArrayList<>();
+        recipe.getContentsNoAir().forEach(s->{
+            if(mass && s.isMass()) result.add(s);
+            if(!mass && !s.isMass()) result.add(s);
+        });
+        return result;
+    }
+
+    private Map<Matter, Integer> getVirtual(Recipe recipe) {
+        Map<Matter, Integer> result = new HashMap<>();
+        for(Matter matter : recipe.getContentsNoAir()) {
+            for(Material material : matter.getCandidate()) {
+                // virtual data -> amount is 0.
+                Matter mass = new Matter(Arrays.asList(material),0,true);
+                Matter normal = new Matter(Arrays.asList(material),0,false);
+                int m = matter.getAmount() + (result.containsKey(mass) ? result.get(mass) : 0);
+                int n = matter.getAmount() + (result.containsKey(normal) ? result.get(normal) : 0);
+                result.put(mass,m);
+                result.put(normal,n);
+            }
+        }
+        return result;
+    }
+
 
     private boolean isAllCandidateContains(Recipe recipe,Recipe input){
         for(int i=0;i<recipe.getContentsNoAir().size();i++){

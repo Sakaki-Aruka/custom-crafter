@@ -183,6 +183,11 @@ public class Matter implements Matters {
         return matter;
     }
 
+    public boolean sameCandidate(Matter matter) {
+        if(this.candidate.size() != matter.candidate.size()) return false;
+        return this.candidate.containsAll(matter.candidate);
+    }
+
     public String info(){
         StringBuilder builder = new StringBuilder();
         builder.append(String.format("name : %s"+nl,name.isEmpty() ? candidate.get(0).name() : name));
