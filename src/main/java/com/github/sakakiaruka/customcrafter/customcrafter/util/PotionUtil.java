@@ -5,6 +5,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.PotionDa
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.PotionBottleType;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.PotionStrict;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.Potions;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -110,10 +111,8 @@ public class PotionUtil {
 
 
     public boolean isSamePotion(Potions recipe, Potions input){
-        Potions r = recipe;
-        Potions i = input;
-        if(r.isBottleTypeMatch()){
-            if(!r.getBottle().equals(i.getBottle())) return false;
+        if(recipe.isBottleTypeMatch()){
+            if(!recipe.getBottle().equals(input.getBottle())) return false;
         }
 
         if(!recipe.hasAnyCustomEffect()){
@@ -123,7 +122,7 @@ public class PotionUtil {
             return true;
         }
 
-        for(Map.Entry<PotionEffect, PotionStrict> entry : r.getData().entrySet()){
+        for(Map.Entry<PotionEffect, PotionStrict> entry : recipe.getData().entrySet()){
 
             PotionEffectType effectType = entry.getKey().getType();
 
@@ -131,23 +130,23 @@ public class PotionUtil {
                 continue;
             }
 
-            if(!i.hasPotionEffect(entry.getKey().getType())) return false;
+            if(!input.hasPotionEffect(entry.getKey().getType())) return false;
 
             if(entry.getValue().equals(PotionStrict.ONLY_EFFECT)){
-                if(!i.hasPotionEffect(effectType)) return false;
+                if(!input.hasPotionEffect(effectType)) return false;
             }
 
             if(entry.getValue().equals(PotionStrict.ONLY_DURATION)){
-                if(entry.getKey().getDuration() != i.getDuration(effectType)) return false;
+                if(entry.getKey().getDuration() != input.getDuration(effectType)) return false;
             }
 
             if(entry.getValue().equals(PotionStrict.ONLY_AMPLIFIER)){
-                if(entry.getKey().getAmplifier() != i.getAmplifier(effectType)) return false;
+                if(entry.getKey().getAmplifier() != input.getAmplifier(effectType)) return false;
             }
 
             if(entry.getValue().equals(PotionStrict.STRICT)){
-                if(entry.getKey().getAmplifier() != i.getAmplifier(effectType)) return false;
-                if(entry.getKey().getDuration() != i.getDuration(effectType)) return false;
+                if(entry.getKey().getAmplifier() != input.getAmplifier(effectType)) return false;
+                if(entry.getKey().getDuration() != input.getDuration(effectType)) return false;
             }
 
         }
@@ -163,6 +162,31 @@ public class PotionUtil {
         }
         return list;
     }
+
+    public boolean getPotionsCongruence(Recipe r, Recipe i) {
+        List<Potions> recipes = getPotions(r);
+        List<Potions> inputs = getPotions(i);
+        if(recipes.isEmpty()) return true;
+        if(recipes.size() > inputs.size()) return false;
+
+        for(Potions potion : recipes) {
+            for(Potions drug : inputs) {
+                if(isSamePotion(potion, drug)) break;
+            }
+            return false;
+        }
+        return true;
+    }
+
+    private List<Potions> getPotions(Recipe recipe) {
+        List<Potions> list = new ArrayList<>();
+        for(Matter matter : recipe.getContentsNoAir()) {
+            if(!matter.getClass().equals(Potions.class)) continue;
+            list.add((Potions) matter);
+        }
+        return list;
+    }
+
 
     private void makeDefaultPotionFiles(String basePath, boolean mass, boolean upgraded, boolean extended, String strict) {
         final String NORMAL = String.format("%s/normal/",basePath);
