@@ -75,10 +75,8 @@ public class Search {
             }else{
                 //amorphous
                 if(!searchAmorphous(recipe,inventory)) continue;
-
-                //debug
                 if(!getEnchantWrapCongruenceAmorphousWrap(recipe,input))continue;
-
+                if(! new PotionUtil().getPotionsCongruence(recipe, input)) continue;
             }
             result = recipe;
             massAmount  = getMinimalAmount(result,input);
