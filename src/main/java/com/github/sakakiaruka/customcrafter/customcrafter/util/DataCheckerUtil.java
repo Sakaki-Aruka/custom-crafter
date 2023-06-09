@@ -2,6 +2,7 @@ package com.github.sakakiaruka.customcrafter.customcrafter.util;
 
 import com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantStrict;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.MetadataType;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -9,6 +10,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.potion.PotionEffectType;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -120,50 +122,136 @@ public class DataCheckerUtil {
             return false;
         }
 
-        if(candidates.get(0).startsWith("R|")){
-            String pattern = candidates.get(0).replace("R|","");
-            if(!isCorrectNameOrRegex(builder,pattern,true,"candidate")) return false;
+//        if(candidates.get(0).startsWith("R|")){
+//            String pattern = candidates.get(0).replace("R|","");
+//            if(!isCorrectNameOrRegex(builder,pattern,true,"candidate")) return false;
+//        }else{
+//            for(String str : candidates){
+//                if(!isCorrectNameOrRegex(builder,str.toUpperCase(),false,"candidate")) return false;
+//            }
+//        }
+        if(candidates.get(0).startsWith("R|")) {
+            // use regular expression
+            String expression = candidates.get(0).replace("R|","");
+            Pattern p;
+            try{
+                p = Pattern.compile(expression);
+            }catch (Exception e) {
+                appendLn(builder, "candidate -> The Java regular expression string is invalid.");
+                appendLn(builder, "  -> You have to rewrite this sections.");
+                appendLn(builder, nl);
+                return false;
+            }
+
+            List<String> buffer = new ArrayList<>();
+            for(String s : allMaterials) {
+                Matcher m = p.matcher(s);
+                if(!m.find()) continue;
+                buffer.add(s);
+            }
+
+            if(buffer.isEmpty()) {
+                appendLn(builder, "candidate -> The Java regular expression has not contain item ids.");
+                appendLn(builder, "  -> You have to rewrite this section.");
+                appendLn(builder, nl);
+                return false;
+            }
+
         }else{
-            for(String str : candidates){
-                if(!isCorrectNameOrRegex(builder,str.toUpperCase(),false,"candidate")) return false;
+            // not use regular expression
+            A: for(String s : candidates) {
+                for(String ss : allMaterials) {
+                    if(s.equalsIgnoreCase(ss)) continue A;
+                }
+
+                appendLn(builder, "candidate -> This string is not an item id.");
+                appendLn(builder, String.format("  -> '%s'",s));
+                return false;
             }
         }
-
-
         return true;
     }
 
-    private boolean isCorrectNameOrRegex(StringBuilder builder,String pattern,boolean isRegex,String section){
-        if(!isRegex){
-            if(!allMaterials.contains(pattern.toUpperCase())) {
-                appendLn(builder,section+" -> Not found a correct material name.");
-                appendLn(builder,"  -> You have to write a correct minecraft item id.");
-                return false;
-            }
-            return true;
-        }
-
-        try{
-            List<String> list = new ArrayList<>();
-            Pattern p = Pattern.compile(pattern);
-            for(String str : allMaterials){
-                Matcher matcher = p.matcher(str);
-                if(matcher.matches()) list.add(str);
-            }
-            if(list.isEmpty()) {
-                appendLn(builder,section+" -> No item IDs from the pattern.");
-                appendLn(builder,"  -> The pattern that is written in this section, does not have any materials.");
-                appendLn(builder,"  -> So, you have to rewrite that to match with some material names.");
-                return false;
-            }
-        }catch (Exception e){
-            appendLn(builder,section+" -> Found an invalid regular expression.");
-            appendLn(builder,"  -> The pattern that is written in this section, does not work as a regular expression pattern.");
-            appendLn(builder,"  -> So you have to rewrite that as a regular expression that works.");
+    private boolean isCorrectResultNameOrRegex(FileConfiguration config, StringBuilder builder) {
+        if(!config.contains("nameOrRegex")) {
+            appendLn(builder, "nameOrRegex -> A section is not found.");
+            appendLn(builder, "  -> This section is need to make a custom recipe.");
+            appendLn(builder,nl);
             return false;
         }
-        return true;
+
+        if(!config.contains("matchPoint")) {
+            appendLn(builder, "matchPoint -> A section is not found.");
+            appendLn(builder, "  -> This section is need to make a custom recipe.");
+            appendLn(builder,nl);
+            return false;
+        }
+
+        int matchPoint = config.getInt("matchPoint");
+        String section = config.getString("nameOrRegex");
+        boolean isRegex = section.contains("@");
+        if(isRegex) {
+            // use regex
+            List<String> inputs = new ArrayList<>();
+            String input = section.substring(0,section.indexOf("@"));
+            String replace = section.substring(section.indexOf("@")+1,section.length());
+
+            if(input.isEmpty() || replace.isEmpty()) {
+                appendLn(builder, "nameOrRegex -> A Java expression string or replace string is invalid.");
+                appendLn(builder, nl);
+                return false;
+            }
+
+            Pattern p;
+            try{
+                p = Pattern.compile(input);
+            }catch (Exception e) {
+                appendLn(builder, "nameOrRegex -> The string does not according to the Java regular expression rule.");
+                appendLn(builder, "  -> So, you have to rewrite this section as soon as.");
+                appendLn(builder,nl);
+                return false;
+            }
+
+            for(String s : allMaterials) {
+                Matcher m = p.matcher(s);
+                if(!m.find()) continue;
+                inputs.add(m.group(matchPoint));
+            }
+
+            if(inputs.isEmpty()) {
+                appendLn(builder, "nameOrRegex -> The Java regular expression has no match string in all materials name.");
+                appendLn(builder, "  -> So, you have to rewrite this section to match any string more than one.");
+                appendLn(builder, nl);
+                return false;
+            }
+
+            for(String s : inputs) {
+                String replaced = replace.replace("{R}",s);
+                try{
+                    Material.valueOf(replaced);
+                }catch (Exception e) {
+                    appendLn(builder, "nameOrRegex -> The replaced string is not an item id.");
+                    appendLn(builder, String.format("  -> '%s' is invalid item id.",replaced));
+                    return false;
+                }
+            }
+
+            return true;
+
+        }else {
+            // not use regex
+            for (String s : allMaterials) {
+                if (section.equalsIgnoreCase(s)) return true;
+            }
+
+            appendLn(builder, "nameOrRegex -> The string is not an item id.");
+            appendLn(builder, "  -> You have to rewrite this section to a correct id.");
+            appendLn(builder, nl);
+            return false;
+        }
     }
+
+
 
     private boolean enchantCheck(FileConfiguration config,StringBuilder builder,boolean strict,int splitter){
         if(!config.contains("enchant")) {
@@ -370,14 +458,14 @@ public class DataCheckerUtil {
                 return false;
             }
 
-            if(duration < 1 || amplifier < 1) {
+            if(duration < -1 || amplifier < -1) {
                 appendLn(builder,"potion -> Duration or Amplifier is an invalid value. (range)");
                 return false;
             }
 
             if(!new PotionUtil().getPotionStrictStringList().contains(list.get(3).toUpperCase())){
                 appendLn(builder,"potion -> PotionStrict is an invalid value.");
-                appendLn(builder,"  -> NotStrict, OnlyDuration, OnlyAmplifier, Strict");
+                appendLn(builder,"  -> Not_Strict, Only_Effect, Only_Duration, Only_Amplifier, Strict");
                 return false;
             }
 
@@ -395,44 +483,8 @@ public class DataCheckerUtil {
         if(!intCheck(config,builder,"amount",64)) count++;
         builder.append(nl);
         // name or regex
-        if(!config.contains("nameOrRegex")){
-            appendLn(builder,"nameOrRegex -> A section is not found.");
-            builder.append(nl);
-        }else{
-            String s = config.getString("nameOrRegex");
-            boolean isRegex = s.contains("@");
-            String pattern = isRegex ? s.substring(0,s.indexOf("@")) : s;
-            if(!isCorrectNameOrRegex(builder,pattern,isRegex,"nameOrRegex")) count++;
-            if(isRegex) {
-                String afterPattern = s.substring(s.indexOf("@")).replace("{R}","");
-                if(!isCorrectNameOrRegex(builder,afterPattern,true,"nameOrRegex")) {
-                    appendLn(builder,"  -> {R} side regular expression has an error.");
-                    count++;
-                }
-            }
-            builder.append(nl);
-            // End name or regex
-            // match point
-            if(isRegex){
-                intCheck(config,builder,"matchPoint",100);
-                builder.append(nl);
-            }else{
-                try{
-                    int point = Integer.valueOf(config.getString("matchPoint"));
-                    if(point != -1) {
-                        appendLn(builder,"matchPoint -> This section must be -1 in this case.");
-                        count ++;
-                    }
-                }catch (Exception e){
-                    appendLn(builder,"matchPoint -> The value cannot be casted to Integer.");
-                    count ++;
-                }
-                builder.append(nl);
-            }
-            // End match point
-        }
-
-
+        if(!isCorrectResultNameOrRegex(config,builder)) count++;
+        builder.append(nl);
         if(!enchantCheck(config,builder,false,2)) count++;
         builder.append(nl);
         if(!metadataCheck(config,builder)) count++;
@@ -445,7 +497,7 @@ public class DataCheckerUtil {
         appendLn(builder,bar);
         appendLn(builder,"Target file is "+path.toString());
         appendLn(builder,nl);
-        if(!nameCheck(config,builder)) count++;
+        if(!recipeNameCheck(config,builder)) count++;
         appendLn(builder,nl);
         if(!tagCheck(config,builder)) count++;
         if(!resultSectionCheck(config, builder)) count++;
@@ -454,6 +506,26 @@ public class DataCheckerUtil {
         if(!returnsCheck(config,builder)) count++;
         if(count != 0) System.out.println(builder);
 
+    }
+
+    private boolean recipeNameCheck(FileConfiguration config, StringBuilder builder) {
+        if(!config.contains("name")) {
+            appendLn(builder, "name -> A section is not found.");
+            appendLn(builder, "  -> Must write this section.'");
+            appendLn(builder,nl);
+            return false;
+        }
+
+        String name = config.getString("name");
+        for(Recipe recipe : recipes) {
+            if(name.equalsIgnoreCase(recipe.getName())) {
+                appendLn(builder, "name -> A recipe name is conflict found.");
+                appendLn(builder, String.format("  -> '%s' is conflict with other matter files.",name));
+                appendLn(builder,nl);
+                return false;
+            }
+        }
+        return true;
     }
 
     private boolean tagCheck(FileConfiguration config, StringBuilder builder){
