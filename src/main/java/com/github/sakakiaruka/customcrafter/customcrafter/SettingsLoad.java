@@ -318,9 +318,6 @@ public class SettingsLoad {
                 if(s.startsWith("R|")){
                     String pattern = s.substring(2); // remove "R|"
 
-                    //debug
-                    System.out.println(String.format("string : %s | pattern : %s",s,pattern));
-
                     candidate.addAll(getCandidateFromRegex(pattern));
                 }else if (s.equalsIgnoreCase("enchanted_book")){
                     // enchanted book
@@ -364,12 +361,6 @@ public class SettingsLoad {
                     System.out.println(String.format("load wrap : %s",wrap.info()));
                     System.out.println(String.format("list : %s",list));
                 }
-            }
-
-            //debug
-            System.out.println("matter name : "+name);
-            for(Material material:candidate){
-                System.out.println(String.format("candidate : %s",material.name()));
             }
 
             if(wrapList.isEmpty())wrapList = null;
@@ -437,8 +428,6 @@ public class SettingsLoad {
             Material matched = Material.valueOf(matcher.group(0).toUpperCase());
             list.add(matched);
 
-            //debug
-            System.out.println(String.format("pattern : %s | matcher(0) : %s | material : %s",pattern,matcher.group(0),material));
         }
         return list;
     }
@@ -477,9 +466,6 @@ public class SettingsLoad {
                     overrides.put(shorter,source);
                 }
             }
-
-            //debug
-            System.out.println("overrides : "+overrides);
 
             if(tag.equalsIgnoreCase("normal")){
                 // normal recipe load
