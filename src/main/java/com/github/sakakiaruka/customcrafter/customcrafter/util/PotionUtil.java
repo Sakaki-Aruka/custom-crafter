@@ -1,5 +1,6 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.util;
 
+import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.PotionData.PotionDuration;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.PotionBottleType;
@@ -7,8 +8,6 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.Potions;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import org.bukkit.Material;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.*;
@@ -16,10 +15,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
-import java.io.ObjectStreamException;
+import java.io.IOException;;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
@@ -245,7 +242,7 @@ public class PotionUtil {
     }
 
     public void makeDefaultPotionFilesWrapper() {
-        final String BASE_PATH = "plugins/Custom_Crafter/matters/default/potion";
+        final String BASE_PATH = CustomCrafter.getInstance().getConfig().getStringList("matters").get(0) + "/default/potion";
 
         new BukkitRunnable(){
             @Override

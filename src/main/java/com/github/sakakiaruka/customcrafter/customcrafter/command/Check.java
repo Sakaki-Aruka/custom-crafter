@@ -44,13 +44,17 @@ public class Check implements CommandExecutor {
         }
         else if(args[0].equalsIgnoreCase("-f")){
             if(args.length != 3) return false;
-            if(!args[1].equalsIgnoreCase("-m")) return false;
-            if(!args[2].equalsIgnoreCase("defaultPotion")) return false;
-
-            //debug
-            System.out.println("make default potion");
-
-            new PotionUtil().makeDefaultPotionFilesWrapper();
+            if(args[1].equalsIgnoreCase("-m")){
+                if(args[2].equalsIgnoreCase("defaultPotion")){
+                    System.out.println(bar + nl);
+                    System.out.println("The system is making default potion files.");
+                    System.out.println("Do not shutdown or stop a server.");
+                    System.out.println(nl + bar);
+                    new PotionUtil().makeDefaultPotionFilesWrapper();
+                }else{
+                    return false;
+                }
+            }
         }
         else {
             System.out.println(getGraphicalRecipe(args[0]));
