@@ -122,14 +122,6 @@ public class DataCheckerUtil {
             return false;
         }
 
-//        if(candidates.get(0).startsWith("R|")){
-//            String pattern = candidates.get(0).replace("R|","");
-//            if(!isCorrectNameOrRegex(builder,pattern,true,"candidate")) return false;
-//        }else{
-//            for(String str : candidates){
-//                if(!isCorrectNameOrRegex(builder,str.toUpperCase(),false,"candidate")) return false;
-//            }
-//        }
         if(candidates.get(0).startsWith("R|")) {
             // use regular expression
             String expression = candidates.get(0).replace("R|","");
