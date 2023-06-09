@@ -1,21 +1,15 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.util;
 
-import com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad;
-import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantStrict;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.MetadataType;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.potion.PotionEffectType;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.*;
 
@@ -296,8 +290,6 @@ public class DataCheckerUtil {
                     return false;
                 }
             }
-
-
         }
         if(enchants.size() != count) {
             appendLn(builder,"enchant -> The enchants list contains invalid settings.");
