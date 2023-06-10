@@ -38,13 +38,13 @@ public class Check implements CommandExecutor {
             if(!sender.isOp())return false;
             reload();
         }
-        else if(args[0].equalsIgnoreCase("-p")){
+        else if(args[0].equalsIgnoreCase("-permission")){
             if(args[1] == null) return false;
             new PermissionCheck().main(args,sender);
         }
-        else if(args[0].equalsIgnoreCase("-f")){
+        else if(args[0].equalsIgnoreCase("-file")){
             if(args.length != 3) return false;
-            if(args[1].equalsIgnoreCase("-m")){
+            if(args[1].equalsIgnoreCase("-make")){
                 if(args[2].equalsIgnoreCase("defaultPotion")){
                     System.out.println(bar + nl);
                     System.out.println("The system is making default potion files.");
@@ -55,7 +55,7 @@ public class Check implements CommandExecutor {
                     return false;
                 }
             }
-        }else if(args[0].equalsIgnoreCase("-g")) {
+        }else if(args[0].equalsIgnoreCase("-give")) {
             new Give().main(args, sender);
         }
         else {
