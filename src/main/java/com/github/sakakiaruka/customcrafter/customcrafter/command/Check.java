@@ -111,7 +111,7 @@ public class Check implements CommandExecutor {
         if(!namedRecipes.containsKey(recipeName))return "Unknown recipe.";
         Recipe recipe = namedRecipes.get(recipeName);
         StringBuilder builder = new StringBuilder();
-        builder.append(String.format("%s%s%s",bar,nl,nl));
+        builder.append(String.format("%s%s%s",String.join("", Collections.nCopies(40,"=")),nl,nl));
         builder.append(String.format("Recipe Name : %s%s",recipeName,nl));
         builder.append(String.format("Tag : %s%s",recipe.getTag().toString(),nl));
         builder.append(String.format("RecipePermission : %s%s",recipe.hasPermission() ? recipe.getPermission().getPermissionName() : "NO PERMISSION",nl));
