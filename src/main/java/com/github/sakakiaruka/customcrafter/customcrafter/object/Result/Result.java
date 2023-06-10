@@ -60,7 +60,7 @@ public class Result {
         return metadata;
     }
 
-    public void setMetadataValue(Map<MetadataType, List<String>> metadata) {
+    public void setMetadata(Map<MetadataType, List<String>> metadata) {
         this.metadata = metadata;
     }
 
