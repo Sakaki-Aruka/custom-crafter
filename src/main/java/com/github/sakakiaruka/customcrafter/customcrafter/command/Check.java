@@ -44,7 +44,7 @@ public class Check implements CommandExecutor {
         }
         else if(args[0].equalsIgnoreCase("-file")){
             if(args.length != 3) return false;
-            if(args[1].equalsIgnoreCase("-matter")){
+            if(args[1].equalsIgnoreCase("-make")){
                 if(args[2].equalsIgnoreCase("defaultPotion")){
                     System.out.println(bar + nl);
                     System.out.println("The system is making default potion files.");

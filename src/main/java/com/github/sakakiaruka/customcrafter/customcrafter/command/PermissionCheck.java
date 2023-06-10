@@ -18,7 +18,7 @@ public class PermissionCheck {
     public void main(String[] args, CommandSender sender){
 
         String name = args[1];
-        if(args.length == 3 && args[1].equals("-p")) {
+        if(args.length == 3 && args[1].equals("-permissions")) {
             if(args.length != 3) return;
             String targetName = args[2];
             if(!isNamePlayerOnline(targetName)) {
@@ -28,7 +28,7 @@ public class PermissionCheck {
             UUID uuid = Bukkit.getPlayer(targetName).getUniqueId();
             displayPlayerPermissions(uuid);
 
-        }else if(args[1].equals("-m")){
+        }else if(args[1].equals("-modify")){
             if(!sender.isOp()) return;
             playersPermissionModify(args);
 
