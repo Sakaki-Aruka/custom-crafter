@@ -50,11 +50,14 @@ public class Give {
                 if(!name.equalsIgnoreCase(s)) continue;
                 Matter matter = matters.get(s);
                 ItemStack item = new ItemStack(matter.getCandidate().get(0), matter.getAmount());
+                List<String> list = new ArrayList<>();
+                list.addAll(setCandidateLine(matter.getCandidate()));
+                list.add(String.format("%s mass:","§f"));
+                list.add(String.format("%s%b","§b",matter.isMass()));
+                if(matter.hasWrap()) list.addAll(getEnchantInfo(matter, item));
+                if(matter.getClass().equals(Potions.class)) list.addAll(getPotionInfo(matter, item));
                 ItemMeta meta = item.getItemMeta();
-                meta.setLore(getCandidateLine(matter.getCandidate()));
-                meta.setLore(Arrays.asList(String.format("mass: %s",matter.isMass())));
-                if(matter.hasWrap()) addEnchantInfo(matter, meta);
-                if(matter.getClass().equals(Potions.class)) addPotionInfo(matter, meta);
+                meta.setLore(list);
                 item.setItemMeta(meta);
 
                 player.getWorld().dropItem(player.getLocation(),item);
@@ -73,19 +76,23 @@ public class Give {
                 ItemMeta meta = item.getItemMeta();
 
                 List<String> modifiedCandidate = new ArrayList<>();
+                modifiedCandidate.add("§f"+shortBar);
+                modifiedCandidate.add("§fResult candidate: ");
                 for(String c : candidates) {
                     modifiedCandidate.add("§f" + c);
                 }
+                modifiedCandidate.add("§f"+shortBar);
                 meta.setLore(modifiedCandidate);
-                result.setMetaData(item);
                 item.setItemMeta(meta);
+                result.setMetaData(item);
 
                 player.getWorld().dropItem(player.getLocation(),item);
             }
         }
     }
 
-    private List<String> getCandidateLine(List<Material> candidate) {
+
+    private List<String> setCandidateLine(List<Material> candidate) {
         final int LIMIT = 40;
         List<String> list = new ArrayList<>();
         String buffer = "";
@@ -93,17 +100,23 @@ public class Give {
         for(Material material : candidate) {
             int len = material.name().length();
             if(buffer.length() + len + 1 > LIMIT){ // +1 -> separator (,)
-                list.add(buffer);
+                list.add("§b" + buffer);
                 buffer = material.name();
                 continue;
             }
-            buffer += "," + material.name();
+            buffer += (buffer.isEmpty() ? "" : ",") + material.name();
         }
+        list.add("§b" + buffer);
+
+        //debug
+        System.out.println(String.format("candidate list : %s",list));
+
         return list;
     }
 
-    private void addEnchantInfo(Matter matter, ItemMeta meta) {
+    private List<String> getEnchantInfo(Matter matter, ItemStack item) {
         List<String> list = new ArrayList<>();
+        ItemMeta meta = item.getItemMeta();
         for(EnchantWrap wrap : matter.getWrap()) {
             int level = wrap.getLevel();
             Enchantment enchant = wrap.getEnchant();
@@ -111,11 +124,13 @@ public class Give {
             meta.addEnchant(enchant,level,true);
             list.add(String.format("§fEnchant: %s | Level: %d | Strict: %s",enchant.toString(),level,strict.toStr()));
         }
-        meta.setLore(list);
+        return list;
     }
 
-    private void addPotionInfo(Matter matter, ItemMeta meta) {
+    private List<String> getPotionInfo(Matter matter, ItemStack item) {
+        ItemMeta meta = item.getItemMeta();
         List<String> list = new ArrayList<>();
+        list.add("§f Potion Info: ");
         for(Map.Entry<PotionEffect, PotionStrict> entry : ((Potions) matter).getData().entrySet()) {
             PotionEffectType type = entry.getKey().getType();
             int level = entry.getKey().getAmplifier();
@@ -123,9 +138,12 @@ public class Give {
             PotionStrict strict = entry.getValue();
             boolean match = ((Potions) matter).isBottleTypeMatch();
             ((PotionMeta) meta).addCustomEffect(entry.getKey(),true);
-            list.add(String.format("§fType: %s | level: %d | duration: %d | Strict: %s | Bottle: %b",type.getName(),level,duration,strict.toStr(),match));
+            list.add(String.format("§bType: %s | level: %d | duration: %d | Strict: %s | Bottle: %b",type.getName(),level,duration,strict.toStr(),match));
         }
         meta.setLore(list);
+        item.setItemMeta(meta);
+
+        return list;
     }
 
     private List<String> getAllResultCandidate(Result result) {
