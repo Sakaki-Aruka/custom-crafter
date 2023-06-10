@@ -14,10 +14,11 @@ custom crafter は，既存のアイテムに新しいレシピを追加，カ�
 ## 使用可能コマンド一覧
 - `/cc`
 - `/cc [recipeName]`
-- `/cc -p [permissionName]`
-- `/cc -p -p [targetPlayerName]`
-- `/cc -p -m [targetPlayerName] [operation] [targetRecipePermission]`
-- `/cc -f -m defaultPotion`
+- `/cc -permission [permissionName]`
+- `/cc -permission -permissions [targetPlayerName]`
+- `/cc -permission -modify [targetPlayerName] [operation] [targetRecipePermission]`
+- `/cc -file -make defaultPotion`
+- `/cc -give [matter|result] [name]`
 
 ### /cc
 このコマンドは、すべてのレシピについての情報を表示する。
@@ -25,29 +26,36 @@ custom crafter は，既存のアイテムに新しいレシピを追加，カ�
 ### /cc [recipeName]
 このコマンドは、指定したレシピについての情報を表示する。
 
-### /cc -p [permissionName]
+### /cc -permission [permissionName]
 このコマンドは、指定したレシピ権限のツリー（再帰的に取得した親権限）をコンソールに表示する。
 
-### /cc -p -p [targetPlayerName]
+### /cc -permission -permissions [targetPlayerName]
 このコマンドは、指定したプレイヤーが保持している全ての権限を表示する。<br>
 指定したプレイヤーがオンラインではないか、または権限を1つも保持していない場合は、失敗した旨のメッセージを表示する。<br>
 
 例)
-`/cc -p -p ytshiyugh`
+`/cc -permission -permissions ytshiyugh`
 
-### /cc -p -m [targetPlayerName] [operation] [targetRecipePermission]
+### /cc -permission -modify [targetPlayerName] [operation] [targetRecipePermission]
 このコマンドは、指定したプレイヤーが保持する権限の状態を変更する。<br>
 `operation` には `add` と `remove` を適用することが出来る。<br>
 それぞれ、権限の追加と削除を行う。<br>
 対象のプレイヤーがオンラインでない場合は、操作に失敗した旨のメッセージを表示する。<br>
 
 例)
-`/cc -p -m ytshiyugh add ROOT`
+`/cc -permissions -modify ytshiyugh add ROOT`
 
-### /cc -f -m defaultPotion
+### /cc -file -make defaultPotion
 このコマンドは、バニラのマインクラフトで取得することが出来るポーションについての Matter ファイルを作成する。<br>
-`~/plugins/Custom_Crafter/matters/default/potion` 以下に `lingering`, `normal`, `splash` ディレクトリを作成し、その中にそれぞれの Matter ファイルを作成する。
+`config.yml` の `matters` セクションに記載した matters ファイルを格納しているディレクトリ配下に `lingering`, `normal`, `splash` ディレクトリを作成する。<br>
+また、その中にそれぞれの Matter ファイルを作成する。
 
+
+### /cc -give -matter [Matter Name]
+指定された Matter をアイテムとしてコマンド実行者に付与する。
+
+### /cc -give -result [Result Name]
+指定された Result をアイテムとしてコマンド実行者に付与する。
 
 ---
 OP権限を持つプレイヤーのみ，上記のコマンドに加えて `/cc -reload` を利用することが出来る。  
