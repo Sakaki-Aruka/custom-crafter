@@ -34,9 +34,9 @@ public class Give {
         * - /cc -g -m [MatterName]
          */
         if(args.length == 3) {
-            if(args[1].equalsIgnoreCase("-r")){
+            if(args[1].equalsIgnoreCase("-result")){
                 give(args[2],sender,false);
-            }else if(args[1].equalsIgnoreCase("-m")){
+            }else if(args[1].equalsIgnoreCase("-matter")){
                 give(args[2],sender,true);
             }
         }
