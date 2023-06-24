@@ -8,5 +8,30 @@ commands:
     permission: cc.op
 
 permissions:
+  cc.*:
+    children:
+      cc.op: true
+      cc.reload: true
+      cc.give: true
+      cc.permission: true
+      cc.file: true
+
   cc.op:
     default: op
+    description: Allows to send all operations.
+
+  cc.reload:
+    default: false
+    description: Allows to reload config files.
+
+  cc.give:
+    default: false
+    description: Allows to receive matters and results.
+
+  cc.permission:
+    default: false
+    description: Allows to modify permissions.
+
+  cc.file:
+    default: false
+    description: Allows to modify config files.
