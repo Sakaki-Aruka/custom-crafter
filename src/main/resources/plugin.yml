@@ -15,6 +15,7 @@ permissions:
       cc.give: true
       cc.permission: true
       cc.file: true
+      cc.craft: true
 
   cc.op:
     default: op
@@ -35,3 +36,7 @@ permissions:
   cc.file:
     default: false
     description: Allows to modify config files.
+
+  cc.craft:
+    default: true
+    description: Allows to craft items.
