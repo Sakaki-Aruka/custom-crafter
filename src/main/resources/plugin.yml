@@ -17,6 +17,7 @@ permissions:
       cc.file: true
       cc.craft: true
       cc.show: true
+      cc.open: true
 
   cc.op:
     default: op
@@ -45,3 +46,7 @@ permissions:
   cc.show:
     default: false
     description: Allows to send commands that display recipes.
+
+  cc.open:
+    default: false
+    description: Allows to open the crafting gui from the command.
