@@ -16,6 +16,7 @@ permissions:
       cc.permission: true
       cc.file: true
       cc.craft: true
+      cc.show: true
 
   cc.op:
     default: op
@@ -40,3 +41,7 @@ permissions:
   cc.craft:
     default: true
     description: Allows to craft items.
+
+  cc.show:
+    default: false
+    description: Allows to send commands that display recipes.
