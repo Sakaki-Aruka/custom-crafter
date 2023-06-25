@@ -3,6 +3,7 @@ package com.github.sakakiaruka.customcrafter.customcrafter.command;
 import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter;
 import com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad;
 import com.github.sakakiaruka.customcrafter.customcrafter.listener.CloseCraftingTable;
+import com.github.sakakiaruka.customcrafter.customcrafter.listener.OpenCraftingTable;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordinate;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
@@ -71,6 +72,12 @@ public class Check implements CommandExecutor {
             if(sender instanceof ConsoleCommandSender) return false;
             if(!sender.hasPermission(("cc.give"))) return false;
             new Give().main(args, sender);
+        }
+        else if(args[0].equalsIgnoreCase("-open")){
+            if(sender instanceof ConsoleCommandSender) return false;
+            if(!sender.hasPermission("cc.open")) return false;
+            ((Player) sender).openInventory(new OpenCraftingTable().setCraftingInventory());
+            opening.add((Player) sender);
         }
         else {
             System.out.println(getGraphicalRecipe(args[0]));
