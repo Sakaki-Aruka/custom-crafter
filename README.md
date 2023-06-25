@@ -43,7 +43,7 @@ custom crafter は，既存のアイテムに新しいレシピを追加，カ�
 対象のプレイヤーがオンラインでない場合は、操作に失敗した旨のメッセージを表示する。<br>
 
 例)
-`/cc -permissions -modify ytshiyugh add ROOT`
+`/cc -permission -modify ytshiyugh add ROOT`
 
 ### /cc -file -make defaultPotion
 このコマンドは、バニラのマインクラフトで取得することが出来るポーションについての Matter ファイルを作成する。<br>

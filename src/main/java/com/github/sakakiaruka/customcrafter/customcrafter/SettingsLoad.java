@@ -1,6 +1,5 @@
 package com.github.sakakiaruka.customcrafter.customcrafter;
 
-import com.github.sakakiaruka.customcrafter.customcrafter.listener.OpenCraftingTable;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantStrict;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantWrap;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
@@ -82,6 +81,9 @@ public class SettingsLoad {
         recipePermissionLoad();
         getAllMaterialsName();
         main();
+
+        //debug
+        new ParserUtil().loader();
     }
 
     private void recipePermissionLoad(){
