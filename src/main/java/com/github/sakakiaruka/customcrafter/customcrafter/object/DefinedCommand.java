@@ -1,18 +1,29 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.object;
 
+import org.bukkit.permissions.Permission;
+
+import java.lang.reflect.Method;
 import java.util.List;
 
 public class DefinedCommand {
     private String commandName;
     private boolean hasArgs;
-    private int argsLen;
     private List<String> args;
+    private boolean console;
+    private Permission commandPermission;
+    private Class<?> processClass;
+    private Method processMethod;
+    private int commandLen;
 
-    public DefinedCommand(String commandName, boolean hasArgs, int argsLen, List<String> args) {
+    public DefinedCommand(String commandName, boolean hasArgs, List<String> args, boolean console, Permission commandPermission, Class<?> processClass, Method processMethod, int commandLen) {
         this.commandName = commandName;
         this.hasArgs = hasArgs;
-        this.argsLen = argsLen;
         this.args = args;
+        this.console = console;
+        this.commandPermission = commandPermission;
+        this.processClass = processClass;
+        this.processMethod = processMethod;
+        this.commandLen = commandLen;
     }
 
     public String getCommandName() {
@@ -31,19 +42,51 @@ public class DefinedCommand {
         this.hasArgs = hasArgs;
     }
 
-    public int getArgsLen() {
-        return argsLen;
-    }
-
-    public void setArgsLen(int argsLen) {
-        this.argsLen = argsLen;
-    }
-
     public List<String> getArgs() {
         return args;
     }
 
     public void setArgs(List<String> args) {
         this.args = args;
+    }
+
+    public boolean isConsole() {
+        return console;
+    }
+
+    public void setConsole(boolean console) {
+        this.console = console;
+    }
+
+    public Permission getCommandPermission() {
+        return commandPermission;
+    }
+
+    public void setCommandPermission(Permission permission) {
+        this.commandPermission = permission;
+    }
+
+    public Class<?> getProcessClass() {
+        return processClass;
+    }
+
+    public void setProcessClass(Class<?> processClass) {
+        this.processClass = processClass;
+    }
+
+    public Method getProcessMethod() {
+        return processMethod;
+    }
+
+    public void setProcessMethod(Method processMethod) {
+        this.processMethod = processMethod;
+    }
+
+    public int getCommandLen() {
+        return commandLen;
+    }
+
+    public void setCommandLen(int commandLen) {
+        this.commandLen = commandLen;
     }
 }
