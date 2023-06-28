@@ -40,7 +40,7 @@ DefinedCommands:
   args: ["-reload","-open","-show","-give","-file","-permission"]
 
   # child: has child args
-  # permission: (nullable)
+  # permission: -> List (nullable)
   # console: true or false
   # class:
   # method:
@@ -49,6 +49,9 @@ DefinedCommands:
   -reload:
     child: false
     permission: cc.reload
+    # permission:
+    #   - or cc.reload (and cc.reload)
+    #   - or cc.op (and cc.op)
     console: true
     class: com.github.sakakiaruka.customcrafter.customcrafter.command.Check
     method: reload

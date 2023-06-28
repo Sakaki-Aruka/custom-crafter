@@ -8,6 +8,7 @@ import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
+import org.bukkit.permissions.PermissionAttachmentInfo;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
@@ -47,7 +48,6 @@ public class DefinedCommandUtil {
             Method processMethod;
             try{
                 processClass = Class.forName(config.getString("DefinedCommands."+s+".class"));
-                //processMethod = processClass.getDeclaredMethod(config.getString(s+".class"));
             }catch (Exception e) {
                 e.printStackTrace();
                 continue;
@@ -64,7 +64,7 @@ public class DefinedCommandUtil {
                         e.printStackTrace();
                         continue;
                     }
-                    DefinedCommand command = new DefinedCommand(s,true,args,console,permission,processClass,processMethod,args.size()+1);
+                    DefinedCommand command = new DefinedCommand(s,true,args,console,permission,processClass,processMethod,args.size());
                     DEFINED_COMMAND_LIST.add(command);
 
                     //debug
@@ -93,7 +93,7 @@ public class DefinedCommandUtil {
     public DefinedCommand getProcessor(String[] args, CommandSender sender) {
         List<String> arg = new ArrayList<>(Arrays.asList(args));
         A:for (DefinedCommand command : DEFINED_COMMAND_LIST) {
-            if (command.getCommandLen() != arg.size()) continue;
+            if (command.getCommandLen() != arg.size()-1) continue;
             if (!command.getCommandName().equalsIgnoreCase(arg.get(0))) continue;
             if (arg.size() == 1) return command;
             if ((sender instanceof ConsoleCommandSender) && !command.isConsole()) continue;
@@ -104,7 +104,10 @@ public class DefinedCommandUtil {
 
             B:for(int i=0;i<command.getCommandLen();i++) {
                 String commandPart = command.getArgs().get(i);
-                String inputPart = arg.get(i);
+                String inputPart = arg.get(i+1);
+
+                //debug
+                System.out.println(String.format("command part: %s / input part: %s",commandPart,inputPart));
 
                 if (commandPart.startsWith("-")){
                     if (!commandPart.equalsIgnoreCase(inputPart)) continue A;
@@ -152,6 +155,10 @@ public class DefinedCommandUtil {
             return command;
         }
         return null;
+    }
+
+    private boolean containsPermissions(Set<PermissionAttachmentInfo> players, Map<String,List<Permission>> required) {
+        //
     }
 
     public void runCommand(DefinedCommand command, String[] args, CommandSender sender) {

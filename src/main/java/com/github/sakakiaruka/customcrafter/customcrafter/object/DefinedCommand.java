@@ -3,19 +3,21 @@ package com.github.sakakiaruka.customcrafter.customcrafter.object;
 import org.bukkit.permissions.Permission;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DefinedCommand {
     private String commandName;
     private boolean hasArgs;
     private List<String> args;
     private boolean console;
-    private Permission commandPermission;
+    private Map<String,List<Permission>> commandPermission;
     private Class<?> processClass;
     private Method processMethod;
     private int commandLen;
 
-    public DefinedCommand(String commandName, boolean hasArgs, List<String> args, boolean console, Permission commandPermission, Class<?> processClass, Method processMethod, int commandLen) {
+    public DefinedCommand(String commandName, boolean hasArgs, List<String> args, boolean console, Map<String,List<Permission>> commandPermission, Class<?> processClass, Method processMethod, int commandLen) {
         this.commandName = commandName;
         this.hasArgs = hasArgs;
         this.args = args;
@@ -58,11 +60,11 @@ public class DefinedCommand {
         this.console = console;
     }
 
-    public Permission getCommandPermission() {
+    public Map<String,List<Permission>> getCommandPermission() {
         return commandPermission;
     }
 
-    public void setCommandPermission(Permission permission) {
+    public void setCommandPermission(Map<String,List<Permission>> permission) {
         this.commandPermission = permission;
     }
 
