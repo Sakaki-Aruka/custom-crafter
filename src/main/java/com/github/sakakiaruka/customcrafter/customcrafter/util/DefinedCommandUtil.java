@@ -9,6 +9,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.*;
 
@@ -28,15 +29,24 @@ public class DefinedCommandUtil {
 
     public void loader() {
         FileConfiguration config = CustomCrafter.getInstance().getConfig();
-        List<String> commands = config.getStringList("args");
+        List<String> commands = config.getStringList("DefinedCommands.args");
         for (String s : commands) {
-            boolean child = config.getBoolean(s+".child");
-            Permission permission = config.getString(s+".permission").equals("null") ? null : new Permission(config.getString(s+".permission"));
-            boolean console = config.getBoolean(s+".console");
+
+            //debug
+            System.out.println("s: "+s);
+
+            boolean child = config.getBoolean("DefinedCommands."+s+".child");
+            Permission permission;
+            if (config.contains("DefinedCommands."+s+".permission")){
+                permission = new Permission(config.getString("DefinedCommands."+s+".permission"));
+            }else{
+                permission = null;
+            }
+            boolean console = config.getBoolean("DefinedCommands."+s+".console");
             Class<?> processClass;
             Method processMethod;
             try{
-                processClass = Class.forName(config.getString(s+".class"));
+                processClass = Class.forName(config.getString("DefinedCommands."+s+".class"));
                 //processMethod = processClass.getDeclaredMethod(config.getString(s+".class"));
             }catch (Exception e) {
                 e.printStackTrace();
@@ -44,22 +54,29 @@ public class DefinedCommandUtil {
             }
 
             if (child) {
-                for (int i=0;i<config.getStringList(s+".args").size();i++) {
-                    List<String> args = Arrays.asList(config.getStringList(s+".args").get(i).split(","));
+                for (int i=0;i<config.getStringList("DefinedCommands."+s+".args").size();i++) {
+                    List<String> args = Arrays.asList(config.getStringList("DefinedCommands."+s+".args").get(i).split(","));
+                    String method = config.getStringList("DefinedCommands."+s+".method").get(i);
                     try{
-                        processMethod = processClass.getDeclaredMethod(processClass.getName());
+                        Class[] argTypes = {String[].class, CommandSender.class};
+                        processMethod = processClass.getDeclaredMethod(method,argTypes);
                     }catch (Exception e) {
                         e.printStackTrace();
                         continue;
                     }
                     DefinedCommand command = new DefinedCommand(s,true,args,console,permission,processClass,processMethod,args.size()+1);
                     DEFINED_COMMAND_LIST.add(command);
+
+                    //debug
+                    System.out.println(String.format("%s%n%s%n%s",bar,command.info(),bar));
+
                 }
                 continue;
             }
 
             try{
-                processMethod = processClass.getDeclaredMethod(processClass.getName());
+                Class[] argTypes = {String[].class, CommandSender.class};
+                processMethod = processClass.getDeclaredMethod(config.getString("DefinedCommands."+s+".method"),argTypes);
             }catch (Exception e) {
                 e.printStackTrace();
                 continue;
@@ -67,6 +84,9 @@ public class DefinedCommandUtil {
 
             DefinedCommand command = new DefinedCommand(s,false,null,console,permission,processClass,processMethod,1);
             DEFINED_COMMAND_LIST.add(command);
+
+            //debug
+            System.out.println(String.format("%s%n%s%n%s",bar,command.info(),bar));
         }
     }
 
@@ -78,6 +98,9 @@ public class DefinedCommandUtil {
             if (arg.size() == 1) return command;
             if ((sender instanceof ConsoleCommandSender) && !command.isConsole()) continue;
             if (!sender.hasPermission(command.getCommandPermission())) continue;
+
+            //debug
+            System.out.println("through");
 
             B:for(int i=0;i<command.getCommandLen();i++) {
                 String commandPart = command.getArgs().get(i);
@@ -134,8 +157,11 @@ public class DefinedCommandUtil {
     public void runCommand(DefinedCommand command, String[] args, CommandSender sender) {
         Method m = command.getProcessMethod();
         Class<?> c = command.getProcessClass();
+        Object[] objects = {args, sender};
         try{
-            m.invoke(c,args,sender);
+            Constructor constructor = c.getConstructor();
+            Object o = constructor.newInstance();
+            m.invoke(o,objects);
         }catch (Exception e) {
             e.printStackTrace();
         }

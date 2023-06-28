@@ -13,6 +13,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.MetadataType;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.Result;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.DataCheckerUtil;
+import com.github.sakakiaruka.customcrafter.customcrafter.util.DefinedCommandUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.PotionUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil;
 import org.bukkit.Bukkit;
@@ -82,6 +83,7 @@ public class SettingsLoad {
         recipePermissionLoad();
         getAllMaterialsName();
         main();
+        new DefinedCommandUtil().loader();
     }
 
     private void recipePermissionLoad(){

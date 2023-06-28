@@ -89,4 +89,17 @@ public class DefinedCommand {
     public void setCommandLen(int commandLen) {
         this.commandLen = commandLen;
     }
+
+    public String info() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("name: "+this.commandName+"\n");
+        builder.append("hasArgs: "+this.hasArgs+"\n");
+        builder.append("args: "+this.args+"\n");
+        builder.append("console: "+this.console+"\n");
+        builder.append("permission: "+this.commandPermission+"\n");
+        builder.append("class: "+this.processClass+"\n");
+        builder.append("method: "+this.processMethod+"\n");
+        builder.append("length: "+this.commandLen+"\n");
+        return builder.toString();
+    }
 }
