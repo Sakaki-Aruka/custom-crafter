@@ -19,3 +19,105 @@ download_threshold: 20
 load_interval: 20
 download:
   - ""
+
+# DO NOT TOUCH CONTENTS THAT ARE UNDER THIS LINE.
+# Defined Commands
+#DefinedCommands:
+#  - "-reload,false"
+#  - "-open,false"
+#  - "-show,true,1,-all"
+#  - "-show,true,1,{Recipe}"
+#  - "-give,true,2,matter,{Matter}"
+#  - "-give,true,2,result,{Result}"
+#  - "-file,true,2,-make,defaultPotion"
+#  - "-permission,2,true,{RecipePermission}"
+#  - "-permission,3,true,-permissions,{Player}"
+#  - "-permission,5,true,-modify,{Player},add,{RecipePermission}"
+#  - "-permission,5,true,-modify,{Player},remove,{RecipePermission}"
+#  -
+
+DefinedCommands:
+  args: ["-reload","-open","-show","-give","-file","-permission"]
+
+  # child: has child args
+  # permission: (nullable)
+  # console: true or false
+  # class:
+  # method:
+  # [args]: -> List (nullable)
+
+  -reload:
+    child: false
+    permission: cc.reload
+    console: true
+    class: Check
+    method: reload
+
+  #----------------------------------------
+
+  -open:
+    child: false
+    permission: cc.open
+    console: false
+    class: Check
+    method: open
+
+  #----------------------------------------
+
+  -show:
+    child: true
+    args:
+      - "-all"
+      - "{Recipe}"
+    permission: cc.show
+    console: true
+    class: Show
+    method:
+      - all
+      - one
+
+  #----------------------------------------
+
+  -give:
+    child: true
+    args:
+      - "-matter,{Matter}"
+      - "-result,{Result}"
+    permissions: cc.give
+    console: false
+    class: Give
+    method:
+      - matter
+      - result
+
+  #----------------------------------------
+
+  -file:
+    child: true
+    args:
+      - "-make,defaultPotion"
+    permission: cc.file
+    console: true
+    class:
+    method:
+      - defaultPotion
+
+  #----------------------------------------
+
+  -permission:
+    child: true
+    args:
+      - "{RecipePermission}"
+      - "-permissions,{Player}"
+      - "-permissions,-modify,{Player},add,{RecipePermission}"
+      - "-permissions,-modify,{Player},remove,{RecipePermission}"
+    permission: cc.permission
+    console: true
+    class: PermissionCheck
+    method:
+      - tree
+      - show
+      - add
+      - remove
+
+  #----------------------------------------
