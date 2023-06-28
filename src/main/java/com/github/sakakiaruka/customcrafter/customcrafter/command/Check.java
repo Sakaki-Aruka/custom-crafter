@@ -96,7 +96,12 @@ public class Check implements CommandExecutor {
         }
     }
 
-    private void reload(String[] args, CommandSender sender){
+    public void open(String[] args, CommandSender sender) {
+        ((Player) sender).openInventory(new OpenCraftingTable().setCraftingInventory());
+        opening.add((Player) sender);
+    }
+
+    public void reload(String[] args, CommandSender sender){
         /*
         * /cc reload
         * -> close all players custom crafter GUI (contained "opening")

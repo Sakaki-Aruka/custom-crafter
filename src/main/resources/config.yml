@@ -59,8 +59,8 @@ DefinedCommands:
     child: false
     permission: cc.open
     console: false
-    class:
-    method:
+    class: Check
+    method: open
 
   #----------------------------------------
 
