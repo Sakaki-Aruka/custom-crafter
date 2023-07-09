@@ -33,59 +33,6 @@ public class Check implements CommandExecutor {
     private final String nl = System.getProperty("line.separator");
     @Override
     public boolean onCommand(CommandSender sender, Command command,String label,String[] args){
-//        //no args -> all recipes show
-//        //one argument -> search recipes
-//        if(args.length == 0){
-//            if (!(sender instanceof ConsoleCommandSender) && !sender.hasPermission("cc.show")){
-//                return false;
-//            }
-//            recipes.forEach(s->System.out.println(getGraphicalRecipe(s.getName())));
-//        }
-//        else if(args[0].equalsIgnoreCase("-reload")) {
-//            if(!(sender instanceof ConsoleCommandSender) && !sender.hasPermission("cc.reload")){
-//                return false;
-//            }
-//            reload();
-//        }
-//        else if(args[0].equalsIgnoreCase("-permission")){
-//            if(!(sender instanceof ConsoleCommandSender) && !sender.hasPermission("cc.permission")){
-//                return false;
-//            }
-//            if(args[1] == null) return false;
-//            new PermissionCheck().main(args,sender);
-//        }
-//        else if(args[0].equalsIgnoreCase("-file")){
-//            if(!(sender instanceof ConsoleCommandSender) && !sender.hasPermission("cc.file")){
-//                return false;
-//            }
-//            if(args.length != 3) return false;
-//            if(args[1].equalsIgnoreCase("-make")){
-//                if(args[2].equalsIgnoreCase("defaultPotion")){
-//                    System.out.println(bar + nl);
-//                    System.out.println("The system is making default potion files.");
-//                    System.out.println("Do not shutdown or stop a server.");
-//                    System.out.println(nl + bar);
-//                    new PotionUtil().makeDefaultPotionFilesWrapper();
-//                }else{
-//                    return false;
-//                }
-//            }
-//        }else if(args[0].equalsIgnoreCase("-give")) {
-//            if(sender instanceof ConsoleCommandSender) return false;
-//            if(!sender.hasPermission(("cc.give"))) return false;
-//            new Give().main(args, sender);
-//        }
-//        else if(args[0].equalsIgnoreCase("-open")){
-//            if(sender instanceof ConsoleCommandSender) return false;
-//            if(!sender.hasPermission("cc.open")) return false;
-//            ((Player) sender).openInventory(new OpenCraftingTable().setCraftingInventory());
-//            opening.add((Player) sender);
-//        }
-//        else {
-//            System.out.println(getGraphicalRecipe(args[0]));
-//        }
-//        return true;
-
         DefinedCommand defCommand;
         if ((defCommand = new DefinedCommandUtil().getProcessor(args, sender)) != null){
             new DefinedCommandUtil().runCommand(defCommand,args,sender);
