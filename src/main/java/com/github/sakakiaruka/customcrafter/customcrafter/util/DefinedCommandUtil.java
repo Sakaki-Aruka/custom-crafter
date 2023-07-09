@@ -37,11 +37,11 @@ public class DefinedCommandUtil {
             System.out.println("s: "+s);
 
             boolean child = config.getBoolean("DefinedCommands."+s+".child");
-            Permission permission;
+            List<String> permission;
             if (config.contains("DefinedCommands."+s+".permission")){
-                permission = new Permission(config.getString("DefinedCommands."+s+".permission"));
+                permission = loadPermissions(config.getString(String.format("DefinedCommands.%s.permission",s)));
             }else{
-                permission = null;
+                permission = new ArrayList<>();
             }
             boolean console = config.getBoolean("DefinedCommands."+s+".console");
             Class<?> processClass;
@@ -90,6 +90,142 @@ public class DefinedCommandUtil {
         }
     }
 
+
+    private List<String> loadPermissions(String input) {
+        List<String> list = parsed(input);
+        List<String> result = new ArrayList<>();
+        Map<Integer,List<String>> map = new HashMap<>();
+
+        for (int i=0;i<list.size();i++) {
+            map.put(i, separator(list.get(i)));
+        }
+
+        for (Map.Entry<Integer,List<String>> entry : map.entrySet()) {
+            for (String s : entry.getValue()) {
+                result.add(s);
+            }
+        }
+
+        return result;
+    }
+
+    private List<String> separator(String input) {
+        List<String> buffer = new ArrayList<>();
+        Map<Integer,List<String>> map = new HashMap<>();
+        int dim = 0;
+        int start = 0;
+        input = input.replace(" ", "");
+        List<String> list = Arrays.asList(input.split(""));
+        for (int i=0;i<input.length();i++) {
+            String s = String.valueOf(input.charAt(i));
+            if (s.equals("(")) {
+                dim++;
+                continue;
+            }
+
+            if (s.equals(")")) {
+                dim--;
+                continue;
+            }
+
+            if (s.equals("&") && dim == 0) {
+                int index = map.isEmpty() ? 0 : Collections.max(map.keySet()) + 1;
+                map.put(index, new ArrayList<>(Arrays.asList(String.join("",list.subList(start, i)))));
+                start = i;
+                continue;
+            }
+        }
+
+        map.put(map.isEmpty() ? 0 : Collections.max(map.keySet()) + 1, new ArrayList<>(Arrays.asList(String.join("",list.subList(start, list.size())))));
+
+        List<Integer> sizes = new ArrayList<>();
+        List<Map<Integer,Integer>> orders = new ArrayList<>();
+        for (Map.Entry<Integer,List<String>> entry : map.entrySet()) {
+            List<String> l = entry.getValue();
+            String s = l.get(0).startsWith("&") ? l.get(0).substring(1, l.get(0).length()) : l.get(0);
+            s = s.replace("(", "").replace(")", "");
+            entry.getValue().addAll(Arrays.asList(s.split("\\|")));
+            entry.getValue().remove(0);
+            sizes.add(entry.getValue().size());
+        }
+
+        for (int i=0;i<getAllElementsProduct(sizes);i++) {
+            orders.add(new HashMap<>());
+        }
+
+        for (int i=0;i<sizes.size();i++) {
+            make(i,sizes,orders);
+        }
+
+        for (Map<Integer,Integer> m : orders) {
+            List<String> ll = new ArrayList<>();
+            for (Map.Entry<Integer,Integer> entry : m.entrySet()) {
+                String temp = map.get(entry.getKey()).get(entry.getValue());
+                temp = temp.replace("&",",");
+                //ll.add(map.get(entry.getKey()).get(entry.getValue()));
+                ll.add(temp);
+            }
+            buffer.add(String.join(",", ll));
+        }
+
+        return buffer;
+
+    }
+
+    private int getAllElementsProduct(List<Integer> list) {
+        int result = 1;
+        for (int i : list) {
+            result *= i;
+        }
+        return result;
+    }
+
+    private void make(int index, List<Integer> source, List<Map<Integer,Integer>> map) {
+        int c = getAllElementsProduct(source.subList(index, source.size()));
+        int count = getAllElementsProduct(source.subList(index+1, source.size()));
+        int all = getAllElementsProduct(source);
+        int now = 0;
+        for (int k=0;k<all/c;k++) {
+            for (int i=0;i<source.get(index);i++) {
+                for (int j=0;j<count;j++) {
+                    map.get(now).put(index, i);
+                    now++;
+                }
+            }
+        }
+    }
+
+    private List<String> parsed(String input) {
+        StringBuilder builder = new StringBuilder();
+        int depth = getDepth(input);
+        int dim = 0;
+        String separator = String.join("", Collections.nCopies(depth+1,"|"));
+        for (String s : input.split("")) {
+            if (s.equals("(")) dim++;
+            if (s.equals(")")) dim--;
+            if (s.equals("|") && dim ==0) {
+                builder.append(separator);
+                continue;
+            }
+
+            builder.append(s);
+        }
+
+        String sep = String.join("", Collections.nCopies(2, "\\|"));
+        return new ArrayList<>(Arrays.asList(builder.toString().split(sep)));
+    }
+
+    private int getDepth(String input) {
+        Set<Integer> set = new HashSet<>();
+        int d = 0;
+        for (String s : input.split("")) {
+            if (s.equals("(")) d++;
+            if (s.equals(")")) d--;
+            set.add(d);
+        }
+        return Collections.max(set);
+    }
+
     public DefinedCommand getProcessor(String[] args, CommandSender sender) {
         List<String> arg = new ArrayList<>(Arrays.asList(args));
         A:for (DefinedCommand command : DEFINED_COMMAND_LIST) {
@@ -97,7 +233,8 @@ public class DefinedCommandUtil {
             if (!command.getCommandName().equalsIgnoreCase(arg.get(0))) continue;
             if (arg.size() == 1) return command;
             if ((sender instanceof ConsoleCommandSender) && !command.isConsole()) continue;
-            if (!sender.hasPermission(command.getCommandPermission())) continue;
+            // permission checker here
+            if (!senderContainsPermission(sender, command)) continue;
 
             //debug
             System.out.println("through");
@@ -157,8 +294,25 @@ public class DefinedCommandUtil {
         return null;
     }
 
-    private boolean containsPermissions(Set<PermissionAttachmentInfo> players, Map<String,List<Permission>> required) {
-        //
+    private boolean senderContainsPermission(CommandSender sender, DefinedCommand command) {
+        if (sender instanceof ConsoleCommandSender) return true;
+        Player player = (Player) sender;
+        Set<String> perms = new HashSet<>();
+        for (PermissionAttachmentInfo pai : player.getEffectivePermissions()) {
+            perms.add(pai.getPermission());
+        }
+        if (command.getCommandPermission().isEmpty()) return true;
+        if (perms == null || perms.isEmpty()) return false;
+
+        int counter = 0;
+        for (String s : command.getCommandPermission()) {
+            for (String t : s.split(",")) {
+                if (perms.contains(t)) counter++;
+            }
+            if (counter == s.split(",").length) return true;
+            counter = 0;
+        }
+        return false;
     }
 
     public void runCommand(DefinedCommand command, String[] args, CommandSender sender) {

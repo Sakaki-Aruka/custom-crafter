@@ -12,12 +12,12 @@ public class DefinedCommand {
     private boolean hasArgs;
     private List<String> args;
     private boolean console;
-    private Map<String,List<Permission>> commandPermission;
+    private List<String> commandPermission; // when has no permissions, this value is an empty ArrayList<String>
     private Class<?> processClass;
     private Method processMethod;
     private int commandLen;
 
-    public DefinedCommand(String commandName, boolean hasArgs, List<String> args, boolean console, Map<String,List<Permission>> commandPermission, Class<?> processClass, Method processMethod, int commandLen) {
+    public DefinedCommand(String commandName, boolean hasArgs, List<String> args, boolean console, List<String> commandPermission, Class<?> processClass, Method processMethod, int commandLen) {
         this.commandName = commandName;
         this.hasArgs = hasArgs;
         this.args = args;
@@ -60,11 +60,11 @@ public class DefinedCommand {
         this.console = console;
     }
 
-    public Map<String,List<Permission>> getCommandPermission() {
+    public List<String> getCommandPermission() {
         return commandPermission;
     }
 
-    public void setCommandPermission(Map<String,List<Permission>> permission) {
+    public void setCommandPermission(List<String> permission) {
         this.commandPermission = permission;
     }
 

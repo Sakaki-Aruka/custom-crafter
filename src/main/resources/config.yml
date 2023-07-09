@@ -48,10 +48,10 @@ DefinedCommands:
 
   -reload:
     child: false
-    permission: cc.reload
     # permission:
     #   - or cc.reload (and cc.reload)
     #   - or cc.op (and cc.op)
+    permission: cc.reload | cc.op
     console: true
     class: com.github.sakakiaruka.customcrafter.customcrafter.command.Check
     method: reload
@@ -60,7 +60,7 @@ DefinedCommands:
 
   -open:
     child: false
-    permission: cc.open
+    permission: cc.op | cc.open
     console: false
     class: com.github.sakakiaruka.customcrafter.customcrafter.command.Check
     method: open
@@ -72,7 +72,7 @@ DefinedCommands:
     args:
       - "-all"
       - "{Recipe}"
-    permission: cc.show
+    permission: cc.op | cc.show
     console: true
     class: com.github.sakakiaruka.customcrafter.customcrafter.command.Show
     method:
@@ -86,7 +86,7 @@ DefinedCommands:
     args:
       - "-matter,{Matter}"
       - "-result,{Result}"
-    permissions: cc.give
+    permissions: cc.op | cc.give
     console: false
     class: com.github.sakakiaruka.customcrafter.customcrafter.command.Give
     method:
@@ -99,7 +99,7 @@ DefinedCommands:
     child: true
     args:
       - "-make,defaultPotion"
-    permission: cc.file
+    permission: cc.op | cc.file
     console: true
     class: com.github.sakakiaruka.customcrafter.customcrafter.command.File
     method:
@@ -114,7 +114,7 @@ DefinedCommands:
       - "-permissions,{Player}"
       - "-permissions,-modify,{Player},add,{RecipePermission}"
       - "-permissions,-modify,{Player},remove,{RecipePermission}"
-    permission: cc.permission
+    permission: cc.op | cc.permission
     console: true
     class: com.github.sakakiaruka.customcrafter.customcrafter.command.PermissionCheck
     method:
