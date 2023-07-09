@@ -82,7 +82,7 @@ public class DefinedCommandUtil {
                 continue;
             }
 
-            DefinedCommand command = new DefinedCommand(s,false,null,console,permission,processClass,processMethod,1);
+            DefinedCommand command = new DefinedCommand(s,false,null,console,permission,processClass,processMethod,0);
             DEFINED_COMMAND_LIST.add(command);
 
             //debug
@@ -237,7 +237,7 @@ public class DefinedCommandUtil {
             if (!senderContainsPermission(sender, command)) continue;
 
             //debug
-            System.out.println("through");
+            System.out.println("through: "+command.getCommandName());
 
             B:for(int i=0;i<command.getCommandLen();i++) {
                 String commandPart = command.getArgs().get(i);
@@ -285,8 +285,7 @@ public class DefinedCommandUtil {
                     continue A;
                 }
 
-                if (inputPart.equals(commandPart)) continue A;
-                continue B;
+                if (!inputPart.equals(commandPart)) continue A;
             }
 
             return command;
@@ -307,6 +306,7 @@ public class DefinedCommandUtil {
         int counter = 0;
         for (String s : command.getCommandPermission()) {
             for (String t : s.split(",")) {
+                if (t.equals("OP") && player.isOp()) counter++;
                 if (perms.contains(t)) counter++;
             }
             if (counter == s.split(",").length) return true;

@@ -209,8 +209,15 @@ public class SettingsLoad {
         if(path.toFile().exists() && path.toFile().isDirectory())return;
         if(!path.toFile().exists()){
             // not exist
-            File dir = new File(path.toUri());
-            dir.mkdir();
+            //File dir = new File(path.toUri());
+            try{
+                Files.createDirectories(path);
+            }catch (Exception e) {
+                e.printStackTrace();
+                return;
+            }
+
+            //dir.mkdir();
             System.out.println(String.format("Not found the directory \"%s\"."+nl+"So, the system made the directory named that.",path.toUri().toString()));
         }else if(!path.toFile().isDirectory()){
             System.out.println(String.format("The path \"%s\" is not a directory.",path.toUri().toString()));

@@ -6,6 +6,9 @@ matters:
 recipes:
   - "plugins/Custom_Crafter/recipes"
 
+permissions: "plugins/Custom_Crafter/permissions.yml"
+relate: "plugins/Custom_Crafter/relate.yml"
+
 # Reload Notice
 notice:
   - "=========="
