@@ -236,15 +236,9 @@ public class DefinedCommandUtil {
             // permission checker here
             if (!senderContainsPermission(sender, command)) continue;
 
-            //debug
-            System.out.println("through: "+command.getCommandName());
-
             B:for(int i=0;i<command.getCommandLen();i++) {
                 String commandPart = command.getArgs().get(i);
                 String inputPart = arg.get(i+1);
-
-                //debug
-                System.out.println(String.format("command part: %s / input part: %s",commandPart,inputPart));
 
                 if (commandPart.startsWith("-")){
                     if (!commandPart.equalsIgnoreCase(inputPart)) continue A;
