@@ -30,6 +30,7 @@ public class DefinedCommandUtil {
     private final String RECIPE_PATTERN = "{Recipe}";
     private final String RECIPE_PERMISSION_PATTERN = "{RecipePermission}";
     private final String PLAYER_PATTERN = "{Player}";
+    private final String COMMAND_ARGS_PATTERN = "{CommandArgs}";
 
     private static List<String> ARGS_INITIAL;
     public void loader() {
@@ -272,6 +273,11 @@ public class DefinedCommandUtil {
 
                 if (commandPart.equals(PLAYER_PATTERN)) {
                     if (!getPlayerNames().contains(inputPart)) continue A;
+                    continue;
+                }
+
+                if (commandPart.equals(COMMAND_ARGS_PATTERN)) {
+                    if (!ARGS_INITIAL.contains(inputPart)) continue A;
                     continue;
                 }
 
