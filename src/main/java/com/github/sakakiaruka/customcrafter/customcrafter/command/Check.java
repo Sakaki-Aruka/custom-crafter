@@ -15,10 +15,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.util.PotionUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
-import org.bukkit.command.CommandSender;
-import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.command.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 
@@ -29,7 +26,7 @@ import java.util.*;
 import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.*;
 import static com.github.sakakiaruka.customcrafter.customcrafter.listener.OpenCraftingTable.opening;
 
-public class Check implements CommandExecutor {
+public class Check implements CommandExecutor{
     private final String nl = System.getProperty("line.separator");
     @Override
     public boolean onCommand(CommandSender sender, Command command,String label,String[] args){

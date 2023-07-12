@@ -220,7 +220,7 @@ public class RecipePermissionUtil{
         builder.append(String.format("=== Permission Info ===%s",nl));
         if(perm.equals(RecipePermission.ROOT)){
             // only ROOT
-            builder.append(String.format("%s%s - Parent : --- %s - Name : ROOT%s",RecipePermission.ROOT.getPermissionName(),nl,nl,nl));
+            builder.append(String.format("%s%s - Parent : --- %s - Name : ROOT%s%s%s",RecipePermission.ROOT.getPermissionName(),nl,nl,nl,nl,"=== Permission Info End ==="));
             return builder.toString();
         }
         List<RecipePermission> permList = new ArrayList<>();
@@ -232,6 +232,7 @@ public class RecipePermissionUtil{
             String data = String.format("%s - Parent : %s %s - Name : %s %s",nl,rp.getParent(),nl,rp.getPermissionName(),nl);
             builder.append(String.format("%s%s%s%s",nl,arrow,nl,data));
         }
+        builder.append(nl+"=== Permission Info End ==="+nl);
         return builder.toString();
     }
 

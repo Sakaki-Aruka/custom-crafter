@@ -24,20 +24,6 @@ download:
   - ""
 
 # DO NOT TOUCH CONTENTS THAT ARE UNDER THIS LINE.
-# Defined Commands
-#DefinedCommands:
-#  - "-reload,false"
-#  - "-open,false"
-#  - "-show,true,1,-all"
-#  - "-show,true,1,{Recipe}"
-#  - "-give,true,2,matter,{Matter}"
-#  - "-give,true,2,result,{Result}"
-#  - "-file,true,2,-make,defaultPotion"
-#  - "-permission,2,true,{RecipePermission}"
-#  - "-permission,3,true,-permissions,{Player}"
-#  - "-permission,5,true,-modify,{Player},add,{RecipePermission}"
-#  - "-permission,5,true,-modify,{Player},remove,{RecipePermission}"
-#  -
 
 DefinedCommands:
   args: ["-reload","-open","-show","-give","-file","-permission"]

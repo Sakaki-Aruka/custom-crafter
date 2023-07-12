@@ -2,6 +2,7 @@ package com.github.sakakiaruka.customcrafter.customcrafter.util;
 
 import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.DefinedCommand;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
@@ -10,10 +11,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 
+import javax.crypto.spec.PSource;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.*;
 
+import static com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter.getInstance;
 import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.*;
 import static com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil.recipePermissionMap;
 
@@ -28,9 +31,11 @@ public class DefinedCommandUtil {
     private final String RECIPE_PERMISSION_PATTERN = "{RecipePermission}";
     private final String PLAYER_PATTERN = "{Player}";
 
+    private static List<String> ARGS_INITIAL;
     public void loader() {
-        FileConfiguration config = CustomCrafter.getInstance().getConfig();
+        FileConfiguration config = getInstance().getConfig();
         List<String> commands = config.getStringList("DefinedCommands.args");
+        ARGS_INITIAL = new ArrayList<>(commands);
         for (String s : commands) {
 
             //debug
@@ -231,8 +236,8 @@ public class DefinedCommandUtil {
         A:for (DefinedCommand command : DEFINED_COMMAND_LIST) {
             if (command.getCommandLen() != arg.size()-1) continue;
             if (!command.getCommandName().equalsIgnoreCase(arg.get(0))) continue;
-            if (arg.size() == 1) return command;
             if ((sender instanceof ConsoleCommandSender) && !command.isConsole()) continue;
+            if (arg.size() == 1) return command;
             // permission checker here
             if (!senderContainsPermission(sender, command)) continue;
 
