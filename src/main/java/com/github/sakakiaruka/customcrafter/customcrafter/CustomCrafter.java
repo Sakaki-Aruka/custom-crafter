@@ -2,7 +2,11 @@ package com.github.sakakiaruka.customcrafter.customcrafter;
 
 import com.github.sakakiaruka.customcrafter.customcrafter.command.Check;
 import com.github.sakakiaruka.customcrafter.customcrafter.listener.Listener;
+import com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public final class CustomCrafter extends JavaPlugin {
 
@@ -21,6 +25,10 @@ public final class CustomCrafter extends JavaPlugin {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
+        if (getConfig().contains("permissions") && getConfig().contains("relate")) {
+            Path path = Paths.get(getConfig().getString("relate"));
+            new RecipePermissionUtil().playerPermissionWriter(path);
+        }
     }
 
     public static CustomCrafter getInstance(){
