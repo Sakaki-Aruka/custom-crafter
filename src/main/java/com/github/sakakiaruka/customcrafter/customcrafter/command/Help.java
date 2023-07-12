@@ -90,6 +90,10 @@ public class Help {
                 String description = String.join("",Arrays.asList(s.split("")).subList(2,s.length()));
                 result.add(description);
             }
+            if (s.startsWith("all:")) {
+                String description = String.join("",Arrays.asList(s.split("")).subList(4,s.length()));
+                result.add(description);
+            }
         }
         return result;
     }

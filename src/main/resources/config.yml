@@ -55,6 +55,9 @@ DefinedCommands:
     console: false
     class: com.github.sakakiaruka.customcrafter.customcrafter.command.Check
     method: open
+    descriptions:
+      - If you send this command from a console, the system cannot complete to processing this.
+      - When this command executing, the crafting gui is opened.
 
   #----------------------------------------
 
@@ -87,6 +90,10 @@ DefinedCommands:
     method:
       - matter
       - result
+    descriptions:
+      - all:If you send this command from a console, the system cannot complete to processing this.
+      - "0:When you send this command, you can get like a specified Matter."
+      - "1:When you send this command, you can get list a specified Result."
 
   #----------------------------------------
 
@@ -99,6 +106,9 @@ DefinedCommands:
     class: com.github.sakakiaruka.customcrafter.customcrafter.command.File
     method:
       - defaultPotion
+
+    descriptions:
+      - "0:When you send this command, the system makes default potion Matter files."
 
   #----------------------------------------
 
@@ -118,6 +128,12 @@ DefinedCommands:
       - add
       - remove
 
+    descriptions:
+      - "0:This command shows the specified permission info."
+      - "1:This command shows the specified player's permission."
+      - "2:This command add the specified permission to the player's."
+      - "3:This command remove the specified permission from the player's."
+
   #----------------------------------------
 
   -help:
@@ -131,3 +147,7 @@ DefinedCommands:
     method:
       - all
       - one
+
+    descriptions:
+      - "0:This command shows all commands info."
+      - "1:This command show the specified commands info."
