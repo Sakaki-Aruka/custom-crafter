@@ -6,6 +6,7 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
@@ -69,7 +70,16 @@ public class RecipePermissionUtil{
     }
 
 
+    private void createFileWrapper(Path path) {
+        if (path.toFile().exists()) return;
+        try{
+            Files.createFile(path);
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
     public void permissionRelateLoad(Path path){
+        createFileWrapper(path);
         FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
         /*
         * (example)
@@ -102,6 +112,7 @@ public class RecipePermissionUtil{
         *   - name:Potion|parent:ROOT
         *   - name:SpeedPotion|parent:Potion
          */
+        createFileWrapper(path);
         FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
         List<String> data = config.getStringList("permissions");
         List<RecipePermission> permissionList = new ArrayList<>();
@@ -134,6 +145,7 @@ public class RecipePermissionUtil{
         // parents length: short -> long
         Map<Integer,List<RecipePermission>> map = new TreeMap<>();
         if(list.isEmpty()) return new ArrayList<>();
+        if(list.size()==1) return list;
         for(RecipePermission perm : list){
             List<RecipePermission> l = new ArrayList<>();
             l.add(perm);
@@ -208,7 +220,7 @@ public class RecipePermissionUtil{
         builder.append(String.format("=== Permission Info ===%s",nl));
         if(perm.equals(RecipePermission.ROOT)){
             // only ROOT
-            builder.append(String.format("%s%s - Parent : --- %s - Name : ROOT%s",RecipePermission.ROOT.getPermissionName(),nl,nl,nl));
+            builder.append(String.format("%s%s - Parent : --- %s - Name : ROOT%s%s%s",RecipePermission.ROOT.getPermissionName(),nl,nl,nl,nl,"=== Permission Info End ==="));
             return builder.toString();
         }
         List<RecipePermission> permList = new ArrayList<>();
@@ -220,6 +232,7 @@ public class RecipePermissionUtil{
             String data = String.format("%s - Parent : %s %s - Name : %s %s",nl,rp.getParent(),nl,rp.getPermissionName(),nl);
             builder.append(String.format("%s%s%s%s",nl,arrow,nl,data));
         }
+        builder.append(nl+"=== Permission Info End ==="+nl);
         return builder.toString();
     }
 

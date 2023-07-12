@@ -6,6 +6,9 @@ matters:
 recipes:
   - "plugins/Custom_Crafter/recipes"
 
+permissions: "plugins/Custom_Crafter/permissions.yml"
+relate: "plugins/Custom_Crafter/relate.yml"
+
 # Reload Notice
 notice:
   - "=========="
@@ -19,3 +22,94 @@ download_threshold: 20
 load_interval: 20
 download:
   - ""
+
+# DO NOT TOUCH CONTENTS THAT ARE UNDER THIS LINE.
+
+DefinedCommands:
+  args: ["-reload","-open","-show","-give","-file","-permission"]
+
+  # child: has child args
+  # permission: -> List (nullable)
+  # console: true or false
+  # class:
+  # method:
+  # [args]: -> List (nullable)
+
+  -reload:
+    child: false
+    # permission:
+    #   - or cc.reload (and cc.reload)
+    #   - or cc.op (and cc.op)
+    permission: cc.reload | cc.op
+    console: true
+    class: com.github.sakakiaruka.customcrafter.customcrafter.command.Check
+    method: reload
+
+  #----------------------------------------
+
+  -open:
+    child: false
+    permission: cc.op | cc.open
+    console: false
+    class: com.github.sakakiaruka.customcrafter.customcrafter.command.Check
+    method: open
+
+  #----------------------------------------
+
+  -show:
+    child: true
+    args:
+      - "-all"
+      - "{Recipe}"
+    permission: cc.op | cc.show
+    console: true
+    class: com.github.sakakiaruka.customcrafter.customcrafter.command.Show
+    method:
+      - all
+      - one
+
+  #----------------------------------------
+
+  -give:
+    child: true
+    args:
+      - "-matter,{Matter}"
+      - "-result,{Result}"
+    permissions: cc.op | cc.give
+    console: false
+    class: com.github.sakakiaruka.customcrafter.customcrafter.command.Give
+    method:
+      - matter
+      - result
+
+  #----------------------------------------
+
+  -file:
+    child: true
+    args:
+      - "-make,defaultPotion"
+    permission: cc.op | cc.file
+    console: true
+    class: com.github.sakakiaruka.customcrafter.customcrafter.command.File
+    method:
+      - defaultPotion
+
+  #----------------------------------------
+
+  -permission:
+    child: true
+    args:
+      - "{RecipePermission}"
+      - "-permissions,{Player}"
+      - "-permissions,-modify,{Player},add,{RecipePermission}"
+      - "-permissions,-modify,{Player},remove,{RecipePermission}"
+    permission: cc.op | cc.permission
+    console: true
+    class: com.github.sakakiaruka.customcrafter.customcrafter.command.PermissionCheck
+    method:
+      - tree
+      - show
+      - add
+      - remove
+
+  #----------------------------------------
