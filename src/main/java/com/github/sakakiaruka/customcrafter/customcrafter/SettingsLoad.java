@@ -303,9 +303,11 @@ public class SettingsLoad {
                     String locate = "container." + counter + ".";
                     NamespacedKey key = new NamespacedKey(getInstance(), config.getString(locate+"key"));
                     PersistentDataType type = new DataContainerUtil().getDataType(config.getString(locate+"type"));
-                    Object value = config.get(locate+"value");
+                    String tag = config.getString(locate+"tag");
+                    int order = config.getInt(locate+"order");
+                    String value = config.getString(locate+"value");
                     if (key == null || type == null) continue;
-                    ContainerWrapper content = new ContainerWrapper(key, type, value);
+                    ContainerWrapper content = new ContainerWrapper(key, type, value,order,tag);
                     phony.add(content);
                     counter++;
                 }

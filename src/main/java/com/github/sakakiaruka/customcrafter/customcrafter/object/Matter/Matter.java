@@ -1,6 +1,7 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.object.Matter;
 
 import com.github.sakakiaruka.customcrafter.customcrafter.interfaces.Matters;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.ContainerWrapper;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
@@ -21,6 +22,8 @@ public class Matter implements Matters {
     private List<EnchantWrap> wrap;
     private int amount;
     private boolean mass;
+    private Map<String, List<ContainerWrapper>> container;
+
     public Matter(String name,List<Material> candidate,List<EnchantWrap> wrap,int amount,boolean mass){
         this.name = name;
         this.candidate = candidate;
@@ -198,5 +201,9 @@ public class Matter implements Matters {
         builder.append(String.format("amount : %d"+nl,amount));
         builder.append(String.format("mass : %b"+nl,isMass()));
         return builder.toString();
+    }
+
+    public boolean hasContainer() {
+        return container != null && !container.isEmpty();
     }
 }

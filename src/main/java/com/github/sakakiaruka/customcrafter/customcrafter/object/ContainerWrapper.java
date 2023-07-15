@@ -6,13 +6,17 @@ import org.bukkit.persistence.PersistentDataType;
 import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.nl;
 
 public class ContainerWrapper {
-    private NamespacedKey key;
-    private PersistentDataType type;
-    private Object value;
-    public ContainerWrapper(NamespacedKey key, PersistentDataType type, Object value) {
+    private int order; //need
+    private String tag; //need
+    private NamespacedKey key; //need
+    private PersistentDataType type;  //need
+    private String value; //not need
+    public ContainerWrapper(NamespacedKey key, PersistentDataType type, String value, int order, String tag) {
         this.key = key;
         this.type = type;
         this.value = value;
+        this.order = order;
+        this.tag = tag;
     }
 
     public Class getValueType() {
@@ -35,11 +39,35 @@ public class ContainerWrapper {
         this.type = type;
     }
 
-    public Object getValue() {
+    public int getOrder() {
+        return order;
+    }
+
+    public void setOrder(int order) {
+        this.order = order;
+    }
+
+    public String getTag() {
+        return tag;
+    }
+
+    public void setTag(String tag) {
+        this.tag = tag;
+    }
+
+    public String getValue() {
         return value;
     }
 
-    public void setValue(Object value) {
+    public boolean hasKey() {
+        return key != null;
+    }
+
+    public boolean hasType() {
+        return type != null;
+    }
+
+    public void setValue(String value) {
         this.value = value;
     }
 
@@ -47,6 +75,8 @@ public class ContainerWrapper {
         StringBuilder builder = new StringBuilder();
         builder.append("key: "+key.toString()+nl);
         builder.append("type: "+type.getPrimitiveType().getSimpleName()+nl);
+        builder.append("tag: "+tag);
+        builder.append("order: "+order);
         builder.append("content:"+nl);
         builder.append("  -> class: "+value.getClass().getSimpleName()+nl);
         builder.append("  -> value: "+value.toString()+nl);
