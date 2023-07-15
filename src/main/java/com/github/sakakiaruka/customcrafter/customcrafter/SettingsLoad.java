@@ -1,6 +1,7 @@
 package com.github.sakakiaruka.customcrafter.customcrafter;
 
 import com.github.sakakiaruka.customcrafter.customcrafter.listener.OpenCraftingTable;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.ContainerWrapper;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantStrict;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantWrap;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
@@ -12,16 +13,15 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordina
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.MetadataType;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.Result;
-import com.github.sakakiaruka.customcrafter.customcrafter.util.DataCheckerUtil;
-import com.github.sakakiaruka.customcrafter.customcrafter.util.DefinedCommandUtil;
-import com.github.sakakiaruka.customcrafter.customcrafter.util.PotionUtil;
-import com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil;
+import com.github.sakakiaruka.customcrafter.customcrafter.util.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -295,7 +295,28 @@ public class SettingsLoad {
                 }
             }
 
-            Result result = new Result(name,enchantInfo,amount,metadata,nameOrRegex,matchPoint);
+            List<ContainerWrapper> phony = new ArrayList<>();
+            if (config.contains("container")) {
+                int counter = 0;
+                while (true) {
+                    if (!config.contains("container."+counter)) break;
+                    String locate = "container." + counter + ".";
+                    NamespacedKey key = new NamespacedKey(getInstance(), config.getString(locate+"key"));
+                    PersistentDataType type = new DataContainerUtil().getDataType(config.getString(locate+"type"));
+                    Object value = config.get(locate+"value");
+                    if (key == null || type == null) continue;
+                    ContainerWrapper content = new ContainerWrapper(key, type, value);
+                    phony.add(content);
+                    counter++;
+                }
+
+                //debug
+                for (ContainerWrapper container : phony) {
+                    System.out.println(bar+nl+container.info()+nl+bar+nl);
+                }
+            }
+
+            Result result = new Result(name,enchantInfo,amount,metadata,nameOrRegex,matchPoint, phony);
             results.put(name,result);
         }
     }
@@ -303,7 +324,7 @@ public class SettingsLoad {
     private void addAllVanillaMaterial(){
         for(Material material : Material.values()){
             String name = material.name().toLowerCase();
-            Result result = new Result(name,null,1,null,material.name(),-1);
+            Result result = new Result(name,null,1,null,material.name(),-1, new ArrayList<>());
             results.put(name,result);
         }
     }
