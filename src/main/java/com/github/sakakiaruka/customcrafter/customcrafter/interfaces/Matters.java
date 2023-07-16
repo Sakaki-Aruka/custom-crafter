@@ -28,7 +28,7 @@ public interface Matters {
     boolean contains(Enchantment enchantment);
     String info();
 
-    Map<String, List<ContainerWrapper>> getContainerWrappers();
-    void setContainerWrappers(Map<String, List<ContainerWrapper>> elements);
+    Map<Integer, ContainerWrapper> getContainerWrappers();
+    void setContainerWrappers(Map<Integer, ContainerWrapper> elements);
     boolean hasContainer();
 }

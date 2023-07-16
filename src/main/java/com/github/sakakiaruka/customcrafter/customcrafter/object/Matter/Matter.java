@@ -22,7 +22,7 @@ public class Matter implements Matters {
     private List<EnchantWrap> wrap;
     private int amount;
     private boolean mass;
-    private Map<String, List<ContainerWrapper>> container;
+    private Map<Integer, ContainerWrapper> container;
 
     public Matter(String name,List<Material> candidate,List<EnchantWrap> wrap,int amount,boolean mass){
         this.name = name;
@@ -205,5 +205,15 @@ public class Matter implements Matters {
 
     public boolean hasContainer() {
         return container != null && !container.isEmpty();
+    }
+
+    @Override
+    public Map<Integer, ContainerWrapper> getContainerWrappers() {
+        return null;
+    }
+
+    @Override
+    public void setContainerWrappers(Map<Integer, ContainerWrapper> elements) {
+
     }
 }

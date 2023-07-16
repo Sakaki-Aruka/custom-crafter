@@ -410,6 +410,7 @@ public class SettingsLoad {
                 continue;
             }
 
+            new ContainerUtil().mattersLoader(path);
             matters.put(name,matter);
         }
     }

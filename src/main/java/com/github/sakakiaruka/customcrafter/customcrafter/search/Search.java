@@ -9,10 +9,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Permission.Reci
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordinate;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Tag;
-import com.github.sakakiaruka.customcrafter.customcrafter.util.EnchantUtil;
-import com.github.sakakiaruka.customcrafter.customcrafter.util.InventoryUtil;
-import com.github.sakakiaruka.customcrafter.customcrafter.util.PotionUtil;
-import com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil;
+import com.github.sakakiaruka.customcrafter.customcrafter.util.*;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -52,6 +49,9 @@ public class Search {
                     Matter recipeMatter = recipe.getContentsNoAir().get(i);
                     Matter inputMatter = input.getContentsNoAir().get(i);
 
+                    //debug (the container contents check)
+                    System.out.println("container content search result: "+new ContainerUtil().isPass(input.getReturnItems().get(i), recipeMatter));
+                    if (!new ContainerUtil().isPass(input.getReturnItems().get(i), recipeMatter)) continue Top;
 
                     //debug (amount one virtual test)
                     Matter recipeOne = recipeMatter.oneCopy();
