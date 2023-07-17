@@ -26,21 +26,6 @@ import java.util.regex.Pattern;
 import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.*;
 
 public class Give {
-    public void main(String args[], CommandSender sender) {
-        if(!(sender instanceof Player)) return;
-        /*
-        * commands
-        * - /cc -g -r [RecipeName]
-        * - /cc -g -m [MatterName]
-         */
-        if(args.length == 3) {
-            if(args[1].equalsIgnoreCase("-result")){
-                give(args[2],sender,false);
-            }else if(args[1].equalsIgnoreCase("-matter")){
-                give(args[2],sender,true);
-            }
-        }
-    }
 
     public void matter(String[] args, CommandSender sender) {
         give(args[2],sender,true);

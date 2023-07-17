@@ -26,7 +26,7 @@ download:
 # DO NOT TOUCH CONTENTS THAT ARE UNDER THIS LINE.
 
 DefinedCommands:
-  args: ["-reload","-open","-show","-give","-file","-permission","-help"]
+  args: ["-reload","-open","-show","-give","-file","-permission","-help","-container"]
 
   # child: has child args
   # permission: -> List (nullable)
@@ -151,3 +151,29 @@ DefinedCommands:
     descriptions:
       - "0:This command shows all commands info."
       - "1:This command show the specified commands info."
+
+  #----------------------------------------
+
+  -container:
+    child: true
+    args:
+      - "-add,{ContainerKey},{ContainerType},{NumbersAlphabet}"
+      - "-remove,{ContainerKey}"
+      - "-set,{ContainerKey},{ContainerType},{NumbersAlphabet}"
+      - "-value_modify,{ContainerKey},{ContainerType},{MathematicalOperators},{ContainerKey}"
+    permission: cc.op
+    console: false
+    class: com.github.sakakiaruka.customcrafter.customcrafter.command.ContainerModify
+    method:
+      - addSet
+      - remove
+      - addSet
+      - valueModify
+
+    descriptions:
+      - "all:If a sender has not any items in their MainHand, this command will not complete to processing."
+      - "0:This command adds the specified data to an item that a sender has."
+      - "2:This command removes the specified data from an item that a sender has."
+      - "1:This command sets the specified data to an item that a sender has."
+      - "1:A diff point with '/cc -container -add' is that this command checks the specified item contained the specified data in their."
+      - "3:This command "

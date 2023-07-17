@@ -1,17 +1,14 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.util;
 
-import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter;
+import com.github.sakakiaruka.customcrafter.customcrafter.command.ContainerModify;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.DefinedCommand;
-import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
-import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 
-import javax.crypto.spec.PSource;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -30,6 +27,11 @@ public class DefinedCommandUtil {
     private final String RECIPE_PATTERN = "{Recipe}";
     private final String RECIPE_PERMISSION_PATTERN = "{RecipePermission}";
     private final String PLAYER_PATTERN = "{Player}";
+    private final String CONTAINER_KEY_PATTERN = "{ContainerKey}";
+    private final String CONTAINER_DATATYPE_PATTERN = "{ContainerType";
+    private final String NOTNULL_EMPTY_PATTERN = "{NotNullEmpty}";
+    private final String NUMBERS_ALPHABET = "{NumbersAlphabet}";
+    private final String MATHEMATICAL_OPERATORS_PATTERN = "{MathematicalOperators}";
     private final String COMMAND_ARGS_PATTERN = "{CommandArgs}";
 
     private static List<String> ARGS_INITIAL;
@@ -278,6 +280,26 @@ public class DefinedCommandUtil {
 
                 if (commandPart.equals(COMMAND_ARGS_PATTERN)) {
                     if (!ARGS_INITIAL.contains(inputPart)) continue A;
+                    continue;
+                }
+
+                if (commandPart.equals(CONTAINER_KEY_PATTERN)) {
+                    if (!inputPart.matches(ContainerModify.CONTAINER_KEY_PATTERN)) continue A;
+                    continue;
+                }
+
+                if (commandPart.equals(CONTAINER_DATATYPE_PATTERN)) {
+                    if (!inputPart.matches(ContainerModify.CONTAINER_DATATYPE_PATTERN)) continue A;
+                    continue;
+                }
+
+                if (commandPart.equals(NUMBERS_ALPHABET)) {
+                    if (!inputPart.matches("([\\w\\d]+)")) continue A;
+                    continue;
+                }
+
+                if (commandPart.equals(MATHEMATICAL_OPERATORS_PATTERN)) {
+                    if (!inputPart.matches(ContainerModify.CONTAINER_OPERATION_PATTERN)) continue A;
                     continue;
                 }
 

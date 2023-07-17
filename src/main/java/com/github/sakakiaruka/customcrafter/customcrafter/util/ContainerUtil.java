@@ -16,7 +16,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter.getInstance;
-import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.matters;
+import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.*;
 
 public class ContainerUtil {
     public static Map<String, Map<Integer, ContainerWrapper>> containers = new HashMap<>();
@@ -33,13 +33,13 @@ public class ContainerUtil {
     private static final String LARGER_PATTERN = "([_|\\d|\\+|-|\\*|/|\\(|\\)]+)<";
     private static final String SMALLER_PATTERN = "<([_|\\d|\\+|-|\\*|/|\\(|\\)]+)";
 
-    private PersistentDataType getDataType(String input) {
+    public PersistentDataType getDataType(String input) {
         if (input.equalsIgnoreCase("string")) return PersistentDataType.STRING;
         if (input.equalsIgnoreCase("int")) return PersistentDataType.INTEGER;
         return null;
     }
 
-    private Class getClassFromType(PersistentDataType type) {
+    public Class getClassFromType(PersistentDataType type) {
         if (type.equals(PersistentDataType.INTEGER)) return Integer.class;
         if (type.equals(PersistentDataType.STRING)) return String.class;
         return null;
@@ -348,5 +348,18 @@ public class ContainerUtil {
         types.add(PersistentDataType.STRING);
         types.add(PersistentDataType.INTEGER);
         return types;
+    }
+
+    public String containerValues(PersistentDataContainer container) {
+        StringBuilder builder = new StringBuilder();
+        for (NamespacedKey key : container.getKeys()) {
+            builder.append(bar+nl);
+            builder.append("key: "+key.toString()+nl);
+            PersistentDataType type = getSpecifiedKeyType(container, key);
+            builder.append("type: "+type.getComplexType().getSimpleName()+nl);
+            builder.append("value: "+container.get(key, type).toString()+nl);
+            builder.append(bar+nl);
+        }
+        return builder.toString();
     }
 }
