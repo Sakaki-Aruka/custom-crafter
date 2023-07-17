@@ -176,4 +176,4 @@ DefinedCommands:
       - "2:This command removes the specified data from an item that a sender has."
       - "1:This command sets the specified data to an item that a sender has."
       - "1:A diff point with '/cc -container -add' is that this command checks the specified item contained the specified data in their."
-      - "3:This command "
+      - "3:This command modifies the specifies data that the specified container and keyed with mathematical operators."
