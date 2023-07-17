@@ -75,8 +75,8 @@ public class ContainerWrapper {
         StringBuilder builder = new StringBuilder();
         builder.append("key: "+key.toString()+nl);
         builder.append("type: "+type.getPrimitiveType().getSimpleName()+nl);
-        builder.append("tag: "+tag);
-        builder.append("order: "+order);
+        builder.append("tag: "+tag+nl);
+        builder.append("order: "+order+nl);
         builder.append("content:"+nl);
         builder.append("  -> class: "+value.getClass().getSimpleName()+nl);
         builder.append("  -> value: "+value.toString()+nl);

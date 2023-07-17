@@ -31,6 +31,8 @@ public class Search {
         Recipe result = null;
         int massAmount = 0;
         Recipe input = toRecipe(inventory);
+        List<ItemStack> interestedItems = getInterestedAreaItems(inventory);
+
         Top:for(Recipe recipe:recipes){
 
             if(recipe.hasPermission()){ // permission check
@@ -49,9 +51,7 @@ public class Search {
                     Matter recipeMatter = recipe.getContentsNoAir().get(i);
                     Matter inputMatter = input.getContentsNoAir().get(i);
 
-                    //debug (the container contents check)
-                    System.out.println("container content search result: "+new ContainerUtil().isPass(input.getReturnItems().get(i), recipeMatter));
-                    if (!new ContainerUtil().isPass(input.getReturnItems().get(i), recipeMatter)) continue Top;
+                    if (!new ContainerUtil().isPass(interestedItems.get(i), recipeMatter)) continue Top;
 
                     //debug (amount one virtual test)
                     Matter recipeOne = recipeMatter.oneCopy();
@@ -409,6 +409,18 @@ public class Search {
         return true;
     }
 
+    private List<ItemStack> getInterestedAreaItems(Inventory inventory) {
+        List<ItemStack> list = new ArrayList<>();
+        for (int y=0;y<craftingTableSize;y++) {
+            for (int x=0;x<craftingTableSize;x++) {
+                int i = x+y*9;
+                if (inventory.getItem(i) == null) continue;
+                list.add(inventory.getItem(i));
+            }
+        }
+        return list;
+    }
+
     private Recipe toRecipe(Inventory inventory){
         Recipe recipe = new Recipe();
         for(int y=0;y<craftingTableSize;y++){
@@ -431,6 +443,10 @@ public class Search {
                         matter.addWrap(wrap);
                     }
                 }
+                //debug
+                new ContainerUtil().setContainerDataItemStackToMatter(inventory.getItem(i), matter);
+                System.out.println("matter info: "+nl+matter.info());
+
                 recipe.addCoordinate(x,y,matter);
             }
         }

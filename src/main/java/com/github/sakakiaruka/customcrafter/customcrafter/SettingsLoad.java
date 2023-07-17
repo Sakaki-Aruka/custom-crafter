@@ -158,8 +158,9 @@ public class SettingsLoad {
             public void run() {
                 // get data from each files
                 getBaseBlock(getFiles(baseBlockPath));
-                resultPaths.forEach(p->getResult(getFiles(p)));
+
                 matterPaths.forEach(p->getMatter(getFiles(p)));
+                resultPaths.forEach(p->getResult(getFiles(p)));
                 recipePaths.forEach(p->getRecipe(getFiles(p)));
 
                 Bukkit.getLogger().info("===Custom-Crafter data loaded.===");
@@ -397,6 +398,7 @@ public class SettingsLoad {
 
             if(wrapList.isEmpty())wrapList = null;
 
+
             Matter matter = new Matter(name,candidate,wrapList,amount,mass);
 
             //PotionData collect
@@ -410,8 +412,8 @@ public class SettingsLoad {
                 continue;
             }
 
-            new ContainerUtil().mattersLoader(path);
             matters.put(name,matter);
+            new ContainerUtil().mattersLoader(path);
         }
     }
 

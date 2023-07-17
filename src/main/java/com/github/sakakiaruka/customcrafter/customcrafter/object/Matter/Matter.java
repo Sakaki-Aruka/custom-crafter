@@ -195,11 +195,15 @@ public class Matter implements Matters {
 
     public String info(){
         StringBuilder builder = new StringBuilder();
-        builder.append(String.format("name : %s"+nl,name.isEmpty() ? candidate.get(0).name() : name));
+        builder.append(String.format("name : %s"+nl,name != null && !name.isEmpty() ? candidate.get(0).name() : name));
         builder.append(String.format("candidate : %s"+nl,candidate.toString()));
         builder.append(String.format("wrap : %s",hasWrap() ? getAllWrapInfo() : "null"+nl));
         builder.append(String.format("amount : %d"+nl,amount));
         builder.append(String.format("mass : %b"+nl,isMass()));
+        if (container == null || container.isEmpty()) builder.append("container: No contents in the container."+nl);
+        else {
+            container.entrySet().forEach(s->builder.append("  container: "+nl+s.getValue().info()+nl));
+        }
         return builder.toString();
     }
 
@@ -207,13 +211,12 @@ public class Matter implements Matters {
         return container != null && !container.isEmpty();
     }
 
-    @Override
+
     public Map<Integer, ContainerWrapper> getContainerWrappers() {
         return null;
     }
 
-    @Override
     public void setContainerWrappers(Map<Integer, ContainerWrapper> elements) {
-
+        this.container = elements;
     }
 }

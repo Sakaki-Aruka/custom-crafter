@@ -45,7 +45,7 @@ public class ContainerUtil {
         return null;
     }
 
-    public void mattersLoader(Path path) {
+    public Map<Integer, ContainerWrapper> mattersLoader(Path path) {
         Map<Integer, ContainerWrapper> map = new LinkedHashMap<>();
         FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
         int current = 0;
@@ -64,16 +64,37 @@ public class ContainerUtil {
 
             ContainerWrapper wrapper = new ContainerWrapper(key, type, value,order,tag);
 
+            //debug
+            System.out.println(wrapper.info());
+
             if (!map.containsKey(order)) map.put(order, wrapper);
             current++;
         }
 
-        Matter matter = matters.get(config.getString("name"));
+        String name = config.getString("name");
+
+        Matter matter = matters.get(name);
         matter.setContainerWrappers(map);
+
+        //debug
+        System.out.println("override display");
+        System.out.println(matter.info());
+
+        matters.remove(name);
+        matters.put(name, matter);
+
         containers.put(matter.getName(), map);
+        return map;
     }
 
     public boolean isPass(ItemStack item, Matter matter) {
+
+        //debug
+        if (matter.getContainerWrappers() != null) {
+            matter.getContainerWrappers().entrySet().forEach(s->System.out.println(s.getValue().info()));
+        }
+
+
         if (!matter.hasContainer()) return true;
 
         ItemMeta meta = item.getItemMeta();
@@ -90,8 +111,8 @@ public class ContainerUtil {
             PersistentDataType type = wrapper.getType();
 
             if (tag.equals(ALLOW_TAG)) {
-                if (container.has(key, type)) continue;
-                return false;
+                if (!container.has(key, type)) return false;
+                continue;
             }
 
             if (tag.equals(DENY_TAG)) {
@@ -289,13 +310,43 @@ public class ContainerUtil {
         return stack.get(0);
     }
 
-    private void removeSpecifiedValueAll(List<String> input, String s) {
-        List<String> buffer = new ArrayList<>();
-        for (String t : input) {
-            if (t.equals(s)) continue;
-            buffer.add(t);
+
+    public void setContainerDataItemStackToMatter(ItemStack item, Matter matter) {
+        ItemMeta meta = item.getItemMeta();
+        PersistentDataContainer container = meta.getPersistentDataContainer();
+        Map<Integer, ContainerWrapper> wrappers = new LinkedHashMap<>();
+
+        List<NamespacedKey> keys = new ArrayList<>(container.getKeys());
+        for (int i=0;i<keys.size();i++) {
+            NamespacedKey key = keys.get(i);
+            PersistentDataType type;
+            if ((type = getSpecifiedKeyType(container, key)) == null) return;
+            // order: i
+            // tag: STORE_ONLY
+            // value: value
+            String value = String.valueOf(container.get(key, type));
+            ContainerWrapper wrapper = new ContainerWrapper(key, type, value, i, STORE_ONLY);
+            wrappers.put(i, wrapper);
         }
-        input.clear();
-        buffer.forEach(u->input.add(u));
+        matter.setContainerWrappers(wrappers);
+    }
+
+    private PersistentDataType getSpecifiedKeyType(PersistentDataContainer container, NamespacedKey key) {
+        for (PersistentDataType type : getDefaultDataTypes()) {
+            try{
+                container.get(key, type);
+                return type;
+            }catch (Exception e) {
+                continue;
+            }
+        }
+        return null;
+    }
+
+    private List<PersistentDataType> getDefaultDataTypes() {
+        List<PersistentDataType> types = new ArrayList<>();
+        types.add(PersistentDataType.STRING);
+        types.add(PersistentDataType.INTEGER);
+        return types;
     }
 }
