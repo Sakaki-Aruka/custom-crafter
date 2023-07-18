@@ -28,7 +28,7 @@ public class DefinedCommandUtil {
     private final String RECIPE_PERMISSION_PATTERN = "{RecipePermission}";
     private final String PLAYER_PATTERN = "{Player}";
     private final String CONTAINER_KEY_PATTERN = "{ContainerKey}";
-    private final String CONTAINER_DATATYPE_PATTERN = "{ContainerType";
+    private final String CONTAINER_DATATYPE_PATTERN = "{ContainerType}";
     private final String NOTNULL_EMPTY_PATTERN = "{NotNullEmpty}";
     private final String NUMBERS_ALPHABET = "{NumbersAlphabet}";
     private final String MATHEMATICAL_OPERATORS_PATTERN = "{MathematicalOperators}";
@@ -294,7 +294,7 @@ public class DefinedCommandUtil {
                 }
 
                 if (commandPart.equals(NUMBERS_ALPHABET)) {
-                    if (!inputPart.matches("([\\w\\d]+)")) continue A;
+                    if (!inputPart.matches("^([\\w\\d]+)$")) continue A;
                     continue;
                 }
 

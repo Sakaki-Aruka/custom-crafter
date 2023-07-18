@@ -38,7 +38,7 @@ public class ContainerModify {
     * patterns transition
     * [key] -> {ContainerKey}
     * [type] -> {ContainerDataType}
-    * [value] -> {NotNull}
+    * [value] -> {NumbersAlphabet}
     * [operation] -> {MathematicalOperators}
     * [oped-key] -> {ContainerKey} (same with [key])
      */
