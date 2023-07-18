@@ -1,6 +1,7 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.command;
 
 import com.github.sakakiaruka.customcrafter.customcrafter.util.ContainerUtil;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -18,8 +19,10 @@ import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.nl
 public class ContainerModify {
 
     public static final String CONTAINER_KEY_PATTERN = "^([a-z0-9\\.\\-_]{1,255})$";
-    public static final String CONTAINER_OPERATION_PATTERN = "^(\\+|\\-|/|*)$";
+    public static final String CONTAINER_OPERATION_PATTERN = "^(\\+|\\-|/|\\*)$";
     public static final String CONTAINER_DATATYPE_PATTERN = "^(?i)(string|int)$";
+    public static final String NUMBERS_PATTERN = "^([\\-0-9]+)$";
+    public static final String NUMBERS_ALPHABET = "^([\\-\\w\\d]+)$";
     // this class provides add (set), remove, value-modify
     /*
     * all argument combinations:
@@ -48,18 +51,15 @@ public class ContainerModify {
     public void addSet(String[] args, CommandSender sender) {
         String modifyType = args[1].replace("-","");
         Player player = (Player) sender;
-        ItemStack item;
-        if ((item = player.getInventory().getItemInMainHand()) == null) {
-            sender.sendMessage("Container add > You have no items in your MainHand.");
-            return;
-        }
+        if (!checkMainHand(player, modifyType)) return;
+        ItemStack item = player.getInventory().getItemInMainHand();
 
         ItemMeta meta = item.getItemMeta();
         PersistentDataContainer container = meta.getPersistentDataContainer();
         String before = new ContainerUtil().containerValues(container);
 
-        String keyName = args[2].toUpperCase();
-        if (getKeyCongruence(keyName, modifyType, sender)) return;
+        String keyName = args[2].toLowerCase();
+        if (!getKeyCongruence(keyName, modifyType, sender)) return;
 
         NamespacedKey key = new NamespacedKey(getInstance(), keyName);
         PersistentDataType type;
@@ -77,26 +77,24 @@ public class ContainerModify {
 
         Object value = args[4];
         container.set(key, type, value);
+        item.setItemMeta(meta);
 
         String after = new ContainerUtil().containerValues(container);
         sendDataDiff(before, after, modifyType, sender);
     }
 
-    // /cc -container -remove [key]
+    // /cc -container -remove [key] [type]
     public void remove(String[] args, CommandSender sender) {
         Player player = (Player) sender;
-        ItemStack item;
-        if ((item = player.getInventory().getItemInMainHand()) == null) {
-            sender.sendMessage("Container remove > You have no items in your MainHand.");
-            return;
-        }
+        if (!checkMainHand(player, "remove")) return;
+        ItemStack item = player.getInventory().getItemInMainHand();
 
         ItemMeta meta = item.getItemMeta();
         PersistentDataContainer container = meta.getPersistentDataContainer();
         String before = new ContainerUtil().containerValues(container);
 
-        String keyName = args[2].toUpperCase();
-        if (getKeyCongruence(keyName, "remove", sender)) return;
+        String keyName = args[2].toLowerCase();
+        if (!getKeyCongruence(keyName, "remove", sender)) return;
         NamespacedKey key = new NamespacedKey(getInstance(), keyName);
         PersistentDataType type;
         if ((type = new ContainerUtil().getDataType(args[3])) == null) {
@@ -106,17 +104,103 @@ public class ContainerModify {
 
         if (!container.has(key, type)) {
             sender.sendMessage("Container remove > The specified key isn't contained.");
+            sender.sendMessage("Container remove > That has following data.");
+            sender.sendMessage("Container remove > Your request nk -> "+key.toString());
+            sender.sendMessage("Container remove > ");
+            if (container.getKeys().isEmpty()) {
+                sender.sendMessage("  Container remove > The container has not any keys.");
+                return;
+            }
+            for (NamespacedKey k : container.getKeys()) {
+                sender.sendMessage("  Container remove > "+k.toString());
+            }
             return;
         }
 
         container.remove(key);
+        item.setItemMeta(meta);
         String after = new ContainerUtil().containerValues(container);
         sendDataDiff(before, after, "remove", sender);
     }
 
-    // /cc -value_modify [key] [type] [operator] [oped-key]
+    // /cc -container -value_modify [key] [type] [operator] [oped-key] [used-value]
     public void valueModify(String[] args, CommandSender sender) {
-        //
+        String modifyType = "value_modify";
+        Player player = (Player) sender;
+
+        String keyName = args[2];
+        String opedKeyName = args[5];
+
+        NamespacedKey key = new NamespacedKey(getInstance(), keyName);
+        NamespacedKey opedKey = new NamespacedKey(getInstance(), opedKeyName);
+
+        if (!checkMainHand(player, modifyType)) return;
+        ItemStack item = player.getInventory().getItemInMainHand();
+        ItemMeta meta = item.getItemMeta();
+        PersistentDataContainer container = meta.getPersistentDataContainer();
+        String before = new ContainerUtil().containerValues(container);
+
+        if (!getKeyCongruence(keyName, modifyType, sender)) return;
+        PersistentDataType type;
+        if ((type = new ContainerUtil().getDataType(args[3])) == null) {
+            sender.sendMessage("Invalid NamespacedKey type.");
+            return;
+        }
+
+        Object targetObj = container.get(key, type);
+
+        String operator = args[4];
+        String usedValueString = args[6];
+        // string + string
+        if (!usedValueString.matches(NUMBERS_PATTERN) && usedValueString.matches(NUMBERS_ALPHABET) && type.equals(PersistentDataType.STRING)) {
+            if (operator.equals("*") || operator.equals("/")) {
+                sender.sendMessage("Container "+modifyType+" > The specified operator.");
+                return;
+            }
+            if (operator.equals("-") && !String.valueOf(targetObj).contains(usedValueString)) {
+                sender.sendMessage("Container "+modifyType+" > The system is not able to the specified operation.");
+                return;
+            }
+
+            String target = String.valueOf(targetObj);
+            String result;
+
+            if (operator.equals("+")) result = target + usedValueString;
+            else if (operator.equals("-")) result = target.replace(usedValueString,"");
+            else return;
+
+            container.set(key, PersistentDataType.STRING, result);
+            item.setItemMeta(meta);
+
+        // int + int
+        }else if (usedValueString.matches(NUMBERS_PATTERN) && type.equals(PersistentDataType.INTEGER)){
+            int target = Integer.valueOf(String.valueOf(targetObj));
+            int usedValue = Integer.valueOf(args[6]);
+
+            int result;
+            if (operator.equals("+")) result = target + usedValue;
+            else if (operator.equals("-")) result = target - usedValue;
+            else if (operator.equals("*")) result = target * usedValue;
+            else if (operator.equals("/")) result = Math.round(target / usedValue);
+            else return;
+
+            container.set(key, PersistentDataType.INTEGER, result);
+            item.setItemMeta(meta);
+        }
+
+        String after = new ContainerUtil().containerValues(container);
+        sendDataDiff(before, after, modifyType, sender);
+    }
+
+    // /cc -container -data -show
+    public void data(String[] args, CommandSender sender) {
+        Player player = (Player) sender;
+        if (!checkMainHand(player, "show")) return;
+        ItemStack item = player.getInventory().getItemInMainHand();
+        ItemMeta meta = item.getItemMeta();
+        PersistentDataContainer container = meta.getPersistentDataContainer();
+        String result = new ContainerUtil().containerValues(container);
+        sender.sendMessage(result);
     }
 
 
@@ -136,6 +220,21 @@ public class ContainerModify {
             sender.sendMessage("Container "+operation+" > The key-name must follow the grammar. -> "+CONTAINER_KEY_PATTERN);
             return false;
         }
+        return true;
+    }
+
+    private boolean checkMainHand(Player player, String opeType) {
+        ItemStack item;
+        if ((item = player.getInventory().getItemInMainHand()) == null) {
+            player.sendMessage("Container "+opeType+" > Items that you have in your MainHand are empty.");
+            return false;
+        }
+
+        if (item.getType().equals(Material.AIR)) {
+            player.sendMessage("Container "+opeType+" > Items that you have in your MainHand are invalid type. (Material#AIR.)");
+            return false;
+        }
+
         return true;
     }
 }

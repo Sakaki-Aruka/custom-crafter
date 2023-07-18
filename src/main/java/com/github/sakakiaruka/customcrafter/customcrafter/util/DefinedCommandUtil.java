@@ -31,6 +31,7 @@ public class DefinedCommandUtil {
     private final String CONTAINER_DATATYPE_PATTERN = "{ContainerType}";
     private final String NOTNULL_EMPTY_PATTERN = "{NotNullEmpty}";
     private final String NUMBERS_ALPHABET = "{NumbersAlphabet}";
+    private final String NUMBERS = "{Numbers}";
     private final String MATHEMATICAL_OPERATORS_PATTERN = "{MathematicalOperators}";
     private final String COMMAND_ARGS_PATTERN = "{CommandArgs}";
 
@@ -294,7 +295,12 @@ public class DefinedCommandUtil {
                 }
 
                 if (commandPart.equals(NUMBERS_ALPHABET)) {
-                    if (!inputPart.matches("^([\\w\\d]+)$")) continue A;
+                    if (!inputPart.matches(ContainerModify.NUMBERS_ALPHABET)) continue A;
+                    continue;
+                }
+
+                if (commandPart.equals(NUMBERS)) {
+                    if (!inputPart.matches(ContainerModify.NUMBERS_PATTERN)) continue A;
                     continue;
                 }
 
