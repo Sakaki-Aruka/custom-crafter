@@ -75,8 +75,8 @@ public class DefinedCommandUtil {
                     DefinedCommand command = new DefinedCommand(s,true,args,console,permission,processClass,processMethod,args.size());
                     DEFINED_COMMAND_LIST.add(command);
 
-                    //debug
-                    System.out.println(String.format("%s%n%s%n%s",bar,command.info(),bar));
+//                    //debug
+//                    System.out.println(String.format("%s%n%s%n%s",bar,command.info(),bar));
 
                 }
                 continue;
