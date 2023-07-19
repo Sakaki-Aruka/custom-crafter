@@ -195,7 +195,10 @@ public class ContainerModify {
     // /cc -container -data -show
     public void data(String[] args, CommandSender sender) {
         Player player = (Player) sender;
-        if (!checkMainHand(player, "show")) return;
+        if (!checkMainHand(player, "show")) {
+            sender.sendMessage("Container data(show) > No container data found.");
+            return;
+        }
         ItemStack item = player.getInventory().getItemInMainHand();
         ItemMeta meta = item.getItemMeta();
         PersistentDataContainer container = meta.getPersistentDataContainer();

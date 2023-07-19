@@ -1,5 +1,6 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.util;
 
+import com.github.sakakiaruka.customcrafter.customcrafter.command.ContainerModify;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.ContainerWrapper;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
@@ -7,7 +8,6 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -77,6 +77,17 @@ public class ContainerUtil {
         return map;
     }
 
+    public boolean isPassTargetEmpty(Matter source) {
+        // target = always empty
+        if (!source.hasContainer()) return true;
+        Map<Integer, ContainerWrapper> wrappers = source.getContainerWrappers();
+        for (Map.Entry<Integer, ContainerWrapper> entry : wrappers.entrySet()) {
+            String tag = entry.getValue().getTag();
+            if (tag.equals(ALLOW_TAG) || tag.equals(ALLOW_VALUE)) return false;
+        }
+        return true;
+    }
+
     public boolean isPass(ItemStack item, Matter matter) {
         // item -> target, matter -> source (recipe)
         // matter > item
@@ -100,9 +111,8 @@ public class ContainerUtil {
 
         ItemMeta meta = item.getItemMeta();
         PersistentDataContainer container = meta.getPersistentDataContainer();
-        if (container.getKeys().isEmpty()) return false;
 
-        for(Map.Entry<Integer, ContainerWrapper> entry : matter.getContainerWrappers().entrySet()) {
+        for (Map.Entry<Integer, ContainerWrapper> entry : matter.getContainerWrappers().entrySet()) {
             String tag = entry.getValue().getTag();
             if (tag.equals(STORE_ONLY)) continue;
 
@@ -111,22 +121,74 @@ public class ContainerUtil {
             NamespacedKey key = wrapper.getKey();
             PersistentDataType type = wrapper.getType();
 
+            //debug
+            System.out.println("current: "+entry.getKey());
+
             if (tag.equals(ALLOW_TAG)) {
                 if (!container.has(key, type)) return false;
                 continue;
             }
 
             if (tag.equals(DENY_TAG)) {
+
+                //debug
+                System.out.println("key: "+key.toString());
+                System.out.println("tag: "+tag);
+                System.out.println("has: "+container.has(key, type));
+                System.out.println("!has: "+!container.has(key, type));
+
+                if (!container.has(key, type)) continue;
                 if (container.has(key, type)) return false;
-                continue;
             }
 
+            //debug
+            System.out.println("no tags");
+
             if (value.matches(ARROW_RANGE_PATTERN) && !arrowPatternOperation(value, matter, container, wrapper)) return false;
+            else if (value.matches(ARROW_RANGE_PATTERN) && arrowPatternOperation(value, matter, container, wrapper)) continue;
+
             if (value.matches(SMALLER_PATTERN) && !smallerPatternOperation(value, matter, container, wrapper)) return false;
+            else if (value.matches(SMALLER_PATTERN) && smallerPatternOperation(value, matter, container, wrapper)) continue;
+
             if (value.matches(LARGER_PATTERN) && !largerPatternOperation(value, matter, container, wrapper)) return false;
+            else if (value.matches(LARGER_PATTERN) && largerPatternOperation(value, matter, container, wrapper)) continue;
+
+
+            //TODO: write 'allow_value' and 'deny_value'
+            //if (!tag.equals(ALLOW_VALUE) && !tag.equals(DENY_VALUE)) continue;
+            boolean isAllow = tag.equals(ALLOW_VALUE);
+            // isAllow = true -> ALLOW_VALUE
+            // isAllow = false -> DENY_VALUE
+            if (!isAllow && container.getKeys().isEmpty()) continue;
+            if (isAllow && container.getKeys().isEmpty()) return false;
+
+            //debug
+            System.out.println("tag: "+tag+" / "+value);
+
+            if (type.equals(PersistentDataType.STRING)) {
+
+                Pattern pattern = Pattern.compile(value);
+                Matcher matcher = pattern.matcher(String.valueOf(container.get(key, type)));
+                if (matcher.matches() == isAllow) continue;
+                return false;
+
+            } else if (type.equals(PersistentDataType.INTEGER)) {
+                PersistentDataType valueType;
+                if ((valueType = getSpecifiedKeyType(container, key)) == null) return false;
+                if (!valueType.equals(PersistentDataType.INTEGER)) return false;
+                String element = String.valueOf(container.get(key, type));
+                if (element.matches(ContainerModify.NUMBERS_PATTERN)) return false;
+
+                int current = Integer.valueOf(value);
+                int containerHas = Integer.valueOf(element);
+                if ((current == containerHas) == isAllow) continue;
+                return false;
+            }
         }
         return true;
     }
+
+
 
     public boolean isPassRecipe(Recipe recipe, Recipe input) {
         // r -> source
@@ -134,12 +196,16 @@ public class ContainerUtil {
         // r > m
 
         int inputCount = 0;
-        int recipeCount = recipe.getContainerHasAmount();
-        if (recipe.getContainerHasAmount() != input.getContainerHasAmount()) return false;
+        int recipeCount = recipe.getContentsNoAir().size();
+        //if (recipe.getContainerHasAmount() != input.getContainerHasAmount()) return false;
         A:for (Matter x : recipe.getContentsNoAir()) {
-            if (!x.hasContainer()) continue;
+            //if (!x.hasContainer()) continue;
             B:for (Matter m : input.getContentsNoAir()) {
-                if (!m.hasContainer()) continue;
+                if (!m.hasContainer()) {
+                    if (!isPassTargetEmpty(x)) return false;
+                    inputCount++;
+                    continue;
+                }
                 ItemStack item = new ItemStack(m.getCandidate().get(0));
                 ItemMeta meta = item.getItemMeta();
                 PersistentDataContainer container = meta.getPersistentDataContainer();
