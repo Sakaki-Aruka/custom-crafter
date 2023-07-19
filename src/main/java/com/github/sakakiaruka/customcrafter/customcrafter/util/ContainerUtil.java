@@ -84,7 +84,16 @@ public class ContainerUtil {
         //debug
         if (matter.getContainerWrappers() != null) {
             matter.getContainerWrappers().entrySet().forEach(s->System.out.println(s.getValue().info()));
+            System.out.println(bar);
+            PersistentDataContainer container = item.getItemMeta().getPersistentDataContainer();
+            if (!container.isEmpty()) {
+                for (NamespacedKey key : container.getKeys()) {
+                    System.out.println("exist key: "+key.toString());
+                }
+            }
+            System.out.println(bar);
         }
+
 
 
         if (!matter.hasContainer()) return true;
@@ -127,8 +136,9 @@ public class ContainerUtil {
         int inputCount = 0;
         int recipeCount = recipe.getContainerHasAmount();
         if (recipe.getContainerHasAmount() != input.getContainerHasAmount()) return false;
-        for (Matter x : recipe.getContentsNoAir()) {
-            for (Matter m : input.getContentsNoAir()) {
+        A:for (Matter x : recipe.getContentsNoAir()) {
+            if (!x.hasContainer()) continue;
+            B:for (Matter m : input.getContentsNoAir()) {
                 if (!m.hasContainer()) continue;
                 ItemStack item = new ItemStack(m.getCandidate().get(0));
                 ItemMeta meta = item.getItemMeta();
@@ -144,6 +154,10 @@ public class ContainerUtil {
                 inputCount++;
             }
         }
+
+        //debug
+        System.out.println("input: "+inputCount+" / recipe: "+recipeCount);
+
         return inputCount == recipeCount;
     }
 
