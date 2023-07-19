@@ -19,10 +19,11 @@ public class Show {
         namedRecipes.keySet().forEach(s->sender.sendMessage(getGraphicalRecipe(s)));
     }
     public void one(String[] args, CommandSender sender) {
-        sender.sendMessage(args[1]);
+        // /cc -show [RecipeName]
+        sender.sendMessage(getGraphicalRecipe(args[1]));
     }
 
-    private String getGraphicalRecipe(String recipeName){
+    public String getGraphicalRecipe(String recipeName){
         if(!namedRecipes.containsKey(recipeName))return "Unknown recipe.";
         Recipe recipe = namedRecipes.get(recipeName);
         StringBuilder builder = new StringBuilder();
@@ -68,9 +69,6 @@ public class Show {
             info = info.replace(nl,nl+"  ");
             builder.append(info);
         }
-
-
-
         return builder.toString();
     }
 

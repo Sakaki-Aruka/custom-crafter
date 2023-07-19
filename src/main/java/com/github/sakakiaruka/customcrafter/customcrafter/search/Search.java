@@ -1,5 +1,7 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.search;
 
+import com.github.sakakiaruka.customcrafter.customcrafter.command.Show;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.ContainerWrapper;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantStrict;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantWrap;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
@@ -11,11 +13,14 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Tag;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.*;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -109,6 +114,8 @@ public class Search {
             vTotal += i;
         }
 
+        if (!new ContainerUtil().isPassRecipe(recipe, input)) return false;
+
         new InventoryUtil().snatchFromVirtual(virtual,massList,true);
         new InventoryUtil().snatchFromVirtual(virtual,normalList,false);
         if(containsMinus(virtual)) return false;
@@ -148,6 +155,12 @@ public class Search {
                 Matter normal = new Matter(Arrays.asList(material),0,false);
                 int m = (result.containsKey(mass) ? result.get(mass) : 0) + 1;
                 int n = (result.containsKey(normal) ? result.get(normal) : 0) + matter.getAmount();
+
+                // about container data
+                Map<Integer, ContainerWrapper> containerElements = matter.containerElementsDeepCopy();
+                mass.setContainerWrappers(containerElements); // set container data
+                normal.setContainerWrappers(containerElements); // set container data
+
                 result.put(mass,m);
                 result.put(normal,n);
             }
@@ -445,7 +458,7 @@ public class Search {
                 }
                 //debug
                 new ContainerUtil().setContainerDataItemStackToMatter(inventory.getItem(i), matter);
-                System.out.println("matter info: "+nl+matter.info());
+//                System.out.println("matter info: "+nl+matter.info());
 
                 recipe.addCoordinate(x,y,matter);
             }

@@ -9,10 +9,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.persistence.PersistentDataType;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.nl;
 
@@ -202,7 +199,7 @@ public class Matter implements Matters {
         builder.append(String.format("mass : %b"+nl,isMass()));
         if (container == null || container.isEmpty()) builder.append("container: No contents in the container."+nl);
         else {
-            container.entrySet().forEach(s->builder.append("  container: "+nl+s.getValue().info()+nl));
+            container.entrySet().forEach(s->builder.append("container: "+nl+s.getValue().info()+nl));
         }
         return builder.toString();
     }
@@ -213,10 +210,19 @@ public class Matter implements Matters {
 
 
     public Map<Integer, ContainerWrapper> getContainerWrappers() {
-        return null;
+        return container;
     }
 
     public void setContainerWrappers(Map<Integer, ContainerWrapper> elements) {
         this.container = elements;
+    }
+
+    public Map<Integer, ContainerWrapper> containerElementsDeepCopy() {
+        Map<Integer, ContainerWrapper> map = new HashMap<>();
+        if (!hasContainer()) return map;
+        for (Map.Entry<Integer, ContainerWrapper> entry : this.container.entrySet()) {
+            map.put(entry.getKey(), entry.getValue());
+        }
+        return map;
     }
 }

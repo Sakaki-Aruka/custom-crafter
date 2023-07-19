@@ -29,7 +29,7 @@ public class ContainerModify {
     * /cc -container -add [key] [type] [value]
     * /cc -container -remove [key]
     * /cc -container -set [key] [type] [value]
-    * /cc -container -value_modify [key] [type] [operation] [oped-key]
+    * /cc -container -value_modify [key] [type] [operation] [oped-key] [oped-value]
     *
     * arguments pattern:
     * [key] -> follow 'CONTAINER_KEY_PATTERN'
@@ -43,7 +43,7 @@ public class ContainerModify {
     * [type] -> {ContainerDataType}
     * [value] -> {NumbersAlphabet}
     * [operation] -> {MathematicalOperators}
-    * [oped-key] -> {ContainerKey} (same with [key])
+    * [oped-value] -> {ContainerKey} (same with [key])
      */
 
     // /cc -container -add [key] [type] [value]

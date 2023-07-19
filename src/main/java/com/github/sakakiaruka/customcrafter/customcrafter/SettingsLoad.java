@@ -412,8 +412,18 @@ public class SettingsLoad {
                 continue;
             }
 
+            Map<Integer, ContainerWrapper> elements = new ContainerUtil().mattersLoader(path);
+            matter.setContainerWrappers(elements);
+
+            //debug
+            if (matter.hasContainer()) {
+                for (Map.Entry<Integer, ContainerWrapper> entry : matter.getContainerWrappers().entrySet()) {
+                    System.out.println(entry.getValue().info());
+                }
+            }
+
             matters.put(name,matter);
-            new ContainerUtil().mattersLoader(path);
+
         }
     }
 
@@ -535,6 +545,14 @@ public class SettingsLoad {
                         Coordinate coordinate = new Coordinate(x,count);
                         String matterName = list.get(j);
                         Matter matter = getMatterFromString(matterName,overrides);
+
+                        //debug
+                        if (matter.hasContainer()) {
+                            System.out.println("matter name: "+matter.getName());
+                            for (Map.Entry<Integer, ContainerWrapper> entry : matter.getContainerWrappers().entrySet()) {
+                                System.out.println(entry.getValue().info());
+                            }
+                        }
 
                         coordinates.put(coordinate,matter);
                         count++;

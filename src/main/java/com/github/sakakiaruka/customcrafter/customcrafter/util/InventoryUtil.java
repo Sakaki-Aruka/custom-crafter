@@ -90,10 +90,9 @@ public class InventoryUtil {
 
     public void snatchFromVirtual(Map<Matter, Integer> virtual, List<Matter> list, boolean mass) {
         Map<Matter, Integer> buf = new HashMap<>();
-        for(Map.Entry<Matter, Integer> entry : virtual.entrySet()) {
-            for(Matter matter : list) {
-                if(!matter.sameCandidate(entry.getKey())) continue;
-
+        A:for(Map.Entry<Matter, Integer> entry : virtual.entrySet()) {
+            B:for(Matter matter : list) {
+                if (!matter.sameCandidate(entry.getKey())) continue;
                 int ii = (buf.containsKey(entry.getKey()) ? entry.getValue() : 0)  - (mass ? 1 : matter.getAmount());
                 buf.put(entry.getKey(),ii);
             }

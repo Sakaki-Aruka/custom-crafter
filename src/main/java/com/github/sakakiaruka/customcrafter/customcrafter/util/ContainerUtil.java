@@ -2,9 +2,12 @@ package com.github.sakakiaruka.customcrafter.customcrafter.util;
 
 import com.github.sakakiaruka.customcrafter.customcrafter.object.ContainerWrapper;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -64,30 +67,19 @@ public class ContainerUtil {
 
             ContainerWrapper wrapper = new ContainerWrapper(key, type, value,order,tag);
 
-            //debug
-            System.out.println(wrapper.info());
-
             if (!map.containsKey(order)) map.put(order, wrapper);
             current++;
         }
 
         String name = config.getString("name");
 
-        Matter matter = matters.get(name);
-        matter.setContainerWrappers(map);
-
-        //debug
-        System.out.println("override display");
-        System.out.println(matter.info());
-
-        matters.remove(name);
-        matters.put(name, matter);
-
-        containers.put(matter.getName(), map);
+        containers.put(name, map);
         return map;
     }
 
     public boolean isPass(ItemStack item, Matter matter) {
+        // item -> target, matter -> source (recipe)
+        // matter > item
 
         //debug
         if (matter.getContainerWrappers() != null) {
@@ -126,6 +118,35 @@ public class ContainerUtil {
         }
         return true;
     }
+
+    public boolean isPassRecipe(Recipe recipe, Recipe input) {
+        // r -> source
+        // m -> target
+        // r > m
+
+        int inputCount = 0;
+        int recipeCount = recipe.getContainerHasAmount();
+        if (recipe.getContainerHasAmount() != input.getContainerHasAmount()) return false;
+        for (Matter x : recipe.getContentsNoAir()) {
+            for (Matter m : input.getContentsNoAir()) {
+                if (!m.hasContainer()) continue;
+                ItemStack item = new ItemStack(m.getCandidate().get(0));
+                ItemMeta meta = item.getItemMeta();
+                PersistentDataContainer container = meta.getPersistentDataContainer();
+                for (Map.Entry<Integer, ContainerWrapper> entry : m.getContainerWrappers().entrySet()) {
+                    NamespacedKey key = entry.getValue().getKey();
+                    PersistentDataType type = entry.getValue().getType();
+                    Object value = entry.getValue().getValue();
+                    container.set(key, type, value);
+                }
+                item.setItemMeta(meta);
+                if (!isPass(item, x)) continue;
+                inputCount++;
+            }
+        }
+        return inputCount == recipeCount;
+    }
+
 
     private boolean arrowPatternOperation(String source, Matter matter, PersistentDataContainer container, ContainerWrapper wrapper) {
         NamespacedKey key = wrapper.getKey();

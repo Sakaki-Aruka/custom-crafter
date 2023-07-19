@@ -145,4 +145,12 @@ public class Recipe {
         }
         return null;
     }
+
+    public int getContainerHasAmount() {
+        int result = 0;
+        for (Matter matter : coordinate.values()) {
+            if (matter.hasContainer()) result++;
+        }
+        return result;
+    }
 }
