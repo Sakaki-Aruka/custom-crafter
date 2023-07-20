@@ -189,129 +189,187 @@ public class ContainerUtil {
         return true;
     }
 
-    public boolean isPassAmorphous(Recipe recipe, Recipe input) {
-        int virtualElementTotal = 0;
-        // make AmorphousVirtualContainer
-        List<AmorphousVirtualContainer> virtual = new ArrayList<>();
+
+    public boolean isPassRecipe(Recipe recipe, Recipe input) {
+        List<AmorphousVirtualContainer> vContainer = new ArrayList<>();
         for (Matter matter : recipe.getContentsNoAir()) {
             if (!matter.hasContainer()) continue;
+
             List<Material> candidate = matter.getCandidate();
             List<NamespacedKey> keys = new ArrayList<>();
             List<PersistentDataType> types = new ArrayList<>();
             List<Object> values = new ArrayList<>();
             List<String> tags = new ArrayList<>();
 
-            for (Map.Entry<Integer, ContainerWrapper> entry : matter.getContainerWrappers().entrySet())  {
-                ContainerWrapper wrapper = entry.getValue();
-                NamespacedKey key = wrapper.getKey();
-                PersistentDataType type = wrapper.getType();
-                String tag = wrapper.getTag();
-                Object value = wrapper.getValue();
-                keys.add(key);
-                types.add(type);
-                values.add(value);
-                tags.add(tag);
+            for (Map.Entry<Integer, ContainerWrapper> entry : matter.getContainerWrappers().entrySet()) {
+                keys.add(entry.getValue().getKey());
+                types.add(entry.getValue().getType());
+                values.add(entry.getValue().getValue());
+                tags.add(entry.getValue().getTag());
             }
 
-            AmorphousVirtualContainer element = new AmorphousVirtualContainer(candidate, keys, types, values, tags, matter.getAmount());
-            virtual.add(element);
-            virtualElementTotal += matter.getAmount();
+            int amount = matter.getAmount();
+            AmorphousVirtualContainer container = new AmorphousVirtualContainer(candidate, keys, types, values, tags, amount);
+            vContainer.add(container);
         }
-        // end to make AmorphousVirtualContainer
+        // finish to make an AmorphousVirtualContainer
 
-
-        A:for (Matter in : input.getContentsNoAir()) {
-            B:for (AmorphousVirtualContainer vContainer : virtual) {
-                if (vContainer.getCandidate().size() != in.getCandidate().size()) continue A;
-                if (!vContainer.getCandidate().containsAll(in.getCandidate())) continue A;
-                C:for (int i=0;i<vContainer.getTags().size();i++) {
-                    String tag = vContainer.getTags().get(i);
-                    NamespacedKey key = vContainer.getKeys().get(i);
-                    PersistentDataType type = vContainer.getTypes().get(i);
-                    Object value = vContainer.getValues().get(i);
-
-                    if (tag.equals(STORE_ONLY)) continue C;
-                    if (tag.equals(ALLOW_TAG) && !in.hasContainer()) continue C;
-                    if (tag.equals(ALLOW_VALUE) && !in.hasContainer()) continue C;
-                }
+        if (vContainer.isEmpty()) return true;
+        for (AmorphousVirtualContainer container : vContainer) {
+            for (Matter in : input.getContentsNoAir()) {
+                if (!vContainerContainsMatter(container, in)) continue;
+                int current = container.getAmount();
+                container.setAmount(current - in.getAmount());
             }
         }
+
+        for (AmorphousVirtualContainer container : vContainer) {
+            if (container.getAmount() != 0) return false;
+        }
+        return true;
     }
+    public boolean vContainerContainsMatter(AmorphousVirtualContainer vContainer, Matter matter) {
+        if (vContainer.getCandidate().size() != matter.getCandidate().size()) return false;
+        if (vContainer.getCandidate().containsAll(matter.getCandidate())) return false;
+        if (vContainerContainsOnlyStore(vContainer)) return true;
 
-    private boolean vContainerContainsContainerWrapper(AmorphousVirtualContainer vContainer, ContainerWrapper wrapper) {
-        List<String> tags = vContainer.getTags();
-        List<PersistentDataType> types = vContainer.getTypes();
-        List<NamespacedKey> keys = vContainer.getKeys();
-        List<Object> values = vContainer.getValues();
+        for (int i=0;i<vContainer.getTags().size();i++) {
+            String tag = vContainer.getTags().get(i);
+            NamespacedKey key = vContainer.getKeys().get(i);
+            PersistentDataType type = vContainer.getTypes().get(i);
+            String value = String.valueOf(vContainer.getValues().get(i));
 
-        for (int i=0;i<tags.size();i++) {
-            String tag = tags.get(i);
-            PersistentDataType type = types.get(i);
-            NamespacedKey key = keys.get(i);
-            Object value = values.get(i);
-
+            if ((tag.equals(ALLOW_TAG) || tag.equals(ALLOW_VALUE)) && !matter.hasContainer()) return false;
             if (tag.equals(STORE_ONLY)) continue;
-            if (tag.equals(ALLOW_TAG) && wrapper == null) continue;
-            if (tag.equals(ALLOW_VALUE) && wrapper == null) continue;
+            if ((tag.equals(DENY_TAG) || tag.equals(DENY_VALUE)) && !matter.hasContainer())  continue;
 
-            NamespacedKey wKey = wrapper.getKey();
-            PersistentDataType wType = wrapper.getType();
-            Object wValue = wrapper.getValue();
+            for (Map.Entry<Integer, ContainerWrapper> entry : matter.getContainerWrappers().entrySet()) {
+                String rTag = entry.getValue().getTag();
+                NamespacedKey rKey = entry.getValue().getKey();
+                PersistentDataType rType = entry.getValue().getType();
+                String rValue = entry.getValue().getValue();
 
-            if (!key.toString().equals(wKey.toString())) continue;
-            if (!type.equals(wType)) continue;
-            if ((tag.equals(ALLOW_TAG) || tag.equals(ALLOW_VALUE)) && !wKey.equals(key)) continue;
-            if ((tag.equals(DENY_TAG) || tag.equals(DENY_VALUE)) && wKey.equals(key)) continue;
+                if (tag.equals(STORE_ONLY)) continue;
+                if ((tag.equals(ALLOW_TAG) || tag.equals(ALLOW_VALUE))&& matterContainsSpecifiedKey(key, matter)) return false;
+                if ((tag.equals(DENY_TAG) || tag.equals(DENY_VALUE)) && !matterContainsSpecifiedKey(key, matter)) continue;
 
-            if (tag.equals(ALLOW_VALUE)) {
-                // allow-value
-            } else if (tag.equals(DENY_VALUE)) {
-                // deny-value
-            }
+                if (!type.equals(rType)) return false;
+                if (tag.equals(ALLOW_TAG) && matterContainsSpecifiedKey(key, matter)) continue;
+                if (tag.equals(DENY_TAG) && !matterContainsSpecifiedKey(key, matter)) continue;
 
-        }
-    }
+                //values check
+                boolean isAllowValue = tag.equals(ALLOW_VALUE);
 
-
-    public boolean isPassRecipe(Recipe recipe, Recipe input) {
-        // r -> source
-        // m -> target
-        // r > m
-
-        int inputCount = 0;
-        int recipeCount = recipe.getContentsNoAir().size();
-        //if (recipe.getContainerHasAmount() != input.getContainerHasAmount()) return false;
-        A:for (Matter x : recipe.getContentsNoAir()) {
-            //if (!x.hasContainer()) continue;
-            B:for (Matter m : input.getContentsNoAir()) {
-                if (!m.hasContainer()) {
-                    if (!isPassTargetEmpty(x)) return false;
-                    inputCount++;
+                if (value.matches(ARROW_RANGE_PATTERN)) {
+                    if (arrowPatternOperation(value, matter, getContainerFromMatter(matter), entry.getValue()) != isAllowValue) return false;
                     continue;
                 }
-                ItemStack item = new ItemStack(m.getCandidate().get(0));
-                ItemMeta meta = item.getItemMeta();
-                PersistentDataContainer container = meta.getPersistentDataContainer();
-                for (Map.Entry<Integer, ContainerWrapper> entry : m.getContainerWrappers().entrySet()) {
-                    NamespacedKey key = entry.getValue().getKey();
-                    PersistentDataType type = entry.getValue().getType();
-                    Object value = entry.getValue().getValue();
-                    container.set(key, type, value);
+
+                if (value.matches(LARGER_PATTERN)) {
+                    if (largerPatternOperation(value, matter, getContainerFromMatter(matter), entry.getValue()) != isAllowValue) return false;
+                    continue;
                 }
-                item.setItemMeta(meta);
-                if (!isPass(item, x)) continue;
-                inputCount++;
+
+                if (value.matches(SMALLER_PATTERN)) {
+                    if (smallerPatternOperation(value, matter, getContainerFromMatter(matter), entry.getValue()) != isAllowValue) return false;
+                }
+
+                // normal value check
+                if (isAllowValue) {
+                    if (!type.equals(rType)) return false;
+                    if (type.equals(PersistentDataType.STRING) && !value.equals(rValue)) return false;
+                    if (type.equals(PersistentDataType.INTEGER)) {
+                        int rValueInt;
+                        try{
+                            rValueInt = Integer.valueOf(rValue);
+                        }catch (Exception e) {
+                            return false;
+                        }
+                        if (Integer.valueOf(value) != rValueInt) return false;
+                        continue;
+                    }
+                    continue;
+                }
             }
         }
-
-        //debug
-        System.out.println("input: "+inputCount+" / recipe: "+recipeCount);
-
-        return inputCount == recipeCount;
+        return true;
     }
+
+    private PersistentDataContainer getContainerFromMatter(Matter matter) {
+        if (!matter.hasContainer()) return null;
+        Material material = matter.getCandidate().get(0);
+        ItemStack item = new ItemStack(material, 0);
+        ItemMeta meta = item.getItemMeta();
+        PersistentDataContainer container = meta.getPersistentDataContainer();
+
+        for (Map.Entry<Integer, ContainerWrapper> entry : matter.getContainerWrappers().entrySet()) {
+            Object value = entry.getValue().getValue();
+            NamespacedKey key = entry.getValue().getKey();
+            PersistentDataType type = entry.getValue().getType();
+            container.set(key, type, value);
+        }
+
+        item.setItemMeta(meta);
+        return container;
+    }
+
+    private boolean matterContainsSpecifiedKey(NamespacedKey key, Matter matter) {
+        for (Map.Entry<Integer, ContainerWrapper> entry : matter.getContainerWrappers().entrySet()) {
+            NamespacedKey rKey = entry.getValue().getKey();
+            if (key.getKey().equals(rKey.getKey())) return true;
+        }
+        return false;
+    }
+
+    private boolean vContainerContainsOnlyStore(AmorphousVirtualContainer vContainer) {
+        for (String tag : vContainer.getTags()) {
+            if (!tag.equals(STORE_ONLY)) return false;
+        }
+        return true;
+    }
+
+
+
+//    public boolean isPassRecipe(Recipe recipe, Recipe input) {
+//        // r -> source
+//        // m -> target
+//        // r > m
+//
+//        int inputCount = 0;
+//        int recipeCount = recipe.getContentsNoAir().size();
+//        //if (recipe.getContainerHasAmount() != input.getContainerHasAmount()) return false;
+//        A:for (Matter x : recipe.getContentsNoAir()) {
+//            //if (!x.hasContainer()) continue;
+//            B:for (Matter m : input.getContentsNoAir()) {
+//                if (!m.hasContainer()) {
+//                    if (!isPassTargetEmpty(x)) return false;
+//                    inputCount++;
+//                    continue;
+//                }
+//                ItemStack item = new ItemStack(m.getCandidate().get(0));
+//                ItemMeta meta = item.getItemMeta();
+//                PersistentDataContainer container = meta.getPersistentDataContainer();
+//                for (Map.Entry<Integer, ContainerWrapper> entry : m.getContainerWrappers().entrySet()) {
+//                    NamespacedKey key = entry.getValue().getKey();
+//                    PersistentDataType type = entry.getValue().getType();
+//                    Object value = entry.getValue().getValue();
+//                    container.set(key, type, value);
+//                }
+//                item.setItemMeta(meta);
+//                if (!isPass(item, x)) continue;
+//                inputCount++;
+//            }
+//        }
+//
+//        //debug
+//        System.out.println("input: "+inputCount+" / recipe: "+recipeCount);
+//
+//        return inputCount == recipeCount;
+//    }
 
 
     private boolean arrowPatternOperation(String source, Matter matter, PersistentDataContainer container, ContainerWrapper wrapper) {
+        if (container == null) return false;
         NamespacedKey key = wrapper.getKey();
         PersistentDataType type = wrapper.getType();
         Pattern pattern = Pattern.compile(ARROW_RANGE_PATTERN);
