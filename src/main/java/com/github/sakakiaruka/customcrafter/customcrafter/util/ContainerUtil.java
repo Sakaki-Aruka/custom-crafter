@@ -1,6 +1,7 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.util;
 
 import com.github.sakakiaruka.customcrafter.customcrafter.command.ContainerModify;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.AmorphousVirtualContainer;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.ContainerWrapper;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
@@ -188,6 +189,88 @@ public class ContainerUtil {
         return true;
     }
 
+    public boolean isPassAmorphous(Recipe recipe, Recipe input) {
+        int virtualElementTotal = 0;
+        // make AmorphousVirtualContainer
+        List<AmorphousVirtualContainer> virtual = new ArrayList<>();
+        for (Matter matter : recipe.getContentsNoAir()) {
+            if (!matter.hasContainer()) continue;
+            List<Material> candidate = matter.getCandidate();
+            List<NamespacedKey> keys = new ArrayList<>();
+            List<PersistentDataType> types = new ArrayList<>();
+            List<Object> values = new ArrayList<>();
+            List<String> tags = new ArrayList<>();
+
+            for (Map.Entry<Integer, ContainerWrapper> entry : matter.getContainerWrappers().entrySet())  {
+                ContainerWrapper wrapper = entry.getValue();
+                NamespacedKey key = wrapper.getKey();
+                PersistentDataType type = wrapper.getType();
+                String tag = wrapper.getTag();
+                Object value = wrapper.getValue();
+                keys.add(key);
+                types.add(type);
+                values.add(value);
+                tags.add(tag);
+            }
+
+            AmorphousVirtualContainer element = new AmorphousVirtualContainer(candidate, keys, types, values, tags, matter.getAmount());
+            virtual.add(element);
+            virtualElementTotal += matter.getAmount();
+        }
+        // end to make AmorphousVirtualContainer
+
+
+        A:for (Matter in : input.getContentsNoAir()) {
+            B:for (AmorphousVirtualContainer vContainer : virtual) {
+                if (vContainer.getCandidate().size() != in.getCandidate().size()) continue A;
+                if (!vContainer.getCandidate().containsAll(in.getCandidate())) continue A;
+                C:for (int i=0;i<vContainer.getTags().size();i++) {
+                    String tag = vContainer.getTags().get(i);
+                    NamespacedKey key = vContainer.getKeys().get(i);
+                    PersistentDataType type = vContainer.getTypes().get(i);
+                    Object value = vContainer.getValues().get(i);
+
+                    if (tag.equals(STORE_ONLY)) continue C;
+                    if (tag.equals(ALLOW_TAG) && !in.hasContainer()) continue C;
+                    if (tag.equals(ALLOW_VALUE) && !in.hasContainer()) continue C;
+                }
+            }
+        }
+    }
+
+    private boolean vContainerContainsContainerWrapper(AmorphousVirtualContainer vContainer, ContainerWrapper wrapper) {
+        List<String> tags = vContainer.getTags();
+        List<PersistentDataType> types = vContainer.getTypes();
+        List<NamespacedKey> keys = vContainer.getKeys();
+        List<Object> values = vContainer.getValues();
+
+        for (int i=0;i<tags.size();i++) {
+            String tag = tags.get(i);
+            PersistentDataType type = types.get(i);
+            NamespacedKey key = keys.get(i);
+            Object value = values.get(i);
+
+            if (tag.equals(STORE_ONLY)) continue;
+            if (tag.equals(ALLOW_TAG) && wrapper == null) continue;
+            if (tag.equals(ALLOW_VALUE) && wrapper == null) continue;
+
+            NamespacedKey wKey = wrapper.getKey();
+            PersistentDataType wType = wrapper.getType();
+            Object wValue = wrapper.getValue();
+
+            if (!key.toString().equals(wKey.toString())) continue;
+            if (!type.equals(wType)) continue;
+            if ((tag.equals(ALLOW_TAG) || tag.equals(ALLOW_VALUE)) && !wKey.equals(key)) continue;
+            if ((tag.equals(DENY_TAG) || tag.equals(DENY_VALUE)) && wKey.equals(key)) continue;
+
+            if (tag.equals(ALLOW_VALUE)) {
+                // allow-value
+            } else if (tag.equals(DENY_VALUE)) {
+                // deny-value
+            }
+
+        }
+    }
 
 
     public boolean isPassRecipe(Recipe recipe, Recipe input) {
