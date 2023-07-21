@@ -281,7 +281,8 @@ public class ContainerUtil {
                     if (type.equals(PersistentDataType.INTEGER)) {
                         int rValueInt;
                         try{
-                            rValueInt = Integer.valueOf(rValue);
+                            //rValueInt = Integer.valueOf(rValue);
+                            rValueInt = getSpecifiedElementValue(rValue, matter, getContainerFromMatter(matter));
                         }catch (Exception e) {
                             return false;
                         }
