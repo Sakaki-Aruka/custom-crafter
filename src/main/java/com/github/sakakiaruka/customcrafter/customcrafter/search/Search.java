@@ -242,6 +242,8 @@ public class Search {
 
         whatMaking.put(player.getUniqueId(),item.getType());
 
+        // TODO: write modify Container elements code here #53
+
         //debug
         if(inventory.getItem(craftingTableResultSlot) == null){
             // empty a result item's slot
