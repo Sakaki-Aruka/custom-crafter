@@ -76,7 +76,22 @@ public class ContainerModify {
         }
 
         Object value = args[4];
-        container.set(key, type, value);
+        int iValue = 0;
+        if (type.equals(PersistentDataType.INTEGER)) {
+            try{
+                iValue = Integer.valueOf(String.valueOf(value));
+            }catch (Exception e) {
+                sender.sendMessage("Container "+modifyType+" > The provided value is not a number.");
+                return;
+            }
+        }
+
+        if (type.equals(PersistentDataType.STRING)) {
+            container.set(key, type, value);
+        } else if (type.equals(PersistentDataType.INTEGER)) {
+            container.set(key, type, iValue);
+        }
+
         item.setItemMeta(meta);
 
         String after = new ContainerUtil().containerValues(container);
@@ -204,6 +219,33 @@ public class ContainerModify {
         PersistentDataContainer container = meta.getPersistentDataContainer();
         String result = new ContainerUtil().containerValues(container);
         sender.sendMessage(result);
+    }
+
+    // /cc -container -data -modifyShow [key] [operator] [key]
+    public void modifyShow(String[] args, CommandSender sender) {
+        Player player = (Player) sender;
+        if (!checkMainHand(player, "modify-show")) {
+            sender.sendMessage("Container modify-show > No container data found.");
+            return;
+        }
+
+        NamespacedKey firstKey = new NamespacedKey(getInstance(), args[3]);
+        NamespacedKey secondKey = new NamespacedKey(getInstance(), args[5]);
+        ItemStack item = player.getInventory().getItemInMainHand();
+        PersistentDataContainer container = item.getItemMeta().getPersistentDataContainer();
+        String operator = args[4];
+
+        PersistentDataType firstType = new ContainerUtil().getSpecifiedKeyType(container, firstKey);
+        PersistentDataType secondType = new ContainerUtil().getSpecifiedKeyType(container, secondKey);
+        if (firstType == null || secondType == null) {
+            sender.sendMessage("Container modify-show > Container data type error.");
+            sender.sendMessage("Container modify-show > Check the data type.");
+            return;
+        }
+
+        if (operator.equals("+")) {
+            //
+        }
     }
 
 

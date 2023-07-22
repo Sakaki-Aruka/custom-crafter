@@ -6,6 +6,8 @@ import org.bukkit.persistence.PersistentDataType;
 
 import java.util.List;
 
+import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.nl;
+
 public class AmorphousVirtualContainer {
     private List<Material> candidate;
     private List<NamespacedKey> keys;
@@ -69,5 +71,26 @@ public class AmorphousVirtualContainer {
 
     public void setAmount(int amount) {
         this.amount = amount;
+    }
+
+    public String info() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("candidate: " + nl);
+        for (Material m : candidate) {
+            builder.append("  -> " + m.name() + nl);
+        }
+        builder.append("keys: " + nl);
+        for (NamespacedKey key : keys) {
+            builder.append("  -> " + key.getKey() + nl);
+        }
+        builder.append("types: " + nl);
+        for (PersistentDataType type : types) {
+            builder.append("  -> " + type.toString() + nl);
+        }
+        builder.append("tags: "+nl);
+        for (String t : tags) {
+            builder.append("  -> "+t+nl);
+        }
+        return builder.toString();
     }
 }

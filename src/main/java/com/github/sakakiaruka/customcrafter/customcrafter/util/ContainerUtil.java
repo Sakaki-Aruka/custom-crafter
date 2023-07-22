@@ -33,7 +33,7 @@ public class ContainerUtil {
     //---
     private static final String OPERATORS_PATTERN = "\\+|-|\\*|/|\\(|\\)";
     private static final String ORDER_NUMBER_PATTERN = "_\\d{1,2}";
-    private static final String ARROW_RANGE_PATTERN = "([_|\\d|\\+|-|\\*|/|\\(|\\)]+)<-->([_|\\d|\\+|-|\\*|/|\\(|\\)]+)";
+    private static final String ARROW_RANGE_PATTERN = "^([_|0-9|\\+|-|\\*|/|\\(|\\)]+)<-->([_|0-9|\\+|-|\\*|/|\\(|\\)]+)$";
     private static final String LARGER_PATTERN = "([_|\\d|\\+|-|\\*|/|\\(|\\)]+)<";
     private static final String SMALLER_PATTERN = "<([_|\\d|\\+|-|\\*|/|\\(|\\)]+)";
 
@@ -214,6 +214,11 @@ public class ContainerUtil {
         }
         // finish to make an AmorphousVirtualContainer
 
+        //debug
+        for (AmorphousVirtualContainer vv : vContainer) {
+            System.out.println(vv.info());
+        }
+
         if (vContainer.isEmpty()) return true;
         for (AmorphousVirtualContainer container : vContainer) {
             for (Matter in : input.getContentsNoAir()) {
@@ -376,6 +381,7 @@ public class ContainerUtil {
         Pattern pattern = Pattern.compile(ARROW_RANGE_PATTERN);
         Matcher matcher = pattern.matcher(source);
         String tag = wrapper.getTag();
+        if (!matcher.matches()) return false;
 
         int element;
         try{
@@ -387,6 +393,8 @@ public class ContainerUtil {
         * examples
         * _1+1<-->10
         * _1<-->_3
+        *
+        * $[KeyName]+1<-->$[KeyName]+1
          */
         int start = getFormulaValue(matcher.group(1), matter, container);
         int end = getFormulaValue(matcher.group(2), matter, container);
@@ -446,27 +454,60 @@ public class ContainerUtil {
     private int getFormulaValue(String input, Matter matter, PersistentDataContainer container) {
         List<String> list = new ArrayList<>();
         List<String> buffer = new ArrayList<>();
+        boolean readingVariableNameFlag = false;
         input = input.replace(" ","");
         for (int i=0;i<input.length();i++) {
             String s = String.valueOf(input.charAt(i));
-            if (s.matches(OPERATORS_PATTERN) && 0 < buffer.size()) {
-                String t = String.join("",buffer);
-                if (t.matches("\\d+")) {
-                    list.add(t);
-                    list.add(s);
-                    buffer.clear();
-                    continue;
-                }
-                list.add(String.valueOf(getSpecifiedElementValue(input, matter, container)));
-                list.add(s);
-                buffer.clear();
+            if (s.equals("$")) readingVariableNameFlag = true;
+            if (readingVariableNameFlag) {
+                buffer.add(s);
+                continue;
             }
+
+            if (readingVariableNameFlag && s.matches(ContainerModify.CONTAINER_OPERATION_PATTERN)) {
+                buffer.add(s);
+                readingVariableNameFlag = false;
+                String variableName = String.join("", buffer);
+                buffer.clear();
+
+                NamespacedKey key = new NamespacedKey(getInstance(), variableName);
+                PersistentDataType type = PersistentDataType.INTEGER;
+                int value = container.has(key, type) ? getSpecifiedElementValue(input, matter, container) : 0;
+                list.add(String.valueOf(value));
+                continue;
+            }
+
             list.add(s);
         }
+        String formula = String.join("", list);
+        return calc(formula);
 
-        String source = String.join("",list);
-        return calc(source);
     }
+
+//    private int getFormulaValue(String input, Matter matter, PersistentDataContainer container) {
+//        List<String> list = new ArrayList<>();
+//        List<String> buffer = new ArrayList<>();
+//        input = input.replace(" ","");
+//        for (int i=0;i<input.length();i++) {
+//            String s = String.valueOf(input.charAt(i));
+//            if (s.matches(OPERATORS_PATTERN) && 0 < buffer.size()) {
+//                String t = String.join("",buffer);
+//                if (t.matches("\\d+")) {
+//                    list.add(t);
+//                    list.add(s);
+//                    buffer.clear();
+//                    continue;
+//                }
+//                list.add(String.valueOf(getSpecifiedElementValue(input, matter, container)));
+//                list.add(s);
+//                buffer.clear();
+//            }
+//            list.add(s);
+//        }
+//
+//        String source = String.join("",list);
+//        return calc(source);
+//    }
 
     private int getSpecifiedElementValue(String input, Matter matter, PersistentDataContainer container) {
         if (input.matches("\\d+")) return Integer.valueOf(input);
@@ -574,7 +615,7 @@ public class ContainerUtil {
         matter.setContainerWrappers(wrappers);
     }
 
-    private PersistentDataType getSpecifiedKeyType(PersistentDataContainer container, NamespacedKey key) {
+    public PersistentDataType getSpecifiedKeyType(PersistentDataContainer container, NamespacedKey key) {
         for (PersistentDataType type : getDefaultDataTypes()) {
             try{
                 container.get(key, type);
