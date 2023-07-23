@@ -396,8 +396,8 @@ public class ContainerUtil {
         *
         * $[KeyName]+1<-->$[KeyName]+1
          */
-        int start = getFormulaValue(matcher.group(1), matter, container);
-        int end = getFormulaValue(matcher.group(2), matter, container);
+        int start = getFormulaValue(matcher.group(1), container);
+        int end = getFormulaValue(matcher.group(2), container);
 
         if (tag.equals(ALLOW_VALUE)) {
             return start < element && element < end;
@@ -419,7 +419,7 @@ public class ContainerUtil {
         }catch (Exception e) {
             return false;
         }
-        int target = getFormulaValue(formula, matter, container);
+        int target = getFormulaValue(formula, container);
 
         if (tag.equals(ALLOW_VALUE)) {
             return element < target;
@@ -441,7 +441,7 @@ public class ContainerUtil {
         }catch (Exception e) {
             return false;
         }
-        int target = getFormulaValue(formula, matter, container);
+        int target = getFormulaValue(formula, container);
 
         if (tag.equals(ALLOW_VALUE)) {
             return target < element;
@@ -451,14 +451,17 @@ public class ContainerUtil {
         return false;
     }
 
-    private int getFormulaValue(String input, Matter matter, PersistentDataContainer container) {
+    private int getFormulaValue(String input, PersistentDataContainer container) {
         List<String> list = new ArrayList<>();
         List<String> buffer = new ArrayList<>();
         boolean readingVariableNameFlag = false;
         input = input.replace(" ","");
         for (int i=0;i<input.length();i++) {
             String s = String.valueOf(input.charAt(i));
-            if (s.equals("$")) readingVariableNameFlag = true;
+            if (s.equals("$")) {
+                readingVariableNameFlag = true;
+                continue;
+            }
             if (readingVariableNameFlag) {
                 buffer.add(s);
                 continue;
@@ -472,7 +475,7 @@ public class ContainerUtil {
 
                 NamespacedKey key = new NamespacedKey(getInstance(), variableName);
                 PersistentDataType type = PersistentDataType.INTEGER;
-                int value = container.has(key, type) ? getSpecifiedElementValue(input, matter, container) : 0;
+                int value = container.has(key, type) ? Integer.valueOf(container.get(key, type).toString()) : 0;
                 list.add(String.valueOf(value));
                 continue;
             }
@@ -511,7 +514,7 @@ public class ContainerUtil {
 
     private int getSpecifiedElementValue(String input, Matter matter, PersistentDataContainer container) {
         if (input.matches("\\d+")) return Integer.valueOf(input);
-        int order = Integer.valueOf(input.replace("_",""));
+        int order = Integer.valueOf(input.replace("$",""));
         NamespacedKey key = matter.getContainerWrappers().get(order).getKey();
         PersistentDataType type = matter.getContainerWrappers().get(order).getType();
         return Integer.valueOf(container.get(key, type).toString());
