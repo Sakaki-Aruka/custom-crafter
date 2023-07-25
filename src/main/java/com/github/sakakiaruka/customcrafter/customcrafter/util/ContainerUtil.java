@@ -569,7 +569,7 @@ public class ContainerUtil {
     }
 
     private int rpnCalc(List<String> list) {
-        // rpn -> Reverse Polish Nation
+        // rpn -> Reverse Polish Notation
         int accumulator;
         List<Integer> stack = new ArrayList<>();
 
