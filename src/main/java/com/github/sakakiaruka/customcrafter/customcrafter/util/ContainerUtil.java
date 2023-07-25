@@ -480,6 +480,19 @@ public class ContainerUtil {
                 continue;
             }
 
+            if (s.equals("(")) {
+                buffer.add(s);
+                continue;
+            }
+
+            if (s.equals(")")) {
+                for (String t : buffer) {
+                    if (t.equals("(")) break;
+                    list.add(t);
+                }
+                continue;
+            }
+
             list.add(s);
         }
         String formula = String.join("", list);
@@ -521,11 +534,11 @@ public class ContainerUtil {
     }
 
     private int calc(String input) {
+        // TODO: rewrite this (RPN processor)
         List<String> output = new ArrayList<>();
         List<String> buffer = new ArrayList<>();
         List<String> intBuffer = new ArrayList<>();
 
-        boolean inBracket = false;
         for (String s : input.split("")) {
             if (s.matches("\\d")) {
                 intBuffer.add(s);
@@ -535,9 +548,7 @@ public class ContainerUtil {
             if (s.matches(OPERATORS_PATTERN) && buffer.size() != 0) {
                 if (s.equals("(")) {
                     buffer.add(s);
-                    inBracket = true;
                 } else if (s.equals(")")) {
-                    inBracket = false;
                     int firstLeftBracket = buffer.indexOf("(");
                     List<String> push = buffer.subList(0,firstLeftBracket);
                     output.addAll(push);
