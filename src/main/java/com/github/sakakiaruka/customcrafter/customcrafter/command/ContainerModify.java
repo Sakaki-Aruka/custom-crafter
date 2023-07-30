@@ -20,9 +20,9 @@ public class ContainerModify {
 
     public static final String CONTAINER_KEY_PATTERN = "^([a-z0-9\\.\\-_]{1,255})$";
     public static final String CONTAINER_OPERATION_PATTERN = "^(\\+|\\-|/|\\*)$";
-    public static final String CONTAINER_DATATYPE_PATTERN = "^(?i)(string|int)$";
-    public static final String NUMBERS_PATTERN = "^([\\-0-9]+)$";
-    public static final String NUMBERS_ALPHABET = "^([\\-\\w\\d]+)$";
+    public static final String CONTAINER_DATATYPE_PATTERN = "^(?i)(string|int|double)$";
+    public static final String NUMBERS_PATTERN = "^([\\-0-9\\.]+)$";
+    public static final String NUMBERS_ALPHABET = "^([\\-\\w\\d\\.]+)$";
     // this class provides add (set), remove, value-modify
     /*
     * all argument combinations:
@@ -76,10 +76,20 @@ public class ContainerModify {
         }
 
         Object value = args[4];
-        int iValue = 0;
+        int intValue = 0;
+        double doubleValue = 0d;
         if (type.equals(PersistentDataType.INTEGER)) {
             try{
-                iValue = Integer.valueOf(String.valueOf(value));
+                intValue = Integer.valueOf(String.valueOf(value));
+            }catch (Exception e) {
+                sender.sendMessage("Container "+modifyType+" > The provided value is not a number.");
+                return;
+            }
+        }
+
+        if (type.equals(PersistentDataType.DOUBLE)) {
+            try{
+                doubleValue = Double.valueOf(String.valueOf(value));
             }catch (Exception e) {
                 sender.sendMessage("Container "+modifyType+" > The provided value is not a number.");
                 return;
@@ -89,7 +99,9 @@ public class ContainerModify {
         if (type.equals(PersistentDataType.STRING)) {
             container.set(key, type, value);
         } else if (type.equals(PersistentDataType.INTEGER)) {
-            container.set(key, type, iValue);
+            container.set(key, type, intValue);
+        } else if (type.equals(PersistentDataType.DOUBLE)) {
+            container.set(key, type, doubleValue);
         }
 
         item.setItemMeta(meta);

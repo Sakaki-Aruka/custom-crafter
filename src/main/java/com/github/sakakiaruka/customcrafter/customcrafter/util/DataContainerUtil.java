@@ -13,8 +13,10 @@ import java.util.Map;
 public class DataContainerUtil{
     public PersistentDataType getDataType(String input) {
         if (input.equalsIgnoreCase("BOOLEAN")) return PersistentDataType.BYTE;
+        // deprecated
         if (input.equalsIgnoreCase("INTEGER")) return PersistentDataType.INTEGER;
         if (input.equalsIgnoreCase("STRING")) return PersistentDataType.STRING;
+        if (input.equalsIgnoreCase("DOUBLE")) return PersistentDataType.DOUBLE;
         return null;
     }
 

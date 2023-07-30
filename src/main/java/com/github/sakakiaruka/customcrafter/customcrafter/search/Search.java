@@ -114,7 +114,7 @@ public class Search {
             vTotal += i;
         }
 
-        if (!new ContainerUtil().isPassRecipe(recipe, input)) return false;
+        //if (!new ContainerUtil().isPassRecipe(recipe, input)) return false;
 
         new InventoryUtil().snatchFromVirtual(virtual,massList,true);
         new InventoryUtil().snatchFromVirtual(virtual,normalList,false);
