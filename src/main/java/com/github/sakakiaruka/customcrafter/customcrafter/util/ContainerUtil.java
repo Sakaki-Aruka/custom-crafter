@@ -94,6 +94,45 @@ public class ContainerUtil {
         return true;
     }
 
+    public boolean amorphousContainerCongruence(Recipe r, Recipe i) {
+        // Key -> candidate
+        // value -> each material's container
+        Map<List<Material>, List<List<ContainerWrapper>>> recipeRelations = getRelations(r);
+        Map<List<Material>, List<List<ContainerWrapper>>> inputRelations = getRelations(i);
+
+        if (recipeRelations.isEmpty()) return true;
+        if (!recipeRelations.isEmpty() && inputRelations.isEmpty()) return false;
+        if (inputRelations.size() < recipeRelations.size()) return false;
+
+        for (Map.Entry<List<Material>,List<List<ContainerWrapper>>> e : recipeRelations.entrySet()) {
+            List<Material> recipeCandidate = e.getKey();
+            List<List<ContainerWrapper>> recipeContainers = e.getValue();
+            List<List<ContainerWrapper>> inputContainers = inputRelations.get(recipeCandidate);
+            if (inputContainers.size() < getNeededElementsCount(recipeContainers)) return false;
+
+            Map<Integer, List<Integer>> matched = new HashMap<>();
+            for (int j=0;j< recipeContainers.size();j++) {
+                List<ContainerWrapper> R = recipeContainers.get(j);
+                List<ContainerWrapper> I = inputContainers.get(j);
+            }
+        }
+    }
+
+
+
+    private Map<List<Material>, List<List<ContainerWrapper>>> getRelations(Recipe in) {
+        Map<List<Material>, List<List<ContainerWrapper>>> result = new HashMap<>();
+        for (Matter matter : in.getContentsNoAir()) {
+            if (!matter.hasContainer()) continue;
+            List<ContainerWrapper> temporary = new ArrayList<>();
+            matter.getContainerWrappers().entrySet().forEach(s->temporary.add(s.getValue()));
+
+            if (!result.containsKey(matter.getCandidate())) result.put(matter.getCandidate(), new ArrayList<>());
+            result.get(matter.getCandidate()).add(temporary);
+        }
+        return result;
+    }
+
     public boolean isPass(ItemStack item, Matter matter) {
         // item -> target, matter -> source (recipe)
         // matter > item
@@ -117,6 +156,8 @@ public class ContainerUtil {
 
         ItemMeta meta = item.getItemMeta();
         PersistentDataContainer container = meta.getPersistentDataContainer();
+        if (container.isEmpty() && !hasNeededElements(matter)) return true;
+        if (container.isEmpty() && hasNeededElements(matter)) return false;
 
         for (Map.Entry<Integer, ContainerWrapper> entry : matter.getContainerWrappers().entrySet()) {
             String tag = entry.getValue().getTag();
@@ -140,6 +181,12 @@ public class ContainerUtil {
                 }
                 if (!multiTagCongruence(wrapper, container)) return false;
                 continue;
+            }
+
+            if (tag.equals(ALLOW_VALUE)) if (!container.has(key, type)) return false;
+            if (tag.equals(DENY_VALUE)) {
+
+                if (!container.has(key, type)) continue;
             }
 
             //debug
@@ -174,18 +221,39 @@ public class ContainerUtil {
                 if (matcher.matches() == isAllow) continue;
                 return false;
 
-            } else if (type.equals(PersistentDataType.INTEGER)) {
+            } else if (type.equals(PersistentDataType.INTEGER) || type.equals(PersistentDataType.DOUBLE)){
                 PersistentDataType valueType;
                 if ((valueType = getSpecifiedKeyType(container, key)) == null) return false;
-                if (!valueType.equals(PersistentDataType.INTEGER)) return false;
+                if (!valueType.equals(type)) return false;
                 String element = String.valueOf(container.get(key, type));
-                if (element.matches(ContainerModify.NUMBERS_PATTERN)) return false;
+                if (!element.matches(ContainerModify.NUMBERS_PATTERN)) return false;
 
-                int current = Integer.valueOf(value);
-                int containerHas = Integer.valueOf(element);
+                double current = Double.valueOf(value);
+                double containerHas = Double.valueOf(element);
                 if ((current == containerHas) == isAllow) continue;
                 return false;
             }
+                //
+//            }else if (type.equals(PersistentDataType.INTEGER)) {
+//                PersistentDataType valueType;
+//                if ((valueType = getSpecifiedKeyType(container, key)) == null) return false;
+//                if (!valueType.equals(PersistentDataType.INTEGER)) return false;
+//                String element = String.valueOf(container.get(key, type));
+//                if (!element.matches(ContainerModify.NUMBERS_PATTERN)) return false;
+//
+//                int current = Integer.valueOf(value);
+//                int containerHas = Integer.valueOf(element);
+//                if ((current == containerHas) == isAllow) continue;
+//                return false;
+//            } else if (type.equals(PersistentDataType.DOUBLE)) {
+//                PersistentDataType valueType;
+//                if ((valueType = getSpecifiedKeyType(container, key)) == null) return false;
+//                if (!valueType.equals(PersistentDataType.DOUBLE)) return false;
+//                String element = String.valueOf(container.get(key, type));
+//                if (!element.matches(ContainerModify.NUMBERS_PATTERN)) return false;
+//
+//                double current = Double.valueOf()
+//            }
         }
         return true;
     }
@@ -237,11 +305,26 @@ public class ContainerUtil {
         return false;
     }
 
-    private boolean vContainerContainsOnlyStore(AmorphousVirtualContainer vContainer) {
-        for (String tag : vContainer.getTags()) {
-            if (!tag.equals(STORE_ONLY)) return false;
+
+    private boolean hasNeededElements(Matter matter) {
+        if (!matter.hasContainer()) return false;
+        for (Map.Entry<Integer, ContainerWrapper> entry : matter.getContainerWrappers().entrySet()) {
+            String tag = entry.getValue().getTag();
+
+            if (tag.equals(ALLOW_TAG) || tag.equals(ALLOW_VALUE)) return true;
         }
-        return true;
+        return false;
+    }
+
+    private int getNeededElementsCount(List<List<ContainerWrapper>> in) {
+        int result = 0;
+        for (List<ContainerWrapper> a : in) {
+            for (ContainerWrapper b : a) {
+                String tag = b.getTag();
+                if (tag.equals(ALLOW_TAG) || tag.equals(ALLOW_VALUE)) result++;
+            }
+        }
+        return result;
     }
 
 
@@ -268,8 +351,8 @@ public class ContainerUtil {
         }
         /*
         * examples
-        * _1+1<-->10
-        * _1<-->_3
+        * $store_1+$store_2<-->10
+        * $store_1<-->$store_3
         *
         * $[KeyName]+1<-->$[KeyName]+1
          */
