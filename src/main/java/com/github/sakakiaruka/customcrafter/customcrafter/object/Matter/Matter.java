@@ -1,15 +1,15 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.object.Matter;
 
 import com.github.sakakiaruka.customcrafter.customcrafter.interfaces.Matters;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.ContainerWrapper;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
+import org.bukkit.persistence.PersistentDataType;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.nl;
 
@@ -19,6 +19,8 @@ public class Matter implements Matters {
     private List<EnchantWrap> wrap;
     private int amount;
     private boolean mass;
+    private Map<Integer, ContainerWrapper> container;
+
     public Matter(String name,List<Material> candidate,List<EnchantWrap> wrap,int amount,boolean mass){
         this.name = name;
         this.candidate = candidate;
@@ -190,11 +192,37 @@ public class Matter implements Matters {
 
     public String info(){
         StringBuilder builder = new StringBuilder();
-        builder.append(String.format("name : %s"+nl,name.isEmpty() ? candidate.get(0).name() : name));
+        builder.append(String.format("name : %s"+nl,name != null && !name.isEmpty() ? candidate.get(0).name() : name));
         builder.append(String.format("candidate : %s"+nl,candidate.toString()));
         builder.append(String.format("wrap : %s",hasWrap() ? getAllWrapInfo() : "null"+nl));
         builder.append(String.format("amount : %d"+nl,amount));
         builder.append(String.format("mass : %b"+nl,isMass()));
+        if (container == null || container.isEmpty()) builder.append("container: No contents in the container."+nl);
+        else {
+            container.entrySet().forEach(s->builder.append("container: "+nl+s.getValue().info()+nl));
+        }
         return builder.toString();
+    }
+
+    public boolean hasContainer() {
+        return container != null && !container.isEmpty();
+    }
+
+
+    public Map<Integer, ContainerWrapper> getContainerWrappers() {
+        return container;
+    }
+
+    public void setContainerWrappers(Map<Integer, ContainerWrapper> elements) {
+        this.container = elements;
+    }
+
+    public Map<Integer, ContainerWrapper> containerElementsDeepCopy() {
+        Map<Integer, ContainerWrapper> map = new HashMap<>();
+        if (!hasContainer()) return map;
+        for (Map.Entry<Integer, ContainerWrapper> entry : this.container.entrySet()) {
+            map.put(entry.getKey(), entry.getValue());
+        }
+        return map;
     }
 }

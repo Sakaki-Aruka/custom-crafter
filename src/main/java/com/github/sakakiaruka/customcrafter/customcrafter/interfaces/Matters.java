@@ -1,10 +1,12 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.interfaces;
 
+import com.github.sakakiaruka.customcrafter.customcrafter.object.ContainerWrapper;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantWrap;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 
 import java.util.List;
+import java.util.Map;
 
 public interface Matters {
     String getName();
@@ -25,4 +27,8 @@ public interface Matters {
     String getAllWrapInfo();
     boolean contains(Enchantment enchantment);
     String info();
+
+    Map<Integer, ContainerWrapper> getContainerWrappers();
+    void setContainerWrappers(Map<Integer, ContainerWrapper> elements);
+    boolean hasContainer();
 }

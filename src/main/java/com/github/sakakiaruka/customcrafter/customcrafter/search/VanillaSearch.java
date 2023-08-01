@@ -4,9 +4,11 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordina
 import com.github.sakakiaruka.customcrafter.customcrafter.util.InventoryUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Server;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.event.inventory.InventoryType;
+import org.bukkit.inventory.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,7 +26,10 @@ public class VanillaSearch {
 
         ItemStack[] itemStack = getItemStacks(inventory,coordinates.get(0));
         ItemStack[] itemStacks = itemStack.clone();
-        ItemStack result = Bukkit.craftItem(itemStack,player.getWorld(),player);
+
+        org.bukkit.inventory.Recipe recipe = Bukkit.getCraftingRecipe(itemStacks.clone(), player.getWorld());
+        if (recipe == null) return; // the system could not find the recipe
+        ItemStack result = recipe.getResult();
 
 
         if(result == null)return;

@@ -1,12 +1,16 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.object.Result;
 
+import com.github.sakakiaruka.customcrafter.customcrafter.object.ContainerWrapper;
+import com.github.sakakiaruka.customcrafter.customcrafter.util.DataContainerUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.PotionUtil;
 import org.bukkit.Color;
+import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -22,14 +26,24 @@ public class Result {
     private Map<MetadataType, List<String>> metadata;
     private String nameOrRegex;
     private int matchPoint;
+    private List<ContainerWrapper> dataContainer;
 
-    public Result(String name,Map<Enchantment,Integer> enchantsInfo,int amount,Map<MetadataType,List<String>> metadata,String nameOrRegex,int matchPoint){
+    public Result(String name,Map<Enchantment,Integer> enchantsInfo,int amount,Map<MetadataType,List<String>> metadata,String nameOrRegex,int matchPoint, List<ContainerWrapper> dataContainer){
         this.name = name;
         this.enchantsInfo = enchantsInfo;
         this.amount = amount;
         this.metadata = metadata;
         this.nameOrRegex = nameOrRegex;
         this.matchPoint = matchPoint;
+        this.dataContainer = dataContainer;
+    }
+
+    public List<ContainerWrapper> getDataContainer() {
+        return dataContainer;
+    }
+
+    public void setDataContainer(List<ContainerWrapper> dataContainer) {
+        this.dataContainer = dataContainer;
     }
 
     public String getName() {
@@ -83,6 +97,9 @@ public class Result {
     public void setMetaData(ItemStack item){
         if(metadata==null || metadata.isEmpty()) return;
         ItemMeta meta = item.getItemMeta();
+
+        new DataContainerUtil().addAllData(item, this.dataContainer);
+
         for(Map.Entry<MetadataType,List<String>> entry : metadata.entrySet()){
             /*
             * kind of metadata -> lore, displayName, enchantment, itemFlag, unbreakable, customModelData, PotionData, PotionColor

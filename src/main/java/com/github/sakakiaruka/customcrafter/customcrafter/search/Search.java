@@ -1,5 +1,7 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.search;
 
+import com.github.sakakiaruka.customcrafter.customcrafter.command.Show;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.ContainerWrapper;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantStrict;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantWrap;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
@@ -9,16 +11,16 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Permission.Reci
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordinate;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Tag;
-import com.github.sakakiaruka.customcrafter.customcrafter.util.EnchantUtil;
-import com.github.sakakiaruka.customcrafter.customcrafter.util.InventoryUtil;
-import com.github.sakakiaruka.customcrafter.customcrafter.util.PotionUtil;
-import com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil;
+import com.github.sakakiaruka.customcrafter.customcrafter.util.*;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataContainer;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -34,6 +36,8 @@ public class Search {
         Recipe result = null;
         int massAmount = 0;
         Recipe input = toRecipe(inventory);
+        List<ItemStack> interestedItems = getInterestedAreaItems(inventory);
+
         Top:for(Recipe recipe:recipes){
 
             if(recipe.hasPermission()){ // permission check
@@ -52,6 +56,7 @@ public class Search {
                     Matter recipeMatter = recipe.getContentsNoAir().get(i);
                     Matter inputMatter = input.getContentsNoAir().get(i);
 
+                    if (!new ContainerUtil().isPass(interestedItems.get(i), recipeMatter)) continue Top;
 
                     //debug (amount one virtual test)
                     Matter recipeOne = recipeMatter.oneCopy();
@@ -109,6 +114,13 @@ public class Search {
             vTotal += i;
         }
 
+        //if (!new ContainerUtil().isPassRecipe(recipe, input)) return false;
+
+        //debug
+        System.out.println("amorphous container: "+new ContainerUtil().amorphousContainerCongruence(recipe, input));
+
+        if (!new ContainerUtil().amorphousContainerCongruence(recipe, input)) return false;
+
         new InventoryUtil().snatchFromVirtual(virtual,massList,true);
         new InventoryUtil().snatchFromVirtual(virtual,normalList,false);
         if(containsMinus(virtual)) return false;
@@ -148,6 +160,12 @@ public class Search {
                 Matter normal = new Matter(Arrays.asList(material),0,false);
                 int m = (result.containsKey(mass) ? result.get(mass) : 0) + 1;
                 int n = (result.containsKey(normal) ? result.get(normal) : 0) + matter.getAmount();
+
+                // about container data
+                Map<Integer, ContainerWrapper> containerElements = matter.containerElementsDeepCopy();
+                mass.setContainerWrappers(containerElements); // set container data
+                normal.setContainerWrappers(containerElements); // set container data
+
                 result.put(mass,m);
                 result.put(normal,n);
             }
@@ -228,6 +246,8 @@ public class Search {
         if(item.getType().equals(Material.AIR))return;
 
         whatMaking.put(player.getUniqueId(),item.getType());
+
+        // TODO: write modify Container elements code here #53
 
         //debug
         if(inventory.getItem(craftingTableResultSlot) == null){
@@ -409,6 +429,18 @@ public class Search {
         return true;
     }
 
+    private List<ItemStack> getInterestedAreaItems(Inventory inventory) {
+        List<ItemStack> list = new ArrayList<>();
+        for (int y=0;y<craftingTableSize;y++) {
+            for (int x=0;x<craftingTableSize;x++) {
+                int i = x+y*9;
+                if (inventory.getItem(i) == null) continue;
+                list.add(inventory.getItem(i));
+            }
+        }
+        return list;
+    }
+
     private Recipe toRecipe(Inventory inventory){
         Recipe recipe = new Recipe();
         for(int y=0;y<craftingTableSize;y++){
@@ -431,6 +463,10 @@ public class Search {
                         matter.addWrap(wrap);
                     }
                 }
+                //debug
+                new ContainerUtil().setContainerDataItemStackToMatter(inventory.getItem(i), matter);
+//                System.out.println("matter info: "+nl+matter.info());
+
                 recipe.addCoordinate(x,y,matter);
             }
         }
