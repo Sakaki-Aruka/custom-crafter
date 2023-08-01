@@ -116,6 +116,11 @@ public class Search {
 
         //if (!new ContainerUtil().isPassRecipe(recipe, input)) return false;
 
+        //debug
+        System.out.println("amorphous container: "+new ContainerUtil().amorphousContainerCongruence(recipe, input));
+
+        if (!new ContainerUtil().amorphousContainerCongruence(recipe, input)) return false;
+
         new InventoryUtil().snatchFromVirtual(virtual,massList,true);
         new InventoryUtil().snatchFromVirtual(virtual,normalList,false);
         if(containsMinus(virtual)) return false;

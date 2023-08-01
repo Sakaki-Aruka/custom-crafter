@@ -40,6 +40,9 @@ public class ContainerUtil {
     private static final String SMALLER_PATTERN = "<([0-9a-zA-Z\\+\\-\\*/\\(\\)\\$_]+)";
     private static final String CONTAINER_OPERATION_PATTERN = "([\\+\\-/\\*])";
 
+    private static final String MULTI_VALUE_PATTERN = "^\\(multi\\)\\(types:(.+)\\)(.+)$";
+    private static final String MULTI_VALUE_CLASS_PATTERN = "([\\w]+)\\*([\\d]+)";
+
     public PersistentDataType getDataType(String input) {
         if (input.equalsIgnoreCase("string")) return PersistentDataType.STRING;
         if (input.equalsIgnoreCase("int")) return PersistentDataType.INTEGER;
@@ -94,43 +97,49 @@ public class ContainerUtil {
         return true;
     }
 
+
     public boolean amorphousContainerCongruence(Recipe r, Recipe i) {
-        // Key -> candidate
-        // value -> each material's container
-        Map<List<Material>, List<List<ContainerWrapper>>> recipeRelations = getRelations(r);
-        Map<List<Material>, List<List<ContainerWrapper>>> inputRelations = getRelations(i);
+        List<Matter> recipes = r.getContentsNoAir();
+        List<Matter> inputs = i.getContentsNoAir();
 
-        if (recipeRelations.isEmpty()) return true;
-        if (!recipeRelations.isEmpty() && inputRelations.isEmpty()) return false;
-        if (inputRelations.size() < recipeRelations.size()) return false;
 
-        for (Map.Entry<List<Material>,List<List<ContainerWrapper>>> e : recipeRelations.entrySet()) {
-            List<Material> recipeCandidate = e.getKey();
-            List<List<ContainerWrapper>> recipeContainers = e.getValue();
-            List<List<ContainerWrapper>> inputContainers = inputRelations.get(recipeCandidate);
-            if (inputContainers.size() < getNeededElementsCount(recipeContainers)) return false;
+        A:for (int j=0;j<recipes.size();j++) {
+            Matter recipe = recipes.get(j);
+            if (!recipe.hasContainer()) continue;
 
-            Map<Integer, List<Integer>> matched = new HashMap<>();
-            for (int j=0;j< recipeContainers.size();j++) {
-                List<ContainerWrapper> R = recipeContainers.get(j);
-                List<ContainerWrapper> I = inputContainers.get(j);
+            B:for (int k=0;k<inputs.size();k++) {
+                Matter input = inputs.get(k);
+                List<ContainerWrapper> wrappers = new ArrayList<>(recipe.getContainerWrappers().values());
+                List<ContainerWrapper> has = new ArrayList<>(input.getContainerWrappers().values());
+                if (!getContainerListCongruence(wrappers, has)) continue B;
+                continue A;
             }
+            return false;
         }
+        return true;
     }
 
-
-
-    private Map<List<Material>, List<List<ContainerWrapper>>> getRelations(Recipe in) {
-        Map<List<Material>, List<List<ContainerWrapper>>> result = new HashMap<>();
-        for (Matter matter : in.getContentsNoAir()) {
-            if (!matter.hasContainer()) continue;
-            List<ContainerWrapper> temporary = new ArrayList<>();
-            matter.getContainerWrappers().entrySet().forEach(s->temporary.add(s.getValue()));
-
-            if (!result.containsKey(matter.getCandidate())) result.put(matter.getCandidate(), new ArrayList<>());
-            result.get(matter.getCandidate()).add(temporary);
+    private boolean getContainerListCongruence(List<ContainerWrapper> recipe, List<ContainerWrapper> in) {
+        ItemStack dummyItemStack = new ItemStack(Material.STONE);
+        ItemMeta meta = dummyItemStack.getItemMeta();
+        PersistentDataContainer dummyContainer = meta.getPersistentDataContainer();
+        for (ContainerWrapper wrapper : in) {
+            NamespacedKey key = wrapper.getKey();
+            PersistentDataType type = wrapper.getType();
+            String stringValue = wrapper.getValue();
+            if (type.equals(PersistentDataType.STRING)) dummyContainer.set(key, type, stringValue);
+            if (type.equals(PersistentDataType.INTEGER)) dummyContainer.set(key, type, Integer.valueOf(stringValue));
+            if (type.equals(PersistentDataType.DOUBLE)) dummyContainer.set(key, type, Double.valueOf(stringValue));
         }
-        return result;
+        dummyItemStack.setItemMeta(meta);
+
+        Matter dummyMatter = new Matter(new ItemStack(Material.STONE));
+        Map<Integer, ContainerWrapper> map = new HashMap<>();
+        for (int i=0;i<recipe.size();i++) {
+            map.put(i, recipe.get(i));
+        }
+        dummyMatter.setContainerWrappers(map);
+        return isPass(dummyItemStack, dummyMatter);
     }
 
     public boolean isPass(ItemStack item, Matter matter) {
@@ -233,27 +242,6 @@ public class ContainerUtil {
                 if ((current == containerHas) == isAllow) continue;
                 return false;
             }
-                //
-//            }else if (type.equals(PersistentDataType.INTEGER)) {
-//                PersistentDataType valueType;
-//                if ((valueType = getSpecifiedKeyType(container, key)) == null) return false;
-//                if (!valueType.equals(PersistentDataType.INTEGER)) return false;
-//                String element = String.valueOf(container.get(key, type));
-//                if (!element.matches(ContainerModify.NUMBERS_PATTERN)) return false;
-//
-//                int current = Integer.valueOf(value);
-//                int containerHas = Integer.valueOf(element);
-//                if ((current == containerHas) == isAllow) continue;
-//                return false;
-//            } else if (type.equals(PersistentDataType.DOUBLE)) {
-//                PersistentDataType valueType;
-//                if ((valueType = getSpecifiedKeyType(container, key)) == null) return false;
-//                if (!valueType.equals(PersistentDataType.DOUBLE)) return false;
-//                String element = String.valueOf(container.get(key, type));
-//                if (!element.matches(ContainerModify.NUMBERS_PATTERN)) return false;
-//
-//                double current = Double.valueOf()
-//            }
         }
         return true;
     }
@@ -268,17 +256,14 @@ public class ContainerUtil {
             if (tag.equals(DENY_TAG)) return !container.has(key, type);
         }
 
-        Matcher subStringMatcher = Pattern.compile("\\(.+\\)([\\w-,_]+)").matcher(value);
-        if (!subStringMatcher.matches()) return false;
-        String valueCopy = subStringMatcher.group(1);
-
-        List<String> keyTypes = new ArrayList<>();
-        Matcher matcher = Pattern.compile(".+types:([\\w\\d,\\*]+).+").matcher(value);
+        Matcher matcher = Pattern.compile(MULTI_VALUE_PATTERN).matcher(value.replace(" ",""));
         if (!matcher.matches()) return false;
-        String types = matcher.group(1);
+        List<String> types = new ArrayList<>(Arrays.asList(matcher.group(1).split(",")));
+        List<String> variables = new ArrayList<>(Arrays.asList(matcher.group(2).split(",")));
+        List<String> keyTypes = new ArrayList<>();
 
-        for (String s : types.replace(" ","").split(",")) {
-            Matcher m = Pattern.compile("([\\w]+)\\*([\\d]+)").matcher(s);
+        for (String s : types) {
+            Matcher m = Pattern.compile(MULTI_VALUE_CLASS_PATTERN).matcher(s);
             if (!m.matches()) return false;
 
             String currentType = m.group(1);
@@ -286,25 +271,16 @@ public class ContainerUtil {
             keyTypes.addAll(Collections.nCopies(times, currentType));
         }
 
-        if (valueCopy.split(",").length != keyTypes.size()) return false;
+        if (variables.size() != keyTypes.size()) return false;
 
-        for (int i=0;i<valueCopy.split(",").length;i++) {
-            NamespacedKey temporaryKey = new NamespacedKey(getInstance(), valueCopy.split(",")[i]);
+        for (int i=0;i<variables.size();i++) {
+            NamespacedKey temporaryKey = new NamespacedKey(getInstance(), variables.get(i));
             PersistentDataType temporaryType = getDataType(keyTypes.get(i));
             if (tag.equals(ALLOW_TAG) && !container.has(temporaryKey, temporaryType)) return false;
             if (tag.equals(DENY_TAG) && container.has(temporaryKey, temporaryType)) return false;
         }
         return true;
     }
-
-    private boolean matterContainsSpecifiedKey(NamespacedKey key, Matter matter) {
-        for (Map.Entry<Integer, ContainerWrapper> entry : matter.getContainerWrappers().entrySet()) {
-            NamespacedKey rKey = entry.getValue().getKey();
-            if (key.getKey().equals(rKey.getKey())) return true;
-        }
-        return false;
-    }
-
 
     private boolean hasNeededElements(Matter matter) {
         if (!matter.hasContainer()) return false;
@@ -315,18 +291,6 @@ public class ContainerUtil {
         }
         return false;
     }
-
-    private int getNeededElementsCount(List<List<ContainerWrapper>> in) {
-        int result = 0;
-        for (List<ContainerWrapper> a : in) {
-            for (ContainerWrapper b : a) {
-                String tag = b.getTag();
-                if (tag.equals(ALLOW_TAG) || tag.equals(ALLOW_VALUE)) result++;
-            }
-        }
-        return result;
-    }
-
 
 
 
@@ -360,7 +324,7 @@ public class ContainerUtil {
         double end = getFormulaValue(matcher.group(2), container);
 
         //debug
-        String info = "ArrowRange | start: "+start+" / end: "+end;
+        String info = "ArrowRange | start: "+start+" / end: "+end+" / element: "+element;
         JavaPlugin.getPlugin(getInstance().getClass()).getLogger().info(info);
 
         if (tag.equals(ALLOW_VALUE)) {
