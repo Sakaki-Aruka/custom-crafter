@@ -610,7 +610,7 @@ public class ContainerUtil {
         return builder.toString();
     }
 
-    public void setRecipeDatContainerToResultItem(ItemStack item, Recipe input, Recipe recipe) {
+    public void setRecipeDataContainerToResultItem(ItemStack item, Recipe input, Recipe recipe) {
         // String -> NK, List<String> -> each containers data
         Map<String, List<String>> stringTypeData = new HashMap<>();
         Map<String, List<Double>> numericTypeData = new HashMap<>();
