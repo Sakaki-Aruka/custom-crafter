@@ -1,5 +1,6 @@
 package com.github.sakakiaruka.customcrafter.customcrafter;
 
+import com.github.sakakiaruka.customcrafter.customcrafter.listener.ModifyCraftingInventory;
 import com.github.sakakiaruka.customcrafter.customcrafter.listener.OpenCraftingTable;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.ContainerWrapper;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantStrict;
@@ -9,6 +10,8 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.PotionStrict;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.Potions;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Permission.RecipePermission;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Container.RecipeDataContainer;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Container.RecipeDataContainerModifyType;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordinate;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.MetadataType;
@@ -606,7 +609,28 @@ public class SettingsLoad {
                 permission = recipePermissionMap.containsKey(key) ? recipePermissionMap.get(key) : null;
             }
 
-            Recipe recipe = new Recipe(name,tag,coordinates,returns,result,permission);
+            Map<NamespacedKey, List<RecipeDataContainer>> map = new HashMap<>();
+            if (config.contains("container_modify")) {
+                int counter = 0;
+
+                while (true) {
+                    String address = "container_modify."+counter+".";
+                    if (!config.contains(address)) break;
+                    NamespacedKey key = new NamespacedKey(getInstance(), config.getString(address+"key"));
+                    RecipeDataContainerModifyType modifyType = RecipeDataContainerModifyType.valueOf(config.getString(address+"modify_type"));
+                    PersistentDataType type = new ContainerUtil().getDataType(config.getString(address+"type"));
+                    String term = config.getString(address+"term");
+                    String action = config.getString(address+"action");
+                    boolean end = config.getBoolean(address+"return");
+                    counter++;
+                    RecipeDataContainer data = new RecipeDataContainer(type, term, action, end, modifyType);
+
+                    if (!map.containsKey(key)) map.put(key, new ArrayList<>());
+                    map.get(key).add(data);
+                }
+            }
+
+            Recipe recipe = new Recipe(name, tag, coordinates, returns, result, permission, map);
             recipes.add(recipe);
             namedRecipes.put(name,recipe);
         }

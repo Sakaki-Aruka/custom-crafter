@@ -2,8 +2,10 @@ package com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe;
 
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Permission.RecipePermission;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Container.RecipeDataContainer;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.Result;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.Permission;
 
@@ -16,13 +18,16 @@ public class Recipe {
     private Map<Material, ItemStack> returnItems;
     private RecipePermission permission;
     private Result result;
-    public Recipe(String name,String tag,Map<Coordinate,Matter> coordinate,Map<Material,ItemStack> returnItems,Result result, RecipePermission permission){
+    private Map<NamespacedKey, List<RecipeDataContainer>> container;
+
+    public Recipe(String name,String tag,Map<Coordinate,Matter> coordinate,Map<Material,ItemStack> returnItems,Result result, RecipePermission permission, Map<NamespacedKey, List<RecipeDataContainer>> container){
         this.name = name;
         this.tag = Tag.valueOf(tag);
         this.coordinate = coordinate;
         this.returnItems = returnItems;
         this.result = result;
         this.permission = permission;
+        this.container = container;
     }
 
     public Recipe(){ //only used for temporary (mainly real) -> tag is "Normal"
@@ -152,5 +157,19 @@ public class Recipe {
             if (matter.hasContainer()) result++;
         }
         return result;
+    }
+
+    public Map<NamespacedKey, List<RecipeDataContainer>> getContainer() {
+        return container;
+    }
+
+    public void setContainer(Map<NamespacedKey, List<RecipeDataContainer>> container) {
+        this.container = container;
+    }
+
+    public boolean hasContainer() {
+        if (this.container == null) return false;
+        if (this.container.isEmpty()) return false;
+        return true;
     }
 }

@@ -4,6 +4,8 @@ import com.github.sakakiaruka.customcrafter.customcrafter.command.ContainerModif
 import com.github.sakakiaruka.customcrafter.customcrafter.object.AmorphousVirtualContainer;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.ContainerWrapper;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Container.RecipeDataContainer;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Container.RecipeDataContainerModifyType;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -36,9 +38,14 @@ public class ContainerUtil {
     private static final String OPERATORS_PATTERN = "\\+|-|\\*|/|\\(|\\)";
     private static final String ORDER_NUMBER_PATTERN = "_\\d{1,2}";
     private static final String ARROW_RANGE_PATTERN = "^([0-9a-zA-Z\\+\\-\\*/\\(\\)\\$_]+)<-->([0-9a-zA-Z\\+\\-\\*/\\(\\)\\$_]+)$";
-    private static final String LARGER_PATTERN = "([0-9a-zA-Z\\+\\-\\*/\\(\\)\\$_]+)<";
+    private static final String LARGER_PATTERN = "^([0-9a-zA-Z\\+\\-\\*/\\(\\)\\$_]+)<$";
     private static final String SMALLER_PATTERN = "<([0-9a-zA-Z\\+\\-\\*/\\(\\)\\$_]+)";
-    private static final String CONTAINER_OPERATION_PATTERN = "([\\+\\-/\\*])";
+    private static final String CONTAINER_OPERATION_PATTERN = "([\\+\\-/\\*\\^])";
+
+    private static final String RECIPE_CONTAINER_ARROW_RANGE_PATTERN = "^([0-9a-zA-Z\\+\\-\\*/\\(\\)\\$_\\[\\]]+)<--\\[(maximum|minimum|median|mode|average|random)\\]-->([0-9a-zA-Z\\+\\-\\*/\\(\\)\\$_\\[\\]]+)$";
+    private static final String RECIPE_CONTAINER_LARGER_PATTERN = "^([0-9a-zA-Z\\+\\-\\*/\\(\\)\\$_\\[\\]]+)<\\[(maximum|minimum|median|mode|average|random)\\]$";
+    private static final String RECIPE_CONTAINER_SMALLER_PATTERN = "^\\[(maximum|minimum|median|mode|average|random)\\]<([0-9a-zA-Z\\+\\-\\*/\\(\\)\\$_\\[\\]]+)$";
+    private static final String RECIPE_CONTAINER_EQUAL_PATTERN = "^\\[(maximum|minimum|median|mode|average|random)\\]==([0-9a-zA-Z\\+\\-\\*/\\(\\)\\$_\\[\\]]+)$";
 
     private static final String MULTI_VALUE_PATTERN = "^\\(multi\\)\\(types:(.+)\\)(.+)$";
     private static final String MULTI_VALUE_CLASS_PATTERN = "([\\w]+)\\*([\\d]+)";
@@ -601,5 +608,193 @@ public class ContainerUtil {
             builder.append(bar+nl);
         }
         return builder.toString();
+    }
+
+    public void setRecipeDataContainerToResultItem(ItemStack item, Recipe input, Recipe recipe) {
+        // String -> NK, List<String> -> each containers data
+        Map<String, List<String>> stringTypeData = new HashMap<>();
+        Map<String, List<Double>> numericTypeData = new HashMap<>();
+        for (Matter matter : input.getContentsNoAir()) {
+            if (!matter.hasContainer()) continue;
+            for (Map.Entry<Integer, ContainerWrapper> entry : matter.getContainerWrappers().entrySet()) {
+                String key = entry.getValue().getKey().toString();
+                String value = entry.getValue().getValue();
+                PersistentDataType type = entry.getValue().getType();
+                if (type.equals(PersistentDataType.STRING)) {
+                    if (!stringTypeData.containsKey(key)) stringTypeData.put(key, new ArrayList<>());
+                    stringTypeData.get(key).add(value);
+                } else if (type.equals(PersistentDataType.INTEGER) || type.equals(PersistentDataType.DOUBLE)) {
+                    if (!numericTypeData.containsKey(key)) numericTypeData.put(key, new ArrayList<>());
+                    numericTypeData.get(key).add(Double.valueOf(value));
+                }
+            }
+        }
+        //---
+        Map<String, Map<String, Double>> derivedMap = getDerivedValues(numericTypeData);
+
+        //debug
+        System.out.println("stringTypeData: "+stringTypeData);
+        System.out.println("numericTypeData: "+numericTypeData);
+        derivedMap.entrySet().forEach(s->System.out.println("derivedMap: "+s.getKey()+" / "+s.getValue()));
+
+        ItemMeta meta = item.getItemMeta();
+        PersistentDataContainer container = meta.getPersistentDataContainer();
+        for (Map.Entry<NamespacedKey, List<RecipeDataContainer>> entry : recipe.getContainer().entrySet()) {
+            NamespacedKey key = entry.getKey();
+            for (RecipeDataContainer rdc : entry.getValue()) {
+                PersistentDataType type = rdc.getDataType();
+                RecipeDataContainerModifyType modifyType = rdc.getModifyType();
+                String term = rdc.getTerm();
+                String action = rdc.getAction();
+                boolean isEnd = rdc.isEnd();
+                boolean isNumeric = type.equals(PersistentDataType.INTEGER) || type.equals(PersistentDataType.DOUBLE);
+
+                if (modifyType.equals(RecipeDataContainerModifyType.MAKE)) {
+                    if (type.equals(PersistentDataType.STRING)) container.set(key, type, "");
+                    else container.set(key, type, 0);
+                }
+
+                if (!isNumeric) {
+                    Set<Boolean> resultSet = new HashSet<>();
+                    boolean isAllMatch = term.equalsIgnoreCase("[all_match]");
+                    stringTypeData.get(key.toString()).forEach(e-> resultSet.add(e.matches(term)));
+                    if ((!isAllMatch && resultSet.contains(true) || (isAllMatch && !resultSet.contains(false)))) {
+                        //success
+                        container.set(key, type, action);
+                    }
+                }
+
+                Matcher arrow = Pattern.compile(RECIPE_CONTAINER_ARROW_RANGE_PATTERN).matcher(term);
+                if (isNumeric && arrow.matches()) {
+                    double start = getValueFromString(arrow.group(1), derivedMap);
+                    double value = derivedMap.get(key.toString()).get(arrow.group(2));
+                    double end = getValueFromString(arrow.group(3), derivedMap);
+                    if (start < value && value < end) {
+                        setValuesToContainer(key, type, getValueFromString(action, derivedMap), container);
+                    }
+                }
+
+                Matcher larger = Pattern.compile(RECIPE_CONTAINER_LARGER_PATTERN).matcher(term);
+                if (isNumeric && larger.matches()) {
+                    double small = getValueFromString(larger.group(1), derivedMap);
+                    double value = derivedMap.get(key.toString()).get(larger.group(2));
+                    if (small < value) setValuesToContainer(key, type, getValueFromString(action, derivedMap), container);
+
+                }
+
+                Matcher smaller = Pattern.compile(RECIPE_CONTAINER_SMALLER_PATTERN).matcher(term);
+                if (isNumeric && smaller.matches()) {
+                    double value = derivedMap.get(key.toString()).get(smaller.group(1));
+                    double large = getValueFromString(smaller.group(2), derivedMap);
+                    if (value < large) setValuesToContainer(key, type, getValueFromString(action, derivedMap), container);
+
+                }
+
+                Matcher equal = Pattern.compile(RECIPE_CONTAINER_EQUAL_PATTERN).matcher(term);
+                if (isNumeric && equal.matches()) {
+                    double value = derivedMap.get(key.toString()).get(equal.group(1));
+                    double comparison = getValueFromString(equal.group(2), derivedMap);
+                    if (value == comparison) setValuesToContainer(key, type, getValueFromString(action, derivedMap), container);
+                }
+
+                if (isEnd) {
+                    item.setItemMeta(meta);
+                    return;
+                }
+            }
+        }
+        item.setItemMeta(meta);
+    }
+
+    private void setValuesToContainer(NamespacedKey key, PersistentDataType type, double value, PersistentDataContainer container) {
+        if (type.equals(PersistentDataType.INTEGER)) container.set(key, type, (int) value);
+        if (type.equals(PersistentDataType.DOUBLE)) container.set(key, type, value);
+    }
+    private double getValueFromString(String formula, Map<String, Map<String, Double>> derived) {
+        List<String> queue = new ArrayList<>();
+        List<String> buffer = new ArrayList<>();
+        for (int i=0; i<formula.length(); i++) {
+            String s = String.valueOf(formula.charAt(i));
+            if (s.equals("$")) {
+                buffer.add(s);
+                continue;
+            }
+
+            if (s.matches("(\\+|\\-|/|\\*|\\(|\\)|\\^|\\[|\\])")) {
+                if (buffer.size() == 0) {
+                    queue.add(s);
+                    continue;
+                }
+                String joined = String.join("", buffer);
+                Matcher matcher = Pattern.compile("^\\$([a-z0-9_\\.\\-]+)\\[(.+)\\]$").matcher(joined);
+                if (!matcher.matches()) continue;
+                String key = matcher.group(1);
+                String type = matcher.group(2);
+                double value = derived.get(key).get(type);
+                queue.add(String.valueOf(value));
+
+                buffer.clear();
+                continue;
+            }
+
+            queue.add(s);
+        }
+        return calc(String.join("", queue));
+    }
+
+    private Map<String, Map<String, Double>> getDerivedValues(Map<String, List<Double>> source) {
+        Map<String, Map<String, Double>> result = new HashMap<>();
+        for (Map.Entry<String, List<Double>> entry : source.entrySet()) {
+            String key = entry.getKey();
+            List<Double> doubleList = entry.getValue();
+            if (!result.containsKey(key)) result.put(key, new HashMap<>());
+            if (doubleList.size() == 1) {
+                result.get(key).put("maximum", doubleList.get(0));
+                result.get(key).put("minimum", doubleList.get(0));
+                result.get(key).put("median", doubleList.get(0));
+                result.get(key).put("mode", doubleList.get(0));
+                result.get(key).put("average", doubleList.get(0));
+                result.get(key).put("random", doubleList.get(0));
+                continue;
+            }
+
+            Collections.sort(doubleList);
+            result.get(key).put("maximum", Collections.max(doubleList));
+            result.get(key).put("minimum", Collections.min(doubleList));
+            double median;
+            if (doubleList.size() % 2 == 0) {
+                median = (doubleList.get(doubleList.size() / 2) + doubleList.get(doubleList.size() / 2) - 1) / 2;
+            } else {
+                median = doubleList.get(doubleList.size() / 2);
+            }
+            result.get(key).put("median", median);
+
+            double mode = 0d;
+            double sum = 0d;
+            Map<Double, Integer> counter = new HashMap<>();
+            for (double d : doubleList) {
+                int current = counter.containsKey(d) ? counter.get(d) : 0;
+                counter.put(d, current + 1);
+                sum += d;
+            }
+            int biggest = Collections.max(counter.values());
+            int times = 0;
+            for (Map.Entry<Double, Integer> e : counter.entrySet()) {
+                if (e.getValue().equals(biggest)) {
+                    mode += e.getKey();
+                    times++;
+                }
+            }
+            mode /= times;
+            result.get(key).put("mode", mode);
+
+            double average = sum / doubleList.size();
+            result.get(key).put("average", average);
+
+            double random = doubleList.get(new Random().nextInt(doubleList.size()));
+            result.get(key).put("random", random);
+
+        }
+        return result;
     }
 }
