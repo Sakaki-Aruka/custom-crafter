@@ -247,7 +247,6 @@ public class Search {
 
         whatMaking.put(player.getUniqueId(),item.getType());
 
-        // TODO: write modify Container elements code here #53
         new ContainerUtil().setRecipeDataContainerToResultItem(item, input, recipe);
 
         //debug
