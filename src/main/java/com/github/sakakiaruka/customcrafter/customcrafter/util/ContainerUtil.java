@@ -454,7 +454,7 @@ public class ContainerUtil {
 
     private double calc(String input) {
 
-        if (input.matches("([\\d]*)(\\.?)(\\d)+")) return Double.valueOf(input);
+        if (input.matches("^d([\\d]*)(\\.?)(\\d)+$")) return Double.valueOf(input);
 
         List<String> outQueue = new ArrayList<>();
         List<String> stack = new ArrayList<>();
