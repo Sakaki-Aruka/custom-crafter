@@ -1,7 +1,5 @@
 package com.github.sakakiaruka.customcrafter.customcrafter;
 
-import com.github.sakakiaruka.customcrafter.customcrafter.listener.ModifyCraftingInventory;
-import com.github.sakakiaruka.customcrafter.customcrafter.listener.OpenCraftingTable;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.ContainerWrapper;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantStrict;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantWrap;
@@ -29,7 +27,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
