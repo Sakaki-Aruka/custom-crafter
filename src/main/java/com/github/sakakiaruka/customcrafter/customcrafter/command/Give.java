@@ -101,8 +101,6 @@ public class Give {
         }
         list.add("§b" + buffer);
 
-        //debug
-        System.out.println(String.format("candidate list : %s",list));
 
         return list;
     }

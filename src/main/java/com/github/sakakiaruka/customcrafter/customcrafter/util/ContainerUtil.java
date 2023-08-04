@@ -152,22 +152,6 @@ public class ContainerUtil {
     public boolean isPass(ItemStack item, Matter matter) {
         // item -> target, matter -> source (recipe)
         // matter > item
-
-        //debug
-        if (matter.getContainerWrappers() != null) {
-            matter.getContainerWrappers().entrySet().forEach(s->System.out.println(s.getValue().info()));
-            System.out.println(bar);
-            PersistentDataContainer container = item.getItemMeta().getPersistentDataContainer();
-            if (!container.isEmpty()) {
-                for (NamespacedKey key : container.getKeys()) {
-                    System.out.println("exist key: "+key.toString());
-                }
-            }
-            System.out.println(bar);
-        }
-
-
-
         if (!matter.hasContainer()) return true;
 
         ItemMeta meta = item.getItemMeta();
@@ -205,8 +189,6 @@ public class ContainerUtil {
                 if (!container.has(key, type)) continue;
             }
 
-            //debug
-            System.out.println("no tags");
 
             if (value.matches(ARROW_RANGE_PATTERN)) {
                 if (!arrowPatternOperation(value, container, wrapper)) return false;
@@ -219,16 +201,12 @@ public class ContainerUtil {
                 continue;
             }
 
-            //TODO: write 'allow_value' and 'deny_value'
-            //if (!tag.equals(ALLOW_VALUE) && !tag.equals(DENY_VALUE)) continue;
+
             boolean isAllow = tag.equals(ALLOW_VALUE);
             // isAllow = true -> ALLOW_VALUE
             // isAllow = false -> DENY_VALUE
             if (!isAllow && container.getKeys().isEmpty()) continue;
             if (isAllow && container.getKeys().isEmpty()) return false;
-
-            //debug
-            System.out.println("tag: "+tag+" / "+value);
 
             if (type.equals(PersistentDataType.STRING)) {
 
@@ -302,10 +280,6 @@ public class ContainerUtil {
 
 
     private boolean arrowPatternOperation(String source, PersistentDataContainer container, ContainerWrapper wrapper) {
-
-        //debug
-        System.out.println("arrow range pattern");
-
         if (container == null) return false;
         NamespacedKey key = wrapper.getKey();
         PersistentDataType type = wrapper.getType();
@@ -329,11 +303,6 @@ public class ContainerUtil {
          */
         double start = getFormulaValue(matcher.group(1), container);
         double end = getFormulaValue(matcher.group(2), container);
-
-        //debug
-        String info = "ArrowRange | start: "+start+" / end: "+end+" / element: "+element;
-        JavaPlugin.getPlugin(getInstance().getClass()).getLogger().info(info);
-
         if (tag.equals(ALLOW_VALUE)) {
             return start < element && element < end;
         } else if (tag.equals(DENY_VALUE)) {
@@ -343,10 +312,6 @@ public class ContainerUtil {
     }
 
     private boolean smallerPatternOperation(String source, PersistentDataContainer container, ContainerWrapper wrapper) {
-
-        //debug
-        System.out.println("smaller pattern");
-
         NamespacedKey key = wrapper.getKey();
         PersistentDataType type = wrapper.getType();
         String formula = source.substring(1, source.length());
@@ -362,11 +327,6 @@ public class ContainerUtil {
             return false;
         }
         double target = getFormulaValue(formula, container);
-
-        //debug
-        String info = "SmallerPattern | target: "+target;
-        JavaPlugin.getPlugin(getInstance().getClass()).getLogger().info(info);
-
         if (tag.equals(ALLOW_VALUE)) {
             return value < target;
         } else if (tag.equals(DENY_VALUE)) {
@@ -376,10 +336,6 @@ public class ContainerUtil {
     }
 
     private boolean largerPatternOperation(String source, PersistentDataContainer container, ContainerWrapper wrapper) {
-
-        //debug
-        System.out.println("larger pattern");
-
         NamespacedKey key = wrapper.getKey();
         PersistentDataType type = wrapper.getType();
         String formula = source.substring(0,source.length()-1);
@@ -392,11 +348,6 @@ public class ContainerUtil {
             return false;
         }
         double target = getFormulaValue(formula, container);
-
-        //debug
-        String info = "LargerPattern | target: "+target;
-        JavaPlugin.getPlugin(getInstance().getClass()).getLogger().info(info);
-
         if (tag.equals(ALLOW_VALUE)) {
             return target < element;
         } else if (tag.equals(DENY_VALUE)) {
@@ -431,7 +382,7 @@ public class ContainerUtil {
                 String variableName = String.join("", buffer).replace("$","");
                 buffer.clear();
                 NamespacedKey key = new NamespacedKey(getInstance(), variableName);
-                PersistentDataType type = PersistentDataType.DOUBLE; // TODO: rewrite DataType.INTEGER -> DOUBLE
+                PersistentDataType type = PersistentDataType.DOUBLE;
                 String value = container.has(key, type) ? container.get(key, type).toString() : "0";
                 list.add(value);
                 list.add(s);
@@ -631,12 +582,6 @@ public class ContainerUtil {
         }
         //---
         Map<String, Map<String, Double>> derivedMap = getDerivedValues(numericTypeData);
-
-        //debug
-        System.out.println("stringTypeData: "+stringTypeData);
-        System.out.println("numericTypeData: "+numericTypeData);
-        derivedMap.entrySet().forEach(s->System.out.println("derivedMap: "+s.getKey()+" / "+s.getValue()));
-
         ItemMeta meta = item.getItemMeta();
         PersistentDataContainer container = meta.getPersistentDataContainer();
         for (Map.Entry<NamespacedKey, List<RecipeDataContainer>> entry : recipe.getContainer().entrySet()) {
