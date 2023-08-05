@@ -10,11 +10,13 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter.getInstance;
 import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.nl;
+import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.upperArrow;
 
 public class ContainerModify {
 
@@ -231,6 +233,8 @@ public class ContainerModify {
         PersistentDataContainer container = meta.getPersistentDataContainer();
         String result = new ContainerUtil().containerValues(container);
         sender.sendMessage(result);
+        UUID uuid = UUID.randomUUID();
+        sender.sendMessage(upperArrow+" Container Ticket: "+uuid);
     }
 
     // /cc -container -data -modifyShow [key] [operator] [key]

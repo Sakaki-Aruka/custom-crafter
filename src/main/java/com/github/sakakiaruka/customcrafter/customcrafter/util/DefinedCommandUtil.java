@@ -41,10 +41,6 @@ public class DefinedCommandUtil {
         List<String> commands = config.getStringList("DefinedCommands.args");
         ARGS_INITIAL = new ArrayList<>(commands);
         for (String s : commands) {
-
-            //debug
-            System.out.println("s: "+s);
-
             boolean child = config.getBoolean("DefinedCommands."+s+".child");
             List<String> permission;
             if (config.contains("DefinedCommands."+s+".permission")){
@@ -75,10 +71,6 @@ public class DefinedCommandUtil {
                     }
                     DefinedCommand command = new DefinedCommand(s,true,args,console,permission,processClass,processMethod,args.size());
                     DEFINED_COMMAND_LIST.add(command);
-
-//                    //debug
-//                    System.out.println(String.format("%s%n%s%n%s",bar,command.info(),bar));
-
                 }
                 continue;
             }
@@ -93,9 +85,6 @@ public class DefinedCommandUtil {
 
             DefinedCommand command = new DefinedCommand(s,false,null,console,permission,processClass,processMethod,0);
             DEFINED_COMMAND_LIST.add(command);
-
-            //debug
-            System.out.println(String.format("%s%n%s%n%s",bar,command.info(),bar));
         }
     }
 

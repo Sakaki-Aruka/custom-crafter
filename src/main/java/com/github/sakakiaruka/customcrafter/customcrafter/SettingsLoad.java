@@ -1,7 +1,5 @@
 package com.github.sakakiaruka.customcrafter.customcrafter;
 
-import com.github.sakakiaruka.customcrafter.customcrafter.listener.ModifyCraftingInventory;
-import com.github.sakakiaruka.customcrafter.customcrafter.listener.OpenCraftingTable;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.ContainerWrapper;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantStrict;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantWrap;
@@ -29,7 +27,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -259,7 +256,6 @@ public class SettingsLoad {
         for(Path path:paths){
             FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
 
-            //debug
             new DataCheckerUtil().resultCheck(new StringBuilder(),config,path);
 
             String name = config.getString("name");
@@ -316,10 +312,6 @@ public class SettingsLoad {
                     counter++;
                 }
 
-                //debug
-                for (ContainerWrapper container : phony) {
-                    System.out.println(bar+nl+container.info()+nl+bar+nl);
-                }
             }
 
             Result result = new Result(name,enchantInfo,amount,metadata,nameOrRegex,matchPoint, phony);
@@ -343,7 +335,6 @@ public class SettingsLoad {
         Top : for(Path path:paths){
             FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
 
-            //debug
             new DataCheckerUtil().matterCheck(new StringBuilder(),config,path);
 
             String name = config.getString("name");
@@ -392,10 +383,6 @@ public class SettingsLoad {
                     EnchantStrict strict = EnchantStrict.valueOf(list.get(2).toUpperCase());
                     EnchantWrap wrap = new EnchantWrap(level,enchant,strict);
                     wrapList.add(wrap);
-
-                    //debug
-                    System.out.println(String.format("load wrap : %s",wrap.info()));
-                    System.out.println(String.format("list : %s",list));
                 }
             }
 
@@ -408,23 +395,11 @@ public class SettingsLoad {
             if(config.contains("potion") && config.contains("bottleTypeMatch")){
                 Potions potions = makeDrug(matter,config);
                 if(potions != null) matters.put(name,potions);
-
-                //debug
-                System.out.println("SettingsLoad Potion : "+nl+potions.PotionInfo());
-
                 continue;
             }
 
             Map<Integer, ContainerWrapper> elements = new ContainerUtil().mattersLoader(path);
             matter.setContainerWrappers(elements);
-
-            //debug
-            if (matter.hasContainer()) {
-                for (Map.Entry<Integer, ContainerWrapper> entry : matter.getContainerWrappers().entrySet()) {
-                    System.out.println(entry.getValue().info());
-                }
-            }
-
             matters.put(name,matter);
 
         }
@@ -548,15 +523,6 @@ public class SettingsLoad {
                         Coordinate coordinate = new Coordinate(x,count);
                         String matterName = list.get(j);
                         Matter matter = getMatterFromString(matterName,overrides);
-
-                        //debug
-                        if (matter.hasContainer()) {
-                            System.out.println("matter name: "+matter.getName());
-                            for (Map.Entry<Integer, ContainerWrapper> entry : matter.getContainerWrappers().entrySet()) {
-                                System.out.println(entry.getValue().info());
-                            }
-                        }
-
                         coordinates.put(coordinate,matter);
                         count++;
                     }

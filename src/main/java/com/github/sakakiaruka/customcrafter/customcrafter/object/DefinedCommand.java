@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.nl;
+
 public class DefinedCommand {
     private String commandName;
     private boolean hasArgs;
@@ -94,14 +96,14 @@ public class DefinedCommand {
 
     public String info() {
         StringBuilder builder = new StringBuilder();
-        builder.append("name: "+this.commandName+"\n");
-        builder.append("hasArgs: "+this.hasArgs+"\n");
-        builder.append("args: "+this.args+"\n");
-        builder.append("console: "+this.console+"\n");
-        builder.append("permission: "+this.commandPermission+"\n");
-        builder.append("class: "+this.processClass+"\n");
-        builder.append("method: "+this.processMethod+"\n");
-        builder.append("length: "+this.commandLen+"\n");
+        builder.append("name: "+this.commandName+nl);
+        builder.append("hasArgs: "+this.hasArgs+nl);
+        builder.append("args: "+this.args+nl);
+        builder.append("console: "+this.console+nl);
+        builder.append("permission: "+this.commandPermission+nl);
+        builder.append("class: "+this.processClass+nl);
+        builder.append("method: "+this.processMethod+nl);
+        builder.append("length: "+this.commandLen+nl);
         return builder.toString();
     }
 }

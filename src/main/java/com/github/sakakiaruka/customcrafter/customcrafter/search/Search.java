@@ -58,7 +58,7 @@ public class Search {
 
                     if (!new ContainerUtil().isPass(interestedItems.get(i), recipeMatter)) continue Top;
 
-                    //debug (amount one virtual test)
+                    //(amount one virtual test)
                     Matter recipeOne = recipeMatter.oneCopy();
                     Matter inputOne = inputMatter.oneCopy();
 
@@ -66,7 +66,7 @@ public class Search {
                     if(!(recipeOne.getClass().equals(Potions.class) && inputOne.getClass().equals(Potions.class))) continue;
                     if(!new PotionUtil().isSamePotion((Potions)recipeOne,(Potions) inputOne)) continue Top;
 
-                    //debug end (amount one virtual test end)
+                    //end (amount one virtual test end)
 
                     if(recipe.getContentsNoAir().get(i).isMass()){
                         if(inputMatter.getAmount() != 1)continue Top;
@@ -113,11 +113,6 @@ public class Search {
         for (int i : virtual.values()) {
             vTotal += i;
         }
-
-        //if (!new ContainerUtil().isPassRecipe(recipe, input)) return false;
-
-        //debug
-        System.out.println("amorphous container: "+new ContainerUtil().amorphousContainerCongruence(recipe, input));
 
         if (!new ContainerUtil().amorphousContainerCongruence(recipe, input)) return false;
 
@@ -249,7 +244,6 @@ public class Search {
 
         new ContainerUtil().setRecipeDataContainerToResultItem(item, input, recipe);
 
-        //debug
         if(inventory.getItem(craftingTableResultSlot) == null){
             // empty a result item's slot
             player.getWorld().dropItem(player.getLocation(),item);
@@ -318,7 +312,7 @@ public class Search {
             if(exitCode == 0)return false;
         }
 
-        //debug
+
         return true;
     }
 
@@ -463,9 +457,7 @@ public class Search {
                         matter.addWrap(wrap);
                     }
                 }
-                //debug
                 new ContainerUtil().setContainerDataItemStackToMatter(inventory.getItem(i), matter);
-//                System.out.println("matter info: "+nl+matter.info());
 
                 recipe.addCoordinate(x,y,matter);
             }
