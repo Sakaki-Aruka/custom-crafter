@@ -264,6 +264,7 @@ public class ContainerModify {
         }
     }
 
+
     private void sendDataDiff(String before, String after, String modifyType, CommandSender sender) {
         StringBuilder builder = new StringBuilder();
         builder.append(before);
