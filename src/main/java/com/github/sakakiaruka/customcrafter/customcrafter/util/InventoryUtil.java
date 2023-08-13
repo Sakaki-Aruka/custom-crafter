@@ -102,4 +102,13 @@ public class InventoryUtil {
             virtual.put(entry.getKey(),virtual.get(entry.getKey()) + entry.getValue());
         }
     }
+
+    public List<ItemStack> getItemStackFromCraftingMenu(Inventory inventory) {
+        List<ItemStack> result = new ArrayList<>();
+        for (int i : getTableSlots(craftingTableSize)) {
+            if (inventory.getItem(i) == null || inventory.getItem(i).getType().equals(Material.AIR)) continue;
+            result.add(inventory.getItem(i));
+        }
+        return result;
+    }
 }
