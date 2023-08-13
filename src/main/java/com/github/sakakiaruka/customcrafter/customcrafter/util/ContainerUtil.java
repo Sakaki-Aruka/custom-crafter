@@ -8,6 +8,8 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Container.RecipeDataContainer;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Container.RecipeDataContainerModifyType;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
+import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -51,6 +53,12 @@ public class ContainerUtil {
 
     private static final String MULTI_VALUE_PATTERN = "^\\(multi\\)\\(types:(.+)\\)(.+)$";
     private static final String MULTI_VALUE_CLASS_PATTERN = "([\\w]+)\\*([\\d]+)";
+
+    private static final String USING_CONTAINER_VALUES_LORE_PATTERN = "^using_container_values_lore -> ([.]+)$";
+    private static final String USING_CONTAINER_VALUES_ENCHANTMENT_PATTERN = "^using_container_values_enchantment -> override: (?i)(true|false) / enchantment: ([a-zA-Z_]+) / operator: ([a-z0-9\\-_\\.\\$\\+\\-/\\*%])(double|int|string)$";
+    private static final String USING_CONTAINER_VALUES_POTION_COLOR_PATTERN = "^using_container_values_potion_color -> type: (?i)(rgb|color_code|random) / value: ([a-z0-9_\\-\\.\\$]+)$";
+    private static final String USING_CONTAINER_VALUES_TEXTURE_ID_PATTERN = "^using_container_values_texture_id -> override: (?i)(true|false) / id: ([0-9]+)$";
+    private static final String USING_CONTAINER_VALUES_TOOL_DURABILITY_PATTERN = "^using_container_values_tool_durability -> type: (?i)(absolute|percentage) / value: ([a-z0-9\\.\\-_\\$]+)$";
 
     public PersistentDataType getDataType(String input) {
         if (input.equalsIgnoreCase("string")) return PersistentDataType.STRING;
@@ -745,18 +753,7 @@ public class ContainerUtil {
         return result;
     }
 
-    public void setRecipeContainer(Recipe recipe, Inventory input, ItemStack result) {
-        if (!recipe.hasRecipeContainer()) return;
-        for (Matter matter : recipe.getContentsNoAir()) {
-            ItemStack item = getCorrecpondenceItemStack(input, matter);
-            if (item == null) continue;
-            List<String> data = recipe.getRecipeContainer().get(matter);
-            if (data.isEmpty()) continue;
-            for (String content : data) {
-                //
-            }
-        }
-    }
+
 
     private ItemStack getCorrecpondenceItemStack(Inventory inventory, Matter matter) {
         for (ItemStack item : new InventoryUtil().getItemStackFromCraftingMenu(inventory)) {
