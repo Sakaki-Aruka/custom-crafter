@@ -1,5 +1,6 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.util;
 
+import com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad;
 import com.github.sakakiaruka.customcrafter.customcrafter.command.ContainerModify;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.AmorphousVirtualContainer;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.ContainerWrapper;
@@ -11,6 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -741,5 +743,25 @@ public class ContainerUtil {
 
         }
         return result;
+    }
+
+    public void setRecipeContainer(Recipe recipe, Inventory input, ItemStack result) {
+        if (!recipe.hasRecipeContainer()) return;
+        for (Matter matter : recipe.getContentsNoAir()) {
+            ItemStack item = getCorrecpondenceItemStack(input, matter);
+            if (item == null) continue;
+            List<String> data = recipe.getRecipeContainer().get(matter);
+            if (data.isEmpty()) continue;
+            for (String content : data) {
+                //
+            }
+        }
+    }
+
+    private ItemStack getCorrecpondenceItemStack(Inventory inventory, Matter matter) {
+        for (ItemStack item : new InventoryUtil().getItemStackFromCraftingMenu(inventory)) {
+            if (matter.getCandidate().contains(item.getType())) return item;
+        }
+        return null;
     }
 }
