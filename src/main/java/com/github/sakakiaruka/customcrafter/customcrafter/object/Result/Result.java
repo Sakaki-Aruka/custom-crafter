@@ -165,6 +165,14 @@ public class Result {
                 if (!matcher.matches()) continue;
                 meta.setCustomModelData(Integer.valueOf(id));
             }
+
+            // using container values
+            if (type.equals(MetadataType.USING_CONTAINER_VALUES_LORE)) {
+                for (String s : content) {
+
+                }
+            }
+
             item.setItemMeta(meta);
         }
     }
