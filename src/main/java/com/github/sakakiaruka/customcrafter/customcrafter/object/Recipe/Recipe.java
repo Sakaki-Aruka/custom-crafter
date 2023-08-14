@@ -19,9 +19,8 @@ public class Recipe {
     private RecipePermission permission;
     private Result result;
     private Map<NamespacedKey, List<RecipeDataContainer>> container;
-    private Map<Matter, List<String>> recipeContainer;
 
-    public Recipe(String name,String tag,Map<Coordinate,Matter> coordinate,Map<Material,ItemStack> returnItems,Result result, RecipePermission permission, Map<NamespacedKey, List<RecipeDataContainer>> container, Map<Matter, List<String>> recipeContainer){
+    public Recipe(String name,String tag,Map<Coordinate,Matter> coordinate,Map<Material,ItemStack> returnItems,Result result, RecipePermission permission, Map<NamespacedKey, List<RecipeDataContainer>> container){
         this.name = name;
         this.tag = Tag.valueOf(tag);
         this.coordinate = coordinate;
@@ -29,7 +28,6 @@ public class Recipe {
         this.result = result;
         this.permission = permission;
         this.container = container;
-        this.recipeContainer = recipeContainer;
     }
 
     public Recipe(){ //only used for temporary (mainly real) -> tag is "Normal"
@@ -97,17 +95,6 @@ public class Recipe {
         return permission != null;
     }
 
-    public Map<Matter, List<String>> getRecipeContainer() {
-        return recipeContainer;
-    }
-
-    public void setRecipeContainer(Map<Matter, List<String>> recipeContainer) {
-        this.recipeContainer = recipeContainer;
-    }
-
-    public boolean hasRecipeContainer(){
-        return (this.recipeContainer != null && !this.recipeContainer.isEmpty());
-    }
 
     public List<Matter> getContentsNoAir(){
         List<Matter> list = new ArrayList<>();

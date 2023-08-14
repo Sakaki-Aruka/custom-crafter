@@ -7,6 +7,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.ContainerWrappe
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Container.RecipeDataContainer;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Container.RecipeDataContainerModifyType;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordinate;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;
 import org.bukkit.Bukkit;
@@ -754,6 +755,19 @@ public class ContainerUtil {
     }
 
 
+    private PersistentDataType getSpecifiedDataType(PersistentDataContainer container, String space) {
+        NamespacedKey key = new NamespacedKey(getInstance(), space);
+        List<PersistentDataType> types = Arrays.asList(PersistentDataType.STRING, PersistentDataType.INTEGER, PersistentDataType.DOUBLE);
+        for (PersistentDataType type : types) {
+            try{
+                if (!container.has(key, type)) continue;
+                return type;
+            } catch (Exception e) {
+                continue;
+            }
+        }
+        return null;
+    }
 
     private ItemStack getCorrecpondenceItemStack(Inventory inventory, Matter matter) {
         for (ItemStack item : new InventoryUtil().getItemStackFromCraftingMenu(inventory)) {

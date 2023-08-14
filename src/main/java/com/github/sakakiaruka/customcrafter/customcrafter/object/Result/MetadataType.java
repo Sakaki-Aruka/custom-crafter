@@ -8,7 +8,8 @@ public enum MetadataType {
     UNBREAKABLE("UNBREAKABLE"),
     CUSTOMMODELDATA("CUSTOMMODELDATA"),
     POTIONDATA("POTIONDATA"),
-    POTIONCOLOR("POTIONCOLOR");
+    POTIONCOLOR("POTIONCOLOR"),
+    TEXTURE_ID("TEXTURE_ID");
 
     private String type;
     private MetadataType(String type){
