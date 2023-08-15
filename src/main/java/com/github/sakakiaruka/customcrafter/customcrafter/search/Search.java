@@ -243,6 +243,7 @@ public class Search {
         whatMaking.put(player.getUniqueId(),item.getType());
 
         new ContainerUtil().setRecipeDataContainerToResultItem(item, input, recipe);
+        if (recipe.hasUsingContainerValuesMetadata()) new ContainerUtil().setRecipeUsingContainerValueMetadata(inventory, recipe, item);
 
         if(inventory.getItem(craftingTableResultSlot) == null){
             // empty a result item's slot

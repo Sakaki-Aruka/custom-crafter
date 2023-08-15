@@ -1,6 +1,7 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.object.Result;
 
 import com.github.sakakiaruka.customcrafter.customcrafter.object.ContainerWrapper;
+import com.github.sakakiaruka.customcrafter.customcrafter.util.ContainerUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.DataContainerUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.PotionUtil;
 import org.bukkit.Color;
@@ -10,6 +11,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -166,12 +168,6 @@ public class Result {
                 meta.setCustomModelData(Integer.valueOf(id));
             }
 
-            // using container values
-            if (type.equals(MetadataType.USING_CONTAINER_VALUES_LORE)) {
-                for (String s : content) {
-
-                }
-            }
 
             item.setItemMeta(meta);
         }

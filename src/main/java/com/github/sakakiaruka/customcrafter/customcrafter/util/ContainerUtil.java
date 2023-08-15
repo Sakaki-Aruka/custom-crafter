@@ -59,11 +59,13 @@ public class ContainerUtil {
     private static final String MULTI_VALUE_PATTERN = "^\\(multi\\)\\(types:(.+)\\)(.+)$";
     private static final String MULTI_VALUE_CLASS_PATTERN = "([\\w]+)\\*([\\d]+)";
 
-    private static final String USING_CONTAINER_VALUES_ENCHANTMENT_PATTERN = "^enchantment:([\\$a-zA-Z0-9\\-_]+)/level:(\\$[a-z0-9\\-_]+|[0-9]+)$";
-    private static final String USING_CONTAINER_VALUES_POTION_COLOR_RGB_PATTERN = "^type:(?i)(rgb)/value:R->([\\$a-z0-9\\-_]+),G->([\\$a-z0-9\\-_]+),B->([\\$a-z0-9\\-_]+)$";
-    private static final String USING_CONTAINER_VALUES_POTION_RANDOM_PATTERN = "^type:(?i)(random)/seed:([\\$a-z0-9\\-_]+)$";
-    private static final String USING_CONTAINER_VALUES_TOOL_DURABILITY_ABSOLUTE_PATTERN = "^type:(?i)(absolute)/value:([a-z0-9\\-_]+)$";
-    private static final String USING_CONTAINER_VALUES_TOOL_DURABILITY_PERCENTAGE_PATTERN = "^type:(?i)(percentage)/value:([a-z0-9\\-_]+)$";
+    private static final String USING_CONTAINER_VALUES_LORE_PATTERN = "^using_container_values_lore -> ([.]+)$";
+    private static final String USING_CONTAINER_VALUES_ENCHANTMENT_PATTERN = "^using_container_values_enchantment -> enchantment:([\\$a-zA-Z0-9\\-_]+)/level:(\\$[a-z0-9\\-_]+|[0-9]+)$";
+    private static final String USING_CONTAINER_VALUES_POTION_COLOR_RGB_PATTERN = "^using_container_valeus_potion_color -> type:(?i)(rgb)/value:R->([\\$a-z0-9\\-_]+),G->([\\$a-z0-9\\-_]+),B->([\\$a-z0-9\\-_]+)$";
+    private static final String USING_CONTAINER_VALUES_POTION_COLOR_RANDOM_PATTERN = "^using_container_values_potion_color -> type:(?i)(random)/seed:([\\$a-z0-9\\-_]+)$";
+    private static final String USING_CONTAINER_VALUES_TOOL_DURABILITY_ABSOLUTE_PATTERN = "^using_container_values_tool_durability -> type:(?i)(absolute)/value:([a-z0-9\\-_]+)$";
+    private static final String USING_CONTAINER_VALUES_TOOL_DURABILITY_PERCENTAGE_PATTERN = "^using_container_values_tool_durability -> type:(?i)(percentage)/value:([a-z0-9\\-_]+)$";
+    private static final String USING_CONTAINER_VALUES_TEXTURE_ID_PATTERN = "^using_container_values_texture_id -> ([a-z0-9\\-_]+)$";
     private static final int ENCHANTMENT_MAX_LEVEL = 255;
 
     public PersistentDataType getDataType(String input) {
@@ -773,7 +775,7 @@ public class ContainerUtil {
         return null;
     }
 
-    private ItemStack getCorrecpondenceItemStack(Inventory inventory, Matter matter) {
+    private ItemStack getCorrespondenceItemStack(Inventory inventory, Matter matter) {
         for (ItemStack item : new InventoryUtil().getItemStackFromCraftingMenu(inventory)) {
             if (matter.getCandidate().contains(item.getType())) return item;
         }
@@ -781,7 +783,44 @@ public class ContainerUtil {
     }
 
 
-    public void setUsingContainerValuesLore(ItemMeta meta, PersistentDataContainer source, String order) {
+    public void setRecipeUsingContainerValueMetadata(Inventory inventory, Recipe recipe, ItemStack item) {
+                ItemMeta resultMeta = item.getItemMeta();
+
+                if (!recipe.hasUsingContainerValuesMetadata()) return;
+                for (Matter matter : recipe.getContentsNoAir()) {
+                    if (!recipe.getUsingContainerValuesMetadata().containsKey(matter)) continue;
+                    ItemStack relate;
+                    if ((relate = getCorrespondenceItemStack(inventory, matter)) == null) continue;
+                    List<String> orders = recipe.getUsingContainerValuesMetadata().get(matter);
+            if (orders == null || orders.isEmpty()) continue;
+
+            for (String order : orders) {
+                Matcher lore = Pattern.compile(USING_CONTAINER_VALUES_LORE_PATTERN).matcher(order);
+                Matcher enchant = Pattern.compile(USING_CONTAINER_VALUES_ENCHANTMENT_PATTERN).matcher(order);
+                Matcher rgb = Pattern.compile(USING_CONTAINER_VALUES_POTION_COLOR_RGB_PATTERN).matcher(order);
+                Matcher randomColor = Pattern.compile(USING_CONTAINER_VALUES_POTION_COLOR_RANDOM_PATTERN).matcher(order);
+                Matcher absoluteDurability = Pattern.compile(USING_CONTAINER_VALUES_TOOL_DURABILITY_ABSOLUTE_PATTERN).matcher(order);
+                Matcher percentageDurability = Pattern.compile(USING_CONTAINER_VALUES_TOOL_DURABILITY_PERCENTAGE_PATTERN).matcher(order);
+                Matcher texture = Pattern.compile(USING_CONTAINER_VALUES_TEXTURE_ID_PATTERN).matcher(order);
+
+                PersistentDataContainer source = relate.getItemMeta().getPersistentDataContainer();
+                if (lore.matches()) setUsingContainerValuesLore(resultMeta, source, order);
+                else if (enchant.matches()) setUsingContainerValuesEnchantment(resultMeta, source, order);
+                else if (rgb.matches()) setUsingContainerValuesPotionColor(resultMeta, source, order);
+                else if (randomColor.matches()) setUsingContainerValuesPotionColor(resultMeta, source, order);
+                else if (absoluteDurability.matches()) setUsingContainerValuesToolDurability(item.getType(), resultMeta, source, order);
+                else if (percentageDurability.matches()) setUsingContainerValuesToolDurability(item.getType(), resultMeta, source, order);
+                else if (texture.matches()) setUsingContainerValuesTextureId(resultMeta, source, order);
+                else {
+                    Bukkit.getLogger().warning("[CustomCrafter] USING_CONTAINER_VALUES Metadata is failed. (Illegal configuration format found.)");
+                    continue;
+                }
+             }
+        }
+        item.setItemMeta(resultMeta);
+    }
+
+    private void setUsingContainerValuesLore(ItemMeta meta, PersistentDataContainer source, String order) {
         String buffer = "";
         String result = "";
         for (int i=0; i<order.length(); i++) {
@@ -808,7 +847,7 @@ public class ContainerUtil {
     }
 
     @Deprecated
-    public void setUsingContainerValuesEnchantment(ItemMeta meta, PersistentDataContainer source, String order) {
+    private void setUsingContainerValuesEnchantment(ItemMeta meta, PersistentDataContainer source, String order) {
         Matcher matcher = Pattern.compile(USING_CONTAINER_VALUES_ENCHANTMENT_PATTERN).matcher(order);
         if (!matcher.matches()) return;
         Enchantment enchant;
@@ -836,9 +875,9 @@ public class ContainerUtil {
 
     }
 
-    public void setUsingContainerValuesPotionColor(ItemMeta meta, PersistentDataContainer source, String order) {
+    private void setUsingContainerValuesPotionColor(ItemMeta meta, PersistentDataContainer source, String order) {
         Matcher rgb = Pattern.compile(USING_CONTAINER_VALUES_POTION_COLOR_RGB_PATTERN).matcher(order);
-        Matcher random = Pattern.compile(USING_CONTAINER_VALUES_POTION_RANDOM_PATTERN).matcher(order);
+        Matcher random = Pattern.compile(USING_CONTAINER_VALUES_POTION_COLOR_RANDOM_PATTERN).matcher(order);
         if (rgb.matches()) {
             // rgb
             String red = rgb.group(1);
@@ -881,7 +920,7 @@ public class ContainerUtil {
         }
     }
 
-    public void setUsingContainerValuesTextureId(ItemMeta meta, PersistentDataContainer source, String order) {
+    private void setUsingContainerValuesTextureId(ItemMeta meta, PersistentDataContainer source, String order) {
         int id;
         try{
             id = (int) Math.round(Double.valueOf(getContent(source, order)));
@@ -892,7 +931,7 @@ public class ContainerUtil {
         meta.setCustomModelData(id);
     }
 
-    public void setUsingContainerValuesToolDurability(Material material,ItemMeta meta, PersistentDataContainer source, String order) {
+    private void setUsingContainerValuesToolDurability(Material material,ItemMeta meta, PersistentDataContainer source, String order) {
         Matcher absolute = Pattern.compile(USING_CONTAINER_VALUES_TOOL_DURABILITY_ABSOLUTE_PATTERN).matcher(order);
         Matcher percentage = Pattern.compile(USING_CONTAINER_VALUES_TOOL_DURABILITY_PERCENTAGE_PATTERN).matcher(order);
         if (absolute.matches()) {
