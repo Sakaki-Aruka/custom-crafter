@@ -1,22 +1,18 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.object.Result;
 
 import com.github.sakakiaruka.customcrafter.customcrafter.object.ContainerWrapper;
-import com.github.sakakiaruka.customcrafter.customcrafter.util.ContainerUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.DataContainerUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.PotionUtil;
 import org.bukkit.Color;
-import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
+
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;

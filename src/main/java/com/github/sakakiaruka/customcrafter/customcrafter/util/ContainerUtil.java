@@ -1,15 +1,11 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.util;
 
-import com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad;
 import com.github.sakakiaruka.customcrafter.customcrafter.command.ContainerModify;
-import com.github.sakakiaruka.customcrafter.customcrafter.object.AmorphousVirtualContainer;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.ContainerWrapper;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Container.RecipeDataContainer;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Container.RecipeDataContainerModifyType;
-import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordinate;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
-import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -24,8 +20,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.nio.file.Path;
 import java.util.*;
