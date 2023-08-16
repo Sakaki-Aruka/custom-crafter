@@ -799,9 +799,6 @@ public class ContainerUtil {
                 Matcher texture = Pattern.compile(USING_CONTAINER_VALUES_TEXTURE_ID_PATTERN).matcher(order);
                 Matcher displayName = Pattern.compile(USING_CONTAINER_VALUES_ITEM_NAME_PATTERN).matcher(order);
 
-                //debug
-                System.out.println("loop order: "+order);
-
                 PersistentDataContainer source = relate.getItemMeta().getPersistentDataContainer();
                 if (lore.matches()) setUsingContainerValuesLore(resultMeta, source, order);
                 else if (enchant.matches()) setUsingContainerValuesEnchantment(resultMeta, source, order);
@@ -1017,6 +1014,7 @@ public class ContainerUtil {
         } catch (Exception e) {
             return "None";
         }
+        if (type == null) return "None";
         if (!container.has(key, type)) return "None";
         return String.valueOf(container.get(key, type));
     }
