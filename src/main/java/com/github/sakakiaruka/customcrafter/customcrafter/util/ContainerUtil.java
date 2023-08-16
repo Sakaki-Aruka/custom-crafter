@@ -60,6 +60,7 @@ public class ContainerUtil {
     private static final String USING_CONTAINER_VALUES_TOOL_DURABILITY_ABSOLUTE_PATTERN = "^using_container_values_tool_durability -> type:absolute/value:([\\$a-z0-9\\-_]+)$";
     private static final String USING_CONTAINER_VALUES_TOOL_DURABILITY_PERCENTAGE_PATTERN = "^using_container_values_tool_durability -> type:percentage/value:([\\$a-z0-9\\-_]+)$";
     private static final String USING_CONTAINER_VALUES_TEXTURE_ID_PATTERN = "^using_container_values_texture_id -> ([a-z0-9\\-_]+)$";
+    private static final String USING_CONTAINER_VALUES_ITEM_NAME_PATTERN = "^using_container_values_item_name -> (.+)$";
     private static final int ENCHANTMENT_MAX_LEVEL = 255;
 
     public PersistentDataType getDataType(String input) {
@@ -796,6 +797,10 @@ public class ContainerUtil {
                 Matcher absoluteDurability = Pattern.compile(USING_CONTAINER_VALUES_TOOL_DURABILITY_ABSOLUTE_PATTERN).matcher(order);
                 Matcher percentageDurability = Pattern.compile(USING_CONTAINER_VALUES_TOOL_DURABILITY_PERCENTAGE_PATTERN).matcher(order);
                 Matcher texture = Pattern.compile(USING_CONTAINER_VALUES_TEXTURE_ID_PATTERN).matcher(order);
+                Matcher displayName = Pattern.compile(USING_CONTAINER_VALUES_ITEM_NAME_PATTERN).matcher(order);
+
+                //debug
+                System.out.println("loop order: "+order);
 
                 PersistentDataContainer source = relate.getItemMeta().getPersistentDataContainer();
                 if (lore.matches()) setUsingContainerValuesLore(resultMeta, source, order);
@@ -805,6 +810,7 @@ public class ContainerUtil {
                 else if (absoluteDurability.matches()) setUsingContainerValuesToolDurability(item.getType(), resultMeta, source, order);
                 else if (percentageDurability.matches()) setUsingContainerValuesToolDurability(item.getType(), resultMeta, source, order);
                 else if (texture.matches()) setUsingContainerValuesTextureId(resultMeta, source, order);
+                else if (displayName.matches()) setUsingContainerValuesItemName(resultMeta, source, order);
                 else {
                     Bukkit.getLogger().warning("[CustomCrafter] USING_CONTAINER_VALUES Metadata failed. (Illegal configuration format found.)");
                     continue;
@@ -814,27 +820,26 @@ public class ContainerUtil {
         item.setItemMeta(resultMeta);
     }
 
-    private void setUsingContainerValuesLore(ItemMeta meta, PersistentDataContainer source, String order) {
+    private String getOrderElement(PersistentDataContainer source, String order, String pattern, int locate) {
         String buffer = "";
-        StringBuilder result = new StringBuilder("");
-        Matcher matcher = Pattern.compile(USING_CONTAINER_VALUES_LORE_PATTERN).matcher(order);
-        if (!matcher.matches()) return;
-        String lore = matcher.group(1);
-        for (int i=0; i<lore.length(); i++) {
-            String s = String.valueOf(lore.charAt(i));
-            if (s.equals("{") && (i == 0 || !buffer.equals("\\"))) {
-                int start = i+1;
-                int end = lore.substring(i,lore.length()).indexOf("}");
-                String formula = lore.substring(start, i + end);
-                if (formula.matches("^\\$([0-9a-z\\-_]+)$")) {
+        StringBuilder result = new StringBuilder();
+        Matcher matcher = Pattern.compile(pattern).matcher(order);
+        if (!matcher.matches()) return "None";
+        String parsed = matcher.group(locate);
+        for (int i=0; i<parsed.length(); i++) {
+            String s = String.valueOf(parsed.charAt(i));
+            if (s.equals("{") && (i ==0 || !buffer.equals("\\"))) {
+                int start = i + 1;
+                int end = parsed.substring(i, parsed.length()).indexOf("}");
+                String formula = parsed.substring(start, i + end);
+                i += formula.length() + 1;
+                if (formula.matches("^\\$([a-z0-9\\-_]+)$")) {
                     result.append(getContent(source, formula));
-                    i += formula.length() + 1;
                     continue;
                 }
                 double value = getFormulaValue(formula, source);
                 result.append(String.valueOf(value));
-                i += formula.length() + 1;
-                buffer = String.valueOf(lore.charAt(i));
+                buffer = String.valueOf(parsed.charAt(i));
                 continue;
             }
 
@@ -845,7 +850,11 @@ public class ContainerUtil {
             result.append(s);
             buffer = s;
         }
-        meta.setLore(Arrays.asList(result.toString()));
+        return result.toString();
+    }
+
+    private void setUsingContainerValuesLore(ItemMeta meta, PersistentDataContainer source, String order) {
+        meta.setLore(Arrays.asList(getOrderElement(source, order, USING_CONTAINER_VALUES_LORE_PATTERN, 1)));
     }
 
     @Deprecated
@@ -992,6 +1001,11 @@ public class ContainerUtil {
             return;
         }
 
+    }
+
+    private void setUsingContainerValuesItemName(ItemMeta meta, PersistentDataContainer source, String order) {
+        // modify item-display-name
+        meta.setDisplayName(getOrderElement(source, order, USING_CONTAINER_VALUES_ITEM_NAME_PATTERN, 1));
     }
 
     private String getContent(PersistentDataContainer container, String order) {
