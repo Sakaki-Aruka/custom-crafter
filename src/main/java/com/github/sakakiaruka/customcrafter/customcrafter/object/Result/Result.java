@@ -4,20 +4,20 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.ContainerWrappe
 import com.github.sakakiaruka.customcrafter.customcrafter.util.DataContainerUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.PotionUtil;
 import org.bukkit.Color;
-import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.persistence.PersistentDataType;
+
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Result {
     private String name;
@@ -102,7 +102,7 @@ public class Result {
 
         for(Map.Entry<MetadataType,List<String>> entry : metadata.entrySet()){
             /*
-            * kind of metadata -> lore, displayName, enchantment, itemFlag, unbreakable, customModelData, PotionData, PotionColor
+            * kind of metadata -> lore, displayName, enchantment, itemFlag, unbreakable, customModelData, PotionData, PotionColor, Texture_id
             *
             * lore -> split with ","
             * displayName -> used directly itemName
@@ -112,6 +112,7 @@ public class Result {
             * customModelData -> "modelNumber"
             * potionData -> "PotionEffectType, duration, amplifier(level)". These are separated with ",".
             * potionColor -> "red, green, blue" (RGB)
+            * texture_id -> "([0-9]+)" only set the id that written at first on the list.
             *
              */
 
@@ -155,6 +156,15 @@ public class Result {
                     potionMeta.setColor(Color.fromRGB(r,g,b));
                 }
             }
+            if (type.equals(MetadataType.TEXTURE_ID)) {
+                if (content.isEmpty()) continue;
+                String id = content.get(0);
+                Matcher matcher = Pattern.compile("^([0-9]+)$").matcher(id);
+                if (!matcher.matches()) continue;
+                meta.setCustomModelData(Integer.valueOf(id));
+            }
+
+
             item.setItemMeta(meta);
         }
     }

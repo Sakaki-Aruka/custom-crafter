@@ -1,22 +1,25 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.util;
 
 import com.github.sakakiaruka.customcrafter.customcrafter.command.ContainerModify;
-import com.github.sakakiaruka.customcrafter.customcrafter.object.AmorphousVirtualContainer;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.ContainerWrapper;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Container.RecipeDataContainer;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Container.RecipeDataContainerModifyType;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
+import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.nio.file.Path;
 import java.util.*;
@@ -49,6 +52,16 @@ public class ContainerUtil {
 
     private static final String MULTI_VALUE_PATTERN = "^\\(multi\\)\\(types:(.+)\\)(.+)$";
     private static final String MULTI_VALUE_CLASS_PATTERN = "([\\w]+)\\*([\\d]+)";
+
+    private static final String USING_CONTAINER_VALUES_LORE_PATTERN = "^using_container_values_lore -> (.+)$";
+    private static final String USING_CONTAINER_VALUES_ENCHANTMENT_PATTERN = "^using_container_values_enchantment -> enchantment:([\\$a-zA-Z0-9\\-_]+)/level:(\\$[a-z0-9\\-_]+|[0-9]+)$";
+    private static final String USING_CONTAINER_VALUES_POTION_COLOR_RGB_PATTERN = "^using_container_valeus_potion_color -> type:(?i)(rgb)/value:R->([\\$a-z0-9\\-_]+),G->([\\$a-z0-9\\-_]+),B->([\\$a-z0-9\\-_]+)$";
+    private static final String USING_CONTAINER_VALUES_POTION_COLOR_RANDOM_PATTERN = "^using_container_values_potion_color -> type:(?i)(random)$";
+    private static final String USING_CONTAINER_VALUES_TOOL_DURABILITY_ABSOLUTE_PATTERN = "^using_container_values_tool_durability -> type:absolute/value:([\\$a-z0-9\\-_]+)$";
+    private static final String USING_CONTAINER_VALUES_TOOL_DURABILITY_PERCENTAGE_PATTERN = "^using_container_values_tool_durability -> type:percentage/value:([\\$a-z0-9\\-_]+)$";
+    private static final String USING_CONTAINER_VALUES_TEXTURE_ID_PATTERN = "^using_container_values_texture_id -> ([a-z0-9\\-_]+)$";
+    private static final String USING_CONTAINER_VALUES_ITEM_NAME_PATTERN = "^using_container_values_item_name -> (.+)$";
+    private static final int ENCHANTMENT_MAX_LEVEL = 255;
 
     public PersistentDataType getDataType(String input) {
         if (input.equalsIgnoreCase("string")) return PersistentDataType.STRING;
@@ -741,5 +754,268 @@ public class ContainerUtil {
 
         }
         return result;
+    }
+
+
+    private PersistentDataType getSpecifiedDataType(PersistentDataContainer container, NamespacedKey key) {
+        List<PersistentDataType> types = Arrays.asList(PersistentDataType.STRING, PersistentDataType.INTEGER, PersistentDataType.DOUBLE);
+        for (PersistentDataType type : types) {
+            try{
+                if (!container.has(key, type)) continue;
+                return type;
+            } catch (Exception e) {
+                continue;
+            }
+        }
+        return null;
+    }
+
+    private ItemStack getCorrespondenceItemStack(Inventory inventory, Matter matter) {
+        for (ItemStack item : new InventoryUtil().getItemStackFromCraftingMenu(inventory)) {
+            if (matter.getCandidate().contains(item.getType())) return item;
+        }
+        return null;
+    }
+
+
+    public void setRecipeUsingContainerValueMetadata(Inventory inventory, Recipe recipe, ItemStack item) {
+        ItemMeta resultMeta = item.getItemMeta();
+
+        if (!recipe.hasUsingContainerValuesMetadata()) return;
+        for (Matter matter : recipe.getContentsNoAir()) {
+            if (!recipe.getUsingContainerValuesMetadata().containsKey(matter)) continue;
+            ItemStack relate;
+            if ((relate = getCorrespondenceItemStack(inventory, matter)) == null) continue;
+            List<String> orders = recipe.getUsingContainerValuesMetadata().get(matter);
+            if (orders == null || orders.isEmpty()) continue;
+
+            for (String order : orders) {
+                Matcher lore = Pattern.compile(USING_CONTAINER_VALUES_LORE_PATTERN).matcher(order);
+                Matcher enchant = Pattern.compile(USING_CONTAINER_VALUES_ENCHANTMENT_PATTERN).matcher(order);
+                Matcher rgb = Pattern.compile(USING_CONTAINER_VALUES_POTION_COLOR_RGB_PATTERN).matcher(order);
+                Matcher randomColor = Pattern.compile(USING_CONTAINER_VALUES_POTION_COLOR_RANDOM_PATTERN).matcher(order);
+                Matcher absoluteDurability = Pattern.compile(USING_CONTAINER_VALUES_TOOL_DURABILITY_ABSOLUTE_PATTERN).matcher(order);
+                Matcher percentageDurability = Pattern.compile(USING_CONTAINER_VALUES_TOOL_DURABILITY_PERCENTAGE_PATTERN).matcher(order);
+                Matcher texture = Pattern.compile(USING_CONTAINER_VALUES_TEXTURE_ID_PATTERN).matcher(order);
+                Matcher displayName = Pattern.compile(USING_CONTAINER_VALUES_ITEM_NAME_PATTERN).matcher(order);
+
+                PersistentDataContainer source = relate.getItemMeta().getPersistentDataContainer();
+                if (lore.matches()) setUsingContainerValuesLore(resultMeta, source, order);
+                else if (enchant.matches()) setUsingContainerValuesEnchantment(resultMeta, source, order);
+                else if (rgb.matches()) setUsingContainerValuesPotionColor(resultMeta, source, order);
+                else if (randomColor.matches()) setUsingContainerValuesPotionColor(resultMeta, source, order);
+                else if (absoluteDurability.matches()) setUsingContainerValuesToolDurability(item.getType(), resultMeta, source, order);
+                else if (percentageDurability.matches()) setUsingContainerValuesToolDurability(item.getType(), resultMeta, source, order);
+                else if (texture.matches()) setUsingContainerValuesTextureId(resultMeta, source, order);
+                else if (displayName.matches()) setUsingContainerValuesItemName(resultMeta, source, order);
+                else {
+                    Bukkit.getLogger().warning("[CustomCrafter] USING_CONTAINER_VALUES Metadata failed. (Illegal configuration format found.)");
+                    continue;
+                }
+            }
+        }
+        item.setItemMeta(resultMeta);
+    }
+
+    private String getOrderElement(PersistentDataContainer source, String order, String pattern, int locate) {
+        String buffer = "";
+        StringBuilder result = new StringBuilder();
+        Matcher matcher = Pattern.compile(pattern).matcher(order);
+        if (!matcher.matches()) return "None";
+        String parsed = matcher.group(locate);
+        for (int i=0; i<parsed.length(); i++) {
+            String s = String.valueOf(parsed.charAt(i));
+            if (s.equals("{") && (i ==0 || !buffer.equals("\\"))) {
+                int start = i + 1;
+                int end = parsed.substring(i, parsed.length()).indexOf("}");
+                String formula = parsed.substring(start, i + end);
+                i += formula.length() + 1;
+                if (formula.matches("^\\$([a-z0-9\\-_]+)$")) {
+                    result.append(getContent(source, formula));
+                    continue;
+                }
+                double value = getFormulaValue(formula, source);
+                result.append(String.valueOf(value));
+                buffer = String.valueOf(parsed.charAt(i));
+                continue;
+            }
+
+            if (s.equals("{") && i != 0 && buffer.equals("\\")) {
+                // delete char
+                result.deleteCharAt(result.length()-1);
+            }
+            result.append(s);
+            buffer = s;
+        }
+        return result.toString();
+    }
+
+    private void setUsingContainerValuesLore(ItemMeta meta, PersistentDataContainer source, String order) {
+        meta.setLore(Arrays.asList(getOrderElement(source, order, USING_CONTAINER_VALUES_LORE_PATTERN, 1)));
+    }
+
+    @Deprecated
+    private void setUsingContainerValuesEnchantment(ItemMeta meta, PersistentDataContainer source, String order) {
+        Matcher matcher = Pattern.compile(USING_CONTAINER_VALUES_ENCHANTMENT_PATTERN).matcher(order);
+        if (!matcher.matches()) return;
+        Enchantment enchant;
+        try{
+            String matched = matcher.group(1);
+            enchant = Enchantment.getByName((matched.contains("$") ? getContent(source, matched) : matched).toUpperCase());
+        } catch (Exception e) {
+            Bukkit.getLogger().warning("[CustomCrafter] USING_CONTAINER_VALUES_ENCHANTMENT failed. (Illegal EnchantmentName)");
+            return;
+        }
+
+        int level;
+        try{
+            double preLevel = Double.valueOf(matcher.group(2).contains("$") ? getContent(source, matcher.group(2)) : matcher.group(2));
+            level = (int) Math.round(ENCHANTMENT_MAX_LEVEL < preLevel ? ENCHANTMENT_MAX_LEVEL : preLevel);
+            if (level < 1) {
+                Bukkit.getLogger().warning("[CustomCrafter] USING_CONTAINER_VALUES_ENCHANTMENT failed. (Illegal Level Range. x < 1)");
+                return;
+            }
+        } catch (Exception e) {
+            Bukkit.getLogger().warning("[CustomCrafter] USING_CONTAINER_VALUES_ENCHANTMENT failed. (Illegal Integer pattern. Does not follow ([0-9]+))");
+            return;
+        }
+        meta.addEnchant(enchant, level, true);
+
+    }
+
+    private void setUsingContainerValuesPotionColor(ItemMeta meta, PersistentDataContainer source, String order) {
+        Matcher rgb = Pattern.compile(USING_CONTAINER_VALUES_POTION_COLOR_RGB_PATTERN).matcher(order);
+        Matcher random = Pattern.compile(USING_CONTAINER_VALUES_POTION_COLOR_RANDOM_PATTERN).matcher(order);
+        if (rgb.matches()) {
+            // rgb
+            String red = rgb.group(1);
+            String green = rgb.group(2);
+            String blue = rgb.group(3);
+            int RED ,GREEN, BLUE;
+            try {
+                RED = (int) Math.round(Double.valueOf(red.contains("$") ? getContent(source, red) : red));
+                GREEN = (int) Math.round(Double.valueOf(green.contains("$") ? getContent(source, green) : green));
+                BLUE = (int) Math.round(Double.valueOf(blue.contains("$") ? getContent(source, blue) : blue));
+            } catch (Exception e) {
+                Bukkit.getLogger().warning("[CustomCrafter] USING_CONTAINER_VALUES_POTION_COLOR failed. (Returned None Value or String type-value.)");
+                return;
+            }
+
+            if (RED < 0 || 255 < RED) RED = RED < 0 ? 0 : 255;
+            if (GREEN < 0 || 255 < GREEN) GREEN = GREEN < 0 ? 0 : 255;
+            if (BLUE < 0 || 255 < BLUE) BLUE = BLUE < 0 ? 0 : 255;
+            try{
+                PotionMeta potionMeta = (PotionMeta) meta;
+                potionMeta.setColor(Color.fromRGB(RED, GREEN, BLUE));
+            } catch (Exception e) {
+                Bukkit.getLogger().warning("[CustomCrafter] USING_CONTAINER_VALUES_POTION_COLOR failed. (PotionMeta cast failed.)");
+                return;
+            }
+
+
+        } else if (random.matches()) {
+            // random
+            Random dice = new Random();
+            int RED = dice.nextInt(256);
+            int GREEN = dice.nextInt(256);
+            int BLUE = dice.nextInt(256);
+            try{
+                PotionMeta potionMeta = (PotionMeta) meta;
+                potionMeta.setColor(Color.fromRGB(RED, GREEN, BLUE));
+            } catch (Exception e) {
+                Bukkit.getLogger().warning("[CustomCrafter] USING_CONTAINER_VALUES_POTION_COLOR failed. (PotionMeta cast failed.)");
+                return;
+            }
+
+        } else {
+            Bukkit.getLogger().warning("[CustomCrafter] USING_CONTAINER_VALUES_POTION_COLOR failed. (Illegal pattern.)");
+            return;
+        }
+    }
+
+    private void setUsingContainerValuesTextureId(ItemMeta meta, PersistentDataContainer source, String order) {
+        int id;
+        try{
+            id = (int) Math.round(Double.valueOf(getContent(source, order)));
+        } catch (Exception e) {
+            Bukkit.getLogger().warning("[CustomCrafter] USING_CONTAINER_VALUES_TEXTURE_ID failed. (Illegal texture id.)");
+            return;
+        }
+        meta.setCustomModelData(id);
+    }
+
+    private void setUsingContainerValuesToolDurability(Material material,ItemMeta meta, PersistentDataContainer source, String order) {
+        Matcher absolute = Pattern.compile(USING_CONTAINER_VALUES_TOOL_DURABILITY_ABSOLUTE_PATTERN).matcher(order);
+        Matcher percentage = Pattern.compile(USING_CONTAINER_VALUES_TOOL_DURABILITY_PERCENTAGE_PATTERN).matcher(order);
+        if (absolute.matches()) {
+            // absolute
+            int LAST_ONE = material.getMaxDurability() - 1;
+            String variable = absolute.group(1);
+            double value;
+            try {
+                value = Double.valueOf(getContent(source, variable));
+            } catch (Exception e) {
+                Bukkit.getLogger().warning("[CustomCrafter] USING_CONTAINER_VALUES_TOOL_DURABILITY failed. (Returned None Value or String type-value found.)");
+                return;
+            }
+            Damageable damageable;
+            try{
+                damageable = (Damageable) meta;
+            } catch (Exception e) {
+                Bukkit.getLogger().warning("[CustomCrafter] USING_CONTAINER_VALUES_TOOL_DURABILITY failed. (Illegal item.(Un-Damageable))");
+                return;
+            }
+            int durability = material.getMaxDurability() - (int) Math.round(value);
+            if (durability < 1 || material.getMaxDurability() < durability) durability = durability < 0 ? LAST_ONE : 0;
+            damageable.setDamage(durability);
+
+        } else if (percentage.matches()) {
+            // percentage
+            int LAST_ONE = material.getMaxDurability() - 1;
+            String variable = percentage.group(1);
+            double value;
+            try {
+                value = Double.valueOf(getContent(source, variable));
+            } catch (Exception e) {
+                Bukkit.getLogger().warning("[CustomCrafter] USING_CONTAINER_VALUES_TOOL_DURABILITY failed. (Returned None Value or String type-value found.)");
+                return;
+            }
+            Damageable damageable;
+            try {
+                damageable = (Damageable) meta;
+            } catch (Exception e) {
+                Bukkit.getLogger().warning("[CustomCrafter] USING_CONTAINER_VALUES_TOOL_DURABILITY failed. (Illegal item.(Un-Damageable))");
+                return;
+            }
+            // value -> (%)
+            if (value < 1 || 100 < value) value = value < 1 ? 99 : 0;
+            int durability = (int) Math.round((100 - value) * 0.01 * material.getMaxDurability());
+            if (durability < 1) durability = LAST_ONE;
+            damageable.setDamage(durability);
+
+        } else {
+            Bukkit.getLogger().warning("[CustomCrafter] USING_CONTAINER_VALUES_TOOL_DURABILITY failed. (Illegal pattern.)");
+            return;
+        }
+
+    }
+
+    private void setUsingContainerValuesItemName(ItemMeta meta, PersistentDataContainer source, String order) {
+        // modify item-display-name
+        meta.setDisplayName(getOrderElement(source, order, USING_CONTAINER_VALUES_ITEM_NAME_PATTERN, 1));
+    }
+
+    private String getContent(PersistentDataContainer container, String order) {
+        order = order.replace("$","");
+        NamespacedKey key = new NamespacedKey(getInstance(), order);
+        PersistentDataType type;
+        try{
+            type = getSpecifiedDataType(container, key);
+        } catch (Exception e) {
+            return "None";
+        }
+        if (type == null) return "None";
+        if (!container.has(key, type)) return "None";
+        return String.valueOf(container.get(key, type));
     }
 }

@@ -7,7 +7,6 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.Result;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.permissions.Permission;
 
 import java.util.*;
 
@@ -19,8 +18,9 @@ public class Recipe {
     private RecipePermission permission;
     private Result result;
     private Map<NamespacedKey, List<RecipeDataContainer>> container;
+    private Map<Matter, List<String>> usingContainerValuesMetadata;
 
-    public Recipe(String name,String tag,Map<Coordinate,Matter> coordinate,Map<Material,ItemStack> returnItems,Result result, RecipePermission permission, Map<NamespacedKey, List<RecipeDataContainer>> container){
+    public Recipe(String name,String tag,Map<Coordinate,Matter> coordinate,Map<Material,ItemStack> returnItems,Result result, RecipePermission permission, Map<NamespacedKey, List<RecipeDataContainer>> container, Map<Matter, List<String>> usingContainerValuesMetadata){
         this.name = name;
         this.tag = Tag.valueOf(tag);
         this.coordinate = coordinate;
@@ -28,6 +28,7 @@ public class Recipe {
         this.result = result;
         this.permission = permission;
         this.container = container;
+        this.usingContainerValuesMetadata = usingContainerValuesMetadata;
     }
 
     public Recipe(){ //only used for temporary (mainly real) -> tag is "Normal"
@@ -37,6 +38,8 @@ public class Recipe {
         this.returnItems = null;
         this.result = null;
         this.permission = null;
+        this.container = new HashMap<>();
+        this.usingContainerValuesMetadata = new HashMap<>();
     }
 
     public void addCoordinate(int x,int y,Matter matter){
@@ -94,6 +97,7 @@ public class Recipe {
     public boolean hasPermission(){
         return permission != null;
     }
+
 
     public List<Matter> getContentsNoAir(){
         List<Matter> list = new ArrayList<>();
@@ -171,5 +175,17 @@ public class Recipe {
         if (this.container == null) return false;
         if (this.container.isEmpty()) return false;
         return true;
+    }
+
+    public Map<Matter, List<String>> getUsingContainerValuesMetadata() {
+        return usingContainerValuesMetadata;
+    }
+
+    public void setUsingContainerValuesMetadata(Map<Matter, List<String>> usingContainerValuesMetadata) {
+        this.usingContainerValuesMetadata = usingContainerValuesMetadata;
+    }
+
+    public boolean hasUsingContainerValuesMetadata() {
+        return !(this.usingContainerValuesMetadata == null || this.usingContainerValuesMetadata.isEmpty());
     }
 }

@@ -56,7 +56,7 @@ public class Matter implements Matters {
     public Matter(ItemStack item){
         this.name = "";
         this.candidate = Arrays.asList(item.getType());
-        if(item.getItemMeta().hasEnchants() && !candidate.get(0).equals(Material.ENCHANTED_BOOK)){
+        if(item.hasItemMeta() && item.getItemMeta().hasEnchants() && !candidate.get(0).equals(Material.ENCHANTED_BOOK)){
             // an enchanted item (not an Enchanted_book)
             List<EnchantWrap> list = new ArrayList<>();
             for(Map.Entry<Enchantment,Integer> entry : item.getItemMeta().getEnchants().entrySet()){
@@ -224,5 +224,33 @@ public class Matter implements Matters {
             map.put(entry.getKey(), entry.getValue());
         }
         return map;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        /*
+         * return the congruence with given object and this.
+         *
+         * check elements
+         * - candidate (all match)
+         * - mass
+         * - amount
+         */
+        if (this == obj) return true;
+        if (!(obj instanceof Matter)) return false;
+        Matter matter =(Matter) obj;
+        if (!this.candidate.equals(matter.candidate)) return false;
+        if (this.mass != matter.mass) return false;
+        if (this.amount != matter.amount) return false;
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = result * 31 + candidate.hashCode();
+        result = result * 31 + (mass ? 1 : 0);
+        result = result * 31 + amount;
+        return result;
     }
 }
