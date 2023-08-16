@@ -78,7 +78,7 @@ public class SettingsLoad {
     private int load_interval;
 
     // === for recipe load === //
-    private static final String USING_CONTAINER_VALUES_METADATA_PATTERN = "^([0-9a-zA-Z_\\-]+) <--> ([.]+)$";
+    private static final String USING_CONTAINER_VALUES_METADATA_PATTERN = "^([0-9a-zA-Z_\\-]+) <--> (.+)$";
 
     public void load(){
         defaultConfig = getInstance().getConfig();
@@ -326,6 +326,9 @@ public class SettingsLoad {
             String name = material.name().toLowerCase();
             Result result = new Result(name,null,1,null,material.name(),-1, new ArrayList<>());
             results.put(name,result);
+
+            Matter matter = new Matter(Arrays.asList(material), 1);
+            matters.put(name, matter);
         }
     }
 
@@ -601,14 +604,22 @@ public class SettingsLoad {
             Map<Matter, List<String>> usingContainerValuesMetadata = new HashMap<>();
             if (config.contains("using_container_values_metadata")) {
                 for (String s : config.getStringList("using_container_values_metadata")) {
+
+                    //debug
+                    System.out.println("s: "+s);
+
                     Matcher matcher = Pattern.compile(USING_CONTAINER_VALUES_METADATA_PATTERN).matcher(s);
                     if (!matcher.matches()) continue;
                     String matterName = matcher.group(1);
-                    if (!matters.containsKey(matterName)) continue;
+                    if (!matters.containsKey(matterName) && !allMaterials.contains(matterName.toUpperCase())) continue;
                     Matter matter = matters.get(matterName);
                     String order = matcher.group(2);
                     if (!usingContainerValuesMetadata.containsKey(matter)) usingContainerValuesMetadata.put(matter, new ArrayList<>());
                     usingContainerValuesMetadata.get(matter).add(order);
+
+                    //debug
+                    System.out.println("matter name: "+matterName);
+                    System.out.println("order: "+order);
                 }
             }
 
