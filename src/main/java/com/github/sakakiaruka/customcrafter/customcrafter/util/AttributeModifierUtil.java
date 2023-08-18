@@ -15,7 +15,7 @@ public class AttributeModifierUtil {
     public static final String USING_CONTAINER_VALUES_ATTRIBUTE_MODIFIER_PATTERN = "^using_container_values_attribute_modifier -> type:([\\w_]+)/operation:(?i)(add|multiply)/value:\\$([a-z0-9\\-_]+)$";
     public static final String USING_CONTAINER_VALUES_ATTRIBUTE_MODIFIER_EQUIPMENT_SLOT_PATTERN = "^using_container_values_attribute_modifier -> type:([\\w_]+)/operation:(?i)(add|multiply)/value:\\$([a-z0-9\\-_]+)/slot:([\\$a-zA-Z]+)$";
 
-    private void setAttributeModifier(ItemMeta meta, PersistentDataContainer source, String order, boolean isNormal, Matcher matcher, String pattern) {
+    private void setAttributeModifier(ItemMeta meta, PersistentDataContainer source, String order, boolean isNormal, Matcher matcher) {
         Attribute attribute;
         try {
             attribute = Attribute.valueOf(matcher.group(1).toUpperCase());
@@ -26,19 +26,8 @@ public class AttributeModifierUtil {
 
         double value;
         try {
-
-            //debug
-            System.out.println("attribute modifier debug order: "+order);
-            System.out.println("attribute modifier debug group: "+matcher.group(3));
-            System.out.println("attribute modifier debug: "+new ContainerUtil().getContent(source, matcher.group(3)));
-            if (isNormal) System.out.println("attribute modifier debug slot: "+matcher.group(4));
-
             value = Double.valueOf(new ContainerUtil().getContent(source, matcher.group(3)));
         } catch (Exception e) {
-
-            //debug
-            e.printStackTrace();
-
             Bukkit.getLogger().warning("[CustomCrafter] USING_CONTAINER_VALUES_ATTRIBUTE_MODIFIER failed. (Attribute modifier -> Not a Number.)");
             return;
         }
@@ -79,20 +68,17 @@ public class AttributeModifierUtil {
     public void setAttributeModifierToResult(ItemMeta meta, PersistentDataContainer container, String order) {
         Matcher matcher;
         boolean isNormal = false;
-        String pattern;
         if (order.matches(USING_CONTAINER_VALUES_ATTRIBUTE_MODIFIER_PATTERN)) {
             matcher = Pattern.compile(USING_CONTAINER_VALUES_ATTRIBUTE_MODIFIER_PATTERN).matcher(order);
             isNormal = true;
-            pattern = USING_CONTAINER_VALUES_ATTRIBUTE_MODIFIER_PATTERN;
         } else if (order.matches(USING_CONTAINER_VALUES_ATTRIBUTE_MODIFIER_EQUIPMENT_SLOT_PATTERN)) {
             matcher = Pattern.compile(USING_CONTAINER_VALUES_ATTRIBUTE_MODIFIER_EQUIPMENT_SLOT_PATTERN).matcher(order);
-            pattern = USING_CONTAINER_VALUES_ATTRIBUTE_MODIFIER_EQUIPMENT_SLOT_PATTERN;
         } else {
             Bukkit.getLogger().warning("[CustomCrafter] USING_CONTAINER_VALUES_ATTRIBUTE_MODIFIER failed. (Not match AttributeModifier pattern.)");
             return;
         }
 
         if (!matcher.matches()) return;
-        setAttributeModifier(meta, container, order, isNormal, matcher, pattern);
+        setAttributeModifier(meta, container, order, isNormal, matcher);
     }
 }
