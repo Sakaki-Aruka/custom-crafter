@@ -28,6 +28,8 @@ import java.util.regex.Pattern;
 
 import static com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter.getInstance;
 import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.*;
+import static com.github.sakakiaruka.customcrafter.customcrafter.util.AttributeModifierUtil.USING_CONTAINER_VALUES_ATTRIBUTE_MODIFIER_EQUIPMENT_SLOT_PATTERN;
+import static com.github.sakakiaruka.customcrafter.customcrafter.util.AttributeModifierUtil.USING_CONTAINER_VALUES_ATTRIBUTE_MODIFIER_PATTERN;
 
 public class ContainerUtil {
     public static Map<String, Map<Integer, ContainerWrapper>> containers = new HashMap<>();
@@ -798,6 +800,8 @@ public class ContainerUtil {
                 Matcher percentageDurability = Pattern.compile(USING_CONTAINER_VALUES_TOOL_DURABILITY_PERCENTAGE_PATTERN).matcher(order);
                 Matcher texture = Pattern.compile(USING_CONTAINER_VALUES_TEXTURE_ID_PATTERN).matcher(order);
                 Matcher displayName = Pattern.compile(USING_CONTAINER_VALUES_ITEM_NAME_PATTERN).matcher(order);
+                Matcher attributeModifierNormal = Pattern.compile(USING_CONTAINER_VALUES_ATTRIBUTE_MODIFIER_PATTERN).matcher(order);
+                Matcher attributeModifierEquipment = Pattern.compile(USING_CONTAINER_VALUES_ATTRIBUTE_MODIFIER_EQUIPMENT_SLOT_PATTERN).matcher(order);
 
                 PersistentDataContainer source = relate.getItemMeta().getPersistentDataContainer();
                 if (lore.matches()) setUsingContainerValuesLore(resultMeta, source, order);
@@ -808,6 +812,8 @@ public class ContainerUtil {
                 else if (percentageDurability.matches()) setUsingContainerValuesToolDurability(item.getType(), resultMeta, source, order);
                 else if (texture.matches()) setUsingContainerValuesTextureId(resultMeta, source, order);
                 else if (displayName.matches()) setUsingContainerValuesItemName(resultMeta, source, order);
+                else if (attributeModifierNormal.matches()) new AttributeModifierUtil().setAttributeModifierToResult(resultMeta, source, order);
+                else if (attributeModifierEquipment.matches()) new AttributeModifierUtil().setAttributeModifierToResult(resultMeta, source, order);
                 else {
                     Bukkit.getLogger().warning("[CustomCrafter] USING_CONTAINER_VALUES Metadata failed. (Illegal configuration format found.)");
                     continue;
@@ -1005,7 +1011,8 @@ public class ContainerUtil {
         meta.setDisplayName(getOrderElement(source, order, USING_CONTAINER_VALUES_ITEM_NAME_PATTERN, 1));
     }
 
-    private String getContent(PersistentDataContainer container, String order) {
+    public String getContent(PersistentDataContainer container, String order) {
+        if (!order.contains(order)) return order;
         order = order.replace("$","");
         NamespacedKey key = new NamespacedKey(getInstance(), order);
         PersistentDataType type;
