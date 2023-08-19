@@ -48,7 +48,7 @@ public class ContainerUtil {
     private static final String CONTAINER_OPERATION_PATTERN = "([\\+\\-/\\*\\^])";
 
     private static final String RECIPE_CONTAINER_ARROW_RANGE_PATTERN = "^([0-9a-zA-Z\\+\\-\\*/\\(\\)\\$_\\[\\]]+)<--\\[(maximum|minimum|median|mode|average|random)\\]-->([0-9a-zA-Z\\+\\-\\*/\\(\\)\\$_\\[\\]]+)$";
-    private static final String RECIPE_CONTAINER_LARGER_PATTERN = "^([0-9a-zA-Z\\+\\-\\*/\\(\\)\\$_\\[\\]]+)<\\[(maximum|minimum|median|mode|average|random)\\]$";
+    private static final String RECIPE_CONTAINER_LARGER_PATTERN = "^([0-9a-zA-Z\\+\\-\\*/\\(\\)$_\\[\\]]+)<\\[(maximum|minimum|median|mode|average|random)\\]$";
     private static final String RECIPE_CONTAINER_SMALLER_PATTERN = "^\\[(maximum|minimum|median|mode|average|random)\\]<([0-9a-zA-Z\\+\\-\\*/\\(\\)\\$_\\[\\]]+)$";
     private static final String RECIPE_CONTAINER_EQUAL_PATTERN = "^\\[(maximum|minimum|median|mode|average|random)\\]==([0-9a-zA-Z\\+\\-\\*/\\(\\)\\$_\\[\\]]+)$";
 
@@ -57,10 +57,10 @@ public class ContainerUtil {
 
     private static final String USING_CONTAINER_VALUES_LORE_PATTERN = "^using_container_values_lore -> (.+)$";
     private static final String USING_CONTAINER_VALUES_ENCHANTMENT_PATTERN = "^using_container_values_enchantment -> enchantment:([\\$a-zA-Z0-9\\-_]+)/level:(\\$[a-z0-9\\-_]+|[0-9]+)$";
-    private static final String USING_CONTAINER_VALUES_POTION_COLOR_RGB_PATTERN = "^using_container_valeus_potion_color -> type:(?i)(rgb)/value:R->([\\$a-z0-9\\-_]+),G->([\\$a-z0-9\\-_]+),B->([\\$a-z0-9\\-_]+)$";
+    private static final String USING_CONTAINER_VALUES_POTION_COLOR_RGB_PATTERN = "^using_container_valeus_potion_color -> type:(?i)(rgb)/value:R->([$a-z0-9\\-_]+),G->([$a-z0-9\\-_]+),B->([$a-z0-9\\-_]+)$";
     private static final String USING_CONTAINER_VALUES_POTION_COLOR_RANDOM_PATTERN = "^using_container_values_potion_color -> type:(?i)(random)$";
-    private static final String USING_CONTAINER_VALUES_TOOL_DURABILITY_ABSOLUTE_PATTERN = "^using_container_values_tool_durability -> type:absolute/value:([\\$a-z0-9\\-_]+)$";
-    private static final String USING_CONTAINER_VALUES_TOOL_DURABILITY_PERCENTAGE_PATTERN = "^using_container_values_tool_durability -> type:percentage/value:([\\$a-z0-9\\-_]+)$";
+    private static final String USING_CONTAINER_VALUES_TOOL_DURABILITY_ABSOLUTE_PATTERN = "^using_container_values_tool_durability -> type:absolute/value:([$a-z0-9\\-_]+)$";
+    private static final String USING_CONTAINER_VALUES_TOOL_DURABILITY_PERCENTAGE_PATTERN = "^using_container_values_tool_durability -> type:percentage/value:([$a-z0-9\\-_]+)$";
     private static final String USING_CONTAINER_VALUES_TEXTURE_ID_PATTERN = "^using_container_values_texture_id -> ([a-z0-9\\-_]+)$";
     private static final String USING_CONTAINER_VALUES_ITEM_NAME_PATTERN = "^using_container_values_item_name -> (.+)$";
     private static final int ENCHANTMENT_MAX_LEVEL = 255;
@@ -1012,7 +1012,7 @@ public class ContainerUtil {
     }
 
     public String getContent(PersistentDataContainer container, String order) {
-        if (!order.contains(order)) return order;
+        if (!order.contains("$")) return order;
         order = order.replace("$","");
         NamespacedKey key = new NamespacedKey(getInstance(), order);
         PersistentDataType type;

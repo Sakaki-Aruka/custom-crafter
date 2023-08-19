@@ -12,8 +12,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class AttributeModifierUtil {
-    public static final String USING_CONTAINER_VALUES_ATTRIBUTE_MODIFIER_PATTERN = "^using_container_values_attribute_modifier -> type:([\\w_]+)/operation:(?i)(add|multiply)/value:\\$([a-z0-9\\-_]+)$";
-    public static final String USING_CONTAINER_VALUES_ATTRIBUTE_MODIFIER_EQUIPMENT_SLOT_PATTERN = "^using_container_values_attribute_modifier -> type:([\\w_]+)/operation:(?i)(add|multiply)/value:\\$([a-z0-9\\-_]+)/slot:([\\$a-zA-Z]+)$";
+    public static final String USING_CONTAINER_VALUES_ATTRIBUTE_MODIFIER_PATTERN = "^using_container_values_attribute_modifier -> type:([\\w_]+)/operation:(?i)(add|multiply|add_scalar)/value:([$a-z0-9\\-_.]+)$";
+    public static final String USING_CONTAINER_VALUES_ATTRIBUTE_MODIFIER_EQUIPMENT_SLOT_PATTERN = "^using_container_values_attribute_modifier -> type:([\\w_]+)/operation:(?i)(add|multiply|add_scalar)/value:([$a-z0-9\\-_.]+)/slot:([\\$a-zA-Z]+)$";
 
     private void setAttributeModifier(ItemMeta meta, PersistentDataContainer source, String order, boolean isNormal, Matcher matcher) {
         Attribute attribute;
@@ -47,7 +47,11 @@ public class AttributeModifierUtil {
             operation = AttributeModifier.Operation.ADD_NUMBER;
         } else if (matcher.group(2).equalsIgnoreCase("multiply")) {
             operation = AttributeModifier.Operation.MULTIPLY_SCALAR_1;
-        } else return;
+        } else if (matcher.group(2).equalsIgnoreCase("add_scalar")) {
+            operation = AttributeModifier.Operation.ADD_SCALAR;
+        } else {
+            return;
+        }
 
         UUID uuid = UUID.randomUUID();
         String name = matcher.group(1);
