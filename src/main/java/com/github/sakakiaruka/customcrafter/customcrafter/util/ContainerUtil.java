@@ -28,6 +28,8 @@ import java.util.regex.Pattern;
 
 import static com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter.getInstance;
 import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.*;
+import static com.github.sakakiaruka.customcrafter.customcrafter.util.AttributeModifierUtil.USING_CONTAINER_VALUES_ATTRIBUTE_MODIFIER_EQUIPMENT_SLOT_PATTERN;
+import static com.github.sakakiaruka.customcrafter.customcrafter.util.AttributeModifierUtil.USING_CONTAINER_VALUES_ATTRIBUTE_MODIFIER_PATTERN;
 
 public class ContainerUtil {
     public static Map<String, Map<Integer, ContainerWrapper>> containers = new HashMap<>();
@@ -46,7 +48,7 @@ public class ContainerUtil {
     private static final String CONTAINER_OPERATION_PATTERN = "([\\+\\-/\\*\\^])";
 
     private static final String RECIPE_CONTAINER_ARROW_RANGE_PATTERN = "^([0-9a-zA-Z\\+\\-\\*/\\(\\)\\$_\\[\\]]+)<--\\[(maximum|minimum|median|mode|average|random)\\]-->([0-9a-zA-Z\\+\\-\\*/\\(\\)\\$_\\[\\]]+)$";
-    private static final String RECIPE_CONTAINER_LARGER_PATTERN = "^([0-9a-zA-Z\\+\\-\\*/\\(\\)\\$_\\[\\]]+)<\\[(maximum|minimum|median|mode|average|random)\\]$";
+    private static final String RECIPE_CONTAINER_LARGER_PATTERN = "^([0-9a-zA-Z\\+\\-\\*/\\(\\)$_\\[\\]]+)<\\[(maximum|minimum|median|mode|average|random)\\]$";
     private static final String RECIPE_CONTAINER_SMALLER_PATTERN = "^\\[(maximum|minimum|median|mode|average|random)\\]<([0-9a-zA-Z\\+\\-\\*/\\(\\)\\$_\\[\\]]+)$";
     private static final String RECIPE_CONTAINER_EQUAL_PATTERN = "^\\[(maximum|minimum|median|mode|average|random)\\]==([0-9a-zA-Z\\+\\-\\*/\\(\\)\\$_\\[\\]]+)$";
 
@@ -55,10 +57,10 @@ public class ContainerUtil {
 
     private static final String USING_CONTAINER_VALUES_LORE_PATTERN = "^using_container_values_lore -> (.+)$";
     private static final String USING_CONTAINER_VALUES_ENCHANTMENT_PATTERN = "^using_container_values_enchantment -> enchantment:([\\$a-zA-Z0-9\\-_]+)/level:(\\$[a-z0-9\\-_]+|[0-9]+)$";
-    private static final String USING_CONTAINER_VALUES_POTION_COLOR_RGB_PATTERN = "^using_container_valeus_potion_color -> type:(?i)(rgb)/value:R->([\\$a-z0-9\\-_]+),G->([\\$a-z0-9\\-_]+),B->([\\$a-z0-9\\-_]+)$";
+    private static final String USING_CONTAINER_VALUES_POTION_COLOR_RGB_PATTERN = "^using_container_valeus_potion_color -> type:(?i)(rgb)/value:R->([$a-z0-9\\-_]+),G->([$a-z0-9\\-_]+),B->([$a-z0-9\\-_]+)$";
     private static final String USING_CONTAINER_VALUES_POTION_COLOR_RANDOM_PATTERN = "^using_container_values_potion_color -> type:(?i)(random)$";
-    private static final String USING_CONTAINER_VALUES_TOOL_DURABILITY_ABSOLUTE_PATTERN = "^using_container_values_tool_durability -> type:absolute/value:([\\$a-z0-9\\-_]+)$";
-    private static final String USING_CONTAINER_VALUES_TOOL_DURABILITY_PERCENTAGE_PATTERN = "^using_container_values_tool_durability -> type:percentage/value:([\\$a-z0-9\\-_]+)$";
+    private static final String USING_CONTAINER_VALUES_TOOL_DURABILITY_ABSOLUTE_PATTERN = "^using_container_values_tool_durability -> type:absolute/value:([$a-z0-9\\-_]+)$";
+    private static final String USING_CONTAINER_VALUES_TOOL_DURABILITY_PERCENTAGE_PATTERN = "^using_container_values_tool_durability -> type:percentage/value:([$a-z0-9\\-_]+)$";
     private static final String USING_CONTAINER_VALUES_TEXTURE_ID_PATTERN = "^using_container_values_texture_id -> ([a-z0-9\\-_]+)$";
     private static final String USING_CONTAINER_VALUES_ITEM_NAME_PATTERN = "^using_container_values_item_name -> (.+)$";
     private static final int ENCHANTMENT_MAX_LEVEL = 255;
@@ -798,6 +800,8 @@ public class ContainerUtil {
                 Matcher percentageDurability = Pattern.compile(USING_CONTAINER_VALUES_TOOL_DURABILITY_PERCENTAGE_PATTERN).matcher(order);
                 Matcher texture = Pattern.compile(USING_CONTAINER_VALUES_TEXTURE_ID_PATTERN).matcher(order);
                 Matcher displayName = Pattern.compile(USING_CONTAINER_VALUES_ITEM_NAME_PATTERN).matcher(order);
+                Matcher attributeModifierNormal = Pattern.compile(USING_CONTAINER_VALUES_ATTRIBUTE_MODIFIER_PATTERN).matcher(order);
+                Matcher attributeModifierEquipment = Pattern.compile(USING_CONTAINER_VALUES_ATTRIBUTE_MODIFIER_EQUIPMENT_SLOT_PATTERN).matcher(order);
 
                 PersistentDataContainer source = relate.getItemMeta().getPersistentDataContainer();
                 if (lore.matches()) setUsingContainerValuesLore(resultMeta, source, order);
@@ -808,6 +812,8 @@ public class ContainerUtil {
                 else if (percentageDurability.matches()) setUsingContainerValuesToolDurability(item.getType(), resultMeta, source, order);
                 else if (texture.matches()) setUsingContainerValuesTextureId(resultMeta, source, order);
                 else if (displayName.matches()) setUsingContainerValuesItemName(resultMeta, source, order);
+                else if (attributeModifierNormal.matches()) new AttributeModifierUtil().setAttributeModifierToResult(resultMeta, source, order);
+                else if (attributeModifierEquipment.matches()) new AttributeModifierUtil().setAttributeModifierToResult(resultMeta, source, order);
                 else {
                     Bukkit.getLogger().warning("[CustomCrafter] USING_CONTAINER_VALUES Metadata failed. (Illegal configuration format found.)");
                     continue;
@@ -1005,7 +1011,8 @@ public class ContainerUtil {
         meta.setDisplayName(getOrderElement(source, order, USING_CONTAINER_VALUES_ITEM_NAME_PATTERN, 1));
     }
 
-    private String getContent(PersistentDataContainer container, String order) {
+    public String getContent(PersistentDataContainer container, String order) {
+        if (!order.contains("$")) return order;
         order = order.replace("$","");
         NamespacedKey key = new NamespacedKey(getInstance(), order);
         PersistentDataType type;
