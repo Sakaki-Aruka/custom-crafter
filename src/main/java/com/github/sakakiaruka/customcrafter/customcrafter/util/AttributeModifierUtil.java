@@ -15,7 +15,7 @@ public class AttributeModifierUtil {
     public static final String USING_CONTAINER_VALUES_ATTRIBUTE_MODIFIER_PATTERN = "^using_container_values_attribute_modifier -> type:([\\w_]+)/operation:(?i)(add|multiply|add_scalar)/value:([$a-z0-9\\-_.]+)$";
     public static final String USING_CONTAINER_VALUES_ATTRIBUTE_MODIFIER_EQUIPMENT_SLOT_PATTERN = "^using_container_values_attribute_modifier -> type:([\\w_]+)/operation:(?i)(add|multiply|add_scalar)/value:([$a-z0-9\\-_.]+)/slot:([\\$a-zA-Z]+)$";
 
-    private void setAttributeModifier(ItemMeta meta, PersistentDataContainer source, String order, boolean isNormal, Matcher matcher) {
+    private void setAttributeModifier(ItemMeta meta, PersistentDataContainer source, boolean isNormal, Matcher matcher) {
         Attribute attribute;
         try {
             attribute = Attribute.valueOf(matcher.group(1).toUpperCase());
@@ -42,16 +42,7 @@ public class AttributeModifierUtil {
             }
         }
 
-        AttributeModifier.Operation operation;
-        if (matcher.group(2).equalsIgnoreCase("add")) {
-            operation = AttributeModifier.Operation.ADD_NUMBER;
-        } else if (matcher.group(2).equalsIgnoreCase("multiply")) {
-            operation = AttributeModifier.Operation.MULTIPLY_SCALAR_1;
-        } else if (matcher.group(2).equalsIgnoreCase("add_scalar")) {
-            operation = AttributeModifier.Operation.ADD_SCALAR;
-        } else {
-            return;
-        }
+        AttributeModifier.Operation operation = AttributeModifier.Operation.valueOf(matcher.group(2).toUpperCase());
 
         UUID uuid = UUID.randomUUID();
         String name = matcher.group(1);
@@ -83,6 +74,36 @@ public class AttributeModifierUtil {
         }
 
         if (!matcher.matches()) return;
-        setAttributeModifier(meta, container, order, isNormal, matcher);
+        setAttributeModifier(meta, container, isNormal, matcher);
+    }
+
+    public AttributeModifier getAttributeModifier(Matcher matcher, boolean isNormal) {
+        Attribute attribute;
+        try {
+            attribute = Attribute.valueOf(matcher.group(1).toUpperCase());
+        } catch (Exception e) {
+            Bukkit.getLogger().warning("[CustomCrafter] AttributeModifier (Result) failed. (Illegal Attribute found.)");
+            return null;
+        }
+        AttributeModifier.Operation operation = AttributeModifier.Operation.valueOf(matcher.group(2).toUpperCase());
+        double value = Double.valueOf(matcher.group(3));
+        EquipmentSlot slot = null;
+        if (!isNormal) {
+            try {
+                slot = EquipmentSlot.valueOf(matcher.group(5).toUpperCase());
+            } catch (Exception e) {
+                Bukkit.getLogger().warning("[CustomCrafter] AttributeModifier (Result) failed. (Illegal EquipmentSlot found.)");
+                return null;
+            }
+        }
+        AttributeModifier modifier;
+        UUID uuid = UUID.randomUUID();
+        String name = attribute.name();
+        if (isNormal) {
+            modifier = new AttributeModifier(uuid, name, value, operation);
+        } else {
+            modifier = new AttributeModifier(uuid, name, value, operation, slot);
+        }
+        return modifier;
     }
 }

@@ -1,17 +1,23 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.object.Result;
 
 import com.github.sakakiaruka.customcrafter.customcrafter.object.ContainerWrapper;
+import com.github.sakakiaruka.customcrafter.customcrafter.util.AttributeModifierUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.DataContainerUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.PotionUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.checkerframework.checker.units.qual.A;
 
 import java.util.Arrays;
 import java.util.List;
@@ -20,6 +26,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Result {
+    private static final String NORMAL_ATTRIBUTE_MODIFIER_PATTERN = "^type:([\\w_]+)/operation:(?i)(add|multiply|add_scalar)/value:(\\-?\\d+(\\.\\d+)?)$";
+    private static final String EQUIPMENT_ATTRIBUTE_MODIFIER_PATTERN = "^type:([\\w_]+)/operation:(?i)(add|multiply|add_scalar)/value:(\\-?\\d+(\\.\\d+)?)/slot:(\\w+)$";
     private String name;
     private Map<Enchantment,Integer> enchantsInfo;
     private int amount;
@@ -164,6 +172,48 @@ public class Result {
                 meta.setCustomModelData(Integer.valueOf(id));
             }
 
+            if (type.equals(MetadataType.ATTRIBUTE_MODIFIER)) {
+                // attribute_modifier,type:(Attribute)/operation:(add/multiply/add_scalar)/value:(double)
+                // attribute_modifier,type:(Attribute)/operation:(add/multiply/add_scalar)/value:(double)/slot:(EquipmentSlot)
+                for (String s : content) {
+                    Matcher matcher;
+                    boolean isNormal = false;
+                    if (s.matches(NORMAL_ATTRIBUTE_MODIFIER_PATTERN)) {
+                        matcher = Pattern.compile(NORMAL_ATTRIBUTE_MODIFIER_PATTERN).matcher(s);
+                        isNormal = true;
+                    } else if (s.matches(EQUIPMENT_ATTRIBUTE_MODIFIER_PATTERN)) {
+                        matcher = Pattern.compile(EQUIPMENT_ATTRIBUTE_MODIFIER_PATTERN).matcher(s);
+                    } else {
+                        continue;
+                    }
+                    AttributeModifier modifier = new AttributeModifierUtil().getAttributeModifier(matcher, isNormal);
+                    if (modifier == null) continue;
+                    Attribute attribute = Attribute.valueOf(matcher.group(1).toUpperCase());
+                    meta.addAttributeModifier(attribute, modifier);
+                }
+            }
+
+            if (type.equals(MetadataType.TOOL_DURABILITY)) {
+                // tool_durability,value:([0-9]+)
+                Damageable damageable;
+                try {
+                    damageable = (Damageable) meta;
+                } catch (Exception e) {
+                    Bukkit.getLogger().warning("[CustomCrafter] ToolDurability (Result) failed. (Illegal item.(Un-Damageable))");
+                    continue;
+                }
+                String s = content.get(0);
+                Matcher matcher = Pattern.compile("^value:([0-9]+)$").matcher(s);
+                if (!matcher.matches()) {
+                    Bukkit.getLogger().warning("[CustomCrafter] ToolDurability (Result) failed. (Illegal configuration format found.)");
+                    continue;
+                }
+                int remaining = Integer.valueOf(matcher.group(1));
+                int maxDurability = item.getType().getMaxDurability();
+                if (remaining == 0) remaining = 1;
+                if (maxDurability < remaining) remaining = maxDurability;
+                 damageable.setDamage(maxDurability - remaining);
+            }
 
             item.setItemMeta(meta);
         }

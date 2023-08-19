@@ -9,7 +9,9 @@ public enum MetadataType {
     CUSTOMMODELDATA("CUSTOMMODELDATA"),
     POTIONDATA("POTIONDATA"),
     POTIONCOLOR("POTIONCOLOR"),
-    TEXTURE_ID("TEXTURE_ID");
+    TEXTURE_ID("TEXTURE_ID"),
+    ATTRIBUTE_MODIFIER("ATTRIBUTE_MODIFIER"),
+    TOOL_DURABILITY("TOOL_DURABILITY");
 
     private String type;
     private MetadataType(String type){
