@@ -121,7 +121,8 @@ public class Result {
             * potionData -> "PotionEffectType, duration, amplifier(level)". These are separated with ",".
             * potionColor -> "red, green, blue" (RGB)
             * texture_id -> "([0-9]+)" only set the id that written at first on the list.
-            *
+            * tool_durability -> "([0-9]+)" only. The item's remaining durability will set that the value.
+            * attribute_modifier -> (Attribute)/operation:(add/multiply/add_scalar)/value:(double)/slot:(EquipmentSlot)
              */
 
             MetadataType type = entry.getKey();
