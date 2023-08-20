@@ -79,6 +79,9 @@ public class SettingsLoad {
 
     // === for recipe load === //
     private static final String USING_CONTAINER_VALUES_METADATA_PATTERN = "^([0-9a-zA-Z_\\-]+) <--> (.+)$";
+    private static final String MATTER_OVERRIDE_PATTERN = "^(\\w+) -> (\\w+)$";
+    private static final String MATTER_REGEX_COLLECT_PATTERN = "^R\\|(.+)$";
+    private static final String RESULT_METADATA_COLLECT_PATTERN = "^([\\w_]+),(.+)$";
 
     public void load(){
         defaultConfig = getInstance().getConfig();
@@ -289,9 +292,10 @@ public class SettingsLoad {
                     * 0 : key (String | lore, displayName, enchantment (deprecated), itemFlag, customModelData, potionData, potionColor
                     * 1 : value (Object | List<String>, String, Enchantment & int, boolean, int
                      */
-                    List<String> list = Arrays.asList(s.split(","));
-                    MetadataType key = MetadataType.valueOf(list.get(0).toUpperCase());
-                    String value = String.join(",",list.subList(1,list.size()));
+                    Matcher matcher = Pattern.compile(RESULT_METADATA_COLLECT_PATTERN).matcher(s);
+                    if (!matcher.matches()) continue;
+                    MetadataType key = MetadataType.valueOf(matcher.group(1).toUpperCase());
+                    String value = matcher.group(2);
                     if(!metadata.containsKey(key))metadata.put(key,new ArrayList<>());
                     metadata.get(key).add(value);
                 }
@@ -347,8 +351,10 @@ public class SettingsLoad {
             boolean mass = config.getBoolean("mass");
             List<Material> candidate = new ArrayList<>();
             for(String s:config.getStringList("candidate")){
-                if(s.startsWith("R|")){
-                    String pattern = s.substring(2); // remove "R|"
+                if(s.matches(MATTER_REGEX_COLLECT_PATTERN)){
+                    Matcher matcher = Pattern.compile(MATTER_REGEX_COLLECT_PATTERN).matcher(s);
+                    if (!matcher.matches()) continue;
+                    String pattern = matcher.group(1); // remove "R|"
 
                     candidate.addAll(getCandidateFromRegex(pattern));
                 }else if (s.equalsIgnoreCase("enchanted_book")){
@@ -382,10 +388,12 @@ public class SettingsLoad {
                     * 1 : enchant level (int)
                     * 2 : enchant strict (String -> input, notStrict, onlyEnchant, strict)
                      */
-                    List<String> list = Arrays.asList(s.split(","));
-                    Enchantment enchant = Enchantment.getByName(list.get(0).toUpperCase());
-                    int level = Integer.valueOf(list.get(1));
-                    EnchantStrict strict = EnchantStrict.valueOf(list.get(2).toUpperCase());
+                    Matcher matcher = Pattern.compile("^([\\w_]+),(\\d+),(\\w+)$").matcher(s);
+                    if (!matcher.matches()) continue;
+                    Enchantment enchant = Enchantment.getByName(matcher.group(1).toUpperCase());
+                    int level = Integer.valueOf(matcher.group(2));
+                    EnchantStrict strict = EnchantStrict.valueOf(matcher.group(3).toUpperCase());
+
                     EnchantWrap wrap = new EnchantWrap(level,enchant,strict);
                     wrapList.add(wrap);
                 }
@@ -486,11 +494,14 @@ public class SettingsLoad {
                 /* override:
                 *  - cobblestone -> c
                 *  - stone -> s
+                *
+                * MATTER_OVERRIDE_PATTERN = "^(\\w+) -> (\\w+)$";
                 */
                 for(String string : config.getStringList("override")){
-                    List<String> splitter = Arrays.asList(string.split(" -> "));
-                    String source = containsAllMaterialsIgnoreCase(splitter.get(0)) ? splitter.get(0).toUpperCase() : splitter.get(0);
-                    String shorter = splitter.get(1);
+                    Matcher matcher = Pattern.compile(MATTER_OVERRIDE_PATTERN).matcher(string);
+                    if (!matcher.matches()) continue;
+                    String source = matcher.group(1);
+                    String shorter = matcher.group(2);
                     overrides.put(shorter,source);
                 }
             }
@@ -532,7 +543,6 @@ public class SettingsLoad {
                         count++;
                     }
                 }
-                //
             }
 
 
@@ -604,10 +614,6 @@ public class SettingsLoad {
             Map<Matter, List<String>> usingContainerValuesMetadata = new HashMap<>();
             if (config.contains("using_container_values_metadata")) {
                 for (String s : config.getStringList("using_container_values_metadata")) {
-
-                    //debug
-                    System.out.println("s: "+s);
-
                     Matcher matcher = Pattern.compile(USING_CONTAINER_VALUES_METADATA_PATTERN).matcher(s);
                     if (!matcher.matches()) continue;
                     String matterName = matcher.group(1);
@@ -617,9 +623,6 @@ public class SettingsLoad {
                     if (!usingContainerValuesMetadata.containsKey(matter)) usingContainerValuesMetadata.put(matter, new ArrayList<>());
                     usingContainerValuesMetadata.get(matter).add(order);
 
-                    //debug
-                    System.out.println("matter name: "+matterName);
-                    System.out.println("order: "+order);
                 }
             }
 
