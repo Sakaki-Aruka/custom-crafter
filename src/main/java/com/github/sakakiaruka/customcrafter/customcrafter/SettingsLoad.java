@@ -588,8 +588,8 @@ public class SettingsLoad {
                     String address = "container_modify."+counter+".";
                     if (!config.contains(address)) break;
                     NamespacedKey key = new NamespacedKey(getInstance(), config.getString(address+"key"));
-                    RecipeDataContainerModifyType modifyType = RecipeDataContainerModifyType.valueOf(config.getString(address+"modify_type"));
-                    PersistentDataType type = new ContainerUtil().getDataType(config.getString(address+"type"));
+                    RecipeDataContainerModifyType modifyType = RecipeDataContainerModifyType.valueOf(config.getString(address+"modify_type").toUpperCase());
+                    PersistentDataType type = new ContainerUtil().getDataType(config.getString(address+"type").toUpperCase());
                     String term = config.getString(address+"term");
                     String action = config.getString(address+"action");
                     boolean end = config.getBoolean(address+"return");
