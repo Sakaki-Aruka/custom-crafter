@@ -2,13 +2,16 @@ package com.github.sakakiaruka.customcrafter.customcrafter.util;
 
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.*;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
 
+import java.awt.print.Book;
 import java.util.*;
 
 import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.*;
@@ -110,5 +113,59 @@ public class InventoryUtil {
             result.add(inventory.getItem(i));
         }
         return result;
+    }
+
+    // === book field set ===
+    public void setAuthor(BookMeta meta, String value) {
+        meta.setAuthor(value);
+    }
+
+    public void setTitle(BookMeta meta, String value) {
+        meta.setTitle(value);
+    }
+
+    public void setPage(BookMeta meta, int page, String value) {
+        // page specified
+        if (page < 0 || 50 < page) {
+            Bukkit.getLogger().warning("[CustomCrafter] Set result metadata (setPage) failed. (Illegal insert page.)");
+            return;
+        }
+        if (!isValidPage(meta, "setPage")) return;
+        meta.setPage(page, value);
+    }
+
+    public void setPages(BookMeta meta, String value) {
+        // set page un-specified page
+        meta.setPages(value);
+    }
+
+    public void setGeneration(BookMeta meta, String value) {
+        // set book-generation
+        BookMeta.Generation generation = BookMeta.Generation.valueOf(value.toUpperCase());
+        meta.setGeneration(generation);
+    }
+
+    public void addPage(BookMeta meta, String value) {
+        // add page
+        String section = "addPage";
+        if (!isValidPage(meta, section)) return;
+        if (!isValidCharacters(value, section)) return;
+        meta.addPage(value);
+    }
+
+    private boolean isValidPage(BookMeta meta, String section) {
+        if (50 <= meta.getPageCount()) {
+            Bukkit.getLogger().warning("[CustomCrafter] Set result metadata ("+section+") failed. (Over 50 pages.)");
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isValidCharacters(String value, String section) {
+        if (256 < value.length()) {
+            Bukkit.getLogger().warning("[CustomCrafter] Set result metadata ("+section+") failed. (Over 256 characters.)");
+            return false;
+        }
+        return true;
     }
 }

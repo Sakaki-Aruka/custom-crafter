@@ -33,7 +33,7 @@ public class PermissionCheck {
         if (!playerPermissions.containsKey(uuid)) playerPermissions.put(uuid,new ArrayList<>());
         playerPermissions.get(uuid).add(permission);
         new RecipePermissionUtil().removePermissionDuplications(playerPermissions.get(uuid));
-        System.out.println(String.format("Permission added: %s  Permission: %s%s  Target: %s",nl,permission.getPermissionName(),nl,player.getName()));
+        Bukkit.getLogger().info(String.format("Permission added: %s  Permission: %s%s  Target: %s",nl,permission.getPermissionName(),nl,player.getName()));
         displayPlayerPermissions(uuid,sender);
     }
 
@@ -43,7 +43,7 @@ public class PermissionCheck {
         UUID uuid = player.getUniqueId();
         if (!playerPermissions.containsKey(uuid)) return;
         RecipePermission permission = recipePermissionMap.get(args[5]);
-        System.out.println(String.format("Permission removed: %s  Permission: %s%s  Target: %s",nl,permission.getPermissionName(),nl,player.getName()));
+        Bukkit.getLogger().info(String.format("Permission removed: %s  Permission: %s%s  Target: %s",nl,permission.getPermissionName(),nl,player.getName()));
         playerPermissions.get(uuid).remove(permission);
         displayPlayerPermissions(uuid,sender);
     }
@@ -60,7 +60,7 @@ public class PermissionCheck {
         builder.append("=== RecipePermissions (The player has) ==="+nl);
         if(!playerPermissions.containsKey(uuid)) {
             builder.append(String.format("Target player has no permissions.%s",nl));
-            System.out.println(builder);
+            Bukkit.getLogger().info(builder.toString());
             return;
         }
 

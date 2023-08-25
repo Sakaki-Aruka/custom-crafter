@@ -2,6 +2,7 @@ package com.github.sakakiaruka.customcrafter.customcrafter.util;
 
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.MetadataType;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.enchantments.Enchantment;
@@ -32,7 +33,7 @@ public class DataCheckerUtil {
             builder.append(nl);
         }
         if(config.contains("potion")) if(!potionCheck(config,builder)) count++;
-        if(count != 0) System.out.println(builder.toString());
+        if(count != 0) Bukkit.getLogger().info(builder.toString());
     }
 
     private boolean nameCheck(FileConfiguration config,StringBuilder builder){
@@ -473,7 +474,7 @@ public class DataCheckerUtil {
         builder.append(nl);
         if(!metadataCheck(config,builder)) count++;
         builder.append(nl);
-        if(count != 0) System.out.println(builder.toString());
+        if(count != 0) Bukkit.getLogger().info(builder.toString());
     }
 
     public void recipeCheck(StringBuilder builder,FileConfiguration config, Path path){
@@ -488,7 +489,7 @@ public class DataCheckerUtil {
         if(!overrideCheck(config,builder)) count++;
         if(!coordinateCheck(config,builder)) count++;
         if(!returnsCheck(config,builder)) count++;
-        if(count != 0) System.out.println(builder);
+        if(count != 0) Bukkit.getLogger().info(builder.toString());
 
     }
 

@@ -11,7 +11,8 @@ public enum MetadataType {
     POTIONCOLOR("POTIONCOLOR"),
     TEXTURE_ID("TEXTURE_ID"),
     ATTRIBUTE_MODIFIER("ATTRIBUTE_MODIFIER"),
-    TOOL_DURABILITY("TOOL_DURABILITY");
+    TOOL_DURABILITY("TOOL_DURABILITY"),
+    BOOK_FIELD("BOOK_FIELD");
 
     private String type;
     private MetadataType(String type){
