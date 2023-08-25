@@ -7,6 +7,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.PotionStrict;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.Potions;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
@@ -257,9 +258,9 @@ public class PotionUtil {
                     }
                 }
 
-                System.out.println(bar);
-                System.out.println(String.format("[Custom Crafter] Finished creating default potion files."));
-                System.out.println(bar);
+                Bukkit.getLogger().info(bar);
+                Bukkit.getLogger().info(String.format("[Custom Crafter] Finished creating default potion files."));
+                Bukkit.getLogger().info(bar);
 
             }
         }.runTaskAsynchronously(getInstance());

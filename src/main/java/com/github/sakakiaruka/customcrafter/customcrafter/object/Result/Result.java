@@ -3,6 +3,7 @@ package com.github.sakakiaruka.customcrafter.customcrafter.object.Result;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.ContainerWrapper;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.AttributeModifierUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.DataContainerUtil;
+import com.github.sakakiaruka.customcrafter.customcrafter.util.InventoryUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.PotionUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -11,13 +12,13 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
-import org.checkerframework.checker.units.qual.A;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,6 +29,13 @@ import java.util.regex.Pattern;
 public class Result {
     private static final String NORMAL_ATTRIBUTE_MODIFIER_PATTERN = "^type:([\\w_]+)/operation:(?i)(add|multiply|add_scalar)/value:(\\-?\\d+(\\.\\d+)?)$";
     private static final String EQUIPMENT_ATTRIBUTE_MODIFIER_PATTERN = "^type:([\\w_]+)/operation:(?i)(add|multiply|add_scalar)/value:(\\-?\\d+(\\.\\d+)?)/slot:(\\w+)$";
+    private static final String BOOK_FIELD_SET_AUTHOR_PATTERN = "^type:author/value:(.+)$";
+    private static final String BOOK_FIELD_SET_TITLE_PATTERN = "^type:title/value:(.+)$";
+    private static final String BOOK_FIELD_SET_PAGE_PATTERN = "^type:page/page:(\\d+)/value:(.+)$";
+    private static final String BOOK_FIELD_ADD_PAGE_PATTERN = "^type:add_page/value:(.+)$";
+    private static final String BOOK_FIELD_SET_PAGES_PATTERN = "^type:pages/value:(.+)$";
+    private static final String BOOK_FIELD_SET_GENERATION_PATTERN = "^type:generation/value:(?i)(original|tattered|copy_of_copy|copy_of_original)$";
+
     private String name;
     private Map<Enchantment,Integer> enchantsInfo;
     private int amount;
@@ -123,6 +131,12 @@ public class Result {
             * texture_id -> "([0-9]+)" only set the id that written at first on the list.
             * tool_durability -> "([0-9]+)" only. The item's remaining durability will set that the value.
             * attribute_modifier -> (Attribute)/operation:(add/multiply/add_scalar)/value:(double)/slot:(EquipmentSlot)
+            *
+            * book_field -> (setAuthor/setTitle)/value:(.+)
+            * (deprecated) book_field -> (setPage)/page:(\\d+)/value:(.+) [page specify]
+            * book_field -> (setPages)/value:(.+) [page un-specify]
+            * book_field -> (setGeneration)/value:(original/tattered/copy_of_copy/copy_of_original)
+            * book_field -> (addPage)/value:(.+)
              */
 
             MetadataType type = entry.getKey();
@@ -214,6 +228,48 @@ public class Result {
                 if (remaining == 0) remaining = 1;
                 if (maxDurability < remaining) remaining = maxDurability;
                  damageable.setDamage(maxDurability - remaining);
+            }
+
+            if (type.equals(MetadataType.BOOK_FIELD)) {
+                BookMeta bookMeta;
+                try {
+                    bookMeta = (BookMeta) meta;
+                } catch (Exception e) {
+                    Bukkit.getLogger().warning("[CustomCrafter] Book Elements (Result) failed. (Illegal item.(Not BookMeta))");
+                    continue;
+                }
+
+                for (String s : content) {
+                    if (s.matches(BOOK_FIELD_SET_AUTHOR_PATTERN)) {
+                        Matcher matcher = Pattern.compile(BOOK_FIELD_SET_AUTHOR_PATTERN).matcher(s);
+                        if (!matcher.matches()) continue;
+                        new InventoryUtil().setAuthor(bookMeta, matcher.group(1));
+                    } else if (s.matches(BOOK_FIELD_SET_TITLE_PATTERN)) {
+                        Matcher matcher = Pattern.compile(BOOK_FIELD_SET_TITLE_PATTERN).matcher(s);
+                        if (!matcher.matches()) continue;
+                        new InventoryUtil().setTitle(bookMeta, matcher.group(1));
+                    } else if (s.matches(BOOK_FIELD_SET_PAGE_PATTERN)) {
+                        Matcher matcher = Pattern.compile(BOOK_FIELD_SET_PAGE_PATTERN).matcher(s);
+                        if (!matcher.matches()) continue;
+                        int page = Integer.valueOf(matcher.group(1));
+                        String value = matcher.group(2);
+                        new InventoryUtil().setPage(bookMeta, page, value);
+                    } else if (s.matches(BOOK_FIELD_SET_PAGES_PATTERN)) {
+                        Matcher matcher = Pattern.compile(BOOK_FIELD_SET_PAGES_PATTERN).matcher(s);
+                        if (!matcher.matches()) continue;
+                        new InventoryUtil().setPages(bookMeta, matcher.group(1));
+                    } else if (s.matches(BOOK_FIELD_SET_GENERATION_PATTERN)){
+                        Matcher matcher = Pattern.compile(BOOK_FIELD_SET_GENERATION_PATTERN).matcher(s);
+                        if (!matcher.matches()) continue;
+                        new InventoryUtil().setGeneration(bookMeta, matcher.group(1));
+                    } else if (s.matches(BOOK_FIELD_ADD_PAGE_PATTERN)){
+                        Matcher matcher = Pattern.compile(BOOK_FIELD_ADD_PAGE_PATTERN).matcher(s);
+                        if (!matcher.matches()) continue;
+                        new InventoryUtil().addPage(bookMeta, matcher.group(1));
+                    }else {
+                        Bukkit.getLogger().warning("[CustomCrafter] Book Elements (Result) failed. (Illegal book field pattern)");
+                    }
+                }
             }
 
             item.setItemMeta(meta);

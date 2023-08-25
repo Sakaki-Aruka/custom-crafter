@@ -224,10 +224,10 @@ public class SettingsLoad {
             }
 
             //dir.mkdir();
-            System.out.println(String.format("Not found the directory \"%s\"."+nl+"So, the system made the directory named that.",path.toUri().toString()));
+            Bukkit.getLogger().info(String.format("Not found the directory \"%s\"."+nl+"So, the system made the directory named that.",path.toUri().toString()));
         }else if(!path.toFile().isDirectory()){
-            System.out.println(String.format("The path \"%s\" is not a directory.",path.toUri().toString()));
-            System.out.println("You must fix this problem when before you use this plugin.");
+            Bukkit.getLogger().warning(String.format("The path \"%s\" is not a directory.",path.toUri().toString()));
+            Bukkit.getLogger().warning("You must fix this problem when before you use this plugin.");
 
             new BukkitRunnable(){
                 public void run(){
@@ -242,7 +242,7 @@ public class SettingsLoad {
         try{
             paths = Files.list(path);
         }catch (Exception e){
-            System.out.println("[CustomCrafter] Error: Cannot get files from "+path);
+            Bukkit.getLogger().warning("[CustomCrafter] Error: Cannot get files from "+path);
             return null;
         }
 
@@ -435,7 +435,7 @@ public class SettingsLoad {
         for(String str : config.getStringList("potion")){
             List<String> list = Arrays.asList(str.split(","));
             if(list.size() != 4) {
-                System.out.println("[Custom Crafter] Potion Configuration Parameter are not enough.");
+                Bukkit.getLogger().warning("[Custom Crafter] Potion Configuration Parameter are not enough.");
                 return null;
             }
             PotionEffectType effectType = PotionEffectType.getByName(list.get(0).toUpperCase());
