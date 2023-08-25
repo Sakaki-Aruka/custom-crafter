@@ -150,11 +150,12 @@ public class InventoryUtil {
         String section = "addPage";
         if (!isValidPage(meta, section)) return;
         if (!isValidCharacters(value, section)) return;
+        if (!isValidCharacters(meta, value, section)) return;
         meta.addPage(value);
     }
 
     private boolean isValidPage(BookMeta meta, String section) {
-        if (50 <= meta.getPageCount()) {
+        if (100 <= meta.getPageCount()) {
             Bukkit.getLogger().warning("[CustomCrafter] Set result metadata ("+section+") failed. (Over 50 pages.)");
             return false;
         }
@@ -167,5 +168,43 @@ public class InventoryUtil {
             return false;
         }
         return true;
+    }
+
+    private boolean isValidCharacters(BookMeta meta, String value, String section) {
+        if (25600 < (meta.getPageCount() * 256) + value.length()) {
+            Bukkit.getLogger().warning("[CustomCrafter] Set result metadata ("+section+") failed. (Over 25600 characters.)");
+            return false;
+        }
+        return true;
+    }
+
+    public void addLong(BookMeta meta, String value) {
+        // 256 -> the characters limit that about one page.
+        // 25600 -> the characters limit that about one book.
+        int ONE_PAGE_CHAR_LIMIT = 256;
+        int ONE_BOOK_CHAR_LIMIT = 25600;
+
+        String section = "addLong";
+
+        if (!isValidCharacters(meta, value, section)) return;
+
+        if (ONE_BOOK_CHAR_LIMIT < value.length()) {
+            Bukkit.getLogger().warning("[CustomCrafter] Set result metadata (addLong) failed. (Over 25600 characters.)");
+            meta.addPage("Overflown");
+            return;
+        }
+
+        int blocks = (int) Math.ceil((double) value.length() / ONE_PAGE_CHAR_LIMIT);
+        for (int i=0;i<blocks;i++) {
+            String element;
+            if (i == blocks - 1) {
+                element = value.substring(i * ONE_PAGE_CHAR_LIMIT);
+            } else {
+                int start = i * ONE_PAGE_CHAR_LIMIT;
+                int end = start + ONE_PAGE_CHAR_LIMIT;
+                element = value.substring(start, end);
+            }
+            meta.addPage(element);
+        }
     }
 }

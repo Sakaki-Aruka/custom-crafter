@@ -35,6 +35,7 @@ public class Result {
     private static final String BOOK_FIELD_ADD_PAGE_PATTERN = "^type:add_page/value:(.+)$";
     private static final String BOOK_FIELD_SET_PAGES_PATTERN = "^type:pages/value:(.+)$";
     private static final String BOOK_FIELD_SET_GENERATION_PATTERN = "^type:generation/value:(?i)(original|tattered|copy_of_copy|copy_of_original)$";
+    private static final String BOOK_FIELD_ADD_LONG = "^type:add_long/value:(.+)$";
 
     private String name;
     private Map<Enchantment,Integer> enchantsInfo;
@@ -266,6 +267,10 @@ public class Result {
                         Matcher matcher = Pattern.compile(BOOK_FIELD_ADD_PAGE_PATTERN).matcher(s);
                         if (!matcher.matches()) continue;
                         new InventoryUtil().addPage(bookMeta, matcher.group(1));
+                    } else if (s.matches(BOOK_FIELD_ADD_LONG)){
+                        Matcher matcher = Pattern.compile(BOOK_FIELD_ADD_LONG).matcher(s);
+                        if (!matcher.matches()) continue;
+                        new InventoryUtil().addLong(bookMeta, matcher.group(1));
                     }else {
                         Bukkit.getLogger().warning("[CustomCrafter] Book Elements (Result) failed. (Illegal book field pattern)");
                     }
