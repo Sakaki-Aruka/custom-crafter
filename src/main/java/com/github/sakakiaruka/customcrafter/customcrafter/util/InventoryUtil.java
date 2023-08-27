@@ -1,5 +1,6 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.util;
 
+import com.github.sakakiaruka.customcrafter.customcrafter.command.File;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.*;
 import org.bukkit.Bukkit;
@@ -12,6 +13,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
 import java.awt.print.Book;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 
 import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.*;
@@ -126,7 +130,7 @@ public class InventoryUtil {
 
     public void setPage(BookMeta meta, int page, String value) {
         // page specified
-        if (page < 0 || 50 < page) {
+        if (page < 0 || 100 < page) {
             Bukkit.getLogger().warning("[CustomCrafter] Set result metadata (setPage) failed. (Illegal insert page.)");
             return;
         }
@@ -141,7 +145,13 @@ public class InventoryUtil {
 
     public void setGeneration(BookMeta meta, String value) {
         // set book-generation
-        BookMeta.Generation generation = BookMeta.Generation.valueOf(value.toUpperCase());
+        BookMeta.Generation generation;
+        try {
+            generation = BookMeta.Generation.valueOf(value.toUpperCase());
+        } catch (Exception e) {
+            Bukkit.getLogger().warning("[CustomCrafter] Set result metadata (setGeneration) failed. (Illegal BOOK_GENERATION)");
+            return;
+        }
         meta.setGeneration(generation);
     }
 
@@ -178,13 +188,23 @@ public class InventoryUtil {
         return true;
     }
 
-    public void addLong(BookMeta meta, String value) {
-        // 256 -> the characters limit that about one page.
+    public void addLong(BookMeta meta, String value, boolean extend) {
+        // 320 -> the characters limit that about one page.
         // 25600 -> the characters limit that about one book.
-        int ONE_PAGE_CHAR_LIMIT = 256;
+        // 14 -> the lines limit that about one page.
         int ONE_BOOK_CHAR_LIMIT = 25600;
-
+        String PATTERN = "[a-zA-Z0-9\\-.+*/=%'\"#@_(),;:?!|{}<>\\[\\]$]";
         String section = "addLong";
+
+        if (extend) {
+            try {
+                value = String.join(nl, Files.readAllLines(Paths.get(value), StandardCharsets.UTF_8));
+            } catch (Exception e) {
+                Bukkit.getLogger().warning("[CustomCrafter] Set result metadata (addLong - extend) failed. (About a file read.)");
+                Bukkit.getLogger().warning(e.getMessage());
+                return;
+            }
+        }
 
         if (!isValidCharacters(meta, value, section)) return;
 
@@ -194,17 +214,50 @@ public class InventoryUtil {
             return;
         }
 
-        int blocks = (int) Math.ceil((double) value.length() / ONE_PAGE_CHAR_LIMIT);
-        for (int i=0;i<blocks;i++) {
-            String element;
-            if (i == blocks - 1) {
-                element = value.substring(i * ONE_PAGE_CHAR_LIMIT);
+        int count = 0;
+        int horizontal = 0;
+        int vertical = 0;
+        StringBuilder element = new StringBuilder();
+        StringBuilder buffer = new StringBuilder();
+
+        // 22 -> horizontal limit
+        // 14 -> vertical limit
+
+        for (int i=0;i<value.length();i++) {
+            String target = String.valueOf(value.charAt(i));
+            int evaluation = target.matches(PATTERN) ? 1 : 2;
+
+            if ((22 <= (horizontal + evaluation) || target.equals(nl)) && vertical == 14) {
+                // make a new page
+
+                if (meta.getPageCount() == 100) {
+                    Bukkit.getLogger().warning("[CustomCrafter] Set result metadata (addLong) failed. (Over 100 pages.)");
+                    Bukkit.getLogger().warning("[CustomCrafter] Remaining "+(element.capacity() + (value.length() - i)) + " characters.");
+                    return;
+                }
+
+                meta.addPage(element.toString());
+                element.setLength(0);
+
+                horizontal = evaluation;
+                element.append(target);
+
+                vertical = 0;
+
+            } else if ((22 <= (horizontal + evaluation) || target.equals(nl)) && vertical < 14) {
+                // make a new line
+                horizontal = evaluation;
+                element.append(target);
+
+                vertical++;
+
             } else {
-                int start = i * ONE_PAGE_CHAR_LIMIT;
-                int end = start + ONE_PAGE_CHAR_LIMIT;
-                element = value.substring(start, end);
+                // a character add
+                element.append(target);
+                horizontal += evaluation;
             }
-            meta.addPage(element);
         }
+
+        meta.addPage(element.toString()); // add remaining string
     }
 }
