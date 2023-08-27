@@ -150,6 +150,8 @@ public class Result {
             * book_field -> (setPages)/value:(.+) [page un-specify]
             * book_field -> (setGeneration)/value:(original/tattered/copy_of_copy/copy_of_original)
             * book_field -> (addPage)/value:(.+)
+            * book_field -> (addLong)/value:(.+) (auto divide pages)
+            * book_field -> (addLongExtend)/value:(.+) (auto read data from a specified data and auto divide)
              */
 
             MetadataType type = entry.getKey();
