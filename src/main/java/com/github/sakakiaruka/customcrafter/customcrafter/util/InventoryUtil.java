@@ -1,6 +1,5 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.util;
 
-import com.github.sakakiaruka.customcrafter.customcrafter.command.File;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.*;
 import org.bukkit.Bukkit;
@@ -12,7 +11,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 
-import java.awt.print.Book;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -173,7 +171,7 @@ public class InventoryUtil {
     }
 
     private boolean isValidCharacters(String value, String section) {
-        if (256 < value.length()) {
+        if (320 < value.length()) {
             Bukkit.getLogger().warning("[CustomCrafter] Set result metadata ("+section+") failed. (Over 256 characters.)");
             return false;
         }
@@ -181,7 +179,7 @@ public class InventoryUtil {
     }
 
     private boolean isValidCharacters(BookMeta meta, String value, String section) {
-        if (25600 < (meta.getPageCount() * 256) + value.length()) {
+        if (25600 < (meta.getPageCount() * 320) + value.length()) {
             Bukkit.getLogger().warning("[CustomCrafter] Set result metadata ("+section+") failed. (Over 25600 characters.)");
             return false;
         }
@@ -214,11 +212,9 @@ public class InventoryUtil {
             return;
         }
 
-        int count = 0;
         int horizontal = 0;
         int vertical = 0;
         StringBuilder element = new StringBuilder();
-        StringBuilder buffer = new StringBuilder();
 
         // 22 -> horizontal limit
         // 14 -> vertical limit
