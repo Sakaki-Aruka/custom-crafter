@@ -20,7 +20,6 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -30,24 +29,8 @@ import java.util.regex.Pattern;
 public class Result {
     private static final String NORMAL_ATTRIBUTE_MODIFIER_PATTERN = "^type:([\\w_]+)/operation:(?i)(add|multiply|add_scalar)/value:(\\-?\\d+(\\.\\d+)?)$";
     private static final String EQUIPMENT_ATTRIBUTE_MODIFIER_PATTERN = "^type:([\\w_]+)/operation:(?i)(add|multiply|add_scalar)/value:(\\-?\\d+(\\.\\d+)?)/slot:(\\w+)$";
-//    private static final String BOOK_FIELD_SET_AUTHOR_PATTERN = "^type:author/value:(.+)$";
-//    private static final String BOOK_FIELD_SET_TITLE_PATTERN = "^type:title/value:(.+)$";
-//    private static final String BOOK_FIELD_SET_PAGE_PATTERN = "^type:page/page:(\\d+)/value:(.+)$";
-//    private static final String BOOK_FIELD_ADD_PAGE_PATTERN = "^type:add_page/value:(.+)$";
-//    private static final String BOOK_FIELD_SET_PAGES_PATTERN = "^type:pages/value:(.+)$";
-//    private static final String BOOK_FIELD_SET_GENERATION_PATTERN = "^type:generation/value:(?i)(original|tattered|copy_of_copy|copy_of_original)$";
-//    private static final String BOOK_FIELD_ADD_LONG_PATTERN = "^type:add_long/value:(.+)$";
-//    private static final String BOOK_FIELD_ADD_LONG_EXTEND_PATTERN = "^type:add_long_extend/value:(.+)$";
+
     private static final String BOOK_FIELD_PATTERN = "^type:(?i)(author|title|add_page|pages|generation|add_long|add_long_extend)/value:(.+)$";
-//    private static final List<String> BOOK_FIELD_PATTERN_LIST = new ArrayList<>(Arrays.asList(
-//            BOOK_FIELD_SET_AUTHOR_PATTERN,
-//            BOOK_FIELD_SET_TITLE_PATTERN,
-//            BOOK_FIELD_ADD_PAGE_PATTERN,
-//            BOOK_FIELD_SET_PAGES_PATTERN,
-//            BOOK_FIELD_SET_GENERATION_PATTERN,
-//            BOOK_FIELD_ADD_LONG_PATTERN,
-//            BOOK_FIELD_ADD_LONG_EXTEND_PATTERN
-//    ));
 
     private String name;
     private Map<Enchantment,Integer> enchantsInfo;

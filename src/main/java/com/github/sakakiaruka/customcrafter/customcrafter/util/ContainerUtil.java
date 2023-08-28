@@ -40,23 +40,21 @@ public class ContainerUtil {
     public static final String STORE_ONLY = "store_only";
 
     //---
-    private static final String OPERATORS_PATTERN = "\\+|-|\\*|/|\\(|\\)";
-    private static final String ORDER_NUMBER_PATTERN = "_\\d{1,2}";
-    private static final String ARROW_RANGE_PATTERN = "^([0-9a-zA-Z\\+\\-\\*/\\(\\)\\$_]+)<-->([0-9a-zA-Z\\+\\-\\*/\\(\\)\\$_]+)$";
-    private static final String LARGER_PATTERN = "^([0-9a-zA-Z\\+\\-\\*/\\(\\)\\$_]+)<$";
-    private static final String SMALLER_PATTERN = "<([0-9a-zA-Z\\+\\-\\*/\\(\\)\\$_]+)";
-    private static final String CONTAINER_OPERATION_PATTERN = "([\\+\\-/\\*\\^])";
+    private static final String ARROW_RANGE_PATTERN = "^([0-9a-zA-Z+\\-*/()$_]+)<-->([0-9a-zA-Z+\\-*/()$_]+)$";
+    private static final String LARGER_PATTERN = "^([0-9a-zA-Z+\\-*/()$_]+)<$";
+    private static final String SMALLER_PATTERN = "<([0-9a-zA-Z+\\-*/()$_]+)";
+    private static final String CONTAINER_OPERATION_PATTERN = "([+\\-/*^])";
 
-    private static final String RECIPE_CONTAINER_ARROW_RANGE_PATTERN = "^([0-9a-zA-Z\\+\\-\\*/\\(\\)\\$_\\[\\]]+)<--\\[(maximum|minimum|median|mode|average|random)\\]-->([0-9a-zA-Z\\+\\-\\*/\\(\\)\\$_\\[\\]]+)$";
-    private static final String RECIPE_CONTAINER_LARGER_PATTERN = "^([0-9a-zA-Z\\+\\-\\*/\\(\\)$_\\[\\]]+)<\\[(maximum|minimum|median|mode|average|random)\\]$";
-    private static final String RECIPE_CONTAINER_SMALLER_PATTERN = "^\\[(maximum|minimum|median|mode|average|random)\\]<([0-9a-zA-Z\\+\\-\\*/\\(\\)\\$_\\[\\]]+)$";
-    private static final String RECIPE_CONTAINER_EQUAL_PATTERN = "^\\[(maximum|minimum|median|mode|average|random)\\]==([0-9a-zA-Z\\+\\-\\*/\\(\\)\\$_\\[\\]]+)$";
+    private static final String RECIPE_CONTAINER_ARROW_RANGE_PATTERN = "^([0-9a-zA-Z+\\-*/()$_\\[\\]]+)<--\\[(maximum|minimum|median|mode|average|random)\\]-->([0-9a-zA-Z+\\-*/()$_\\[\\]]+)$";
+    private static final String RECIPE_CONTAINER_LARGER_PATTERN = "^([0-9a-zA-Z+\\-*/()$_\\[\\]]+)<\\[(maximum|minimum|median|mode|average|random)\\]$";
+    private static final String RECIPE_CONTAINER_SMALLER_PATTERN = "^\\[(maximum|minimum|median|mode|average|random)\\]<([0-9a-zA-Z+\\-*/()$_\\[\\]]+)$";
+    private static final String RECIPE_CONTAINER_EQUAL_PATTERN = "^\\[(maximum|minimum|median|mode|average|random)\\]==([0-9a-zA-Z+\\-*/()$_\\[\\]]+)$";
 
     private static final String MULTI_VALUE_PATTERN = "^\\(multi\\)\\(types:(.+)\\)(.+)$";
     private static final String MULTI_VALUE_CLASS_PATTERN = "([\\w]+)\\*([\\d]+)";
 
     private static final String USING_CONTAINER_VALUES_LORE_PATTERN = "^using_container_values_lore -> (.+)$";
-    private static final String USING_CONTAINER_VALUES_ENCHANTMENT_PATTERN = "^using_container_values_enchantment -> enchantment:([\\$a-zA-Z0-9\\-_]+)/level:(\\$[a-z0-9\\-_]+|[0-9]+)$";
+    private static final String USING_CONTAINER_VALUES_ENCHANTMENT_PATTERN = "^using_container_values_enchantment -> enchantment:([$a-zA-Z0-9\\-_]+)/level:(\\$[a-z0-9\\-_]+|[0-9]+)$";
     private static final String USING_CONTAINER_VALUES_POTION_COLOR_RGB_PATTERN = "^using_container_valeus_potion_color -> type:(?i)(rgb)/value:R->([$a-z0-9\\-_]+),G->([$a-z0-9\\-_]+),B->([$a-z0-9\\-_]+)$";
     private static final String USING_CONTAINER_VALUES_POTION_COLOR_RANDOM_PATTERN = "^using_container_values_potion_color -> type:(?i)(random)$";
     private static final String USING_CONTAINER_VALUES_TOOL_DURABILITY_ABSOLUTE_PATTERN = "^using_container_values_tool_durability -> type:absolute/value:([$a-z0-9\\-_]+)$";
@@ -686,7 +684,7 @@ public class ContainerUtil {
                     continue;
                 }
                 String joined = String.join("", buffer);
-                Matcher matcher = Pattern.compile("^\\$([a-z0-9_\\.\\-]+)\\[(.+)\\]$").matcher(joined);
+                Matcher matcher = Pattern.compile("^\\$([a-z0-9_.\\-]+)\\[(.+)\\]$").matcher(joined);
                 if (!matcher.matches()) continue;
                 String key = matcher.group(1);
                 String type = matcher.group(2);
