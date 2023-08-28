@@ -29,12 +29,8 @@ import java.util.regex.Pattern;
 public class Result {
     private static final String NORMAL_ATTRIBUTE_MODIFIER_PATTERN = "^type:([\\w_]+)/operation:(?i)(add|multiply|add_scalar)/value:(\\-?\\d+(\\.\\d+)?)$";
     private static final String EQUIPMENT_ATTRIBUTE_MODIFIER_PATTERN = "^type:([\\w_]+)/operation:(?i)(add|multiply|add_scalar)/value:(\\-?\\d+(\\.\\d+)?)/slot:(\\w+)$";
-    private static final String BOOK_FIELD_SET_AUTHOR_PATTERN = "^type:author/value:(.+)$";
-    private static final String BOOK_FIELD_SET_TITLE_PATTERN = "^type:title/value:(.+)$";
-    private static final String BOOK_FIELD_SET_PAGE_PATTERN = "^type:page/page:(\\d+)/value:(.+)$";
-    private static final String BOOK_FIELD_ADD_PAGE_PATTERN = "^type:add_page/value:(.+)$";
-    private static final String BOOK_FIELD_SET_PAGES_PATTERN = "^type:pages/value:(.+)$";
-    private static final String BOOK_FIELD_SET_GENERATION_PATTERN = "^type:generation/value:(?i)(original|tattered|copy_of_copy|copy_of_original)$";
+
+    private static final String BOOK_FIELD_PATTERN = "^type:(?i)(author|title|add_page|pages|generation|add_long|add_long_extend)/value:(.+)$";
 
     private String name;
     private Map<Enchantment,Integer> enchantsInfo;
@@ -137,6 +133,8 @@ public class Result {
             * book_field -> (setPages)/value:(.+) [page un-specify]
             * book_field -> (setGeneration)/value:(original/tattered/copy_of_copy/copy_of_original)
             * book_field -> (addPage)/value:(.+)
+            * book_field -> (addLong)/value:(.+) (auto divide pages)
+            * book_field -> (addLongExtend)/value:(.+) (auto read data from a specified data and auto divide)
              */
 
             MetadataType type = entry.getKey();
@@ -239,36 +237,24 @@ public class Result {
                     continue;
                 }
 
+                InventoryUtil util = new InventoryUtil();
+
                 for (String s : content) {
-                    if (s.matches(BOOK_FIELD_SET_AUTHOR_PATTERN)) {
-                        Matcher matcher = Pattern.compile(BOOK_FIELD_SET_AUTHOR_PATTERN).matcher(s);
-                        if (!matcher.matches()) continue;
-                        new InventoryUtil().setAuthor(bookMeta, matcher.group(1));
-                    } else if (s.matches(BOOK_FIELD_SET_TITLE_PATTERN)) {
-                        Matcher matcher = Pattern.compile(BOOK_FIELD_SET_TITLE_PATTERN).matcher(s);
-                        if (!matcher.matches()) continue;
-                        new InventoryUtil().setTitle(bookMeta, matcher.group(1));
-                    } else if (s.matches(BOOK_FIELD_SET_PAGE_PATTERN)) {
-                        Matcher matcher = Pattern.compile(BOOK_FIELD_SET_PAGE_PATTERN).matcher(s);
-                        if (!matcher.matches()) continue;
-                        int page = Integer.valueOf(matcher.group(1));
-                        String value = matcher.group(2);
-                        new InventoryUtil().setPage(bookMeta, page, value);
-                    } else if (s.matches(BOOK_FIELD_SET_PAGES_PATTERN)) {
-                        Matcher matcher = Pattern.compile(BOOK_FIELD_SET_PAGES_PATTERN).matcher(s);
-                        if (!matcher.matches()) continue;
-                        new InventoryUtil().setPages(bookMeta, matcher.group(1));
-                    } else if (s.matches(BOOK_FIELD_SET_GENERATION_PATTERN)){
-                        Matcher matcher = Pattern.compile(BOOK_FIELD_SET_GENERATION_PATTERN).matcher(s);
-                        if (!matcher.matches()) continue;
-                        new InventoryUtil().setGeneration(bookMeta, matcher.group(1));
-                    } else if (s.matches(BOOK_FIELD_ADD_PAGE_PATTERN)){
-                        Matcher matcher = Pattern.compile(BOOK_FIELD_ADD_PAGE_PATTERN).matcher(s);
-                        if (!matcher.matches()) continue;
-                        new InventoryUtil().addPage(bookMeta, matcher.group(1));
-                    }else {
+                    Matcher matcher = Pattern.compile(BOOK_FIELD_PATTERN).matcher(s);
+                    if (!matcher.matches()) {
                         Bukkit.getLogger().warning("[CustomCrafter] Book Elements (Result) failed. (Illegal book field pattern)");
+                        continue;
                     }
+                    String bookFieldType = matcher.group(1).toLowerCase();
+                    String value = matcher.group(2);
+
+                    if (bookFieldType.equals("author")) util.setAuthor(bookMeta, value);
+                    if (bookFieldType.equals("title")) util.setTitle(bookMeta, value);
+                    if (bookFieldType.equals("generation")) util.setGeneration(bookMeta, value);
+                    if (bookFieldType.equals("add_page")) util.addPage(bookMeta, value);
+                    if (bookFieldType.equals("pages")) util.setPages(bookMeta, value);
+                    if (bookFieldType.equals("add_long")) util.addLong(bookMeta, value, false);
+                    if (bookFieldType.equals("add_long_extend")) util.addLong(bookMeta, value, true);
                 }
             }
 
