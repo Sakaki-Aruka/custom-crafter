@@ -2,23 +2,28 @@ package com.github.sakakiaruka.customcrafter.customcrafter.util;
 
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.*;
-import org.bukkit.Bukkit;
-import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.*;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
+import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.*;
 
 public class InventoryUtil {
+
+    private static final String LEATHER_ARMOR_COLOR_RGB_PATTERN = "^type:(?i)(RGB)/value:R->(\\d{1,3}),G->(\\d{1,3}),B->(\\d{1,3})$";
+    private static final String LEATHER_ARMOR_COLOR_NAME_PATTERN = "^type:(?i)(NAME)/value:([\\w_]+)$";
+    private static final String LEATHER_ARMOR_COLOR_RANDOM_PATTERN = "^type:(?i)(RANDOM)$";
+
     public List<Integer> getTableSlots(int size){
         List<Integer> list = new ArrayList<>();
         for(int i=0;i<size;i++){
@@ -191,7 +196,7 @@ public class InventoryUtil {
         // 25600 -> the characters limit that about one book.
         // 14 -> the lines limit that about one page.
         int ONE_BOOK_CHAR_LIMIT = 25600;
-        String PATTERN = "[a-zA-Z0-9\\-.+*/=%'\"#@_(),;:?!|{}<>\\[\\]$]";
+        String PATTERN = "[a-zA-Z0-9\\-.+*/=%'\"#@_(),;:?!|{}<>§\\[\\]$]";
         String section = "addLong";
 
         if (extend) {
@@ -255,5 +260,91 @@ public class InventoryUtil {
         }
 
         meta.addPage(element.toString()); // add remaining string
+    }
+
+
+    // leather_armor_color modify
+    private Color getColor(String value) {
+        // if the value is not a color-name, returns null.
+        Color color;
+        value = value.toUpperCase();
+        if (value.equals("AQUA")) color = Color.AQUA;
+        else if (value.equals("BLACK")) color = Color.BLACK;
+        else if (value.equals("BLUE")) color = Color.BLUE;
+        else if (value.equals("FUCHSIA")) color = Color.FUCHSIA;
+        else if (value.equals("GRAY")) color = Color.GRAY;
+        else if (value.equals("GREEN")) color = Color.GREEN;
+        else if (value.equals("LIME")) color = Color.LIME;
+        else if (value.equals("MAROON")) color = Color.MAROON;
+        else if (value.equals("NAVY")) color = Color.NAVY;
+        else if (value.equals("OLIVE")) color = Color.OLIVE;
+        else if (value.equals("ORANGE")) color = Color.ORANGE;
+        else if (value.equals("PURPLE")) color = Color.PURPLE;
+        else if (value.equals("RED")) color = Color.RED;
+        else if (value.equals("SILVER")) color = Color.SILVER;
+        else if (value.equals("TEAL")) color = Color.TEAL;
+        else if (value.equals("WHITE")) color = Color.WHITE;
+        else if (value.equals("YELLOW")) color = Color.YELLOW;
+        else {
+            Bukkit.getLogger().warning("[CustomCrafter] Set result metadata (ColorName) failed. Input -> "+value);
+            return null;
+        }
+        return color;
+    }
+
+    private String getLeatherArmorColorWarningUnMatchPattern() {
+        String result =
+                "[CustomCrafter] Set result metadata (LeatherArmorColor) failed. (Illegal data format.)" + nl
+                + "Follow the patterns." + nl
+                + "- " + LEATHER_ARMOR_COLOR_RGB_PATTERN + nl
+                + "- " + LEATHER_ARMOR_COLOR_NAME_PATTERN + nl
+                + "- " + LEATHER_ARMOR_COLOR_RANDOM_PATTERN + nl;
+        return result;
+    }
+
+    public void setLeatherArmorColorFromRGB(LeatherArmorMeta meta, String value) {
+        Matcher matcher = Pattern.compile(LEATHER_ARMOR_COLOR_RGB_PATTERN).matcher(value);
+        if (!matcher.matches()) {
+            Bukkit.getLogger().warning(getLeatherArmorColorWarningUnMatchPattern());
+            return;
+        }
+
+        int RED = Integer.valueOf(matcher.group(2));
+        int GREEN = Integer.valueOf(matcher.group(3));
+        int BLUE = Integer.valueOf(matcher.group(4));
+        Color color;
+        try {
+            color = Color.fromRGB(RED, GREEN, BLUE);
+        } catch (Exception e) {
+            Bukkit.getLogger().warning("[CustomCrafter] Set result metadata (LeatherArmorColor) failed. (Illegal RGB elements.)");
+            e.printStackTrace();
+            return;
+        }
+        meta.setColor(color);
+    }
+
+    public void setLeatherArmorColorFromName(LeatherArmorMeta meta, String value) {
+        Matcher matcher = Pattern.compile(LEATHER_ARMOR_COLOR_NAME_PATTERN).matcher(value);
+        if (!matcher.matches()) {
+            Bukkit.getLogger().warning(getLeatherArmorColorWarningUnMatchPattern());
+            return;
+        }
+        Color color;
+        if ((color = getColor(matcher.group(2))) == null) {
+            Bukkit.getLogger().warning("[CustomCrafter] Set result metadata (LeatherArmorColor) failed. (Illegal color-name.)" + nl
+            + "You can use 'AQUA', 'BLACK', 'BLUE', 'FUCHSIA', 'GRAY', 'GREEN', 'LIME', 'MAROON', 'NAVY', 'OLIVE', 'ORANGE', 'PURPLE', 'RED', 'SILVER', 'TEAL', 'WHITE' and 'YELLOW'."
+            + nl);
+            return;
+        }
+        meta.setColor(color);
+    }
+
+    public void setLeatherArmorColorRandom(LeatherArmorMeta meta) {
+        Random random = new Random();
+        int RED = random.nextInt(256);
+        int GREEN = random.nextInt(256);
+        int BLUE = random.nextInt(256);
+        Color color = Color.fromRGB(RED, GREEN, BLUE);
+        meta.setColor(color);
     }
 }
