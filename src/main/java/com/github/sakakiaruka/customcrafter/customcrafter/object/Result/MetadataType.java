@@ -12,7 +12,8 @@ public enum MetadataType {
     TEXTURE_ID("TEXTURE_ID"),
     ATTRIBUTE_MODIFIER("ATTRIBUTE_MODIFIER"),
     TOOL_DURABILITY("TOOL_DURABILITY"),
-    BOOK_FIELD("BOOK_FIELD");
+    BOOK_FIELD("BOOK_FIELD"),
+    LEATHER_ARMOR_COLOR("LEATHER_ARMOR_COLOR");
 
     private String type;
     private MetadataType(String type){

@@ -12,10 +12,7 @@ import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.BookMeta;
-import org.bukkit.inventory.meta.Damageable;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.inventory.meta.*;
 
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -31,6 +28,8 @@ public class Result {
     private static final String EQUIPMENT_ATTRIBUTE_MODIFIER_PATTERN = "^type:([\\w_]+)/operation:(?i)(add|multiply|add_scalar)/value:(\\-?\\d+(\\.\\d+)?)/slot:(\\w+)$";
 
     private static final String BOOK_FIELD_PATTERN = "^type:(?i)(author|title|add_page|pages|generation|add_long|add_long_extend)/value:(.+)$";
+
+    private static final String LEATHER_ARMOR_COLOR_PATTERN = "type:(?i)(rgb|name|random)";
 
     private String name;
     private Map<Enchantment,Integer> enchantsInfo;
@@ -135,10 +134,15 @@ public class Result {
             * book_field -> (addPage)/value:(.+)
             * book_field -> (addLong)/value:(.+) (auto divide pages)
             * book_field -> (addLongExtend)/value:(.+) (auto read data from a specified data and auto divide)
+            *
+            * leather_armor_color -> type:rgb/value:R->(\\d{1,3}),G->(\\d{1,3}),B->(\\d{1,3})
+            * leather_armor_color -> type:name/value:([\\w_]+)  #color name
+            * leather_armor_color -> type:random
              */
 
             MetadataType type = entry.getKey();
             List<String> content = entry.getValue();
+            InventoryUtil util = new InventoryUtil();
 
             if(type.equals(MetadataType.LORE)) meta.setLore(content);
             if(type.equals(MetadataType.DISPLAYNAME)) meta.setDisplayName(content.get(0));
@@ -237,8 +241,6 @@ public class Result {
                     continue;
                 }
 
-                InventoryUtil util = new InventoryUtil();
-
                 for (String s : content) {
                     Matcher matcher = Pattern.compile(BOOK_FIELD_PATTERN).matcher(s);
                     if (!matcher.matches()) {
@@ -255,6 +257,30 @@ public class Result {
                     if (bookFieldType.equals("pages")) util.setPages(bookMeta, value);
                     if (bookFieldType.equals("add_long")) util.addLong(bookMeta, value, false);
                     if (bookFieldType.equals("add_long_extend")) util.addLong(bookMeta, value, true);
+                }
+            }
+
+            if (type.equals(MetadataType.LEATHER_ARMOR_COLOR)) {
+                LeatherArmorMeta leatherArmorMeta;
+                try {
+                    leatherArmorMeta = (LeatherArmorMeta) meta;
+                } catch (Exception e) {
+                    Bukkit.getLogger().warning("[CustomCrafter] Leather Armor Color (Result) failed. (Illegal item. (Not LeatherArmorMeta))");
+                    continue;
+                }
+
+                for (String s : content) {
+                    Matcher matcher = Pattern.compile(LEATHER_ARMOR_COLOR_PATTERN).matcher(s);
+                    if (!matcher.find()) {
+                        Bukkit.getLogger().warning("[CustomCrafter] Leather Armor Color (Result) failed. (Illegal armor color pattern)");
+                        continue;
+                    }
+
+                    String colorType = matcher.group(1).toLowerCase();
+
+                    if (colorType.equals("random")) util.setLeatherArmorColorRandom(leatherArmorMeta);
+                    if (colorType.equals("rgb")) util.setLeatherArmorColorFromRGB(leatherArmorMeta, s);
+                    if (colorType.equals("name")) util.setLeatherArmorColorFromName(leatherArmorMeta, s);
                 }
             }
 
