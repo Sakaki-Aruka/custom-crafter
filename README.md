@@ -1,7 +1,5 @@
 # custom crafter
 
-![logo](https://github.com/Sakaki-Aruka/custom-crafter/assets/99568054/65e00fbd-acd4-45c0-837b-33a16ebd7c44)
-
 # 概要
 custom crafter は，既存のアイテムに新しいレシピを追加，カスタムアイテムにレシピを設定することが出来る Spigot 向けプラグインです．  
 使用するには `config.yml` 以外にも yaml ファイルを作成する必要があり，それらファイルを格納しておくためのディレクトリも必要とします.  
