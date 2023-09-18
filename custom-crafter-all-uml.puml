@@ -1,0 +1,624 @@
+@startuml
+class com.github.sakakiaruka.customcrafter.customcrafter.command.File {
++ void defaultPotion(String[],CommandSender)
+}
+enum com.github.sakakiaruka.customcrafter.customcrafter.object.Result.MetadataType {
++  LORE
++  DISPLAYNAME
++  ENCHANTMENT
++  ITEMFLAG
++  UNBREAKABLE
++  CUSTOMMODELDATA
++  POTIONDATA
++  POTIONCOLOR
++  TEXTURE_ID
++  ATTRIBUTE_MODIFIER
++  TOOL_DURABILITY
++  BOOK_FIELD
++  LEATHER_ARMOR_COLOR
+- String type
++ String toStr()
+}
+class com.github.sakakiaruka.customcrafter.customcrafter.command.PermissionCheck {
++ void tree(String[],CommandSender)
++ void show(String[],CommandSender)
++ void add(String[],CommandSender)
++ void remove(String[],CommandSender)
+}
+class com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad {
++ {static} int craftingTableSize
++ {static} int craftingTableResultSlot
++ {static} int craftingTableMakeButton
++ {static} int craftingTableTotalSize
++ {static} int vanillaCraftingSlots
++ {static} int vanillaCraftingSquareSize
++ {static} String nl
++ {static} String bar
++ {static} String shortBar
++ {static} String upperArrow
++ {static} Material baseBlock
++ {static} List<Recipe> recipes
++ {static} List<String> allMaterials
++ {static} Map<String,Recipe> namedRecipes
++ {static} Map<UUID,Material> whatMaking
+- {static} FileConfiguration defaultConfig
++ {static} Map<String,Result> results
++ {static} Map<String,Matter> matters
+- List<String> downloadUri
+- List<String> failed
+- int returnCode
+- int times
+- int threshold
+- int load_interval
+- {static} String USING_CONTAINER_VALUES_METADATA_PATTERN
+- {static} String MATTER_OVERRIDE_PATTERN
+- {static} String MATTER_REGEX_COLLECT_PATTERN
+- {static} String RESULT_METADATA_COLLECT_PATTERN
++ void load()
++ void getMatter(List<Path>)
+}
+enum com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantStrict {
++  INPUT
++  NOTSTRICT
++  ONLYENCHANT
++  STRICT
+- String strict
++ String toStr()
+}
+class com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter {
+- {static} CustomCrafter instance
++ void onEnable()
++ void onDisable()
++ {static} CustomCrafter getInstance()
+}
+class com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantWrap {
+- int level
+- Enchantment enchant
+- EnchantStrict strict
++ int getLevel()
++ void setLevel(int)
++ Enchantment getEnchant()
++ void setEnchant(Enchantment)
++ EnchantStrict getStrict()
++ void setStrict(EnchantStrict)
++ String info()
+}
+class com.github.sakakiaruka.customcrafter.customcrafter.command.Give {
++ void matter(String[],CommandSender)
++ void result(String[],CommandSender)
++ void give(String,CommandSender,boolean)
+}
+class com.github.sakakiaruka.customcrafter.customcrafter.util.DataContainerUtil {
++ PersistentDataType getDataType(String)
++ void addAllData(ItemStack,List<ContainerWrapper>)
+}
+enum com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.PotionStrict {
++  INPUT
++  NOT_STRICT
++  ONLY_DURATION
++  ONLY_AMPLIFIER
++  ONLY_EFFECT
++  STRICT
+- String type
++ String toStr()
+}
+class com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordinate {
+- int x
+- int y
++ int getX()
++ void setX(int)
++ int getY()
++ void setY(int)
++ boolean isSame(Coordinate)
+}
+class com.github.sakakiaruka.customcrafter.customcrafter.object.AmorphousVirtualContainer {
+- List<Material> candidate
+- List<NamespacedKey> keys
+- List<PersistentDataType> types
+- List<Object> values
+- List<String> tags
+- int amount
++ List<Material> getCandidate()
++ void setCandidate(List<Material>)
++ List<NamespacedKey> getKeys()
++ void setKeys(List<NamespacedKey>)
++ List<PersistentDataType> getTypes()
++ void setTypes(List<PersistentDataType>)
++ List<Object> getValues()
++ void setValues(List<Object>)
++ List<String> getTags()
++ void setTags(List<String>)
++ int getAmount()
++ void setAmount(int)
++ String info()
+}
+class com.github.sakakiaruka.customcrafter.customcrafter.util.DataCheckerUtil {
++ void matterCheck(StringBuilder,FileConfiguration,Path)
++ void resultCheck(StringBuilder,FileConfiguration,Path)
++ void recipeCheck(StringBuilder,FileConfiguration,Path)
++ List<String> getMetadataTypeStringList()
+}
+enum com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Container.RecipeDataContainerModifyType {
++  MODIFY
++  MAKE
+- String modifyTypeString
++ String getModifyTypeString()
+}
+class com.github.sakakiaruka.customcrafter.customcrafter.util.InventoryUtil {
+- {static} String LEATHER_ARMOR_COLOR_RGB_PATTERN
+- {static} String LEATHER_ARMOR_COLOR_NAME_PATTERN
+- {static} String LEATHER_ARMOR_COLOR_RANDOM_PATTERN
++ List<Integer> getTableSlots(int)
++ List<Integer> getBlankCoordinates(int)
++ void decrementMaterials(Inventory,int)
++ void decrementResult(Inventory,Player)
++ void returnItems(Recipe,Inventory,int,Player)
++ void snatchFromVirtual(Map<Matter,Integer>,List<Matter>,boolean)
++ List<ItemStack> getItemStackFromCraftingMenu(Inventory)
++ void setAuthor(BookMeta,String)
++ void setTitle(BookMeta,String)
++ void setPage(BookMeta,int,String)
++ void setPages(BookMeta,String)
++ void setGeneration(BookMeta,String)
++ void addPage(BookMeta,String)
++ void addLong(BookMeta,String,boolean)
++ void setLeatherArmorColorFromRGB(LeatherArmorMeta,String)
++ void setLeatherArmorColorFromName(LeatherArmorMeta,String)
++ void setLeatherArmorColorRandom(LeatherArmorMeta)
+}
+class com.github.sakakiaruka.customcrafter.customcrafter.command.Help {
+- String separateBar
+- String nl2
++ void all(String[],CommandSender)
++ void one(String[],CommandSender)
+}
+class com.github.sakakiaruka.customcrafter.customcrafter.search.Search {
++ void massSearch(Player,Inventory,boolean)
++ boolean isSameMatter(Matter,Matter)
++ boolean getEnchantWrapCongruence(Matter,Matter)
+}
+class com.github.sakakiaruka.customcrafter.customcrafter.command.ContainerModify {
++ {static} String CONTAINER_KEY_PATTERN
++ {static} String CONTAINER_OPERATION_PATTERN
++ {static} String CONTAINER_DATATYPE_PATTERN
++ {static} String NUMBERS_PATTERN
++ {static} String NUMBERS_ALPHABET
++ void addSet(String[],CommandSender)
++ void remove(String[],CommandSender)
++ void valueModify(String[],CommandSender)
++ void data(String[],CommandSender)
++ void modifyShow(String[],CommandSender)
+}
+class com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil {
++ {static} Map<String,RecipePermission> recipePermissionMap
++ {static} Map<UUID,List<RecipePermission>> playerPermissions
++ void makeRecipePermissionMap(List<RecipePermission>)
++ void playerPermissionWriter(Path)
++ boolean hasPermission(RecipePermission,Player)
++ void permissionRelateLoad(Path)
++ void permissionSettingsLoad(Path)
++ List<RecipePermission> removePermissionDuplications(List<RecipePermission>)
++ boolean inSameTree(RecipePermission,RecipePermission)
++ boolean isUpper(RecipePermission,RecipePermission)
++ boolean containsPermission(Player,RecipePermission)
++ String getPermissionTree(RecipePermission)
+}
+class com.github.sakakiaruka.customcrafter.customcrafter.object.DefinedCommand {
+- String commandName
+- boolean hasArgs
+- List<String> args
+- boolean console
+- List<String> commandPermission
+- Class<?> processClass
+- Method processMethod
+- int commandLen
++ String getCommandName()
++ void setCommandName(String)
++ boolean isHasArgs()
++ void setHasArgs(boolean)
++ List<String> getArgs()
++ void setArgs(List<String>)
++ boolean isConsole()
++ void setConsole(boolean)
++ List<String> getCommandPermission()
++ void setCommandPermission(List<String>)
++ Class<?> getProcessClass()
++ void setProcessClass(Class<?>)
++ Method getProcessMethod()
++ void setProcessMethod(Method)
++ int getCommandLen()
++ void setCommandLen(int)
++ String info()
+}
+interface com.github.sakakiaruka.customcrafter.customcrafter.interfaces.Matters {
+~ String getName()
+~ void setName(String)
+~ List<Material> getCandidate()
+~ void setCandidate(List<Material>)
+~ void addCandidate(List<Material>)
+~ List<EnchantWrap> getWrap()
+~ void setWrap(List<EnchantWrap>)
+~ boolean hasWrap()
+~ void addWrap(EnchantWrap)
+~ void addAllWrap(List<EnchantWrap>)
+~ int getAmount()
+~ void setAmount(int)
+~ boolean isMass()
+~ void setMass(boolean)
+~ int getEnchantLevel(Enchantment)
+~ String getAllWrapInfo()
+~ boolean contains(Enchantment)
+~ String info()
+~ Map<Integer,ContainerWrapper> getContainerWrappers()
+~ void setContainerWrappers(Map<Integer,ContainerWrapper>)
+~ boolean hasContainer()
+}
+class com.github.sakakiaruka.customcrafter.customcrafter.listener.ModifyCraftingInventory {
++ void onInventoryClick(InventoryClickEvent)
+}
+class com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Container.RecipeDataContainer {
+- PersistentDataType type
+- String term
+- String action
+- boolean end
+- RecipeDataContainerModifyType modifyType
++ PersistentDataType getDataType()
++ void setDataType(PersistentDataType)
++ String getTerm()
++ void setTerm(String)
++ String getAction()
++ void setAction(String)
++ boolean isEnd()
++ void setEnd(boolean)
++ RecipeDataContainerModifyType getModifyType()
++ void setModifyType(RecipeDataContainerModifyType)
+}
+class com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe {
+- String name
+- Tag tag
+- Map<Coordinate,Matter> coordinate
+- Map<Material,ItemStack> returnItems
+- RecipePermission permission
+- Result result
+- Map<NamespacedKey,List<RecipeDataContainer>> container
+- Map<Matter,List<String>> usingContainerValuesMetadata
++ void addCoordinate(int,int,Matter)
++ Tag getTag()
++ void setTag(Tag)
++ String getName()
++ void setName(String)
++ Map<Coordinate,Matter> getCoordinate()
++ void setCoordinate(Map<Coordinate,Matter>)
++ Map<Material,ItemStack> getReturnItems()
++ void setReturnItems(Map<Material,ItemStack>)
++ Result getResult()
++ void setResult(Result)
++ RecipePermission getPermission()
++ void setPermission(RecipePermission)
++ boolean hasPermission()
++ List<Matter> getContentsNoAir()
++ List<Coordinate> getCoordinateList()
++ List<Matter> getContentsNoDuplicate()
++ Map<Matter,Integer> getContentsNoDuplicateRelateAmount()
++ Set<Material> getMassMaterialSet()
++ Matter getMatterFromCoordinate(Coordinate)
++ int getContainerHasAmount()
++ Map<NamespacedKey,List<RecipeDataContainer>> getContainer()
++ void setContainer(Map<NamespacedKey,List<RecipeDataContainer>>)
++ boolean hasContainer()
++ Map<Matter,List<String>> getUsingContainerValuesMetadata()
++ void setUsingContainerValuesMetadata(Map<Matter,List<String>>)
++ boolean hasUsingContainerValuesMetadata()
+}
+enum com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Tag {
++  NORMAL
++  AMORPHOUS
+}
+class com.github.sakakiaruka.customcrafter.customcrafter.util.DefinedCommandUtil {
++ {static} Map<Integer,List<DefinedCommand>> definedCommands
++ {static} List<DefinedCommand> DEFINED_COMMAND_LIST
+- String MATTER_PATTERN
+- String RESULT_PATTERN
+- String RECIPE_PATTERN
+- String RECIPE_PERMISSION_PATTERN
+- String PLAYER_PATTERN
+- String CONTAINER_KEY_PATTERN
+- String CONTAINER_DATATYPE_PATTERN
+- String NOTNULL_EMPTY_PATTERN
+- String NUMBERS_ALPHABET
+- String NUMBERS
+- String MATHEMATICAL_OPERATORS_PATTERN
+- String COMMAND_ARGS_PATTERN
+- {static} List<String> ARGS_INITIAL
++ void loader()
++ DefinedCommand getProcessor(String[],CommandSender)
++ void runCommand(DefinedCommand,String[],CommandSender)
+}
+class com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter {
+- String name
+- List<Material> candidate
+- List<EnchantWrap> wrap
+- int amount
+- boolean mass
+- Map<Integer,ContainerWrapper> container
++ String getName()
++ void setName(String)
++ List<Material> getCandidate()
++ void setCandidate(List<Material>)
++ void addCandidate(List<Material>)
++ List<EnchantWrap> getWrap()
++ void setWrap(List<EnchantWrap>)
++ boolean hasWrap()
++ void addWrap(EnchantWrap)
++ void addAllWrap(List<EnchantWrap>)
++ int getAmount()
++ void setAmount(int)
++ boolean isMass()
++ void setMass(boolean)
++ int getEnchantLevel(Enchantment)
++ String getAllWrapInfo()
++ boolean contains(Enchantment)
++ Matter copy()
++ Matter oneCopy()
++ boolean sameCandidate(Matter)
++ String info()
++ boolean hasContainer()
++ Map<Integer,ContainerWrapper> getContainerWrappers()
++ void setContainerWrappers(Map<Integer,ContainerWrapper>)
++ Map<Integer,ContainerWrapper> containerElementsDeepCopy()
++ boolean equals(Object)
++ int hashCode()
+}
+class com.github.sakakiaruka.customcrafter.customcrafter.search.VanillaSearch {
++ void main(Player,Inventory,boolean)
+}
+class com.github.sakakiaruka.customcrafter.customcrafter.util.AttributeModifierUtil {
++ {static} String USING_CONTAINER_VALUES_ATTRIBUTE_MODIFIER_PATTERN
++ {static} String USING_CONTAINER_VALUES_ATTRIBUTE_MODIFIER_EQUIPMENT_SLOT_PATTERN
++ void setAttributeModifierToResult(ItemMeta,PersistentDataContainer,String)
++ AttributeModifier getAttributeModifier(Matcher,boolean)
+}
+class com.github.sakakiaruka.customcrafter.customcrafter.listener.Listener {
++ void onCloseInventory(InventoryCloseEvent)
++ void onInventoryModify(InventoryClickEvent)
++ void onInventoryOpen(PlayerInteractEvent)
+}
+class com.github.sakakiaruka.customcrafter.customcrafter.util.EnchantUtil {
++ List<Matter> getTargetMaterialMatters(Recipe,Material)
++ List<Matter> getTargetEnchantMatters(Recipe,Enchantment)
++ boolean containsFromDoubleList(List<List<EnchantWrap>>,Matter)
++ EnchantStrict getStrictByName(String)
++ List<String> strValues()
++ List<String> strValuesNoInput()
++ List<String> getEnchantmentStrList()
+}
+enum com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.PotionData.PotionDuration {
++  JUMP
++  FIRE_RESISTANCE
++  SPEED
++  SLOW
++  WATER_BREATHING
++  HEAL
++  HARM
++  POISON
++  REGENERATION
++  INCREASE_DAMAGE
++  WEAKNESS
++  LUCK
++  TURTLE_MASTER
++  SLOW_FALLING
++  INVISIBILITY
++  NIGHT_VISION
++  LINGERING_NIGHT_VISION
++  LINGERING_INVISIBILITY
++  LINGERING_JUMP
++  LINGERING_FIRE_RESISTANCE
++  LINGERING_SPEED
++  LINGERING_SLOW
++  LINGERING_TURTLE_MASTER
++  LINGERING_WATER_BREATHING
++  LINGERING_HEAL
++  LINGERING_HARM
++  LINGERING_POISON
++  LINGERING_REGENERATION
++  LINGERING_INCREASE_DAMAGE
++  LINGERING_WEAKNESS
++  LINGERING_LUCK
++  LINGERING_SLOW_FALLING
+- int upgraded
+- int extended
+- int normal
+- String name
++ int getUpgraded()
++ int getExtended()
++ int getNormal()
++ String getPDName()
+}
+class com.github.sakakiaruka.customcrafter.customcrafter.command.Show {
++ void all(String[],CommandSender)
++ void one(String[],CommandSender)
++ String getGraphicalRecipe(String)
+}
+class com.github.sakakiaruka.customcrafter.customcrafter.object.ContainerWrapper {
+- int order
+- String tag
+- NamespacedKey key
+- PersistentDataType type
+- String value
++ Class getValueType()
++ NamespacedKey getKey()
++ void setKey(NamespacedKey)
++ PersistentDataType getType()
++ void setType(PersistentDataType)
++ int getOrder()
++ void setOrder(int)
++ String getTag()
++ void setTag(String)
++ String getValue()
++ boolean hasKey()
++ boolean hasType()
++ void setValue(String)
++ String info()
+}
+class com.github.sakakiaruka.customcrafter.customcrafter.listener.CloseCraftingTable {
++ void onInventoryClose(InventoryCloseEvent)
++ void close(Player,Inventory)
+}
+class com.github.sakakiaruka.customcrafter.customcrafter.object.Result.Result {
+- {static} String NORMAL_ATTRIBUTE_MODIFIER_PATTERN
+- {static} String EQUIPMENT_ATTRIBUTE_MODIFIER_PATTERN
+- {static} String BOOK_FIELD_PATTERN
+- {static} String LEATHER_ARMOR_COLOR_PATTERN
+- String name
+- Map<Enchantment,Integer> enchantsInfo
+- int amount
+- Map<MetadataType,List<String>> metadata
+- String nameOrRegex
+- int matchPoint
+- List<ContainerWrapper> dataContainer
++ List<ContainerWrapper> getDataContainer()
++ void setDataContainer(List<ContainerWrapper>)
++ String getName()
++ void setName(String)
++ Map<Enchantment,Integer> getEnchantsInfo()
++ void setEnchantsInfo(Map<Enchantment,Integer>)
++ int getAmount()
++ void setAmount(int)
++ Map<MetadataType,List<String>> getMetadata()
++ void setMetadataValue(Map<MetadataType,List<String>>)
++ String getNameOrRegex()
++ void setNameOrRegex(String)
++ int getMatchPoint()
++ void setMatchPoint(int)
++ void setMetaData(ItemStack)
+}
+class com.github.sakakiaruka.customcrafter.customcrafter.object.Permission.RecipePermission {
++ {static} RecipePermission ROOT
+- String parent
+- String name
++ String getParent()
++ void setParent(String)
++ String getPermissionName()
++ void setPermissionName(String)
++ String toStr()
+}
+class com.github.sakakiaruka.customcrafter.customcrafter.util.ContainerUtil {
++ {static} Map<String,Map<Integer,ContainerWrapper>> containers
++ {static} String ALLOW_TAG
++ {static} String ALLOW_VALUE
++ {static} String DENY_TAG
++ {static} String DENY_VALUE
++ {static} String STORE_ONLY
+- {static} String ARROW_RANGE_PATTERN
+- {static} String LARGER_PATTERN
+- {static} String SMALLER_PATTERN
+- {static} String CONTAINER_OPERATION_PATTERN
+- {static} String RECIPE_CONTAINER_ARROW_RANGE_PATTERN
+- {static} String RECIPE_CONTAINER_LARGER_PATTERN
+- {static} String RECIPE_CONTAINER_SMALLER_PATTERN
+- {static} String RECIPE_CONTAINER_EQUAL_PATTERN
+- {static} String MULTI_VALUE_PATTERN
+- {static} String MULTI_VALUE_CLASS_PATTERN
+- {static} String USING_CONTAINER_VALUES_LORE_PATTERN
+- {static} String USING_CONTAINER_VALUES_ENCHANTMENT_PATTERN
+- {static} String USING_CONTAINER_VALUES_POTION_COLOR_RGB_PATTERN
+- {static} String USING_CONTAINER_VALUES_POTION_COLOR_RANDOM_PATTERN
+- {static} String USING_CONTAINER_VALUES_TOOL_DURABILITY_ABSOLUTE_PATTERN
+- {static} String USING_CONTAINER_VALUES_TOOL_DURABILITY_PERCENTAGE_PATTERN
+- {static} String USING_CONTAINER_VALUES_TEXTURE_ID_PATTERN
+- {static} String USING_CONTAINER_VALUES_ITEM_NAME_PATTERN
+- {static} int ENCHANTMENT_MAX_LEVEL
++ PersistentDataType getDataType(String)
++ Class getClassFromType(PersistentDataType)
++ Map<Integer,ContainerWrapper> mattersLoader(Path)
++ boolean isPassTargetEmpty(Matter)
++ boolean amorphousContainerCongruence(Recipe,Recipe)
++ boolean isPass(ItemStack,Matter)
++ void setContainerDataItemStackToMatter(ItemStack,Matter)
++ PersistentDataType getSpecifiedKeyType(PersistentDataContainer,NamespacedKey)
++ String containerValues(PersistentDataContainer)
++ void setRecipeDataContainerToResultItem(ItemStack,Recipe,Recipe)
++ void setRecipeUsingContainerValueMetadata(Inventory,Recipe,ItemStack)
++ String getContent(PersistentDataContainer,String)
+}
+enum com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.PotionBottleType {
++  NORMAL
++  LINGERING
++  SPLASH
+- Material related
++ Material getRelated()
+}
+class com.github.sakakiaruka.customcrafter.customcrafter.util.PotionUtil {
++ int getDuration(String,boolean,boolean,PotionBottleType)
++ PotionBottleType getBottleType(Material)
++ boolean isPotion(Material)
++ List<String> getPotionEffectTypeStringList()
++ List<String> getPotionStrictStringList()
++ Potions water_bottle()
++ ItemStack water_bottle_ItemStack()
++ boolean isWaterBottle(Matter)
++ boolean isSamePotion(Potions,Potions)
++ boolean getPotionsCongruence(Recipe,Recipe)
++ void makeDefaultPotionFilesWrapper()
+}
+class com.github.sakakiaruka.customcrafter.customcrafter.listener.OpenCraftingTable {
++ {static} List<Player> opening
+- {static} double degrees
+- {static} double radius
++ void onPlayerInteract(PlayerInteractEvent)
++ Inventory setCraftingInventory()
+}
+class com.github.sakakiaruka.customcrafter.customcrafter.command.Check {
+- String nl
++ boolean onCommand(CommandSender,Command,String,String[])
++ void open(String[],CommandSender)
++ void reload(String[],CommandSender)
+}
+class com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.Potions {
+- Map<PotionEffect,PotionStrict> data
+- PotionBottleType bottle
+- boolean bottleTypeMatch
++ ItemStack prescribe()
++ String PotionInfo()
++ boolean hasAnyCustomEffect()
++ boolean hasPotionEffect(PotionEffectType)
++ Map<PotionEffect,PotionStrict> getData()
++ PotionBottleType getBottle()
++ boolean isBottleTypeMatch()
++ int getDuration(PotionEffectType)
++ int getAmplifier(PotionEffectType)
++ String getName()
++ void setName(String)
++ List<Material> getCandidate()
++ void setCandidate(List<Material>)
++ void addCandidate(List<Material>)
++ List<EnchantWrap> getWrap()
++ void setWrap(List<EnchantWrap>)
++ boolean hasWrap()
++ void addWrap(EnchantWrap)
++ void addAllWrap(List<EnchantWrap>)
++ int getAmount()
++ void setAmount(int)
++ boolean isMass()
++ void setMass(boolean)
++ int getEnchantLevel(Enchantment)
++ String getAllWrapInfo()
++ boolean contains(Enchantment)
++ String info()
++ Map<Integer,ContainerWrapper> getContainerWrappers()
++ void setContainerWrappers(Map<Integer,ContainerWrapper>)
++ Potions copy()
++ Potions oneCopy()
+}
+
+
+org.bukkit.plugin.java.JavaPlugin <|-- com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter
+org.bukkit.event.Listener <|.. com.github.sakakiaruka.customcrafter.customcrafter.listener.ModifyCraftingInventory
+com.github.sakakiaruka.customcrafter.customcrafter.interfaces.Matters <|.. com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter
+com.github.sakakiaruka.customcrafter.customcrafter.listener.Listener <|.. com.github.sakakiaruka.customcrafter.customcrafter.listener.Listener
+org.bukkit.event.Listener <|.. com.github.sakakiaruka.customcrafter.customcrafter.listener.CloseCraftingTable
+org.bukkit.event.Listener <|.. com.github.sakakiaruka.customcrafter.customcrafter.listener.OpenCraftingTable
+com.github.sakakiaruka.customcrafter.customcrafter.command.CommandExecutor <|.. com.github.sakakiaruka.customcrafter.customcrafter.command.Check
+com.github.sakakiaruka.customcrafter.customcrafter.interfaces.Matters <|.. com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.Potions
+com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter <|-- com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.Potions
+@enduml
