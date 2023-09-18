@@ -15,8 +15,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter.getInstance;
-import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.nl;
-import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.upperArrow;
+import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.LINE_SEPARATOR;
+import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.UPPER_ARROW;
 
 public class ContainerModify {
 
@@ -234,7 +234,7 @@ public class ContainerModify {
         String result = new ContainerUtil().containerValues(container);
         sender.sendMessage(result);
         UUID uuid = UUID.randomUUID();
-        sender.sendMessage(upperArrow+" Container Ticket: "+uuid);
+        sender.sendMessage(UPPER_ARROW +" Container Ticket: "+uuid);
     }
 
     // /cc -container -data -modifyShow [key] [operator] [key]
@@ -268,7 +268,7 @@ public class ContainerModify {
     private void sendDataDiff(String before, String after, String modifyType, CommandSender sender) {
         StringBuilder builder = new StringBuilder();
         builder.append(before);
-        builder.append(nl+"The modify type is '"+modifyType+"'."+nl);
+        builder.append(LINE_SEPARATOR +"The modify type is '"+modifyType+"'."+ LINE_SEPARATOR);
         builder.append(after);
         sender.sendMessage(builder.toString());
     }

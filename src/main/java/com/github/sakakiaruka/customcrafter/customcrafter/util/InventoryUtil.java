@@ -38,19 +38,19 @@ public class InventoryUtil {
 
     public List<Integer> getBlankCoordinates(int size){
         List<Integer> list = new ArrayList<>();
-        for(int i=0;i<craftingTableTotalSize;i++){
+        for(int i = 0; i< CRAFTING_TABLE_TOTAL_SIZE; i++){
             list.add(i);
         }
         list.removeAll(getTableSlots(size));
-        list.removeAll(Arrays.asList(craftingTableMakeButton));
-        list.removeAll(Arrays.asList(craftingTableResultSlot));
+        list.removeAll(Arrays.asList(CRAFTING_TABLE_MAKE_BUTTON));
+        list.removeAll(Arrays.asList(CRAFTING_TABLE_RESULT_SLOT));
         return list;
     }
 
     public void decrementMaterials(Inventory inventory, int amount){
         // decrement crafting tables material
         // amount -> decrement amount
-        List<Integer> slots = getTableSlots(craftingTableSize);
+        List<Integer> slots = getTableSlots(CRAFTING_TABLE_SIZE);
         for(int i:slots){
             if(inventory.getItem(i) == null)continue;
             int oldAmount = inventory.getItem(i).getAmount();
@@ -60,12 +60,12 @@ public class InventoryUtil {
     }
 
     public void decrementResult(Inventory inventory,Player player){
-        if(inventory.getItem(craftingTableResultSlot) == null)return;
+        if(inventory.getItem(CRAFTING_TABLE_RESULT_SLOT) == null)return;
         World world = player.getWorld();
         Location location = player.getLocation();
-        ItemStack item = inventory.getItem(craftingTableResultSlot);
+        ItemStack item = inventory.getItem(CRAFTING_TABLE_RESULT_SLOT);
         world.dropItem(location,item); // drop
-        inventory.setItem(craftingTableResultSlot,new ItemStack(Material.AIR));
+        inventory.setItem(CRAFTING_TABLE_RESULT_SLOT,new ItemStack(Material.AIR));
     }
 
     public void returnItems(Recipe recipe,Inventory inventory, int removeAmount,Player player){
@@ -115,7 +115,7 @@ public class InventoryUtil {
 
     public List<ItemStack> getItemStackFromCraftingMenu(Inventory inventory) {
         List<ItemStack> result = new ArrayList<>();
-        for (int i : getTableSlots(craftingTableSize)) {
+        for (int i : getTableSlots(CRAFTING_TABLE_SIZE)) {
             if (inventory.getItem(i) == null || inventory.getItem(i).getType().equals(Material.AIR)) continue;
             result.add(inventory.getItem(i));
         }
@@ -201,7 +201,7 @@ public class InventoryUtil {
 
         if (extend) {
             try {
-                value = String.join(nl, Files.readAllLines(Paths.get(value), StandardCharsets.UTF_8));
+                value = String.join(LINE_SEPARATOR, Files.readAllLines(Paths.get(value), StandardCharsets.UTF_8));
             } catch (Exception e) {
                 Bukkit.getLogger().warning("[CustomCrafter] Set result metadata (addLong - extend) failed. (About a file read.)");
                 Bukkit.getLogger().warning(e.getMessage());
@@ -228,7 +228,7 @@ public class InventoryUtil {
             String target = String.valueOf(value.charAt(i));
             int evaluation = target.matches(PATTERN) ? 1 : 2;
 
-            if ((22 <= (horizontal + evaluation) || target.equals(nl)) && vertical == 14) {
+            if ((22 <= (horizontal + evaluation) || target.equals(LINE_SEPARATOR)) && vertical == 14) {
                 // make a new page
 
                 if (meta.getPageCount() == 100) {
@@ -245,7 +245,7 @@ public class InventoryUtil {
 
                 vertical = 0;
 
-            } else if ((22 <= (horizontal + evaluation) || target.equals(nl)) && vertical < 14) {
+            } else if ((22 <= (horizontal + evaluation) || target.equals(LINE_SEPARATOR)) && vertical < 14) {
                 // make a new line
                 horizontal = evaluation;
                 element.append(target);
@@ -294,11 +294,11 @@ public class InventoryUtil {
 
     private String getLeatherArmorColorWarningUnMatchPattern() {
         String result =
-                "[CustomCrafter] Set result metadata (LeatherArmorColor) failed. (Illegal data format.)" + nl
-                + "Follow the patterns." + nl
-                + "- " + LEATHER_ARMOR_COLOR_RGB_PATTERN + nl
-                + "- " + LEATHER_ARMOR_COLOR_NAME_PATTERN + nl
-                + "- " + LEATHER_ARMOR_COLOR_RANDOM_PATTERN + nl;
+                "[CustomCrafter] Set result metadata (LeatherArmorColor) failed. (Illegal data format.)" + LINE_SEPARATOR
+                + "Follow the patterns." + LINE_SEPARATOR
+                + "- " + LEATHER_ARMOR_COLOR_RGB_PATTERN + LINE_SEPARATOR
+                + "- " + LEATHER_ARMOR_COLOR_NAME_PATTERN + LINE_SEPARATOR
+                + "- " + LEATHER_ARMOR_COLOR_RANDOM_PATTERN + LINE_SEPARATOR;
         return result;
     }
 
@@ -331,9 +331,9 @@ public class InventoryUtil {
         }
         Color color;
         if ((color = getColor(matcher.group(2))) == null) {
-            Bukkit.getLogger().warning("[CustomCrafter] Set result metadata (LeatherArmorColor) failed. (Illegal color-name.)" + nl
+            Bukkit.getLogger().warning("[CustomCrafter] Set result metadata (LeatherArmorColor) failed. (Illegal color-name.)" + LINE_SEPARATOR
             + "You can use 'AQUA', 'BLACK', 'BLUE', 'FUCHSIA', 'GRAY', 'GREEN', 'LIME', 'MAROON', 'NAVY', 'OLIVE', 'ORANGE', 'PURPLE', 'RED', 'SILVER', 'TEAL', 'WHITE' and 'YELLOW'."
-            + nl);
+            + LINE_SEPARATOR);
             return;
         }
         meta.setColor(color);

@@ -5,16 +5,9 @@ import com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad;
 import com.github.sakakiaruka.customcrafter.customcrafter.listener.CloseCraftingTable;
 import com.github.sakakiaruka.customcrafter.customcrafter.listener.OpenCraftingTable;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.DefinedCommand;
-import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
-import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordinate;
-import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
-import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Tag;
-import com.github.sakakiaruka.customcrafter.customcrafter.search.Search;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.DefinedCommandUtil;
-import com.github.sakakiaruka.customcrafter.customcrafter.util.PotionUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.command.*;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
@@ -64,10 +57,10 @@ public class Check implements CommandExecutor{
             s.closeInventory();
         });
 
-        recipes.clear();
-        namedRecipes.clear();
+        RECIPE_LIST.clear();
+        NAMED_RECIPES_MAP.clear();
 
-        whatMaking.clear();
+        WHAT_MAKING.clear();
         opening.clear();
 
         FileConfiguration oldConfig = CustomCrafter.getInstance().getConfig();

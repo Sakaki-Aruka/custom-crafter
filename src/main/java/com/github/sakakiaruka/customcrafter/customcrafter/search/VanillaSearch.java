@@ -4,10 +4,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordina
 import com.github.sakakiaruka.customcrafter.customcrafter.util.InventoryUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.Server;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.*;
 
 import java.util.ArrayList;
@@ -21,8 +18,8 @@ public class VanillaSearch {
     public void main(Player player, Inventory inventory,boolean batchBool){
         List<Coordinate> coordinates = getCoordinateList(inventory);
         if(coordinates.isEmpty())return;
-        if(coordinates.size() > vanillaCraftingSlots)return;
-        if(getSquareSize(coordinates) > vanillaCraftingSquareSize)return;
+        if(coordinates.size() > VANILLA_CRAFTING_SLOTS)return;
+        if(getSquareSize(coordinates) > VANILLA_CRAFTING_SQUARE_SIZE)return;
 
         ItemStack[] itemStack = getItemStacks(inventory,coordinates.get(0));
         ItemStack[] itemStacks = itemStack.clone();
@@ -34,7 +31,7 @@ public class VanillaSearch {
 
         if(result == null)return;
         if(result.getType().equals(Material.AIR))return;
-        whatMaking.put(player.getUniqueId(),result.getType());
+        WHAT_MAKING.put(player.getUniqueId(),result.getType());
 
         InventoryUtil util = new InventoryUtil();
         if(batchBool) {
@@ -52,9 +49,9 @@ public class VanillaSearch {
         if(result.getAmount() > result.getType().getMaxStackSize()){
             // amount over
             player.getWorld().dropItem(player.getLocation(),result);
-            inventory.setItem(craftingTableResultSlot,new ItemStack(Material.AIR));
+            inventory.setItem(CRAFTING_TABLE_RESULT_SLOT,new ItemStack(Material.AIR));
         }else{
-            inventory.setItem(craftingTableResultSlot,result);
+            inventory.setItem(CRAFTING_TABLE_RESULT_SLOT,result);
         }
 
     }
@@ -74,17 +71,17 @@ public class VanillaSearch {
 
 
     private ItemStack[] getItemStacks(Inventory inventory,Coordinate start){
-        ItemStack[] items = new ItemStack[vanillaCraftingSlots];
+        ItemStack[] items = new ItemStack[VANILLA_CRAFTING_SLOTS];
         int counter = 0;
         for(int y=start.getY();y < start.getY()+3;y++){
             for(int x=start.getX();x < start.getX()+3;x++){
-                if(y >= craftingTableSize || x >= craftingTableSize){
+                if(y >= CRAFTING_TABLE_SIZE || x >= CRAFTING_TABLE_SIZE){
                     // over the crafting tables coordinates
                     items[counter] = new ItemStack(Material.AIR);
                     counter++;
                     continue;
                 }
-                int slot = x + y*vanillaCraftingSlots;
+                int slot = x + y* VANILLA_CRAFTING_SLOTS;
                 items[counter] = inventory.getItem(slot) == null ? new ItemStack(Material.AIR) : inventory.getItem(slot);
                 counter++;
             }
@@ -94,11 +91,11 @@ public class VanillaSearch {
 
     private List<Coordinate> getCoordinateList(Inventory inventory){
         List<Coordinate> list = new ArrayList<>();
-        for(int i:new InventoryUtil().getTableSlots(craftingTableSize)){
+        for(int i:new InventoryUtil().getTableSlots(CRAFTING_TABLE_SIZE)){
             if(inventory.getItem(i) == null)continue;
             if(inventory.getItem(i).getType().equals(Material.AIR))continue;
-            int x = i % vanillaCraftingSlots;
-            int y = i / vanillaCraftingSlots;
+            int x = i % 9;
+            int y = i / 9;
             list.add(new Coordinate(x,y));
         }
         return list;

@@ -35,7 +35,7 @@ public class Search {
         Recipe input = toRecipe(inventory);
         List<ItemStack> interestedItems = getInterestedAreaItems(inventory);
 
-        Top:for(Recipe recipe:recipes){
+        Top:for(Recipe recipe: RECIPE_LIST){
 
             if(recipe.hasPermission()){ // permission check
                 RecipePermission source = recipe.getPermission();
@@ -200,7 +200,7 @@ public class Search {
 
     private void setResultItem(Inventory inventory,Recipe recipe,Recipe input,Player player,int amount, boolean oneCraft){
         ItemStack item = null;
-        if(allMaterials.contains(recipe.getResult().getNameOrRegex())
+        if(ALL_MATERIALS.contains(recipe.getResult().getNameOrRegex())
         || recipe.getResult().getMatchPoint() == -1
         || !recipe.getResult().getNameOrRegex().contains("@")){
             // result has defined material
@@ -237,12 +237,12 @@ public class Search {
         if(item == null)return;
         if(item.getType().equals(Material.AIR))return;
 
-        whatMaking.put(player.getUniqueId(),item.getType());
+        WHAT_MAKING.put(player.getUniqueId(),item.getType());
 
         new ContainerUtil().setRecipeDataContainerToResultItem(item, input, recipe);
         if (recipe.hasUsingContainerValuesMetadata()) new ContainerUtil().setRecipeUsingContainerValueMetadata(inventory, recipe, item);
 
-        if(inventory.getItem(craftingTableResultSlot) == null){
+        if(inventory.getItem(CRAFTING_TABLE_RESULT_SLOT) == null){
             // empty a result item's slot
             player.getWorld().dropItem(player.getLocation(),item);
         }else{
@@ -251,7 +251,7 @@ public class Search {
                 player.getWorld().dropItem(player.getLocation(),item);
             }else{
                 // in the limit
-                inventory.setItem(craftingTableResultSlot,item);
+                inventory.setItem(CRAFTING_TABLE_RESULT_SLOT,item);
             }
         }
 
@@ -423,8 +423,8 @@ public class Search {
 
     private List<ItemStack> getInterestedAreaItems(Inventory inventory) {
         List<ItemStack> list = new ArrayList<>();
-        for (int y=0;y<craftingTableSize;y++) {
-            for (int x=0;x<craftingTableSize;x++) {
+        for (int y = 0; y< CRAFTING_TABLE_SIZE; y++) {
+            for (int x = 0; x< CRAFTING_TABLE_SIZE; x++) {
                 int i = x+y*9;
                 if (inventory.getItem(i) == null) continue;
                 list.add(inventory.getItem(i));
@@ -435,8 +435,8 @@ public class Search {
 
     private Recipe toRecipe(Inventory inventory){
         Recipe recipe = new Recipe();
-        for(int y=0;y<craftingTableSize;y++){
-            for(int x=0;x<craftingTableSize;x++){
+        for(int y = 0; y< CRAFTING_TABLE_SIZE; y++){
+            for(int x = 0; x< CRAFTING_TABLE_SIZE; x++){
                 int i = x+y*9;
                 Matter matter = toMatter(inventory,i);
                 if(inventory.getItem(i) == null)continue;

@@ -6,7 +6,7 @@ import org.bukkit.persistence.PersistentDataType;
 
 import java.util.List;
 
-import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.nl;
+import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.LINE_SEPARATOR;
 
 public class AmorphousVirtualContainer {
     private List<Material> candidate;
@@ -75,21 +75,21 @@ public class AmorphousVirtualContainer {
 
     public String info() {
         StringBuilder builder = new StringBuilder();
-        builder.append("candidate: " + nl);
+        builder.append("candidate: " + LINE_SEPARATOR);
         for (Material m : candidate) {
-            builder.append("  -> " + m.name() + nl);
+            builder.append("  -> " + m.name() + LINE_SEPARATOR);
         }
-        builder.append("keys: " + nl);
+        builder.append("keys: " + LINE_SEPARATOR);
         for (NamespacedKey key : keys) {
-            builder.append("  -> " + key.getKey() + nl);
+            builder.append("  -> " + key.getKey() + LINE_SEPARATOR);
         }
-        builder.append("types: " + nl);
+        builder.append("types: " + LINE_SEPARATOR);
         for (PersistentDataType type : types) {
-            builder.append("  -> " + type.toString() + nl);
+            builder.append("  -> " + type.toString() + LINE_SEPARATOR);
         }
-        builder.append("tags: "+nl);
+        builder.append("tags: "+ LINE_SEPARATOR);
         for (String t : tags) {
-            builder.append("  -> "+t+nl);
+            builder.append("  -> "+t+ LINE_SEPARATOR);
         }
         return builder.toString();
     }

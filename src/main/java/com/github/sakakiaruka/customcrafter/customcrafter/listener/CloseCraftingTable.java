@@ -9,8 +9,8 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
-import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.craftingTableResultSlot;
-import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.craftingTableSize;
+import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.CRAFTING_TABLE_RESULT_SLOT;
+import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.CRAFTING_TABLE_SIZE;
 import static com.github.sakakiaruka.customcrafter.customcrafter.listener.OpenCraftingTable.opening;
 
 public class CloseCraftingTable implements Listener {
@@ -24,15 +24,15 @@ public class CloseCraftingTable implements Listener {
     }
 
     public void close(Player player,Inventory inventory){
-        for(int i:new InventoryUtil().getTableSlots(craftingTableSize)){
+        for(int i:new InventoryUtil().getTableSlots(CRAFTING_TABLE_SIZE)){
             if(inventory.getItem(i)==null)continue;
             if(inventory.getItem(i).getType().equals(Material.AIR))continue;
             player.getWorld().dropItem(player.getLocation(),inventory.getItem(i));
             inventory.setItem(i,new ItemStack(Material.AIR));
         }
 
-        if(inventory.getItem(craftingTableResultSlot) != null)player.getWorld().dropItem(player.getLocation(),inventory.getItem(craftingTableResultSlot));
-        inventory.setItem(craftingTableResultSlot,new ItemStack(Material.AIR));
+        if(inventory.getItem(CRAFTING_TABLE_RESULT_SLOT) != null)player.getWorld().dropItem(player.getLocation(),inventory.getItem(CRAFTING_TABLE_RESULT_SLOT));
+        inventory.setItem(CRAFTING_TABLE_RESULT_SLOT,new ItemStack(Material.AIR));
 
     }
 }
