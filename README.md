@@ -1,4 +1,5 @@
-# custom crafter
+# custom crafter  
+custom crafter is a plugin for minecraft servers (Spigot or Paper) that provides custom recipes.  
 
 # 概要
 custom crafter は，既存のアイテムに新しいレシピを追加，カスタムアイテムにレシピを設定することが出来る Spigot 向けプラグインです．  
