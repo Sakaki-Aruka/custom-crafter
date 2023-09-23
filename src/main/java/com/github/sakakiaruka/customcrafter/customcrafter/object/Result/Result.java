@@ -150,21 +150,21 @@ public class Result {
                 for(String s : content){
                     List<String> enchants = Arrays.asList(s.split(","));
                     Enchantment enchant = Enchantment.getByName(enchants.get(0).toUpperCase());
-                    int level = Integer.valueOf(enchants.get(1));
+                    int level = Integer.parseInt(enchants.get(1));
                     meta.addEnchant(enchant,level,true);
                 }
             }
 
             if(type.equals(MetadataType.ITEMFLAG)) content.forEach(s->meta.addItemFlags(ItemFlag.valueOf(s.toUpperCase())));
-            if(type.equals(MetadataType.UNBREAKABLE)) meta.setUnbreakable(Boolean.valueOf(content.get(0)));
-            if(type.equals(MetadataType.CUSTOMMODELDATA)) meta.setCustomModelData(Integer.valueOf(content.get(0)));
+            if(type.equals(MetadataType.UNBREAKABLE)) meta.setUnbreakable(Boolean.parseBoolean(content.get(0)));
+            if(type.equals(MetadataType.CUSTOMMODELDATA)) meta.setCustomModelData(Integer.parseInt(content.get(0)));
             if(type.equals(MetadataType.POTIONDATA)) {
                 if(!new PotionUtil().isPotion(item.getType())) return;
                 for(String s : content){
                     List<String> potionData = Arrays.asList(s.split(","));
                     PotionEffectType effectType = PotionEffectType.getByName(potionData.get(0).toUpperCase());
-                    int duration = Integer.valueOf(potionData.get(1)) < 1 ? 1 : Integer.valueOf(potionData.get(1));
-                    int amplifier = Integer.valueOf(potionData.get(2)) < 1 ? 1 : Integer.valueOf(potionData.get(2));
+                    int duration = Integer.parseInt(potionData.get(1)) < 1 ? 1 : Integer.parseInt(potionData.get(1));
+                    int amplifier = Integer.parseInt(potionData.get(2)) < 1 ? 1 : Integer.parseInt(potionData.get(2));
                     PotionEffect effect = new PotionEffect(effectType,duration,amplifier);
                     PotionMeta potionMeta = (PotionMeta)  meta;
                     potionMeta.addCustomEffect(effect,true);
@@ -173,9 +173,9 @@ public class Result {
             if(type.equals(MetadataType.POTIONCOLOR)) {
                 for(String s : content){
                     List<String> colors = Arrays.asList(s.split(","));
-                    int r = Integer.valueOf(colors.get(0));
-                    int g = Integer.valueOf(colors.get(1));
-                    int b = Integer.valueOf(colors.get(2));
+                    int r = Integer.parseInt(colors.get(0));
+                    int g = Integer.parseInt(colors.get(1));
+                    int b = Integer.parseInt(colors.get(2));
 
                     PotionMeta potionMeta = (PotionMeta)meta;
                     potionMeta.setColor(Color.fromRGB(r,g,b));
@@ -186,7 +186,7 @@ public class Result {
                 String id = content.get(0);
                 Matcher matcher = Pattern.compile("^([0-9]+)$").matcher(id);
                 if (!matcher.matches()) continue;
-                meta.setCustomModelData(Integer.valueOf(id));
+                meta.setCustomModelData(Integer.parseInt(id));
             }
 
             if (type.equals(MetadataType.ATTRIBUTE_MODIFIER)) {
@@ -225,7 +225,7 @@ public class Result {
                     Bukkit.getLogger().warning("[CustomCrafter] ToolDurability (Result) failed. (Illegal configuration format found.)");
                     continue;
                 }
-                int remaining = Integer.valueOf(matcher.group(1));
+                int remaining = Integer.parseInt(matcher.group(1));
                 int maxDurability = item.getType().getMaxDurability();
                 if (remaining == 0) remaining = 1;
                 if (maxDurability < remaining) remaining = maxDurability;

@@ -26,7 +26,7 @@ public class AttributeModifierUtil {
 
         double value;
         try {
-            value = Double.valueOf(new ContainerUtil().getContent(source, matcher.group(3)));
+            value = Double.parseDouble(new ContainerUtil().getContent(source, matcher.group(3)));
         } catch (Exception e) {
             Bukkit.getLogger().warning("[CustomCrafter] USING_CONTAINER_VALUES_ATTRIBUTE_MODIFIER failed. (Attribute modifier -> Not a Number.)");
             return;
@@ -86,7 +86,7 @@ public class AttributeModifierUtil {
             return null;
         }
         AttributeModifier.Operation operation = AttributeModifier.Operation.valueOf(matcher.group(2).toUpperCase());
-        double value = Double.valueOf(matcher.group(3));
+        double value = Double.parseDouble(matcher.group(3));
         EquipmentSlot slot = null;
         if (!isNormal) {
             try {

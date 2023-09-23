@@ -67,7 +67,7 @@ public class DataCheckerUtil {
         }
         int amount;
         try{
-            amount = Integer.valueOf(config.getString(section));
+            amount = Integer.parseInt(config.getString(section));
         }catch (Exception e){
             appendLn(builder,section + " -> The system cannot cast to integer.");
             appendLn(builder,"  -> Have to write a number.");
@@ -271,7 +271,7 @@ public class DataCheckerUtil {
             }
             int level;
             try{
-                level = Integer.valueOf(settings.get(1));
+                level = Integer.parseInt(settings.get(1));
             }catch (Exception e){
                 appendLn(builder,"enchant -> Cannot cast a string to Integer.");
                 return false;
@@ -334,7 +334,7 @@ public class DataCheckerUtil {
                     return false;
                 }
                 try{
-                    int level = Integer.valueOf(list.get(2));
+                    int level = Integer.parseInt(list.get(2));
                     if(level < 1) {
                         appendLn(builder,"metadata -> An invalid enchantment level found.");
                         appendLn(builder,"  -> Have to write in the range that is 1 to 255.");
@@ -351,7 +351,7 @@ public class DataCheckerUtil {
                     return false;
                 }
                 try{
-                    Integer.valueOf(list.get(1));
+                    Integer.parseInt(list.get(1));
                 }catch (Exception e){
                     appendLn(builder,"metadata -> Custom Model Data cannot be casted to Integer.");
                     return false;
@@ -367,8 +367,8 @@ public class DataCheckerUtil {
                     return false;
                 }
                 try{
-                    int duration = Integer.valueOf(list.get(2));
-                    int amplifier = Integer.valueOf(list.get(3));
+                    int duration = Integer.parseInt(list.get(2));
+                    int amplifier = Integer.parseInt(list.get(3));
                     if(duration < 1 || amplifier < 1){
                         appendLn(builder,"metadata -> Potion duration or amplifier is invalid value.");
                         return false;
@@ -385,9 +385,9 @@ public class DataCheckerUtil {
                     return false;
                 }
                 try{
-                    int r = Integer.valueOf(list.get(1));
-                    int g = Integer.valueOf(list.get(2));
-                    int b = Integer.valueOf(list.get(3));
+                    int r = Integer.parseInt(list.get(1));
+                    int g = Integer.parseInt(list.get(2));
+                    int b = Integer.parseInt(list.get(3));
                     List<Integer> color = Arrays.asList(r,g,b);
                     if(Collections.max(color) > 255 || Collections.min(color) < 0){
                         appendLn(builder,"metadata -> Out of the color range error.");
@@ -436,8 +436,8 @@ public class DataCheckerUtil {
             int duration;
             int amplifier;
             try{
-                duration = Integer.valueOf(list.get(1));
-                amplifier = Integer.valueOf(list.get(2));
+                duration = Integer.parseInt(list.get(1));
+                amplifier = Integer.parseInt(list.get(2));
             }catch (Exception e){
                 appendLn(builder,"potion -> Duration or Amplifier is an invalid value. (cast)");
                 return false;
