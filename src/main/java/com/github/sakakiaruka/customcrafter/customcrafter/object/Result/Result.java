@@ -156,7 +156,7 @@ public class Result {
             }
 
             if(type.equals(MetadataType.ITEMFLAG)) content.forEach(s->meta.addItemFlags(ItemFlag.valueOf(s.toUpperCase())));
-            if(type.equals(MetadataType.UNBREAKABLE)) meta.setUnbreakable(Boolean.valueOf(content.get(0)));
+            if(type.equals(MetadataType.UNBREAKABLE)) meta.setUnbreakable(Boolean.parseBoolean(content.get(0)));
             if(type.equals(MetadataType.CUSTOMMODELDATA)) meta.setCustomModelData(Integer.parseInt(content.get(0)));
             if(type.equals(MetadataType.POTIONDATA)) {
                 if(!new PotionUtil().isPotion(item.getType())) return;
