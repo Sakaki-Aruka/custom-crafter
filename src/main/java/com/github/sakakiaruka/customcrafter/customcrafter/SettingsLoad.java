@@ -43,30 +43,30 @@ import static com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePerm
 public class SettingsLoad {
 
     // === defined settings values === //
-    public static final int craftingTableSize = 6;
-    public static final int craftingTableResultSlot = 44;
-    public static final int craftingTableMakeButton = 35;
-    public static final int craftingTableTotalSize = 54;
-    public static final int vanillaCraftingSlots = 9;
-    public static final int vanillaCraftingSquareSize = 3;
-    public static final String nl = System.getProperty("line.separator");
-    public static final String bar = String.join("",Collections.nCopies(40,"="));
-    public static final String shortBar = String.join("",Collections.nCopies(20,"="));
-    public static final String upperArrow = String.format("↑");
+    public static final int CRAFTING_TABLE_SIZE = 6;
+    public static final int CRAFTING_TABLE_RESULT_SLOT = 44;
+    public static final int CRAFTING_TABLE_MAKE_BUTTON = 35;
+    public static final int CRAFTING_TABLE_TOTAL_SIZE = 54;
+    public static final int VANILLA_CRAFTING_SLOTS = 9;
+    public static final int VANILLA_CRAFTING_SQUARE_SIZE = 3;
+    public static final String LINE_SEPARATOR = System.getProperty("line.separator");
+    public static final String BAR = String.join("",Collections.nCopies(40,"="));
+    public static final String SHORT_BAR = String.join("",Collections.nCopies(20,"="));
+    public static final String UPPER_ARROW = String.format("↑");
 
     // === recipes public values === //
-    public static Material baseBlock;
-    public static List<Recipe> recipes = new ArrayList<>();
-    public static List<String> allMaterials = new ArrayList<>();
-    public static Map<String,Recipe> namedRecipes = new HashMap<>();
+    public static Material BASE_BLOCK;
+    public static List<Recipe> RECIPE_LIST = new ArrayList<>();
+    public static List<String> ALL_MATERIALS = new ArrayList<>();
+    public static Map<String,Recipe> NAMED_RECIPES_MAP = new HashMap<>();
 
     // === for crafting data manage === //
-    public static Map<UUID,Material> whatMaking = Collections.synchronizedMap(new HashMap<>());
+    public static Map<UUID,Material> WHAT_MAKING = Collections.synchronizedMap(new HashMap<>());
 
     // === for data get methods === //
-    private static FileConfiguration defaultConfig;
-    public static Map<String,Result> results = new HashMap<>();
-    public static Map<String, Matter> matters = new HashMap<>();
+    private static FileConfiguration DEFAULT_CONFIG;
+    public static Map<String,Result> RESULTS = new HashMap<>();
+    public static Map<String, Matter> MATTERS = new HashMap<>();
 
     // === for runnable task === //
     private List<String> downloadUri;
@@ -84,7 +84,7 @@ public class SettingsLoad {
     private static final String RESULT_METADATA_COLLECT_PATTERN = "^([\\w_]+),(.+)$";
 
     public void load(){
-        defaultConfig = getInstance().getConfig();
+        DEFAULT_CONFIG = getInstance().getConfig();
         recipePermissionLoad();
         getAllMaterialsName();
         main();
@@ -93,13 +93,13 @@ public class SettingsLoad {
 
     private void recipePermissionLoad(){
 
-        if(defaultConfig.contains("permissions") && defaultConfig.contains("relate")){
+        if(DEFAULT_CONFIG.contains("permissions") && DEFAULT_CONFIG.contains("relate")){
             // The file that defines RecipePermissions.
-            Path path = Paths.get(defaultConfig.getString("permissions"));
+            Path path = Paths.get(DEFAULT_CONFIG.getString("permissions"));
             new RecipePermissionUtil().permissionSettingsLoad(path);
 
             // The file that defines the relate between players and RecipePermissions.
-            Path relate = Paths.get(defaultConfig.getString("relate"));
+            Path relate = Paths.get(DEFAULT_CONFIG.getString("relate"));
             new RecipePermissionUtil().permissionRelateLoad(relate);
 
             // Resolve permission duplications.
@@ -113,22 +113,22 @@ public class SettingsLoad {
     }
 
     private void getAllMaterialsName(){
-        Arrays.stream(Material.values()).forEach(s->allMaterials.add(s.name()));
+        Arrays.stream(Material.values()).forEach(s-> ALL_MATERIALS.add(s.name()));
     }
 
     private void main(){
-        results.clear();
-        matters.clear();
+        RESULTS.clear();
+        MATTERS.clear();
         failed.clear();
 
-        Path baseBlockPath = Paths.get(defaultConfig.getString("baseBlock"));
+        Path baseBlockPath = Paths.get(DEFAULT_CONFIG.getString("baseBlock"));
 
         List<Path> resultPaths = new ArrayList<>();
         List<Path> matterPaths = new ArrayList<>();
         List<Path> recipePaths = new ArrayList<>();
-        defaultConfig.getStringList("results").forEach(s->resultPaths.add(Paths.get(s)));
-        defaultConfig.getStringList("matters").forEach(s->matterPaths.add(Paths.get(s)));
-        defaultConfig.getStringList("recipes").forEach(s->recipePaths.add(Paths.get(s)));
+        DEFAULT_CONFIG.getStringList("results").forEach(s->resultPaths.add(Paths.get(s)));
+        DEFAULT_CONFIG.getStringList("matters").forEach(s->matterPaths.add(Paths.get(s)));
+        DEFAULT_CONFIG.getStringList("recipes").forEach(s->recipePaths.add(Paths.get(s)));
 
         configFileDirectoryCheck(baseBlockPath);
         resultPaths.forEach(p->configFileDirectoryCheck(p));
@@ -175,19 +175,19 @@ public class SettingsLoad {
         // === bukkit runnable finish ===//
 
         //getFilesFromTheSea (download section)
-        if(defaultConfig.contains("download")){
-            if(defaultConfig.getStringList("download").isEmpty()){
+        if(DEFAULT_CONFIG.contains("download")){
+            if(DEFAULT_CONFIG.getStringList("download").isEmpty()){
                 // no download files.
                 main.runTaskLater(getInstance(),20l);
                 return;
             }
-            downloadUri = defaultConfig.getStringList("download");
-            List<String> downloadErrorMessageList = defaultConfig.getStringList("errorMessages");
-            threshold = defaultConfig.getInt("download_threshold");
-            load_interval = defaultConfig.getInt("download_interval");
+            downloadUri = DEFAULT_CONFIG.getStringList("download");
+            List<String> downloadErrorMessageList = DEFAULT_CONFIG.getStringList("errorMessages");
+            threshold = DEFAULT_CONFIG.getInt("download_threshold");
+            load_interval = DEFAULT_CONFIG.getInt("download_interval");
 
             downloader.runTaskAsynchronously(getInstance());
-            defaultConfig.set("download",failed);
+            DEFAULT_CONFIG.set("download",failed);
             getInstance().saveConfig();
         }
 
@@ -224,7 +224,7 @@ public class SettingsLoad {
             }
 
             //dir.mkdir();
-            Bukkit.getLogger().info(String.format("Not found the directory \"%s\"."+nl+"So, the system made the directory named that.",path.toUri().toString()));
+            Bukkit.getLogger().info(String.format("Not found the directory \"%s\"."+ LINE_SEPARATOR +"So, the system made the directory named that.",path.toUri().toString()));
         }else if(!path.toFile().isDirectory()){
             Bukkit.getLogger().warning(String.format("The path \"%s\" is not a directory.",path.toUri().toString()));
             Bukkit.getLogger().warning("You must fix this problem when before you use this plugin.");
@@ -253,7 +253,7 @@ public class SettingsLoad {
 
     private void getBaseBlock(List<Path> paths){
         FileConfiguration config = YamlConfiguration.loadConfiguration(paths.get(0).toFile());
-        baseBlock = Material.valueOf(config.getString("material").toUpperCase());
+        BASE_BLOCK = Material.valueOf(config.getString("material").toUpperCase());
     }
 
     private void getResult(List<Path> paths){
@@ -321,7 +321,7 @@ public class SettingsLoad {
             }
 
             Result result = new Result(name,enchantInfo,amount,metadata,nameOrRegex,matchPoint, phony);
-            results.put(name,result);
+            RESULTS.put(name,result);
         }
     }
 
@@ -329,10 +329,10 @@ public class SettingsLoad {
         for(Material material : Material.values()){
             String name = material.name().toLowerCase();
             Result result = new Result(name,null,1,null,material.name(),-1, new ArrayList<>());
-            results.put(name,result);
+            RESULTS.put(name,result);
 
             Matter matter = new Matter(Arrays.asList(material), 1);
-            matters.put(name, matter);
+            MATTERS.put(name, matter);
         }
     }
 
@@ -407,26 +407,26 @@ public class SettingsLoad {
             //PotionData collect
             if(config.contains("potion") && config.contains("bottleTypeMatch")){
                 Potions potions = makeDrug(matter,config);
-                if(potions != null) matters.put(name,potions);
+                if(potions != null) MATTERS.put(name,potions);
                 continue;
             }
 
             Map<Integer, ContainerWrapper> elements = new ContainerUtil().mattersLoader(path);
             matter.setContainerWrappers(elements);
-            matters.put(name,matter);
+            MATTERS.put(name,matter);
 
         }
     }
 
     private void addNull(){
         Matter matter = new Matter(Arrays.asList(Material.AIR),0);
-        matters.put("null",matter);
+        MATTERS.put("null",matter);
         //matters.put("NULL",matter);
     }
 
     private void addWaterBottle(){
         Potions waterBottle = new PotionUtil().water_bottle();
-        matters.put("water_bottle",waterBottle);
+        MATTERS.put("water_bottle",waterBottle);
     }
 
     private Potions makeDrug(Matter matter, FileConfiguration config){
@@ -469,7 +469,7 @@ public class SettingsLoad {
     }
 
     private boolean containsAllMaterialsIgnoreCase(String in){
-        for(String str : allMaterials){
+        for(String str : ALL_MATERIALS){
             if(in.equalsIgnoreCase(str)) return true;
         }
         return false;
@@ -483,7 +483,7 @@ public class SettingsLoad {
 
             String name = config.getString("name");
             String tag = config.getString("tag").toUpperCase();
-            Result result = results.get(config.getString("result"));
+            Result result = RESULTS.get(config.getString("result"));
 
             Map<Coordinate,Matter> coordinates = new LinkedHashMap<>();
             Map<Material, ItemStack> returns = new HashMap<>();
@@ -564,7 +564,7 @@ public class SettingsLoad {
                         materials.add(Material.valueOf(list.get(0).toUpperCase()));
                     }else{
                         // regex collect
-                        for(String id : allMaterials){
+                        for(String id : ALL_MATERIALS){
                             if(id.matches(list.get(0))) materials.add(Material.valueOf(id));
                         }
                     }
@@ -617,8 +617,8 @@ public class SettingsLoad {
                     Matcher matcher = Pattern.compile(USING_CONTAINER_VALUES_METADATA_PATTERN).matcher(s);
                     if (!matcher.matches()) continue;
                     String matterName = matcher.group(1);
-                    if (!matters.containsKey(matterName) && !allMaterials.contains(matterName.toUpperCase())) continue;
-                    Matter matter = matters.get(matterName);
+                    if (!MATTERS.containsKey(matterName) && !ALL_MATERIALS.contains(matterName.toUpperCase())) continue;
+                    Matter matter = MATTERS.get(matterName);
                     String order = matcher.group(2);
                     if (!usingContainerValuesMetadata.containsKey(matter)) usingContainerValuesMetadata.put(matter, new ArrayList<>());
                     usingContainerValuesMetadata.get(matter).add(order);
@@ -627,8 +627,8 @@ public class SettingsLoad {
             }
 
             Recipe recipe = new Recipe(name, tag, coordinates, returns, result, permission, map, usingContainerValuesMetadata);
-            recipes.add(recipe);
-            namedRecipes.put(name,recipe);
+            RECIPE_LIST.add(recipe);
+            NAMED_RECIPES_MAP.put(name,recipe);
         }
     }
 
@@ -638,17 +638,17 @@ public class SettingsLoad {
         if(name.equalsIgnoreCase("null")){
             // null
             matter = new Matter(Arrays.asList(Material.AIR),0,false);
-        }else if(matters.containsKey(name)){
+        }else if(MATTERS.containsKey(name)){
             // 'name' is contained 'matters'
-            matter = matters.get(name);
-        }else if(overrides.containsKey(name) && matters.containsKey(overrides.get(name))){
+            matter = MATTERS.get(name);
+        }else if(overrides.containsKey(name) && MATTERS.containsKey(overrides.get(name))){
             // replaced the shorted name and contained 'matters'.
-            matter = matters.get(overrides.get(name));
-        }else if(allMaterials.contains(upper)){
+            matter = MATTERS.get(overrides.get(name));
+        }else if(ALL_MATERIALS.contains(upper)){
             // normal material-name
             Material material = Material.valueOf(name.toUpperCase());
             matter = new Matter(Arrays.asList(material),1,false);
-        }else if(overrides.containsKey(name) && allMaterials.contains(overrides.get(name).toUpperCase())){
+        }else if(overrides.containsKey(name) && ALL_MATERIALS.contains(overrides.get(name).toUpperCase())){
             // replaced the shorted name and contained 'allMaterials'
             Material material = Material.valueOf(overrides.get(name).toUpperCase());
             matter = new Matter(Arrays.asList(material),1,false);

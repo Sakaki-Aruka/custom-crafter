@@ -10,8 +10,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
-import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.nl;
-import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.upperArrow;
+import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.LINE_SEPARATOR;
+import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.UPPER_ARROW;
 
 public class RecipePermissionUtil{
 
@@ -217,10 +217,10 @@ public class RecipePermissionUtil{
 
     public String getPermissionTree(RecipePermission perm){
         StringBuilder builder = new StringBuilder();
-        builder.append(String.format("=== Permission Info ===%s",nl));
+        builder.append(String.format("=== Permission Info ===%s", LINE_SEPARATOR));
         if(perm.equals(RecipePermission.ROOT)){
             // only ROOT
-            builder.append(String.format("%s%s - Parent : --- %s - Name : ROOT%s%s%s",RecipePermission.ROOT.getPermissionName(),nl,nl,nl,nl,"=== Permission Info End ==="));
+            builder.append(String.format("%s%s - Parent : --- %s - Name : ROOT%s%s%s",RecipePermission.ROOT.getPermissionName(), LINE_SEPARATOR, LINE_SEPARATOR, LINE_SEPARATOR, LINE_SEPARATOR,"=== Permission Info End ==="));
             return builder.toString();
         }
         List<RecipePermission> permList = new ArrayList<>();
@@ -228,11 +228,11 @@ public class RecipePermissionUtil{
         recourse(perm,permList);
         Collections.reverse(permList); // ~,...,ROOT -> ROOT,~,...~
         for(RecipePermission rp : permList){
-            String arrow = String.join("",Collections.nCopies(permList.indexOf(rp),upperArrow));
-            String data = String.format("%s - Parent : %s %s - Name : %s %s",nl,rp.getParent(),nl,rp.getPermissionName(),nl);
-            builder.append(String.format("%s%s%s%s",nl,arrow,nl,data));
+            String arrow = String.join("",Collections.nCopies(permList.indexOf(rp), UPPER_ARROW));
+            String data = String.format("%s - Parent : %s %s - Name : %s %s", LINE_SEPARATOR,rp.getParent(), LINE_SEPARATOR,rp.getPermissionName(), LINE_SEPARATOR);
+            builder.append(String.format("%s%s%s%s", LINE_SEPARATOR,arrow, LINE_SEPARATOR,data));
         }
-        builder.append(nl+"=== Permission Info End ==="+nl);
+        builder.append(LINE_SEPARATOR +"=== Permission Info End ==="+ LINE_SEPARATOR);
         return builder.toString();
     }
 

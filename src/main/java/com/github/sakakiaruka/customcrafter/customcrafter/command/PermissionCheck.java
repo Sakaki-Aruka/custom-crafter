@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.nl;
+import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.LINE_SEPARATOR;
 import static com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil.playerPermissions;
 import static com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil.recipePermissionMap;
 
@@ -33,7 +33,7 @@ public class PermissionCheck {
         if (!playerPermissions.containsKey(uuid)) playerPermissions.put(uuid,new ArrayList<>());
         playerPermissions.get(uuid).add(permission);
         new RecipePermissionUtil().removePermissionDuplications(playerPermissions.get(uuid));
-        Bukkit.getLogger().info(String.format("Permission added: %s  Permission: %s%s  Target: %s",nl,permission.getPermissionName(),nl,player.getName()));
+        Bukkit.getLogger().info(String.format("Permission added: %s  Permission: %s%s  Target: %s", LINE_SEPARATOR,permission.getPermissionName(), LINE_SEPARATOR,player.getName()));
         displayPlayerPermissions(uuid,sender);
     }
 
@@ -43,7 +43,7 @@ public class PermissionCheck {
         UUID uuid = player.getUniqueId();
         if (!playerPermissions.containsKey(uuid)) return;
         RecipePermission permission = recipePermissionMap.get(args[5]);
-        Bukkit.getLogger().info(String.format("Permission removed: %s  Permission: %s%s  Target: %s",nl,permission.getPermissionName(),nl,player.getName()));
+        Bukkit.getLogger().info(String.format("Permission removed: %s  Permission: %s%s  Target: %s", LINE_SEPARATOR,permission.getPermissionName(), LINE_SEPARATOR,player.getName()));
         playerPermissions.get(uuid).remove(permission);
         displayPlayerPermissions(uuid,sender);
     }
@@ -57,15 +57,15 @@ public class PermissionCheck {
     private void displayPlayerPermissions(UUID uuid, CommandSender sender){
         // /cc -p -p [targetPlayerName]
         StringBuilder builder = new StringBuilder();
-        builder.append("=== RecipePermissions (The player has) ==="+nl);
+        builder.append("=== RecipePermissions (The player has) ==="+ LINE_SEPARATOR);
         if(!playerPermissions.containsKey(uuid)) {
-            builder.append(String.format("Target player has no permissions.%s",nl));
+            builder.append(String.format("Target player has no permissions.%s", LINE_SEPARATOR));
             Bukkit.getLogger().info(builder.toString());
             return;
         }
 
         List<RecipePermission> permissions = playerPermissions.get(uuid);
-        permissions.forEach(s->builder.append(String.format("Parent: %s | Name: %s %s",s.getParent(),s.getPermissionName(),nl)));
+        permissions.forEach(s->builder.append(String.format("Parent: %s | Name: %s %s",s.getParent(),s.getPermissionName(), LINE_SEPARATOR)));
         builder.append("=== RecipePermissions (END) ===");
         sender.sendMessage(builder.toString());
     }

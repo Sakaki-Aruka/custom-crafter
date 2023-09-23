@@ -1,6 +1,6 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.object.Permission;
 
-import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.nl;
+import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.LINE_SEPARATOR;
 
 public class RecipePermission {
 
@@ -31,7 +31,7 @@ public class RecipePermission {
 
     public String toStr(){
         StringBuilder builder = new StringBuilder();
-        builder.append(String.format("parent: %s | name: %s%s",parent,name,nl));
+        builder.append(String.format("parent: %s | name: %s%s",parent,name, LINE_SEPARATOR));
         return builder.toString();
 
     }

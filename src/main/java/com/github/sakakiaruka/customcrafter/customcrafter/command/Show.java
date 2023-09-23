@@ -16,7 +16,7 @@ import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.*;
 public class Show {
 
     public void all(String[] args, CommandSender sender) {
-        namedRecipes.keySet().forEach(s->sender.sendMessage(getGraphicalRecipe(s)));
+        NAMED_RECIPES_MAP.keySet().forEach(s->sender.sendMessage(getGraphicalRecipe(s)));
     }
     public void one(String[] args, CommandSender sender) {
         // /cc -show [RecipeName]
@@ -24,13 +24,13 @@ public class Show {
     }
 
     public String getGraphicalRecipe(String recipeName){
-        if(!namedRecipes.containsKey(recipeName))return "Unknown recipe.";
-        Recipe recipe = namedRecipes.get(recipeName);
+        if(!NAMED_RECIPES_MAP.containsKey(recipeName))return "Unknown recipe.";
+        Recipe recipe = NAMED_RECIPES_MAP.get(recipeName);
         StringBuilder builder = new StringBuilder();
-        builder.append(String.format("%s%s%s",bar,nl,nl));
-        builder.append(String.format("Recipe Name : %s%s",recipeName,nl));
-        builder.append(String.format("Tag : %s%s",recipe.getTag().toString(),nl));
-        builder.append(String.format("RecipePermission : %s%s",recipe.hasPermission() ? recipe.getPermission().getPermissionName() : "NO PERMISSION",nl));
+        builder.append(String.format("%s%s%s", BAR, LINE_SEPARATOR, LINE_SEPARATOR));
+        builder.append(String.format("Recipe Name : %s%s",recipeName, LINE_SEPARATOR));
+        builder.append(String.format("Tag : %s%s",recipe.getTag().toString(), LINE_SEPARATOR));
+        builder.append(String.format("RecipePermission : %s%s",recipe.hasPermission() ? recipe.getPermission().getPermissionName() : "NO PERMISSION", LINE_SEPARATOR));
         if(recipe.getTag().equals(Tag.NORMAL)) return normal(builder,recipe);
         return amorphous(builder,recipe);
 
@@ -39,7 +39,7 @@ public class Show {
     private String normal(StringBuilder builder,Recipe recipe){
         double size = Math.sqrt(recipe.getCoordinate().size());
         Map<Integer, Matter> map = new HashMap<>();
-        builder.append(nl);
+        builder.append(LINE_SEPARATOR);
         for(int y=0;y<size;y++){
             Point : for(int x=0;x<size;x++){
                 Coordinate coordinate = new Coordinate(x,y);
@@ -59,32 +59,32 @@ public class Show {
                 map.put(map.size(),matter);
 
             }
-            builder.append(nl);
+            builder.append(LINE_SEPARATOR);
         }
 
         for(Map.Entry<Integer,Matter> entry : map.entrySet()){
-            builder.append(nl);
-            builder.append(String.format("%02d -> %s",entry.getKey(),nl));
+            builder.append(LINE_SEPARATOR);
+            builder.append(String.format("%02d -> %s",entry.getKey(), LINE_SEPARATOR));
             String info = entry.getValue().info();
-            info = info.replace(nl,nl+"  ");
+            info = info.replace(LINE_SEPARATOR, LINE_SEPARATOR +"  ");
             builder.append(info);
         }
         return builder.toString();
     }
 
     private String amorphous(StringBuilder builder,Recipe recipe){
-        builder.append(nl+"List : ");
+        builder.append(LINE_SEPARATOR +"List : ");
         StringBuilder names = new StringBuilder();
         recipe.getContentsNoDuplicateRelateAmount().entrySet().forEach(s->{
             String name = s.getKey().getName().isEmpty() ? s.getKey().getCandidate().get(0).name() : s.getKey().getName();
             names.append(String.format("%s -> %d | ",name,s.getValue()));
         });
         builder.append(names);
-        builder.append(nl);
+        builder.append(LINE_SEPARATOR);
         for(Matter matter : recipe.getContentsNoDuplicate()){
-            builder.append(nl);
+            builder.append(LINE_SEPARATOR);
             String info = matter.info();
-            info = info.replace(nl,nl+"  ");
+            info = info.replace(LINE_SEPARATOR, LINE_SEPARATOR +"  ");
             builder.append(info);
         }
         return builder.toString();

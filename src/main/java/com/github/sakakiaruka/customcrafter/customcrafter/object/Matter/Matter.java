@@ -3,15 +3,13 @@ package com.github.sakakiaruka.customcrafter.customcrafter.object.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.interfaces.Matters;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.ContainerWrapper;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
-import org.bukkit.persistence.PersistentDataType;
 
 import java.util.*;
 
-import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.nl;
+import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.LINE_SEPARATOR;
 
 public class Matter implements Matters {
     private String name;
@@ -153,7 +151,7 @@ public class Matter implements Matters {
     public String getAllWrapInfo(){
         if(!hasWrap())return "";
         StringBuilder builder = new StringBuilder();
-        getWrap().forEach(s->builder.append(s.info()+nl));
+        getWrap().forEach(s->builder.append(s.info()+ LINE_SEPARATOR));
         return builder.toString();
     }
 
@@ -192,14 +190,14 @@ public class Matter implements Matters {
 
     public String info(){
         StringBuilder builder = new StringBuilder();
-        builder.append(String.format("name : %s"+nl,name != null && !name.isEmpty() ? candidate.get(0).name() : name));
-        builder.append(String.format("candidate : %s"+nl,candidate.toString()));
-        builder.append(String.format("wrap : %s",hasWrap() ? getAllWrapInfo() : "null"+nl));
-        builder.append(String.format("amount : %d"+nl,amount));
-        builder.append(String.format("mass : %b"+nl,isMass()));
-        if (container == null || container.isEmpty()) builder.append("container: No contents in the container."+nl);
+        builder.append(String.format("name : %s"+ LINE_SEPARATOR,name != null && !name.isEmpty() ? candidate.get(0).name() : name));
+        builder.append(String.format("candidate : %s"+ LINE_SEPARATOR,candidate.toString()));
+        builder.append(String.format("wrap : %s",hasWrap() ? getAllWrapInfo() : "null"+ LINE_SEPARATOR));
+        builder.append(String.format("amount : %d"+ LINE_SEPARATOR,amount));
+        builder.append(String.format("mass : %b"+ LINE_SEPARATOR,isMass()));
+        if (container == null || container.isEmpty()) builder.append("container: No contents in the container."+ LINE_SEPARATOR);
         else {
-            container.entrySet().forEach(s->builder.append("container: "+nl+s.getValue().info()+nl));
+            container.entrySet().forEach(s->builder.append("container: "+ LINE_SEPARATOR +s.getValue().info()+ LINE_SEPARATOR));
         }
         return builder.toString();
     }

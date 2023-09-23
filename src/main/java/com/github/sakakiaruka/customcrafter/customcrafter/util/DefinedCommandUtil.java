@@ -244,17 +244,17 @@ public class DefinedCommandUtil {
                 }
 
                 if (commandPart.equals(MATTER_PATTERN)) {
-                    if (!matters.containsKey(inputPart)) continue A;
+                    if (!MATTERS.containsKey(inputPart)) continue A;
                     continue;
                 }
 
                 if (commandPart.equals(RESULT_PATTERN)) {
-                    if (!results.containsKey(inputPart)) continue A;
+                    if (!RESULTS.containsKey(inputPart)) continue A;
                     continue;
                 }
 
                 if (commandPart.equals(RECIPE_PATTERN)) {
-                    if (!namedRecipes.containsKey(inputPart)) continue A;
+                    if (!NAMED_RECIPES_MAP.containsKey(inputPart)) continue A;
                     continue;
                 }
 

@@ -18,19 +18,19 @@ public class DataCheckerUtil {
 
     public void matterCheck(StringBuilder builder, FileConfiguration config, Path path){
         int count = 0;
-        appendLn(builder,bar);
+        appendLn(builder, BAR);
         appendLn(builder,"Target file is "+path.toString());
-        builder.append(nl);
+        builder.append(LINE_SEPARATOR);
         if(!nameCheck(config,builder)) count++;
-        builder.append(nl);
+        builder.append(LINE_SEPARATOR);
         if(!intCheck(config,builder,"amount",64)) count++;
-        builder.append(nl);
+        builder.append(LINE_SEPARATOR);
         if(!candidateCheck(config,builder)) count++;
-        builder.append(nl);
+        builder.append(LINE_SEPARATOR);
         if(!massCheck(config, builder)) count++;
         if(config.contains("enchant")) {
             if(!enchantCheck(config,builder,true,3)) count++;
-            builder.append(nl);
+            builder.append(LINE_SEPARATOR);
         }
         if(config.contains("potion")) if(!potionCheck(config,builder)) count++;
         if(count != 0) Bukkit.getLogger().info(builder.toString());
@@ -49,7 +49,7 @@ public class DataCheckerUtil {
             appendLn(builder,"  -> And, do not duplicate with Vanilla item ids.");
             return false;
         }
-        for(String str : allMaterials){
+        for(String str : ALL_MATERIALS){
             if(name.toUpperCase().equals(str)) {
                 appendLn(builder,"name -> This name conflicts with a vanilla item id.");
                 appendLn(builder,"  -> Do not duplicate with Vanilla item ids.");
@@ -126,12 +126,12 @@ public class DataCheckerUtil {
             }catch (Exception e) {
                 appendLn(builder, "candidate -> The Java regular expression string is invalid.");
                 appendLn(builder, "  -> You have to rewrite this sections.");
-                appendLn(builder, nl);
+                appendLn(builder, LINE_SEPARATOR);
                 return false;
             }
 
             List<String> buffer = new ArrayList<>();
-            for(String s : allMaterials) {
+            for(String s : ALL_MATERIALS) {
                 Matcher m = p.matcher(s);
                 if(!m.find()) continue;
                 buffer.add(s);
@@ -140,14 +140,14 @@ public class DataCheckerUtil {
             if(buffer.isEmpty()) {
                 appendLn(builder, "candidate -> The Java regular expression has not contain item ids.");
                 appendLn(builder, "  -> You have to rewrite this section.");
-                appendLn(builder, nl);
+                appendLn(builder, LINE_SEPARATOR);
                 return false;
             }
 
         }else{
             // not use regular expression
             A: for(String s : candidates) {
-                for(String ss : allMaterials) {
+                for(String ss : ALL_MATERIALS) {
                     if(s.equalsIgnoreCase(ss)) continue A;
                 }
 
@@ -163,14 +163,14 @@ public class DataCheckerUtil {
         if(!config.contains("nameOrRegex")) {
             appendLn(builder, "nameOrRegex -> A section is not found.");
             appendLn(builder, "  -> This section is need to make a custom recipe.");
-            appendLn(builder,nl);
+            appendLn(builder, LINE_SEPARATOR);
             return false;
         }
 
         if(!config.contains("matchPoint")) {
             appendLn(builder, "matchPoint -> A section is not found.");
             appendLn(builder, "  -> This section is need to make a custom recipe.");
-            appendLn(builder,nl);
+            appendLn(builder, LINE_SEPARATOR);
             return false;
         }
 
@@ -185,7 +185,7 @@ public class DataCheckerUtil {
 
             if(input.isEmpty() || replace.isEmpty()) {
                 appendLn(builder, "nameOrRegex -> A Java expression string or replace string is invalid.");
-                appendLn(builder, nl);
+                appendLn(builder, LINE_SEPARATOR);
                 return false;
             }
 
@@ -195,11 +195,11 @@ public class DataCheckerUtil {
             }catch (Exception e) {
                 appendLn(builder, "nameOrRegex -> The string does not according to the Java regular expression rule.");
                 appendLn(builder, "  -> So, you have to rewrite this section as soon as.");
-                appendLn(builder,nl);
+                appendLn(builder, LINE_SEPARATOR);
                 return false;
             }
 
-            for(String s : allMaterials) {
+            for(String s : ALL_MATERIALS) {
                 Matcher m = p.matcher(s);
                 if(!m.find()) continue;
                 inputs.add(m.group(matchPoint));
@@ -208,7 +208,7 @@ public class DataCheckerUtil {
             if(inputs.isEmpty()) {
                 appendLn(builder, "nameOrRegex -> The Java regular expression has no match string in all materials name.");
                 appendLn(builder, "  -> So, you have to rewrite this section to match any string more than one.");
-                appendLn(builder, nl);
+                appendLn(builder, LINE_SEPARATOR);
                 return false;
             }
 
@@ -227,13 +227,13 @@ public class DataCheckerUtil {
 
         }else {
             // not use regex
-            for (String s : allMaterials) {
+            for (String s : ALL_MATERIALS) {
                 if (section.equalsIgnoreCase(s)) return true;
             }
 
             appendLn(builder, "nameOrRegex -> The string is not an item id.");
             appendLn(builder, "  -> You have to rewrite this section to a correct id.");
-            appendLn(builder, nl);
+            appendLn(builder, LINE_SEPARATOR);
             return false;
         }
     }
@@ -460,30 +460,30 @@ public class DataCheckerUtil {
 
     public void resultCheck(StringBuilder builder,FileConfiguration config,Path path){
         int count = 0;
-        appendLn(builder,bar);
+        appendLn(builder, BAR);
         appendLn(builder,"Target file is "+path.toString());
-        appendLn(builder,nl);
+        appendLn(builder, LINE_SEPARATOR);
         if(!nameCheck(config,builder)) count++;
-        builder.append(nl);
+        builder.append(LINE_SEPARATOR);
         if(!intCheck(config,builder,"amount",64)) count++;
-        builder.append(nl);
+        builder.append(LINE_SEPARATOR);
         // name or regex
         if(!isCorrectResultNameOrRegex(config,builder)) count++;
-        builder.append(nl);
+        builder.append(LINE_SEPARATOR);
         if(!enchantCheck(config,builder,false,2)) count++;
-        builder.append(nl);
+        builder.append(LINE_SEPARATOR);
         if(!metadataCheck(config,builder)) count++;
-        builder.append(nl);
+        builder.append(LINE_SEPARATOR);
         if(count != 0) Bukkit.getLogger().info(builder.toString());
     }
 
     public void recipeCheck(StringBuilder builder,FileConfiguration config, Path path){
         int count = 0;
-        appendLn(builder,bar);
+        appendLn(builder, BAR);
         appendLn(builder,"Target file is "+path.toString());
-        appendLn(builder,nl);
+        appendLn(builder, LINE_SEPARATOR);
         if(!recipeNameCheck(config,builder)) count++;
-        appendLn(builder,nl);
+        appendLn(builder, LINE_SEPARATOR);
         if(!tagCheck(config,builder)) count++;
         if(!resultSectionCheck(config, builder)) count++;
         if(!overrideCheck(config,builder)) count++;
@@ -497,16 +497,16 @@ public class DataCheckerUtil {
         if(!config.contains("name")) {
             appendLn(builder, "name -> A section is not found.");
             appendLn(builder, "  -> Must write this section.'");
-            appendLn(builder,nl);
+            appendLn(builder, LINE_SEPARATOR);
             return false;
         }
 
         String name = config.getString("name");
-        for(Recipe recipe : recipes) {
+        for(Recipe recipe : RECIPE_LIST) {
             if(name.equalsIgnoreCase(recipe.getName())) {
                 appendLn(builder, "name -> A recipe name is conflict found.");
                 appendLn(builder, String.format("  -> '%s' is conflict with other matter files.",name));
-                appendLn(builder,nl);
+                appendLn(builder, LINE_SEPARATOR);
                 return false;
             }
         }
@@ -517,7 +517,7 @@ public class DataCheckerUtil {
         if(!config.contains("tag")){
             appendLn(builder,"tag -> A section is not found.");
             appendLn(builder,"  -> Must write this section. The values are 'normal' and 'amorphous'.");
-            appendLn(builder,nl);
+            appendLn(builder, LINE_SEPARATOR);
             return false;
         }
         return true;
@@ -527,18 +527,18 @@ public class DataCheckerUtil {
         if(!config.contains("result")) {
             appendLn(builder,"result -> A section is not found.");
             appendLn(builder,"  -> Must write this section to use this recipe.");
-            appendLn(builder,nl);
+            appendLn(builder, LINE_SEPARATOR);
             return false;
         }
 
         String resultName = config.getString("result");
-        for(String ss : results.keySet()){
+        for(String ss : RESULTS.keySet()){
             if(ss.equals(resultName)) return true;
         }
 
         appendLn(builder,"result -> The result item that you wrote on the config not found from the result items list.");
         appendLn(builder,"  -> Remember the result file and the spelling.");
-        appendLn(builder,nl);
+        appendLn(builder, LINE_SEPARATOR);
         return false;
     }
 
@@ -554,7 +554,7 @@ public class DataCheckerUtil {
         for(String s : overrides){
             if(!s.matches(pattern)){
                 appendLn(builder,String.format("override -> '%s' is not a correct override pattern.",s));
-                appendLn(builder,nl);
+                appendLn(builder, LINE_SEPARATOR);
                 counter++;
             }else{
                 // correct pattern
@@ -564,7 +564,7 @@ public class DataCheckerUtil {
                 if(relates.containsKey(shorter)){
                     appendLn(builder,"override -> An override conflict was found.");
                     appendLn(builder,String.format("  -> Conflicted %s and %s",base,relates.get(shorter)));
-                    appendLn(builder,nl);
+                    appendLn(builder, LINE_SEPARATOR);
                 }else{
                     relates.put(shorter,base);
                 }
@@ -574,7 +574,7 @@ public class DataCheckerUtil {
         if(counter != 0){
             appendLn(builder,"override -> The override patterns must follow the pattern.");
             appendLn(builder,"  -> ([\\w]+) -> ([\\w])");
-            appendLn(builder,nl);
+            appendLn(builder, LINE_SEPARATOR);
         }
 
         return counter == 0;
@@ -584,13 +584,13 @@ public class DataCheckerUtil {
         if(!config.contains("coordinate")){
             appendLn(builder,"coordinate -> A section is not found.");
             appendLn(builder,"  -> You must write this section.");
-            appendLn(builder,nl);
+            appendLn(builder, LINE_SEPARATOR);
             return false;
         }
         if(config.getStringList("coordinate").isEmpty()){
             appendLn(builder,"coordinate -> This section is empty.");
             appendLn(builder,"  -> You must write more information about this recipe.");
-            appendLn(builder,nl);
+            appendLn(builder, LINE_SEPARATOR);
             return false;
         }
         if(!config.contains("tag")) return false;
@@ -598,10 +598,10 @@ public class DataCheckerUtil {
         String tagType = config.getString("tag");
         if(tagType.equalsIgnoreCase("normal")){
             int vertical = config.getStringList("coordinate").size();
-            if(vertical > craftingTableSize){
+            if(vertical > CRAFTING_TABLE_SIZE){
                 appendLn(builder,"coordinate -> Recipe size over the limit.");
                 appendLn(builder,"  -> Recipe size must be in the range that is 1 ~ 6. (Normal)");
-                appendLn(builder,nl);
+                appendLn(builder, LINE_SEPARATOR);
                 return false;
             }
             for(String s : config.getStringList("coordinate")){
@@ -609,19 +609,19 @@ public class DataCheckerUtil {
                 if(list.isEmpty()){
                     appendLn(builder,"coordinate -> An empty line found.");
                     appendLn(builder,"  -> You must write anything to 'coordinate' section.");
-                    appendLn(builder,nl);
+                    appendLn(builder, LINE_SEPARATOR);
                     return false;
                 }
                 if(list.size() != vertical){
                     appendLn(builder,"coordinate -> The recipe width is invalid.");
                     appendLn(builder,"  -> When 'tag' is normal, 'coordinate' shape must be a square.");
-                    appendLn(builder,nl);
+                    appendLn(builder, LINE_SEPARATOR);
                     return false;
                 }
-                if(list.size() > craftingTableSize){
+                if(list.size() > CRAFTING_TABLE_SIZE){
                     appendLn(builder,"coordinate -> Recipe size over the limit.");
                     appendLn(builder,"  -> Recipe size must be in the range that is 1 ~ 6. (Normal)");
-                    appendLn(builder,nl);
+                    appendLn(builder, LINE_SEPARATOR);
                     return false;
                 }
             }
@@ -630,7 +630,7 @@ public class DataCheckerUtil {
             if(config.getStringList("coordinate").isEmpty()){
                 appendLn(builder,"coordinate -> An empty line found.");
                 appendLn(builder,"  -> You must write anything to 'coordinate' section.");
-                appendLn(builder,nl);
+                appendLn(builder, LINE_SEPARATOR);
                 return false;
             }
             if(config.getStringList("coordinate").size() > 36){
@@ -656,7 +656,7 @@ public class DataCheckerUtil {
             if(list.size() != 3){
                 appendLn(builder,"returns -> Parameters not enough or over.");
                 appendLn(builder,"  -> TargetMaterial,ReturnMaterial,Amount");
-                appendLn(builder,nl);
+                appendLn(builder, LINE_SEPARATOR);
                 return false;
             }
         }
@@ -665,7 +665,7 @@ public class DataCheckerUtil {
 
     private void appendLn(StringBuilder builder,String str){
         builder.append(str);
-        builder.append(nl);
+        builder.append(LINE_SEPARATOR);
     }
 
     public List<String> getMetadataTypeStringList(){

@@ -17,7 +17,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -39,9 +38,9 @@ public class Give {
         Player player = (Player) sender;
         if(isMatter) {
             // give matter
-            for(String s : matters.keySet()) {
+            for(String s : MATTERS.keySet()) {
                 if(!name.equalsIgnoreCase(s)) continue;
-                Matter matter = matters.get(s);
+                Matter matter = MATTERS.get(s);
                 ItemStack item = new ItemStack(matter.getCandidate().get(0), matter.getAmount());
                 List<String> list = new ArrayList<>();
                 list.addAll(setCandidateLine(matter.getCandidate()));
@@ -57,24 +56,24 @@ public class Give {
             }
         }else{
             // give result
-            for(String s : results.keySet()) {
+            for(String s : RESULTS.keySet()) {
                 if(!name.equalsIgnoreCase(s)) continue;
-                Result result = results.get(s);
+                Result result = RESULTS.get(s);
                 List<String> candidates = getAllResultCandidate(result);
                 if(candidates.isEmpty()) {
-                    player.sendMessage(String.format("§f%s%sCould not make an item.%sCause a invalid item id.%s&s%s",bar,nl,nl,nl,bar,nl));
+                    player.sendMessage(String.format("§f%s%sCould not make an item.%sCause a invalid item id.%s&s%s", BAR, LINE_SEPARATOR, LINE_SEPARATOR, LINE_SEPARATOR, BAR, LINE_SEPARATOR));
                     return;
                 }
                 ItemStack item = new ItemStack(Material.valueOf(candidates.get(0).toUpperCase()),result.getAmount());
                 ItemMeta meta = item.getItemMeta();
 
                 List<String> modifiedCandidate = new ArrayList<>();
-                modifiedCandidate.add("§f"+shortBar);
+                modifiedCandidate.add("§f"+ SHORT_BAR);
                 modifiedCandidate.add("§fResult candidate: ");
                 for(String c : candidates) {
                     modifiedCandidate.add("§f" + c);
                 }
-                modifiedCandidate.add("§f"+shortBar);
+                modifiedCandidate.add("§f"+ SHORT_BAR);
                 meta.setLore(modifiedCandidate);
                 item.setItemMeta(meta);
                 result.setMetaData(item);
@@ -149,7 +148,7 @@ public class Give {
         String replace = section.substring(section.indexOf("@")+1,section.length());
         if(pattern.isEmpty() || replace.isEmpty()) return list; // return an empty list
         Pattern p = Pattern.compile(pattern);
-        for(String s : allMaterials) {
+        for(String s : ALL_MATERIALS) {
             Matcher m = p.matcher(s);
             if(!m.find()) continue;
             String temp = replace;

@@ -9,13 +9,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import static com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter.getInstance;
-import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.bar;
-import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.nl;
+import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.BAR;
+import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.LINE_SEPARATOR;
 import static com.github.sakakiaruka.customcrafter.customcrafter.util.DefinedCommandUtil.DEFINED_COMMAND_LIST;
 
 public class Help {
-    private String separateBar = bar + nl + nl + nl;
-    private String nl2 = nl + nl;
+    private String separateBar = BAR + LINE_SEPARATOR + LINE_SEPARATOR + LINE_SEPARATOR;
+    private String nl2 = LINE_SEPARATOR + LINE_SEPARATOR;
     public void all(String[] args, CommandSender sender) {
         FileConfiguration config = getInstance().getConfig();
         StringBuilder builder = new StringBuilder();
@@ -45,20 +45,20 @@ public class Help {
 
     private String getHelpString(DefinedCommand command, FileConfiguration config) {
         StringBuilder builder = new StringBuilder();
-        builder.append("CommandName: "+command.getCommandName()+nl);
+        builder.append("CommandName: "+command.getCommandName()+ LINE_SEPARATOR);
 
         String usage = "/cc "+command.getCommandName()+ " ";
         usage += command.isHasArgs() ? String.join(" ",command.getArgs()) : "";
-        builder.append(String.format("Command usage: %s %s",usage,nl));
+        builder.append(String.format("Command usage: %s %s",usage, LINE_SEPARATOR));
 
         String permission = command.getCommandPermission().isEmpty() ? "This command does not require any permissions." : String.join(" | ",command.getCommandPermission());
-        builder.append("Permission required: "+permission+nl);
+        builder.append("Permission required: "+permission+ LINE_SEPARATOR);
 
-        builder.append("description: "+nl);
-        String notFound = "  Sorry, this command pattern has not any descriptions." + nl;
+        builder.append("description: "+ LINE_SEPARATOR);
+        String notFound = "  Sorry, this command pattern has not any descriptions." + LINE_SEPARATOR;
         if (config.contains("DefinedCommands."+command.getCommandName()+".descriptions")) {
             List<String> descriptions = getIndividualDescription(command, config);
-            if (!descriptions.isEmpty()) descriptions.forEach(s->builder.append("  "+s+nl));
+            if (!descriptions.isEmpty()) descriptions.forEach(s->builder.append("  "+s+ LINE_SEPARATOR));
             else builder.append(notFound);
         } else {
             builder.append(notFound);

@@ -83,14 +83,14 @@ public class Potions extends Matter implements Matters {
     public String PotionInfo(){
         StringBuilder builder = new StringBuilder();
         builder.append("=== potion info ===");
-        builder.append(nl+nl);
-        builder.append(String.format("bottle type match : %b -> only '%s'"+nl,bottleTypeMatch,super.getCandidate().get(0).name()));
+        builder.append(LINE_SEPARATOR + LINE_SEPARATOR);
+        builder.append(String.format("bottle type match : %b -> only '%s'"+ LINE_SEPARATOR,bottleTypeMatch,super.getCandidate().get(0).name()));
         for(Map.Entry<PotionEffect, PotionStrict> entry : data.entrySet()){
             PotionEffect effect = entry.getKey();
-            builder.append(String.format("effect : %s | duration : %d | amplifier : %d"+nl,effect.getType(),effect.getDuration(),effect.getAmplifier()));
-            builder.append(String.format("potion strict : %s"+nl+nl,entry.getValue()));
+            builder.append(String.format("effect : %s | duration : %d | amplifier : %d"+ LINE_SEPARATOR,effect.getType(),effect.getDuration(),effect.getAmplifier()));
+            builder.append(String.format("potion strict : %s"+ LINE_SEPARATOR + LINE_SEPARATOR,entry.getValue()));
         }
-        builder.append("=== potion info END ==="+nl);
+        builder.append("=== potion info END ==="+ LINE_SEPARATOR);
         return builder.toString();
     }
 
@@ -203,7 +203,7 @@ public class Potions extends Matter implements Matters {
     }
 
     public String info(){
-        return super.info()+nl+PotionInfo();
+        return super.info()+ LINE_SEPARATOR +PotionInfo();
     }
 
     public Map<Integer, ContainerWrapper> getContainerWrappers() {

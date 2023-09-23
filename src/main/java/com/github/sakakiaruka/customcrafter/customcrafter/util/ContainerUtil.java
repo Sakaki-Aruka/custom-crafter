@@ -564,12 +564,12 @@ public class ContainerUtil {
     public String containerValues(PersistentDataContainer container) {
         StringBuilder builder = new StringBuilder();
         for (NamespacedKey key : container.getKeys()) {
-            builder.append(bar+nl);
-            builder.append("key: "+key.toString()+nl);
+            builder.append(BAR + LINE_SEPARATOR);
+            builder.append("key: "+key.toString()+ LINE_SEPARATOR);
             PersistentDataType type = getSpecifiedKeyType(container, key);
-            builder.append("type: "+type.getComplexType().getSimpleName()+nl);
-            builder.append("value: "+container.get(key, type).toString()+nl);
-            builder.append(bar+nl);
+            builder.append("type: "+type.getComplexType().getSimpleName()+ LINE_SEPARATOR);
+            builder.append("value: "+container.get(key, type).toString()+ LINE_SEPARATOR);
+            builder.append(BAR + LINE_SEPARATOR);
         }
         return builder.toString();
     }
@@ -790,32 +790,19 @@ public class ContainerUtil {
             if (orders == null || orders.isEmpty()) continue;
 
             for (String order : orders) {
-                Matcher lore = Pattern.compile(USING_CONTAINER_VALUES_LORE_PATTERN).matcher(order);
-                Matcher enchant = Pattern.compile(USING_CONTAINER_VALUES_ENCHANTMENT_PATTERN).matcher(order);
-                Matcher rgb = Pattern.compile(USING_CONTAINER_VALUES_POTION_COLOR_RGB_PATTERN).matcher(order);
-                Matcher randomColor = Pattern.compile(USING_CONTAINER_VALUES_POTION_COLOR_RANDOM_PATTERN).matcher(order);
-                Matcher absoluteDurability = Pattern.compile(USING_CONTAINER_VALUES_TOOL_DURABILITY_ABSOLUTE_PATTERN).matcher(order);
-                Matcher percentageDurability = Pattern.compile(USING_CONTAINER_VALUES_TOOL_DURABILITY_PERCENTAGE_PATTERN).matcher(order);
-                Matcher texture = Pattern.compile(USING_CONTAINER_VALUES_TEXTURE_ID_PATTERN).matcher(order);
-                Matcher displayName = Pattern.compile(USING_CONTAINER_VALUES_ITEM_NAME_PATTERN).matcher(order);
-                Matcher attributeModifierNormal = Pattern.compile(USING_CONTAINER_VALUES_ATTRIBUTE_MODIFIER_PATTERN).matcher(order);
-                Matcher attributeModifierEquipment = Pattern.compile(USING_CONTAINER_VALUES_ATTRIBUTE_MODIFIER_EQUIPMENT_SLOT_PATTERN).matcher(order);
-
                 PersistentDataContainer source = relate.getItemMeta().getPersistentDataContainer();
-                if (lore.matches()) setUsingContainerValuesLore(resultMeta, source, order);
-                else if (enchant.matches()) setUsingContainerValuesEnchantment(resultMeta, source, order);
-                else if (rgb.matches()) setUsingContainerValuesPotionColor(resultMeta, source, order);
-                else if (randomColor.matches()) setUsingContainerValuesPotionColor(resultMeta, source, order);
-                else if (absoluteDurability.matches()) setUsingContainerValuesToolDurability(item.getType(), resultMeta, source, order);
-                else if (percentageDurability.matches()) setUsingContainerValuesToolDurability(item.getType(), resultMeta, source, order);
-                else if (texture.matches()) setUsingContainerValuesTextureId(resultMeta, source, order);
-                else if (displayName.matches()) setUsingContainerValuesItemName(resultMeta, source, order);
-                else if (attributeModifierNormal.matches()) new AttributeModifierUtil().setAttributeModifierToResult(resultMeta, source, order);
-                else if (attributeModifierEquipment.matches()) new AttributeModifierUtil().setAttributeModifierToResult(resultMeta, source, order);
-                else {
-                    Bukkit.getLogger().warning("[CustomCrafter] USING_CONTAINER_VALUES Metadata failed. (Illegal configuration format found.)");
-                    continue;
-                }
+
+                if (order.matches(USING_CONTAINER_VALUES_LORE_PATTERN)) setUsingContainerValuesLore(resultMeta, source, order);
+                else if (order.matches(USING_CONTAINER_VALUES_ENCHANTMENT_PATTERN)) setUsingContainerValuesEnchantment(resultMeta, source, order);
+                else if (order.matches(USING_CONTAINER_VALUES_POTION_COLOR_RGB_PATTERN)) setUsingContainerValuesPotionColor(resultMeta, source, order);
+                else if (order.matches(USING_CONTAINER_VALUES_POTION_COLOR_RANDOM_PATTERN)) setUsingContainerValuesPotionColor(resultMeta, source, order);
+                else if (order.matches(USING_CONTAINER_VALUES_TOOL_DURABILITY_ABSOLUTE_PATTERN)) setUsingContainerValuesToolDurability(item.getType(), resultMeta, source, order);
+                else if (order.matches(USING_CONTAINER_VALUES_TOOL_DURABILITY_PERCENTAGE_PATTERN)) setUsingContainerValuesToolDurability(item.getType(), resultMeta, source, order);
+                else if (order.matches(USING_CONTAINER_VALUES_TEXTURE_ID_PATTERN)) setUsingContainerValuesTextureId(resultMeta, source, order);
+                else if (order.matches(USING_CONTAINER_VALUES_ITEM_NAME_PATTERN)) setUsingContainerValuesItemName(resultMeta, source, order);
+                else if (order.matches(USING_CONTAINER_VALUES_ATTRIBUTE_MODIFIER_PATTERN)) new AttributeModifierUtil().setAttributeModifierToResult(resultMeta, source, order);
+                else if (order.matches(USING_CONTAINER_VALUES_ATTRIBUTE_MODIFIER_EQUIPMENT_SLOT_PATTERN)) new AttributeModifierUtil().setAttributeModifierToResult(resultMeta, source, order);
+                else Bukkit.getLogger().warning("[CustomCrafter] USING_CONTAINER_VALUES Metadata failed. (Illegal configuration format found.)");
             }
         }
         item.setItemMeta(resultMeta);

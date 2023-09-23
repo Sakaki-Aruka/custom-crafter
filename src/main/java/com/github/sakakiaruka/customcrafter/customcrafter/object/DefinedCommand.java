@@ -1,13 +1,9 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.object;
 
-import org.bukkit.permissions.Permission;
-
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.nl;
+import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.LINE_SEPARATOR;
 
 public class DefinedCommand {
     private String commandName;
@@ -96,14 +92,14 @@ public class DefinedCommand {
 
     public String info() {
         StringBuilder builder = new StringBuilder();
-        builder.append("name: "+this.commandName+nl);
-        builder.append("hasArgs: "+this.hasArgs+nl);
-        builder.append("args: "+this.args+nl);
-        builder.append("console: "+this.console+nl);
-        builder.append("permission: "+this.commandPermission+nl);
-        builder.append("class: "+this.processClass+nl);
-        builder.append("method: "+this.processMethod+nl);
-        builder.append("length: "+this.commandLen+nl);
+        builder.append("name: "+this.commandName+ LINE_SEPARATOR);
+        builder.append("hasArgs: "+this.hasArgs+ LINE_SEPARATOR);
+        builder.append("args: "+this.args+ LINE_SEPARATOR);
+        builder.append("console: "+this.console+ LINE_SEPARATOR);
+        builder.append("permission: "+this.commandPermission+ LINE_SEPARATOR);
+        builder.append("class: "+this.processClass+ LINE_SEPARATOR);
+        builder.append("method: "+this.processMethod+ LINE_SEPARATOR);
+        builder.append("length: "+this.commandLen+ LINE_SEPARATOR);
         return builder.toString();
     }
 }

@@ -3,7 +3,7 @@ package com.github.sakakiaruka.customcrafter.customcrafter.object;
 import org.bukkit.NamespacedKey;
 import org.bukkit.persistence.PersistentDataType;
 
-import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.nl;
+import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.LINE_SEPARATOR;
 
 public class ContainerWrapper {
     private int order; //need
@@ -73,13 +73,13 @@ public class ContainerWrapper {
 
     public String info() {
         StringBuilder builder = new StringBuilder();
-        builder.append("key: "+key.toString()+nl);
-        builder.append("type: "+type != null ? type.getPrimitiveType().getSimpleName() : "null" +nl);
-        builder.append("tag: "+tag+nl);
-        builder.append("order: "+order+nl);
-        builder.append("content:"+nl);
-        builder.append("  -> class: "+value.getClass().getSimpleName()+nl);
-        builder.append("  -> value: "+value.toString()+nl);
+        builder.append("key: "+key.toString()+ LINE_SEPARATOR);
+        builder.append("type: "+type != null ? type.getPrimitiveType().getSimpleName() : "null" + LINE_SEPARATOR);
+        builder.append("tag: "+tag+ LINE_SEPARATOR);
+        builder.append("order: "+order+ LINE_SEPARATOR);
+        builder.append("content:"+ LINE_SEPARATOR);
+        builder.append("  -> class: "+value.getClass().getSimpleName()+ LINE_SEPARATOR);
+        builder.append("  -> value: "+value.toString()+ LINE_SEPARATOR);
         return builder.toString();
     }
 }

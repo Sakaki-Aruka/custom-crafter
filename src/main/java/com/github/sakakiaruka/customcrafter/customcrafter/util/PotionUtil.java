@@ -22,8 +22,8 @@ import java.nio.file.Paths;
 import java.util.*;
 
 import static com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter.getInstance;
-import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.bar;
-import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.nl;
+import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.BAR;
+import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.LINE_SEPARATOR;
 
 public class PotionUtil {
     // this string key is "PotionEffectType" 's name
@@ -227,14 +227,14 @@ public class PotionUtil {
                 }
 
                 List<String> content = new ArrayList<>();
-                content.add("name: "+name + nl);
-                content.add("amount: "+AMOUNT + nl);
-                content.add("mass: "+mass + nl);
-                content.add("candidate: ["+bottle+"]" + nl);
+                content.add("name: "+name + LINE_SEPARATOR);
+                content.add("amount: "+AMOUNT + LINE_SEPARATOR);
+                content.add("mass: "+mass + LINE_SEPARATOR);
+                content.add("candidate: ["+bottle+"]" + LINE_SEPARATOR);
 
                 int duration = getDuration(type.getName(),upgraded,extended, getBottleType(Material.valueOf(bottle.toUpperCase())));
-                content.add("potion: " + nl);
-                content.add(String.format("  - %s,%d,%d,%s%s",type.getName(),duration,upgraded ? 1 : 0,strict,nl));
+                content.add("potion: " + LINE_SEPARATOR);
+                content.add(String.format("  - %s,%d,%d,%s%s",type.getName(),duration,upgraded ? 1 : 0,strict, LINE_SEPARATOR));
 
                 writerWrapper(content, file);
 
@@ -258,9 +258,9 @@ public class PotionUtil {
                     }
                 }
 
-                Bukkit.getLogger().info(bar);
+                Bukkit.getLogger().info(BAR);
                 Bukkit.getLogger().info(String.format("[Custom Crafter] Finished creating default potion files."));
-                Bukkit.getLogger().info(bar);
+                Bukkit.getLogger().info(BAR);
 
             }
         }.runTaskAsynchronously(getInstance());
