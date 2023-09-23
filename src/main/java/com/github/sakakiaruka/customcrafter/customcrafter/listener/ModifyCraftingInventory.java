@@ -61,7 +61,8 @@ public class ModifyCraftingInventory implements Listener {
             // empty checker ===>
             // replace old result items
             if(inventory.getItem(CRAFTING_TABLE_RESULT_SLOT) != null){
-                player.getWorld().dropItem(player.getLocation(),inventory.getItem(CRAFTING_TABLE_RESULT_SLOT));
+
+                InventoryUtil.safetyItemDrop(player, Collections.singletonList(inventory.getItem(CRAFTING_TABLE_RESULT_SLOT)));
                 inventory.setItem(CRAFTING_TABLE_RESULT_SLOT,new ItemStack(Material.AIR));
             }
             if(clickType.equals(ClickType.RIGHT)){

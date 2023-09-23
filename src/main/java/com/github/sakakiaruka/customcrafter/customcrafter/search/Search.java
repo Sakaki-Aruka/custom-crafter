@@ -244,11 +244,11 @@ public class Search {
 
         if(inventory.getItem(CRAFTING_TABLE_RESULT_SLOT) == null){
             // empty a result item's slot
-            player.getWorld().dropItem(player.getLocation(),item);
+            InventoryUtil.safetyItemDrop(player, Collections.singletonList(item));
         }else{
             if(item.getAmount() > item.getType().getMaxStackSize()){
                 // over the max amount
-                player.getWorld().dropItem(player.getLocation(),item);
+                InventoryUtil.safetyItemDrop(player, Collections.singletonList(item));
             }else{
                 // in the limit
                 inventory.setItem(CRAFTING_TABLE_RESULT_SLOT,item);

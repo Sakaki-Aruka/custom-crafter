@@ -48,7 +48,7 @@ public class VanillaSearch {
 
         if(result.getAmount() > result.getType().getMaxStackSize()){
             // amount over
-            player.getWorld().dropItem(player.getLocation(),result);
+            InventoryUtil.safetyItemDrop(player, Collections.singletonList(result));
             inventory.setItem(CRAFTING_TABLE_RESULT_SLOT,new ItemStack(Material.AIR));
         }else{
             inventory.setItem(CRAFTING_TABLE_RESULT_SLOT,result);
