@@ -3,6 +3,7 @@ package com.github.sakakiaruka.customcrafter.customcrafter.util;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.*;
 import org.bukkit.*;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -61,10 +62,8 @@ public class InventoryUtil {
 
     public void decrementResult(Inventory inventory,Player player){
         if(inventory.getItem(CRAFTING_TABLE_RESULT_SLOT) == null)return;
-        World world = player.getWorld();
-        Location location = player.getLocation();
         ItemStack item = inventory.getItem(CRAFTING_TABLE_RESULT_SLOT);
-        world.dropItem(location,item); // drop
+        InventoryUtil.safetyItemDrop(player, Collections.singletonList(item));
         inventory.setItem(CRAFTING_TABLE_RESULT_SLOT,new ItemStack(Material.AIR));
     }
 
@@ -93,9 +92,7 @@ public class InventoryUtil {
 
     private void drop(ItemStack item, int returnAmount, Player player) {
         item.setAmount(returnAmount);
-        World world = player.getWorld();
-        Location location = player.getLocation();
-        world.dropItem(location,item);
+        InventoryUtil.safetyItemDrop(player, Collections.singletonList(item));
     }
 
     public void snatchFromVirtual(Map<Matter, Integer> virtual, List<Matter> list, boolean mass) {
@@ -346,5 +343,13 @@ public class InventoryUtil {
         int BLUE = random.nextInt(256);
         Color color = Color.fromRGB(RED, GREEN, BLUE);
         meta.setColor(color);
+    }
+
+    public static void safetyItemDrop(Player player, List<ItemStack> items) {
+        for (ItemStack item : items) {
+            Item dropped = player.getWorld().dropItem(player.getLocation(), item);
+            dropped.setOwner(player.getUniqueId());
+            dropped.setGravity(false);
+        }
     }
 }

@@ -6,6 +6,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.PotionStrict;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.Potions;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.Result;
+import com.github.sakakiaruka.customcrafter.customcrafter.util.InventoryUtil;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
@@ -17,6 +18,7 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -52,7 +54,7 @@ public class Give {
                 meta.setLore(list);
                 item.setItemMeta(meta);
 
-                player.getWorld().dropItem(player.getLocation(),item);
+                InventoryUtil.safetyItemDrop(player, Collections.singletonList(item));
             }
         }else{
             // give result
@@ -78,7 +80,7 @@ public class Give {
                 item.setItemMeta(meta);
                 result.setMetaData(item);
 
-                player.getWorld().dropItem(player.getLocation(),item);
+                InventoryUtil.safetyItemDrop(player, Collections.singletonList(item));
             }
         }
     }
