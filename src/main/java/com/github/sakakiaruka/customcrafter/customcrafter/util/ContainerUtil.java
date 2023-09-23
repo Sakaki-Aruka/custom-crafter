@@ -149,7 +149,7 @@ public class ContainerUtil {
             String stringValue = wrapper.getValue();
             if (type.equals(PersistentDataType.STRING)) dummyContainer.set(key, type, stringValue);
             if (type.equals(PersistentDataType.INTEGER)) dummyContainer.set(key, type, Integer.parseInt(stringValue));
-            if (type.equals(PersistentDataType.DOUBLE)) dummyContainer.set(key, type, Double.valueOf(stringValue));
+            if (type.equals(PersistentDataType.DOUBLE)) dummyContainer.set(key, type, Double.parseDouble(stringValue));
         }
         dummyItemStack.setItemMeta(meta);
 
@@ -235,8 +235,8 @@ public class ContainerUtil {
                 String element = String.valueOf(container.get(key, type));
                 if (!element.matches(ContainerModify.NUMBERS_PATTERN)) return false;
 
-                double current = Double.valueOf(value);
-                double containerHas = Double.valueOf(element);
+                double current = Double.parseDouble(value);
+                double containerHas = Double.parseDouble(element);
                 if ((current == containerHas) == isAllow) continue;
                 return false;
             }
@@ -303,7 +303,7 @@ public class ContainerUtil {
 
         double element;
         try{
-            element = Double.valueOf(String.valueOf(container.get(key,type)));
+            element = Double.parseDouble(String.valueOf(container.get(key,type)));
         }catch (Exception e) {
             return false;
         }
@@ -333,7 +333,7 @@ public class ContainerUtil {
         double value;
         try{
             if (type.equals(PersistentDataType.INTEGER)) value = Integer.parseInt(String.valueOf(container.get(key, type)));
-            if (type.equals(PersistentDataType.DOUBLE)) value = Double.valueOf(String.valueOf(container.get(key, type)));
+            if (type.equals(PersistentDataType.DOUBLE)) value = Double.parseDouble(String.valueOf(container.get(key, type)));
             else return false;
 
         }catch (Exception e) {
@@ -418,7 +418,7 @@ public class ContainerUtil {
 
     private double calc(String input) {
 
-        if (input.matches("^([\\d]*)(\\.?)(\\d)+$")) return Double.valueOf(input);
+        if (input.matches("^([\\d]*)(\\.?)(\\d)+$")) return Double.parseDouble(input);
 
         List<String> outQueue = new ArrayList<>();
         List<String> stack = new ArrayList<>();
@@ -502,7 +502,7 @@ public class ContainerUtil {
         for (String s : list) {
             if (!s.matches("(\\+|\\-|\\*|/|^)")) {
                 String t = s.contains("~") ? s.replace("~", "-") : s ;
-                stacks.add(Double.valueOf(t));
+                stacks.add(Double.parseDouble(t));
                 continue;
             }
             double element1 = stacks.get(stacks.size()-1);
@@ -589,7 +589,7 @@ public class ContainerUtil {
                     stringTypeData.get(key).add(value);
                 } else if (type.equals(PersistentDataType.INTEGER) || type.equals(PersistentDataType.DOUBLE)) {
                     if (!numericTypeData.containsKey(key)) numericTypeData.put(key, new ArrayList<>());
-                    numericTypeData.get(key).add(Double.valueOf(value));
+                    numericTypeData.get(key).add(Double.parseDouble(value));
                 }
             }
         }
@@ -860,7 +860,7 @@ public class ContainerUtil {
 
         int level;
         try{
-            double preLevel = Double.valueOf(matcher.group(2).contains("$") ? getContent(source, matcher.group(2)) : matcher.group(2));
+            double preLevel = Double.parseDouble(matcher.group(2).contains("$") ? getContent(source, matcher.group(2)) : matcher.group(2));
             level = (int) Math.round(ENCHANTMENT_MAX_LEVEL < preLevel ? ENCHANTMENT_MAX_LEVEL : preLevel);
             if (level < 1) {
                 Bukkit.getLogger().warning("[CustomCrafter] USING_CONTAINER_VALUES_ENCHANTMENT failed. (Illegal Level Range. x < 1)");
@@ -884,9 +884,9 @@ public class ContainerUtil {
             String blue = rgb.group(3);
             int RED ,GREEN, BLUE;
             try {
-                RED = (int) Math.round(Double.valueOf(red.contains("$") ? getContent(source, red) : red));
-                GREEN = (int) Math.round(Double.valueOf(green.contains("$") ? getContent(source, green) : green));
-                BLUE = (int) Math.round(Double.valueOf(blue.contains("$") ? getContent(source, blue) : blue));
+                RED = (int) Math.round(Double.parseDouble(red.contains("$") ? getContent(source, red) : red));
+                GREEN = (int) Math.round(Double.parseDouble(green.contains("$") ? getContent(source, green) : green));
+                BLUE = (int) Math.round(Double.parseDouble(blue.contains("$") ? getContent(source, blue) : blue));
             } catch (Exception e) {
                 Bukkit.getLogger().warning("[CustomCrafter] USING_CONTAINER_VALUES_POTION_COLOR failed. (Returned None Value or String type-value.)");
                 return;
@@ -927,7 +927,7 @@ public class ContainerUtil {
     private void setUsingContainerValuesTextureId(ItemMeta meta, PersistentDataContainer source, String order) {
         int id;
         try{
-            id = (int) Math.round(Double.valueOf(getContent(source, order)));
+            id = (int) Math.round(Double.parseDouble(getContent(source, order)));
         } catch (Exception e) {
             Bukkit.getLogger().warning("[CustomCrafter] USING_CONTAINER_VALUES_TEXTURE_ID failed. (Illegal texture id.)");
             return;
@@ -944,7 +944,7 @@ public class ContainerUtil {
             String variable = absolute.group(1);
             double value;
             try {
-                value = Double.valueOf(getContent(source, variable));
+                value = Double.parseDouble(getContent(source, variable));
             } catch (Exception e) {
                 Bukkit.getLogger().warning("[CustomCrafter] USING_CONTAINER_VALUES_TOOL_DURABILITY failed. (Returned None Value or String type-value found.)");
                 return;
@@ -966,7 +966,7 @@ public class ContainerUtil {
             String variable = percentage.group(1);
             double value;
             try {
-                value = Double.valueOf(getContent(source, variable));
+                value = Double.parseDouble(getContent(source, variable));
             } catch (Exception e) {
                 Bukkit.getLogger().warning("[CustomCrafter] USING_CONTAINER_VALUES_TOOL_DURABILITY failed. (Returned None Value or String type-value found.)");
                 return;

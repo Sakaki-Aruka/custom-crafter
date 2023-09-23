@@ -91,7 +91,7 @@ public class ContainerModify {
 
         if (type.equals(PersistentDataType.DOUBLE)) {
             try{
-                doubleValue = Double.valueOf(String.valueOf(value));
+                doubleValue = Double.parseDouble(String.valueOf(value));
             }catch (Exception e) {
                 sender.sendMessage("Container "+modifyType+" > The provided value is not a number.");
                 return;
