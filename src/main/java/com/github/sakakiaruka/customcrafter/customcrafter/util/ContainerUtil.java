@@ -148,7 +148,7 @@ public class ContainerUtil {
             PersistentDataType type = wrapper.getType();
             String stringValue = wrapper.getValue();
             if (type.equals(PersistentDataType.STRING)) dummyContainer.set(key, type, stringValue);
-            if (type.equals(PersistentDataType.INTEGER)) dummyContainer.set(key, type, Integer.valueOf(stringValue));
+            if (type.equals(PersistentDataType.INTEGER)) dummyContainer.set(key, type, Integer.parseInt(stringValue));
             if (type.equals(PersistentDataType.DOUBLE)) dummyContainer.set(key, type, Double.valueOf(stringValue));
         }
         dummyItemStack.setItemMeta(meta);
@@ -265,7 +265,7 @@ public class ContainerUtil {
             if (!m.matches()) return false;
 
             String currentType = m.group(1);
-            int times = Integer.valueOf(m.group(2));
+            int times = Integer.parseInt(m.group(2));
             keyTypes.addAll(Collections.nCopies(times, currentType));
         }
 
@@ -332,7 +332,7 @@ public class ContainerUtil {
 
         double value;
         try{
-            if (type.equals(PersistentDataType.INTEGER)) value = Integer.valueOf(String.valueOf(container.get(key, type)));
+            if (type.equals(PersistentDataType.INTEGER)) value = Integer.parseInt(String.valueOf(container.get(key, type)));
             if (type.equals(PersistentDataType.DOUBLE)) value = Double.valueOf(String.valueOf(container.get(key, type)));
             else return false;
 
@@ -356,7 +356,7 @@ public class ContainerUtil {
 
         int element;
         try{
-            element = Integer.valueOf(String.valueOf(container.get(key, type)));
+            element = Integer.parseInt(String.valueOf(container.get(key, type)));
         }catch (Exception e) {
             return false;
         }

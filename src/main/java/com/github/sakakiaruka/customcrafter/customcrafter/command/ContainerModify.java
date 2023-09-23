@@ -82,7 +82,7 @@ public class ContainerModify {
         double doubleValue = 0d;
         if (type.equals(PersistentDataType.INTEGER)) {
             try{
-                intValue = Integer.valueOf(String.valueOf(value));
+                intValue = Integer.parseInt(String.valueOf(value));
             }catch (Exception e) {
                 sender.sendMessage("Container "+modifyType+" > The provided value is not a number.");
                 return;
@@ -203,8 +203,8 @@ public class ContainerModify {
 
         // int + int
         }else if (usedValueString.matches(NUMBERS_PATTERN) && type.equals(PersistentDataType.INTEGER)){
-            int target = Integer.valueOf(String.valueOf(targetObj));
-            int usedValue = Integer.valueOf(args[6]);
+            int target = Integer.parseInt(String.valueOf(targetObj));
+            int usedValue = Integer.parseInt(args[6]);
 
             int result;
             if (operator.equals("+")) result = target + usedValue;

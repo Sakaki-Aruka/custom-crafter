@@ -279,7 +279,7 @@ public class SettingsLoad {
                      */
                     List<String> list = Arrays.asList(s.split(","));
                     Enchantment enchant = Enchantment.getByName(list.get(0).toUpperCase());
-                    int level = Integer.valueOf(list.get(1));
+                    int level = Integer.parseInt(list.get(1));
                     enchantInfo.put(enchant,level);
                 }
             }
@@ -391,7 +391,7 @@ public class SettingsLoad {
                     Matcher matcher = Pattern.compile("^([\\w_]+),(\\d+),(\\w+)$").matcher(s);
                     if (!matcher.matches()) continue;
                     Enchantment enchant = Enchantment.getByName(matcher.group(1).toUpperCase());
-                    int level = Integer.valueOf(matcher.group(2));
+                    int level = Integer.parseInt(matcher.group(2));
                     EnchantStrict strict = EnchantStrict.valueOf(matcher.group(3).toUpperCase());
 
                     EnchantWrap wrap = new EnchantWrap(level,enchant,strict);
@@ -439,8 +439,8 @@ public class SettingsLoad {
                 return null;
             }
             PotionEffectType effectType = PotionEffectType.getByName(list.get(0).toUpperCase());
-            int duration = Integer.valueOf(list.get(1));
-            int amplifier = Integer.valueOf(list.get(2));//-1 < 0 ? 0 : Integer.valueOf(list.get(2)) -1;
+            int duration = Integer.parseInt(list.get(1));
+            int amplifier = Integer.parseInt(list.get(2));//-1 < 0 ? 0 : Integer.parseInt(list.get(2)) -1;
             PotionEffect effect = new PotionEffect(effectType,duration,amplifier);
             PotionStrict strict = PotionStrict.valueOf(list.get(3).toUpperCase());
             map.put(effect,strict);
@@ -573,11 +573,11 @@ public class SettingsLoad {
                         itemStack = new PotionUtil().water_bottle_ItemStack();
                     }else if(list.get(1).matches(PASS_THROUGH_PATTERN)){
                         // pass through
-                        int amount = Integer.valueOf(list.get(2));
+                        int amount = Integer.parseInt(list.get(2));
                         itemStack = new ItemStack(Material.AIR,amount);
                     }else{
                         Material returnMaterial = Material.valueOf(list.get(1).toUpperCase());
-                        int amount = Integer.valueOf(list.get(2));
+                        int amount = Integer.parseInt(list.get(2));
                         itemStack  = new ItemStack(returnMaterial,amount);
                     }
 

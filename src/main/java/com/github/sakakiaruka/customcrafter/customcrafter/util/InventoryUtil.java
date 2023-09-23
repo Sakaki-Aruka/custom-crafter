@@ -309,9 +309,9 @@ public class InventoryUtil {
             return;
         }
 
-        int RED = Integer.valueOf(matcher.group(2));
-        int GREEN = Integer.valueOf(matcher.group(3));
-        int BLUE = Integer.valueOf(matcher.group(4));
+        int RED = Integer.parseInt(matcher.group(2));
+        int GREEN = Integer.parseInt(matcher.group(3));
+        int BLUE = Integer.parseInt(matcher.group(4));
         Color color;
         try {
             color = Color.fromRGB(RED, GREEN, BLUE);
