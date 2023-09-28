@@ -233,7 +233,7 @@ public class Search {
             }
 
             item = items.get(0);
-
+            recipe.getResult().setMetaData(item);
 
         }else {
             // not contains -> A result has written by regex pattern.

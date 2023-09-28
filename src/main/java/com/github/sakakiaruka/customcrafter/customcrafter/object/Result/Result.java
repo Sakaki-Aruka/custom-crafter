@@ -31,6 +31,17 @@ public class Result {
 
     private static final String LEATHER_ARMOR_COLOR_PATTERN = "type:(?i)(rgb|name|random)";
 
+
+    private static final String PASS_THROUGH_MODE_ENCHANTMENT_MODIFY = "mode=pass/type=enchant/action=(?i)(add|remove)/value=([\\w_]+)";
+    private static final String PASS_THROUGH_MODE_DECREMENT_ENCHANT_LEVEL_MODIFY = "mode=pass/type=enchant_level/action=(?i)(minus|plus)/value=(+|-)(\\d+)";
+    private static final String PASS_THROUGH_MODE_ADD_LORE = "mode=pass/type=lore/action=add/value=(.+)";
+    private static final String PASS_THROUGH_MODE_REMOVE_LORE = "mode=pass/type=lore/action=remove";
+    private static final String PASS_THROUGH_MODE_LORE_MODIFY = "mode=pass/type=lore/action=modify/value=(.+)";
+    private static final String PASS_THROUGH_MODE_CONTAINER_MODIFY = "mode=pass/type=container/action=modify/value=(.+)";
+    private static final String PASS_THROUGH_MODE_CONTAINER_VALUES_REMOVE = "mode=pass/type=container/action=remove/value=(.+)";
+    private static final String PASS_THROUGH_MODE_CONTAINER_VALUE_ADD = "mode=pass/type=container/action=add/value=(.+)";
+    private static final String PASS_THROUGH_MODE_DURABILITY_MODIFY = "mode=pass/type=durability/action=(?i)(minus|plus)/value=(+|-)(\\d+)";
+
     private String name;
     private Map<Enchantment,Integer> enchantsInfo;
     private int amount;
@@ -138,6 +149,14 @@ public class Result {
             * leather_armor_color -> type:rgb/value:R->(\\d{1,3}),G->(\\d{1,3}),B->(\\d{1,3})
             * leather_armor_color -> type:name/value:([\\w_]+)  #color name
             * leather_armor_color -> type:random
+            *
+            * pass_through_mode_enchantment_modify -> mode=pass/type=enchant/action=(?i)(add|remove)/value=([\\w_]+)
+            * pass_through_mode_enchant_level_modify -> mode=pass/type=enchant_level/action=(?i)(minus|plus)/value=(+|-)(\d+)
+            * pass_through_mode_add_lore -> mode=pass/type=lore/action=add/value=(.+)
+            * pass_through_mode_remove_lore -> mode=pass/type=lore/action=remove
+            * pass_through_mode_lore_modify -> mode=pass/type=lore/action=modify/value=(.+)
+            * pass_through_mode_container_modify -> mode=pass/type=container/action=modify/value=(.+)
+            *
              */
 
             MetadataType type = entry.getKey();
