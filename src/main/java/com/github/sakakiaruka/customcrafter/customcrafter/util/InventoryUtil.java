@@ -371,7 +371,7 @@ public class InventoryUtil {
         item.setItemMeta(meta);
     }
 
-    public static void enchantLevelModify(String action, String value, ItemStack item) {
+    public static void enchantLevel(String action, String value, ItemStack item) {
         // if the specified enchantment is not contained the item-stack, this method does nothing.
         ItemMeta meta = item.getItemMeta();
         if (!meta.hasEnchants()) return;
@@ -387,5 +387,30 @@ public class InventoryUtil {
         if (action.equals("minus")) newLevel = Math.max(1, oldLevel - change);
         else if (action.equals("plus")) newLevel = Math.min(255, oldLevel + change);
         meta.addEnchant(enchant, newLevel, false);
+    }
+
+    public static void loreModify(String action, String value, ItemStack item) {
+        ItemMeta meta = item.getItemMeta();
+        if (action.equals("add")) {
+            List<String> lore = meta.getLore();
+            meta.setLore(null); // clear the lore
+            lore.add(value);
+            meta.setLore(lore);
+        } else if (action.equals("clear")) {
+            meta.setLore(null);
+        } else if (action.equals("modify")) {
+            List<String> lore = meta.getLore();
+            meta.setLore(null); // clear the lore
+
+            Matcher v = Pattern.compile("line=([\\d]+),lore=(.+)").matcher(value);
+            if (!v.matches()) return;
+            int line = Integer.parseInt(v.group(1));
+            String add = v.group(2);
+
+            if (lore.size()< line+1) return;
+            lore.add(line+1, add);
+            meta.setLore(lore);
+        }
+        item.setItemMeta(meta);
     }
 }
