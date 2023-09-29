@@ -34,7 +34,8 @@ public class Result {
 
 
     private static final String PASS_THROUGH_MODE_TEMPLATE = "^mode=pass/type=([\\w\\d-_]+)/action=([\\w\\d-_]+)(/value=(.+))?$";
-    private static final String PASS_THROUGH_MODE_ENCHANTMENT_MODIFY = "ACTION=(add|remove)/VALUE=([\\w-_]+)";
+    private static final String PASS_THROUGH_MODE_ENCHANTMENT_ADD = "ACTION=add/VALUE=enchant=([\\w_]+),level=([\\d]+)";
+    private static final String PASS_THROUGH_MODE_ENCHANTMENT_REMOVE = "ACTION=remove/VALUE=([\\w_]+)";
 //"mode=pass/type=enchant/action=(add|remove)/value=(\\w\\d_-)";
     private static final String PASS_THROUGH_MODE_ENCHANT_LEVEL_MODIFY = "ACTION=(minus|plus)/VALUE=enchant=([\\w_]),change=([\\d]+)";
 //    private static final String PASS_THROUGH_MODE_DECREMENT_ENCHANT_LEVEL_MODIFY = "mode=pass/type=enchant_level/action=(?i)(minus|plus)/value=(\\+|-)(\\d+)";
@@ -325,10 +326,12 @@ public class Result {
                     String ACTION = template.group(2);
                     String VALUE = template.group(3);
 
-                    if (TYPE.equals("enchant") && isFollowPattern(PASS_THROUGH_MODE_ENCHANTMENT_MODIFY, ACTION, VALUE)) {
-                        // enchant modify
+                    if (TYPE.equals("enchant") && isFollowPattern(PASS_THROUGH_MODE_ENCHANTMENT_ADD, ACTION, VALUE)) {
+                        // enchant add
 
-                    } else if (TYPE.equals("enchant_level") && isFollowPattern(PASS_THROUGH_MODE_ENCHANT_LEVEL_MODIFY, ACTION, VALUE)) {
+                    } else if (TYPE.equals("enchant") && isFollowPattern(PASS_THROUGH_MODE_ENCHANTMENT_REMOVE, ACTION, VALUE)){
+                        // enchant remove
+                    }else if (TYPE.equals("enchant_level") && isFollowPattern(PASS_THROUGH_MODE_ENCHANT_LEVEL_MODIFY, ACTION, VALUE)) {
                         // enchant level modify
                     } else if (TYPE.equals("lore") && isFollowPattern(PASS_THROUGH_MODE_LORE_ADD, ACTION, VALUE)) {
                         // lore add

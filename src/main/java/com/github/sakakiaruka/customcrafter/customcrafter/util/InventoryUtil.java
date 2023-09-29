@@ -356,6 +356,8 @@ public class InventoryUtil {
     }
 
     public static void enchantModify(String action, String enchant, ItemStack item) {
-
+        if (action.equals("add")) {
+            //
+        }
     }
 }
