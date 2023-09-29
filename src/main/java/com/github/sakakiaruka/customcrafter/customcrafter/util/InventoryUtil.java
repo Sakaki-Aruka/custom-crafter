@@ -3,7 +3,10 @@ package com.github.sakakiaruka.customcrafter.customcrafter.util;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.*;
 import org.bukkit.*;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -412,5 +415,30 @@ public class InventoryUtil {
             meta.setLore(lore);
         }
         item.setItemMeta(meta);
+    }
+
+    public static void durabilityModify(String action, String value, ItemStack item) {
+        Damageable damageable;
+        try {
+            damageable = (Damageable) item.getItemMeta();
+        } catch (Exception e) {
+            return;
+        }
+
+        double oldHealth = damageable.getHealth();
+        List<AttributeModifier> modifiers = (List<AttributeModifier>) item.getItemMeta().getAttributeModifiers(Attribute.GENERIC_MAX_HEALTH);
+        double maxHealth = modifiers.get(0).getAmount();
+        double lastOne = maxHealth - 1;
+        double change = Double.parseDouble(value);
+
+        if (action.equals("minus")) {
+            // minus
+            double damage = Math.min(lastOne, change);
+            damageable.damage(damage);
+        } else if (action.equals("plus")) {
+            // plus
+            double newHealth = Math.min(maxHealth, oldHealth + change);
+            damageable.setHealth(newHealth);
+        }
     }
 }
