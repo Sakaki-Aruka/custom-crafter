@@ -32,15 +32,27 @@ public class Result {
     private static final String LEATHER_ARMOR_COLOR_PATTERN = "type:(?i)(rgb|name|random)";
 
 
-    private static final String PASS_THROUGH_MODE_ENCHANTMENT_MODIFY = "mode=pass/type=enchant/action=(?i)(add|remove)/value=([\\w_]+)";
-    private static final String PASS_THROUGH_MODE_DECREMENT_ENCHANT_LEVEL_MODIFY = "mode=pass/type=enchant_level/action=(?i)(minus|plus)/value=(+|-)(\\d+)";
-    private static final String PASS_THROUGH_MODE_ADD_LORE = "mode=pass/type=lore/action=add/value=(.+)";
-    private static final String PASS_THROUGH_MODE_REMOVE_LORE = "mode=pass/type=lore/action=remove";
-    private static final String PASS_THROUGH_MODE_LORE_MODIFY = "mode=pass/type=lore/action=modify/value=(.+)";
-    private static final String PASS_THROUGH_MODE_CONTAINER_MODIFY = "mode=pass/type=container/action=modify/value=(.+)";
-    private static final String PASS_THROUGH_MODE_CONTAINER_VALUES_REMOVE = "mode=pass/type=container/action=remove/value=(.+)";
-    private static final String PASS_THROUGH_MODE_CONTAINER_VALUE_ADD = "mode=pass/type=container/action=add/value=(.+)";
-    private static final String PASS_THROUGH_MODE_DURABILITY_MODIFY = "mode=pass/type=durability/action=(?i)(minus|plus)/value=(+|-)(\\d+)";
+
+    private static final String PASS_THROUGH_MODE_TEMPLATE = "^mode=pass/type=([\\w\\d-_]+)/action=([\\w\\d-_]+)(/value=(.+))?$";
+    private static final String PASS_THROUGH_MODE_ENCHANTMENT_MODIFY = "ACTION=(add|remove)/VALUE=([\\w-_]+)";
+//"mode=pass/type=enchant/action=(add|remove)/value=(\\w\\d_-)";
+    private static final String PASS_THROUGH_MODE_ENCHANT_LEVEL_MODIFY = "ACTION=(minus|plus)/VALUE=enchant=([\\w_]),change=([\\d]+)";
+//    private static final String PASS_THROUGH_MODE_DECREMENT_ENCHANT_LEVEL_MODIFY = "mode=pass/type=enchant_level/action=(?i)(minus|plus)/value=(\\+|-)(\\d+)";
+    private static final String PASS_THROUGH_MODE_LORE_ADD = "ACTION=add/VALUE=(.+)";
+    private static final String PASS_THROUGH_MODE_LORE_CLEAR = "ACTION=clear/VALUE=null";
+    private static final String PASS_THROUGH_MODE_LORE_MODIFY = "ACTION=modify/VALUE=line=([\\d]+),lore=(.+)";
+//    private static final String PASS_THROUGH_MODE_ADD_LORE = "mode=pass/type=lore/action=add/value=(.+)";
+//    private static final String PASS_THROUGH_MODE_REMOVE_LORE = "mode=pass/type=lore/action=remove/value=null";
+//    private static final String PASS_THROUGH_MODE_LORE_MODIFY = "mode=pass/type=lore/action=modify/value=(.+)";
+    private static final String PASS_THROUGH_MODE_CONTAINER_MODIFY = "ACTION=modify/VALUE=(.+)";
+    // modify (set, modify (+-/*^)) defined in InventoryUtil
+    private static final String PASS_THROUGH_MODE_CONTAINER_REMOVE = "ACTION=remove/VALUE=([\\w\\d-_]+)";
+    private static final String PASS_THROUGH_MODE_CONTAINER_ADD = "ACTION=add/VALUE=type=(string|double|int),init=(.+)";
+//    private static final String PASS_THROUGH_MODE_CONTAINER_MODIFY = "mode=pass/type=container/action=modify/value=(.+)";
+//    private static final String PASS_THROUGH_MODE_CONTAINER_VALUES_REMOVE = "mode=pass/type=container/action=remove/value=(.+)";
+//    private static final String PASS_THROUGH_MODE_CONTAINER_VALUE_ADD = "mode=pass/type=container/action=add/value=(.+)";
+    private static final String PASS_THROUGH_MODE_DURABILITY_MODIFY = "ACTION=(minus|plus)/VALUE=([\\d]+)";
+//    private static final String PASS_THROUGH_MODE_DURABILITY_MODIFY = "mode=pass/type=durability/action=(?i)(minus|plus)/value=(+|-)(\\d+)";
 
     private String name;
     private Map<Enchantment,Integer> enchantsInfo;
@@ -182,8 +194,8 @@ public class Result {
                 for(String s : content){
                     List<String> potionData = Arrays.asList(s.split(","));
                     PotionEffectType effectType = PotionEffectType.getByName(potionData.get(0).toUpperCase());
-                    int duration = Integer.parseInt(potionData.get(1)) < 1 ? 1 : Integer.parseInt(potionData.get(1));
-                    int amplifier = Integer.parseInt(potionData.get(2)) < 1 ? 1 : Integer.parseInt(potionData.get(2));
+                    int duration = Math.max(Integer.parseInt(potionData.get(1)), 1);
+                    int amplifier = Math.max(Integer.parseInt(potionData.get(2)), 1);
                     PotionEffect effect = new PotionEffect(effectType,duration,amplifier);
                     PotionMeta potionMeta = (PotionMeta)  meta;
                     potionMeta.addCustomEffect(effect,true);
@@ -303,7 +315,50 @@ public class Result {
                 }
             }
 
+            if (type.equals(MetadataType.PASS_THROUGH)) {
+                // pass_through processor
+                for (String s : entry.getValue()) {
+                    s = s.toLowerCase();
+
+                    Matcher template = Pattern.compile(PASS_THROUGH_MODE_TEMPLATE).matcher(s);
+                    String TYPE = template.group(1);
+                    String ACTION = template.group(2);
+                    String VALUE = template.group(3);
+
+                    if (TYPE.equals("enchant") && isFollowPattern(PASS_THROUGH_MODE_ENCHANTMENT_MODIFY, ACTION, VALUE)) {
+                        // enchant modify
+
+                    } else if (TYPE.equals("enchant_level") && isFollowPattern(PASS_THROUGH_MODE_ENCHANT_LEVEL_MODIFY, ACTION, VALUE)) {
+                        // enchant level modify
+                    } else if (TYPE.equals("lore") && isFollowPattern(PASS_THROUGH_MODE_LORE_ADD, ACTION, VALUE)) {
+                        // lore add
+                    } else if (TYPE.equals("lore") && isFollowPattern(PASS_THROUGH_MODE_LORE_CLEAR, ACTION, VALUE)) {
+                        // lore clear
+                    } else if (TYPE.equals("lore") && isFollowPattern(PASS_THROUGH_MODE_LORE_MODIFY, ACTION, VALUE)) {
+                        // lore modify
+                    } else if (TYPE.equals("container") && isFollowPattern(PASS_THROUGH_MODE_CONTAINER_MODIFY, ACTION, VALUE)) {
+                        // container modify (set, modify)
+                    } else if (TYPE.equals("container") && isFollowPattern(PASS_THROUGH_MODE_CONTAINER_REMOVE, ACTION, VALUE)) {
+                        // container remove
+                    } else if (TYPE.equals("container") && isFollowPattern(PASS_THROUGH_MODE_CONTAINER_ADD, ACTION, VALUE)) {
+                        // container add
+                    }
+                }
+            }
+
             item.setItemMeta(meta);
         }
+    }
+
+    private boolean isFollowPattern(String pattern, String actionInput, String valueInput) {
+        Matcher template = Pattern.compile("ACTION=(.+)/VALUE=(.+)").matcher(pattern);
+        if (!template.matches()) {
+            Bukkit.getLogger().warning("[CustomCrafter] Result Pass-through error. (Not follow the pattern.)");
+            return false;
+        }
+
+        Matcher action = Pattern.compile(template.group(1)).matcher(actionInput);
+        Matcher value = Pattern.compile(template.group(2)).matcher(valueInput);
+        return (!action.matches() || !value.matches());
     }
 }

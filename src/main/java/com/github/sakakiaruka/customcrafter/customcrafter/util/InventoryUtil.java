@@ -3,11 +3,13 @@ package com.github.sakakiaruka.customcrafter.customcrafter.util;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.*;
 import org.bukkit.*;
+import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 import java.nio.charset.StandardCharsets;
@@ -351,5 +353,9 @@ public class InventoryUtil {
             dropped.setOwner(player.getUniqueId());
             dropped.setGravity(false);
         }
+    }
+
+    public static void enchantModify(String action, String enchant, ItemStack item) {
+
     }
 }

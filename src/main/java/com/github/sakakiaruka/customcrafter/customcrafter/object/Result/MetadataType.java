@@ -13,7 +13,8 @@ public enum MetadataType {
     ATTRIBUTE_MODIFIER("ATTRIBUTE_MODIFIER"),
     TOOL_DURABILITY("TOOL_DURABILITY"),
     BOOK_FIELD("BOOK_FIELD"),
-    LEATHER_ARMOR_COLOR("LEATHER_ARMOR_COLOR");
+    LEATHER_ARMOR_COLOR("LEATHER_ARMOR_COLOR"),
+    PASS_THROUGH("PASS_THROUGH");
 
     private String type;
     private MetadataType(String type){
