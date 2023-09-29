@@ -355,9 +355,37 @@ public class InventoryUtil {
         }
     }
 
-    public static void enchantModify(String action, String enchant, ItemStack item) {
+    public static void enchantModify(String action, String value, ItemStack item) {
+        ItemMeta meta = item.getItemMeta();
+        if (!meta.hasEnchants()) return;
         if (action.equals("add")) {
-            //
+            Matcher v = Pattern.compile("enchant=([\\w_]+),level=([\\d]+)").matcher(value);
+            if (!v.matches()) return;
+            Enchantment enchant = Enchantment.getByName(v.group(1).toUpperCase());
+            int level = Integer.parseInt(v.group(2));
+            meta.addEnchant(enchant, level, false);
+        } else if (action.equals("remove")) {
+            Enchantment enchant = Enchantment.getByName(value.toUpperCase());
+            meta.removeEnchant(enchant);
         }
+        item.setItemMeta(meta);
+    }
+
+    public static void enchantLevelModify(String action, String value, ItemStack item) {
+        // if the specified enchantment is not contained the item-stack, this method does nothing.
+        ItemMeta meta = item.getItemMeta();
+        if (!meta.hasEnchants()) return;
+        Matcher v = Pattern.compile("enchant=([\\w_]),change=([\\d]+)").matcher(value);
+        if (!v.matches()) return;
+        Enchantment enchant = Enchantment.getByName(v.group(1).toUpperCase());
+        int change = Integer.parseInt(v.group(2));
+        if (!meta.hasEnchant(enchant)) return;
+
+        int oldLevel = meta.getEnchantLevel(enchant);
+        meta.removeEnchant(enchant);
+        int newLevel = 1;
+        if (action.equals("minus")) newLevel = Math.max(1, oldLevel - change);
+        else if (action.equals("plus")) newLevel = Math.min(255, oldLevel + change);
+        meta.addEnchant(enchant, newLevel, false);
     }
 }
