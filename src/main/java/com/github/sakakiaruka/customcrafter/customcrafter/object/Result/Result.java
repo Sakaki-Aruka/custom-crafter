@@ -48,7 +48,7 @@ public class Result {
     private static final String PASS_THROUGH_MODE_CONTAINER_MODIFY = "ACTION=modify/VALUE=(.+)";
     // modify (set, modify (+-/*^)) defined in InventoryUtil
     private static final String PASS_THROUGH_MODE_CONTAINER_REMOVE = "ACTION=remove/VALUE=([\\w\\d-_]+)";
-    private static final String PASS_THROUGH_MODE_CONTAINER_ADD = "ACTION=add/VALUE=type=(string|double|int),init=(.+)";
+    private static final String PASS_THROUGH_MODE_CONTAINER_ADD = "ACTION=add/VALUE=name=([\\w\\d-_]+),type=(string|double|int),init=(.+)";
 //    private static final String PASS_THROUGH_MODE_CONTAINER_MODIFY = "mode=pass/type=container/action=modify/value=(.+)";
 //    private static final String PASS_THROUGH_MODE_CONTAINER_VALUES_REMOVE = "mode=pass/type=container/action=remove/value=(.+)";
 //    private static final String PASS_THROUGH_MODE_CONTAINER_VALUE_ADD = "mode=pass/type=container/action=add/value=(.+)";
