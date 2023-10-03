@@ -1011,8 +1011,7 @@ public class ContainerUtil {
         return String.valueOf(container.get(key, type));
     }
 
-    public void containerModify(String action, String value, ItemStack item) {
-        ItemMeta meta = item.getItemMeta();
+    public void containerModify(String action, String value, ItemMeta meta) {
         PersistentDataContainer container = meta.getPersistentDataContainer();
         if (action.equals("add")) {
             // non override
@@ -1033,6 +1032,5 @@ public class ContainerUtil {
         } else if (action.equals("modify")) {
             //
         }
-        item.setItemMeta(meta);
     }
 }

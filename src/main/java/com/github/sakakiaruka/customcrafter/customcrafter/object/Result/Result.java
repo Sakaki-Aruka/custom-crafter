@@ -2,6 +2,7 @@ package com.github.sakakiaruka.customcrafter.customcrafter.object.Result;
 
 import com.github.sakakiaruka.customcrafter.customcrafter.object.ContainerWrapper;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.AttributeModifierUtil;
+import com.github.sakakiaruka.customcrafter.customcrafter.util.ContainerUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.DataContainerUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.InventoryUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.PotionUtil;
@@ -33,27 +34,27 @@ public class Result {
 
 
 
-    private static final String PASS_THROUGH_MODE_TEMPLATE = "^mode=pass/type=([\\w\\d-_]+)/action=([\\w\\d-_]+)(/value=(.+))?$";
+    private static final String PASS_THROUGH_MODE_TEMPLATE = "^mode=pass/type=([\\w\\d-_]+)/action=([\\w\\d-_]+)/value=(.+)$";
     private static final String PASS_THROUGH_MODE_ENCHANTMENT_ADD = "ACTION=add/VALUE=enchant=([\\w_]+),level=([\\d]+)";
     private static final String PASS_THROUGH_MODE_ENCHANTMENT_REMOVE = "ACTION=remove/VALUE=([\\w_]+)";
-//"mode=pass/type=enchant/action=(add|remove)/value=(\\w\\d_-)";
-    private static final String PASS_THROUGH_MODE_ENCHANT_LEVEL_MODIFY = "ACTION=(minus|plus)/VALUE=enchant=([\\w_]),change=([\\d]+)";
-//    private static final String PASS_THROUGH_MODE_DECREMENT_ENCHANT_LEVEL_MODIFY = "mode=pass/type=enchant_level/action=(?i)(minus|plus)/value=(\\+|-)(\\d+)";
+    //"mode=pass/type=enchant/action=(add|remove)/value=(\\w\\d_-)";
+    private static final String PASS_THROUGH_MODE_ENCHANT_LEVEL_MODIFY = "ACTION=(minus|plus)/VALUE=enchant=([\\w_]+),change=([\\d]+)";
+    //`"mode=pass/type=enchant_level/action=(?i)(minus|plus)/value=(\\+|-)(\\d+)";
     private static final String PASS_THROUGH_MODE_LORE_ADD = "ACTION=add/VALUE=(.+)";
     private static final String PASS_THROUGH_MODE_LORE_CLEAR = "ACTION=clear/VALUE=null";
     private static final String PASS_THROUGH_MODE_LORE_MODIFY = "ACTION=modify/VALUE=line=([\\d]+),lore=(.+)";
-//    private static final String PASS_THROUGH_MODE_ADD_LORE = "mode=pass/type=lore/action=add/value=(.+)";
-//    private static final String PASS_THROUGH_MODE_REMOVE_LORE = "mode=pass/type=lore/action=remove/value=null";
-//    private static final String PASS_THROUGH_MODE_LORE_MODIFY = "mode=pass/type=lore/action=modify/value=(.+)";
+    //"mode=pass/type=lore/action=add/value=(.+)";
+    //"mode=pass/type=lore/action=remove/value=null";
+    //"mode=pass/type=lore/action=modify/value=(.+)";
     private static final String PASS_THROUGH_MODE_CONTAINER_MODIFY = "ACTION=modify/VALUE=(.+)";
     // modify (set, modify (+-/*^)) defined in InventoryUtil
     private static final String PASS_THROUGH_MODE_CONTAINER_REMOVE = "ACTION=remove/VALUE=([\\w\\d-_]+)";
     private static final String PASS_THROUGH_MODE_CONTAINER_ADD = "ACTION=add/VALUE=name=([\\w\\d-_]+),type=(string|double|int),init=(.+)";
-//    private static final String PASS_THROUGH_MODE_CONTAINER_MODIFY = "mode=pass/type=container/action=modify/value=(.+)";
-//    private static final String PASS_THROUGH_MODE_CONTAINER_VALUES_REMOVE = "mode=pass/type=container/action=remove/value=(.+)";
-//    private static final String PASS_THROUGH_MODE_CONTAINER_VALUE_ADD = "mode=pass/type=container/action=add/value=(.+)";
     private static final String PASS_THROUGH_MODE_DURABILITY_MODIFY = "ACTION=(minus|plus)/VALUE=([\\d]+)";
-//    private static final String PASS_THROUGH_MODE_DURABILITY_MODIFY = "mode=pass/type=durability/action=(?i)(minus|plus)/value=(+|-)(\\d+)";
+    //"mode=pass/type=container/action=modify/value=(.+)";
+    //"mode=pass/type=container/action=remove/value=(.+)";
+    //"mode=pass/type=container/action=add/value=(.+)";
+    //"mode=pass/type=durability/action=(?i)(minus|plus)/value=(+|-)(\\d+)";
 
     private String name;
     private Map<Enchantment,Integer> enchantsInfo;
@@ -333,6 +334,10 @@ public class Result {
                     s = s.toLowerCase();
 
                     Matcher template = Pattern.compile(PASS_THROUGH_MODE_TEMPLATE).matcher(s);
+                    if (!template.matches()) {
+                        Bukkit.getLogger().warning("[CustomCrafter] Pass-through mode failed. (Illegal pass through config found).");
+                        continue;
+                    }
                     String TYPE = template.group(1);
                     String ACTION = template.group(2);
                     String VALUE = template.group(3);
@@ -340,22 +345,45 @@ public class Result {
                     if (TYPE.equals("enchant") && isFollowPattern(PASS_THROUGH_MODE_ENCHANTMENT_ADD, ACTION, VALUE)) {
                         // enchant add
 
+                        //debug
+                        Bukkit.getLogger().info("pass through mode=1");
+
+                        InventoryUtil.enchantModify(ACTION, VALUE, meta);
                     } else if (TYPE.equals("enchant") && isFollowPattern(PASS_THROUGH_MODE_ENCHANTMENT_REMOVE, ACTION, VALUE)){
                         // enchant remove
+                        InventoryUtil.enchantModify(ACTION, VALUE, meta);
+
                     }else if (TYPE.equals("enchant_level") && isFollowPattern(PASS_THROUGH_MODE_ENCHANT_LEVEL_MODIFY, ACTION, VALUE)) {
                         // enchant level modify
+                        InventoryUtil.enchantLevel(ACTION, VALUE, meta);
+
                     } else if (TYPE.equals("lore") && isFollowPattern(PASS_THROUGH_MODE_LORE_ADD, ACTION, VALUE)) {
                         // lore add
+                        InventoryUtil.loreModify(ACTION, VALUE, meta);
+
                     } else if (TYPE.equals("lore") && isFollowPattern(PASS_THROUGH_MODE_LORE_CLEAR, ACTION, VALUE)) {
                         // lore clear
+                        InventoryUtil.loreModify(ACTION, VALUE, meta);
+
                     } else if (TYPE.equals("lore") && isFollowPattern(PASS_THROUGH_MODE_LORE_MODIFY, ACTION, VALUE)) {
                         // lore modify
+                        InventoryUtil.loreModify(ACTION, VALUE, meta);
+
                     } else if (TYPE.equals("container") && isFollowPattern(PASS_THROUGH_MODE_CONTAINER_MODIFY, ACTION, VALUE)) {
                         // container modify (set, modify)
+                        new ContainerUtil().containerModify(ACTION, VALUE, meta);
+
                     } else if (TYPE.equals("container") && isFollowPattern(PASS_THROUGH_MODE_CONTAINER_REMOVE, ACTION, VALUE)) {
                         // container remove
+                        new ContainerUtil().containerModify(ACTION, VALUE, meta);
                     } else if (TYPE.equals("container") && isFollowPattern(PASS_THROUGH_MODE_CONTAINER_ADD, ACTION, VALUE)) {
                         // container add
+                        new ContainerUtil().containerModify(ACTION, VALUE, meta);
+
+                    } else if (TYPE.equals("durability") && isFollowPattern(PASS_THROUGH_MODE_DURABILITY_MODIFY, ACTION, VALUE)) {
+                        // durability modify
+                        InventoryUtil.durabilityModify(ACTION, VALUE, meta);
+
                     }
                 }
             }
@@ -373,6 +401,6 @@ public class Result {
 
         Matcher action = Pattern.compile(template.group(1)).matcher(actionInput);
         Matcher value = Pattern.compile(template.group(2)).matcher(valueInput);
-        return (!action.matches() || !value.matches());
+        return action.matches() && value.matches();
     }
 }

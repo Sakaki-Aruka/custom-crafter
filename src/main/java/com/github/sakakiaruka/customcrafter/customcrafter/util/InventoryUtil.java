@@ -358,75 +358,80 @@ public class InventoryUtil {
         }
     }
 
-    public static void enchantModify(String action, String value, ItemStack item) {
-        ItemMeta meta = item.getItemMeta();
+    public static void enchantModify(String action, String value, ItemMeta meta) {
         if (!meta.hasEnchants()) return;
         if (action.equals("add")) {
             Matcher v = Pattern.compile("enchant=([\\w_]+),level=([\\d]+)").matcher(value);
             if (!v.matches()) return;
             Enchantment enchant = Enchantment.getByName(v.group(1).toUpperCase());
             int level = Integer.parseInt(v.group(2));
+            meta.removeEnchant(enchant);
             meta.addEnchant(enchant, level, false);
         } else if (action.equals("remove")) {
+
+            //debug
+            Bukkit.getLogger().info("enchant REMOVE="+value);
+
             Enchantment enchant = Enchantment.getByName(value.toUpperCase());
             meta.removeEnchant(enchant);
         }
-        item.setItemMeta(meta);
     }
 
-    public static void enchantLevel(String action, String value, ItemStack item) {
+    public static void enchantLevel(String action, String value, ItemMeta meta) {
         // if the specified enchantment is not contained the item-stack, this method does nothing.
-        ItemMeta meta = item.getItemMeta();
         if (!meta.hasEnchants()) return;
-        Matcher v = Pattern.compile("enchant=([\\w_]),change=([\\d]+)").matcher(value);
+        Matcher v = Pattern.compile("enchant=([\\w_]+),change=(\\d+)").matcher(value);
         if (!v.matches()) return;
         Enchantment enchant = Enchantment.getByName(v.group(1).toUpperCase());
         int change = Integer.parseInt(v.group(2));
-        if (!meta.hasEnchant(enchant)) return;
 
         int oldLevel = meta.getEnchantLevel(enchant);
         meta.removeEnchant(enchant);
         int newLevel = 1;
         if (action.equals("minus")) newLevel = Math.max(1, oldLevel - change);
         else if (action.equals("plus")) newLevel = Math.min(255, oldLevel + change);
-        meta.addEnchant(enchant, newLevel, false);
+        meta.addEnchant(enchant, newLevel, true);
     }
 
-    public static void loreModify(String action, String value, ItemStack item) {
-        ItemMeta meta = item.getItemMeta();
-        if (action.equals("add")) {
-            List<String> lore = meta.getLore();
-            meta.setLore(null); // clear the lore
-            lore.add(value);
-            meta.setLore(lore);
-        } else if (action.equals("clear")) {
-            meta.setLore(null);
-        } else if (action.equals("modify")) {
-            List<String> lore = meta.getLore();
-            meta.setLore(null); // clear the lore
+    public static void loreModify(String action, String value, ItemMeta meta) {
+        switch (action) {
+            case "add": {
+                List<String> lore = meta.getLore();
+                meta.setLore(null); // clear the lore
 
-            Matcher v = Pattern.compile("line=([\\d]+),lore=(.+)").matcher(value);
-            if (!v.matches()) return;
-            int line = Integer.parseInt(v.group(1));
-            String add = v.group(2);
+                lore.add(value);
+                meta.setLore(lore);
+                break;
+            }
+            case "clear":
+                meta.setLore(null);
+                break;
+            case "modify": {
+                List<String> lore = meta.getLore();
+                meta.setLore(null); // clear the lore
+                Matcher v = Pattern.compile("line=([\\d]+),lore=(.+)").matcher(value);
+                if (!v.matches()) return;
+                int line = Integer.parseInt(v.group(1));
+                String add = v.group(2);
 
-            if (lore.size()< line+1) return;
-            lore.add(line+1, add);
-            meta.setLore(lore);
+                if (lore.size() < line + 1) return;
+                lore.add(line + 1, add);
+                meta.setLore(lore);
+                break;
+            }
         }
-        item.setItemMeta(meta);
     }
 
-    public static void durabilityModify(String action, String value, ItemStack item) {
+    public static void durabilityModify(String action, String value, ItemMeta meta) {
         Damageable damageable;
         try {
-            damageable = (Damageable) item.getItemMeta();
+            damageable = (Damageable) meta;
         } catch (Exception e) {
             return;
         }
 
         double oldHealth = damageable.getHealth();
-        List<AttributeModifier> modifiers = (List<AttributeModifier>) item.getItemMeta().getAttributeModifiers(Attribute.GENERIC_MAX_HEALTH);
+        List<AttributeModifier> modifiers = (List<AttributeModifier>) meta.getAttributeModifiers(Attribute.GENERIC_MAX_HEALTH);
         double maxHealth = modifiers.get(0).getAmount();
         double lastOne = maxHealth - 1;
         double change = Double.parseDouble(value);
