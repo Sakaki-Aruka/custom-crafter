@@ -3,11 +3,16 @@ package com.github.sakakiaruka.customcrafter.customcrafter.util;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.*;
 import org.bukkit.*;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 import java.nio.charset.StandardCharsets;
@@ -350,6 +355,90 @@ public class InventoryUtil {
             Item dropped = player.getWorld().dropItem(player.getLocation(), item);
             dropped.setOwner(player.getUniqueId());
             dropped.setGravity(false);
+        }
+    }
+
+    public static void enchantModify(String action, String value, ItemStack item) {
+        ItemMeta meta = item.getItemMeta();
+        if (!meta.hasEnchants()) return;
+        if (action.equals("add")) {
+            Matcher v = Pattern.compile("enchant=([\\w_]+),level=([\\d]+)").matcher(value);
+            if (!v.matches()) return;
+            Enchantment enchant = Enchantment.getByName(v.group(1).toUpperCase());
+            int level = Integer.parseInt(v.group(2));
+            meta.addEnchant(enchant, level, false);
+        } else if (action.equals("remove")) {
+            Enchantment enchant = Enchantment.getByName(value.toUpperCase());
+            meta.removeEnchant(enchant);
+        }
+        item.setItemMeta(meta);
+    }
+
+    public static void enchantLevel(String action, String value, ItemStack item) {
+        // if the specified enchantment is not contained the item-stack, this method does nothing.
+        ItemMeta meta = item.getItemMeta();
+        if (!meta.hasEnchants()) return;
+        Matcher v = Pattern.compile("enchant=([\\w_]),change=([\\d]+)").matcher(value);
+        if (!v.matches()) return;
+        Enchantment enchant = Enchantment.getByName(v.group(1).toUpperCase());
+        int change = Integer.parseInt(v.group(2));
+        if (!meta.hasEnchant(enchant)) return;
+
+        int oldLevel = meta.getEnchantLevel(enchant);
+        meta.removeEnchant(enchant);
+        int newLevel = 1;
+        if (action.equals("minus")) newLevel = Math.max(1, oldLevel - change);
+        else if (action.equals("plus")) newLevel = Math.min(255, oldLevel + change);
+        meta.addEnchant(enchant, newLevel, false);
+    }
+
+    public static void loreModify(String action, String value, ItemStack item) {
+        ItemMeta meta = item.getItemMeta();
+        if (action.equals("add")) {
+            List<String> lore = meta.getLore();
+            meta.setLore(null); // clear the lore
+            lore.add(value);
+            meta.setLore(lore);
+        } else if (action.equals("clear")) {
+            meta.setLore(null);
+        } else if (action.equals("modify")) {
+            List<String> lore = meta.getLore();
+            meta.setLore(null); // clear the lore
+
+            Matcher v = Pattern.compile("line=([\\d]+),lore=(.+)").matcher(value);
+            if (!v.matches()) return;
+            int line = Integer.parseInt(v.group(1));
+            String add = v.group(2);
+
+            if (lore.size()< line+1) return;
+            lore.add(line+1, add);
+            meta.setLore(lore);
+        }
+        item.setItemMeta(meta);
+    }
+
+    public static void durabilityModify(String action, String value, ItemStack item) {
+        Damageable damageable;
+        try {
+            damageable = (Damageable) item.getItemMeta();
+        } catch (Exception e) {
+            return;
+        }
+
+        double oldHealth = damageable.getHealth();
+        List<AttributeModifier> modifiers = (List<AttributeModifier>) item.getItemMeta().getAttributeModifiers(Attribute.GENERIC_MAX_HEALTH);
+        double maxHealth = modifiers.get(0).getAmount();
+        double lastOne = maxHealth - 1;
+        double change = Double.parseDouble(value);
+
+        if (action.equals("minus")) {
+            // minus
+            double damage = Math.min(lastOne, change);
+            damageable.damage(damage);
+        } else if (action.equals("plus")) {
+            // plus
+            double newHealth = Math.min(maxHealth, oldHealth + change);
+            damageable.setHealth(newHealth);
         }
     }
 }
