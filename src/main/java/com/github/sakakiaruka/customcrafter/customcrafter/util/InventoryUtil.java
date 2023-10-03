@@ -55,7 +55,7 @@ public class InventoryUtil {
         for(int i:slots){
             if(inventory.getItem(i) == null)continue;
             int oldAmount = inventory.getItem(i).getAmount();
-            int newAmount = oldAmount - amount < 0 ? 0 : oldAmount - amount;
+            int newAmount = Math.max(oldAmount - amount, 0);
             inventory.getItem(i).setAmount(newAmount);
         }
     }

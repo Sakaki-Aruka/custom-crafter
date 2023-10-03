@@ -204,20 +204,25 @@ public class Search {
     private void setResultItem(Inventory inventory, Recipe recipe, Recipe input, Player player, int amount, boolean oneCraft){
         ItemStack item = null;
         if (ALL_MATERIALS.contains(recipe.getResult().getNameOrRegex())
-        || recipe.getResult().getMatchPoint() == -1
-        || !recipe.getResult().getNameOrRegex().contains("@")){
+        && recipe.getResult().getMatchPoint() == -1
+        && !recipe.getResult().getNameOrRegex().contains("@")) {
             // result has defined material
             Material m = Material.valueOf(recipe.getResult().getNameOrRegex().toUpperCase());
-            item = new ItemStack(m,amount);
+            item = new ItemStack(m, amount);
             recipe.getResult().setMetaData(item);
             //setMetaData(item,recipe.getResult()); //set result itemStack's metadata
-        } else if (recipe.getResult().getNameOrRegex().matches(PASS_THROUGH_PATTERN)) {
+        }else if (recipe.getResult().getNameOrRegex().matches(PASS_THROUGH_PATTERN)) {
             // pass through mode
             // nameOrRegex: pass -> material name (there are only one in the inventory.)
             // example): nameOrRegex: pass -> cobblestone
             Material target;
             try {
-                target = Material.valueOf(recipe.getResult().getNameOrRegex().toUpperCase());
+                Matcher m = Pattern.compile(PASS_THROUGH_PATTERN).matcher(recipe.getResult().getNameOrRegex());
+                if (!m.matches()) {
+                    Bukkit.getLogger().warning("[CustomCrafter] pass-through mode failed. (Illegal Material name.)");
+                    return;
+                }
+                target = Material.valueOf(m.group(1).toUpperCase());
             } catch (Exception e) {
                 Bukkit.getLogger().warning("[CustomCrafter] pass-through mode failed. (Illegal Material name.)");
                 return;

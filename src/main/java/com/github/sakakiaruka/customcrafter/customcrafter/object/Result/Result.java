@@ -60,6 +60,17 @@ public class Result {
         this.dataContainer = dataContainer;
     }
 
+    public Result(String name) {
+        // for pass-through
+        this.name = name;
+        this.enchantsInfo = null;
+        this.amount = -1;
+        this.metadata = null;
+        this.nameOrRegex = "";
+        this.matchPoint = Integer.MIN_VALUE;
+        this.dataContainer = null;
+    }
+
     public List<ContainerWrapper> getDataContainer() {
         return dataContainer;
     }
