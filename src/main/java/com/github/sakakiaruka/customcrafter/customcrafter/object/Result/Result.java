@@ -50,11 +50,19 @@ public class Result {
     // modify (set, modify (+-/*^)) defined in InventoryUtil
     private static final String PASS_THROUGH_MODE_CONTAINER_REMOVE = "ACTION=remove/VALUE=([\\w\\d-_]+)";
     private static final String PASS_THROUGH_MODE_CONTAINER_ADD = "ACTION=add/VALUE=name=([\\w\\d-_]+),type=(string|double|int),init=(.+)";
-    private static final String PASS_THROUGH_MODE_DURABILITY_MODIFY = "ACTION=(minus|plus)/VALUE=([\\d]+)";
     //"mode=pass/type=container/action=modify/value=(.+)";
     //"mode=pass/type=container/action=remove/value=(.+)";
     //"mode=pass/type=container/action=add/value=(.+)";
-    //"mode=pass/type=durability/action=(?i)(minus|plus)/value=(+|-)(\\d+)";
+    private static final String PASS_THROUGH_MODE_DURABILITY_MODIFY = "ACTION=(minus|plus)/VALUE=([\\d]+)";
+    //"mode=pass/type=durability/action=(?i)(minus|plus)/value=(\\d+)";
+    private static final String PASS_THROUGH_MODE_TEXTURE_ID_CLEAR = "ACTION=clear/VALUE=null";
+    private static final String PASS_THROUGH_MODE_TEXTURE_ID_MODIFY = "ACTION=modify/VALUE=(\\d+)";
+    //"mode=pass/type=texture_id/action=clear/value=null"
+    //"mode=pass/type=texture_id/action=modify/value=(\\d+)"
+    private static final String PASS_THROUGH_MODE_DISPLAY_NAME_MODIFY = "ACTION=item_name/VALUE=(.+)";
+    private static final String PASS_THROUGH_MODE_DISPLAY_NAME_CLEAR = "ACTION=item_name/VALUE=null";
+    //"mode=pass/type=item_name/action=modify/value=(.+)"
+    //"mode=pass/type=item_name/action=clear/value=null"
 
     private String name;
     private Map<Enchantment,Integer> enchantsInfo;

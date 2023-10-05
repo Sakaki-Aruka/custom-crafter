@@ -446,4 +446,12 @@ public class InventoryUtil {
             damageable.setHealth(newHealth);
         }
     }
+
+    public static void textureIdModify(String action, String value, ItemMeta meta) {
+        //
+    }
+
+    public static void displayNameModify(String action, String value, ItemMeta meta) {
+        //
+    }
 }
