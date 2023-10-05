@@ -59,10 +59,10 @@ public class Result {
 
     private static final String PASS_THROUGH_MODE_LEATHER_ARMOR_COLOR_MODIFY_FROM_NAME = "ACTION=(?i)(name)/VALUE=([\\w_]+)";
     private static final String PASS_THROUGH_MODE_LEATHER_ARMOR_COLOR_MODIFY_FROM_RGB = "ACTION=(?i)(rgb)/VALUE=R=(\\d{1,3}),G=(\\d{1,3}),B=(\\d{1,3})";
-    private static final String PASS_THROUGH_MODE_LEATHER_ARMOR_COLOR_MODIFY_FROM_RANDOM = "ACTION=(?i)(random)/VALUE=(.+)?";
+    private static final String PASS_THROUGH_MODE_LEATHER_ARMOR_COLOR_MODIFY_FROM_RANDOM = "ACTION=(?i)(random)/VALUE=null";
     //  mode=pass/type=armor_color/action=name/value=([\w_]+)
     //  mode=pass/type=armor_color/action=rgb/value=R=(\d{1,3}),G=(\d{1,3}),B=(\d{1,3})
-    //  mode=pass/type=armor_color/action=random/value=(.+)?
+    //  mode=pass/type=armor_color/action=random/value=null
     // randoms last argument is a seed of Random classes constructor (default is empty string.)
 
     private static final String PASS_THROUGH_MODE_TEXTURE_ID_CLEAR = "ACTION=clear/VALUE=null";
@@ -199,6 +199,14 @@ public class Result {
             * pass_through_mode_remove_lore -> mode=pass/type=lore/action=remove
             * pass_through_mode_lore_modify -> mode=pass/type=lore/action=modify/value=(.+)
             * pass_through_mode_container_modify -> mode=pass/type=container/action=modify/value=(.+)
+            * pass_through_mode_durability -> mode=pass/type=durability/action=(?i)(minus|plus)/value=(\\d+)
+            * pass_through_mode_armor_color -> mode=pass/type=armor_color/action=name/value=([\w_]+)
+            * pass_through_mode_armor_color -> mode=pass/type=armor_color/action=rgb/value=R=(\d{1,3}),G=(\d{1,3}),B=(\d{1,3})
+            * pass_through_mode_armor_color -> mode=pass/type=armor_color/action=random/value=null
+            * pass_through_mode_texture_id -> mode=pass/type=texture_id/action=clear/value=null
+            * pass_through_mode_texture_id -> mode=pass/type=texture_id/action=modify/value=(\\d+)
+            * pass_through_mode_item_name -> mode=pass/type=item_name/action=modify/value=(.+)
+            * pass_through_mode_item_name -> mode=pass/type=item_name/action=clear/value=null
             *
              */
 
@@ -413,6 +421,18 @@ public class Result {
                     } else if (TYPE.equals("armor_color") && isFollowPattern(PASS_THROUGH_MODE_LEATHER_ARMOR_COLOR_MODIFY_FROM_RGB, ACTION, VALUE)) {
                         // armor_color from rgb
                         new InventoryUtil().armorColor(ACTION, VALUE, meta);
+
+                    } else if (TYPE.equals("texture_id") && isFollowPattern(PASS_THROUGH_MODE_TEXTURE_ID_MODIFY, ACTION, VALUE)) {
+                        // texture_id modify
+                        InventoryUtil.textureIdModify(ACTION, VALUE, meta);
+
+                    } else if (TYPE.equals("item_name") && isFollowPattern(PASS_THROUGH_MODE_DISPLAY_NAME_CLEAR, ACTION, VALUE)) {
+                        // display_name clear
+                        InventoryUtil.displayNameModify(ACTION, VALUE, meta);
+
+                    } else if (TYPE.equals("item_name") && isFollowPattern(PASS_THROUGH_MODE_DISPLAY_NAME_MODIFY, ACTION, VALUE)) {
+                        // display_name modify
+                        InventoryUtil.displayNameModify(ACTION, VALUE, meta);
 
                     }
                 }

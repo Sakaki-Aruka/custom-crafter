@@ -472,11 +472,23 @@ public class InventoryUtil {
     }
 
     public static void textureIdModify(String action, String value, ItemMeta meta) {
-        //
+        if (action.equals("clear")) {
+            meta.setCustomModelData(null);
+        } else if (action.equals("modify")) {
+            try {
+                meta.setCustomModelData(Integer.parseInt(value));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public static void displayNameModify(String action, String value, ItemMeta meta) {
-        //
+        if (action.equals("clear")) {
+            meta.setDisplayName(null);
+        } else if (action.equals("modify")) {
+            if (value.isEmpty()) meta.setDisplayName(null); // clear
+            meta.setDisplayName(value);
+        }
     }
 }
-
