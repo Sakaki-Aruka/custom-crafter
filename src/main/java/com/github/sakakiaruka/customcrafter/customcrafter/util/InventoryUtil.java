@@ -288,7 +288,7 @@ public class InventoryUtil {
         else if (value.equals("WHITE")) color = Color.WHITE;
         else if (value.equals("YELLOW")) color = Color.YELLOW;
         else {
-            Bukkit.getLogger().warning("[CustomCrafter] Set result metadata (ColorName) failed. Input -> "+value);
+            Bukkit.getLogger().warning("[CustomCrafter] (ColorName) failed. Input -> "+value);
             return null;
         }
         return color;
@@ -436,14 +436,35 @@ public class InventoryUtil {
         double lastOne = maxHealth - 1;
         double change = Double.parseDouble(value);
 
-        if (action.equals("minus")) {
+        if (action.equalsIgnoreCase("minus")) {
             // minus
             double damage = Math.min(lastOne, change);
             damageable.damage(damage);
-        } else if (action.equals("plus")) {
+        } else if (action.equalsIgnoreCase("plus")) {
             // plus
             double newHealth = Math.min(maxHealth, oldHealth + change);
             damageable.setHealth(newHealth);
+        }
+    }
+
+    public void armorColor(String action, String value, ItemMeta meta) {
+        LeatherArmorMeta leatherMeta;
+        try {
+            leatherMeta = (LeatherArmorMeta) meta;
+        } catch (Exception e) {
+            Bukkit.getLogger().warning("[CustomCrafter] Failed to convert metadata to LeatherArmorMeta. (Not LeatherArmor)");
+            return;
+        }
+
+        if (action.equalsIgnoreCase("name")) {
+            String query = "type:name/value:"+value;
+            setLeatherArmorColorFromName(leatherMeta, query);
+        } else if (action.equalsIgnoreCase("rgb")) {
+            String query = "type:rgb/value:"+value.replace("=", "->");
+            setLeatherArmorColorFromRGB(leatherMeta, query);
+        } else if (action.equalsIgnoreCase("random")) {
+            Bukkit.getLogger().info("[CustomCrafter] The specified value (="+value+") is not used.");
+            setLeatherArmorColorRandom(leatherMeta);
         }
     }
 }

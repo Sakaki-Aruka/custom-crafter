@@ -50,11 +50,19 @@ public class Result {
     // modify (set, modify (+-/*^)) defined in InventoryUtil
     private static final String PASS_THROUGH_MODE_CONTAINER_REMOVE = "ACTION=remove/VALUE=([\\w\\d-_]+)";
     private static final String PASS_THROUGH_MODE_CONTAINER_ADD = "ACTION=add/VALUE=name=([\\w\\d-_]+),type=(string|double|int),init=(.+)";
-    private static final String PASS_THROUGH_MODE_DURABILITY_MODIFY = "ACTION=(minus|plus)/VALUE=([\\d]+)";
     //"mode=pass/type=container/action=modify/value=(.+)";
     //"mode=pass/type=container/action=remove/value=(.+)";
     //"mode=pass/type=container/action=add/value=(.+)";
-    //"mode=pass/type=durability/action=(?i)(minus|plus)/value=(+|-)(\\d+)";
+    private static final String PASS_THROUGH_MODE_DURABILITY_MODIFY = "ACTION=(minus|plus)/VALUE=([\\d]+)";
+    //"mode=pass/type=durability/action=(?i)(minus|plus)/value=(\\d+)";
+
+    private static final String PASS_THROUGH_MODE_LEATHER_ARMOR_COLOR_MODIFY_FROM_NAME = "ACTION=(?i)(name)/VALUE=([\\w_]+)";
+    private static final String PASS_THROUGH_MODE_LEATHER_ARMOR_COLOR_MODIFY_FROM_RGB = "ACTION=(?i)(rgb)/VALUE=R=(\\d{1,3}),G=(\\d{1,3}),B=(\\d{1,3})";
+    private static final String PASS_THROUGH_MODE_LEATHER_ARMOR_COLOR_MODIFY_FROM_RANDOM = "ACTION=(?i)(random)/VALUE=(.+)?";
+    //  mode=pass/type=armor_color/action=name/value=([\w_]+)
+    //  mode=pass/type=armor_color/action=rgb/value=R=(\d{1,3}),G=(\d{1,3}),B=(\d{1,3})
+    //  mode=pass/type=armor_color/action=random/value=(.+)?
+    // randoms last argument is a seed of Random classes constructor (default is empty string.)
 
     private String name;
     private Map<Enchantment,Integer> enchantsInfo;
@@ -383,6 +391,18 @@ public class Result {
                     } else if (TYPE.equals("durability") && isFollowPattern(PASS_THROUGH_MODE_DURABILITY_MODIFY, ACTION, VALUE)) {
                         // durability modify
                         InventoryUtil.durabilityModify(ACTION, VALUE, meta);
+
+                    } else if (TYPE.equals("armor_color") && isFollowPattern(PASS_THROUGH_MODE_LEATHER_ARMOR_COLOR_MODIFY_FROM_NAME, ACTION, VALUE)) {
+                        // armor_color from name
+                        new InventoryUtil().armorColor(ACTION, VALUE, meta);
+
+                    } else if (TYPE.equals("armor_color") && isFollowPattern(PASS_THROUGH_MODE_LEATHER_ARMOR_COLOR_MODIFY_FROM_RANDOM, ACTION, VALUE)) {
+                        // armor_color from random
+                        new InventoryUtil().armorColor(ACTION, VALUE, meta);
+
+                    } else if (TYPE.equals("armor_color") && isFollowPattern(PASS_THROUGH_MODE_LEATHER_ARMOR_COLOR_MODIFY_FROM_RGB, ACTION, VALUE)) {
+                        // armor_color from rgb
+                        new InventoryUtil().armorColor(ACTION, VALUE, meta);
 
                     }
                 }
