@@ -414,8 +414,8 @@ public class InventoryUtil {
                 int line = Integer.parseInt(v.group(1));
                 String add = v.group(2);
 
-                if (lore.size() < line + 1) return;
-                lore.add(line + 1, add);
+                if (lore.size() < line) return;
+                lore.add(line, add);
                 meta.setLore(lore);
                 break;
             }
