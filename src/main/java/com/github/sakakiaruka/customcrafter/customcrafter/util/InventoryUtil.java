@@ -30,11 +30,11 @@ public class InventoryUtil {
     private static final String LEATHER_ARMOR_COLOR_NAME_PATTERN = "^type:(?i)(NAME)/value:([\\w_]+)$";
     private static final String LEATHER_ARMOR_COLOR_RANDOM_PATTERN = "^type:(?i)(RANDOM)$";
 
-    public List<Integer> getTableSlots(int size){
+    public List<Integer> getTableSlots(int size) {
         List<Integer> list = new ArrayList<>();
-        for(int i=0;i<size;i++){
-            for(int j=0;j<size;j++){
-                int result = i*9+j;
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                int result = i * 9 + j;
                 list.add(result);
             }
         }
@@ -42,9 +42,9 @@ public class InventoryUtil {
         return list;
     }
 
-    public List<Integer> getBlankCoordinates(int size){
+    public List<Integer> getBlankCoordinates(int size) {
         List<Integer> list = new ArrayList<>();
-        for(int i = 0; i< CRAFTING_TABLE_TOTAL_SIZE; i++){
+        for (int i = 0; i < CRAFTING_TABLE_TOTAL_SIZE; i++) {
             list.add(i);
         }
         list.removeAll(getTableSlots(size));
@@ -53,45 +53,45 @@ public class InventoryUtil {
         return list;
     }
 
-    public void decrementMaterials(Inventory inventory, int amount){
+    public void decrementMaterials(Inventory inventory, int amount) {
         // decrement crafting tables material
         // amount -> decrement amount
         List<Integer> slots = getTableSlots(CRAFTING_TABLE_SIZE);
-        for(int i:slots){
-            if(inventory.getItem(i) == null)continue;
+        for (int i : slots) {
+            if (inventory.getItem(i) == null) continue;
             int oldAmount = inventory.getItem(i).getAmount();
             int newAmount = Math.max(oldAmount - amount, 0);
             inventory.getItem(i).setAmount(newAmount);
         }
     }
 
-    public void decrementResult(Inventory inventory,Player player){
-        if(inventory.getItem(CRAFTING_TABLE_RESULT_SLOT) == null)return;
+    public void decrementResult(Inventory inventory, Player player) {
+        if (inventory.getItem(CRAFTING_TABLE_RESULT_SLOT) == null) return;
         ItemStack item = inventory.getItem(CRAFTING_TABLE_RESULT_SLOT);
         InventoryUtil.safetyItemDrop(player, Collections.singletonList(item));
-        inventory.setItem(CRAFTING_TABLE_RESULT_SLOT,new ItemStack(Material.AIR));
+        inventory.setItem(CRAFTING_TABLE_RESULT_SLOT, new ItemStack(Material.AIR));
     }
 
-    public void returnItems(Recipe recipe,Inventory inventory, int removeAmount,Player player){
-        if(recipe.getReturnItems().isEmpty())return;
+    public void returnItems(Recipe recipe, Inventory inventory, int removeAmount, Player player) {
+        if (recipe.getReturnItems().isEmpty()) return;
         List<Material> isMassList = new ArrayList<>();
-        recipe.getContentsNoAir().forEach(s->{
-            if(s.isMass())isMassList.add(s.getCandidate().get(0));
+        recipe.getContentsNoAir().forEach(s -> {
+            if (s.isMass()) isMassList.add(s.getCandidate().get(0));
         });
 
-        for(ItemStack item:inventory){
-            if(item == null)continue;
-            if(!recipe.getReturnItems().containsKey(item.getType()))continue;
+        for (ItemStack item : inventory) {
+            if (item == null) continue;
+            if (!recipe.getReturnItems().containsKey(item.getType())) continue;
             int returnAmount = recipe.getReturnItems().get(item.getType()).getAmount();
-            if(!isMassList.contains(item.getType())) returnAmount *= removeAmount;
+            if (!isMassList.contains(item.getType())) returnAmount *= removeAmount;
             ItemStack itemStack = recipe.getReturnItems().get(item.getType()).clone();
-            if(!itemStack.getType().equals(Material.AIR)) {
-                drop(itemStack,returnAmount,player);
+            if (!itemStack.getType().equals(Material.AIR)) {
+                drop(itemStack, returnAmount, player);
                 continue;
             }
 
             // pass through return
-            drop(item,returnAmount,player);
+            drop(item, returnAmount, player);
         }
     }
 
@@ -102,16 +102,18 @@ public class InventoryUtil {
 
     public void snatchFromVirtual(Map<Matter, Integer> virtual, List<Matter> list, boolean mass) {
         Map<Matter, Integer> buf = new HashMap<>();
-        A:for(Map.Entry<Matter, Integer> entry : virtual.entrySet()) {
-            B:for(Matter matter : list) {
+        A:
+        for (Map.Entry<Matter, Integer> entry : virtual.entrySet()) {
+            B:
+            for (Matter matter : list) {
                 if (!matter.sameCandidate(entry.getKey())) continue;
-                int ii = (buf.containsKey(entry.getKey()) ? entry.getValue() : 0)  - (mass ? 1 : matter.getAmount());
-                buf.put(entry.getKey(),ii);
+                int ii = (buf.containsKey(entry.getKey()) ? entry.getValue() : 0) - (mass ? 1 : matter.getAmount());
+                buf.put(entry.getKey(), ii);
             }
         }
 
-        for(Map.Entry<Matter, Integer> entry : buf.entrySet()) {
-            virtual.put(entry.getKey(),virtual.get(entry.getKey()) + entry.getValue());
+        for (Map.Entry<Matter, Integer> entry : buf.entrySet()) {
+            virtual.put(entry.getKey(), virtual.get(entry.getKey()) + entry.getValue());
         }
     }
 
@@ -171,7 +173,7 @@ public class InventoryUtil {
 
     private boolean isValidPage(BookMeta meta, String section) {
         if (100 <= meta.getPageCount()) {
-            Bukkit.getLogger().warning("[CustomCrafter] Set result metadata ("+section+") failed. (Over 50 pages.)");
+            Bukkit.getLogger().warning("[CustomCrafter] Set result metadata (" + section + ") failed. (Over 50 pages.)");
             return false;
         }
         return true;
@@ -179,7 +181,7 @@ public class InventoryUtil {
 
     private boolean isValidCharacters(String value, String section) {
         if (320 < value.length()) {
-            Bukkit.getLogger().warning("[CustomCrafter] Set result metadata ("+section+") failed. (Over 256 characters.)");
+            Bukkit.getLogger().warning("[CustomCrafter] Set result metadata (" + section + ") failed. (Over 256 characters.)");
             return false;
         }
         return true;
@@ -187,7 +189,7 @@ public class InventoryUtil {
 
     private boolean isValidCharacters(BookMeta meta, String value, String section) {
         if (25600 < (meta.getPageCount() * 320) + value.length()) {
-            Bukkit.getLogger().warning("[CustomCrafter] Set result metadata ("+section+") failed. (Over 25600 characters.)");
+            Bukkit.getLogger().warning("[CustomCrafter] Set result metadata (" + section + ") failed. (Over 25600 characters.)");
             return false;
         }
         return true;
@@ -226,7 +228,7 @@ public class InventoryUtil {
         // 22 -> horizontal limit
         // 14 -> vertical limit
 
-        for (int i=0;i<value.length();i++) {
+        for (int i = 0; i < value.length(); i++) {
             String target = String.valueOf(value.charAt(i));
             int evaluation = target.matches(PATTERN) ? 1 : 2;
 
@@ -235,7 +237,7 @@ public class InventoryUtil {
 
                 if (meta.getPageCount() == 100) {
                     Bukkit.getLogger().warning("[CustomCrafter] Set result metadata (addLong) failed. (Over 100 pages.)");
-                    Bukkit.getLogger().warning("[CustomCrafter] Remaining "+(element.capacity() + (value.length() - i)) + " characters.");
+                    Bukkit.getLogger().warning("[CustomCrafter] Remaining " + (element.capacity() + (value.length() - i)) + " characters.");
                     return;
                 }
 
@@ -288,7 +290,7 @@ public class InventoryUtil {
         else if (value.equals("WHITE")) color = Color.WHITE;
         else if (value.equals("YELLOW")) color = Color.YELLOW;
         else {
-            Bukkit.getLogger().warning("[CustomCrafter] (ColorName) failed. Input -> "+value);
+            Bukkit.getLogger().warning("[CustomCrafter] (ColorName) failed. Input -> " + value);
             return null;
         }
         return color;
@@ -297,10 +299,10 @@ public class InventoryUtil {
     private String getLeatherArmorColorWarningUnMatchPattern() {
         String result =
                 "[CustomCrafter] Set result metadata (LeatherArmorColor) failed. (Illegal data format.)" + LINE_SEPARATOR
-                + "Follow the patterns." + LINE_SEPARATOR
-                + "- " + LEATHER_ARMOR_COLOR_RGB_PATTERN + LINE_SEPARATOR
-                + "- " + LEATHER_ARMOR_COLOR_NAME_PATTERN + LINE_SEPARATOR
-                + "- " + LEATHER_ARMOR_COLOR_RANDOM_PATTERN + LINE_SEPARATOR;
+                        + "Follow the patterns." + LINE_SEPARATOR
+                        + "- " + LEATHER_ARMOR_COLOR_RGB_PATTERN + LINE_SEPARATOR
+                        + "- " + LEATHER_ARMOR_COLOR_NAME_PATTERN + LINE_SEPARATOR
+                        + "- " + LEATHER_ARMOR_COLOR_RANDOM_PATTERN + LINE_SEPARATOR;
         return result;
     }
 
@@ -334,8 +336,8 @@ public class InventoryUtil {
         Color color;
         if ((color = getColor(matcher.group(2))) == null) {
             Bukkit.getLogger().warning("[CustomCrafter] Set result metadata (LeatherArmorColor) failed. (Illegal color-name.)" + LINE_SEPARATOR
-            + "You can use 'AQUA', 'BLACK', 'BLUE', 'FUCHSIA', 'GRAY', 'GREEN', 'LIME', 'MAROON', 'NAVY', 'OLIVE', 'ORANGE', 'PURPLE', 'RED', 'SILVER', 'TEAL', 'WHITE' and 'YELLOW'."
-            + LINE_SEPARATOR);
+                    + "You can use 'AQUA', 'BLACK', 'BLUE', 'FUCHSIA', 'GRAY', 'GREEN', 'LIME', 'MAROON', 'NAVY', 'OLIVE', 'ORANGE', 'PURPLE', 'RED', 'SILVER', 'TEAL', 'WHITE' and 'YELLOW'."
+                    + LINE_SEPARATOR);
             return;
         }
         meta.setColor(color);
@@ -370,7 +372,7 @@ public class InventoryUtil {
         } else if (action.equals("remove")) {
 
             //debug
-            Bukkit.getLogger().info("enchant REMOVE="+value);
+            Bukkit.getLogger().info("enchant REMOVE=" + value);
 
             Enchantment enchant = Enchantment.getByName(value.toUpperCase());
             meta.removeEnchant(enchant);
@@ -447,6 +449,7 @@ public class InventoryUtil {
         }
     }
 
+
     public void armorColor(String action, String value, ItemMeta meta) {
         LeatherArmorMeta leatherMeta;
         try {
@@ -457,14 +460,23 @@ public class InventoryUtil {
         }
 
         if (action.equalsIgnoreCase("name")) {
-            String query = "type:name/value:"+value;
+            String query = "type:name/value:" + value;
             setLeatherArmorColorFromName(leatherMeta, query);
         } else if (action.equalsIgnoreCase("rgb")) {
-            String query = "type:rgb/value:"+value.replace("=", "->");
+            String query = "type:rgb/value:" + value.replace("=", "->");
             setLeatherArmorColorFromRGB(leatherMeta, query);
         } else if (action.equalsIgnoreCase("random")) {
-            Bukkit.getLogger().info("[CustomCrafter] The specified value (="+value+") is not used.");
+            Bukkit.getLogger().info("[CustomCrafter] The specified value (=" + value + ") is not used.");
             setLeatherArmorColorRandom(leatherMeta);
         }
     }
+
+    public static void textureIdModify(String action, String value, ItemMeta meta) {
+        //
+    }
+
+    public static void displayNameModify(String action, String value, ItemMeta meta) {
+        //
+    }
 }
+

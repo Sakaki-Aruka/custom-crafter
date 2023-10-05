@@ -56,6 +56,7 @@ public class Result {
     private static final String PASS_THROUGH_MODE_DURABILITY_MODIFY = "ACTION=(minus|plus)/VALUE=([\\d]+)";
     //"mode=pass/type=durability/action=(?i)(minus|plus)/value=(\\d+)";
 
+
     private static final String PASS_THROUGH_MODE_LEATHER_ARMOR_COLOR_MODIFY_FROM_NAME = "ACTION=(?i)(name)/VALUE=([\\w_]+)";
     private static final String PASS_THROUGH_MODE_LEATHER_ARMOR_COLOR_MODIFY_FROM_RGB = "ACTION=(?i)(rgb)/VALUE=R=(\\d{1,3}),G=(\\d{1,3}),B=(\\d{1,3})";
     private static final String PASS_THROUGH_MODE_LEATHER_ARMOR_COLOR_MODIFY_FROM_RANDOM = "ACTION=(?i)(random)/VALUE=(.+)?";
@@ -63,6 +64,15 @@ public class Result {
     //  mode=pass/type=armor_color/action=rgb/value=R=(\d{1,3}),G=(\d{1,3}),B=(\d{1,3})
     //  mode=pass/type=armor_color/action=random/value=(.+)?
     // randoms last argument is a seed of Random classes constructor (default is empty string.)
+
+    private static final String PASS_THROUGH_MODE_TEXTURE_ID_CLEAR = "ACTION=clear/VALUE=null";
+    private static final String PASS_THROUGH_MODE_TEXTURE_ID_MODIFY = "ACTION=modify/VALUE=(\\d+)";
+    //"mode=pass/type=texture_id/action=clear/value=null"
+    //"mode=pass/type=texture_id/action=modify/value=(\\d+)"
+    private static final String PASS_THROUGH_MODE_DISPLAY_NAME_MODIFY = "ACTION=item_name/VALUE=(.+)";
+    private static final String PASS_THROUGH_MODE_DISPLAY_NAME_CLEAR = "ACTION=item_name/VALUE=null";
+    //"mode=pass/type=item_name/action=modify/value=(.+)"
+    //"mode=pass/type=item_name/action=clear/value=null"
 
     private String name;
     private Map<Enchantment,Integer> enchantsInfo;
