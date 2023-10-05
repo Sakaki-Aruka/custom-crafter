@@ -426,7 +426,11 @@ public class Result {
                         // texture_id modify
                         InventoryUtil.textureIdModify(ACTION, VALUE, meta);
 
-                    } else if (TYPE.equals("item_name") && isFollowPattern(PASS_THROUGH_MODE_DISPLAY_NAME_CLEAR, ACTION, VALUE)) {
+                    } else if (TYPE.equals("texture_id") && isFollowPattern(PASS_THROUGH_MODE_TEXTURE_ID_CLEAR, ACTION, VALUE)) {
+                        // texture_id clear
+                        InventoryUtil.textureIdModify(ACTION, VALUE, meta);
+
+                    }else if (TYPE.equals("item_name") && isFollowPattern(PASS_THROUGH_MODE_DISPLAY_NAME_CLEAR, ACTION, VALUE)) {
                         // display_name clear
                         InventoryUtil.displayNameModify(ACTION, VALUE, meta);
 
