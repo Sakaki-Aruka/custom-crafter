@@ -8,6 +8,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.util.InventoryUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.PotionUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
+import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
@@ -228,7 +229,7 @@ public class Result {
             if(type.equals(MetadataType.ENCHANTMENT)) {
                 for(String s : content){
                     List<String> enchants = Arrays.asList(s.split(","));
-                    Enchantment enchant = Enchantment.getByName(enchants.get(0).toUpperCase());
+                    Enchantment enchant = Enchantment.getByKey(NamespacedKey.minecraft(enchants.get(0).toLowerCase()));
                     int level = Integer.parseInt(enchants.get(1));
                     meta.addEnchant(enchant,level,true);
                 }

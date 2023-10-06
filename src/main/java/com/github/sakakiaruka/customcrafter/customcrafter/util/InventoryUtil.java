@@ -366,7 +366,7 @@ public class InventoryUtil {
         if (action.equals("add")) {
             Matcher v = Pattern.compile("enchant=([\\w_]+),level=([\\d]+)").matcher(value);
             if (!v.matches()) return;
-            Enchantment enchant = Enchantment.getByName(v.group(1).toUpperCase());
+            Enchantment enchant = Enchantment.getByKey(NamespacedKey.minecraft(v.group(1).toLowerCase()));
             int level = Integer.parseInt(v.group(2));
             meta.removeEnchant(enchant);
             meta.addEnchant(enchant, level, false);
@@ -375,7 +375,7 @@ public class InventoryUtil {
             //debug
             Bukkit.getLogger().info("enchant REMOVE=" + value);
 
-            Enchantment enchant = Enchantment.getByName(value.toUpperCase());
+            Enchantment enchant = Enchantment.getByKey(NamespacedKey.minecraft(value.toLowerCase()));
             meta.removeEnchant(enchant);
         }
     }
@@ -385,7 +385,7 @@ public class InventoryUtil {
         if (!meta.hasEnchants()) return;
         Matcher v = Pattern.compile("enchant=([\\w_]+),change=(\\d+)").matcher(value);
         if (!v.matches()) return;
-        Enchantment enchant = Enchantment.getByName(v.group(1).toUpperCase());
+        Enchantment enchant = Enchantment.getByKey(NamespacedKey.minecraft(v.group(1).toLowerCase()));
         int change = Integer.parseInt(v.group(2));
 
         int oldLevel = meta.getEnchantLevel(enchant);
