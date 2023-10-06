@@ -845,14 +845,13 @@ public class ContainerUtil {
         meta.setLore(Arrays.asList(getOrderElement(source, order, USING_CONTAINER_VALUES_LORE_PATTERN, 1)));
     }
 
-    @Deprecated
     private void setUsingContainerValuesEnchantment(ItemMeta meta, PersistentDataContainer source, String order) {
         Matcher matcher = Pattern.compile(USING_CONTAINER_VALUES_ENCHANTMENT_PATTERN).matcher(order);
         if (!matcher.matches()) return;
         Enchantment enchant;
         try{
             String matched = matcher.group(1);
-            enchant = Enchantment.getByName((matched.contains("$") ? getContent(source, matched) : matched).toUpperCase());
+            enchant = Enchantment.getByKey(NamespacedKey.minecraft((matched.contains("$") ? getContent(source, matched) : matched).toLowerCase()));
         } catch (Exception e) {
             Bukkit.getLogger().warning("[CustomCrafter] USING_CONTAINER_VALUES_ENCHANTMENT failed. (Illegal EnchantmentName)");
             return;

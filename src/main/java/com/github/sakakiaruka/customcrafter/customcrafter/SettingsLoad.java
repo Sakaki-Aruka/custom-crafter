@@ -281,7 +281,7 @@ public class SettingsLoad {
                     * 1 : enchantment level (int)
                      */
                     List<String> list = Arrays.asList(s.split(","));
-                    Enchantment enchant = Enchantment.getByName(list.get(0).toUpperCase());
+                    Enchantment enchant = Enchantment.getByKey(NamespacedKey.minecraft(list.get(0).toLowerCase()));
                     int level = Integer.parseInt(list.get(1));
                     enchantInfo.put(enchant,level);
                 }
@@ -393,7 +393,7 @@ public class SettingsLoad {
                      */
                     Matcher matcher = Pattern.compile("^([\\w_]+),(\\d+),(\\w+)$").matcher(s);
                     if (!matcher.matches()) continue;
-                    Enchantment enchant = Enchantment.getByName(matcher.group(1).toUpperCase());
+                    Enchantment enchant = Enchantment.getByKey(NamespacedKey.minecraft(matcher.group(1).toLowerCase()));
                     int level = Integer.parseInt(matcher.group(2));
                     EnchantStrict strict = EnchantStrict.valueOf(matcher.group(3).toUpperCase());
 
