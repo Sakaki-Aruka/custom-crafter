@@ -18,6 +18,7 @@ import org.bukkit.inventory.meta.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
+import javax.lang.model.util.AbstractAnnotationValueVisitor6;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -73,6 +74,11 @@ public class Result {
     private static final String PASS_THROUGH_MODE_DISPLAY_NAME_CLEAR = "ACTION=item_name/VALUE=null";
     //"mode=pass/type=item_name/action=modify/value=(.+)"
     //"mode=pass/type=item_name/action=clear/value=null"
+
+    private static final String PASS_THROUGH_MODE_ITEM_FLAG_CLEAR = "ACTION=clear/VALUE=null";
+    private static final String PASS_THROUGH_MODE_ITEM_FLAG_ADD = "ACTON=add/VALUE=([\\w_]+)";
+    private static final String PASS_THROUGH_MODE_ITEM_FLAG_REMOVE = "ACTION=remove/VALUE=([\\d_]+)";
+
 
     private String name;
     private Map<Enchantment,Integer> enchantsInfo;
@@ -368,75 +374,58 @@ public class Result {
                     String ACTION = template.group(2);
                     String VALUE = template.group(3);
 
-                    if (TYPE.equals("enchant") && isFollowPattern(PASS_THROUGH_MODE_ENCHANTMENT_ADD, ACTION, VALUE)) {
-                        // enchant add
-
-                        //debug
-                        Bukkit.getLogger().info("pass through mode=1");
-
+                    if (TYPE.equals("enchant") && (
+                            isFollowPattern(PASS_THROUGH_MODE_ENCHANTMENT_ADD, ACTION, VALUE) ||
+                            isFollowPattern(PASS_THROUGH_MODE_ENCHANTMENT_REMOVE, ACTION, VALUE))) {
+                        // enchant
                         InventoryUtil.enchantModify(ACTION, VALUE, meta);
-                    } else if (TYPE.equals("enchant") && isFollowPattern(PASS_THROUGH_MODE_ENCHANTMENT_REMOVE, ACTION, VALUE)){
-                        // enchant remove
-                        InventoryUtil.enchantModify(ACTION, VALUE, meta);
-
-                    }else if (TYPE.equals("enchant_level") && isFollowPattern(PASS_THROUGH_MODE_ENCHANT_LEVEL_MODIFY, ACTION, VALUE)) {
+                    } else if (TYPE.equals("enchant_level") && isFollowPattern(PASS_THROUGH_MODE_ENCHANT_LEVEL_MODIFY, ACTION, VALUE)) {
                         // enchant level modify
                         InventoryUtil.enchantLevel(ACTION, VALUE, meta);
 
-                    } else if (TYPE.equals("lore") && isFollowPattern(PASS_THROUGH_MODE_LORE_ADD, ACTION, VALUE)) {
-                        // lore add
+                    } else if (TYPE.equals("lore") && (
+                            isFollowPattern(PASS_THROUGH_MODE_LORE_ADD, ACTION, VALUE) ||
+                            isFollowPattern(PASS_THROUGH_MODE_LORE_CLEAR, ACTION, VALUE) ||
+                            isFollowPattern(PASS_THROUGH_MODE_LORE_MODIFY, ACTION, VALUE))) {
+                        // lore
                         InventoryUtil.loreModify(ACTION, VALUE, meta);
 
-                    } else if (TYPE.equals("lore") && isFollowPattern(PASS_THROUGH_MODE_LORE_CLEAR, ACTION, VALUE)) {
-                        // lore clear
-                        InventoryUtil.loreModify(ACTION, VALUE, meta);
-
-                    } else if (TYPE.equals("lore") && isFollowPattern(PASS_THROUGH_MODE_LORE_MODIFY, ACTION, VALUE)) {
-                        // lore modify
-                        InventoryUtil.loreModify(ACTION, VALUE, meta);
-
-                    } else if (TYPE.equals("container") && isFollowPattern(PASS_THROUGH_MODE_CONTAINER_MODIFY, ACTION, VALUE)) {
-                        // container modify (set, modify)
-                        new ContainerUtil().containerModify(ACTION, VALUE, meta);
-
-                    } else if (TYPE.equals("container") && isFollowPattern(PASS_THROUGH_MODE_CONTAINER_REMOVE, ACTION, VALUE)) {
-                        // container remove
-                        new ContainerUtil().containerModify(ACTION, VALUE, meta);
-                    } else if (TYPE.equals("container") && isFollowPattern(PASS_THROUGH_MODE_CONTAINER_ADD, ACTION, VALUE)) {
-                        // container add
+                    } else if (TYPE.equals("container") && (
+                            isFollowPattern(PASS_THROUGH_MODE_CONTAINER_MODIFY, ACTION, VALUE) ||
+                            isFollowPattern(PASS_THROUGH_MODE_CONTAINER_REMOVE, ACTION, VALUE) ||
+                            isFollowPattern(PASS_THROUGH_MODE_CONTAINER_ADD, ACTION, VALUE))) {
+                        // container
                         new ContainerUtil().containerModify(ACTION, VALUE, meta);
 
                     } else if (TYPE.equals("durability") && isFollowPattern(PASS_THROUGH_MODE_DURABILITY_MODIFY, ACTION, VALUE)) {
                         // durability modify
                         InventoryUtil.durabilityModify(ACTION, VALUE, meta);
 
-                    } else if (TYPE.equals("armor_color") && isFollowPattern(PASS_THROUGH_MODE_LEATHER_ARMOR_COLOR_MODIFY_FROM_NAME, ACTION, VALUE)) {
-                        // armor_color from name
+                    } else if (TYPE.equals("armor_color") && (
+                            isFollowPattern(PASS_THROUGH_MODE_LEATHER_ARMOR_COLOR_MODIFY_FROM_NAME, ACTION, VALUE) ||
+                            isFollowPattern(PASS_THROUGH_MODE_LEATHER_ARMOR_COLOR_MODIFY_FROM_RANDOM, ACTION, VALUE) ||
+                            isFollowPattern(PASS_THROUGH_MODE_LEATHER_ARMOR_COLOR_MODIFY_FROM_RGB, ACTION, VALUE))) {
+                        // armor_color
                         new InventoryUtil().armorColor(ACTION, VALUE, meta);
 
-                    } else if (TYPE.equals("armor_color") && isFollowPattern(PASS_THROUGH_MODE_LEATHER_ARMOR_COLOR_MODIFY_FROM_RANDOM, ACTION, VALUE)) {
-                        // armor_color from random
-                        new InventoryUtil().armorColor(ACTION, VALUE, meta);
-
-                    } else if (TYPE.equals("armor_color") && isFollowPattern(PASS_THROUGH_MODE_LEATHER_ARMOR_COLOR_MODIFY_FROM_RGB, ACTION, VALUE)) {
-                        // armor_color from rgb
-                        new InventoryUtil().armorColor(ACTION, VALUE, meta);
-
-                    } else if (TYPE.equals("texture_id") && isFollowPattern(PASS_THROUGH_MODE_TEXTURE_ID_MODIFY, ACTION, VALUE)) {
-                        // texture_id modify
+                    } else if (TYPE.equals("texture_id") && (
+                            isFollowPattern(PASS_THROUGH_MODE_TEXTURE_ID_MODIFY, ACTION, VALUE) ||
+                            isFollowPattern(PASS_THROUGH_MODE_TEXTURE_ID_CLEAR, ACTION, VALUE))) {
+                        // texture_id
                         InventoryUtil.textureIdModify(ACTION, VALUE, meta);
 
-                    } else if (TYPE.equals("texture_id") && isFollowPattern(PASS_THROUGH_MODE_TEXTURE_ID_CLEAR, ACTION, VALUE)) {
-                        // texture_id clear
-                        InventoryUtil.textureIdModify(ACTION, VALUE, meta);
-
-                    }else if (TYPE.equals("item_name") && isFollowPattern(PASS_THROUGH_MODE_DISPLAY_NAME_CLEAR, ACTION, VALUE)) {
-                        // display_name clear
+                    } else if (TYPE.equals("item_name") && (
+                            isFollowPattern(PASS_THROUGH_MODE_DISPLAY_NAME_CLEAR, ACTION, VALUE) ||
+                            isFollowPattern(PASS_THROUGH_MODE_DISPLAY_NAME_MODIFY, ACTION, VALUE))) {
+                        // display_name
                         InventoryUtil.displayNameModify(ACTION, VALUE, meta);
 
-                    } else if (TYPE.equals("item_name") && isFollowPattern(PASS_THROUGH_MODE_DISPLAY_NAME_MODIFY, ACTION, VALUE)) {
-                        // display_name modify
-                        InventoryUtil.displayNameModify(ACTION, VALUE, meta);
+                    } else if (TYPE.equals("item_flag") && (
+                            isFollowPattern(PASS_THROUGH_MODE_ITEM_FLAG_CLEAR, ACTION, VALUE) ||
+                            isFollowPattern(PASS_THROUGH_MODE_ITEM_FLAG_ADD, ACTION, VALUE) ||
+                            isFollowPattern(PASS_THROUGH_MODE_ITEM_FLAG_REMOVE, ACTION, VALUE))) {
+                        // item_flag
+                        InventoryUtil.itemFlagModify(ACTION, VALUE, meta);
 
                     }
                 }

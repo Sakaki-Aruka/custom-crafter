@@ -10,6 +10,7 @@ import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -489,6 +490,35 @@ public class InventoryUtil {
         } else if (action.equals("modify")) {
             if (value.isEmpty()) meta.setDisplayName(null); // clear
             meta.setDisplayName(value);
+        }
+    }
+
+    public static void itemFlagModify(String action, String value, ItemMeta meta) {
+        if (action.equals("clear")) {
+            if (meta.getItemFlags().isEmpty()) return;
+            meta.getItemFlags().forEach(flag-> meta.removeItemFlags(flag));
+        } else if (action.equals("add")) {
+            ItemFlag flag;
+            try {
+                flag = ItemFlag.valueOf(value.toUpperCase());
+            } catch (Exception e) {
+                Bukkit.getLogger().warning("[CustomCrafter] Failed to add item-flag in Pass-through. (Invalid ItemFlag)");
+                e.printStackTrace();
+                return;
+            }
+
+            meta.addItemFlags(flag);
+        } else if (action.equals("remove")) {
+            ItemFlag target;
+            try {
+                target = ItemFlag.valueOf(value.toUpperCase());
+            } catch (Exception e) {
+                Bukkit.getLogger().warning("[CustomCrafter] Failed to remove item-flag in Pass-through. (Invalid ItemFlag)");
+                e.printStackTrace();
+                return;
+            }
+
+            meta.removeItemFlags(target);
         }
     }
 }
