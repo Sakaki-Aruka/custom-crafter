@@ -11,6 +11,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordina
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Tag;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.*;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -27,6 +28,8 @@ import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.*;
 
 
 public class Search {
+
+    private static final String PASS_THROUGH_PATTERN = "^(?i)pass -> ([a-zA-Z_]+)$";
 
     public void massSearch(Player player,Inventory inventory, boolean isOneCraft){
         // mass (in batch)
@@ -198,17 +201,46 @@ public class Search {
     }
 
 
-    private void setResultItem(Inventory inventory,Recipe recipe,Recipe input,Player player,int amount, boolean oneCraft){
+    private void setResultItem(Inventory inventory, Recipe recipe, Recipe input, Player player, int amount, boolean oneCraft){
         ItemStack item = null;
-        if(ALL_MATERIALS.contains(recipe.getResult().getNameOrRegex())
-        || recipe.getResult().getMatchPoint() == -1
-        || !recipe.getResult().getNameOrRegex().contains("@")){
+        if (ALL_MATERIALS.contains(recipe.getResult().getNameOrRegex())
+        && recipe.getResult().getMatchPoint() == -1
+        && !recipe.getResult().getNameOrRegex().contains("@")) {
             // result has defined material
             Material m = Material.valueOf(recipe.getResult().getNameOrRegex().toUpperCase());
-            item = new ItemStack(m,amount);
+            item = new ItemStack(m, amount);
             recipe.getResult().setMetaData(item);
             //setMetaData(item,recipe.getResult()); //set result itemStack's metadata
-        }else{
+        }else if (recipe.getResult().getNameOrRegex().matches(PASS_THROUGH_PATTERN)) {
+            // pass through mode
+            // nameOrRegex: pass -> material name (there are only one in the inventory.)
+            // example): nameOrRegex: pass -> cobblestone
+            Material target;
+            try {
+                Matcher m = Pattern.compile(PASS_THROUGH_PATTERN).matcher(recipe.getResult().getNameOrRegex());
+                if (!m.matches()) {
+                    Bukkit.getLogger().warning("[CustomCrafter] pass-through mode failed. (Illegal Material name.)");
+                    return;
+                }
+                target = Material.valueOf(m.group(1).toUpperCase());
+            } catch (Exception e) {
+                Bukkit.getLogger().warning("[CustomCrafter] pass-through mode failed. (Illegal Material name.)");
+                return;
+            }
+            List<ItemStack> items = new ArrayList<>();
+            for (int i=0;i<inventory.getSize();i++) {
+                if (inventory.getItem(i) == null) continue;
+                if (inventory.getItem(i).getType().equals(target)) items.add(inventory.getItem(i));
+            }
+            if (items.size() != 1) {
+                Bukkit.getLogger().warning("[CustomCrafter] pass-through mode failed. (Same material some where.) ");
+                return;
+            }
+
+            item = items.get(0);
+            recipe.getResult().setMetaData(item);
+
+        }else {
             // not contains -> A result has written by regex pattern.
             List<String> list = Arrays.asList(recipe.getResult().getNameOrRegex().split("@"));
 

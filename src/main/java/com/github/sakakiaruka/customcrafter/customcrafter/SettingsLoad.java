@@ -83,6 +83,9 @@ public class SettingsLoad {
     private static final String MATTER_REGEX_COLLECT_PATTERN = "^R\\|(.+)$";
     private static final String RESULT_METADATA_COLLECT_PATTERN = "^([\\w_]+),(.+)$";
 
+    // --- for pass-through ===//
+    private static final Result PASS_THROUGH_RESULT = new Result("PASS_THROUGH");
+
     public void load(){
         DEFAULT_CONFIG = getInstance().getConfig();
         recipePermissionLoad();
@@ -483,7 +486,7 @@ public class SettingsLoad {
 
             String name = config.getString("name");
             String tag = config.getString("tag").toUpperCase();
-            Result result = RESULTS.get(config.getString("result"));
+            Result result = RESULTS.getOrDefault(config.getString("result"), PASS_THROUGH_RESULT);
 
             Map<Coordinate,Matter> coordinates = new LinkedHashMap<>();
             Map<Material, ItemStack> returns = new HashMap<>();

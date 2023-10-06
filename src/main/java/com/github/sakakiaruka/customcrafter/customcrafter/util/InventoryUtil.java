@@ -3,11 +3,17 @@ package com.github.sakakiaruka.customcrafter.customcrafter.util;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.*;
 import org.bukkit.*;
+import org.bukkit.attribute.Attribute;
+import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 import java.nio.charset.StandardCharsets;
@@ -25,11 +31,11 @@ public class InventoryUtil {
     private static final String LEATHER_ARMOR_COLOR_NAME_PATTERN = "^type:(?i)(NAME)/value:([\\w_]+)$";
     private static final String LEATHER_ARMOR_COLOR_RANDOM_PATTERN = "^type:(?i)(RANDOM)$";
 
-    public List<Integer> getTableSlots(int size){
+    public List<Integer> getTableSlots(int size) {
         List<Integer> list = new ArrayList<>();
-        for(int i=0;i<size;i++){
-            for(int j=0;j<size;j++){
-                int result = i*9+j;
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                int result = i * 9 + j;
                 list.add(result);
             }
         }
@@ -37,9 +43,9 @@ public class InventoryUtil {
         return list;
     }
 
-    public List<Integer> getBlankCoordinates(int size){
+    public List<Integer> getBlankCoordinates(int size) {
         List<Integer> list = new ArrayList<>();
-        for(int i = 0; i< CRAFTING_TABLE_TOTAL_SIZE; i++){
+        for (int i = 0; i < CRAFTING_TABLE_TOTAL_SIZE; i++) {
             list.add(i);
         }
         list.removeAll(getTableSlots(size));
@@ -48,45 +54,45 @@ public class InventoryUtil {
         return list;
     }
 
-    public void decrementMaterials(Inventory inventory, int amount){
+    public void decrementMaterials(Inventory inventory, int amount) {
         // decrement crafting tables material
         // amount -> decrement amount
         List<Integer> slots = getTableSlots(CRAFTING_TABLE_SIZE);
-        for(int i:slots){
-            if(inventory.getItem(i) == null)continue;
+        for (int i : slots) {
+            if (inventory.getItem(i) == null) continue;
             int oldAmount = inventory.getItem(i).getAmount();
-            int newAmount = oldAmount - amount < 0 ? 0 : oldAmount - amount;
+            int newAmount = Math.max(oldAmount - amount, 0);
             inventory.getItem(i).setAmount(newAmount);
         }
     }
 
-    public void decrementResult(Inventory inventory,Player player){
-        if(inventory.getItem(CRAFTING_TABLE_RESULT_SLOT) == null)return;
+    public void decrementResult(Inventory inventory, Player player) {
+        if (inventory.getItem(CRAFTING_TABLE_RESULT_SLOT) == null) return;
         ItemStack item = inventory.getItem(CRAFTING_TABLE_RESULT_SLOT);
         InventoryUtil.safetyItemDrop(player, Collections.singletonList(item));
-        inventory.setItem(CRAFTING_TABLE_RESULT_SLOT,new ItemStack(Material.AIR));
+        inventory.setItem(CRAFTING_TABLE_RESULT_SLOT, new ItemStack(Material.AIR));
     }
 
-    public void returnItems(Recipe recipe,Inventory inventory, int removeAmount,Player player){
-        if(recipe.getReturnItems().isEmpty())return;
+    public void returnItems(Recipe recipe, Inventory inventory, int removeAmount, Player player) {
+        if (recipe.getReturnItems().isEmpty()) return;
         List<Material> isMassList = new ArrayList<>();
-        recipe.getContentsNoAir().forEach(s->{
-            if(s.isMass())isMassList.add(s.getCandidate().get(0));
+        recipe.getContentsNoAir().forEach(s -> {
+            if (s.isMass()) isMassList.add(s.getCandidate().get(0));
         });
 
-        for(ItemStack item:inventory){
-            if(item == null)continue;
-            if(!recipe.getReturnItems().containsKey(item.getType()))continue;
+        for (ItemStack item : inventory) {
+            if (item == null) continue;
+            if (!recipe.getReturnItems().containsKey(item.getType())) continue;
             int returnAmount = recipe.getReturnItems().get(item.getType()).getAmount();
-            if(!isMassList.contains(item.getType())) returnAmount *= removeAmount;
+            if (!isMassList.contains(item.getType())) returnAmount *= removeAmount;
             ItemStack itemStack = recipe.getReturnItems().get(item.getType()).clone();
-            if(!itemStack.getType().equals(Material.AIR)) {
-                drop(itemStack,returnAmount,player);
+            if (!itemStack.getType().equals(Material.AIR)) {
+                drop(itemStack, returnAmount, player);
                 continue;
             }
 
             // pass through return
-            drop(item,returnAmount,player);
+            drop(item, returnAmount, player);
         }
     }
 
@@ -97,16 +103,18 @@ public class InventoryUtil {
 
     public void snatchFromVirtual(Map<Matter, Integer> virtual, List<Matter> list, boolean mass) {
         Map<Matter, Integer> buf = new HashMap<>();
-        A:for(Map.Entry<Matter, Integer> entry : virtual.entrySet()) {
-            B:for(Matter matter : list) {
+        A:
+        for (Map.Entry<Matter, Integer> entry : virtual.entrySet()) {
+            B:
+            for (Matter matter : list) {
                 if (!matter.sameCandidate(entry.getKey())) continue;
-                int ii = (buf.containsKey(entry.getKey()) ? entry.getValue() : 0)  - (mass ? 1 : matter.getAmount());
-                buf.put(entry.getKey(),ii);
+                int ii = (buf.containsKey(entry.getKey()) ? entry.getValue() : 0) - (mass ? 1 : matter.getAmount());
+                buf.put(entry.getKey(), ii);
             }
         }
 
-        for(Map.Entry<Matter, Integer> entry : buf.entrySet()) {
-            virtual.put(entry.getKey(),virtual.get(entry.getKey()) + entry.getValue());
+        for (Map.Entry<Matter, Integer> entry : buf.entrySet()) {
+            virtual.put(entry.getKey(), virtual.get(entry.getKey()) + entry.getValue());
         }
     }
 
@@ -166,7 +174,7 @@ public class InventoryUtil {
 
     private boolean isValidPage(BookMeta meta, String section) {
         if (100 <= meta.getPageCount()) {
-            Bukkit.getLogger().warning("[CustomCrafter] Set result metadata ("+section+") failed. (Over 50 pages.)");
+            Bukkit.getLogger().warning("[CustomCrafter] Set result metadata (" + section + ") failed. (Over 50 pages.)");
             return false;
         }
         return true;
@@ -174,7 +182,7 @@ public class InventoryUtil {
 
     private boolean isValidCharacters(String value, String section) {
         if (320 < value.length()) {
-            Bukkit.getLogger().warning("[CustomCrafter] Set result metadata ("+section+") failed. (Over 256 characters.)");
+            Bukkit.getLogger().warning("[CustomCrafter] Set result metadata (" + section + ") failed. (Over 256 characters.)");
             return false;
         }
         return true;
@@ -182,7 +190,7 @@ public class InventoryUtil {
 
     private boolean isValidCharacters(BookMeta meta, String value, String section) {
         if (25600 < (meta.getPageCount() * 320) + value.length()) {
-            Bukkit.getLogger().warning("[CustomCrafter] Set result metadata ("+section+") failed. (Over 25600 characters.)");
+            Bukkit.getLogger().warning("[CustomCrafter] Set result metadata (" + section + ") failed. (Over 25600 characters.)");
             return false;
         }
         return true;
@@ -221,7 +229,7 @@ public class InventoryUtil {
         // 22 -> horizontal limit
         // 14 -> vertical limit
 
-        for (int i=0;i<value.length();i++) {
+        for (int i = 0; i < value.length(); i++) {
             String target = String.valueOf(value.charAt(i));
             int evaluation = target.matches(PATTERN) ? 1 : 2;
 
@@ -230,7 +238,7 @@ public class InventoryUtil {
 
                 if (meta.getPageCount() == 100) {
                     Bukkit.getLogger().warning("[CustomCrafter] Set result metadata (addLong) failed. (Over 100 pages.)");
-                    Bukkit.getLogger().warning("[CustomCrafter] Remaining "+(element.capacity() + (value.length() - i)) + " characters.");
+                    Bukkit.getLogger().warning("[CustomCrafter] Remaining " + (element.capacity() + (value.length() - i)) + " characters.");
                     return;
                 }
 
@@ -283,7 +291,7 @@ public class InventoryUtil {
         else if (value.equals("WHITE")) color = Color.WHITE;
         else if (value.equals("YELLOW")) color = Color.YELLOW;
         else {
-            Bukkit.getLogger().warning("[CustomCrafter] Set result metadata (ColorName) failed. Input -> "+value);
+            Bukkit.getLogger().warning("[CustomCrafter] (ColorName) failed. Input -> " + value);
             return null;
         }
         return color;
@@ -292,10 +300,10 @@ public class InventoryUtil {
     private String getLeatherArmorColorWarningUnMatchPattern() {
         String result =
                 "[CustomCrafter] Set result metadata (LeatherArmorColor) failed. (Illegal data format.)" + LINE_SEPARATOR
-                + "Follow the patterns." + LINE_SEPARATOR
-                + "- " + LEATHER_ARMOR_COLOR_RGB_PATTERN + LINE_SEPARATOR
-                + "- " + LEATHER_ARMOR_COLOR_NAME_PATTERN + LINE_SEPARATOR
-                + "- " + LEATHER_ARMOR_COLOR_RANDOM_PATTERN + LINE_SEPARATOR;
+                        + "Follow the patterns." + LINE_SEPARATOR
+                        + "- " + LEATHER_ARMOR_COLOR_RGB_PATTERN + LINE_SEPARATOR
+                        + "- " + LEATHER_ARMOR_COLOR_NAME_PATTERN + LINE_SEPARATOR
+                        + "- " + LEATHER_ARMOR_COLOR_RANDOM_PATTERN + LINE_SEPARATOR;
         return result;
     }
 
@@ -329,8 +337,8 @@ public class InventoryUtil {
         Color color;
         if ((color = getColor(matcher.group(2))) == null) {
             Bukkit.getLogger().warning("[CustomCrafter] Set result metadata (LeatherArmorColor) failed. (Illegal color-name.)" + LINE_SEPARATOR
-            + "You can use 'AQUA', 'BLACK', 'BLUE', 'FUCHSIA', 'GRAY', 'GREEN', 'LIME', 'MAROON', 'NAVY', 'OLIVE', 'ORANGE', 'PURPLE', 'RED', 'SILVER', 'TEAL', 'WHITE' and 'YELLOW'."
-            + LINE_SEPARATOR);
+                    + "You can use 'AQUA', 'BLACK', 'BLUE', 'FUCHSIA', 'GRAY', 'GREEN', 'LIME', 'MAROON', 'NAVY', 'OLIVE', 'ORANGE', 'PURPLE', 'RED', 'SILVER', 'TEAL', 'WHITE' and 'YELLOW'."
+                    + LINE_SEPARATOR);
             return;
         }
         meta.setColor(color);
@@ -350,6 +358,167 @@ public class InventoryUtil {
             Item dropped = player.getWorld().dropItem(player.getLocation(), item);
             dropped.setOwner(player.getUniqueId());
             dropped.setGravity(false);
+        }
+    }
+
+    public static void enchantModify(String action, String value, ItemMeta meta) {
+        if (!meta.hasEnchants()) return;
+        if (action.equals("add")) {
+            Matcher v = Pattern.compile("enchant=([\\w_]+),level=([\\d]+)").matcher(value);
+            if (!v.matches()) return;
+            Enchantment enchant = Enchantment.getByName(v.group(1).toUpperCase());
+            int level = Integer.parseInt(v.group(2));
+            meta.removeEnchant(enchant);
+            meta.addEnchant(enchant, level, false);
+        } else if (action.equals("remove")) {
+
+            //debug
+            Bukkit.getLogger().info("enchant REMOVE=" + value);
+
+            Enchantment enchant = Enchantment.getByName(value.toUpperCase());
+            meta.removeEnchant(enchant);
+        }
+    }
+
+    public static void enchantLevel(String action, String value, ItemMeta meta) {
+        // if the specified enchantment is not contained the item-stack, this method does nothing.
+        if (!meta.hasEnchants()) return;
+        Matcher v = Pattern.compile("enchant=([\\w_]+),change=(\\d+)").matcher(value);
+        if (!v.matches()) return;
+        Enchantment enchant = Enchantment.getByName(v.group(1).toUpperCase());
+        int change = Integer.parseInt(v.group(2));
+
+        int oldLevel = meta.getEnchantLevel(enchant);
+        meta.removeEnchant(enchant);
+        int newLevel = 1;
+        if (action.equals("minus")) newLevel = Math.max(1, oldLevel - change);
+        else if (action.equals("plus")) newLevel = Math.min(255, oldLevel + change);
+        meta.addEnchant(enchant, newLevel, true);
+    }
+
+    public static void loreModify(String action, String value, ItemMeta meta) {
+        switch (action) {
+            case "add": {
+                List<String> lore = meta.getLore();
+                meta.setLore(null); // clear the lore
+
+                lore.add(value);
+                meta.setLore(lore);
+                break;
+            }
+            case "clear":
+                meta.setLore(null);
+                break;
+            case "modify": {
+                List<String> lore = meta.getLore();
+                meta.setLore(null); // clear the lore
+                Matcher v = Pattern.compile("line=([\\d]+),lore=(.+)").matcher(value);
+                if (!v.matches()) return;
+                int line = Integer.parseInt(v.group(1));
+                String add = v.group(2);
+
+                if (lore.size() < line) return;
+                lore.add(line, add);
+                meta.setLore(lore);
+                break;
+            }
+        }
+    }
+
+    public static void durabilityModify(String action, String value, ItemMeta meta) {
+        Damageable damageable;
+        try {
+            damageable = (Damageable) meta;
+        } catch (Exception e) {
+            return;
+        }
+
+        double oldHealth = damageable.getHealth();
+        List<AttributeModifier> modifiers = (List<AttributeModifier>) meta.getAttributeModifiers(Attribute.GENERIC_MAX_HEALTH);
+        double maxHealth = modifiers.get(0).getAmount();
+        double lastOne = maxHealth - 1;
+        double change = Double.parseDouble(value);
+
+        if (action.equalsIgnoreCase("minus")) {
+            // minus
+            double damage = Math.min(lastOne, change);
+            damageable.damage(damage);
+        } else if (action.equalsIgnoreCase("plus")) {
+            // plus
+            double newHealth = Math.min(maxHealth, oldHealth + change);
+            damageable.setHealth(newHealth);
+        }
+    }
+
+
+    public void armorColor(String action, String value, ItemMeta meta) {
+        LeatherArmorMeta leatherMeta;
+        try {
+            leatherMeta = (LeatherArmorMeta) meta;
+        } catch (Exception e) {
+            Bukkit.getLogger().warning("[CustomCrafter] Failed to convert metadata to LeatherArmorMeta. (Not LeatherArmor)");
+            return;
+        }
+
+        if (action.equalsIgnoreCase("name")) {
+            String query = "type:name/value:" + value;
+            setLeatherArmorColorFromName(leatherMeta, query);
+        } else if (action.equalsIgnoreCase("rgb")) {
+            String query = "type:rgb/value:" + value.replace("=", "->");
+            setLeatherArmorColorFromRGB(leatherMeta, query);
+        } else if (action.equalsIgnoreCase("random")) {
+            Bukkit.getLogger().info("[CustomCrafter] The specified value (=" + value + ") is not used.");
+            setLeatherArmorColorRandom(leatherMeta);
+        }
+    }
+
+    public static void textureIdModify(String action, String value, ItemMeta meta) {
+        if (action.equals("clear")) {
+            meta.setCustomModelData(null);
+        } else if (action.equals("modify")) {
+            try {
+                meta.setCustomModelData(Integer.parseInt(value));
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void displayNameModify(String action, String value, ItemMeta meta) {
+        if (action.equals("clear")) {
+            meta.setDisplayName(null);
+        } else if (action.equals("modify")) {
+            if (value.isEmpty()) meta.setDisplayName(null); // clear
+            meta.setDisplayName(value);
+        }
+    }
+
+    public static void itemFlagModify(String action, String value, ItemMeta meta) {
+        if (action.equals("clear")) {
+            if (meta.getItemFlags().isEmpty()) return;
+            meta.getItemFlags().forEach(flag-> meta.removeItemFlags(flag));
+        } else if (action.equals("add")) {
+            ItemFlag flag;
+            try {
+                flag = ItemFlag.valueOf(value.toUpperCase());
+            } catch (Exception e) {
+                Bukkit.getLogger().warning("[CustomCrafter] Failed to add item-flag in Pass-through. (Invalid ItemFlag)");
+                e.printStackTrace();
+                return;
+            }
+
+            meta.addItemFlags(flag);
+        } else if (action.equals("remove")) {
+            ItemFlag target;
+            try {
+                target = ItemFlag.valueOf(value.toUpperCase());
+            } catch (Exception e) {
+                Bukkit.getLogger().warning("[CustomCrafter] Failed to remove item-flag in Pass-through. (Invalid ItemFlag)");
+                e.printStackTrace();
+                return;
+            }
+
+            meta.removeItemFlags(target);
         }
     }
 }

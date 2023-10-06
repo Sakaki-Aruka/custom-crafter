@@ -1010,4 +1010,27 @@ public class ContainerUtil {
         if (!container.has(key, type)) return "None";
         return String.valueOf(container.get(key, type));
     }
+
+    public void containerModify(String action, String value, ItemMeta meta) {
+        PersistentDataContainer container = meta.getPersistentDataContainer();
+        if (action.equals("add")) {
+            // non override
+            Matcher v = Pattern.compile("type=(string|double|int),init=(.+)").matcher(value);
+            if (!v.matches()) return;
+            String name = v.group(1);
+            String type = v.group(2);
+            String init = v.group(3);
+            NamespacedKey key = new NamespacedKey(getInstance(), name);
+            PersistentDataType T = getDataType(type);
+            if (container.has(key, T)) return;
+            if (type.equals("string")) container.set(key, T, init);
+            else if (type.equals("double")) container.set(key, T, Double.parseDouble(init));
+            else if (type.equals("int")) container.set(key, T, Integer.parseInt(init));
+        } else if (action.equals("remove")) {
+            NamespacedKey key = new NamespacedKey(getInstance(), value);
+            container.remove(key);
+        } else if (action.equals("modify")) {
+            //
+        }
+    }
 }

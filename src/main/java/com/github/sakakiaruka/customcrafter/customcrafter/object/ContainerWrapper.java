@@ -73,13 +73,13 @@ public class ContainerWrapper {
 
     public String info() {
         StringBuilder builder = new StringBuilder();
-        builder.append("key: "+key.toString()+ LINE_SEPARATOR);
+        builder.append("key: ").append(key.toString()).append(LINE_SEPARATOR);
         builder.append("type: "+type != null ? type.getPrimitiveType().getSimpleName() : "null" + LINE_SEPARATOR);
-        builder.append("tag: "+tag+ LINE_SEPARATOR);
-        builder.append("order: "+order+ LINE_SEPARATOR);
-        builder.append("content:"+ LINE_SEPARATOR);
-        builder.append("  -> class: "+value.getClass().getSimpleName()+ LINE_SEPARATOR);
-        builder.append("  -> value: "+value.toString()+ LINE_SEPARATOR);
+        builder.append("tag: ").append(tag).append(LINE_SEPARATOR);
+        builder.append("order: ").append(order).append(LINE_SEPARATOR);
+        builder.append("content:").append(LINE_SEPARATOR);
+        builder.append("  -> class: ").append(value.getClass().getSimpleName()).append(LINE_SEPARATOR);
+        builder.append("  -> value: ").append(value).append(LINE_SEPARATOR);
         return builder.toString();
     }
 }
