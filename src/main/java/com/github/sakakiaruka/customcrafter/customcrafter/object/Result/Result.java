@@ -78,6 +78,9 @@ public class Result {
     private static final String PASS_THROUGH_MODE_ITEM_FLAG_CLEAR = "ACTION=clear/VALUE=null";
     private static final String PASS_THROUGH_MODE_ITEM_FLAG_ADD = "ACTON=add/VALUE=([\\w_]+)";
     private static final String PASS_THROUGH_MODE_ITEM_FLAG_REMOVE = "ACTION=remove/VALUE=([\\d_]+)";
+    //"mode=pass/type=item_flag/action=clear/value=null"
+    //"mode=pass/type=item_flag/action=add/value=([\\w_]+)"
+    //"mode=pass/type=item_flag/action=remove/value=([\\w_]+)"
 
 
     private String name;
