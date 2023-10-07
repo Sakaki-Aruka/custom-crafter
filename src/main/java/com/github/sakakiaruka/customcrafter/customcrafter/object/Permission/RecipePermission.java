@@ -35,4 +35,21 @@ public class RecipePermission {
         return builder.toString();
 
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) return true;
+        if (!(obj instanceof RecipePermission)) return false;
+        RecipePermission perm = (RecipePermission) obj;
+        if (!this.name.equals(perm.getPermissionName())) return false;
+        return this.parent.equals(perm.getParent());
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = result*31 + name.hashCode();
+        result = result*31 + parent.hashCode();
+        return result;
+    }
 }

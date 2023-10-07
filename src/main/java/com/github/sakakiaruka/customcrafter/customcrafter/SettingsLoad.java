@@ -37,8 +37,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter.getInstance;
-import static com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil.playerPermissions;
-import static com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil.recipePermissionMap;
+import static com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil.PLAYER_PERMISSIONS;
+import static com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil.RECIPE_PERMISSION_MAP;
 
 public class SettingsLoad {
 
@@ -104,14 +104,6 @@ public class SettingsLoad {
             // The file that defines the relate between players and RecipePermissions.
             Path relate = Paths.get(DEFAULT_CONFIG.getString("relate"));
             new RecipePermissionUtil().permissionRelateLoad(relate);
-
-            // Resolve permission duplications.
-            synchronized (playerPermissions) {
-                Iterator<Map.Entry<UUID,List<RecipePermission>>> iterator = playerPermissions.entrySet().iterator();
-                while (iterator.hasNext()) {
-                    new RecipePermissionUtil().removePermissionDuplications(iterator.next().getValue());
-                }
-            }
         }
     }
 
@@ -590,7 +582,7 @@ public class SettingsLoad {
 
             if(config.contains("permission")){
                 String key = config.getString("permission");
-                permission = recipePermissionMap.containsKey(key) ? recipePermissionMap.get(key) : null;
+                permission = RECIPE_PERMISSION_MAP.containsKey(key) ? RECIPE_PERMISSION_MAP.get(key) : null;
             }
 
             Map<NamespacedKey, List<RecipeDataContainer>> map = new HashMap<>();

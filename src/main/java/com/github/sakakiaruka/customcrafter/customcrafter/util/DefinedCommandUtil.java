@@ -15,7 +15,7 @@ import java.util.*;
 
 import static com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter.getInstance;
 import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.*;
-import static com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil.recipePermissionMap;
+import static com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil.RECIPE_PERMISSION_MAP;
 
 public class DefinedCommandUtil {
     public static Map<Integer,List<DefinedCommand>> definedCommands = new HashMap<>();
@@ -259,7 +259,7 @@ public class DefinedCommandUtil {
                 }
 
                 if (commandPart.equals(RECIPE_PERMISSION_PATTERN)) {
-                    if (!recipePermissionMap.containsKey(inputPart)) continue A;
+                    if (!RECIPE_PERMISSION_MAP.containsKey(inputPart)) continue A;
                     continue;
                 }
 
