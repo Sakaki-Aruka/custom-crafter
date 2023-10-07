@@ -83,7 +83,7 @@ public class SettingsLoad {
     private static final String MATTER_REGEX_COLLECT_PATTERN = "^R\\|(.+)$";
     private static final String RESULT_METADATA_COLLECT_PATTERN = "^([\\w_]+),(.+)$";
 
-    // --- for pass-through ===//
+    // === for pass-through ===//
     private static final Result PASS_THROUGH_RESULT = new Result("PASS_THROUGH");
 
     public void load(){

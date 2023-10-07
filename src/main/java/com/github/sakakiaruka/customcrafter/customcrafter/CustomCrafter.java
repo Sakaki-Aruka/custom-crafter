@@ -1,6 +1,7 @@
 package com.github.sakakiaruka.customcrafter.customcrafter;
 
 import com.github.sakakiaruka.customcrafter.customcrafter.command.Check;
+import com.github.sakakiaruka.customcrafter.customcrafter.command.Processor;
 import com.github.sakakiaruka.customcrafter.customcrafter.listener.Listener;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -18,7 +19,7 @@ public final class CustomCrafter extends JavaPlugin {
         saveDefaultConfig();
         this.instance = this;
         new SettingsLoad().load();
-        getCommand("cc").setExecutor(new Check());
+        getCommand("cc").setExecutor(new Processor());
         getServer().getPluginManager().registerEvents(new Listener(),this);
     }
 

@@ -25,6 +25,73 @@ download:
 
 # DO NOT TOUCH CONTENTS THAT ARE UNDER THIS LINE.
 
+Commands:
+  args:
+    - reload
+    - open
+    - show
+    - give
+    - file
+    - permission
+    - help
+    - container
+
+  reload:
+    console: true
+    permission: cc.reload | cc.op
+    args: [NULL]
+
+  open:
+    console: false
+    permission: cc.open | cc.op
+    args: [NULL]
+
+  show:
+    console: true
+    permission: cc.show | cc.op
+    args:
+      - all
+      - {Recipe}
+
+  give:
+    console: false
+    permission: cc.give | cc.op
+    args:
+      - matter/{Matter}
+      - result/{Result}
+
+  file:
+    console: true
+    permission: cc.file | cc.op
+    args:
+      - make/defaultPotion
+
+  permission:
+    console: true
+    permission: cc.permission | cc.op
+    args:
+      - {RecipePermission}
+      - permissions/{Player}
+      - permissions/modify/{Player}/add/{RecipePermission}
+      - permissions/modify/{Player}/remove/{RecipePermission}
+
+  help:
+    console: true
+    permission: cc.reload | cc.open | cc.give | cc.show | cc.file | cc.op
+    args:
+      - all
+      - {CommandArgs}
+
+  container:
+    console: false
+    permission: cc.op
+    args:
+      - add/{ContainerKey}/{ContainerTYpe}/{Characters}
+      - remove/{ContainerKey}/{ContainerType}
+      - set/{ContainerKey}/{ContainerTYpe}/{Characters}
+      - value_modify/{ContainerKey}/{ContainerType}/{Operator}/{ContainerKey}/{Characters}
+      - data/show
+
 DefinedCommands:
   args: ["-reload","-open","-show","-give","-file","-permission","-help","-container"]
 
