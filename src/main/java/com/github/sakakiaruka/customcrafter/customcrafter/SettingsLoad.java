@@ -67,6 +67,8 @@ public class SettingsLoad {
     private static FileConfiguration DEFAULT_CONFIG;
     public static Map<String,Result> RESULTS = new HashMap<>();
     public static Map<String, Matter> MATTERS = new HashMap<>();
+    public static Map<String, Result> CUSTOM_RESULTS = new HashMap<>();
+    public static Map<String, Matter> CUSTOM_MATTERS = new HashMap<>();
 
     // === for runnable task === //
     private List<String> downloadUri;
@@ -317,6 +319,7 @@ public class SettingsLoad {
 
             Result result = new Result(name,enchantInfo,amount,metadata,nameOrRegex,matchPoint, phony);
             RESULTS.put(name,result);
+            CUSTOM_RESULTS.put(name, result);
         }
     }
 
@@ -409,7 +412,7 @@ public class SettingsLoad {
             Map<Integer, ContainerWrapper> elements = new ContainerUtil().mattersLoader(path);
             matter.setContainerWrappers(elements);
             MATTERS.put(name,matter);
-
+            CUSTOM_MATTERS.put(name, matter);
         }
     }
 

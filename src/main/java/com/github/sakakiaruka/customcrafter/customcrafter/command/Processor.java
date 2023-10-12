@@ -11,9 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.MATTERS;
-import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.NAMED_RECIPES_MAP;
-import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.RESULTS;
+import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.*;
 import static com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil.RECIPE_PERMISSION_MAP;
 
 public class Processor implements CommandExecutor, TabCompleter {
@@ -73,8 +71,8 @@ public class Processor implements CommandExecutor, TabCompleter {
             }
         } else if (args.length == 3) {
             if (args[0].equals("give")) {
-                if (args[1].equals("matter")) list.addAll(MATTERS.keySet());
-                if (args[1].equals("result")) list.addAll(RESULTS.keySet());
+                if (args[1].equals("matter")) list.addAll(CUSTOM_MATTERS.keySet());
+                if (args[1].equals("result")) list.addAll(CUSTOM_RESULTS.keySet());
             }
             if (args[0].equals("file")) {
                 if (args[1].equals("make")) {
