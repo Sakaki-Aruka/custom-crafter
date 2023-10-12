@@ -70,29 +70,31 @@ public class Processor implements CommandExecutor, TabCompleter {
                     break;
             }
         } else if (args.length == 3) {
-            if (args[0].equals("give")) {
-                if (args[1].equals("matter")) list.addAll(CUSTOM_MATTERS.keySet());
-                if (args[1].equals("result")) list.addAll(CUSTOM_RESULTS.keySet());
-            }
-            if (args[0].equals("file")) {
-                if (args[1].equals("make")) {
-                    list.add("defaultPotion");
-                }
-            }
-            if (args[0].equals("permission")) {
-                if (args[1].equals("permissions")) {
-                    list.addAll(getOnlinePlayers());
-                    list.add("modify");
-                }
-            }
-            if (args[0].equals("container")) {
-                if (args[1].equals("data")) list.add("show");
+
+            switch (args[0]) {
+                case "give":
+                    if (args[1].equals("matter")) list.addAll(CUSTOM_MATTERS.keySet());
+                    if (args[1].equals("result")) list.addAll(CUSTOM_RESULTS.keySet());
+                    break;
+                case "file":
+                    if (args[1].equals("make")) {
+                        list.add("defaultPotion");
+                    }
+                    break;
+                case "permission":
+                    if (args[1].equals("permissions")) {
+                        list.addAll(getOnlinePlayers());
+                        list.add("modify");
+                    }
+                    break;
+                case "container":
+                    if (args[1].equals("data")) list.add("show");
+                    break;
             }
         } else if (args.length == 4) {
             if (args[0].equals("permission")) {
                 if (args[2].equals("modify")) list.addAll(getOnlinePlayers());
-            }
-            if (args[0].equals("container")) {
+            } else if (args[0].equals("container")) {
                 list.add("string");
                 list.add("double");
                 list.add("int");
@@ -101,8 +103,7 @@ public class Processor implements CommandExecutor, TabCompleter {
             if (args[0].equals("permission")) {
                 list.add("add");
                 list.add("remove");
-            }
-            if (args[0].equals("container")) {
+            } else if (args[0].equals("container")) {
                 if (args[1].equals("value_modify")) {
                     list.add("+");
                     list.add("-");
