@@ -24,6 +24,7 @@ download:
   - ""
 
 # DO NOT TOUCH CONTENTS THAT ARE UNDER THIS LINE.
+COMMAND_ARGS: ["reload", "open", "show", "give", "file", "permission", "help", "container"]
 DefinedCommands:
   args: ["-reload","-open","-show","-give","-file","-permission","-help","-container"]
 

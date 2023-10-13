@@ -69,6 +69,7 @@ public class SettingsLoad {
     public static Map<String, Matter> MATTERS = new HashMap<>();
     public static Map<String, Result> CUSTOM_RESULTS = new HashMap<>();
     public static Map<String, Matter> CUSTOM_MATTERS = new HashMap<>();
+    public static Set<String> COMMAND_ARGS = new HashSet<>();
 
     // === for runnable task === //
     private List<String> downloadUri;
@@ -94,6 +95,7 @@ public class SettingsLoad {
         getAllMaterialsName();
         main();
         new DefinedCommandUtil().loader();
+        getCommandArgs();
     }
 
     private void recipePermissionLoad(){
@@ -246,6 +248,10 @@ public class SettingsLoad {
         List<Path> list = new ArrayList<>();
         paths.forEach(s->list.add(s));
         return list;
+    }
+
+    private void getCommandArgs() {
+        COMMAND_ARGS.addAll(DEFAULT_CONFIG.getStringList("COMMAND_ARGS"));
     }
 
     private void getBaseBlock(List<Path> paths){

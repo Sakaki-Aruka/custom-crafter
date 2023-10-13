@@ -7,16 +7,94 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.*;
 import static com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil.RECIPE_PERMISSION_MAP;
 
 public class Processor implements CommandExecutor, TabCompleter {
+
+    private static final String CONTAINER_KEY = "([a-z0-9-_]+)";
+    private static final String CONTAINER_TYPE = "(?i)(string|double|int)";
+    private static final String NUMBER_ALPHABET = "(.+)";
+    private static final String OPERATOR = "(+|-|*|/|^)";
+    private static final String RECIPE = getCustomElementsPattern(NAMED_RECIPES_MAP.keySet());
+    private static final String MATTER = getCustomElementsPattern(CUSTOM_MATTERS.keySet());
+    private static final String RESULT = getCustomElementsPattern(CUSTOM_RESULTS.keySet());
+    private static final String RECIPE_PERMISSION = getCustomElementsPattern(RECIPE_PERMISSION_MAP.keySet());
+
+    private List<String> getCommandPattern() {
+        List<String> list = new ArrayList<>();
+        list.add("reload");
+        list.add("open");
+
+        list.add("show "+RECIPE);
+        list.add("show all");
+
+        list.add("give "+MATTER);
+        list.add("give "+RESULT);
+
+        list.add("file make defaultPotion");
+
+        list.add("permission "+RECIPE_PERMISSION);
+        list.add("permission permissions "+ getPlayerListPattern());
+        list.add("permission permissions modify "+ getPlayerListPattern() + " add " + RECIPE_PERMISSION);
+        list.add("permission permissions modify "+ getPlayerListPattern() + " remove " + RECIPE_PERMISSION);
+
+        list.add("help all");
+        list.add("help "+getCustomElementsPattern(COMMAND_ARGS));
+
+        list.add("container add "+CONTAINER_KEY+" "+CONTAINER_TYPE+" "+NUMBER_ALPHABET);
+        list.add("container remove "+CONTAINER_KEY+" "+CONTAINER_TYPE);
+        list.add("container set "+CONTAINER_KEY+" "+CONTAINER_TYPE+" "+NUMBER_ALPHABET);
+        list.add("container value_modify "+CONTAINER_KEY+" "+CONTAINER_TYPE+" "+OPERATOR+" "+CONTAINER_KEY+" "+NUMBER_ALPHABET);
+        list.add("container data show");
+        return list;
+    }
+
+    private String getPlayerListPattern() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("(");
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            builder.append(player.getName()).append("|");
+        }
+        builder.deleteCharAt(builder.length()-1);
+        builder.append(")");
+        return builder.toString();
+    }
+
+    private static String getCustomElementsPattern(Set<String> arg) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("(");
+        for (String name : arg) {
+            builder.append(name).append("|");
+        }
+        builder.deleteCharAt(builder.length()-1);
+        builder.append(")");
+        return builder.toString();
+    }
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+
+        //debug
+        String matched = "";
+        String send = String.join(" ", args);
+        for (String c : getCommandPattern()) {
+            if (send.matches(c)) {
+                matched = c;
+                break;
+            }
+        }
+
+        if (matched.isEmpty()) {
+            sender.sendMessage("[CustomCrafter] Send a command with arguments.");
+            return false;
+        }
+
+        if (args[0].equals("reload")) new Check().reload();
+        if (args[0].equals("open")) new Check().open(sender);
+
         return false;
     }
 
