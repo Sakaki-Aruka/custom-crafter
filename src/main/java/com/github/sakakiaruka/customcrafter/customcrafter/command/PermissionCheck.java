@@ -17,20 +17,20 @@ import static com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePerm
 import static com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil.RECIPE_PERMISSION_MAP;
 
 public class PermissionCheck {
-    public void tree(String[] args, CommandSender sender) {
-        displayPermissionInfo(args[1],sender);
+    public void tree(String name, CommandSender sender) {
+        displayPermissionInfo(name ,sender);
     }
 
-    public void show(String[] args, CommandSender sender) {
-        UUID uuid = Bukkit.getPlayer(args[2]).getUniqueId();
+    public void show(String name, CommandSender sender) {
+        UUID uuid = Bukkit.getPlayer(name).getUniqueId();
         displayPlayerPermissions(uuid,sender);
     }
 
-    public void add(String[] args, CommandSender sender) {
-        if (!isNamePlayerOnline(args[3])) return;
-        Player player = Bukkit.getPlayer(args[3]);
+    public void add(String name, String perm, CommandSender sender) {
+        if (!isNamePlayerOnline(name)) return;
+        Player player = Bukkit.getPlayer(name);
         UUID uuid = player.getUniqueId();
-        RecipePermission permission = RECIPE_PERMISSION_MAP.get(args[5]);
+        RecipePermission permission = RECIPE_PERMISSION_MAP.get(perm);
         if (new RecipePermissionUtil().hasPermission(permission,player)) return;
         if (!PLAYER_PERMISSIONS.containsKey(uuid)) PLAYER_PERMISSIONS.put(uuid,new HashSet<>());
         PLAYER_PERMISSIONS.get(uuid).add(permission);
@@ -38,12 +38,12 @@ public class PermissionCheck {
         displayPlayerPermissions(uuid,sender);
     }
 
-    public void remove(String[] args, CommandSender sender) {
-        if (!isNamePlayerOnline(args[3])) return;
-        Player player = Bukkit.getPlayer(args[3]);
+    public void remove(String name, String perm, CommandSender sender) {
+        if (!isNamePlayerOnline(name)) return;
+        Player player = Bukkit.getPlayer(name);
         UUID uuid = player.getUniqueId();
         if (!PLAYER_PERMISSIONS.containsKey(uuid)) return;
-        RecipePermission permission = RECIPE_PERMISSION_MAP.get(args[5]);
+        RecipePermission permission = RECIPE_PERMISSION_MAP.get(perm);
         Bukkit.getLogger().info(String.format("Permission removed: %s  Permission: %s%s  Target: %s", LINE_SEPARATOR,permission.getPermissionName(), LINE_SEPARATOR,player.getName()));
         PLAYER_PERMISSIONS.get(uuid).remove(permission);
         displayPlayerPermissions(uuid,sender);

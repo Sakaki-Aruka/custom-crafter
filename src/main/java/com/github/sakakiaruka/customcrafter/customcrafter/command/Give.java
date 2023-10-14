@@ -28,12 +28,16 @@ import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.*;
 
 public class Give {
 
-    public void matter(String[] args, CommandSender sender) {
-        give(args[2],sender,true);
+    public void main(String[] args, CommandSender sender) {
+
     }
 
-    public void result(String[] args, CommandSender sender) {
-        give(args[2],sender,false);
+    public void matter(String name, CommandSender sender) {
+        give(name ,sender,true);
+    }
+
+    public void result(String name, CommandSender sender) {
+        give(name ,sender,false);
     }
 
     public void give(String name, CommandSender sender, boolean isMatter) {

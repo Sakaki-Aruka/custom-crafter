@@ -222,7 +222,7 @@ public class ContainerModify {
     }
 
     // /cc -container -data -show
-    public void data(String[] args, CommandSender sender) {
+    public void data(CommandSender sender) {
         Player player = (Player) sender;
         if (!checkMainHand(player, "show")) {
             sender.sendMessage("Container data(show) > No container data found.");

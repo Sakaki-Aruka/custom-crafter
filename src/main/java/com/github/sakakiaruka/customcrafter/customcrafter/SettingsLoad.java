@@ -1,5 +1,6 @@
 package com.github.sakakiaruka.customcrafter.customcrafter;
 
+import com.github.sakakiaruka.customcrafter.customcrafter.command.Processor;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.ContainerWrapper;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantStrict;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantWrap;
@@ -94,7 +95,7 @@ public class SettingsLoad {
         recipePermissionLoad();
         getAllMaterialsName();
         main();
-        new DefinedCommandUtil().loader();
+        //new DefinedCommandUtil().loader();
         getCommandArgs();
     }
 
@@ -166,6 +167,8 @@ public class SettingsLoad {
                 matterPaths.forEach(p->getMatter(getFiles(p)));
                 resultPaths.forEach(p->getResult(getFiles(p)));
                 recipePaths.forEach(p->getRecipe(getFiles(p)));
+
+                new Processor().init();
 
                 Bukkit.getLogger().info("===Custom-Crafter data loaded.===");
             }

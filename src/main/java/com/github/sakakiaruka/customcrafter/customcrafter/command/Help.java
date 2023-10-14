@@ -14,9 +14,9 @@ import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.LI
 import static com.github.sakakiaruka.customcrafter.customcrafter.util.DefinedCommandUtil.DEFINED_COMMAND_LIST;
 
 public class Help {
-    private String separateBar = BAR + LINE_SEPARATOR + LINE_SEPARATOR + LINE_SEPARATOR;
-    private String nl2 = LINE_SEPARATOR + LINE_SEPARATOR;
-    public void all(String[] args, CommandSender sender) {
+    private final String separateBar = BAR + LINE_SEPARATOR + LINE_SEPARATOR + LINE_SEPARATOR;
+    private final String nl2 = LINE_SEPARATOR + LINE_SEPARATOR;
+    public void all(CommandSender sender) {
         FileConfiguration config = getInstance().getConfig();
         StringBuilder builder = new StringBuilder();
         for (DefinedCommand command : DEFINED_COMMAND_LIST) {
@@ -28,10 +28,9 @@ public class Help {
         sender.sendMessage(builder.toString());
     }
 
-    public void one(String[] args,CommandSender sender) {
+    public void one(String type,CommandSender sender) {
         FileConfiguration config = getInstance().getConfig();
         StringBuilder builder = new StringBuilder();
-        String type = args[1];
 
         for (DefinedCommand command : DEFINED_COMMAND_LIST) {
             if (!command.getCommandName().equals(type)) continue;
