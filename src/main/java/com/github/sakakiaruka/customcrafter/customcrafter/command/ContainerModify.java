@@ -10,6 +10,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
+import java.util.Arrays;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -77,12 +78,12 @@ public class ContainerModify {
             }
         }
 
-        Object value = args[4];
+        String value = args[4];
         int intValue = 0;
         double doubleValue = 0d;
         if (type.equals(PersistentDataType.INTEGER)) {
             try{
-                intValue = Integer.parseInt(String.valueOf(value));
+                intValue = Integer.parseInt(value);
             }catch (Exception e) {
                 sender.sendMessage("Container "+modifyType+" > The provided value is not a number.");
                 return;
@@ -91,7 +92,7 @@ public class ContainerModify {
 
         if (type.equals(PersistentDataType.DOUBLE)) {
             try{
-                doubleValue = Double.parseDouble(String.valueOf(value));
+                doubleValue = Double.parseDouble(value);
             }catch (Exception e) {
                 sender.sendMessage("Container "+modifyType+" > The provided value is not a number.");
                 return;
@@ -99,6 +100,9 @@ public class ContainerModify {
         }
 
         if (type.equals(PersistentDataType.STRING)) {
+            if (5 < args.length) {
+                value += String.join(" ", Arrays.asList(args).subList(5, args.length));
+            }
             container.set(key, type, value);
         } else if (type.equals(PersistentDataType.INTEGER)) {
             container.set(key, type, intValue);

@@ -38,6 +38,7 @@ public class Processor implements CommandExecutor, TabCompleter {
 
     private Map<Integer, String> getCommandPattern() {
         Map<Integer, String> map = new HashMap<>();
+        String playerPattern = getPlayerListPattern();
         map.put(1, "reload");
         map.put(2 + 100, "open");
 
@@ -50,9 +51,9 @@ public class Processor implements CommandExecutor, TabCompleter {
         map.put(7, "file make defaultPotion");
 
         if (noEmpty(RECIPE_PERMISSION)) map.put(8, "permission "+RECIPE_PERMISSION);
-        if (noEmpty(getPlayerListPattern())) map.put(9, "permission permissions "+ getPlayerListPattern());
-        if (noEmpty(getPlayerListPattern(), RECIPE_PERMISSION)) map.put(10, "permission permissions modify "+ getPlayerListPattern() + " add " + RECIPE_PERMISSION);
-        if (noEmpty(getPlayerListPattern(), RECIPE_PERMISSION)) map.put(11, "permission permissions modify "+ getPlayerListPattern() + " remove " + RECIPE_PERMISSION);
+        if (noEmpty(playerPattern)) map.put(9, "permission permissions "+ playerPattern);
+        if (noEmpty(playerPattern, RECIPE_PERMISSION)) map.put(10, "permission permissions modify "+ playerPattern + " add " + RECIPE_PERMISSION);
+        if (noEmpty(playerPattern, RECIPE_PERMISSION)) map.put(11, "permission permissions modify "+ playerPattern + " remove " + RECIPE_PERMISSION);
 
         map.put(12, "help all");
         if (noEmpty(getCustomElementsPattern(COMMAND_ARGS))) map.put(13, "help "+getCustomElementsPattern(COMMAND_ARGS));
@@ -75,14 +76,7 @@ public class Processor implements CommandExecutor, TabCompleter {
 
     private String getPlayerListPattern() {
         if (Bukkit.getOnlinePlayers().isEmpty()) return "";
-        StringBuilder builder = new StringBuilder();
-        builder.append("(");
-        for (Player player : Bukkit.getOnlinePlayers()) {
-            builder.append(player.getName()).append("|");
-        }
-        builder.deleteCharAt(builder.length()-1);
-        builder.append(")");
-        return builder.toString();
+        return "(" + String.join("|", getOnlinePlayers()) + ")";
     }
 
     private static String getCustomElementsPattern(Set<String> arg) {
@@ -114,8 +108,8 @@ public class Processor implements CommandExecutor, TabCompleter {
         }
         else if (id == 1) new Check().reload();
         else if (id == 2 + 100) new Check().open(sender);
-        else if (id == 3) new Show().all(sender);
-        else if (id == 4) new Show().one(args, sender);
+        else if (id == 3) new Show().one(args, sender);
+        else if (id == 4) new Show().all(sender);
         else if (id == 5 + 100) new Give().matter(args[1], sender);
         else if (id == 6 + 100) new Give().result(args[1], sender);
         else if (id == 7) new File().defaultPotion();

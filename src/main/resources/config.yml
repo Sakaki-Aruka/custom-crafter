@@ -25,158 +25,55 @@ download:
 
 # DO NOT TOUCH CONTENTS THAT ARE UNDER THIS LINE.
 COMMAND_ARGS: ["reload", "open", "show", "give", "file", "permission", "help", "container"]
-DefinedCommands:
-  args: ["-reload","-open","-show","-give","-file","-permission","-help","-container"]
 
-  # child: has child args
-  # permission: -> List (nullable)
-  # console: true or false
-  # class:
-  # method:
-  # [args]: -> List (nullable)
+reload:
+  - "When this command executing, the system save and load info from config files."
 
-  -reload:
-    child: false
-    # permission:
-    #   - or cc.reload (and cc.reload)
-    #   - or cc.op (and cc.op)
-    permission: cc.reload | cc.op
-    console: true
-    class: com.github.sakakiaruka.customcrafter.customcrafter.command.Check
-    method: reload
-    descriptions:
-      - When this command executing, the system save and load info from config files.
+open:
+  - "If you send this command from a console, the system cannot complete to processing this."
+  - "When this command executing, the crafting gui is opened."
 
-  #----------------------------------------
+show:
+  - "show all = This command shows all recipe info that enabled in this server. "
+  - "show {RECIPE} = This command shows the specified recipe info that enabled in this server."
 
-  -open:
-    child: false
-    permission: cc.op | cc.open
-    console: false
-    class: com.github.sakakiaruka.customcrafter.customcrafter.command.Check
-    method: open
-    descriptions:
-      - If you send this command from a console, the system cannot complete to processing this.
-      - When this command executing, the crafting gui is opened.
+give:
+  - "If you send this command from a console, the system cannot complete to processing this."
+  - "give matter {MATTER}"
+  - "    When you send this command, you can get like a specified Matter."
+  - "give result {RESULT}"
+  - "    When you send this command, you can get like a specified Result."
 
-  #----------------------------------------
+file:
+  - "file make defaultPotion = When you send this command. the system makes default-potion-Matter files."
 
-  -show:
-    child: true
-    args:
-      - "-all"
-      - "{Recipe}"
-    permission: cc.op | cc.show
-    console: true
-    class: com.github.sakakiaruka.customcrafter.customcrafter.command.Show
-    method:
-      - all
-      - one
+permission:
+  - "permission {RECIPE_PERMISSION}"
+  - "    This command shows the specified permission info."
+  - "permission permissions {PLAYER}"
+  - "    This command shows permissions that the specified player has."
+  - "permission permissions modify {PLAYER} add {RECIPE_PERMISSION}"
+  - "    This command adds the specified permission to the player has."
+  - "permission permissions modify {PLAYER} remove {RECIPE_PERMISSION}"
+  - "    This command removes the specified permission from the player has."
 
-    descriptions:
-      - "0:This command shows all permissions that enabled in this server."
-      - "1:This command shows the specified permission that enabled in this server."
+help:
+  - "help all"
+  - "    This command shows all commands info."
+  - "help {COMMAND_ARGS}"
+  - "    This command shows the specified commands info."
+  - "For example, when you send '/cc help help' command, the system shows the description that above."
 
-  #----------------------------------------
-
-  -give:
-    child: true
-    args:
-      - "-matter,{Matter}"
-      - "-result,{Result}"
-    permission: cc.op | cc.give
-    console: false
-    class: com.github.sakakiaruka.customcrafter.customcrafter.command.Give
-    method:
-      - matter
-      - result
-    descriptions:
-      - all:If you send this command from a console, the system cannot complete to processing this.
-      - "0:When you send this command, you can get like a specified Matter."
-      - "1:When you send this command, you can get list a specified Result."
-
-  #----------------------------------------
-
-  -file:
-    child: true
-    args:
-      - "-make,defaultPotion"
-    permission: cc.op | cc.file
-    console: true
-    class: com.github.sakakiaruka.customcrafter.customcrafter.command.File
-    method:
-      - defaultPotion
-
-    descriptions:
-      - "0:When you send this command, the system makes default potion Matter files."
-
-  #----------------------------------------
-
-  -permission:
-    child: true
-    args:
-      - "{RecipePermission}"
-      - "-permissions,{Player}"
-      - "-permissions,-modify,{Player},add,{RecipePermission}"
-      - "-permissions,-modify,{Player},remove,{RecipePermission}"
-    permission: cc.op | cc.permission
-    console: true
-    class: com.github.sakakiaruka.customcrafter.customcrafter.command.PermissionCheck
-    method:
-      - tree
-      - show
-      - add
-      - remove
-
-    descriptions:
-      - "0:This command shows the specified permission info."
-      - "1:This command shows the specified player's permission."
-      - "2:This command add the specified permission to the player's."
-      - "3:This command remove the specified permission from the player's."
-
-  #----------------------------------------
-
-  -help:
-    child: true
-    args:
-      - "-all"
-      - "{CommandArgs}"
-    permission: cc.op | cc.reload | cc.give | cc.permission | cc.file | cc.open
-    console: true
-    class: com.github.sakakiaruka.customcrafter.customcrafter.command.Help
-    method:
-      - all
-      - one
-
-    descriptions:
-      - "0:This command shows all commands info."
-      - "1:This command show the specified commands info."
-
-  #----------------------------------------
-
-  -container:
-    child: true
-    args:
-      - "-add,{ContainerKey},{ContainerType},{NumbersAlphabet}"
-      - "-remove,{ContainerKey},{ContainerType}"
-      - "-set,{ContainerKey},{ContainerType},{NumbersAlphabet}"
-      - "-value_modify,{ContainerKey},{ContainerType},{MathematicalOperators},{ContainerKey},{NumbersAlphabet}"
-      - "-data,-show"
-    permission: cc.op
-    console: false
-    class: com.github.sakakiaruka.customcrafter.customcrafter.command.ContainerModify
-    method:
-      - addSet
-      - remove
-      - addSet
-      - valueModify
-      - data
-
-    descriptions:
-      - "all:If a sender has not any items in their MainHand, this command will not complete to processing."
-      - "0:This command adds the specified data to an item that a sender has."
-      - "2:This command removes the specified data from an item that a sender has."
-      - "1:This command sets the specified data to an item that a sender has."
-      - "1:A diff point with '/cc -container -add' is that this command checks the specified item contained the specified data in their."
-      - "3:This command modifies the specifies data that the specified container and keyed with mathematical operators."
-      - "4:This command shows the containers info that is the sender has in their MainHand."
+container:
+  - "If a sender sends this command from a console, this command will not work."
+  - "If a sender has not any items in their MainHand, this command will not complete to processing."
+  - "container add {CONTAINER_KEY} {CONTAINER_TYPE} {CHARACTER}"
+  - "    This command adds the specified data to an item that a sender has."
+  - "container remove {CONTAINER_KEY} {CONTAINER_TYPE}"
+  - "    This command removes the specified data from an item that a sender has."
+  - "container set {CONTAINER_KEY} {CONTAINER_TYPE} {CHARACTERS}"
+  - "    This command sets the specified data to an item that a sender has."
+  - "container value_modify {CONTAINER_KEY} {CONTAINER_TYPE} {OPERATOR} {CONTAINER_KEY} {CHARACTERS}"
+  - "    This command modifies the specified data that the specified container and keyed with a mathematical operator."
+  - "container data show"
+  - "    This command shows the containers info that is the sender has in their MainHand."
