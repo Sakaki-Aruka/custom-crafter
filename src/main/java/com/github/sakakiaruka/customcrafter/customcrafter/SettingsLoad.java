@@ -95,7 +95,6 @@ public class SettingsLoad {
         recipePermissionLoad();
         getAllMaterialsName();
         main();
-        //new DefinedCommandUtil().loader();
         getCommandArgs();
     }
 

@@ -4,8 +4,6 @@ import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter;
 import com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad;
 import com.github.sakakiaruka.customcrafter.customcrafter.listener.CloseCraftingTable;
 import com.github.sakakiaruka.customcrafter.customcrafter.listener.OpenCraftingTable;
-import com.github.sakakiaruka.customcrafter.customcrafter.object.DefinedCommand;
-import com.github.sakakiaruka.customcrafter.customcrafter.util.DefinedCommandUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.*;
@@ -19,19 +17,7 @@ import java.util.*;
 import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.*;
 import static com.github.sakakiaruka.customcrafter.customcrafter.listener.OpenCraftingTable.opening;
 
-public class Check implements CommandExecutor{
-    private final String nl = System.getProperty("line.separator");
-    @Override
-    public boolean onCommand(CommandSender sender, Command command,String label,String[] args){
-        DefinedCommand defCommand;
-        if ((defCommand = new DefinedCommandUtil().getProcessor(args, sender)) != null){
-            new DefinedCommandUtil().runCommand(defCommand,args,sender);
-            return true;
-        }else{
-            // show help page
-            return false;
-        }
-    }
+public class Check{
 
     public void open(CommandSender sender) {
         ((Player) sender).openInventory(new OpenCraftingTable().setCraftingInventory());
