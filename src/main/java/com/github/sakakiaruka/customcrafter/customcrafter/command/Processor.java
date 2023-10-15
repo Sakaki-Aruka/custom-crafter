@@ -66,6 +66,25 @@ public class Processor implements CommandExecutor, TabCompleter {
         return map;
     }
 
+    private boolean hasCorrectPermission(Player player, int id) {
+        if (player.hasPermission("cc.op")) return true;
+        if (id == 1) return player.hasPermission("cc.reload");
+        else if (id == 2) return player.hasPermission("cc.open");
+        else if (id == 3 || id == 4) return player.hasPermission("cc.show");
+        else if (id == 5 + 100 || id == 6 + 100) return player.hasPermission("cc.give");
+        else if (id == 7) return player.hasPermission("cc.file");
+        else if (8 <= id && id <= 11) return player.hasPermission("cc.permission");
+        else if (id == 12 || id == 13) {
+            for (String arg : COMMAND_ARGS) {
+                if (player.hasPermission("cc."+arg.toLowerCase())) return true;
+            }
+            return false;
+        } else if (14 + 100 <= id && id <= 18 + 100) return player.hasPermission("cc.container");
+
+        return false;
+    }
+
+
     private boolean noEmpty(String... in) {
         for (String s : in) {
             if (s.isEmpty()) return false;
@@ -106,7 +125,13 @@ public class Processor implements CommandExecutor, TabCompleter {
             sender.sendMessage("[CustomCrafter] You cannot use this command from other than as a player.");
             return false;
         }
-        else if (id == 1) new Check().reload();
+
+        if (sender instanceof Player && !hasCorrectPermission((Player) sender, id)) {
+            sender.sendMessage("[CustomCrafter] You do not have enough permissions to use this command.");
+            return false;
+        }
+
+        if (id == 1) new Check().reload();
         else if (id == 2 + 100) new Check().open(sender);
         else if (id == 3) new Show().one(args, sender);
         else if (id == 4) new Show().all(sender);
