@@ -1,5 +1,6 @@
 package com.github.sakakiaruka.customcrafter.customcrafter;
 
+import com.github.sakakiaruka.customcrafter.customcrafter.command.Processor;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.ContainerWrapper;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantStrict;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantWrap;
@@ -67,6 +68,9 @@ public class SettingsLoad {
     private static FileConfiguration DEFAULT_CONFIG;
     public static Map<String,Result> RESULTS = new HashMap<>();
     public static Map<String, Matter> MATTERS = new HashMap<>();
+    public static Map<String, Result> CUSTOM_RESULTS = new HashMap<>();
+    public static Map<String, Matter> CUSTOM_MATTERS = new HashMap<>();
+    public static Set<String> COMMAND_ARGS = new HashSet<>();
 
     // === for runnable task === //
     private List<String> downloadUri;
@@ -83,7 +87,7 @@ public class SettingsLoad {
     private static final String MATTER_REGEX_COLLECT_PATTERN = "^R\\|(.+)$";
     private static final String RESULT_METADATA_COLLECT_PATTERN = "^([\\w_]+),(.+)$";
 
-    // --- for pass-through ===//
+    // === for pass-through ===//
     private static final Result PASS_THROUGH_RESULT = new Result("PASS_THROUGH");
 
     public void load(){
@@ -91,7 +95,7 @@ public class SettingsLoad {
         recipePermissionLoad();
         getAllMaterialsName();
         main();
-        new DefinedCommandUtil().loader();
+        getCommandArgs();
     }
 
     private void recipePermissionLoad(){
@@ -162,6 +166,8 @@ public class SettingsLoad {
                 matterPaths.forEach(p->getMatter(getFiles(p)));
                 resultPaths.forEach(p->getResult(getFiles(p)));
                 recipePaths.forEach(p->getRecipe(getFiles(p)));
+
+                new Processor().init();
 
                 Bukkit.getLogger().info("===Custom-Crafter data loaded.===");
             }
@@ -246,6 +252,10 @@ public class SettingsLoad {
         return list;
     }
 
+    private void getCommandArgs() {
+        COMMAND_ARGS.addAll(DEFAULT_CONFIG.getStringList("COMMAND_ARGS"));
+    }
+
     private void getBaseBlock(List<Path> paths){
         FileConfiguration config = YamlConfiguration.loadConfiguration(paths.get(0).toFile());
         BASE_BLOCK = Material.valueOf(config.getString("material").toUpperCase());
@@ -317,6 +327,7 @@ public class SettingsLoad {
 
             Result result = new Result(name,enchantInfo,amount,metadata,nameOrRegex,matchPoint, phony);
             RESULTS.put(name,result);
+            CUSTOM_RESULTS.put(name, result);
         }
     }
 
@@ -409,7 +420,7 @@ public class SettingsLoad {
             Map<Integer, ContainerWrapper> elements = new ContainerUtil().mattersLoader(path);
             matter.setContainerWrappers(elements);
             MATTERS.put(name,matter);
-
+            CUSTOM_MATTERS.put(name, matter);
         }
     }
 

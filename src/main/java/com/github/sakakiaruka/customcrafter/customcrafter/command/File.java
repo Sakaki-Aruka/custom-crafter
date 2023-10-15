@@ -8,7 +8,7 @@ import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.BA
 import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.LINE_SEPARATOR;
 
 public class File {
-    public void defaultPotion(String[] args, CommandSender sender) {
+    public void defaultPotion() {
         Bukkit.getLogger().info(BAR + LINE_SEPARATOR);
         Bukkit.getLogger().info("The system is making default potion files.");
         Bukkit.getLogger().info("Do not shutdown or stop a server.");

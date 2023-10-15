@@ -15,7 +15,8 @@ import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.*;
 
 public class Show {
 
-    public void all(String[] args, CommandSender sender) {
+
+    public void all(CommandSender sender) {
         NAMED_RECIPES_MAP.keySet().forEach(s->sender.sendMessage(getGraphicalRecipe(s)));
     }
     public void one(String[] args, CommandSender sender) {
