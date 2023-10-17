@@ -31,6 +31,10 @@ import org.bukkit.scheduler.BukkitRunnable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.DateTimeException;
+import java.time.Duration;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -53,7 +57,7 @@ public class SettingsLoad {
     public static final String LINE_SEPARATOR = System.getProperty("line.separator");
     public static final String BAR = String.join("",Collections.nCopies(40,"="));
     public static final String SHORT_BAR = String.join("",Collections.nCopies(20,"="));
-    public static final String UPPER_ARROW = String.format("↑");
+    public static final String UPPER_ARROW = "↑";
 
     // === recipes public values === //
     public static Material BASE_BLOCK;
@@ -86,6 +90,13 @@ public class SettingsLoad {
     private static final String MATTER_OVERRIDE_PATTERN = "^(\\w+) -> (\\w+)$";
     private static final String MATTER_REGEX_COLLECT_PATTERN = "^R\\|(.+)$";
     private static final String RESULT_METADATA_COLLECT_PATTERN = "^([\\w_]+),(.+)$";
+
+    // === unlock registration === //
+    public static Map<String, Recipe> REGISTERED_RECIPES = new HashMap<>();
+    public static Map<Integer, String> UNLOCK_TASK_ID_WITH_RECIPE_NAME = new HashMap<>();
+
+    // === lock registration === //
+    public static Map<Integer, String> LOCK_TASK_ID_WITH_RECIPE_NAME = new HashMap<>();
 
     // === for pass-through ===//
     private static final Result PASS_THROUGH_RESULT = new Result("PASS_THROUGH");
@@ -632,10 +643,97 @@ public class SettingsLoad {
                 }
             }
 
+            if (config.contains("lock")) {
+                String lockTimeRow = config.getString("lock");
+                Duration duration;
+                if ((duration = getDuration(lockTimeRow, true)) == null) continue;
+                if (duration != Duration.ZERO) {
+                    long delayTicks = duration.getSeconds() * 20;
+                    BukkitRunnable runnable = new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            int id = this.getTaskId();
+                            String targetName = LOCK_TASK_ID_WITH_RECIPE_NAME.get(id);
+                            Recipe recipe = NAMED_RECIPES_MAP.get(targetName);
+                            RECIPE_LIST.remove(recipe);
+                            NAMED_RECIPES_MAP.remove(targetName);
+                            LOCK_TASK_ID_WITH_RECIPE_NAME.remove(id);
+
+                            Bukkit.getLogger().info("[CustomCrafter] "+targetName+" is disabled now!");
+                        }
+                    };
+                    runnable.runTaskLater(CustomCrafter.getInstance(), delayTicks);
+                    int taskID = runnable.getTaskId();
+                    LOCK_TASK_ID_WITH_RECIPE_NAME.put(taskID, name);
+
+                    Bukkit.getLogger().info(String.format("[CustomCrafter] Named Recipe=%s will be locked in %s", name, ZonedDateTime.parse(lockTimeRow).toString()));
+                }
+            }
+
+            if (config.contains("unlock")) {
+                String unlockTimeRow = config.getString("unlock");
+                Duration duration;
+                if ((duration = getDuration(unlockTimeRow, false)) == null) continue;
+                if (duration != Duration.ZERO) {
+                    long delayTicks = duration.getSeconds() * 20;
+                    BukkitRunnable runnable = new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            int id = this.getTaskId();
+                            String targetName = UNLOCK_TASK_ID_WITH_RECIPE_NAME.get(id);
+                            Recipe target = REGISTERED_RECIPES.get(targetName);
+                            RECIPE_LIST.add(target);
+                            NAMED_RECIPES_MAP.put(targetName, target);
+
+                            Bukkit.getLogger().info("[CustomCrafter] "+targetName+" is enabled now!");
+                            REGISTERED_RECIPES.remove(targetName);
+                            UNLOCK_TASK_ID_WITH_RECIPE_NAME.remove(id);
+                        }
+                    };
+                    runnable.runTaskLater(CustomCrafter.getInstance(), delayTicks);
+                    int taskID = runnable.getTaskId();
+                    REGISTERED_RECIPES.put(name, new Recipe(name, tag, coordinates, returns, result, permission, map, usingContainerValuesMetadata));
+                    UNLOCK_TASK_ID_WITH_RECIPE_NAME.put(taskID, name);
+
+                    Bukkit.getLogger().info(String.format("[CustomCrafter] Named Recipe=%s will be unlocked in %s", name, ZonedDateTime.parse(unlockTimeRow).toString()));
+                    continue;
+                }
+            }
+
             Recipe recipe = new Recipe(name, tag, coordinates, returns, result, permission, map, usingContainerValuesMetadata);
             RECIPE_LIST.add(recipe);
             NAMED_RECIPES_MAP.put(name,recipe);
         }
+    }
+
+    private Duration getDuration(String dateRow, boolean delete) {
+        ZonedDateTime zonedDateTime;
+        try {
+            // for example
+            // 2023-10-17T16:45:30+09:00[Asia/Tokyo]
+            // yyyy-mm-ddThh:mm:ss+offset with UTC[TIMEZONE]
+            zonedDateTime = ZonedDateTime.parse(dateRow);
+        } catch (DateTimeParseException e) {
+            Bukkit.getLogger().warning("[CustomCrafter] An invalid DateTime format found. (from java.time.ZonedDateTime=DateTimeParseException)");
+            Bukkit.getLogger().info("[CustomCrafter] So, the system will not load this recipe and register to the list about auto "+(delete ? "" : "un")+"lock.");
+            return null;
+        }
+        ZonedDateTime now = ZonedDateTime.now();
+        if (zonedDateTime.isAfter(now)) {
+            // register (unlock) || remove (lock)
+            Duration duration;
+            try {
+                duration = Duration.between(zonedDateTime, now).abs();
+            } catch (DateTimeException e) {
+                Bukkit.getLogger().warning("[CustomCrafter] The system cannot get times diff about now and unlock date. (DateTimeException)");
+                return null;
+            } catch (ArithmeticException e) {
+                Bukkit.getLogger().warning("[CustomCrafter] The system could not register to "+(delete ? "" : "un")+"lock the recipe. (Diff times over the limit.)");
+                return null;
+            }
+            return duration;
+        } else if (delete) return null; // already locked
+        return Duration.ZERO;  // normal load
     }
 
     private Matter getMatterFromString(String name,Map<String,String> overrides){
