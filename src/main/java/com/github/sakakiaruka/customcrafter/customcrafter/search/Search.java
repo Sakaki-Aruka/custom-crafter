@@ -20,7 +20,14 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -47,7 +54,7 @@ public class Search {
 
             if(recipe.getTag().equals(Tag.NORMAL)){
                 //normal
-                if(getSquareSize(recipe) != getSquareSize(input))continue;
+                if(getSquareSize(recipe.getCoordinateList()) != getSquareSize(input.getCoordinateList()))continue;
                 if(!isSameShape(getCoordinateNoAir(recipe),getCoordinateNoAir(input)))continue;
                 if(!isAllCandidateContains(recipe,input))continue;
 
@@ -421,8 +428,8 @@ public class Search {
         return result;
     }
 
-    private int getSquareSize(Recipe recipe){
-        List<Coordinate> list = getCoordinateNoAir(recipe);
+    public static int getSquareSize(List<Coordinate> list){
+//        List<Coordinate> list = getCoordinateNoAir(recipe);
         if(list.isEmpty())return -1;
         if(list.get(0).getX() < 0 || list.get(0).getY() < 0)return -1;
 

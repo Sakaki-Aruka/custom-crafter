@@ -5,31 +5,30 @@ import com.github.sakakiaruka.customcrafter.customcrafter.util.InventoryUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.*;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
+
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.*;
 
 public class VanillaSearch {
-    public void main(Player player, Inventory inventory,boolean batchBool){
+    public void main(Player player, Inventory inventory, boolean batchBool){
         List<Coordinate> coordinates = getCoordinateList(inventory);
         if(coordinates.isEmpty())return;
         if(coordinates.size() > VANILLA_CRAFTING_SLOTS)return;
-        if(getSquareSize(coordinates) > VANILLA_CRAFTING_SQUARE_SIZE)return;
+        if(Search.getSquareSize(coordinates) > VANILLA_CRAFTING_SQUARE_SIZE)return;
 
         ItemStack[] itemStack = getItemStacks(inventory,coordinates.get(0));
         ItemStack[] itemStacks = itemStack.clone();
 
-        org.bukkit.inventory.Recipe recipe = Bukkit.getCraftingRecipe(itemStacks.clone(), player.getWorld());
-        if (recipe == null) return; // the system could not find the recipe
+        org.bukkit.inventory.Recipe recipe;
+        if ((recipe = Bukkit.getCraftingRecipe(itemStacks.clone(), player.getWorld())) == null) return;
         ItemStack result = recipe.getResult();
 
-
-        if(result == null)return;
         if(result.getType().equals(Material.AIR))return;
         WHAT_MAKING.put(player.getUniqueId(),result.getType());
 
@@ -57,16 +56,13 @@ public class VanillaSearch {
     }
 
     private int getMinimalAmount(ItemStack[] items){
-        List<Integer> list = new ArrayList<>();
-        Arrays.stream(items).forEach(s->{
-
-            if(s != null && !s.getType().equals(Material.AIR)){
-                list.add(s.getAmount());
+        int result = Integer.MAX_VALUE;
+        for (ItemStack item : items) {
+            if (item != null && !item.getType().equals(Material.AIR) && item.getAmount() < result) {
+                result = item.getAmount();
             }
-        });
-        if(list.isEmpty())return -1;
-        Collections.sort(list);
-        return list.get(0);
+        }
+        return result;
     }
 
 
@@ -101,17 +97,4 @@ public class VanillaSearch {
         return list;
     }
 
-    private int getSquareSize(List<Coordinate> list){
-        List<Integer> xBuffer = new ArrayList<>();
-        List<Integer> yBuffer = new ArrayList<>();
-        list.forEach(s->{
-            xBuffer.add(s.getX());
-            yBuffer.add(s.getY());
-        });
-        Collections.sort(xBuffer);
-        Collections.sort(yBuffer);
-        int width = xBuffer.get(xBuffer.size()-1) - xBuffer.get(0) + 1;
-        int height = yBuffer.get(yBuffer.size()-1) - yBuffer.get(0) + 1;
-        return Math.max(width,height);
-    }
 }
