@@ -93,6 +93,7 @@ public class SettingsLoad {
 
     // === unlock registration === //
     public static Map<String, Recipe> REGISTERED_RECIPES = new HashMap<>();
+    public static Map<Integer, List<Recipe>> ITEM_PLACED_SLOTS_RECIPE_MAP = new HashMap<>();
     public static Map<Integer, String> UNLOCK_TASK_ID_WITH_RECIPE_NAME = new HashMap<>();
 
     // === lock registration === //
@@ -656,6 +657,7 @@ public class SettingsLoad {
                             String targetName = LOCK_TASK_ID_WITH_RECIPE_NAME.get(id);
                             Recipe recipe = NAMED_RECIPES_MAP.get(targetName);
                             RECIPE_LIST.remove(recipe);
+                            ITEM_PLACED_SLOTS_RECIPE_MAP.get(recipe.getContentsNoAir().size()).remove(recipe);
                             NAMED_RECIPES_MAP.remove(targetName);
                             LOCK_TASK_ID_WITH_RECIPE_NAME.remove(id);
 
@@ -684,6 +686,10 @@ public class SettingsLoad {
                             Recipe target = REGISTERED_RECIPES.get(targetName);
                             RECIPE_LIST.add(target);
                             NAMED_RECIPES_MAP.put(targetName, target);
+                            if (!ITEM_PLACED_SLOTS_RECIPE_MAP.containsKey(target.getContentsNoAir().size())) {
+                                ITEM_PLACED_SLOTS_RECIPE_MAP.put(target.getContentsNoAir().size(), new ArrayList<>());
+                            }
+                            ITEM_PLACED_SLOTS_RECIPE_MAP.get(target.getContentsNoAir().size()).add(target);
 
                             Bukkit.getLogger().info("[CustomCrafter] "+targetName+" is enabled now!");
                             REGISTERED_RECIPES.remove(targetName);
@@ -703,6 +709,10 @@ public class SettingsLoad {
             Recipe recipe = new Recipe(name, tag, coordinates, returns, result, permission, map, usingContainerValuesMetadata);
             RECIPE_LIST.add(recipe);
             NAMED_RECIPES_MAP.put(name,recipe);
+            if (!ITEM_PLACED_SLOTS_RECIPE_MAP.containsKey(recipe.getContentsNoAir().size())) {
+                ITEM_PLACED_SLOTS_RECIPE_MAP.put(recipe.getContentsNoAir().size(), new ArrayList<>());
+            }
+            ITEM_PLACED_SLOTS_RECIPE_MAP.get(recipe.getContentsNoAir().size()).add(recipe);
         }
     }
 

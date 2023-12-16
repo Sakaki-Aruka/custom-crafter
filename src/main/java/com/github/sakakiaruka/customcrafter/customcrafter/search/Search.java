@@ -44,8 +44,10 @@ public class Search {
         int massAmount = 0;
         Recipe input = toRecipe(inventory);
         List<ItemStack> interestedItems = getInterestedAreaItems(inventory);
+        int itemContainedSlots = input.getContentsNoAir().size();
+        if (itemContainedSlots == 0) return;
 
-        Top:for(Recipe recipe: RECIPE_LIST){
+        Top:for(Recipe recipe: ITEM_PLACED_SLOTS_RECIPE_MAP.get(itemContainedSlots)){
 
             if(recipe.hasPermission()){ // permission check
                 RecipePermission source = recipe.getPermission();
