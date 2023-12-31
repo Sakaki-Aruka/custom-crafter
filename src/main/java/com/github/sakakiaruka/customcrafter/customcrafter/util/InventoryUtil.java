@@ -1,6 +1,7 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.util;
 
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.Potions;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.*;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -26,9 +27,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -110,22 +113,7 @@ public class InventoryUtil {
         InventoryUtil.safetyItemDrop(player, Collections.singletonList(item));
     }
 
-    public void snatchFromVirtual(Map<Matter, Integer> virtual, List<Matter> list, boolean mass) {
-        Map<Matter, Integer> buf = new HashMap<>();
-        A:
-        for (Map.Entry<Matter, Integer> entry : virtual.entrySet()) {
-            B:
-            for (Matter matter : list) {
-                if (!matter.sameCandidate(entry.getKey())) continue;
-                int ii = (buf.containsKey(entry.getKey()) ? entry.getValue() : 0) - (mass ? 1 : matter.getAmount());
-                buf.put(entry.getKey(), ii);
-            }
-        }
 
-        for (Map.Entry<Matter, Integer> entry : buf.entrySet()) {
-            virtual.put(entry.getKey(), virtual.get(entry.getKey()) + entry.getValue());
-        }
-    }
 
     public List<ItemStack> getItemStackFromCraftingMenu(Inventory inventory) {
         List<ItemStack> result = new ArrayList<>();
@@ -529,5 +517,169 @@ public class InventoryUtil {
 
             meta.removeItemFlags(target);
         }
+    }
+
+    public Map<Coordinate, List<Coordinate>> amorphous(Recipe recipe, Recipe input) {
+        Map<Coordinate, List<Coordinate>> map = new HashMap<>();
+        for (Coordinate r : recipe.getCoordinateList()) {
+            List<Material> rCandidate = recipe.getMatterFromCoordinate(r).getCandidate();
+            for (Coordinate i : input.getCoordinateList()) {
+                List<Material> iCandidate = input.getMatterFromCoordinate(i).getCandidate();
+                if (!rCandidate.isEmpty() && !iCandidate.isEmpty() && new HashSet<>(rCandidate).containsAll(iCandidate)) {
+                    if (!map.containsKey(r)) map.put(r, new ArrayList<>());
+                    map.get(r).add(i);
+                }
+            }
+        }
+        return map;
+    }
+
+    public Map<Coordinate, Map<String, Boolean>> getEachMatterStatus(Recipe recipe) {
+        Map<Coordinate, Map<String, Boolean>> map = new HashMap<>();
+        for (Coordinate coordinate : recipe.getCoordinateList()) {
+            Map<String, Boolean> element = new HashMap<>();
+            Matter current = recipe.getMatterFromCoordinate(coordinate);
+            element.put("potion", current instanceof Potions);
+            element.put("enchant", current.hasWrap());
+            element.put("container", current.hasContainer());
+            map.put(coordinate, element);
+        }
+        return map;
+    }
+
+    public Map<Coordinate, Coordinate> combination(List<Map<Coordinate, List<Coordinate>>> input) {
+        Map<Coordinate, List<Coordinate>> merged = new HashMap<>();
+        for (Map<Coordinate, List<Coordinate>> element : input) {
+            for (Map.Entry<Coordinate, List<Coordinate>> entry : element.entrySet()) {
+                if (!merged.containsKey(entry.getKey())) {
+                    merged.put(entry.getKey(), entry.getValue());
+                    continue;
+                }
+
+                List<Coordinate> a = merged.get(entry.getKey());
+                List<Coordinate> b = entry.getValue();
+                List<Coordinate> both = bothContained(a, b);
+                if (both.isEmpty()) return new HashMap<>();
+                merged.put(entry.getKey(), both);
+            }
+        }
+
+        Bukkit.getLogger().info("merged map="+merged);
+
+        Map<Coordinate, List<Coordinate>> conflict = new HashMap<>();
+        Map<Coordinate, Coordinate> finished = new HashMap<>();
+        for (Map.Entry<Coordinate, List<Coordinate>> entry : merged.entrySet()) {
+            if (entry.getValue().size() == 1) {
+                if (!finished.containsKey(entry.getKey())) {
+                    finished.put(entry.getKey(), entry.getValue().get(0));
+                    continue;
+                }
+                // finished has already contained this value
+                Bukkit.getLogger().info("combination error (value duplication)");
+                return new HashMap<>();
+            }
+
+            conflict.put(entry.getKey(), entry.getValue());
+        }
+
+        Bukkit.getLogger().info("finished="+finished);
+        Bukkit.getLogger().info("conflict="+conflict);
+
+        if (hasDuplicate(finished)) {
+            Bukkit.getLogger().info("contains duplicate coordinate.");
+            return new HashMap<>();
+        }
+
+        // gen combination
+        List<Integer> sizes = new ArrayList<>();
+        conflict.forEach((k, e) -> sizes.add(e.size()));
+
+        int[] arr = new int[sizes.size()];
+        for (int i = 0; i < sizes.size(); i++) {
+            arr[i] = sizes.get(i);
+        }
+
+        int multi = getMultiply(-1, arr);
+        int[][] result = new int[multi][arr.length];
+        for (int x = 0; x < arr.length; x++) {
+            int times = getMultiply(x, arr);
+            for (int y = 0; y < multi; y++) {
+                int current = (y / times) % arr[x];
+                result[y][x] = current;
+            }
+        }
+
+        Set<String> non_duplicate = new HashSet<>();
+        A : for (int[] ss : result) {
+            List<Integer> buffer = new ArrayList<>();
+            for (int element : ss) {
+                if (buffer.contains(element)) continue A;
+                buffer.add(element);
+            }
+            non_duplicate.add(Arrays.toString(ss));
+        }
+
+        Bukkit.getLogger().info("non_duplicate="+non_duplicate);
+
+        List<String> non_duplcicate_list = new ArrayList<>(non_duplicate);
+        for (int i = 0; i < non_duplcicate_list.size(); i++) {
+            String[] temp = non_duplcicate_list.get(i).split(",");
+            int index = 0;
+            for (Map.Entry<Coordinate, List<Coordinate>> entry : conflict.entrySet()) {
+                Coordinate key = entry.getKey();
+
+                // debug ^ 2
+                Bukkit.getLogger().info("conflict loop (i="+i+", temp[index])="+temp[index]);
+
+                String indexParse = temp[index]
+                        .replace("[", "")
+                        .replace("]", "")
+                        .replace(" ", "");
+                Coordinate value = entry.getValue().get(Integer.parseInt(indexParse));
+                finished.put(key, value);
+
+                for (Map.Entry<Coordinate, List<Coordinate>> e : conflict.entrySet()) {
+                    if (e.getValue().contains(value)) {
+                        List<Coordinate> conflict_temp = conflict.get(key);
+                        conflict_temp.remove(value);
+                    }
+                }
+                index++;
+            }
+
+            if (hasDuplicate(finished)) {
+                Bukkit.getLogger().info("contains duplicate coordinate (in loop)");
+                continue;
+            }
+
+            Bukkit.getLogger().info("finished (index="+index+")="+finished);
+            return finished;
+        }
+
+        Bukkit.getLogger().info("recipe match failed.");
+        return new HashMap<>();
+    }
+
+    private boolean hasDuplicate(Map<Coordinate, Coordinate> map) {
+        return new HashSet<>(map.values()).size() != map.values().size();
+    }
+
+    private int getMultiply(int current, int[] arr) {
+        int result = 1;
+        if (current == arr.length - 1) return 1;
+        for (int i = current + 1; i < arr.length; i++) {
+            result *= arr[i];
+        }
+        return result;
+    }
+
+    private List<Coordinate> bothContained(List<Coordinate> a, List<Coordinate> b) {
+        List<Coordinate> result = new ArrayList<>();
+        List<Coordinate> ed = a.size() <= b.size() ? b : a;
+        List<Coordinate> er = a.size() <= b.size() ? a : b;
+        for (Coordinate coordinate : er) {
+            if (ed.contains(coordinate)) result.add(coordinate);
+        }
+        return result;
     }
 }

@@ -5,6 +5,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.ContainerWrappe
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Container.RecipeDataContainer;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Container.RecipeDataContainerModifyType;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordinate;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
@@ -63,6 +64,7 @@ public class ContainerUtil {
     private static final String USING_CONTAINER_VALUES_ITEM_NAME_PATTERN = "^using_container_values_item_name -> (.+)$";
     private static final int ENCHANTMENT_MAX_LEVEL = 255;
 
+
     public PersistentDataType getDataType(String input) {
         if (input.equalsIgnoreCase("string")) return PersistentDataType.STRING;
         if (input.equalsIgnoreCase("int")) return PersistentDataType.INTEGER;
@@ -70,12 +72,6 @@ public class ContainerUtil {
         return null;
     }
 
-    public Class getClassFromType(PersistentDataType type) {
-        if (type.equals(PersistentDataType.INTEGER)) return Integer.class;
-        if (type.equals(PersistentDataType.STRING)) return String.class;
-        if (type.equals(PersistentDataType.DOUBLE)) return Double.class;
-        return null;
-    }
 
     public Map<Integer, ContainerWrapper> mattersLoader(Path path) {
         Map<Integer, ContainerWrapper> map = new LinkedHashMap<>();
@@ -106,61 +102,10 @@ public class ContainerUtil {
         return map;
     }
 
-    public boolean isPassTargetEmpty(Matter source) {
-        // target = always empty
-        if (!source.hasContainer()) return true;
-        Map<Integer, ContainerWrapper> wrappers = source.getContainerWrappers();
-        for (Map.Entry<Integer, ContainerWrapper> entry : wrappers.entrySet()) {
-            String tag = entry.getValue().getTag();
-            if (tag.equals(ALLOW_TAG) || tag.equals(ALLOW_VALUE)) return false;
-        }
-        return true;
-    }
 
 
-    public boolean amorphousContainerCongruence(Recipe r, Recipe i) {
-        List<Matter> recipes = r.getContentsNoAir();
-        List<Matter> inputs = i.getContentsNoAir();
 
 
-        A:for (int j=0;j<recipes.size();j++) {
-            Matter recipe = recipes.get(j);
-            if (!recipe.hasContainer()) continue;
-
-            B:for (int k=0;k<inputs.size();k++) {
-                Matter input = inputs.get(k);
-                List<ContainerWrapper> wrappers = new ArrayList<>(recipe.getContainerWrappers().values());
-                List<ContainerWrapper> has = new ArrayList<>(input.getContainerWrappers().values());
-                if (!getContainerListCongruence(wrappers, has)) continue B;
-                continue A;
-            }
-            return false;
-        }
-        return true;
-    }
-
-    private boolean getContainerListCongruence(List<ContainerWrapper> recipe, List<ContainerWrapper> in) {
-        ItemStack dummyItemStack = new ItemStack(Material.STONE);
-        ItemMeta meta = dummyItemStack.getItemMeta();
-        PersistentDataContainer dummyContainer = meta.getPersistentDataContainer();
-        for (ContainerWrapper wrapper : in) {
-            NamespacedKey key = wrapper.getKey();
-            PersistentDataType type = wrapper.getType();
-            String stringValue = wrapper.getValue();
-            if (type.equals(PersistentDataType.STRING)) dummyContainer.set(key, type, stringValue);
-            if (type.equals(PersistentDataType.INTEGER)) dummyContainer.set(key, type, Integer.parseInt(stringValue));
-            if (type.equals(PersistentDataType.DOUBLE)) dummyContainer.set(key, type, Double.parseDouble(stringValue));
-        }
-        dummyItemStack.setItemMeta(meta);
-
-        Matter dummyMatter = new Matter(new ItemStack(Material.STONE));
-        Map<Integer, ContainerWrapper> map = new HashMap<>();
-        for (int i=0;i<recipe.size();i++) {
-            map.put(i, recipe.get(i));
-        }
-        dummyMatter.setContainerWrappers(map);
-        return isPass(dummyItemStack, dummyMatter);
-    }
 
     public boolean isPass(ItemStack item, Matter matter) {
         // item -> target, matter -> source (recipe)
@@ -208,7 +153,7 @@ public class ContainerUtil {
                 continue;
             } else if (value.matches(SMALLER_PATTERN)) {
                 if (!smallerPatternOperation(value, container, wrapper)) return false;
-                continue;
+               continue;
             } else if (value.matches(LARGER_PATTERN)) {
                 if (!largerPatternOperation(value, container, wrapper)) return false;
                 continue;
@@ -313,6 +258,8 @@ public class ContainerUtil {
         * $store_1<-->$store_3
         *
         * $[KeyName]+1<-->$[KeyName]+1
+        *
+        * ex) input value = 100, and input formula "99 <--> 200" returns true;
          */
         double start = getFormulaValue(matcher.group(1), container);
         double end = getFormulaValue(matcher.group(2), container);
@@ -418,7 +365,7 @@ public class ContainerUtil {
 
     private double calc(String input) {
 
-        if (input.matches("^([\\d]*)(\\.?)(\\d)+$")) return Double.parseDouble(input);
+        if (input.matches("^(\\d*)(\\.?)(\\d)+$")) return Double.parseDouble(input);
 
         List<String> outQueue = new ArrayList<>();
         List<String> stack = new ArrayList<>();
@@ -500,7 +447,7 @@ public class ContainerUtil {
         double accumlator = 0;
         List<Double> stacks = new ArrayList<>();
         for (String s : list) {
-            if (!s.matches("(\\+|\\-|\\*|/|^)")) {
+            if (!s.matches("(\\+|-|\\*|/|^)")) {
                 String t = s.contains("~") ? s.replace("~", "-") : s ;
                 stacks.add(Double.parseDouble(t));
                 continue;
@@ -678,7 +625,7 @@ public class ContainerUtil {
                 continue;
             }
 
-            if (s.matches("(\\+|\\-|/|\\*|\\(|\\)|\\^|\\[|\\])")) {
+            if (s.matches("(\\+|-|/|\\*|\\(|\\)|\\^|\\[|\\])")) {
                 if (buffer.size() == 0) {
                     queue.add(s);
                     continue;
@@ -1032,4 +979,166 @@ public class ContainerUtil {
             //
         }
     }
+
+
+    public Map<Coordinate, List<Coordinate>> amorphous(Recipe recipe, Recipe input) {
+        List<Coordinate> r = recipe.getHasContainerDataItemList();
+        List<Coordinate> i = input.getHasContainerDataItemList();
+        Map<Coordinate, List<Coordinate>> map = new HashMap<>();
+
+        // returns NULL = no container required
+        // returns an EMPTY MAP = the input does not matched.
+        if (r.isEmpty()) return new HashMap<Coordinate, List<Coordinate>>() {{
+            put(Coordinate.NULL_ANCHOR, Collections.emptyList());
+        }};
+        if (i.isEmpty()) return new HashMap<>();
+
+        // container wrapper's "value" is value. (sometimes when a wrapper has the tag "allow_tag" or "deny tag", this variable maybe empty.)
+
+        for (int j = 0; j < r.size(); j++) {
+            Matter R = recipe.getMatterFromCoordinate(r.get(j));
+            Matter I = input.getMatterFromCoordinate(i.get(j));
+            int judge = 0;
+            for (int k = 0; k < R.getContainerWrappers().size(); k++) {
+                ContainerWrapper rContainerWrapper = R.getContainerWrappers().get(k);
+                String TAG = rContainerWrapper.getTag();
+                String VALUE = rContainerWrapper.getValue();
+                String KEY = rContainerWrapper.getKey().getKey();
+                String TYPE = rContainerWrapper.getValueType().toGenericString().toLowerCase();
+                if (TAG.equals(STORE_ONLY)) judge += 1;
+                else if (TAG.equals(ALLOW_TAG)) {
+                    if (!VALUE.contains(",") && !VALUE.startsWith("(multi)")) {
+                        if (hasKey(I, KEY)) judge += 1;
+                    }
+                    if (multiKeys(I, VALUE, true)) judge += 1;
+
+                } else if (TAG.equals(DENY_TAG)) {
+                    if (!VALUE.contains(",") && !VALUE.startsWith("(multi)")) {
+                        if (!hasKey(I, KEY)) judge += 1;
+                    }
+                    if (multiKeys(I, VALUE, false)) judge += 1;
+
+                } else if (TAG.equals(ALLOW_VALUE) && hasValue(I, KEY, VALUE, TYPE)) judge += 1;
+                 else if (TAG.equals(DENY_VALUE) && !hasValue(I, KEY, VALUE, TYPE)) judge += 1;
+            }
+
+            if (judge == R.getContainerWrappers().size()) {
+                if (!map.containsKey(r.get(j))) map.put(r.get(j), new ArrayList<>());
+                map.get(r.get(j)).add(i.get(j));
+            }
+        }
+
+        //debug
+        System.out.println("[ContainerUtil]r size="+r.size()+", i size="+i.size());
+        map.forEach((key, value) -> System.out.printf("[ContainerUtil] index=%s, list=%s%n", key.toString(), value.toString()));
+
+        return map;
+    }
+
+    private boolean multiKeys(Matter matter, String multiKeys, boolean needed) {
+        // (multi)(types:int*3,string*3,double*1)a,b,c,d,e,f,g
+        // -> a,b,c = type int
+        // -> d,e,f = type string
+        // -> g = type double
+        // when these keys exist and the variable "needed" is true, this returns true.
+        // when these keys not exist and the variable "needed" is false, this return true.
+        // otherwise, this returns false.
+        // this method only for "ALLOW_TAG" and "DENY_TAG". Not "ALLOW_VALUE" and "DENY_VALUE".
+        Matcher matcher = Pattern.compile(MULTI_VALUE_PATTERN).matcher(multiKeys);
+        if (!matcher.matches()) return false;
+        List<String> variableNames = new ArrayList<>(Arrays.asList(matcher.group(2).split(",")));
+        for (String variableName : variableNames) {
+            int judge = 0;
+            for (Map.Entry<Integer, ContainerWrapper> entry : matter.getContainerWrappers().entrySet()) {
+                String name = entry.getValue().getKey().getKey();
+                if (variableName.equals(name)) {
+                    judge += 1;
+                    break;
+                }
+            }
+            if ((!needed && judge != 0) || (needed && judge == 0)) return false;
+        }
+        return true;
+    }
+
+    private boolean hasKey(Matter matter, String keyName) {
+        for (int i = 0; i < matter.getContainerWrappers().size(); i++) {
+            ContainerWrapper wrapper = matter.getContainerWrappers().get(i);
+            if (wrapper.getKey().getKey().equals(keyName)) return true;
+        }
+        return false;
+    }
+
+    private boolean hasValue(Matter matter, String keyName, String value, String type) {
+        Map<String, ContainerWrapper> data = new HashMap<>();
+        for (Map.Entry<Integer, ContainerWrapper> entry : matter.getContainerWrappers().entrySet()) {
+            String key = entry.getValue().getKey().getKey();
+            data.put(key, entry.getValue());
+        }
+
+        for (int i = 0; i < matter.getContainerWrappers().size(); i++) {
+            ContainerWrapper wrapper = matter.getContainerWrappers().get(i);
+            String typeStr = wrapper.getValueType().toGenericString().toLowerCase();
+            if (!typeStr.equals(type) || !keyName.equals(wrapper.getKey().getKey())) continue;
+            int judge = 0;
+            judge += isInArrowRange(value, keyName,data) ? 1 : 0;
+            judge += isInSmallerRange(value, keyName, data) ? 1 : 0;
+            judge += isInLargerRange(value, keyName, data) ? 1 : 0;
+            if (judge == 0) return false;
+        }
+        return true;
+    }
+
+    private boolean isInArrowRange(String source, String key,Map<String, ContainerWrapper> data) {
+        Matcher matcher = Pattern.compile(ARROW_RANGE_PATTERN).matcher(source);
+        if (!matcher.matches()) return false;
+        double start = getFormulaValue(matcher.group(1), data);
+        double end = getFormulaValue(matcher.group(2), data);
+        double value = getFormulaValue(data.get(key).getValue(), data);
+
+        return start < value && value < end;
+    }
+
+    private boolean isInSmallerRange(String source, String key,Map<String, ContainerWrapper> data) {
+        Matcher matcher = Pattern.compile(SMALLER_PATTERN).matcher(source);
+        if (!matcher.matches()) return false;
+        double large = getFormulaValue(matcher.group(1), data);
+        double value = getFormulaValue(data.get(key).getValue(), data);
+
+        return value < large;
+    }
+
+    private boolean isInLargerRange(String source, String key, Map<String, ContainerWrapper> data) {
+        Matcher matcher = Pattern.compile(LARGER_PATTERN).matcher(source);
+        if (!matcher.matches()) return false;
+        double small = getFormulaValue(matcher.group(1), data);
+        double value = getFormulaValue(data.get(key).getValue(), data);
+
+        return small < value;
+    }
+
+    private double getFormulaValue(String formula, Map<String, ContainerWrapper> map) {
+        Map<String, Double> data = new HashMap<>();
+        for (Map.Entry<String, ContainerWrapper> entry : map.entrySet()) {
+            if (entry.getValue().getValueType().equals(String.class)) continue;
+            String key = entry.getKey();
+            double v = Double.parseDouble(entry.getValue().getValue());
+            data.put(key, v);
+        }
+
+        StringBuilder stack = new StringBuilder();
+        for (int i = 0; i < formula.length(); i++) {
+            String c = String.valueOf(formula.charAt(i));
+            if (!c.equals("$") && stack.length() == 0) continue;
+            if (c.matches("[-+/*^~()]")) {
+                String replacer = String.valueOf(data.get(stack.toString()));
+                formula = formula.replace(stack.toString(), replacer);
+                stack.setLength(0);
+            }
+            stack.append(c);
+        }
+        return calc(formula);
+    }
+
+
 }
