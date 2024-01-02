@@ -103,12 +103,15 @@ public class Search {
                 Map<Coordinate, List<Coordinate>> enchant = new EnchantUtil().amorphous(recipe, input);
                 Map<Coordinate, List<Coordinate>> container = new ContainerUtil().amorphous(recipe, input);
                 Map<Coordinate,List<Coordinate>> candidate = new InventoryUtil().amorphous(recipe, input);
+                Map<Coordinate, List<Coordinate>> potion = new PotionUtil().amorphous(recipe, input);
+
                 Map<Coordinate, Map<String, Boolean>> rStatus = new InventoryUtil().getEachMatterStatus(recipe);
                 Map<Coordinate, Map<String, Boolean>> iStatus = new InventoryUtil().getEachMatterStatus(input);
 
                 Bukkit.getLogger().info("enchant map="+enchant);
                 Bukkit.getLogger().info("container map="+container);
                 Bukkit.getLogger().info("candidate map="+candidate);
+                Bukkit.getLogger().info("potion map="+potion);
 
                 if (!isElementMatch(enchant, rStatus, "enchant")) {
                     Bukkit.getLogger().info("enchant not matched");
@@ -117,6 +120,11 @@ public class Search {
 
                 if (!isElementMatch(container, rStatus, "container")) {
                     Bukkit.getLogger().info("container not matched");
+                    continue Top;
+                }
+
+                if (!isElementMatch(potion, rStatus, "potion")) {
+                    Bukkit.getLogger().info("potion not matched");
                     continue Top;
                 }
 
@@ -129,6 +137,8 @@ public class Search {
 
                 //if (container.isEmpty()) continue;
                 if (!container.isEmpty() && !container.equals(AMORPHOUS_NULL_ANCHOR)) temp.add(container);
+
+                if (!potion.isEmpty() && !potion.equals(AMORPHOUS_NULL_ANCHOR)) temp.add(potion);
 
 
                 for (Map<Coordinate, List<Coordinate>> element : temp) {

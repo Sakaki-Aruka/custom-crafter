@@ -110,6 +110,15 @@ public class Potions extends Matter implements Matters {
         return data;
     }
 
+    public Map<PotionEffect, PotionStrict> getUsefulData() {
+        Map<PotionEffect, PotionStrict> map = new HashMap<>();
+        for (Map.Entry<PotionEffect, PotionStrict> entry : this.getData().entrySet()) {
+            if (entry.getValue().equals(PotionStrict.NOT_STRICT)) continue;
+            map.put(entry.getKey(), entry.getValue());
+        }
+        return map;
+    }
+
     public PotionBottleType getBottle() {
         return bottle;
     }
@@ -231,5 +240,17 @@ public class Potions extends Matter implements Matters {
         boolean match = this.bottleTypeMatch;
         Potions potion = new Potions(matter,data,bottle,match);
         return potion;
+    }
+
+    public Map<PotionEffectType, Map<PotionEffect, PotionStrict>> getEffectTypeMap() {
+        Map<PotionEffectType, Map<PotionEffect, PotionStrict>> map = new HashMap<>();
+        for (Map.Entry<PotionEffect, PotionStrict> entry : getData().entrySet()) {
+            PotionEffectType type = entry.getKey().getType();
+            Map<PotionEffect, PotionStrict> value = new HashMap<PotionEffect, PotionStrict>() {{
+                put(entry.getKey(), entry.getValue());
+            }};
+            map.put(type, value);
+        }
+        return map;
     }
 }

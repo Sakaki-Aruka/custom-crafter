@@ -3,6 +3,7 @@ package com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantStrict;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantWrap;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.Potions;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Permission.RecipePermission;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Container.RecipeDataContainer;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.Result;
@@ -230,6 +231,15 @@ public class Recipe {
                 element.add(wrap);
             }
             list.add(element);
+        }
+        return list;
+    }
+
+    public List<Coordinate> getPotionCoordinateList() {
+        List<Coordinate> list = new ArrayList<>();
+        for (Map.Entry<Coordinate, Matter> entry : this.coordinate.entrySet()) {
+            if (!(entry.getValue() instanceof Potions)) continue;
+            list.add(entry.getKey());
         }
         return list;
     }

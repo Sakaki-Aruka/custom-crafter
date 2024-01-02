@@ -6,12 +6,16 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.PotionDa
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.PotionBottleType;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.PotionStrict;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.Potions;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordinate;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.potion.*;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.potion.PotionType;
+import org.bukkit.potion.PotionData;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
@@ -19,7 +23,11 @@ import java.io.FileWriter;
 import java.io.IOException;;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter.getInstance;
 import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.BAR;
@@ -161,29 +169,6 @@ public class PotionUtil {
         return list;
     }
 
-    public boolean getPotionsCongruence(Recipe r, Recipe i) {
-        List<Potions> recipes = getPotions(r);
-        List<Potions> inputs = getPotions(i);
-        if(recipes.isEmpty()) return true;
-        if(recipes.size() > inputs.size()) return false;
-
-        for(Potions potion : recipes) {
-            for(Potions drug : inputs) {
-                if(isSamePotion(potion, drug)) break;
-            }
-            return false;
-        }
-        return true;
-    }
-
-    private List<Potions> getPotions(Recipe recipe) {
-        List<Potions> list = new ArrayList<>();
-        for(Matter matter : recipe.getContentsNoAir()) {
-            if(!matter.getClass().equals(Potions.class)) continue;
-            list.add((Potions) matter);
-        }
-        return list;
-    }
 
 
     private void makeDefaultPotionFiles(String basePath, boolean mass, boolean upgraded, boolean extended, String strict) {
@@ -302,6 +287,41 @@ public class PotionUtil {
             return false;
         }
         return true;
+    }
+
+    public Map<Coordinate, List<Coordinate>> amorphous(Recipe recipe, Recipe input) {
+        // returns candidate of correct pattern
+        Map<Coordinate, List<Coordinate>> result = new HashMap<>();
+        //
+        List<Coordinate> r = recipe.getPotionCoordinateList();
+        List<Coordinate> i = input.getPotionCoordinateList();
+
+        //debug
+        Bukkit.getLogger().info("potion pre list(recipe)="+r);
+        Bukkit.getLogger().info("potion pre list(input)="+i);
+
+        Map<Coordinate, List<Coordinate>> NULL_ANOCHOR_MAP = new HashMap<Coordinate, List<Coordinate>>() {{
+            put(Coordinate.NULL_ANCHOR, Collections.emptyList());
+        }};
+
+        if (r.isEmpty()) return NULL_ANOCHOR_MAP; // not enough elements
+        if (r.size() > i.size()) return new HashMap<>(); // not match
+
+        for (Coordinate a : r) {
+            for (Coordinate b : i) {
+                Potions source = (Potions) recipe.getMatterFromCoordinate(a);
+                Potions target = (Potions) input.getMatterFromCoordinate(b);
+
+                if (!isSamePotion(source, target)) continue;
+                if (!result.containsKey(a)) result.put(a, new ArrayList<>());
+                result.get(a).add(b);
+            }
+        }
+
+        //debug
+        result.forEach((key, value) -> System.out.println("PotionList(key)="+key.toString()+" / value="+value.toString()));
+
+        return result;
     }
 
 }
