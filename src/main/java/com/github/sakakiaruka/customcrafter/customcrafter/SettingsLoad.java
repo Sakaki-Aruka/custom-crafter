@@ -318,26 +318,7 @@ public class SettingsLoad {
                 }
             }
 
-            List<ContainerWrapper> phony = new ArrayList<>();
-            if (config.contains("container")) {
-                int counter = 0;
-                while (true) {
-                    if (!config.contains("container."+counter)) break;
-                    String locate = "container." + counter + ".";
-                    NamespacedKey key = new NamespacedKey(getInstance(), config.getString(locate+"key"));
-                    PersistentDataType type = new DataContainerUtil().getDataType(config.getString(locate+"type"));
-                    String tag = config.getString(locate+"tag");
-                    int order = config.getInt(locate+"order");
-                    String value = config.getString(locate+"value");
-                    if (key == null || type == null) continue;
-                    ContainerWrapper content = new ContainerWrapper(key, type, value,order,tag);
-                    phony.add(content);
-                    counter++;
-                }
-
-            }
-
-            Result result = new Result(name,enchantInfo,amount,metadata,nameOrRegex,matchPoint, phony);
+            Result result = new Result(name,enchantInfo,amount,metadata,nameOrRegex,matchPoint);
             RESULTS.put(name,result);
             CUSTOM_RESULTS.put(name, result);
         }
@@ -346,7 +327,13 @@ public class SettingsLoad {
     private void addAllVanillaMaterial(){
         for(Material material : Material.values()){
             String name = material.name().toLowerCase();
-            Result result = new Result(name,null,1,null,material.name(),-1, new ArrayList<>());
+//            Result test = new Result(name,null,1,null,material.name(),-1, new ArrayList<>());
+            Result result = new Result().
+                    setAmount(1).
+                    setName(name).
+                    setNameOrRegex(material.name()).
+                    setMatchPoint(-1);
+
             RESULTS.put(name,result);
 
             Matter matter = new Matter(Arrays.asList(material), 1);
@@ -619,7 +606,7 @@ public class SettingsLoad {
                     RecipeDataContainerModifyType modifyType = RecipeDataContainerModifyType.valueOf(config.getString(address+"modify_type").toUpperCase());
                     PersistentDataType type = new ContainerUtil().getDataType(config.getString(address+"type").toUpperCase());
                     String term = config.getString(address+"term");
-                    String action = config.getString(address+"action");
+                    String action = Objects.requireNonNullElse(config.getString(address + "action"), "");
                     boolean end = config.getBoolean(address+"return");
                     counter++;
                     RecipeDataContainer data = new RecipeDataContainer(type, term, action, end, modifyType);

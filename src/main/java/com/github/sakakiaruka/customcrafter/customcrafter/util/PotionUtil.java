@@ -8,6 +8,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.Potions;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordinate;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
+import com.github.sakakiaruka.customcrafter.customcrafter.search.Search;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -300,12 +301,8 @@ public class PotionUtil {
         Bukkit.getLogger().info("potion pre list(recipe)="+r);
         Bukkit.getLogger().info("potion pre list(input)="+i);
 
-        Map<Coordinate, List<Coordinate>> NULL_ANOCHOR_MAP = new HashMap<Coordinate, List<Coordinate>>() {{
-            put(Coordinate.NULL_ANCHOR, Collections.emptyList());
-        }};
-
-        if (r.isEmpty()) return NULL_ANOCHOR_MAP; // not enough elements
-        if (r.size() > i.size()) return new HashMap<>(); // not match
+        if (r.isEmpty()) return Search.AMORPHOUS_NON_REQUIRED_ANCHOR; // no required potion elements
+        if (r.size() > i.size()) return Search.AMORPHOUS_NULL_ANCHOR; // failed to match
 
         for (Coordinate a : r) {
             for (Coordinate b : i) {
@@ -321,7 +318,7 @@ public class PotionUtil {
         //debug
         result.forEach((key, value) -> System.out.println("PotionList(key)="+key.toString()+" / value="+value.toString()));
 
-        return result;
+        return result.isEmpty() ? Search.AMORPHOUS_NULL_ANCHOR : result;
     }
 
 }

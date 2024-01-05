@@ -11,21 +11,21 @@ import java.util.List;
 import java.util.Map;
 
 public class DataContainerUtil{
-    public PersistentDataType getDataType(String input) {
-        if (input.equalsIgnoreCase("BOOLEAN")) return PersistentDataType.BYTE;
-        // deprecated
-        if (input.equalsIgnoreCase("INTEGER")) return PersistentDataType.INTEGER;
-        if (input.equalsIgnoreCase("STRING")) return PersistentDataType.STRING;
-        if (input.equalsIgnoreCase("DOUBLE")) return PersistentDataType.DOUBLE;
-        return null;
-    }
-
-    public void addAllData(ItemStack in, List<ContainerWrapper> data) {
-        ItemMeta meta = in.getItemMeta();
-        PersistentDataContainer container = meta.getPersistentDataContainer();
-        for (ContainerWrapper content : data) {
-            if (container.has(content.getKey(),content.getType())) continue;
-            container.set(content.getKey(), content.getType(), content.getValue());
-        }
-    }
+//    public PersistentDataType getDataType(String input) {
+//        if (input.equalsIgnoreCase("BOOLEAN")) return PersistentDataType.BYTE;
+//        // deprecated
+//        if (input.equalsIgnoreCase("INTEGER")) return PersistentDataType.INTEGER;
+//        if (input.equalsIgnoreCase("STRING")) return PersistentDataType.STRING;
+//        if (input.equalsIgnoreCase("DOUBLE")) return PersistentDataType.DOUBLE;
+//        return null;
+//    }
+//
+//    public void addAllData(ItemStack in, List<ContainerWrapper> data) {
+//        ItemMeta meta = in.getItemMeta();
+//        PersistentDataContainer container = meta.getPersistentDataContainer();
+//        for (ContainerWrapper content : data) {
+//            if (container.has(content.getKey(),content.getType())) continue;
+//            container.set(content.getKey(), content.getType(), content.getValue());
+//        }
+//    }
 }

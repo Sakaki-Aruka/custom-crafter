@@ -7,6 +7,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Containe
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Container.RecipeDataContainerModifyType;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordinate;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
+import com.github.sakakiaruka.customcrafter.customcrafter.search.Search;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
@@ -44,6 +45,10 @@ public class ContainerUtil {
     private static final String ARROW_RANGE_PATTERN = "^([0-9a-zA-Z+\\-*/()$_]+)<-->([0-9a-zA-Z+\\-*/()$_]+)$";
     private static final String LARGER_PATTERN = "^([0-9a-zA-Z+\\-*/()$_]+)<$";
     private static final String SMALLER_PATTERN = "<([0-9a-zA-Z+\\-*/()$_]+)";
+    private static final String NUMBER_EQUALS_PATTERN = "==([0-9a-zA-Z+\\-*/()$_]+)";
+    private static final String STRING_EQUALS_PATTERN = "==\\[(.+)]";
+    private static final String STRING_IGNORE_EQUALS_PATTERN = "\\?=\\[(.+)]";
+    private static final String FOLLOW_REGEX_PATTERN = "r=\\[(.+)]";
     private static final String CONTAINER_OPERATION_PATTERN = "([+\\-/*^])";
 
     private static final String RECIPE_CONTAINER_ARROW_RANGE_PATTERN = "^([0-9a-zA-Z+\\-*/()$_\\[\\]]+)<--\\[(maximum|minimum|median|mode|average|random)\\]-->([0-9a-zA-Z+\\-*/()$_\\[\\]]+)$";
@@ -555,8 +560,16 @@ public class ContainerUtil {
                 boolean isNumeric = type.equals(PersistentDataType.INTEGER) || type.equals(PersistentDataType.DOUBLE);
 
                 if (modifyType.equals(RecipeDataContainerModifyType.MAKE)) {
-                    if (type.equals(PersistentDataType.STRING)) container.set(key, type, "");
-                    else container.set(key, type, 0);
+                    if (type.equals(PersistentDataType.STRING)) {
+                        String value = action.isEmpty() ? "" : action;
+                        container.set(key, type, value);
+                    } else if (type.equals(PersistentDataType.DOUBLE)) {
+                        double value = Double.parseDouble(action.isEmpty() ? "0" : action);
+                        container.set(key, type, value);
+                    } else if (type.equals(PersistentDataType.INTEGER)) {
+                        int value = Integer.parseInt(action.isEmpty() ? "0" : action);
+                        container.set(key, type, value);
+                    }
                 }
 
                 if (!isNumeric) {
@@ -986,12 +999,11 @@ public class ContainerUtil {
         List<Coordinate> i = input.getHasContainerDataItemList();
         Map<Coordinate, List<Coordinate>> map = new HashMap<>();
 
-        // returns NULL = no container required
-        // returns an EMPTY MAP = the input does not matched.
-        if (r.isEmpty()) return new HashMap<Coordinate, List<Coordinate>>() {{
-            put(Coordinate.NULL_ANCHOR, Collections.emptyList());
-        }};
-        if (i.isEmpty()) return new HashMap<>();
+
+        // returns NON_REQUIRED = non required container elements
+        // returns NULL         = an input does not matched
+        if (r.isEmpty()) return Search.AMORPHOUS_NON_REQUIRED_ANCHOR;
+        if (r.size() > i.size()) return Search.AMORPHOUS_NULL_ANCHOR;
 
         // container wrapper's "value" is value. (sometimes when a wrapper has the tag "allow_tag" or "deny tag", this variable maybe empty.)
 
@@ -1009,17 +1021,16 @@ public class ContainerUtil {
                 else if (TAG.equals(ALLOW_TAG)) {
                     if (!VALUE.contains(",") && !VALUE.startsWith("(multi)")) {
                         if (hasKey(I, KEY)) judge += 1;
-                    }
-                    if (multiKeys(I, VALUE, true)) judge += 1;
+                    } else if (multiKeys(I, VALUE, true)) judge += 1;
 
                 } else if (TAG.equals(DENY_TAG)) {
                     if (!VALUE.contains(",") && !VALUE.startsWith("(multi)")) {
                         if (!hasKey(I, KEY)) judge += 1;
-                    }
-                    if (multiKeys(I, VALUE, false)) judge += 1;
+                    } else if (multiKeys(I, VALUE, false)) judge += 1;
+                }
 
-                } else if (TAG.equals(ALLOW_VALUE) && hasValue(I, KEY, VALUE, TYPE)) judge += 1;
-                 else if (TAG.equals(DENY_VALUE) && !hasValue(I, KEY, VALUE, TYPE)) judge += 1;
+                if (TAG.equals(ALLOW_VALUE) && hasValue(I, KEY, VALUE, TYPE)) judge += 1;
+                if (TAG.equals(DENY_VALUE) && !hasValue(I, KEY, VALUE, TYPE)) judge += 1;
             }
 
             if (judge == R.getContainerWrappers().size()) {
@@ -1029,10 +1040,10 @@ public class ContainerUtil {
         }
 
         //debug
-        System.out.println("[ContainerUtil]r size="+r.size()+", i size="+i.size());
+        Bukkit.getLogger().info("[ContainerUtil]r size=" + r.size() + ", i size=" + i.size());
         map.forEach((key, value) -> System.out.printf("[ContainerUtil] index=%s, list=%s%n", key.toString(), value.toString()));
 
-        return map;
+        return map.isEmpty() ? Search.AMORPHOUS_NULL_ANCHOR : map;
     }
 
     private boolean multiKeys(Matter matter, String multiKeys, boolean needed) {
@@ -1081,13 +1092,45 @@ public class ContainerUtil {
             String typeStr = wrapper.getValueType().toGenericString().toLowerCase();
             if (!typeStr.equals(type) || !keyName.equals(wrapper.getKey().getKey())) continue;
             int judge = 0;
-            judge += isInArrowRange(value, keyName,data) ? 1 : 0;
-            judge += isInSmallerRange(value, keyName, data) ? 1 : 0;
-            judge += isInLargerRange(value, keyName, data) ? 1 : 0;
+            if (type.equals("int") || type.equals("double")) {
+                judge += isInArrowRange(value, keyName,data) ? 1 : 0;
+                judge += isInSmallerRange(value, keyName, data) ? 1 : 0;
+                judge += isInLargerRange(value, keyName, data) ? 1 : 0;
+            } else if (type.equals("string")) {
+                judge += isEqualsString(value, keyName, data) ? 1 : 0;
+                judge += isEqualsIgnoreCase(value, keyName, data) ? 1 : 0;
+                judge += isFollowRegexPattern(value, keyName, data) ? 1 : 0;
+            }
+
             if (judge == 0) return false;
         }
         return true;
     }
+
+    private boolean isFollowRegexPattern(String source, String key, Map<String, ContainerWrapper> data) {
+        Matcher matcher = Pattern.compile(FOLLOW_REGEX_PATTERN).matcher(source);
+        if (!matcher.matches()) return false;
+        String element = getFormulaValueString(matcher.group(1), data);
+        String value = getFormulaValueString(data.get(key).getValue(), data);
+        return Pattern.compile(value).matcher(element).matches();
+    }
+
+    private boolean isEqualsIgnoreCase(String source, String key, Map<String, ContainerWrapper> data) {
+        Matcher matcher = Pattern.compile(STRING_IGNORE_EQUALS_PATTERN).matcher(source);
+        if (!matcher.matches()) return false;
+        String element = getFormulaValueString(matcher.group(1), data);
+        String value = getFormulaValueString(data.get(key).getValue(), data);
+        return element.equalsIgnoreCase(value);
+    }
+
+    private boolean isEqualsString(String source, String key, Map<String, ContainerWrapper> data) {
+        Matcher matcher = Pattern.compile(STRING_EQUALS_PATTERN).matcher(source);
+        if (!matcher.matches()) return false;
+        String element = getFormulaValueString(matcher.group(1), data);
+        String value = getFormulaValueString(data.get(key).getValue(), data);
+        return element.equals(value);
+    }
+
 
     private boolean isInArrowRange(String source, String key,Map<String, ContainerWrapper> data) {
         Matcher matcher = Pattern.compile(ARROW_RANGE_PATTERN).matcher(source);
@@ -1129,7 +1172,7 @@ public class ContainerUtil {
         StringBuilder stack = new StringBuilder();
         for (int i = 0; i < formula.length(); i++) {
             String c = String.valueOf(formula.charAt(i));
-            if (!c.equals("$") && stack.length() == 0) continue;
+            if (!c.equals("$") && stack.isEmpty()) continue;
             if (c.matches("[-+/*^~()]")) {
                 String replacer = String.valueOf(data.get(stack.toString()));
                 formula = formula.replace(stack.toString(), replacer);
@@ -1138,6 +1181,33 @@ public class ContainerUtil {
             stack.append(c);
         }
         return calc(formula);
+    }
+
+    private String getFormulaValueString(String formula, Map<String, ContainerWrapper> map) {
+        Map<String, String> data = new HashMap<>();
+        for (Map.Entry<String, ContainerWrapper> entry : map.entrySet()) {
+            if (!entry.getValue().getValueType().equals(String.class)) continue;
+            String key = entry.getKey();
+            String v = entry.getValue().getValue();
+            data.put(key, v);
+        }
+
+        StringBuilder value = new StringBuilder();
+        for (int i = 0; i < formula.length(); i++) {
+            String c = String.valueOf(formula.charAt(i));
+            if (c.matches("[^0-9a-zA-Z_]")) {
+                String buffer = value.toString();
+                int start = buffer.lastIndexOf("$");
+                String key = buffer.substring(start + 1, i);
+                if (start == -1 || !data.containsKey(key)) {
+                    value.append(c);
+                    continue;
+                }
+                value.replace(start + 1, i, data.get(key));
+            }
+            value.append(c);
+        }
+        return value.toString();
     }
 
 

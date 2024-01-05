@@ -36,8 +36,12 @@ import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.*;
 public class Search {
 
     private static final String PASS_THROUGH_PATTERN = "^(?i)pass -> ([a-zA-Z_]+)$";
-    private final Map<Coordinate, List<Coordinate>> AMORPHOUS_NULL_ANCHOR = new HashMap<Coordinate, List<Coordinate>>() {{
+    public static final Map<Coordinate, List<Coordinate>> AMORPHOUS_NULL_ANCHOR = new HashMap<Coordinate, List<Coordinate>>() {{
         put(Coordinate.NULL_ANCHOR, Collections.emptyList());
+    }};
+
+    public static final Map<Coordinate, List<Coordinate>> AMORPHOUS_NON_REQUIRED_ANCHOR = new HashMap<Coordinate, List<Coordinate>>() {{
+        put(Coordinate.NON_REQUIRED_ANCHOR, Collections.emptyList());
     }};
 
     public void massSearch(Player player,Inventory inventory, boolean isOneCraft){
@@ -98,6 +102,9 @@ public class Search {
 
             }else{
 
+                Bukkit.getLogger().info(BAR);
+                Bukkit.getLogger().info("recipe name="+recipe.getName());
+
                 //debug
                 List<Map<Coordinate, List<Coordinate>>> temp = new ArrayList<>();
                 Map<Coordinate, List<Coordinate>> enchant = new EnchantUtil().amorphous(recipe, input);
@@ -113,32 +120,24 @@ public class Search {
                 Bukkit.getLogger().info("candidate map="+candidate);
                 Bukkit.getLogger().info("potion map="+potion);
 
-                if (!isElementMatch(enchant, rStatus, "enchant")) {
+                if (!enchant.equals(AMORPHOUS_NON_REQUIRED_ANCHOR) && !isElementMatch(enchant, rStatus, "enchant")) {
                     Bukkit.getLogger().info("enchant not matched");
                     continue Top;
                 }
 
-                if (!isElementMatch(container, rStatus, "container")) {
+                if (!container.equals(AMORPHOUS_NON_REQUIRED_ANCHOR) && !isElementMatch(container, rStatus, "container")) {
                     Bukkit.getLogger().info("container not matched");
                     continue Top;
                 }
 
-                if (!isElementMatch(potion, rStatus, "potion")) {
+                if (!potion.equals(AMORPHOUS_NON_REQUIRED_ANCHOR) && !isElementMatch(potion, rStatus, "potion")) {
                     Bukkit.getLogger().info("potion not matched");
                     continue Top;
                 }
 
-                //TODO : have to impl Potion check
-
-
-                //if (enchant.isEmpty()) continue;
-
-                if (!enchant.isEmpty() && !enchant.equals(AMORPHOUS_NULL_ANCHOR)) temp.add(enchant);
-
-                //if (container.isEmpty()) continue;
-                if (!container.isEmpty() && !container.equals(AMORPHOUS_NULL_ANCHOR)) temp.add(container);
-
-                if (!potion.isEmpty() && !potion.equals(AMORPHOUS_NULL_ANCHOR)) temp.add(potion);
+                if (!enchant.equals(AMORPHOUS_NON_REQUIRED_ANCHOR)) temp.add(enchant);
+                if (!container.equals(AMORPHOUS_NON_REQUIRED_ANCHOR)) temp.add(container);
+                if (!potion.equals(AMORPHOUS_NON_REQUIRED_ANCHOR)) temp.add(potion);
 
 
                 for (Map<Coordinate, List<Coordinate>> element : temp) {
@@ -151,21 +150,9 @@ public class Search {
                     Bukkit.getLogger().info("  source(candidate)="+element.getKey()+" / element="+element.getValue());
                 }
 
-                Bukkit.getLogger().info("recipe name="+recipe.getName());
+
                 for (Map.Entry<Coordinate, Map<String, Boolean>> entry : rStatus.entrySet()) {
                     Bukkit.getLogger().info("coordinate="+entry.getKey()+" / status="+entry.getValue());
-                }
-
-                if (!enchant.isEmpty() && (!enchant.equals(AMORPHOUS_NULL_ANCHOR))) {
-                    Bukkit.getLogger().info("enchant size congruence="+(enchant.size() == input.getEnchantedItemCoordinateList().size()));
-                }
-
-                if (!container.isEmpty() && !container.equals(AMORPHOUS_NULL_ANCHOR)) {
-                    Bukkit.getLogger().info("container size congruence="+(container.size() == input.getHasContainerDataItemList().size()));
-                }
-
-                if (!candidate.isEmpty()) {
-                    Bukkit.getLogger().info("candidate size congruence="+(candidate.size() == input.getContentsNoAir().size()));
                 }
 
                 temp.add(candidate);
@@ -179,6 +166,7 @@ public class Search {
                 }
 
                 Bukkit.getLogger().info("temp map="+temp);
+                Bukkit.getLogger().info(BAR);
 
                 judge += 1;
             }
@@ -205,16 +193,19 @@ public class Search {
     }
 
     private boolean isElementMatch(Map<Coordinate, List<Coordinate>> map, Map<Coordinate, Map<String, Boolean>> status, String key) {
-        Set<Coordinate> set = new HashSet<>();
-        map.forEach((k, v) -> set.add(k));
+        int statusJudge = 0;
         for (Map.Entry<Coordinate, Map<String, Boolean>> entry : status.entrySet()) {
             if (!entry.getValue().get(key)) continue;
-            Coordinate needContained = entry.getKey();
-            if (!set.contains(needContained)) return false;
+            statusJudge++;
         }
-        return true;
+        int mapJudge = 0;
+        for (Map.Entry<Coordinate, List<Coordinate>> entry : map.entrySet()) {
+            List<Coordinate> list = entry.getValue();
+            if (list.isEmpty() || list.get(0).equals(Coordinate.NULL_ANCHOR)) continue;
+            mapJudge++;
+        }
+        return statusJudge == mapJudge;
     }
-
 
 
 

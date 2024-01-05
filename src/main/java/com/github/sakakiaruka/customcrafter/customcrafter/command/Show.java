@@ -30,6 +30,7 @@ public class Show {
         StringBuilder builder = new StringBuilder();
         builder.append(String.format("%s%s%s", BAR, LINE_SEPARATOR, LINE_SEPARATOR));
         builder.append(String.format("Recipe Name : %s%s",recipeName, LINE_SEPARATOR));
+        builder.append(String.format("Result Name : %s%s", recipe.getResult().getName(), LINE_SEPARATOR));
         builder.append(String.format("Tag : %s%s",recipe.getTag().toString(), LINE_SEPARATOR));
         builder.append(String.format("RecipePermission : %s%s",recipe.hasPermission() ? recipe.getPermission().getPermissionName() : "NO PERMISSION", LINE_SEPARATOR));
         if(recipe.getTag().equals(Tag.NORMAL)) return normal(builder,recipe);

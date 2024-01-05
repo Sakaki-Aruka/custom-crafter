@@ -4,10 +4,10 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantS
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantWrap;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordinate;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
+import com.github.sakakiaruka.customcrafter.customcrafter.search.Search;
 import org.bukkit.enchantments.Enchantment;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,18 +37,17 @@ public class EnchantUtil {
 //====
     public Map<Coordinate, List<Coordinate>> amorphous(Recipe recipe, Recipe input) {
         // returns candidate of correct pattern
+
+        // returns NON_REQUIRED = containers not required
+        // returns NULL         = not enough containers in an input
         Map<Coordinate, List<Coordinate>> result = new HashMap<>();
         List<Coordinate> r = recipe.getEnchantedItemCoordinateList();
         List<Coordinate> i = input.getEnchantedItemCoordinateList();
 
-        Map<Coordinate, List<Coordinate>> NULL_ANCHOR_MAP = new HashMap<Coordinate, List<Coordinate>>() {{
-            put(Coordinate.NULL_ANCHOR, Collections.emptyList());
-        }};
-
         List<List<EnchantWrap>> x = input.getEnchantedItemList();
 
-        if (r.size() > i.size()) return new HashMap<>();
-        if (r.isEmpty()) return NULL_ANCHOR_MAP;
+        if (r.size() > i.size()) return Search.AMORPHOUS_NULL_ANCHOR;
+        if (r.isEmpty()) return Search.AMORPHOUS_NON_REQUIRED_ANCHOR;
 
         Map<Integer, List<Integer>> map = new HashMap<>();
         for (int j = 0; j < r.size(); j++) {
@@ -80,7 +79,7 @@ public class EnchantUtil {
         System.out.println("[EnchantUtil]r size="+r.size()+", i size="+i.size());
         map.forEach((key, value) -> System.out.printf("index=%s, list=%s%n", key.toString(), value.toString()));
         result.forEach((s, t) -> t.forEach(e -> System.out.printf("index=%s, element=%s%n", s.toString(), e.toString())));
-        return result.isEmpty() ? NULL_ANCHOR_MAP : result;
+        return result.isEmpty() ? Search.AMORPHOUS_NULL_ANCHOR : result;
     }
 
     private List<Boolean> getMatchList(List<EnchantWrap> recipe, List<List<EnchantWrap>> in) {
