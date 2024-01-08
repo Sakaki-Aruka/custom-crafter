@@ -1,6 +1,5 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.search;
 
-import com.github.sakakiaruka.customcrafter.customcrafter.object.ContainerWrapper;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantStrict;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantWrap;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
@@ -20,7 +19,14 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,6 +36,13 @@ import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.*;
 public class Search {
 
     private static final String PASS_THROUGH_PATTERN = "^(?i)pass -> ([a-zA-Z_]+)$";
+    public static final Map<Coordinate, List<Coordinate>> AMORPHOUS_NULL_ANCHOR = new HashMap<Coordinate, List<Coordinate>>() {{
+        put(Coordinate.NULL_ANCHOR, Collections.emptyList());
+    }};
+
+    public static final Map<Coordinate, List<Coordinate>> AMORPHOUS_NON_REQUIRED_ANCHOR = new HashMap<Coordinate, List<Coordinate>>() {{
+        put(Coordinate.NON_REQUIRED_ANCHOR, Collections.emptyList());
+    }};
 
     public void massSearch(Player player,Inventory inventory, boolean isOneCraft){
         // mass (in batch)
@@ -37,8 +50,16 @@ public class Search {
         int massAmount = 0;
         Recipe input = toRecipe(inventory);
         List<ItemStack> interestedItems = getInterestedAreaItems(inventory);
+        int itemContainedSlots = input.getContentsNoAir().size();
+        if (itemContainedSlots == 0) return;
+        if (ITEM_PLACED_SLOTS_RECIPE_MAP.get(itemContainedSlots) == null || ITEM_PLACED_SLOTS_RECIPE_MAP.get(itemContainedSlots).isEmpty()) {
+            new VanillaSearch().main(player, inventory, isOneCraft);
+            return;
+        }
 
-        Top:for(Recipe recipe: RECIPE_LIST){
+        int judge = 0;
+
+        Top:for(Recipe recipe: ITEM_PLACED_SLOTS_RECIPE_MAP.get(itemContainedSlots)){
 
             if(recipe.hasPermission()){ // permission check
                 RecipePermission source = recipe.getPermission();
@@ -47,7 +68,7 @@ public class Search {
 
             if(recipe.getTag().equals(Tag.NORMAL)){
                 //normal
-                if(getSquareSize(recipe) != getSquareSize(input))continue;
+                if(getSquareSize(recipe.getCoordinateList()) != getSquareSize(input.getCoordinateList()))continue;
                 if(!isSameShape(getCoordinateNoAir(recipe),getCoordinateNoAir(input)))continue;
                 if(!isAllCandidateContains(recipe,input))continue;
 
@@ -74,17 +95,88 @@ public class Search {
 
                     if(inputMatter.getAmount() < recipeMatter.getAmount())continue Top;
                     if(!getEnchantWrapCongruence(recipeMatter,inputMatter))continue Top; // enchant check
+
+                    judge += 1;
                 }
 
 
             }else{
-                //amorphous
-                if(!searchAmorphous(recipe,inventory)) continue;
-                if(!getEnchantWrapCongruenceAmorphousWrap(recipe,input))continue;
-                if(! new PotionUtil().getPotionsCongruence(recipe, input)) continue;
+
+                Bukkit.getLogger().info(BAR);
+                Bukkit.getLogger().info("recipe name="+recipe.getName());
+
+                //debug
+                List<Map<Coordinate, List<Coordinate>>> temp = new ArrayList<>();
+                Map<Coordinate, List<Coordinate>> enchant = new EnchantUtil().amorphous(recipe, input);
+                Map<Coordinate, List<Coordinate>> container = new ContainerUtil().amorphous(recipe, input);
+                Map<Coordinate,List<Coordinate>> candidate = new InventoryUtil().amorphous(recipe, input);
+                Map<Coordinate, List<Coordinate>> potion = new PotionUtil().amorphous(recipe, input);
+
+                Map<Coordinate, Map<String, Boolean>> rStatus = new InventoryUtil().getEachMatterStatus(recipe);
+                Map<Coordinate, Map<String, Boolean>> iStatus = new InventoryUtil().getEachMatterStatus(input);
+
+                Bukkit.getLogger().info("enchant map="+enchant);
+                Bukkit.getLogger().info("container map="+container);
+                Bukkit.getLogger().info("candidate map="+candidate);
+                Bukkit.getLogger().info("potion map="+potion);
+
+                if (!enchant.equals(AMORPHOUS_NON_REQUIRED_ANCHOR) && !isElementMatch(enchant, rStatus, "enchant")) {
+                    Bukkit.getLogger().info("enchant not matched");
+                    continue Top;
+                }
+
+                if (!container.equals(AMORPHOUS_NON_REQUIRED_ANCHOR) && !isElementMatch(container, rStatus, "container")) {
+                    Bukkit.getLogger().info("container not matched");
+                    continue Top;
+                }
+
+                if (!potion.equals(AMORPHOUS_NON_REQUIRED_ANCHOR) && !isElementMatch(potion, rStatus, "potion")) {
+                    Bukkit.getLogger().info("potion not matched");
+                    continue Top;
+                }
+
+                if (!enchant.equals(AMORPHOUS_NON_REQUIRED_ANCHOR)) temp.add(enchant);
+                if (!container.equals(AMORPHOUS_NON_REQUIRED_ANCHOR)) temp.add(container);
+                if (!potion.equals(AMORPHOUS_NON_REQUIRED_ANCHOR)) temp.add(potion);
+
+
+                for (Map<Coordinate, List<Coordinate>> element : temp) {
+                    for (Map.Entry<Coordinate, List<Coordinate>> entry : element.entrySet()) {
+                        Bukkit.getLogger().info("  source="+entry.getKey()+" / element="+entry.getValue());
+                    }
+                }
+
+                for (Map.Entry<Coordinate, List<Coordinate>> element : candidate.entrySet()) {
+                    Bukkit.getLogger().info("  source(candidate)="+element.getKey()+" / element="+element.getValue());
+                }
+
+
+                for (Map.Entry<Coordinate, Map<String, Boolean>> entry : rStatus.entrySet()) {
+                    Bukkit.getLogger().info("coordinate="+entry.getKey()+" / status="+entry.getValue());
+                }
+
+                temp.add(candidate);
+                Map<Coordinate, Coordinate> relate;
+                if ((relate = new InventoryUtil().combination(temp)).isEmpty()) continue;
+
+                for (Map.Entry<Coordinate, Coordinate> entry : relate.entrySet()) {
+                    Coordinate r = entry.getKey();
+                    Coordinate i = entry.getValue();
+                    if (!rStatus.get(r).equals(iStatus.get(i))) continue Top;
+                }
+
+                Bukkit.getLogger().info("temp map="+temp);
+                Bukkit.getLogger().info(BAR);
+
+                judge += 1;
             }
-            result = recipe;
-            massAmount  = getMinimalAmount(result,input);
+
+
+            if (judge > 0) {
+                result = recipe;
+                massAmount  = getMinimalAmount(result,input);
+            }
+
             break;
         }
 
@@ -96,77 +188,25 @@ public class Search {
             setResultItem(inventory,result,input,player,quantity,isOneCraft);
         }else{
             // not found
-            new VanillaSearch().main(player,inventory,true);
+            new VanillaSearch().main(player,inventory,isOneCraft);
         }
     }
 
-    private boolean searchAmorphous(Recipe recipe, Inventory inventory) {
-        Recipe input = toRecipe(inventory);
-        if(recipe.getContentsNoAir().size() != input.getContentsNoAir().size()) return false;
-        if(!getAllCandidateNoDuplicate(recipe).containsAll(getAllCandidateNoDuplicate(input))) return false;
-
-        List<Matter> massList = getMassOrNotList(recipe,true);
-        List<Matter> normalList = getMassOrNotList(recipe,false);
-        Map<Matter, Integer> virtual = getVirtual(input);
-
-        int vTotal = 0;
-        for (int i : virtual.values()) {
-            vTotal += i;
+    private boolean isElementMatch(Map<Coordinate, List<Coordinate>> map, Map<Coordinate, Map<String, Boolean>> status, String key) {
+        int statusJudge = 0;
+        for (Map.Entry<Coordinate, Map<String, Boolean>> entry : status.entrySet()) {
+            if (!entry.getValue().get(key)) continue;
+            statusJudge++;
         }
-
-        if (!new ContainerUtil().amorphousContainerCongruence(recipe, input)) return false;
-
-        new InventoryUtil().snatchFromVirtual(virtual,massList,true);
-        new InventoryUtil().snatchFromVirtual(virtual,normalList,false);
-        if(containsMinus(virtual)) return false;
-
-        int normalListTotal = 0;
-        for(Matter matter : normalList) {
-            normalListTotal += matter.getAmount();
+        int mapJudge = 0;
+        for (Map.Entry<Coordinate, List<Coordinate>> entry : map.entrySet()) {
+            List<Coordinate> list = entry.getValue();
+            if (list.isEmpty() || list.get(0).equals(Coordinate.NULL_ANCHOR)) continue;
+            mapJudge++;
         }
-
-        return (vTotal - (massList.size() + normalListTotal) == getTotal(input));
-
+        return statusJudge == mapJudge;
     }
 
-
-    private boolean containsMinus(Map<Matter,Integer> virtual) {
-        for(int i : virtual.values()) {
-            if(i < 0) return true;
-        }
-        return false;
-    }
-
-    private List<Matter> getMassOrNotList(Recipe recipe, boolean mass) {
-        List<Matter> result = new ArrayList<>();
-        recipe.getContentsNoAir().forEach(s->{
-            if(mass && s.isMass()) result.add(s);
-            if(!mass && !s.isMass()) result.add(s);
-        });
-        return result;
-    }
-
-    private Map<Matter, Integer> getVirtual(Recipe recipe) {
-        Map<Matter, Integer> result = new HashMap<>();
-        for(Matter matter : recipe.getContentsNoAir()) {
-            for(Material material : matter.getCandidate()) {
-                // virtual data -> amount 0.
-                Matter mass = new Matter(Arrays.asList(material),0,true);
-                Matter normal = new Matter(Arrays.asList(material),0,false);
-                int m = (result.containsKey(mass) ? result.get(mass) : 0) + 1;
-                int n = (result.containsKey(normal) ? result.get(normal) : 0) + matter.getAmount();
-
-                // about container data
-                Map<Integer, ContainerWrapper> containerElements = matter.containerElementsDeepCopy();
-                mass.setContainerWrappers(containerElements); // set container data
-                normal.setContainerWrappers(containerElements); // set container data
-
-                result.put(mass,m);
-                result.put(normal,n);
-            }
-        }
-        return result;
-    }
 
 
     private boolean isAllCandidateContains(Recipe recipe,Recipe input){
@@ -190,14 +230,6 @@ public class Search {
         Collections.sort(list);
 
         return list.get(0);
-    }
-
-    private Set<Material> getAllCandidateNoDuplicate(Recipe recipe){
-        Set<Material> set = new HashSet<>();
-        recipe.getContentsNoAir().forEach(s->{
-            set.addAll(s.getCandidate());
-        });
-        return set;
     }
 
 
@@ -313,40 +345,12 @@ public class Search {
     }
 
 
-    private boolean getEnchantWrapCongruenceAmorphousWrap(Recipe recipe,Recipe input){
-        Map<Material,List<List<EnchantWrap>>> inputVirtual = new HashMap<>();
-        for(Matter matter : input.getContentsNoAir()){
-            if(!matter.hasWrap())continue;
-            Material material = matter.getCandidate().get(0);
-            if(inputVirtual.get(material) == null)inputVirtual.put(material,new ArrayList<>());
-            List<EnchantWrap> wrap = matter.getWrap();
-            inputVirtual.get(material).add(wrap);
-        }
-
-
-        // collation with a recipe
-        for(Matter matter : recipe.getContentsNoAir()){
-            if(!matter.hasWrap())continue;
-
-            int exitCode = 0;
-            for(Material material : matter.getCandidate()){
-                if(inputVirtual.get(material) == null)continue;
-                if(inputVirtual.get(material).isEmpty())continue;
-                List<List<EnchantWrap>> list = inputVirtual.get(material);
-                if(!new EnchantUtil().containsFromDoubleList(list,matter))continue;
-
-                //debug
-                exitCode = 1;
-                break;
-            }
-            if(exitCode == 0)return false;
-        }
-
-
-        return true;
-    }
 
     public boolean getEnchantWrapCongruence(Matter recipe,Matter input){
+
+
+        if(!input.hasWrap() && recipe.hasWrap()) return false;
+        if(!recipe.hasWrap())return true; // no target
 
         if(recipe.getCandidate().get(0).equals(Material.ENCHANTED_BOOK)){
             if(!input.getCandidate().get(0).equals(Material.ENCHANTED_BOOK)) return false;
@@ -360,8 +364,6 @@ public class Search {
             return true;
         }
 
-        if(!input.hasWrap() && recipe.hasWrap())return false;
-        if(!recipe.hasWrap())return true; // no target
 
         for(EnchantWrap wrap : recipe.getWrap()){
             if(wrap.getStrict().equals(EnchantStrict.NOTSTRICT))continue; // not have to check
@@ -380,11 +382,6 @@ public class Search {
         return true;
     }
 
-    private List<Enchantment> getEnchantmentList(List<EnchantWrap> wrap){
-        List<Enchantment> list = new ArrayList<>();
-        wrap.forEach(s->list.add(s.getEnchant()));
-        return list;
-    }
 
     private List<EnchantWrap> getEnchantWrap(ItemStack item){
         List<EnchantWrap> list = new ArrayList<>();
@@ -411,18 +408,10 @@ public class Search {
         return list;
     }
 
-    private int getTotal(Recipe recipe){
-        Map<Coordinate,Matter> map = recipe.getCoordinate();
-        int result =0;
-        for(Map.Entry<Coordinate,Matter> entry: map.entrySet()){
-            if(entry.getValue().getCandidate().get(0).equals(Material.AIR))continue;
-            result += entry.getValue().getAmount();
-        }
-        return result;
-    }
 
-    private int getSquareSize(Recipe recipe){
-        List<Coordinate> list = getCoordinateNoAir(recipe);
+
+    public static int getSquareSize(List<Coordinate> list){
+//        List<Coordinate> list = getCoordinateNoAir(recipe);
         if(list.isEmpty())return -1;
         if(list.get(0).getX() < 0 || list.get(0).getY() < 0)return -1;
 
@@ -458,7 +447,7 @@ public class Search {
         for (int y = 0; y< CRAFTING_TABLE_SIZE; y++) {
             for (int x = 0; x< CRAFTING_TABLE_SIZE; x++) {
                 int i = x+y*9;
-                if (inventory.getItem(i) == null) continue;
+                if (inventory.getItem(i) == null || inventory.getItem(i).getType().equals(Material.AIR)) continue;
                 list.add(inventory.getItem(i));
             }
         }

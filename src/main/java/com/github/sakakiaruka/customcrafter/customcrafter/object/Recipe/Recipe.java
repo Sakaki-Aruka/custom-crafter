@@ -1,6 +1,9 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe;
 
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantStrict;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantWrap;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.Potions;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Permission.RecipePermission;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Container.RecipeDataContainer;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.Result;
@@ -107,6 +110,14 @@ public class Recipe {
         return list;
     }
 
+    public List<Coordinate> getCoordinateNoAir() {
+        List<Coordinate> list = new ArrayList<>();
+        coordinate.entrySet().forEach(s -> {
+            if (!s.getValue().getCandidate().get(0).equals(Material.AIR)) list.add(s.getKey());
+        });
+        return list;
+    }
+
     public List<Coordinate> getCoordinateList(){
         List<Coordinate> list = new ArrayList<>();
         coordinate.keySet().forEach(s->list.add(s));
@@ -188,4 +199,49 @@ public class Recipe {
     public boolean hasUsingContainerValuesMetadata() {
         return !(this.usingContainerValuesMetadata == null || this.usingContainerValuesMetadata.isEmpty());
     }
+
+
+    public List<Coordinate> getEnchantedItemCoordinateList() {
+        List<Coordinate> list = new ArrayList<>();
+        for (Coordinate coordinate : getCoordinateNoAir()) {
+            Matter matter = getMatterFromCoordinate(coordinate);
+            if (!matter.hasWrap()) continue;
+            list.add(coordinate);
+        }
+        return list;
+    }
+
+    public List<Coordinate> getHasContainerDataItemList() {
+        List<Coordinate> list = new ArrayList<>();
+        for (Coordinate coordinate : getCoordinateNoAir()) {
+            Matter matter = getMatterFromCoordinate(coordinate);
+            if (!matter.hasContainer()) continue;
+            list.add(coordinate);
+        }
+        return list;
+    }
+
+    public List<List<EnchantWrap>> getEnchantedItemList() {
+        List<List<EnchantWrap>> list = new ArrayList<>();
+        for (Matter matter : getContentsNoAir()) {
+            if ((matter.getWrap() == null) || matter.getWrap().isEmpty()) continue;
+            List<EnchantWrap> element = new ArrayList<>();
+            for (EnchantWrap wrap : matter.getWrap()) {
+                if (wrap.getStrict().equals(EnchantStrict.NOTSTRICT)) continue;
+                element.add(wrap);
+            }
+            list.add(element);
+        }
+        return list;
+    }
+
+    public List<Coordinate> getPotionCoordinateList() {
+        List<Coordinate> list = new ArrayList<>();
+        for (Map.Entry<Coordinate, Matter> entry : this.coordinate.entrySet()) {
+            if (!(entry.getValue() instanceof Potions)) continue;
+            list.add(entry.getKey());
+        }
+        return list;
+    }
+
 }

@@ -2,11 +2,12 @@ package com.github.sakakiaruka.customcrafter.customcrafter.listener;
 
 import com.github.sakakiaruka.customcrafter.customcrafter.util.InventoryUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -22,20 +23,20 @@ import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.*;
 
 public class OpenCraftingTable implements Listener {
     public static List<Player> opening = new ArrayList<>();
-    private static final double degrees = 2 * Math.PI / (360 / 30);
-    private static final double radius = 1;
     @EventHandler
     public void onPlayerInteract(PlayerInteractEvent event){
+        if (!event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) return;
         if(event.getClickedBlock()==null)return;
         if(!event.getClickedBlock().getType().equals(Material.CRAFTING_TABLE))return;
-        Location location = event.getClickedBlock().getLocation();
-        for(double d = 0;d<(2 * Math.PI);d+=degrees){
-            double x = radius * Math.cos(d) + location.getX();
-            double z = radius * Math.sin(d) + location.getZ();
-            double y = location.getY() - 1;
-            Location loc = new Location(location.getWorld(),x,y,z);
 
-            if(!loc.getBlock().getType().equals(BASE_BLOCK))return;
+        int x = event.getClickedBlock().getX();
+        int y = event.getClickedBlock().getY() - 1;
+        int z = event.getClickedBlock().getZ();
+        World world = event.getClickedBlock().getWorld();
+        for (int dx = -1; dx <= 1; dx++) {
+            for (int dz = -1; dz <= 1; dz++) {
+                if (!world.getBlockAt(x + dx, y, z + dz).getType().equals(BASE_BLOCK)) return;
+            }
         }
 
         //open crafting inventory (delay 2ticks = 0.10s)
@@ -45,7 +46,7 @@ public class OpenCraftingTable implements Listener {
                 event.getPlayer().openInventory(setCraftingInventory());
                 opening.add(event.getPlayer());
             }
-        }.runTaskLater(getInstance(),2l);
+        }.runTaskLater(getInstance(),2);
 
     }
 

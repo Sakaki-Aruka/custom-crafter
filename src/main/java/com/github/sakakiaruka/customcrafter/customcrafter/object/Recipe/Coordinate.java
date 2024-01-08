@@ -1,6 +1,10 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe;
 
 public class Coordinate {
+
+    public static final Coordinate NULL_ANCHOR = new Coordinate(Integer.MIN_VALUE, Integer.MIN_VALUE);
+    public static final Coordinate NON_REQUIRED_ANCHOR = new Coordinate(Integer.MAX_VALUE, Integer.MAX_VALUE);
+
     private int x;
     private int y;
     public Coordinate(int x,int y){
@@ -28,5 +32,10 @@ public class Coordinate {
         if(x != coordinate.getX())return false;
         if(y != coordinate.getY())return false;
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return "[x=" + x + ",y=" + y +"]";
     }
 }

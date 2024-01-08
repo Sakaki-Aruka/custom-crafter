@@ -90,16 +90,17 @@ public class Result {
     private Map<MetadataType, List<String>> metadata;
     private String nameOrRegex;
     private int matchPoint;
-    private List<ContainerWrapper> dataContainer;
 
-    public Result(String name,Map<Enchantment,Integer> enchantsInfo,int amount,Map<MetadataType,List<String>> metadata,String nameOrRegex,int matchPoint, List<ContainerWrapper> dataContainer){
+    public Result(String name,Map<Enchantment,Integer> enchantsInfo,int amount,Map<MetadataType,List<String>> metadata,String nameOrRegex,int matchPoint){
         this.name = name;
         this.enchantsInfo = enchantsInfo;
         this.amount = amount;
         this.metadata = metadata;
         this.nameOrRegex = nameOrRegex;
         this.matchPoint = matchPoint;
-        this.dataContainer = dataContainer;
+    }
+
+    public Result() {
     }
 
     public Result(String name) {
@@ -110,70 +111,65 @@ public class Result {
         this.metadata = null;
         this.nameOrRegex = "";
         this.matchPoint = Integer.MIN_VALUE;
-        this.dataContainer = null;
-    }
-
-    public List<ContainerWrapper> getDataContainer() {
-        return dataContainer;
-    }
-
-    public void setDataContainer(List<ContainerWrapper> dataContainer) {
-        this.dataContainer = dataContainer;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
+    public Result setName(String name) {
         this.name = name;
+        return this;
     }
 
     public Map<Enchantment, Integer> getEnchantsInfo() {
         return enchantsInfo;
     }
 
-    public void setEnchantsInfo(Map<Enchantment, Integer> enchantsInfo) {
+    public Result setEnchantsInfo(Map<Enchantment, Integer> enchantsInfo) {
         this.enchantsInfo = enchantsInfo;
+        return this;
     }
 
     public int getAmount() {
         return amount;
     }
 
-    public void setAmount(int amount) {
+    public Result setAmount(int amount) {
         this.amount = amount;
+        return this;
     }
 
     public Map<MetadataType, List<String>> getMetadata() {
         return metadata;
     }
 
-    public void setMetadataValue(Map<MetadataType, List<String>> metadata) {
+    public Result setMetadataValue(Map<MetadataType, List<String>> metadata) {
         this.metadata = metadata;
+        return this;
     }
 
     public String getNameOrRegex() {
         return nameOrRegex;
     }
 
-    public void setNameOrRegex(String nameOrRegex) {
+    public Result setNameOrRegex(String nameOrRegex) {
         this.nameOrRegex = nameOrRegex;
+        return this;
     }
 
     public int getMatchPoint() {
         return matchPoint;
     }
 
-    public void setMatchPoint(int matchPoint) {
+    public Result setMatchPoint(int matchPoint) {
         this.matchPoint = matchPoint;
+        return this;
     }
 
     public void setMetaData(ItemStack item){
         if(metadata==null || metadata.isEmpty()) return;
         ItemMeta meta = item.getItemMeta();
-
-        new DataContainerUtil().addAllData(item, this.dataContainer);
 
         for(Map.Entry<MetadataType,List<String>> entry : metadata.entrySet()){
             /*
@@ -309,7 +305,7 @@ public class Result {
                 int maxDurability = item.getType().getMaxDurability();
                 if (remaining == 0) remaining = 1;
                 if (maxDurability < remaining) remaining = maxDurability;
-                 damageable.setDamage(maxDurability - remaining);
+                damageable.setDamage(maxDurability - remaining);
             }
 
             if (type.equals(MetadataType.BOOK_FIELD)) {

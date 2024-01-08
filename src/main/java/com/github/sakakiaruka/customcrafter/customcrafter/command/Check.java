@@ -45,6 +45,7 @@ public class Check{
 
         RECIPE_LIST.clear();
         NAMED_RECIPES_MAP.clear();
+        ITEM_PLACED_SLOTS_RECIPE_MAP.clear();
 
         WHAT_MAKING.clear();
         opening.clear();

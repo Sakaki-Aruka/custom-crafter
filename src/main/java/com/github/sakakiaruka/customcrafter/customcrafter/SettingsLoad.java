@@ -93,6 +93,7 @@ public class SettingsLoad {
 
     // === unlock registration === //
     public static Map<String, Recipe> REGISTERED_RECIPES = new HashMap<>();
+    public static Map<Integer, List<Recipe>> ITEM_PLACED_SLOTS_RECIPE_MAP = new HashMap<>();
     public static Map<Integer, String> UNLOCK_TASK_ID_WITH_RECIPE_NAME = new HashMap<>();
 
     // === lock registration === //
@@ -317,26 +318,7 @@ public class SettingsLoad {
                 }
             }
 
-            List<ContainerWrapper> phony = new ArrayList<>();
-            if (config.contains("container")) {
-                int counter = 0;
-                while (true) {
-                    if (!config.contains("container."+counter)) break;
-                    String locate = "container." + counter + ".";
-                    NamespacedKey key = new NamespacedKey(getInstance(), config.getString(locate+"key"));
-                    PersistentDataType type = new DataContainerUtil().getDataType(config.getString(locate+"type"));
-                    String tag = config.getString(locate+"tag");
-                    int order = config.getInt(locate+"order");
-                    String value = config.getString(locate+"value");
-                    if (key == null || type == null) continue;
-                    ContainerWrapper content = new ContainerWrapper(key, type, value,order,tag);
-                    phony.add(content);
-                    counter++;
-                }
-
-            }
-
-            Result result = new Result(name,enchantInfo,amount,metadata,nameOrRegex,matchPoint, phony);
+            Result result = new Result(name,enchantInfo,amount,metadata,nameOrRegex,matchPoint);
             RESULTS.put(name,result);
             CUSTOM_RESULTS.put(name, result);
         }
@@ -345,7 +327,13 @@ public class SettingsLoad {
     private void addAllVanillaMaterial(){
         for(Material material : Material.values()){
             String name = material.name().toLowerCase();
-            Result result = new Result(name,null,1,null,material.name(),-1, new ArrayList<>());
+//            Result test = new Result(name,null,1,null,material.name(),-1, new ArrayList<>());
+            Result result = new Result().
+                    setAmount(1).
+                    setName(name).
+                    setNameOrRegex(material.name()).
+                    setMatchPoint(-1);
+
             RESULTS.put(name,result);
 
             Matter matter = new Matter(Arrays.asList(material), 1);
@@ -618,7 +606,7 @@ public class SettingsLoad {
                     RecipeDataContainerModifyType modifyType = RecipeDataContainerModifyType.valueOf(config.getString(address+"modify_type").toUpperCase());
                     PersistentDataType type = new ContainerUtil().getDataType(config.getString(address+"type").toUpperCase());
                     String term = config.getString(address+"term");
-                    String action = config.getString(address+"action");
+                    String action = Objects.requireNonNullElse(config.getString(address + "action"), "");
                     boolean end = config.getBoolean(address+"return");
                     counter++;
                     RecipeDataContainer data = new RecipeDataContainer(type, term, action, end, modifyType);
@@ -656,6 +644,7 @@ public class SettingsLoad {
                             String targetName = LOCK_TASK_ID_WITH_RECIPE_NAME.get(id);
                             Recipe recipe = NAMED_RECIPES_MAP.get(targetName);
                             RECIPE_LIST.remove(recipe);
+                            ITEM_PLACED_SLOTS_RECIPE_MAP.get(recipe.getContentsNoAir().size()).remove(recipe);
                             NAMED_RECIPES_MAP.remove(targetName);
                             LOCK_TASK_ID_WITH_RECIPE_NAME.remove(id);
 
@@ -684,6 +673,10 @@ public class SettingsLoad {
                             Recipe target = REGISTERED_RECIPES.get(targetName);
                             RECIPE_LIST.add(target);
                             NAMED_RECIPES_MAP.put(targetName, target);
+                            if (!ITEM_PLACED_SLOTS_RECIPE_MAP.containsKey(target.getContentsNoAir().size())) {
+                                ITEM_PLACED_SLOTS_RECIPE_MAP.put(target.getContentsNoAir().size(), new ArrayList<>());
+                            }
+                            ITEM_PLACED_SLOTS_RECIPE_MAP.get(target.getContentsNoAir().size()).add(target);
 
                             Bukkit.getLogger().info("[CustomCrafter] "+targetName+" is enabled now!");
                             REGISTERED_RECIPES.remove(targetName);
@@ -703,6 +696,10 @@ public class SettingsLoad {
             Recipe recipe = new Recipe(name, tag, coordinates, returns, result, permission, map, usingContainerValuesMetadata);
             RECIPE_LIST.add(recipe);
             NAMED_RECIPES_MAP.put(name,recipe);
+            if (!ITEM_PLACED_SLOTS_RECIPE_MAP.containsKey(recipe.getContentsNoAir().size())) {
+                ITEM_PLACED_SLOTS_RECIPE_MAP.put(recipe.getContentsNoAir().size(), new ArrayList<>());
+            }
+            ITEM_PLACED_SLOTS_RECIPE_MAP.get(recipe.getContentsNoAir().size()).add(recipe);
         }
     }
 
