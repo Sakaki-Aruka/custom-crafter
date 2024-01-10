@@ -77,7 +77,7 @@ public class Search {
                     Matter recipeMatter = recipe.getContentsNoAir().get(i);
                     Matter inputMatter = input.getContentsNoAir().get(i);
 
-                    if (!new ContainerUtil().isPass(interestedItems.get(i), recipeMatter)) continue Top;
+                    if (!ContainerUtil.isPass(interestedItems.get(i), recipeMatter)) continue Top;
 
                     //(amount one virtual test)
                     Matter recipeOne = recipeMatter.oneCopy();
@@ -108,7 +108,7 @@ public class Search {
                 //debug
                 List<Map<Coordinate, List<Coordinate>>> temp = new ArrayList<>();
                 Map<Coordinate, List<Coordinate>> enchant = new EnchantUtil().amorphous(recipe, input);
-                Map<Coordinate, List<Coordinate>> container = new ContainerUtil().amorphous(recipe, input);
+                Map<Coordinate, List<Coordinate>> container = ContainerUtil.amorphous(recipe, input);
                 Map<Coordinate,List<Coordinate>> candidate = InventoryUtil.amorphous(recipe, input);
                 Map<Coordinate, List<Coordinate>> potion = new PotionUtil().amorphous(recipe, input);
 
@@ -303,8 +303,8 @@ public class Search {
 
         WHAT_MAKING.put(player.getUniqueId(),item.getType());
 
-        new ContainerUtil().setRecipeDataContainerToResultItem(item, input, recipe);
-        if (recipe.hasUsingContainerValuesMetadata()) new ContainerUtil().setRecipeUsingContainerValueMetadata(inventory, recipe, item);
+        ContainerUtil.setRecipeDataContainerToResultItem(item, input, recipe);
+        if (recipe.hasUsingContainerValuesMetadata()) ContainerUtil.setRecipeUsingContainerValueMetadata(inventory, recipe, item);
 
         if(inventory.getItem(CRAFTING_TABLE_RESULT_SLOT) == null){
             // empty a result item's slot
@@ -476,7 +476,7 @@ public class Search {
                         matter.addWrap(wrap);
                     }
                 }
-                new ContainerUtil().setContainerDataItemStackToMatter(inventory.getItem(i), matter);
+                ContainerUtil.setContainerDataItemStackToMatter(inventory.getItem(i), matter);
 
                 recipe.addCoordinate(x,y,matter);
             }

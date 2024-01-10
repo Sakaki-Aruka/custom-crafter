@@ -1,9 +1,7 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.object.Result;
 
-import com.github.sakakiaruka.customcrafter.customcrafter.object.ContainerWrapper;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.AttributeModifierUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.ContainerUtil;
-import com.github.sakakiaruka.customcrafter.customcrafter.util.DataContainerUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.InventoryUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.PotionUtil;
 import org.bukkit.Bukkit;
@@ -19,7 +17,6 @@ import org.bukkit.inventory.meta.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import javax.lang.model.util.AbstractAnnotationValueVisitor6;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -394,7 +391,7 @@ public class Result {
                             isFollowPattern(PASS_THROUGH_MODE_CONTAINER_REMOVE, ACTION, VALUE) ||
                             isFollowPattern(PASS_THROUGH_MODE_CONTAINER_ADD, ACTION, VALUE))) {
                         // container
-                        new ContainerUtil().containerModify(ACTION, VALUE, meta);
+                        ContainerUtil.containerModify(ACTION, VALUE, meta);
 
                     } else if (TYPE.equals("durability") && isFollowPattern(PASS_THROUGH_MODE_DURABILITY_MODIFY, ACTION, VALUE)) {
                         // durability modify

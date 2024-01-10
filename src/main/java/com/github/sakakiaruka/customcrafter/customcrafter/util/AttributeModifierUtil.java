@@ -26,7 +26,7 @@ public class AttributeModifierUtil {
 
         double value;
         try {
-            value = Double.parseDouble(new ContainerUtil().getContent(source, matcher.group(3)));
+            value = Double.parseDouble(ContainerUtil.getContent(source, matcher.group(3)));
         } catch (Exception e) {
             Bukkit.getLogger().warning("[CustomCrafter] USING_CONTAINER_VALUES_ATTRIBUTE_MODIFIER failed. (Attribute modifier -> Not a Number.)");
             return;

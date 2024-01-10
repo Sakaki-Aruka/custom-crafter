@@ -70,7 +70,7 @@ public class ContainerUtil {
     private static final int ENCHANTMENT_MAX_LEVEL = 255;
 
 
-    public PersistentDataType getDataType(String input) {
+    public static PersistentDataType getDataType(String input) {
         if (input.equalsIgnoreCase("string")) return PersistentDataType.STRING;
         if (input.equalsIgnoreCase("int")) return PersistentDataType.INTEGER;
         if (input.equalsIgnoreCase("double")) return PersistentDataType.DOUBLE;
@@ -78,7 +78,7 @@ public class ContainerUtil {
     }
 
 
-    public Map<Integer, ContainerWrapper> mattersLoader(Path path) {
+    public static Map<Integer, ContainerWrapper> mattersLoader(Path path) {
         Map<Integer, ContainerWrapper> map = new LinkedHashMap<>();
         FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
         int current = 0;
@@ -108,11 +108,7 @@ public class ContainerUtil {
     }
 
 
-
-
-
-
-    public boolean isPass(ItemStack item, Matter matter) {
+    public static boolean isPass(ItemStack item, Matter matter) {
         // item -> target, matter -> source (recipe)
         // matter > item
         if (!matter.hasContainer()) return true;
@@ -194,7 +190,7 @@ public class ContainerUtil {
         return true;
     }
 
-    private boolean multiTagCongruence(ContainerWrapper wrapper, PersistentDataContainer container) {
+    private static boolean multiTagCongruence(ContainerWrapper wrapper, PersistentDataContainer container) {
         String tag = wrapper.getTag();
         String value = wrapper.getValue();
         NamespacedKey key = wrapper.getKey();
@@ -230,7 +226,7 @@ public class ContainerUtil {
         return true;
     }
 
-    private boolean hasNeededElements(Matter matter) {
+    private static boolean hasNeededElements(Matter matter) {
         if (!matter.hasContainer()) return false;
         for (Map.Entry<Integer, ContainerWrapper> entry : matter.getContainerWrappers().entrySet()) {
             String tag = entry.getValue().getTag();
@@ -242,7 +238,7 @@ public class ContainerUtil {
 
 
 
-    private boolean arrowPatternOperation(String source, PersistentDataContainer container, ContainerWrapper wrapper) {
+    private static boolean arrowPatternOperation(String source, PersistentDataContainer container, ContainerWrapper wrapper) {
         if (container == null) return false;
         NamespacedKey key = wrapper.getKey();
         PersistentDataType type = wrapper.getType();
@@ -276,7 +272,7 @@ public class ContainerUtil {
         return false;
     }
 
-    private boolean smallerPatternOperation(String source, PersistentDataContainer container, ContainerWrapper wrapper) {
+    private static boolean smallerPatternOperation(String source, PersistentDataContainer container, ContainerWrapper wrapper) {
         NamespacedKey key = wrapper.getKey();
         PersistentDataType type = wrapper.getType();
         String formula = source.substring(1, source.length());
@@ -300,7 +296,7 @@ public class ContainerUtil {
         return false;
     }
 
-    private boolean largerPatternOperation(String source, PersistentDataContainer container, ContainerWrapper wrapper) {
+    private static boolean largerPatternOperation(String source, PersistentDataContainer container, ContainerWrapper wrapper) {
         NamespacedKey key = wrapper.getKey();
         PersistentDataType type = wrapper.getType();
         String formula = source.substring(0,source.length()-1);
@@ -321,7 +317,7 @@ public class ContainerUtil {
         return false;
     }
 
-    private double getFormulaValue(String input, PersistentDataContainer container) {
+    private static double getFormulaValue(String input, PersistentDataContainer container) {
         List<String> list = new ArrayList<>();
         List<String> buffer = new ArrayList<>();
         input = input.replace(" ","");
@@ -368,7 +364,7 @@ public class ContainerUtil {
     }
 
 
-    private double calc(String input) {
+    private static double calc(String input) {
 
         if (input.matches("^(\\d*)(\\.?)(\\d)+$")) return Double.parseDouble(input);
 
@@ -439,7 +435,7 @@ public class ContainerUtil {
         return rpnCalc(outQueue);
     }
 
-    private int getPriority(String s) {
+    private static int getPriority(String s) {
         if (s.equals("^")) return 4;
         if (s.equals("*")) return 3;
         if (s.equals("/")) return 3;
@@ -448,7 +444,7 @@ public class ContainerUtil {
         return -1;
     }
 
-    private double rpnCalc(List<String> list) {
+    private static double rpnCalc(List<String> list) {
         double accumlator = 0;
         List<Double> stacks = new ArrayList<>();
         for (String s : list) {
@@ -473,7 +469,7 @@ public class ContainerUtil {
     }
 
 
-    public void setContainerDataItemStackToMatter(ItemStack item, Matter matter) {
+    public static void setContainerDataItemStackToMatter(ItemStack item, Matter matter) {
         ItemMeta meta = item.getItemMeta();
         PersistentDataContainer container = meta.getPersistentDataContainer();
         Map<Integer, ContainerWrapper> wrappers = new LinkedHashMap<>();
@@ -493,7 +489,7 @@ public class ContainerUtil {
         matter.setContainerWrappers(wrappers);
     }
 
-    public PersistentDataType getSpecifiedKeyType(PersistentDataContainer container, NamespacedKey key) {
+    public static PersistentDataType getSpecifiedKeyType(PersistentDataContainer container, NamespacedKey key) {
         for (PersistentDataType type : getDefaultDataTypes()) {
             try{
                 container.get(key, type);
@@ -505,7 +501,7 @@ public class ContainerUtil {
         return null;
     }
 
-    private List<PersistentDataType> getDefaultDataTypes() {
+    private static List<PersistentDataType> getDefaultDataTypes() {
         List<PersistentDataType> types = new ArrayList<>();
         types.add(PersistentDataType.STRING);
         types.add(PersistentDataType.INTEGER);
@@ -513,7 +509,7 @@ public class ContainerUtil {
         return types;
     }
 
-    public String containerValues(PersistentDataContainer container) {
+    public static String containerValues(PersistentDataContainer container) {
         StringBuilder builder = new StringBuilder();
         for (NamespacedKey key : container.getKeys()) {
             builder.append(BAR + LINE_SEPARATOR);
@@ -526,7 +522,7 @@ public class ContainerUtil {
         return builder.toString();
     }
 
-    public void setRecipeDataContainerToResultItem(ItemStack item, Recipe input, Recipe recipe) {
+    public static void setRecipeDataContainerToResultItem(ItemStack item, Recipe input, Recipe recipe) {
         // String -> NK, List<String> -> each containers data
         Map<String, List<String>> stringTypeData = new HashMap<>();
         Map<String, List<Double>> numericTypeData = new HashMap<>();
@@ -624,11 +620,11 @@ public class ContainerUtil {
         item.setItemMeta(meta);
     }
 
-    private void setValuesToContainer(NamespacedKey key, PersistentDataType type, double value, PersistentDataContainer container) {
+    private static void setValuesToContainer(NamespacedKey key, PersistentDataType type, double value, PersistentDataContainer container) {
         if (type.equals(PersistentDataType.INTEGER)) container.set(key, type, (int) value);
         if (type.equals(PersistentDataType.DOUBLE)) container.set(key, type, value);
     }
-    private double getValueFromString(String formula, Map<String, Map<String, Double>> derived) {
+    private static double getValueFromString(String formula, Map<String, Map<String, Double>> derived) {
         List<String> queue = new ArrayList<>();
         List<String> buffer = new ArrayList<>();
         for (int i=0; i<formula.length(); i++) {
@@ -660,7 +656,7 @@ public class ContainerUtil {
         return calc(String.join("", queue));
     }
 
-    private Map<String, Map<String, Double>> getDerivedValues(Map<String, List<Double>> source) {
+    private static Map<String, Map<String, Double>> getDerivedValues(Map<String, List<Double>> source) {
         Map<String, Map<String, Double>> result = new HashMap<>();
         for (Map.Entry<String, List<Double>> entry : source.entrySet()) {
             String key = entry.getKey();
@@ -717,7 +713,7 @@ public class ContainerUtil {
     }
 
 
-    private PersistentDataType getSpecifiedDataType(PersistentDataContainer container, NamespacedKey key) {
+    private static PersistentDataType getSpecifiedDataType(PersistentDataContainer container, NamespacedKey key) {
         List<PersistentDataType> types = Arrays.asList(PersistentDataType.STRING, PersistentDataType.INTEGER, PersistentDataType.DOUBLE);
         for (PersistentDataType type : types) {
             try{
@@ -730,7 +726,7 @@ public class ContainerUtil {
         return null;
     }
 
-    private ItemStack getCorrespondenceItemStack(Inventory inventory, Matter matter) {
+    private static ItemStack getCorrespondenceItemStack(Inventory inventory, Matter matter) {
         for (ItemStack item : InventoryUtil.getItemStackFromCraftingMenu(inventory)) {
             if (matter.getCandidate().contains(item.getType())) return item;
         }
@@ -738,7 +734,7 @@ public class ContainerUtil {
     }
 
 
-    public void setRecipeUsingContainerValueMetadata(Inventory inventory, Recipe recipe, ItemStack item) {
+    public static void setRecipeUsingContainerValueMetadata(Inventory inventory, Recipe recipe, ItemStack item) {
         ItemMeta resultMeta = item.getItemMeta();
 
         if (!recipe.hasUsingContainerValuesMetadata()) return;
@@ -768,7 +764,7 @@ public class ContainerUtil {
         item.setItemMeta(resultMeta);
     }
 
-    private String getOrderElement(PersistentDataContainer source, String order, String pattern, int locate) {
+    private static String getOrderElement(PersistentDataContainer source, String order, String pattern, int locate) {
         String buffer = "";
         StringBuilder result = new StringBuilder();
         Matcher matcher = Pattern.compile(pattern).matcher(order);
@@ -801,11 +797,11 @@ public class ContainerUtil {
         return result.toString();
     }
 
-    private void setUsingContainerValuesLore(ItemMeta meta, PersistentDataContainer source, String order) {
+    private static void setUsingContainerValuesLore(ItemMeta meta, PersistentDataContainer source, String order) {
         meta.setLore(Arrays.asList(getOrderElement(source, order, USING_CONTAINER_VALUES_LORE_PATTERN, 1)));
     }
 
-    private void setUsingContainerValuesEnchantment(ItemMeta meta, PersistentDataContainer source, String order) {
+    private static void setUsingContainerValuesEnchantment(ItemMeta meta, PersistentDataContainer source, String order) {
         Matcher matcher = Pattern.compile(USING_CONTAINER_VALUES_ENCHANTMENT_PATTERN).matcher(order);
         if (!matcher.matches()) return;
         Enchantment enchant;
@@ -833,7 +829,7 @@ public class ContainerUtil {
 
     }
 
-    private void setUsingContainerValuesPotionColor(ItemMeta meta, PersistentDataContainer source, String order) {
+    private static void setUsingContainerValuesPotionColor(ItemMeta meta, PersistentDataContainer source, String order) {
         Matcher rgb = Pattern.compile(USING_CONTAINER_VALUES_POTION_COLOR_RGB_PATTERN).matcher(order);
         Matcher random = Pattern.compile(USING_CONTAINER_VALUES_POTION_COLOR_RANDOM_PATTERN).matcher(order);
         if (rgb.matches()) {
@@ -883,7 +879,7 @@ public class ContainerUtil {
         }
     }
 
-    private void setUsingContainerValuesTextureId(ItemMeta meta, PersistentDataContainer source, String order) {
+    private static void setUsingContainerValuesTextureId(ItemMeta meta, PersistentDataContainer source, String order) {
         int id;
         try{
             id = (int) Math.round(Double.parseDouble(getContent(source, order)));
@@ -894,7 +890,7 @@ public class ContainerUtil {
         meta.setCustomModelData(id);
     }
 
-    private void setUsingContainerValuesToolDurability(Material material,ItemMeta meta, PersistentDataContainer source, String order) {
+    private static void setUsingContainerValuesToolDurability(Material material,ItemMeta meta, PersistentDataContainer source, String order) {
         Matcher absolute = Pattern.compile(USING_CONTAINER_VALUES_TOOL_DURABILITY_ABSOLUTE_PATTERN).matcher(order);
         Matcher percentage = Pattern.compile(USING_CONTAINER_VALUES_TOOL_DURABILITY_PERCENTAGE_PATTERN).matcher(order);
         if (absolute.matches()) {
@@ -950,12 +946,12 @@ public class ContainerUtil {
 
     }
 
-    private void setUsingContainerValuesItemName(ItemMeta meta, PersistentDataContainer source, String order) {
+    private static void setUsingContainerValuesItemName(ItemMeta meta, PersistentDataContainer source, String order) {
         // modify item-display-name
         meta.setDisplayName(getOrderElement(source, order, USING_CONTAINER_VALUES_ITEM_NAME_PATTERN, 1));
     }
 
-    public String getContent(PersistentDataContainer container, String order) {
+    public static String getContent(PersistentDataContainer container, String order) {
         if (!order.contains("$")) return order;
         order = order.replace("$","");
         NamespacedKey key = new NamespacedKey(getInstance(), order);
@@ -970,7 +966,7 @@ public class ContainerUtil {
         return String.valueOf(container.get(key, type));
     }
 
-    public void containerModify(String action, String value, ItemMeta meta) {
+    public static  void containerModify(String action, String value, ItemMeta meta) {
         PersistentDataContainer container = meta.getPersistentDataContainer();
         if (action.equals("add")) {
             // non override
@@ -994,7 +990,7 @@ public class ContainerUtil {
     }
 
 
-    public Map<Coordinate, List<Coordinate>> amorphous(Recipe recipe, Recipe input) {
+    public static Map<Coordinate, List<Coordinate>> amorphous(Recipe recipe, Recipe input) {
         List<Coordinate> r = recipe.getHasContainerDataItemList();
         List<Coordinate> i = input.getHasContainerDataItemList();
         Map<Coordinate, List<Coordinate>> map = new HashMap<>();
@@ -1046,7 +1042,7 @@ public class ContainerUtil {
         return map.isEmpty() ? Search.AMORPHOUS_NULL_ANCHOR : map;
     }
 
-    private boolean multiKeys(Matter matter, String multiKeys, boolean needed) {
+    private static boolean multiKeys(Matter matter, String multiKeys, boolean needed) {
         // (multi)(types:int*3,string*3,double*1)a,b,c,d,e,f,g
         // -> a,b,c = type int
         // -> d,e,f = type string
@@ -1072,7 +1068,7 @@ public class ContainerUtil {
         return true;
     }
 
-    private boolean hasKey(Matter matter, String keyName) {
+    private static boolean hasKey(Matter matter, String keyName) {
         for (int i = 0; i < matter.getContainerWrappers().size(); i++) {
             ContainerWrapper wrapper = matter.getContainerWrappers().get(i);
             if (wrapper.getKey().getKey().equals(keyName)) return true;
@@ -1080,7 +1076,7 @@ public class ContainerUtil {
         return false;
     }
 
-    private boolean hasValue(Matter matter, String keyName, String value, String type) {
+    private static boolean hasValue(Matter matter, String keyName, String value, String type) {
         Map<String, ContainerWrapper> data = new HashMap<>();
         for (Map.Entry<Integer, ContainerWrapper> entry : matter.getContainerWrappers().entrySet()) {
             String key = entry.getValue().getKey().getKey();
@@ -1107,7 +1103,7 @@ public class ContainerUtil {
         return true;
     }
 
-    private boolean isFollowRegexPattern(String source, String key, Map<String, ContainerWrapper> data) {
+    private static boolean isFollowRegexPattern(String source, String key, Map<String, ContainerWrapper> data) {
         Matcher matcher = Pattern.compile(FOLLOW_REGEX_PATTERN).matcher(source);
         if (!matcher.matches()) return false;
         String element = getFormulaValueString(matcher.group(1), data);
@@ -1115,7 +1111,7 @@ public class ContainerUtil {
         return Pattern.compile(value).matcher(element).matches();
     }
 
-    private boolean isEqualsIgnoreCase(String source, String key, Map<String, ContainerWrapper> data) {
+    private static boolean isEqualsIgnoreCase(String source, String key, Map<String, ContainerWrapper> data) {
         Matcher matcher = Pattern.compile(STRING_IGNORE_EQUALS_PATTERN).matcher(source);
         if (!matcher.matches()) return false;
         String element = getFormulaValueString(matcher.group(1), data);
@@ -1123,7 +1119,7 @@ public class ContainerUtil {
         return element.equalsIgnoreCase(value);
     }
 
-    private boolean isEqualsString(String source, String key, Map<String, ContainerWrapper> data) {
+    private static boolean isEqualsString(String source, String key, Map<String, ContainerWrapper> data) {
         Matcher matcher = Pattern.compile(STRING_EQUALS_PATTERN).matcher(source);
         if (!matcher.matches()) return false;
         String element = getFormulaValueString(matcher.group(1), data);
@@ -1132,7 +1128,7 @@ public class ContainerUtil {
     }
 
 
-    private boolean isInArrowRange(String source, String key,Map<String, ContainerWrapper> data) {
+    private static boolean isInArrowRange(String source, String key,Map<String, ContainerWrapper> data) {
         Matcher matcher = Pattern.compile(ARROW_RANGE_PATTERN).matcher(source);
         if (!matcher.matches()) return false;
         double start = getFormulaValue(matcher.group(1), data);
@@ -1142,7 +1138,7 @@ public class ContainerUtil {
         return start < value && value < end;
     }
 
-    private boolean isInSmallerRange(String source, String key,Map<String, ContainerWrapper> data) {
+    private static boolean isInSmallerRange(String source, String key,Map<String, ContainerWrapper> data) {
         Matcher matcher = Pattern.compile(SMALLER_PATTERN).matcher(source);
         if (!matcher.matches()) return false;
         double large = getFormulaValue(matcher.group(1), data);
@@ -1151,7 +1147,7 @@ public class ContainerUtil {
         return value < large;
     }
 
-    private boolean isInLargerRange(String source, String key, Map<String, ContainerWrapper> data) {
+    private static boolean isInLargerRange(String source, String key, Map<String, ContainerWrapper> data) {
         Matcher matcher = Pattern.compile(LARGER_PATTERN).matcher(source);
         if (!matcher.matches()) return false;
         double small = getFormulaValue(matcher.group(1), data);
@@ -1160,7 +1156,7 @@ public class ContainerUtil {
         return small < value;
     }
 
-    private double getFormulaValue(String formula, Map<String, ContainerWrapper> map) {
+    private static double getFormulaValue(String formula, Map<String, ContainerWrapper> map) {
         Map<String, Double> data = new HashMap<>();
         for (Map.Entry<String, ContainerWrapper> entry : map.entrySet()) {
             if (entry.getValue().getValueType().equals(String.class)) continue;
@@ -1183,7 +1179,7 @@ public class ContainerUtil {
         return calc(formula);
     }
 
-    private String getFormulaValueString(String formula, Map<String, ContainerWrapper> map) {
+    private static String getFormulaValueString(String formula, Map<String, ContainerWrapper> map) {
         Map<String, String> data = new HashMap<>();
         for (Map.Entry<String, ContainerWrapper> entry : map.entrySet()) {
             if (!entry.getValue().getValueType().equals(String.class)) continue;

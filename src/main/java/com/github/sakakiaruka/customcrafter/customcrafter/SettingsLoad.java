@@ -416,7 +416,7 @@ public class SettingsLoad {
                 continue;
             }
 
-            Map<Integer, ContainerWrapper> elements = new ContainerUtil().mattersLoader(path);
+            Map<Integer, ContainerWrapper> elements = ContainerUtil.mattersLoader(path);
             matter.setContainerWrappers(elements);
             MATTERS.put(name,matter);
             CUSTOM_MATTERS.put(name, matter);
@@ -604,7 +604,7 @@ public class SettingsLoad {
                     if (!config.contains(address)) break;
                     NamespacedKey key = new NamespacedKey(getInstance(), config.getString(address+"key"));
                     RecipeDataContainerModifyType modifyType = RecipeDataContainerModifyType.valueOf(config.getString(address+"modify_type").toUpperCase());
-                    PersistentDataType type = new ContainerUtil().getDataType(config.getString(address+"type").toUpperCase());
+                    PersistentDataType type = ContainerUtil.getDataType(config.getString(address+"type").toUpperCase());
                     String term = config.getString(address+"term");
                     String action = Objects.requireNonNullElse(config.getString(address + "action"), "");
                     boolean end = config.getBoolean(address+"return");
