@@ -35,11 +35,11 @@ import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.*;
 public class Search {
 
     private static final String PASS_THROUGH_PATTERN = "^(?i)pass -> ([a-zA-Z_]+)$";
-    public static final Map<Coordinate, List<Coordinate>> AMORPHOUS_NULL_ANCHOR = new HashMap<Coordinate, List<Coordinate>>() {{
+    public static final Map<Coordinate, List<Coordinate>> AMORPHOUS_NULL_ANCHOR = new HashMap<>() {{
         put(Coordinate.NULL_ANCHOR, Collections.emptyList());
     }};
 
-    public static final Map<Coordinate, List<Coordinate>> AMORPHOUS_NON_REQUIRED_ANCHOR = new HashMap<Coordinate, List<Coordinate>>() {{
+    public static final Map<Coordinate, List<Coordinate>> AMORPHOUS_NON_REQUIRED_ANCHOR = new HashMap<>() {{
         put(Coordinate.NON_REQUIRED_ANCHOR, Collections.emptyList());
     }};
 
@@ -281,8 +281,6 @@ public class Search {
         if(!getEnchantWrapCongruence(recipe,input))return false;
         return true;
     }
-
-
 
     public boolean getEnchantWrapCongruence(Matter recipe,Matter input){
 
