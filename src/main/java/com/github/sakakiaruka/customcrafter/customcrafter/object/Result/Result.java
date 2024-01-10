@@ -275,7 +275,7 @@ public class Result {
                     } else {
                         continue;
                     }
-                    AttributeModifier modifier = new AttributeModifierUtil().getAttributeModifier(matcher, isNormal);
+                    AttributeModifier modifier = AttributeModifierUtil.getAttributeModifier(matcher, isNormal);
                     if (modifier == null) continue;
                     Attribute attribute = Attribute.valueOf(matcher.group(1).toUpperCase());
                     meta.addAttributeModifier(attribute, modifier);

@@ -756,8 +756,8 @@ public class ContainerUtil {
                 else if (order.matches(USING_CONTAINER_VALUES_TOOL_DURABILITY_PERCENTAGE_PATTERN)) setUsingContainerValuesToolDurability(item.getType(), resultMeta, source, order);
                 else if (order.matches(USING_CONTAINER_VALUES_TEXTURE_ID_PATTERN)) setUsingContainerValuesTextureId(resultMeta, source, order);
                 else if (order.matches(USING_CONTAINER_VALUES_ITEM_NAME_PATTERN)) setUsingContainerValuesItemName(resultMeta, source, order);
-                else if (order.matches(USING_CONTAINER_VALUES_ATTRIBUTE_MODIFIER_PATTERN)) new AttributeModifierUtil().setAttributeModifierToResult(resultMeta, source, order);
-                else if (order.matches(USING_CONTAINER_VALUES_ATTRIBUTE_MODIFIER_EQUIPMENT_SLOT_PATTERN)) new AttributeModifierUtil().setAttributeModifierToResult(resultMeta, source, order);
+                else if (order.matches(USING_CONTAINER_VALUES_ATTRIBUTE_MODIFIER_PATTERN)) AttributeModifierUtil.setAttributeModifierToResult(resultMeta, source, order);
+                else if (order.matches(USING_CONTAINER_VALUES_ATTRIBUTE_MODIFIER_EQUIPMENT_SLOT_PATTERN)) AttributeModifierUtil.setAttributeModifierToResult(resultMeta, source, order);
                 else Bukkit.getLogger().warning("[CustomCrafter] USING_CONTAINER_VALUES Metadata failed. (Illegal configuration format found.)");
             }
         }
