@@ -326,15 +326,14 @@ public class SettingsLoad {
 
     private void addAllVanillaMaterial(){
         for(Material material : Material.values()){
-            String name = material.name().toLowerCase();
-//            Result test = new Result(name,null,1,null,material.name(),-1, new ArrayList<>());
+            String name = material.name();
             Result result = new Result().
                     setAmount(1).
-                    setName(name).
+                    setName(material.name()).
                     setNameOrRegex(material.name()).
                     setMatchPoint(-1);
 
-            RESULTS.put(name,result);
+            RESULTS.put(name, result);
 
             Matter matter = new Matter(Arrays.asList(material), 1);
             MATTERS.put(name, matter);
