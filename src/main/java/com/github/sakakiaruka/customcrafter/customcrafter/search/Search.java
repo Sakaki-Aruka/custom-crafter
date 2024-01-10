@@ -18,7 +18,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -59,154 +58,93 @@ public class Search {
 
         int judge = 0;
 
-        Top:for(Recipe recipe: ITEM_PLACED_SLOTS_RECIPE_MAP.get(itemContainedSlots)){
+        for (Recipe recipe: ITEM_PLACED_SLOTS_RECIPE_MAP.get(itemContainedSlots)){
 
             if(recipe.hasPermission()){ // permission check
                 RecipePermission source = recipe.getPermission();
                 if(!new RecipePermissionUtil().containsPermission(player, source)) continue;
             }
 
-            if(recipe.getTag().equals(Tag.NORMAL)){
-                //normal
-                if(getSquareSize(recipe.getCoordinateList()) != getSquareSize(input.getCoordinateList()))continue;
-                if(!isSameShape(getCoordinateNoAir(recipe),getCoordinateNoAir(input)))continue;
-                if(!isAllCandidateContains(recipe,input))continue;
+            if (recipe.getTag().equals(Tag.NORMAL) && isMatchNormal(interestedItems ,recipe, input)) judge++;
+            if (recipe.getTag().equals(Tag.AMORPHOUS) && isMatchAmorphous(recipe, input)) judge++;
 
-                // check mass matter is one
-                for(int i=0;i<recipe.getContentsNoAir().size();i++){
-                    Matter recipeMatter = recipe.getContentsNoAir().get(i);
-                    Matter inputMatter = input.getContentsNoAir().get(i);
-
-                    if (!ContainerUtil.isPass(interestedItems.get(i), recipeMatter)) continue Top;
-
-                    //(amount one virtual test)
-                    Matter recipeOne = recipeMatter.oneCopy();
-                    Matter inputOne = inputMatter.oneCopy();
-
-                    if(!isSameMatter(recipeOne,inputOne)) continue Top;
-                    if(!(recipeOne.getClass().equals(Potions.class) && inputOne.getClass().equals(Potions.class))) continue;
-                    if(!PotionUtil.isSamePotion((Potions)recipeOne,(Potions) inputOne)) continue Top;
-
-                    //end (amount one virtual test end)
-
-                    if(recipe.getContentsNoAir().get(i).isMass()){
-                        if(inputMatter.getAmount() != 1)continue Top;
-                    }
-
-                    if(inputMatter.getAmount() < recipeMatter.getAmount())continue Top;
-                    if(!getEnchantWrapCongruence(recipeMatter,inputMatter))continue Top; // enchant check
-
-                    judge += 1;
-                }
-
-
-            }else{
-
-                Bukkit.getLogger().info(BAR);
-                Bukkit.getLogger().info("recipe name="+recipe.getName());
-
-                //debug
-                List<Map<Coordinate, List<Coordinate>>> temp = new ArrayList<>();
-                Map<Coordinate, List<Coordinate>> enchant = EnchantUtil.amorphous(recipe, input);
-                Map<Coordinate, List<Coordinate>> container = ContainerUtil.amorphous(recipe, input);
-                Map<Coordinate,List<Coordinate>> candidate = InventoryUtil.amorphous(recipe, input);
-                Map<Coordinate, List<Coordinate>> potion = PotionUtil.amorphous(recipe, input);
-
-                Map<Coordinate, Map<String, Boolean>> rStatus = InventoryUtil.getEachMatterStatus(recipe);
-                Map<Coordinate, Map<String, Boolean>> iStatus = InventoryUtil.getEachMatterStatus(input);
-
-                Bukkit.getLogger().info("enchant map="+enchant);
-                Bukkit.getLogger().info("container map="+container);
-                Bukkit.getLogger().info("candidate map="+candidate);
-                Bukkit.getLogger().info("potion map="+potion);
-
-                if (!enchant.equals(AMORPHOUS_NON_REQUIRED_ANCHOR) && !isElementMatch(enchant, rStatus, "enchant")) {
-                    Bukkit.getLogger().info("enchant not matched");
-                    continue Top;
-                }
-
-                if (!container.equals(AMORPHOUS_NON_REQUIRED_ANCHOR) && !isElementMatch(container, rStatus, "container")) {
-                    Bukkit.getLogger().info("container not matched");
-                    continue Top;
-                }
-
-                if (!potion.equals(AMORPHOUS_NON_REQUIRED_ANCHOR) && !isElementMatch(potion, rStatus, "potion")) {
-                    Bukkit.getLogger().info("potion not matched");
-                    continue Top;
-                }
-
-                if (!enchant.equals(AMORPHOUS_NON_REQUIRED_ANCHOR)) temp.add(enchant);
-                if (!container.equals(AMORPHOUS_NON_REQUIRED_ANCHOR)) temp.add(container);
-                if (!potion.equals(AMORPHOUS_NON_REQUIRED_ANCHOR)) temp.add(potion);
-
-
-                for (Map<Coordinate, List<Coordinate>> element : temp) {
-                    for (Map.Entry<Coordinate, List<Coordinate>> entry : element.entrySet()) {
-                        Bukkit.getLogger().info("  source="+entry.getKey()+" / element="+entry.getValue());
-                    }
-                }
-
-                for (Map.Entry<Coordinate, List<Coordinate>> element : candidate.entrySet()) {
-                    Bukkit.getLogger().info("  source(candidate)="+element.getKey()+" / element="+element.getValue());
-                }
-
-
-                for (Map.Entry<Coordinate, Map<String, Boolean>> entry : rStatus.entrySet()) {
-                    Bukkit.getLogger().info("coordinate="+entry.getKey()+" / status="+entry.getValue());
-                }
-
-                temp.add(candidate);
-                Map<Coordinate, Coordinate> relate;
-                if ((relate = InventoryUtil.combination(temp)).isEmpty()) continue;
-
-                for (Map.Entry<Coordinate, Coordinate> entry : relate.entrySet()) {
-                    Coordinate r = entry.getKey();
-                    Coordinate i = entry.getValue();
-                    if (!rStatus.get(r).equals(iStatus.get(i))) continue Top;
-                }
-
-                Bukkit.getLogger().info("temp map="+temp);
-                Bukkit.getLogger().info(BAR);
-
-                judge += 1;
-            }
-
-
-            if (judge > 0) {
-                result = recipe;
-                massAmount  = getMinimalAmount(result,input);
-            }
+            if (judge == 0) continue;
+            result = recipe;
+            massAmount = getMinimalAmount(result, input);
 
             break;
         }
 
 
-        if(result != null){
+        if (result != null) {
             // custom recipe found
             InventoryUtil.returnItems(result,inventory,massAmount,player);
             int quantity = (isOneCraft ? 1 : massAmount) * result.getResult().getAmount();
             setResultItem(inventory,result,input,player,quantity,isOneCraft);
-        }else{
+        } else {
             // not found
             new VanillaSearch().main(player,inventory,isOneCraft);
         }
     }
 
-    private boolean isElementMatch(Map<Coordinate, List<Coordinate>> map, Map<Coordinate, Map<String, Boolean>> status, String key) {
-        int statusJudge = 0;
-        for (Map.Entry<Coordinate, Map<String, Boolean>> entry : status.entrySet()) {
-            if (!entry.getValue().get(key)) continue;
-            statusJudge++;
+    private boolean isMatchNormal(List<ItemStack> interestedItems,Recipe recipe, Recipe input) {
+        if(getSquareSize(recipe.getCoordinateList()) != getSquareSize(input.getCoordinateList())) return false;
+        if(!isSameShape(getCoordinateNoAir(recipe),getCoordinateNoAir(input))) return false;
+        if(!isAllCandidateContains(recipe,input)) return false;
+
+        // check mass matter is one
+        for(int i=0;i<recipe.getContentsNoAir().size();i++){
+            Matter recipeMatter = recipe.getContentsNoAir().get(i);
+            Matter inputMatter = input.getContentsNoAir().get(i);
+
+            if (!ContainerUtil.isPass(interestedItems.get(i), recipeMatter)) return false;
+
+            //(amount one virtual test)
+            Matter recipeOne = recipeMatter.oneCopy();
+            Matter inputOne = inputMatter.oneCopy();
+
+            if(!isSameMatter(recipeOne,inputOne)) return false;
+            if(!(recipeOne.getClass().equals(Potions.class) && inputOne.getClass().equals(Potions.class))) continue;
+            if(!PotionUtil.isSamePotion((Potions)recipeOne,(Potions) inputOne)) return false;
+
+            //end (amount one virtual test end)
+
+            if(recipe.getContentsNoAir().get(i).isMass()){
+                if(inputMatter.getAmount() != 1) return false;
+            }
+
+            if(inputMatter.getAmount() < recipeMatter.getAmount()) return false;
+            if(!getEnchantWrapCongruence(recipeMatter,inputMatter)) return false; // enchant check
         }
-        int mapJudge = 0;
-        for (Map.Entry<Coordinate, List<Coordinate>> entry : map.entrySet()) {
-            List<Coordinate> list = entry.getValue();
-            if (list.isEmpty() || list.get(0).equals(Coordinate.NULL_ANCHOR)) continue;
-            mapJudge++;
-        }
-        return statusJudge == mapJudge;
+        return true;
     }
 
+    private boolean isMatchAmorphous(Recipe recipe, Recipe input) {
+        List<Map<Coordinate, List<Coordinate>>> temp = new ArrayList<>();
+        Map<Coordinate, List<Coordinate>> enchant = EnchantUtil.amorphous(recipe, input);
+        Map<Coordinate, List<Coordinate>> container = ContainerUtil.amorphous(recipe, input);
+        Map<Coordinate,List<Coordinate>> candidate = InventoryUtil.amorphous(recipe, input);
+        Map<Coordinate, List<Coordinate>> potion = PotionUtil.amorphous(recipe, input);
+
+        Map<Coordinate, Map<String, Boolean>> rStatus = InventoryUtil.getEachMatterStatus(recipe);
+        Map<Coordinate, Map<String, Boolean>> iStatus = InventoryUtil.getEachMatterStatus(input);
+
+        if (!enchant.equals(AMORPHOUS_NON_REQUIRED_ANCHOR)) temp.add(enchant);
+        if (!container.equals(AMORPHOUS_NON_REQUIRED_ANCHOR)) temp.add(container);
+        if (!potion.equals(AMORPHOUS_NON_REQUIRED_ANCHOR)) temp.add(potion);
+
+        temp.add(candidate);
+        Map<Coordinate, Coordinate> relate;
+        if ((relate = InventoryUtil.combination(temp)).isEmpty()) return false;
+
+        for (Map.Entry<Coordinate, Coordinate> entry : relate.entrySet()) {
+            Coordinate r = entry.getKey();
+            Coordinate i = entry.getValue();
+            if (!rStatus.get(r).equals(iStatus.get(i))) return false;
+        }
+
+        return true;
+    }
 
 
     private boolean isAllCandidateContains(Recipe recipe,Recipe input){
@@ -272,7 +210,7 @@ public class Search {
             item = items.get(0);
             recipe.getResult().setMetaData(item);
 
-        }else {
+        } else {
             // not contains -> A result has written by regex pattern.
             List<String> list = Arrays.asList(recipe.getResult().getNameOrRegex().split("@"));
 
