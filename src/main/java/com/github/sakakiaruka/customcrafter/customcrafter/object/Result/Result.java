@@ -231,7 +231,7 @@ public class Result {
             if(type.equals(MetadataType.UNBREAKABLE)) meta.setUnbreakable(Boolean.parseBoolean(content.get(0)));
             if(type.equals(MetadataType.CUSTOMMODELDATA)) meta.setCustomModelData(Integer.parseInt(content.get(0)));
             if(type.equals(MetadataType.POTIONDATA)) {
-                if(!new PotionUtil().isPotion(item.getType())) return;
+                if(!PotionUtil.isPotion(item.getType())) return;
                 for(String s : content){
                     List<String> potionData = Arrays.asList(s.split(","));
                     PotionEffectType effectType = PotionEffectType.getByName(potionData.get(0).toUpperCase());

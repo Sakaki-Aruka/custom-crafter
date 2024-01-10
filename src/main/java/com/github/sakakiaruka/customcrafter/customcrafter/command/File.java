@@ -13,6 +13,6 @@ public class File {
         Bukkit.getLogger().info("The system is making default potion files.");
         Bukkit.getLogger().info("Do not shutdown or stop a server.");
         Bukkit.getLogger().info(LINE_SEPARATOR + BAR);
-        new PotionUtil().makeDefaultPotionFilesWrapper();
+        PotionUtil.makeDefaultPotionFilesWrapper();
     }
 }

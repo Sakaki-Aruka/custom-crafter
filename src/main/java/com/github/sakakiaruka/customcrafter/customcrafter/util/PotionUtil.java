@@ -1,7 +1,6 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.util;
 
 import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter;
-import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.PotionData.PotionDuration;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.PotionBottleType;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.PotionStrict;
@@ -36,11 +35,9 @@ import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.LI
 
 public class PotionUtil {
     // this string key is "PotionEffectType" 's name
-    public int getDuration(String key,boolean upgraded,boolean extended,PotionBottleType bottleType){
+    public static int getDuration(String key,boolean upgraded,boolean extended,PotionBottleType bottleType){
         if(bottleType.equals(PotionBottleType.LINGERING)){
-            StringBuilder builder = new StringBuilder("LINGERING_");
-            builder.append(key);
-            key = builder.toString();
+            key = "LINGERING_" + key;
         }
         for(PotionDuration pd : PotionDuration.values()){
             if(!pd.toString().equalsIgnoreCase(key)) continue;
@@ -51,21 +48,21 @@ public class PotionUtil {
         return -1;
     }
 
-    public PotionBottleType getBottleType(Material material){
+    public static PotionBottleType getBottleType(Material material){
         for(PotionBottleType type : PotionBottleType.values()){
             if(type.getRelated().equals(material)) return type;
         }
         return null;
     }
 
-    public boolean isPotion(Material material){
+    public static boolean isPotion(Material material){
         for(PotionBottleType type : PotionBottleType.values()){
             if(type.getRelated().equals(material)) return true;
         }
         return false;
     }
 
-    public List<String> getPotionEffectTypeStringList(){
+    public static List<String> getPotionEffectTypeStringList(){
         List<String> list = new ArrayList<>();
         for(PotionEffectType e : PotionEffectType.values()){
             list.add(e.getName());
@@ -73,7 +70,7 @@ public class PotionUtil {
         return list;
     }
 
-    public List<String> getPotionStrictStringList(){
+    public static List<String> getPotionStrictStringList(){
         List<String> list = new ArrayList<>();
         for(PotionStrict strict : PotionStrict.values()){
             if(strict.toStr().equalsIgnoreCase("INPUT")) continue;
@@ -82,19 +79,18 @@ public class PotionUtil {
         return list;
     }
 
-    public Potions water_bottle(){
+    public static Potions water_bottle(){
         ItemStack item = new ItemStack(Material.POTION);
         PotionMeta meta = (PotionMeta) item.getItemMeta();
         PotionType type = PotionType.WATER;
         PotionData data = new PotionData(type);
         meta.setBasePotionData(data);
         item.setItemMeta(meta);
-        Potions potion = new Potions(item,PotionStrict.STRICT);
         //potion.setName("water_bottle");
-        return potion;
+        return new Potions(item,PotionStrict.STRICT);
     }
 
-    public ItemStack water_bottle_ItemStack(){
+    public static ItemStack water_bottle_ItemStack(){
         ItemStack item = new ItemStack(Material.POTION);
         PotionMeta meta = (PotionMeta) item.getItemMeta();
         PotionType type = PotionType.WATER;
@@ -104,20 +100,8 @@ public class PotionUtil {
         return item;
     }
 
-    public boolean isWaterBottle(Matter matter){
-        Potions potion;
-        try{
-            potion = (Potions) matter;
-        }catch (Exception e){
-            return false;
-        }
-        if(!potion.getCandidate().get(0).equals(Material.POTION)) return false;
-        if(potion.hasAnyCustomEffect()) return false;
-        return true;
-    }
 
-
-    public boolean isSamePotion(Potions recipe, Potions input){
+    public static boolean isSamePotion(Potions recipe, Potions input){
         if(recipe.isBottleTypeMatch()){
             if(!recipe.getBottle().equals(input.getBottle())) return false;
         }
@@ -125,8 +109,7 @@ public class PotionUtil {
         if(!recipe.hasAnyCustomEffect()){
             if(input.hasAnyCustomEffect()) return false;
             if(!recipe.isBottleTypeMatch()) return true;
-            if(!recipe.getBottle().equals(input.getBottle())) return false;
-            return true;
+            return recipe.getBottle().equals(input.getBottle());
         }
 
         for(Map.Entry<PotionEffect, PotionStrict> entry : recipe.getData().entrySet()){
@@ -162,7 +145,7 @@ public class PotionUtil {
     }
 
 
-    private List<String> getPDNames() {
+    private static List<String> getPDNames() {
         List<String> list = new ArrayList<>();
         for(PotionDuration pd : PotionDuration.values()) {
             list.add(pd.getPDName());
@@ -172,7 +155,7 @@ public class PotionUtil {
 
 
 
-    private void makeDefaultPotionFiles(String basePath, boolean mass, boolean upgraded, boolean extended, String strict) {
+    private static void makeDefaultPotionFiles(String basePath, boolean mass, boolean upgraded, boolean extended, String strict) {
         final String NORMAL = String.format("%s/normal/",basePath);
         final String SPLASH = String.format("%s/splash/",basePath);
         final String LINGERING = String.format("%s/lingering/",basePath);
@@ -228,7 +211,7 @@ public class PotionUtil {
         }
     }
 
-    public void makeDefaultPotionFilesWrapper() {
+    public static void makeDefaultPotionFilesWrapper() {
         final String BASE_PATH = CustomCrafter.getInstance().getConfig().getStringList("matters").get(0) + "/default/potion";
 
         new BukkitRunnable(){
@@ -245,7 +228,7 @@ public class PotionUtil {
                 }
 
                 Bukkit.getLogger().info(BAR);
-                Bukkit.getLogger().info(String.format("[Custom Crafter] Finished creating default potion files."));
+                Bukkit.getLogger().info("[Custom Crafter] Finished creating default potion files.");
                 Bukkit.getLogger().info(BAR);
 
             }
@@ -254,16 +237,16 @@ public class PotionUtil {
 
     }
 
-    private void binary(int num, List<Boolean> list){
+    private static void binary(int num, List<Boolean> list){
         if(num == 0 || num == 1) {
-            list.add(num == 0 ? false : true);
+            list.add(num != 0);
             return;
         }
-        list.add(num % 2 == 0 ? false : true);
+        list.add(num % 2 != 0);
         binary(num / 2,list);
     }
 
-    private boolean writerWrapper(List<String> list, File file) {
+    private static boolean writerWrapper(List<String> list, File file) {
         FileWriter writer;
         try{
             writer = new FileWriter(file);
@@ -290,7 +273,7 @@ public class PotionUtil {
         return true;
     }
 
-    public Map<Coordinate, List<Coordinate>> amorphous(Recipe recipe, Recipe input) {
+    public static Map<Coordinate, List<Coordinate>> amorphous(Recipe recipe, Recipe input) {
         // returns candidate of correct pattern
         Map<Coordinate, List<Coordinate>> result = new HashMap<>();
         //

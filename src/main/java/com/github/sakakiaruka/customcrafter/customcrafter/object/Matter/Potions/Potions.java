@@ -42,7 +42,7 @@ public class Potions extends Matter implements Matters {
         PotionData baseData = meta.getBasePotionData();
         PotionUtil util = new PotionUtil();
         if(meta.getBasePotionData().getType().equals(PotionType.TURTLE_MASTER)){
-            int duration = util.getDuration("turtle_master",baseData.isUpgraded(),baseData.isExtended(),util.getBottleType(item.getType()));
+            int duration = PotionUtil.getDuration("turtle_master",baseData.isUpgraded(),baseData.isExtended(),util.getBottleType(item.getType()));
             int slowLevel = baseData.isUpgraded() ? 6 : 4;
             int resistanceLevel = baseData.isUpgraded() ? 4 : 3;
             PotionEffect slow = new PotionEffect(PotionEffectType.SLOW,duration,slowLevel);
@@ -61,7 +61,7 @@ public class Potions extends Matter implements Matters {
             }
         }
         data = map;
-        bottle = new PotionUtil().getBottleType(item.getType());
+        bottle = PotionUtil.getBottleType(item.getType());
 
         // default is "true"
         bottleTypeMatch = true;

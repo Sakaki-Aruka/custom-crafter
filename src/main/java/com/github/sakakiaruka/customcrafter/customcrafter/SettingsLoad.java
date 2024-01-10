@@ -430,7 +430,7 @@ public class SettingsLoad {
     }
 
     private void addWaterBottle(){
-        Potions waterBottle = new PotionUtil().water_bottle();
+        Potions waterBottle = PotionUtil.water_bottle();
         MATTERS.put("water_bottle",waterBottle);
     }
 
@@ -451,7 +451,7 @@ public class SettingsLoad {
             map.put(effect,strict);
         }
 
-        PotionBottleType bottleType = new PotionUtil().getBottleType(matter.getCandidate().get(0));
+        PotionBottleType bottleType = PotionUtil.getBottleType(matter.getCandidate().get(0));
         boolean bottleTypeMatch = config.getBoolean("bottleTypeMatch");
 
         Potions potions = new Potions(matter,map,bottleType,bottleTypeMatch);
@@ -575,7 +575,7 @@ public class SettingsLoad {
                     }
 
                     if(list.get(1).equals("water_bottle")){
-                        itemStack = new PotionUtil().water_bottle_ItemStack();
+                        itemStack = PotionUtil.water_bottle_ItemStack();
                     }else if(list.get(1).matches(PASS_THROUGH_PATTERN)){
                         // pass through
                         int amount = Integer.parseInt(list.get(2));

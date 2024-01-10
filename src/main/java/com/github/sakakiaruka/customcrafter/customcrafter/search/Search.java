@@ -85,7 +85,7 @@ public class Search {
 
                     if(!isSameMatter(recipeOne,inputOne)) continue Top;
                     if(!(recipeOne.getClass().equals(Potions.class) && inputOne.getClass().equals(Potions.class))) continue;
-                    if(!new PotionUtil().isSamePotion((Potions)recipeOne,(Potions) inputOne)) continue Top;
+                    if(!PotionUtil.isSamePotion((Potions)recipeOne,(Potions) inputOne)) continue Top;
 
                     //end (amount one virtual test end)
 
@@ -110,7 +110,7 @@ public class Search {
                 Map<Coordinate, List<Coordinate>> enchant = EnchantUtil.amorphous(recipe, input);
                 Map<Coordinate, List<Coordinate>> container = ContainerUtil.amorphous(recipe, input);
                 Map<Coordinate,List<Coordinate>> candidate = InventoryUtil.amorphous(recipe, input);
-                Map<Coordinate, List<Coordinate>> potion = new PotionUtil().amorphous(recipe, input);
+                Map<Coordinate, List<Coordinate>> potion = PotionUtil.amorphous(recipe, input);
 
                 Map<Coordinate, Map<String, Boolean>> rStatus = InventoryUtil.getEachMatterStatus(recipe);
                 Map<Coordinate, Map<String, Boolean>> iStatus = InventoryUtil.getEachMatterStatus(input);
@@ -488,7 +488,7 @@ public class Search {
         Matter matter;
         if(inventory.getItem(slot) == null){
             matter = new Matter(Arrays.asList(Material.AIR),0);
-        }else if(new PotionUtil().isPotion(inventory.getItem(slot).getType())){
+        }else if(PotionUtil.isPotion(inventory.getItem(slot).getType())){
             matter = new Potions(inventory.getItem(slot), PotionStrict.INPUT);
         }else{
             matter = new Matter(inventory.getItem(slot));

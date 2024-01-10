@@ -362,7 +362,7 @@ public class DataCheckerUtil {
                     appendLn(builder,"  -> PotionEffectType, duration, amplifier");
                     return false;
                 }
-                if(!new PotionUtil().getPotionEffectTypeStringList().contains(list.get(1).toUpperCase())){
+                if(!PotionUtil.getPotionEffectTypeStringList().contains(list.get(1).toUpperCase())){
                     appendLn(builder,"metadata -> The potion type is invalid value.");
                     return false;
                 }
@@ -428,7 +428,7 @@ public class DataCheckerUtil {
                 return false;
             }
 
-            if(!new PotionUtil().getPotionEffectTypeStringList().contains(list.get(0).toUpperCase())){
+            if(!PotionUtil.getPotionEffectTypeStringList().contains(list.get(0).toUpperCase())){
                 appendLn(builder,"potion -> Invalid PotionType found.");
                 return false;
             }
@@ -448,7 +448,7 @@ public class DataCheckerUtil {
                 return false;
             }
 
-            if(!new PotionUtil().getPotionStrictStringList().contains(list.get(3).toUpperCase())){
+            if(!PotionUtil.getPotionStrictStringList().contains(list.get(3).toUpperCase())){
                 appendLn(builder,"potion -> PotionStrict is an invalid value.");
                 appendLn(builder,"  -> Not_Strict, Only_Effect, Only_Duration, Only_Amplifier, Strict");
                 return false;
