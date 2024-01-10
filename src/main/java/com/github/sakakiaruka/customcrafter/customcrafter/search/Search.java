@@ -107,7 +107,7 @@ public class Search {
 
                 //debug
                 List<Map<Coordinate, List<Coordinate>>> temp = new ArrayList<>();
-                Map<Coordinate, List<Coordinate>> enchant = new EnchantUtil().amorphous(recipe, input);
+                Map<Coordinate, List<Coordinate>> enchant = EnchantUtil.amorphous(recipe, input);
                 Map<Coordinate, List<Coordinate>> container = ContainerUtil.amorphous(recipe, input);
                 Map<Coordinate,List<Coordinate>> candidate = InventoryUtil.amorphous(recipe, input);
                 Map<Coordinate, List<Coordinate>> potion = new PotionUtil().amorphous(recipe, input);

@@ -285,7 +285,7 @@ public class DataCheckerUtil {
 
             if(strict){
                 String s = settings.get(2).toUpperCase();
-                if(!new EnchantUtil().strValuesNoInput().contains(s)){
+                if(!EnchantUtil.strValuesNoInput().contains(s)){
                     appendLn(builder,"enchant -> An EnchantStrict value is incorrect.");
                     appendLn(builder,"  -> You can choose EnchantStrict from these -> NotStrict, OnlyEnchant, Strict");
                     return false;
@@ -328,7 +328,7 @@ public class DataCheckerUtil {
                     appendLn(builder,"  -> Have to write two parameters. EnchantName and those level.");
                     return false;
                 }
-                if(!new EnchantUtil().getEnchantmentStrList().contains(list.get(1).toUpperCase())){
+                if(!EnchantUtil.getEnchantmentStrList().contains(list.get(1).toUpperCase())){
                     appendLn(builder,"meta -> An invalid Enchantment found.");
                     appendLn(builder,"  -> Write correct Enchantment name.");
                     return false;

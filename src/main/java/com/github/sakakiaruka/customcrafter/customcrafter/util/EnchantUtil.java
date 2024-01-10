@@ -14,10 +14,7 @@ import java.util.Map;
 
 
 public class EnchantUtil {
-
-
-
-    public List<String> strValuesNoInput(){
+    public static List<String> strValuesNoInput(){
         List<String> list = new ArrayList<>();
         for(EnchantStrict es : EnchantStrict.values()){
             if(es.equals(EnchantStrict.INPUT)) continue;
@@ -26,7 +23,7 @@ public class EnchantUtil {
         return list;
     }
 
-    public List<String> getEnchantmentStrList(){
+    public static List<String> getEnchantmentStrList(){
         List<String> list = new ArrayList<>();
         for(Enchantment enchant : Enchantment.values()){
             list.add(enchant.getName().toUpperCase());
@@ -35,7 +32,7 @@ public class EnchantUtil {
     }
 
 //====
-    public Map<Coordinate, List<Coordinate>> amorphous(Recipe recipe, Recipe input) {
+    public static Map<Coordinate, List<Coordinate>> amorphous(Recipe recipe, Recipe input) {
         // returns candidate of correct pattern
 
         // returns NON_REQUIRED = containers not required
@@ -82,7 +79,7 @@ public class EnchantUtil {
         return result.isEmpty() ? Search.AMORPHOUS_NULL_ANCHOR : result;
     }
 
-    private List<Boolean> getMatchList(List<EnchantWrap> recipe, List<List<EnchantWrap>> in) {
+    private static List<Boolean> getMatchList(List<EnchantWrap> recipe, List<List<EnchantWrap>> in) {
         List<Boolean> list = new ArrayList<>();
         for (List<EnchantWrap> cell : in) {
             int a = 0;
