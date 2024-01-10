@@ -218,7 +218,6 @@ public class Result {
 
             MetadataType type = entry.getKey();
             List<String> content = entry.getValue();
-            InventoryUtil util = new InventoryUtil();
 
             if(type.equals(MetadataType.LORE)) meta.setLore(content);
             if(type.equals(MetadataType.DISPLAYNAME)) meta.setDisplayName(content.get(0));
@@ -326,13 +325,13 @@ public class Result {
                     String bookFieldType = matcher.group(1).toLowerCase();
                     String value = matcher.group(2);
 
-                    if (bookFieldType.equals("author")) util.setAuthor(bookMeta, value);
-                    if (bookFieldType.equals("title")) util.setTitle(bookMeta, value);
-                    if (bookFieldType.equals("generation")) util.setGeneration(bookMeta, value);
-                    if (bookFieldType.equals("add_page")) util.addPage(bookMeta, value);
-                    if (bookFieldType.equals("pages")) util.setPages(bookMeta, value);
-                    if (bookFieldType.equals("add_long")) util.addLong(bookMeta, value, false);
-                    if (bookFieldType.equals("add_long_extend")) util.addLong(bookMeta, value, true);
+                    if (bookFieldType.equals("author")) InventoryUtil.setAuthor(bookMeta, value);
+                    if (bookFieldType.equals("title")) InventoryUtil.setTitle(bookMeta, value);
+                    if (bookFieldType.equals("generation")) InventoryUtil.setGeneration(bookMeta, value);
+                    if (bookFieldType.equals("add_page")) InventoryUtil.addPage(bookMeta, value);
+                    if (bookFieldType.equals("pages")) InventoryUtil.setPages(bookMeta, value);
+                    if (bookFieldType.equals("add_long")) InventoryUtil.addLong(bookMeta, value, false);
+                    if (bookFieldType.equals("add_long_extend")) InventoryUtil.addLong(bookMeta, value, true);
                 }
             }
 
@@ -354,9 +353,9 @@ public class Result {
 
                     String colorType = matcher.group(1).toLowerCase();
 
-                    if (colorType.equals("random")) util.setLeatherArmorColorRandom(leatherArmorMeta);
-                    if (colorType.equals("rgb")) util.setLeatherArmorColorFromRGB(leatherArmorMeta, s);
-                    if (colorType.equals("name")) util.setLeatherArmorColorFromName(leatherArmorMeta, s);
+                    if (colorType.equals("random")) InventoryUtil.setLeatherArmorColorRandom(leatherArmorMeta);
+                    if (colorType.equals("rgb")) InventoryUtil.setLeatherArmorColorFromRGB(leatherArmorMeta, s);
+                    if (colorType.equals("name")) InventoryUtil.setLeatherArmorColorFromName(leatherArmorMeta, s);
                 }
             }
 
@@ -406,7 +405,7 @@ public class Result {
                             isFollowPattern(PASS_THROUGH_MODE_LEATHER_ARMOR_COLOR_MODIFY_FROM_RANDOM, ACTION, VALUE) ||
                             isFollowPattern(PASS_THROUGH_MODE_LEATHER_ARMOR_COLOR_MODIFY_FROM_RGB, ACTION, VALUE))) {
                         // armor_color
-                        new InventoryUtil().armorColor(ACTION, VALUE, meta);
+                        InventoryUtil.armorColor(ACTION, VALUE, meta);
 
                     } else if (TYPE.equals("texture_id") && (
                             isFollowPattern(PASS_THROUGH_MODE_TEXTURE_ID_MODIFY, ACTION, VALUE) ||

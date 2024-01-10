@@ -109,11 +109,11 @@ public class Search {
                 List<Map<Coordinate, List<Coordinate>>> temp = new ArrayList<>();
                 Map<Coordinate, List<Coordinate>> enchant = new EnchantUtil().amorphous(recipe, input);
                 Map<Coordinate, List<Coordinate>> container = new ContainerUtil().amorphous(recipe, input);
-                Map<Coordinate,List<Coordinate>> candidate = new InventoryUtil().amorphous(recipe, input);
+                Map<Coordinate,List<Coordinate>> candidate = InventoryUtil.amorphous(recipe, input);
                 Map<Coordinate, List<Coordinate>> potion = new PotionUtil().amorphous(recipe, input);
 
-                Map<Coordinate, Map<String, Boolean>> rStatus = new InventoryUtil().getEachMatterStatus(recipe);
-                Map<Coordinate, Map<String, Boolean>> iStatus = new InventoryUtil().getEachMatterStatus(input);
+                Map<Coordinate, Map<String, Boolean>> rStatus = InventoryUtil.getEachMatterStatus(recipe);
+                Map<Coordinate, Map<String, Boolean>> iStatus = InventoryUtil.getEachMatterStatus(input);
 
                 Bukkit.getLogger().info("enchant map="+enchant);
                 Bukkit.getLogger().info("container map="+container);
@@ -157,7 +157,7 @@ public class Search {
 
                 temp.add(candidate);
                 Map<Coordinate, Coordinate> relate;
-                if ((relate = new InventoryUtil().combination(temp)).isEmpty()) continue;
+                if ((relate = InventoryUtil.combination(temp)).isEmpty()) continue;
 
                 for (Map.Entry<Coordinate, Coordinate> entry : relate.entrySet()) {
                     Coordinate r = entry.getKey();
@@ -183,7 +183,7 @@ public class Search {
 
         if(result != null){
             // custom recipe found
-            new InventoryUtil().returnItems(result,inventory,massAmount,player);
+            InventoryUtil.returnItems(result,inventory,massAmount,player);
             int quantity = (isOneCraft ? 1 : massAmount) * result.getResult().getAmount();
             setResultItem(inventory,result,input,player,quantity,isOneCraft);
         }else{
@@ -319,7 +319,7 @@ public class Search {
             }
         }
 
-        new InventoryUtil().decrementMaterials(inventory,oneCraft ? 1 : getMinimalAmount(recipe,input));
+        InventoryUtil.decrementMaterials(inventory,oneCraft ? 1 : getMinimalAmount(recipe,input));
 
     }
 

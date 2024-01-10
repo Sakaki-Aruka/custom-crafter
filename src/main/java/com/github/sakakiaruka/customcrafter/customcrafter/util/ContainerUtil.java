@@ -731,7 +731,7 @@ public class ContainerUtil {
     }
 
     private ItemStack getCorrespondenceItemStack(Inventory inventory, Matter matter) {
-        for (ItemStack item : new InventoryUtil().getItemStackFromCraftingMenu(inventory)) {
+        for (ItemStack item : InventoryUtil.getItemStackFromCraftingMenu(inventory)) {
             if (matter.getCandidate().contains(item.getType())) return item;
         }
         return null;

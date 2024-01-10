@@ -59,7 +59,7 @@ public class OpenCraftingTable implements Listener {
         for(int i = 0; i< CRAFTING_TABLE_TOTAL_SIZE; i++){
             inventory.setItem(i,blank);
         }
-        new InventoryUtil().getTableSlots(CRAFTING_TABLE_SIZE).forEach(s->{
+        InventoryUtil.getTableSlots(CRAFTING_TABLE_SIZE).forEach(s->{
             inventory.setItem(s,new ItemStack(Material.AIR));
         });
 
