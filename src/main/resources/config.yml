@@ -1,4 +1,4 @@
-baseBlock: "plugins/Custom_Crafter/baseBlock"
+baseBlock: "golden_block"
 results:
   - "plugins/Custom_Crafter/results"
 matters:

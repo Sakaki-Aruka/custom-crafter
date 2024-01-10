@@ -15,7 +15,10 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordina
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.MetadataType;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.Result;
-import com.github.sakakiaruka.customcrafter.customcrafter.util.*;
+import com.github.sakakiaruka.customcrafter.customcrafter.util.ContainerUtil;
+import com.github.sakakiaruka.customcrafter.customcrafter.util.DataCheckerUtil;
+import com.github.sakakiaruka.customcrafter.customcrafter.util.PotionUtil;
+import com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -42,7 +45,6 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 import static com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter.getInstance;
-import static com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil.PLAYER_PERMISSIONS;
 import static com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil.RECIPE_PERMISSION_MAP;
 
 public class SettingsLoad {
@@ -132,7 +134,7 @@ public class SettingsLoad {
         MATTERS.clear();
         failed.clear();
 
-        Path baseBlockPath = Paths.get(DEFAULT_CONFIG.getString("baseBlock"));
+        Path baseBlockPath = Paths.get(Objects.requireNonNull(DEFAULT_CONFIG.getString("baseBlock")));
 
         List<Path> resultPaths = new ArrayList<>();
         List<Path> matterPaths = new ArrayList<>();
@@ -142,86 +144,19 @@ public class SettingsLoad {
         DEFAULT_CONFIG.getStringList("recipes").forEach(s->recipePaths.add(Paths.get(s)));
 
         configFileDirectoryCheck(baseBlockPath);
-        resultPaths.forEach(p->configFileDirectoryCheck(p));
-        matterPaths.forEach(p->configFileDirectoryCheck(p));
-        recipePaths.forEach(p->configFileDirectoryCheck(p));
+        resultPaths.forEach(this::configFileDirectoryCheck);
+        matterPaths.forEach(this::configFileDirectoryCheck);
+        recipePaths.forEach(this::configFileDirectoryCheck);
 
+        getBaseBlock();
 
-        // --- bukkit runnable --- //
-        BukkitRunnable downloader = new BukkitRunnable() {
-            @Override
-            public void run() {
-                for(String command:downloadUri){
-                    if(command.isEmpty())return;
-                    ProcessBuilder builder = new ProcessBuilder(Arrays.asList(command.split(" ")));
-                    Process process;
-                    try{
-                        process = builder.start();
-                        process.waitFor();
-                    }catch (Exception e){
-                        Logger logger = Bukkit.getLogger();
-                        logger.info("[CustomCrafter] downloading error.");
-                        logger.info("command : "+command);
-                        failed.add(command);
-                    }
-                }
-                returnCode = 0;
-            }
-        };
+        matterPaths.forEach(p->getMatter(getFiles(p)));
+        resultPaths.forEach(p->getResult(Objects.requireNonNull(getFiles(p))));
+        recipePaths.forEach(p->getRecipe(Objects.requireNonNull(getFiles(p))));
 
-        BukkitRunnable main = new BukkitRunnable() {
-            @Override
-            public void run() {
-                // get data from each files
-                getBaseBlock(getFiles(baseBlockPath));
+        new Processor().init();
 
-                matterPaths.forEach(p->getMatter(getFiles(p)));
-                resultPaths.forEach(p->getResult(getFiles(p)));
-                recipePaths.forEach(p->getRecipe(getFiles(p)));
-
-                new Processor().init();
-
-                Bukkit.getLogger().info("===Custom-Crafter data loaded.===");
-            }
-        };
-
-        // === bukkit runnable finish ===//
-
-        //getFilesFromTheSea (download section)
-        if(DEFAULT_CONFIG.contains("download")){
-            if(DEFAULT_CONFIG.getStringList("download").isEmpty()){
-                // no download files.
-                main.runTaskLater(getInstance(),20l);
-                return;
-            }
-            downloadUri = DEFAULT_CONFIG.getStringList("download");
-            List<String> downloadErrorMessageList = DEFAULT_CONFIG.getStringList("errorMessages");
-            threshold = DEFAULT_CONFIG.getInt("download_threshold");
-            load_interval = DEFAULT_CONFIG.getInt("download_interval");
-
-            downloader.runTaskAsynchronously(getInstance());
-            DEFAULT_CONFIG.set("download",failed);
-            getInstance().saveConfig();
-        }
-
-        new BukkitRunnable(){
-            @Override
-            public void run(){
-                if(times <= threshold && returnCode==0){
-                    //finish
-                    main.runTaskLater(getInstance(),20); // 1 second delay
-                    this.cancel();
-                    Bukkit.getLogger().info("[CustomCrafter] Config Download complete!");
-                    return;
-                }else if(times > threshold){
-                    Bukkit.getLogger().info("[CustomCrafter] Could not load data.");
-                    this.cancel();
-                    return;
-                }
-                Bukkit.getLogger().info("[CustomCrafter] Downloading now...");
-                times++;
-            }
-        }.runTaskTimer(getInstance(),20,load_interval);
+        Bukkit.getLogger().info("===Custom-Crafter data loaded.===");
     }
 
     private void configFileDirectoryCheck(Path path){
@@ -246,21 +181,21 @@ public class SettingsLoad {
                 public void run(){
                     Bukkit.getPluginManager().disablePlugin(getInstance());
                 }
-            }.runTaskLater(getInstance(),30 * 20l);
+            }.runTaskLater(getInstance(),30 * 20L);
         }
     }
 
     private List<Path> getFiles(Path path){
         Stream<Path> paths;
-        try{
+        try {
             paths = Files.list(path);
-        }catch (Exception e){
+        } catch (Exception e){
             Bukkit.getLogger().warning("[CustomCrafter] Error: Cannot get files from "+path);
             return null;
         }
 
         List<Path> list = new ArrayList<>();
-        paths.forEach(s->list.add(s));
+        paths.forEach(list::add);
         return list;
     }
 
@@ -268,9 +203,8 @@ public class SettingsLoad {
         COMMAND_ARGS.addAll(DEFAULT_CONFIG.getStringList("COMMAND_ARGS"));
     }
 
-    private void getBaseBlock(List<Path> paths){
-        FileConfiguration config = YamlConfiguration.loadConfiguration(paths.get(0).toFile());
-        BASE_BLOCK = Material.valueOf(config.getString("material").toUpperCase());
+    private void getBaseBlock(){
+        BASE_BLOCK = Material.valueOf(Objects.requireNonNull(DEFAULT_CONFIG.getString("baseBlock")).toUpperCase());
     }
 
     private void getResult(List<Path> paths){
@@ -329,8 +263,8 @@ public class SettingsLoad {
             String name = material.name();
             Result result = new Result().
                     setAmount(1).
-                    setName(material.name()).
-                    setNameOrRegex(material.name()).
+                    setName(name).
+                    setNameOrRegex(name).
                     setMatchPoint(-1);
 
             RESULTS.put(name, result);
@@ -453,8 +387,7 @@ public class SettingsLoad {
         PotionBottleType bottleType = PotionUtil.getBottleType(matter.getCandidate().get(0));
         boolean bottleTypeMatch = config.getBoolean("bottleTypeMatch");
 
-        Potions potions = new Potions(matter,map,bottleType,bottleTypeMatch);
-        return potions;
+        return new Potions(matter,map,bottleType,bottleTypeMatch);
 
     }
 
@@ -470,13 +403,6 @@ public class SettingsLoad {
 
         }
         return list;
-    }
-
-    private boolean containsAllMaterialsIgnoreCase(String in){
-        for(String str : ALL_MATERIALS){
-            if(in.equalsIgnoreCase(str)) return true;
-        }
-        return false;
     }
 
     private void getRecipe(List<Path> paths){
@@ -591,7 +517,7 @@ public class SettingsLoad {
 
             if(config.contains("permission")){
                 String key = config.getString("permission");
-                permission = RECIPE_PERMISSION_MAP.containsKey(key) ? RECIPE_PERMISSION_MAP.get(key) : null;
+                permission = RECIPE_PERMISSION_MAP.getOrDefault(key, null);
             }
 
             Map<NamespacedKey, List<RecipeDataContainer>> map = new HashMap<>();

@@ -1,6 +1,16 @@
 # custom crafter  
 custom crafter is a plugin for minecraft servers (Spigot or Paper) that provides custom recipes.  
 
+# Features
+- Set custom recipes to vanilla items.
+- Set custom recipes to original items.
+
+# Getting Start
+## Install
+- [Download here.](https://github.com/Sakaki-Aruka/custom-crafter/releases/latest)
+ - Place the downloaded file to plugins directory.
+ - Reboot or reload your server.
+
 # 概要
 custom crafter は，既存のアイテムに新しいレシピを追加，カスタムアイテムにレシピを設定することが出来る Spigot 向けプラグインです．  
 使用するには `config.yml` 以外にも yaml ファイルを作成する必要があり，それらファイルを格納しておくためのディレクトリも必要とします.  
