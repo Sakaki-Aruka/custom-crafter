@@ -134,8 +134,6 @@ public class SettingsLoad {
         MATTERS.clear();
         failed.clear();
 
-        Path baseBlockPath = Paths.get(Objects.requireNonNull(DEFAULT_CONFIG.getString("baseBlock")));
-
         List<Path> resultPaths = new ArrayList<>();
         List<Path> matterPaths = new ArrayList<>();
         List<Path> recipePaths = new ArrayList<>();
@@ -143,7 +141,6 @@ public class SettingsLoad {
         DEFAULT_CONFIG.getStringList("matters").forEach(s->matterPaths.add(Paths.get(s)));
         DEFAULT_CONFIG.getStringList("recipes").forEach(s->recipePaths.add(Paths.get(s)));
 
-        configFileDirectoryCheck(baseBlockPath);
         resultPaths.forEach(this::configFileDirectoryCheck);
         matterPaths.forEach(this::configFileDirectoryCheck);
         recipePaths.forEach(this::configFileDirectoryCheck);
