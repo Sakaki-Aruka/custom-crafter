@@ -1,9 +1,13 @@
 # custom crafter  
 custom crafter is a plugin for minecraft servers (Spigot or Paper) that provides custom recipes. 
 
+---
+
 # Recommend environment
 - Paper (above 1.19.2)
 - Spigot (above 1.19.2)
+
+---
 
 # License
 <details><summary>MIT License</summary><div>
@@ -32,12 +36,16 @@ SOFTWARE.
 </div>
 </details>
 
+---
+
 # Features
 - Set custom recipes to vanilla items.
 - Set custom recipes to original items.
 - Provide some commands that manages items that material of recipes.
 - Provide those recipes to players.
 - (custom crafter provides crafting vanilla items from vanilla recipes feature.)
+
+---
 
 # Getting Start
 1. Install
@@ -52,3 +60,9 @@ If you want to provide custom recipes and custom items to players, you have to w
 custom crafter does not work only a work bench block.  
 If you want to use custom crafter features, place the base blocks under a work bench block 3 * 3.  
 The default base block is `GOLDEN_BLOCK`.
+
+---
+
+# Help
+## about commands
+Run command `/cc help all` from Console or as a player in a server.
