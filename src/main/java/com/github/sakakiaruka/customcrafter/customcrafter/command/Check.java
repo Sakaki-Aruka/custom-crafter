@@ -53,7 +53,7 @@ public class Check{
         FileConfiguration oldConfig = CustomCrafter.getInstance().getConfig();
         if(oldConfig.contains("relate")){
             Path relate = Paths.get(oldConfig.getString("relate"));
-            new RecipePermissionUtil().playerPermissionWriter(relate);
+            RecipePermissionUtil.playerPermissionWriter(relate);
         }
 
         // ==============

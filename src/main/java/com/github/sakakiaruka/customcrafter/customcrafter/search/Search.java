@@ -62,7 +62,7 @@ public class Search {
 
             if(recipe.hasPermission()){ // permission check
                 RecipePermission source = recipe.getPermission();
-                if(!new RecipePermissionUtil().containsPermission(player, source)) continue;
+                if(!RecipePermissionUtil.containsPermission(player, source)) continue;
             }
 
             if (recipe.getTag().equals(Tag.NORMAL) && isMatchNormal(interestedItems ,recipe, input)) judge++;

@@ -117,11 +117,11 @@ public class SettingsLoad {
         if(DEFAULT_CONFIG.contains("permissions") && DEFAULT_CONFIG.contains("relate")){
             // The file that defines RecipePermissions.
             Path path = Paths.get(DEFAULT_CONFIG.getString("permissions"));
-            new RecipePermissionUtil().permissionSettingsLoad(path);
+            RecipePermissionUtil.permissionSettingsLoad(path);
 
             // The file that defines the relate between players and RecipePermissions.
             Path relate = Paths.get(DEFAULT_CONFIG.getString("relate"));
-            new RecipePermissionUtil().permissionRelateLoad(relate);
+            RecipePermissionUtil.permissionRelateLoad(relate);
         }
     }
 

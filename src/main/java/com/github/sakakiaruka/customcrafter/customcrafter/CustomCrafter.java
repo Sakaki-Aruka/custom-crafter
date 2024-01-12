@@ -1,6 +1,5 @@
 package com.github.sakakiaruka.customcrafter.customcrafter;
 
-import com.github.sakakiaruka.customcrafter.customcrafter.command.Check;
 import com.github.sakakiaruka.customcrafter.customcrafter.command.Processor;
 import com.github.sakakiaruka.customcrafter.customcrafter.listener.Listener;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil;
@@ -28,7 +27,7 @@ public final class CustomCrafter extends JavaPlugin {
         // Plugin shutdown logic
         if (getConfig().contains("permissions") && getConfig().contains("relate")) {
             Path path = Paths.get(getConfig().getString("relate"));
-            new RecipePermissionUtil().playerPermissionWriter(path);
+            RecipePermissionUtil.playerPermissionWriter(path);
         }
     }
 

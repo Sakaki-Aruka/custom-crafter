@@ -56,10 +56,12 @@ SOFTWARE.
    2. Place the downloaded file to plugins directory. 
    3. Reboot or reload your server.
 
-## Write configuration files
+
+2. Write configuration files  
 If you want to provide custom recipes and custom items to players, you have to write configuration files.
 
-## Place base block
+
+3. Place base block  
 custom crafter does not work only a work bench block.  
 If you want to use custom crafter features, place the base blocks under a work bench block 3 * 3.  
 The default base block is `GOLDEN_BLOCK`.
