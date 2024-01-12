@@ -3,9 +3,12 @@ custom crafter is a plugin for minecraft servers (Spigot and Paper) that provide
 
 ---
 
-# Recommend environment
+# Recommended environment
 - Paper (above 1.19.2)
 - Spigot (above 1.19.2)
+
+Tested in Paper 1.20.2.  
+This plugin does not work in the server that is less than 1.19.2 ver.
 
 ---
 
@@ -13,7 +16,7 @@ custom crafter is a plugin for minecraft servers (Spigot and Paper) that provide
 <details><summary>MIT License</summary><div>
 MIT License
 
-Copyright (c) 2023 Sakaki-Aruka
+Copyright (c) 2023 - 2024 Sakaki-Aruka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -66,3 +69,8 @@ The default base block is `GOLDEN_BLOCK`.
 # Help
 ## about commands
 Run command `/cc help all` from Console or as a player in a server.
+
+## about configuration files
+Show [here](https://github.com/Sakaki-Aruka/custom-crafter-config/blob/master/config_description.md). (Jump to `custom-crafter-config/Sakaki-Aruka`)
+
+Written by Japanese only. (wip: English version)
