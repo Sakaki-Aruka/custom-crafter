@@ -47,13 +47,12 @@ public class ModifyCraftingInventory implements Listener {
         }
 
         Inventory inventory = event.getClickedInventory();
-        InventoryUtil util = new InventoryUtil();
         if (slot == CRAFTING_TABLE_MAKE_BUTTON){
             // click make button
             event.setCancelled(true);
             // <=== empty checker
             List<ItemStack> forCheck = new ArrayList<>();
-            for(int i: util.getTableSlots(CRAFTING_TABLE_SIZE)){
+            for(int i: InventoryUtil.getTableSlots(CRAFTING_TABLE_SIZE)){
                 if(inventory.getItem(i) == null)continue;
                 forCheck.add(inventory.getItem(i));
             }
@@ -85,9 +84,9 @@ public class ModifyCraftingInventory implements Listener {
             // click result slot
             event.setCancelled(true);
             if(inventory.getItem(CRAFTING_TABLE_RESULT_SLOT) == null)return;
-            util.decrementResult(inventory,player); // remove result that clicked.
+            InventoryUtil.decrementResult(inventory,player); // remove result that clicked.
 
-        }else if(new InventoryUtil().getBlankCoordinates(CRAFTING_TABLE_SIZE).contains(slot)){
+        }else if(InventoryUtil.getBlankCoordinates(CRAFTING_TABLE_SIZE).contains(slot)){
             // click a blank slot
             event.setCancelled(true);
             return;
@@ -99,7 +98,7 @@ public class ModifyCraftingInventory implements Listener {
 
     private int getMinimalAmount(Inventory inventory){
         List<Integer> list = new ArrayList<>();
-        for(int i:new InventoryUtil().getTableSlots(CRAFTING_TABLE_SIZE)){
+        for(int i: InventoryUtil.getTableSlots(CRAFTING_TABLE_SIZE)){
             if(inventory.getItem(i) == null)continue;
             if(inventory.getItem(i).getType().equals(Material.AIR))continue;
             list.add(inventory.getItem(i).getAmount());

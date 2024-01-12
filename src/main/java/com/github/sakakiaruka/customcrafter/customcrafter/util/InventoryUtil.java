@@ -43,7 +43,7 @@ public class InventoryUtil {
     private static final String LEATHER_ARMOR_COLOR_NAME_PATTERN = "^type:(?i)(NAME)/value:([\\w_]+)$";
     private static final String LEATHER_ARMOR_COLOR_RANDOM_PATTERN = "^type:(?i)(RANDOM)$";
 
-    public List<Integer> getTableSlots(int size) {
+    public static List<Integer> getTableSlots(int size) {
         List<Integer> list = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
@@ -55,7 +55,7 @@ public class InventoryUtil {
         return list;
     }
 
-    public List<Integer> getBlankCoordinates(int size) {
+    public static List<Integer> getBlankCoordinates(int size) {
         List<Integer> list = new ArrayList<>();
         for (int i = 0; i < CRAFTING_TABLE_TOTAL_SIZE; i++) {
             list.add(i);
@@ -66,7 +66,7 @@ public class InventoryUtil {
         return list;
     }
 
-    public void decrementMaterials(Inventory inventory, int amount) {
+    public static void decrementMaterials(Inventory inventory, int amount) {
         // decrement crafting tables material
         // amount -> decrement amount
         List<Integer> slots = getTableSlots(CRAFTING_TABLE_SIZE);
@@ -78,14 +78,14 @@ public class InventoryUtil {
         }
     }
 
-    public void decrementResult(Inventory inventory, Player player) {
+    public static void decrementResult(Inventory inventory, Player player) {
         if (inventory.getItem(CRAFTING_TABLE_RESULT_SLOT) == null) return;
         ItemStack item = inventory.getItem(CRAFTING_TABLE_RESULT_SLOT);
         InventoryUtil.safetyItemDrop(player, Collections.singletonList(item));
         inventory.setItem(CRAFTING_TABLE_RESULT_SLOT, new ItemStack(Material.AIR));
     }
 
-    public void returnItems(Recipe recipe, Inventory inventory, int removeAmount, Player player) {
+    public static void returnItems(Recipe recipe, Inventory inventory, int removeAmount, Player player) {
         if (recipe.getReturnItems().isEmpty()) return;
         List<Material> isMassList = new ArrayList<>();
         recipe.getContentsNoAir().forEach(s -> {
@@ -108,14 +108,14 @@ public class InventoryUtil {
         }
     }
 
-    private void drop(ItemStack item, int returnAmount, Player player) {
+    private static void drop(ItemStack item, int returnAmount, Player player) {
         item.setAmount(returnAmount);
         InventoryUtil.safetyItemDrop(player, Collections.singletonList(item));
     }
 
 
 
-    public List<ItemStack> getItemStackFromCraftingMenu(Inventory inventory) {
+    public static List<ItemStack> getItemStackFromCraftingMenu(Inventory inventory) {
         List<ItemStack> result = new ArrayList<>();
         for (int i : getTableSlots(CRAFTING_TABLE_SIZE)) {
             if (inventory.getItem(i) == null || inventory.getItem(i).getType().equals(Material.AIR)) continue;
@@ -125,11 +125,11 @@ public class InventoryUtil {
     }
 
     // === book field set ===
-    public void setAuthor(BookMeta meta, String value) {
+    public static void setAuthor(BookMeta meta, String value) {
         meta.setAuthor(value);
     }
 
-    public void setTitle(BookMeta meta, String value) {
+    public static void setTitle(BookMeta meta, String value) {
         meta.setTitle(value);
     }
 
@@ -143,12 +143,12 @@ public class InventoryUtil {
         meta.setPage(page, value);
     }
 
-    public void setPages(BookMeta meta, String value) {
+    public static void setPages(BookMeta meta, String value) {
         // set page un-specified page
         meta.setPages(value);
     }
 
-    public void setGeneration(BookMeta meta, String value) {
+    public static void setGeneration(BookMeta meta, String value) {
         // set book-generation
         BookMeta.Generation generation;
         try {
@@ -160,7 +160,7 @@ public class InventoryUtil {
         meta.setGeneration(generation);
     }
 
-    public void addPage(BookMeta meta, String value) {
+    public static void addPage(BookMeta meta, String value) {
         // add page
         String section = "addPage";
         if (!isValidPage(meta, section)) return;
@@ -169,7 +169,7 @@ public class InventoryUtil {
         meta.addPage(value);
     }
 
-    private boolean isValidPage(BookMeta meta, String section) {
+    private static boolean isValidPage(BookMeta meta, String section) {
         if (100 <= meta.getPageCount()) {
             Bukkit.getLogger().warning("[CustomCrafter] Set result metadata (" + section + ") failed. (Over 50 pages.)");
             return false;
@@ -177,7 +177,7 @@ public class InventoryUtil {
         return true;
     }
 
-    private boolean isValidCharacters(String value, String section) {
+    private static boolean isValidCharacters(String value, String section) {
         if (320 < value.length()) {
             Bukkit.getLogger().warning("[CustomCrafter] Set result metadata (" + section + ") failed. (Over 256 characters.)");
             return false;
@@ -185,7 +185,7 @@ public class InventoryUtil {
         return true;
     }
 
-    private boolean isValidCharacters(BookMeta meta, String value, String section) {
+    private static boolean isValidCharacters(BookMeta meta, String value, String section) {
         if (25600 < (meta.getPageCount() * 320) + value.length()) {
             Bukkit.getLogger().warning("[CustomCrafter] Set result metadata (" + section + ") failed. (Over 25600 characters.)");
             return false;
@@ -193,7 +193,7 @@ public class InventoryUtil {
         return true;
     }
 
-    public void addLong(BookMeta meta, String value, boolean extend) {
+    public static void addLong(BookMeta meta, String value, boolean extend) {
         // 320 -> the characters limit that about one page.
         // 25600 -> the characters limit that about one book.
         // 14 -> the lines limit that about one page.
@@ -266,7 +266,7 @@ public class InventoryUtil {
 
 
     // leather_armor_color modify
-    private Color getColor(String value) {
+    private static Color getColor(String value) {
         // if the value is not a color-name, returns null.
         Color color;
         value = value.toUpperCase();
@@ -294,7 +294,7 @@ public class InventoryUtil {
         return color;
     }
 
-    private String getLeatherArmorColorWarningUnMatchPattern() {
+    private static String getLeatherArmorColorWarningUnMatchPattern() {
         String result =
                 "[CustomCrafter] Set result metadata (LeatherArmorColor) failed. (Illegal data format.)" + LINE_SEPARATOR
                         + "Follow the patterns." + LINE_SEPARATOR
@@ -304,7 +304,7 @@ public class InventoryUtil {
         return result;
     }
 
-    public void setLeatherArmorColorFromRGB(LeatherArmorMeta meta, String value) {
+    public static void setLeatherArmorColorFromRGB(LeatherArmorMeta meta, String value) {
         Matcher matcher = Pattern.compile(LEATHER_ARMOR_COLOR_RGB_PATTERN).matcher(value);
         if (!matcher.matches()) {
             Bukkit.getLogger().warning(getLeatherArmorColorWarningUnMatchPattern());
@@ -325,7 +325,7 @@ public class InventoryUtil {
         meta.setColor(color);
     }
 
-    public void setLeatherArmorColorFromName(LeatherArmorMeta meta, String value) {
+    public static void setLeatherArmorColorFromName(LeatherArmorMeta meta, String value) {
         Matcher matcher = Pattern.compile(LEATHER_ARMOR_COLOR_NAME_PATTERN).matcher(value);
         if (!matcher.matches()) {
             Bukkit.getLogger().warning(getLeatherArmorColorWarningUnMatchPattern());
@@ -341,7 +341,7 @@ public class InventoryUtil {
         meta.setColor(color);
     }
 
-    public void setLeatherArmorColorRandom(LeatherArmorMeta meta) {
+    public static void setLeatherArmorColorRandom(LeatherArmorMeta meta) {
         Random random = new Random();
         int RED = random.nextInt(256);
         int GREEN = random.nextInt(256);
@@ -448,7 +448,7 @@ public class InventoryUtil {
     }
 
 
-    public void armorColor(String action, String value, ItemMeta meta) {
+    public static void armorColor(String action, String value, ItemMeta meta) {
         LeatherArmorMeta leatherMeta;
         try {
             leatherMeta = (LeatherArmorMeta) meta;
@@ -519,7 +519,7 @@ public class InventoryUtil {
         }
     }
 
-    public Map<Coordinate, List<Coordinate>> amorphous(Recipe recipe, Recipe input) {
+    public static Map<Coordinate, List<Coordinate>> amorphous(Recipe recipe, Recipe input) {
         Map<Coordinate, List<Coordinate>> map = new HashMap<>();
         for (Coordinate r : recipe.getCoordinateList()) {
             List<Material> rCandidate = recipe.getMatterFromCoordinate(r).getCandidate();
@@ -534,7 +534,7 @@ public class InventoryUtil {
         return map;
     }
 
-    public Map<Coordinate, Map<String, Boolean>> getEachMatterStatus(Recipe recipe) {
+    public static Map<Coordinate, Map<String, Boolean>> getEachMatterStatus(Recipe recipe) {
         Map<Coordinate, Map<String, Boolean>> map = new HashMap<>();
         for (Coordinate coordinate : recipe.getCoordinateList()) {
             Map<String, Boolean> element = new HashMap<>();
@@ -547,7 +547,7 @@ public class InventoryUtil {
         return map;
     }
 
-    public Map<Coordinate, Coordinate> combination(List<Map<Coordinate, List<Coordinate>>> input) {
+    public static Map<Coordinate, Coordinate> combination(List<Map<Coordinate, List<Coordinate>>> input) {
         Map<Coordinate, List<Coordinate>> merged = new HashMap<>();
         for (Map<Coordinate, List<Coordinate>> element : input) {
             for (Map.Entry<Coordinate, List<Coordinate>> entry : element.entrySet()) {
@@ -660,11 +660,11 @@ public class InventoryUtil {
         return new HashMap<>();
     }
 
-    private boolean hasDuplicate(Map<Coordinate, Coordinate> map) {
+    private static boolean hasDuplicate(Map<Coordinate, Coordinate> map) {
         return new HashSet<>(map.values()).size() != map.values().size();
     }
 
-    private int getMultiply(int current, int[] arr) {
+    private static int getMultiply(int current, int[] arr) {
         int result = 1;
         if (current == arr.length - 1) return 1;
         for (int i = current + 1; i < arr.length; i++) {
@@ -673,7 +673,7 @@ public class InventoryUtil {
         return result;
     }
 
-    private List<Coordinate> bothContained(List<Coordinate> a, List<Coordinate> b) {
+    private static List<Coordinate> bothContained(List<Coordinate> a, List<Coordinate> b) {
         List<Coordinate> result = new ArrayList<>();
         List<Coordinate> ed = a.size() <= b.size() ? b : a;
         List<Coordinate> er = a.size() <= b.size() ? a : b;

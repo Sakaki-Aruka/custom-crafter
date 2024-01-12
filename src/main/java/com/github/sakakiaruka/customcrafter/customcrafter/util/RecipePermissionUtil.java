@@ -21,15 +21,15 @@ public class RecipePermissionUtil{
     public static Map<UUID,Set<RecipePermission>> PLAYER_PERMISSIONS = Collections.synchronizedMap(new HashMap<>());
 
 
-    private final String PERMISSIONS_PATTERN = "name=(.+)/parent=(.+)";
+    private static final String PERMISSIONS_PATTERN = "name=(.+)/parent=(.+)";
 
 
-    public void makeRecipePermissionMap(List<RecipePermission> list){
+    public static void makeRecipePermissionMap(List<RecipePermission> list){
         list.forEach(s-> RECIPE_PERMISSION_MAP.put(s.getPermissionName(),s));
         RECIPE_PERMISSION_MAP.put("ROOT",RecipePermission.ROOT);
     }
 
-    public void playerPermissionWriter(Path path){
+    public static void playerPermissionWriter(Path path){
 
         /*
          * (example)
@@ -81,7 +81,7 @@ public class RecipePermissionUtil{
         setWrapper(refreshSections, map, config, file);  // refresh second step (add)
     }
 
-    private void setWrapper(Set<String> set, Map<String, List<String>> map, FileConfiguration config, File file) {
+    private static void setWrapper(Set<String> set, Map<String, List<String>> map, FileConfiguration config, File file) {
         for (String element : set) {
             config.set(element, map == null ? null : map.get(element));
             try {
@@ -92,7 +92,7 @@ public class RecipePermissionUtil{
         }
     }
 
-    public boolean hasPermission(RecipePermission perm, Player player){
+    public static boolean hasPermission(RecipePermission perm, Player player){
         UUID uuid = player.getUniqueId();
         if(!PLAYER_PERMISSIONS.containsKey(uuid)) return false;
         Set<RecipePermission> perms = PLAYER_PERMISSIONS.get(uuid);
@@ -103,7 +103,7 @@ public class RecipePermissionUtil{
     }
 
 
-    private boolean createFileWrapper(Path path) {
+    private static boolean createFileWrapper(Path path) {
         // true = The file maybe has contents.
         // false = The file has not any contents.
         if (path.toFile().exists()) return true;
@@ -114,7 +114,7 @@ public class RecipePermissionUtil{
         }
         return false;
     }
-    public void permissionRelateLoad(Path path){
+    public static void permissionRelateLoad(Path path){
         if (!createFileWrapper(path)) return;
         FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
         /*
@@ -138,7 +138,7 @@ public class RecipePermissionUtil{
         }
     }
 
-    public void permissionSettingsLoad(Path path){
+    public static void permissionSettingsLoad(Path path){
         // to collect RecipePermission settings from the config file.
         /*
         * (example)
@@ -162,7 +162,7 @@ public class RecipePermissionUtil{
         makeRecipePermissionMap(permissionList);
     }
 
-    private List<RecipePermission> permissionSort(List<RecipePermission> list){
+    private static List<RecipePermission> permissionSort(List<RecipePermission> list){
         // parents length: short -> long
         Map<Integer,List<RecipePermission>> map = new TreeMap<>();
         if(list.isEmpty()) return new ArrayList<>();
@@ -183,7 +183,7 @@ public class RecipePermissionUtil{
     }
 
 
-    public boolean inSameTree(RecipePermission a, RecipePermission b){
+    public static boolean inSameTree(RecipePermission a, RecipePermission b){
         if(a.equals(b)) return true;
         List<RecipePermission> as = new ArrayList<>();
         List<RecipePermission> bs = new ArrayList<>();
@@ -200,13 +200,13 @@ public class RecipePermissionUtil{
         return false;
     }
 
-    private List<RecipePermission> getLonger(List<RecipePermission> a, List<RecipePermission> b){
+    private static List<RecipePermission> getLonger(List<RecipePermission> a, List<RecipePermission> b){
         if(a.size() == b.size()) return a;
         return a.size() > b.size() ? a : b;
     }
 
 
-    public boolean isUpper(RecipePermission source, RecipePermission target){
+    public static boolean isUpper(RecipePermission source, RecipePermission target){
         // permission order: source > target (true) | source == target (false) | source < target (false)
         if(source.equals(target)) return false;
         if(!inSameTree(source,target)) return false;
@@ -217,7 +217,7 @@ public class RecipePermissionUtil{
         return sL.size() < tL.size(); // parent long -> nearer a bottom of the permission
     }
 
-    public boolean containsPermission(Player player, RecipePermission target){
+    public static boolean containsPermission(Player player, RecipePermission target){
         if(!PLAYER_PERMISSIONS.containsKey(player.getUniqueId())) return false;
         if(PLAYER_PERMISSIONS.get(player.getUniqueId()).isEmpty()) return false;
         Set<RecipePermission> list = PLAYER_PERMISSIONS.get(player.getUniqueId());
@@ -229,14 +229,14 @@ public class RecipePermissionUtil{
     }
 
 
-    private void recourse(RecipePermission rp, List<RecipePermission> list){
+    private static void recourse(RecipePermission rp, List<RecipePermission> list){
         if(rp.equals(RecipePermission.ROOT)) return;
         RecipePermission parent = RECIPE_PERMISSION_MAP.get(rp.getParent());
         list.add(parent);
         recourse(parent,list);
     }
 
-    public String getPermissionTree(RecipePermission perm){
+    public static String getPermissionTree(RecipePermission perm){
         StringBuilder builder = new StringBuilder();
         builder.append(String.format("=== Permission Info ===%s", LINE_SEPARATOR));
         if(perm.equals(RecipePermission.ROOT)){

@@ -1,9 +1,7 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.object.Result;
 
-import com.github.sakakiaruka.customcrafter.customcrafter.object.ContainerWrapper;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.AttributeModifierUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.ContainerUtil;
-import com.github.sakakiaruka.customcrafter.customcrafter.util.DataContainerUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.InventoryUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.PotionUtil;
 import org.bukkit.Bukkit;
@@ -19,7 +17,6 @@ import org.bukkit.inventory.meta.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import javax.lang.model.util.AbstractAnnotationValueVisitor6;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -218,7 +215,6 @@ public class Result {
 
             MetadataType type = entry.getKey();
             List<String> content = entry.getValue();
-            InventoryUtil util = new InventoryUtil();
 
             if(type.equals(MetadataType.LORE)) meta.setLore(content);
             if(type.equals(MetadataType.DISPLAYNAME)) meta.setDisplayName(content.get(0));
@@ -235,7 +231,7 @@ public class Result {
             if(type.equals(MetadataType.UNBREAKABLE)) meta.setUnbreakable(Boolean.parseBoolean(content.get(0)));
             if(type.equals(MetadataType.CUSTOMMODELDATA)) meta.setCustomModelData(Integer.parseInt(content.get(0)));
             if(type.equals(MetadataType.POTIONDATA)) {
-                if(!new PotionUtil().isPotion(item.getType())) return;
+                if(!PotionUtil.isPotion(item.getType())) return;
                 for(String s : content){
                     List<String> potionData = Arrays.asList(s.split(","));
                     PotionEffectType effectType = PotionEffectType.getByName(potionData.get(0).toUpperCase());
@@ -279,7 +275,7 @@ public class Result {
                     } else {
                         continue;
                     }
-                    AttributeModifier modifier = new AttributeModifierUtil().getAttributeModifier(matcher, isNormal);
+                    AttributeModifier modifier = AttributeModifierUtil.getAttributeModifier(matcher, isNormal);
                     if (modifier == null) continue;
                     Attribute attribute = Attribute.valueOf(matcher.group(1).toUpperCase());
                     meta.addAttributeModifier(attribute, modifier);
@@ -326,13 +322,13 @@ public class Result {
                     String bookFieldType = matcher.group(1).toLowerCase();
                     String value = matcher.group(2);
 
-                    if (bookFieldType.equals("author")) util.setAuthor(bookMeta, value);
-                    if (bookFieldType.equals("title")) util.setTitle(bookMeta, value);
-                    if (bookFieldType.equals("generation")) util.setGeneration(bookMeta, value);
-                    if (bookFieldType.equals("add_page")) util.addPage(bookMeta, value);
-                    if (bookFieldType.equals("pages")) util.setPages(bookMeta, value);
-                    if (bookFieldType.equals("add_long")) util.addLong(bookMeta, value, false);
-                    if (bookFieldType.equals("add_long_extend")) util.addLong(bookMeta, value, true);
+                    if (bookFieldType.equals("author")) InventoryUtil.setAuthor(bookMeta, value);
+                    if (bookFieldType.equals("title")) InventoryUtil.setTitle(bookMeta, value);
+                    if (bookFieldType.equals("generation")) InventoryUtil.setGeneration(bookMeta, value);
+                    if (bookFieldType.equals("add_page")) InventoryUtil.addPage(bookMeta, value);
+                    if (bookFieldType.equals("pages")) InventoryUtil.setPages(bookMeta, value);
+                    if (bookFieldType.equals("add_long")) InventoryUtil.addLong(bookMeta, value, false);
+                    if (bookFieldType.equals("add_long_extend")) InventoryUtil.addLong(bookMeta, value, true);
                 }
             }
 
@@ -354,9 +350,9 @@ public class Result {
 
                     String colorType = matcher.group(1).toLowerCase();
 
-                    if (colorType.equals("random")) util.setLeatherArmorColorRandom(leatherArmorMeta);
-                    if (colorType.equals("rgb")) util.setLeatherArmorColorFromRGB(leatherArmorMeta, s);
-                    if (colorType.equals("name")) util.setLeatherArmorColorFromName(leatherArmorMeta, s);
+                    if (colorType.equals("random")) InventoryUtil.setLeatherArmorColorRandom(leatherArmorMeta);
+                    if (colorType.equals("rgb")) InventoryUtil.setLeatherArmorColorFromRGB(leatherArmorMeta, s);
+                    if (colorType.equals("name")) InventoryUtil.setLeatherArmorColorFromName(leatherArmorMeta, s);
                 }
             }
 
@@ -395,7 +391,7 @@ public class Result {
                             isFollowPattern(PASS_THROUGH_MODE_CONTAINER_REMOVE, ACTION, VALUE) ||
                             isFollowPattern(PASS_THROUGH_MODE_CONTAINER_ADD, ACTION, VALUE))) {
                         // container
-                        new ContainerUtil().containerModify(ACTION, VALUE, meta);
+                        ContainerUtil.containerModify(ACTION, VALUE, meta);
 
                     } else if (TYPE.equals("durability") && isFollowPattern(PASS_THROUGH_MODE_DURABILITY_MODIFY, ACTION, VALUE)) {
                         // durability modify
@@ -406,7 +402,7 @@ public class Result {
                             isFollowPattern(PASS_THROUGH_MODE_LEATHER_ARMOR_COLOR_MODIFY_FROM_RANDOM, ACTION, VALUE) ||
                             isFollowPattern(PASS_THROUGH_MODE_LEATHER_ARMOR_COLOR_MODIFY_FROM_RGB, ACTION, VALUE))) {
                         // armor_color
-                        new InventoryUtil().armorColor(ACTION, VALUE, meta);
+                        InventoryUtil.armorColor(ACTION, VALUE, meta);
 
                     } else if (TYPE.equals("texture_id") && (
                             isFollowPattern(PASS_THROUGH_MODE_TEXTURE_ID_MODIFY, ACTION, VALUE) ||

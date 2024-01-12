@@ -32,16 +32,15 @@ public class VanillaSearch {
         if(result.getType().equals(Material.AIR))return;
         WHAT_MAKING.put(player.getUniqueId(),result.getType());
 
-        InventoryUtil util = new InventoryUtil();
         if(batchBool) {
             // needed batch process
             int minimal = getMinimalAmount(itemStacks);
             result.setAmount(result.getAmount() * minimal);
-            util.decrementMaterials(inventory,minimal);
+            InventoryUtil.decrementMaterials(inventory,minimal);
 
         }else{
             // not needed batch process
-            util.decrementMaterials(inventory,1);
+            InventoryUtil.decrementMaterials(inventory,1);
 
         }
 
@@ -87,7 +86,7 @@ public class VanillaSearch {
 
     private List<Coordinate> getCoordinateList(Inventory inventory){
         List<Coordinate> list = new ArrayList<>();
-        for(int i:new InventoryUtil().getTableSlots(CRAFTING_TABLE_SIZE)){
+        for(int i: InventoryUtil.getTableSlots(CRAFTING_TABLE_SIZE)){
             if(inventory.getItem(i) == null)continue;
             if(inventory.getItem(i).getType().equals(Material.AIR))continue;
             int x = i % 9;

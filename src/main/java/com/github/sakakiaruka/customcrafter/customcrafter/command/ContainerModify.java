@@ -59,14 +59,14 @@ public class ContainerModify {
 
         ItemMeta meta = item.getItemMeta();
         PersistentDataContainer container = meta.getPersistentDataContainer();
-        String before = new ContainerUtil().containerValues(container);
+        String before = ContainerUtil.containerValues(container);
 
         String keyName = args[2].toLowerCase();
         if (!getKeyCongruence(keyName, modifyType, sender)) return;
 
         NamespacedKey key = new NamespacedKey(getInstance(), keyName);
         PersistentDataType type;
-        if ((type = new ContainerUtil().getDataType(args[3])) == null) {
+        if ((type = ContainerUtil.getDataType(args[3])) == null) {
             sender.sendMessage("Invalid NamespacedKey type.");
             return;
         }
@@ -112,7 +112,7 @@ public class ContainerModify {
 
         item.setItemMeta(meta);
 
-        String after = new ContainerUtil().containerValues(container);
+        String after = ContainerUtil.containerValues(container);
         sendDataDiff(before, after, modifyType, sender);
     }
 
@@ -124,13 +124,13 @@ public class ContainerModify {
 
         ItemMeta meta = item.getItemMeta();
         PersistentDataContainer container = meta.getPersistentDataContainer();
-        String before = new ContainerUtil().containerValues(container);
+        String before = ContainerUtil.containerValues(container);
 
         String keyName = args[2].toLowerCase();
         if (!getKeyCongruence(keyName, "remove", sender)) return;
         NamespacedKey key = new NamespacedKey(getInstance(), keyName);
         PersistentDataType type;
-        if ((type = new ContainerUtil().getDataType(args[3])) == null) {
+        if ((type = ContainerUtil.getDataType(args[3])) == null) {
             sender.sendMessage("Container remove > Invalid NamespacedKey type.");
             return;
         }
@@ -152,7 +152,7 @@ public class ContainerModify {
 
         container.remove(key);
         item.setItemMeta(meta);
-        String after = new ContainerUtil().containerValues(container);
+        String after = ContainerUtil.containerValues(container);
         sendDataDiff(before, after, "remove", sender);
     }
 
@@ -171,11 +171,11 @@ public class ContainerModify {
         ItemStack item = player.getInventory().getItemInMainHand();
         ItemMeta meta = item.getItemMeta();
         PersistentDataContainer container = meta.getPersistentDataContainer();
-        String before = new ContainerUtil().containerValues(container);
+        String before = ContainerUtil.containerValues(container);
 
         if (!getKeyCongruence(keyName, modifyType, sender)) return;
         PersistentDataType type;
-        if ((type = new ContainerUtil().getDataType(args[3])) == null) {
+        if ((type = ContainerUtil.getDataType(args[3])) == null) {
             sender.sendMessage("Invalid NamespacedKey type.");
             return;
         }
@@ -221,7 +221,7 @@ public class ContainerModify {
             item.setItemMeta(meta);
         }
 
-        String after = new ContainerUtil().containerValues(container);
+        String after = ContainerUtil.containerValues(container);
         sendDataDiff(before, after, modifyType, sender);
     }
 
@@ -235,7 +235,7 @@ public class ContainerModify {
         ItemStack item = player.getInventory().getItemInMainHand();
         ItemMeta meta = item.getItemMeta();
         PersistentDataContainer container = meta.getPersistentDataContainer();
-        String result = new ContainerUtil().containerValues(container);
+        String result = ContainerUtil.containerValues(container);
         sender.sendMessage(result);
         UUID uuid = UUID.randomUUID();
         sender.sendMessage(UPPER_ARROW +" Container Ticket: "+uuid);
@@ -255,8 +255,8 @@ public class ContainerModify {
         PersistentDataContainer container = item.getItemMeta().getPersistentDataContainer();
         String operator = args[4];
 
-        PersistentDataType firstType = new ContainerUtil().getSpecifiedKeyType(container, firstKey);
-        PersistentDataType secondType = new ContainerUtil().getSpecifiedKeyType(container, secondKey);
+        PersistentDataType firstType = ContainerUtil.getSpecifiedKeyType(container, firstKey);
+        PersistentDataType secondType = ContainerUtil.getSpecifiedKeyType(container, secondKey);
         if (firstType == null || secondType == null) {
             sender.sendMessage("Container modify-show > Container data type error.");
             sender.sendMessage("Container modify-show > Check the data type.");

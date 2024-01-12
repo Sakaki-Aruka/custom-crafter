@@ -31,7 +31,7 @@ public class PermissionCheck {
         Player player = Bukkit.getPlayer(name);
         UUID uuid = player.getUniqueId();
         RecipePermission permission = RECIPE_PERMISSION_MAP.get(perm);
-        if (new RecipePermissionUtil().hasPermission(permission,player)) return;
+        if (RecipePermissionUtil.hasPermission(permission,player)) return;
         if (!PLAYER_PERMISSIONS.containsKey(uuid)) PLAYER_PERMISSIONS.put(uuid,new HashSet<>());
         PLAYER_PERMISSIONS.get(uuid).add(permission);
         Bukkit.getLogger().info(String.format("Permission added: %s  Permission: %s%s  Target: %s", LINE_SEPARATOR,permission.getPermissionName(), LINE_SEPARATOR,player.getName()));
@@ -52,7 +52,7 @@ public class PermissionCheck {
     private void displayPermissionInfo(String name, CommandSender sender){
         // /cc -p [permissionName]
         RecipePermission perm = RECIPE_PERMISSION_MAP.get(name);
-        sender.sendMessage(new RecipePermissionUtil().getPermissionTree(perm));
+        sender.sendMessage(RecipePermissionUtil.getPermissionTree(perm));
     }
 
     private void displayPlayerPermissions(UUID uuid, CommandSender sender){

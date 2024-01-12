@@ -26,7 +26,7 @@ public class CloseCraftingTable implements Listener {
     }
 
     public void close(Player player,Inventory inventory){
-        for(int i:new InventoryUtil().getTableSlots(CRAFTING_TABLE_SIZE)){
+        for(int i: InventoryUtil.getTableSlots(CRAFTING_TABLE_SIZE)){
             if(inventory.getItem(i)==null)continue;
             if(inventory.getItem(i).getType().equals(Material.AIR))continue;
             InventoryUtil.safetyItemDrop(player, Collections.singletonList(inventory.getItem(i)));
