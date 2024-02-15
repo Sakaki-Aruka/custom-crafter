@@ -1,7 +1,6 @@
 package com.github.sakakiaruka.customcrafter.customcrafter;
 
 import com.github.sakakiaruka.customcrafter.customcrafter.command.Processor;
-import com.github.sakakiaruka.customcrafter.customcrafter.object.ContainerWrapper;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantStrict;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantWrap;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
@@ -9,13 +8,10 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.PotionStrict;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.Potions;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Permission.RecipePermission;
-import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Container.RecipeDataContainer;
-import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Container.RecipeDataContainerModifyType;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordinate;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.MetadataType;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.Result;
-import com.github.sakakiaruka.customcrafter.customcrafter.util.ContainerUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.DataCheckerUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.PotionUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil;
@@ -26,7 +22,6 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -39,7 +34,6 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.*;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -346,8 +340,8 @@ public class SettingsLoad {
                 continue;
             }
 
-            Map<Integer, ContainerWrapper> elements = ContainerUtil.mattersLoader(path);
-            matter.setContainerWrappers(elements);
+//            Map<Integer, ContainerWrapper> elements = ContainerUtil.mattersLoader(path);
+//            matter.setContainerWrappers(elements);
             MATTERS.put(name,matter);
             CUSTOM_MATTERS.put(name, matter);
         }
@@ -517,41 +511,41 @@ public class SettingsLoad {
                 permission = RECIPE_PERMISSION_MAP.getOrDefault(key, null);
             }
 
-            Map<NamespacedKey, List<RecipeDataContainer>> map = new HashMap<>();
-            if (config.contains("container_modify")) {
-                int counter = 0;
+//            Map<NamespacedKey, List<RecipeDataContainer>> map = new HashMap<>();
+//            if (config.contains("container_modify")) {
+//                int counter = 0;
+//
+//                while (true) {
+//                    String address = "container_modify."+counter+".";
+//                    if (!config.contains(address)) break;
+//                    NamespacedKey key = new NamespacedKey(getInstance(), config.getString(address+"key"));
+//                    RecipeDataContainerModifyType modifyType = RecipeDataContainerModifyType.valueOf(config.getString(address+"modify_type").toUpperCase());
+//                    PersistentDataType type = ContainerUtil.getDataType(config.getString(address+"type").toUpperCase());
+//                    String term = config.getString(address+"term");
+//                    String action = Objects.requireNonNullElse(config.getString(address + "action"), "");
+//                    boolean end = config.getBoolean(address+"return");
+//                    counter++;
+//                    RecipeDataContainer data = new RecipeDataContainer(type, term, action, end, modifyType);
+//
+//                    if (!map.containsKey(key)) map.put(key, new ArrayList<>());
+//                    map.get(key).add(data);
+//                }
+//            }
 
-                while (true) {
-                    String address = "container_modify."+counter+".";
-                    if (!config.contains(address)) break;
-                    NamespacedKey key = new NamespacedKey(getInstance(), config.getString(address+"key"));
-                    RecipeDataContainerModifyType modifyType = RecipeDataContainerModifyType.valueOf(config.getString(address+"modify_type").toUpperCase());
-                    PersistentDataType type = ContainerUtil.getDataType(config.getString(address+"type").toUpperCase());
-                    String term = config.getString(address+"term");
-                    String action = Objects.requireNonNullElse(config.getString(address + "action"), "");
-                    boolean end = config.getBoolean(address+"return");
-                    counter++;
-                    RecipeDataContainer data = new RecipeDataContainer(type, term, action, end, modifyType);
-
-                    if (!map.containsKey(key)) map.put(key, new ArrayList<>());
-                    map.get(key).add(data);
-                }
-            }
-
-            Map<Matter, List<String>> usingContainerValuesMetadata = new HashMap<>();
-            if (config.contains("using_container_values_metadata")) {
-                for (String s : config.getStringList("using_container_values_metadata")) {
-                    Matcher matcher = Pattern.compile(USING_CONTAINER_VALUES_METADATA_PATTERN).matcher(s);
-                    if (!matcher.matches()) continue;
-                    String matterName = matcher.group(1);
-                    if (!MATTERS.containsKey(matterName) && !ALL_MATERIALS.contains(matterName.toUpperCase())) continue;
-                    Matter matter = MATTERS.get(matterName);
-                    String order = matcher.group(2);
-                    if (!usingContainerValuesMetadata.containsKey(matter)) usingContainerValuesMetadata.put(matter, new ArrayList<>());
-                    usingContainerValuesMetadata.get(matter).add(order);
-
-                }
-            }
+//            Map<Matter, List<String>> usingContainerValuesMetadata = new HashMap<>();
+//            if (config.contains("using_container_values_metadata")) {
+//                for (String s : config.getStringList("using_container_values_metadata")) {
+//                    Matcher matcher = Pattern.compile(USING_CONTAINER_VALUES_METADATA_PATTERN).matcher(s);
+//                    if (!matcher.matches()) continue;
+//                    String matterName = matcher.group(1);
+//                    if (!MATTERS.containsKey(matterName) && !ALL_MATERIALS.contains(matterName.toUpperCase())) continue;
+//                    Matter matter = MATTERS.get(matterName);
+//                    String order = matcher.group(2);
+//                    if (!usingContainerValuesMetadata.containsKey(matter)) usingContainerValuesMetadata.put(matter, new ArrayList<>());
+//                    usingContainerValuesMetadata.get(matter).add(order);
+//
+//                }
+//            }
 
             if (config.contains("lock")) {
                 String lockTimeRow = config.getString("lock");
@@ -607,7 +601,7 @@ public class SettingsLoad {
                     };
                     runnable.runTaskLater(CustomCrafter.getInstance(), delayTicks);
                     int taskID = runnable.getTaskId();
-                    REGISTERED_RECIPES.put(name, new Recipe(name, tag, coordinates, returns, result, permission, map, usingContainerValuesMetadata));
+                    REGISTERED_RECIPES.put(name, new Recipe(name, tag, coordinates, returns, result, permission));
                     UNLOCK_TASK_ID_WITH_RECIPE_NAME.put(taskID, name);
 
                     Bukkit.getLogger().info(String.format("[CustomCrafter] Named Recipe=%s will be unlocked in %s", name, ZonedDateTime.parse(unlockTimeRow).toString()));
@@ -615,7 +609,7 @@ public class SettingsLoad {
                 }
             }
 
-            Recipe recipe = new Recipe(name, tag, coordinates, returns, result, permission, map, usingContainerValuesMetadata);
+            Recipe recipe = new Recipe(name, tag, coordinates, returns, result, permission);
             RECIPE_LIST.add(recipe);
             NAMED_RECIPES_MAP.put(name,recipe);
             if (!ITEM_PLACED_SLOTS_RECIPE_MAP.containsKey(recipe.getContentsNoAir().size())) {

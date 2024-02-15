@@ -144,10 +144,10 @@ public class Processor implements CommandExecutor, TabCompleter {
         else if (id == 11) new PermissionCheck().remove(args[3], args[5], sender);
         else if (id == 12) new Help().all(sender);
         else if (id == 13) new Help().one(args[1], sender);
-        else if (id == 14 + 100 || id == 16 + 100) new ContainerModify().addSet(args, sender);
-        else if (id == 15 + 100) new ContainerModify().remove(args, sender);
-        else if (id == 17 + 100) new ContainerModify().valueModify(args, sender);
-        else if (id == 18 + 100) new ContainerModify().data(sender);
+//        else if (id == 14 + 100 || id == 16 + 100) new ContainerModify().addSet(args, sender);
+//        else if (id == 15 + 100) new ContainerModify().remove(args, sender);
+//        else if (id == 17 + 100) new ContainerModify().valueModify(args, sender);
+//        else if (id == 18 + 100) new ContainerModify().data(sender);
 
         return false;
     }

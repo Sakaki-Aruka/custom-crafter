@@ -1,23 +1,24 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.object.Matter;
 
-import com.github.sakakiaruka.customcrafter.customcrafter.interfaces.Matters;
-import com.github.sakakiaruka.customcrafter.customcrafter.object.ContainerWrapper;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Container.MatterContainer;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
+import org.bukkit.persistence.PersistentDataContainer;
 
 import java.util.*;
 
 import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.LINE_SEPARATOR;
 
-public class Matter implements Matters {
+public class Matter {
     private String name;
     private List<Material> candidate;
     private List<EnchantWrap> wrap;
     private int amount;
     private boolean mass;
-    private Map<Integer, ContainerWrapper> container;
+    private List<MatterContainer> containers;
+    private PersistentDataContainer pdc;
 
     public Matter(String name,List<Material> candidate,List<EnchantWrap> wrap,int amount,boolean mass){
         this.name = name;
@@ -49,6 +50,7 @@ public class Matter implements Matters {
         this.wrap = matter.hasWrap() ? matter.getWrap() : null;
         this.amount = matter.getAmount();
         this.mass = matter.isMass();
+        this.containers = matter.getContainers();
     }
 
     public Matter(ItemStack item){
@@ -197,34 +199,40 @@ public class Matter implements Matters {
         builder.append(String.format("wrap : %s",hasWrap() ? getAllWrapInfo() : "null"+ LINE_SEPARATOR));
         builder.append(String.format("amount : %d"+ LINE_SEPARATOR,amount));
         builder.append(String.format("mass : %b"+ LINE_SEPARATOR,isMass()));
-        if (container == null || container.isEmpty()) builder.append("container: No contents in the container."+ LINE_SEPARATOR);
-        else {
-            container.entrySet().forEach(s->builder.append("container: "+ LINE_SEPARATOR +s.getValue().info()+ LINE_SEPARATOR));
-        }
         return builder.toString();
     }
 
-    public boolean hasContainer() {
-        return !((container == null) || container.isEmpty());
+
+    public boolean hasContainers() {
+        return !((containers == null) || containers.isEmpty());
+    }
+
+    public List<MatterContainer> getContainers() {
+        return containers;
+    }
+
+    public void setContainers(List<MatterContainer> containers) {
+        this.containers = containers;
+    }
+
+    public void addContainers(List<MatterContainer> containers) {
+        this.containers.addAll(containers);
+    }
+
+    public PersistentDataContainer getPDC() {
+        if (!hasPDC()) return null;
+        return this.pdc;
+    }
+
+    public boolean hasPDC() {
+        return pdc != null;
+    }
+
+    public void setPDC(PersistentDataContainer pdc) {
+        this.pdc = pdc;
     }
 
 
-    public Map<Integer, ContainerWrapper> getContainerWrappers() {
-        return container;
-    }
-
-    public void setContainerWrappers(Map<Integer, ContainerWrapper> elements) {
-        this.container = elements;
-    }
-
-    public Map<Integer, ContainerWrapper> containerElementsDeepCopy() {
-        Map<Integer, ContainerWrapper> map = new HashMap<>();
-        if (!hasContainer()) return map;
-        for (Map.Entry<Integer, ContainerWrapper> entry : this.container.entrySet()) {
-            map.put(entry.getKey(), entry.getValue());
-        }
-        return map;
-    }
 
     @Override
     public boolean equals(Object obj) {

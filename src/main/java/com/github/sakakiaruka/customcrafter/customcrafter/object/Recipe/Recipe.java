@@ -5,11 +5,11 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantW
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.Potions;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Permission.RecipePermission;
-import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Container.RecipeDataContainer;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Container.RecipeContainer;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.Result;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataContainer;
 
 import java.util.*;
 
@@ -20,18 +20,20 @@ public class Recipe {
     private Map<Material, ItemStack> returnItems;
     private RecipePermission permission;
     private Result result;
-    private Map<NamespacedKey, List<RecipeDataContainer>> container;
-    private Map<Matter, List<String>> usingContainerValuesMetadata;
+    private List<RecipeContainer> containers;
+//    private Map<NamespacedKey, List<RecipeDataContainer>> container;
+//    private Map<Matter, List<String>> usingContainerValuesMetadata;
 
-    public Recipe(String name,String tag,Map<Coordinate,Matter> coordinate,Map<Material,ItemStack> returnItems,Result result, RecipePermission permission, Map<NamespacedKey, List<RecipeDataContainer>> container, Map<Matter, List<String>> usingContainerValuesMetadata){
+    public Recipe(String name,String tag,Map<Coordinate,Matter> coordinate,Map<Material,ItemStack> returnItems,Result result, RecipePermission permission){
         this.name = name;
         this.tag = Tag.valueOf(tag);
         this.coordinate = coordinate;
         this.returnItems = returnItems;
         this.result = result;
         this.permission = permission;
-        this.container = container;
-        this.usingContainerValuesMetadata = usingContainerValuesMetadata;
+        // TODO: write here List<RecipeContainer>
+//        this.container = container;
+//        this.usingContainerValuesMetadata = usingContainerValuesMetadata;
     }
 
     public Recipe(){ //only used for temporary (mainly real) -> tag is "Normal"
@@ -41,8 +43,8 @@ public class Recipe {
         this.returnItems = null;
         this.result = null;
         this.permission = null;
-        this.container = new HashMap<>();
-        this.usingContainerValuesMetadata = new HashMap<>();
+//        this.container = new HashMap<>();
+//        this.usingContainerValuesMetadata = new HashMap<>();
     }
 
     public void addCoordinate(int x,int y,Matter matter){
@@ -101,6 +103,13 @@ public class Recipe {
         return permission != null;
     }
 
+    public List<RecipeContainer> getContainers() {
+        return containers;
+    }
+
+    public void setContainers(List<RecipeContainer> containers) {
+        this.containers = containers;
+    }
 
     public List<Matter> getContentsNoAir(){
         List<Matter> list = new ArrayList<>();
@@ -166,39 +175,39 @@ public class Recipe {
         return null;
     }
 
-    public int getContainerHasAmount() {
-        int result = 0;
-        for (Matter matter : coordinate.values()) {
-            if (matter.hasContainer()) result++;
-        }
-        return result;
-    }
+//    public int getContainerHasAmount() {
+//        int result = 0;
+//        for (Matter matter : coordinate.values()) {
+//            if (matter.hasContainer()) result++;
+//        }
+//        return result;
+//    }
 
-    public Map<NamespacedKey, List<RecipeDataContainer>> getContainer() {
-        return container;
-    }
-
-    public void setContainer(Map<NamespacedKey, List<RecipeDataContainer>> container) {
-        this.container = container;
-    }
-
-    public boolean hasContainer() {
-        if (this.container == null) return false;
-        if (this.container.isEmpty()) return false;
-        return true;
-    }
-
-    public Map<Matter, List<String>> getUsingContainerValuesMetadata() {
-        return usingContainerValuesMetadata;
-    }
-
-    public void setUsingContainerValuesMetadata(Map<Matter, List<String>> usingContainerValuesMetadata) {
-        this.usingContainerValuesMetadata = usingContainerValuesMetadata;
-    }
-
-    public boolean hasUsingContainerValuesMetadata() {
-        return !(this.usingContainerValuesMetadata == null || this.usingContainerValuesMetadata.isEmpty());
-    }
+//    public Map<NamespacedKey, List<RecipeDataContainer>> getContainer() {
+//        return container;
+//    }
+//
+//    public void setContainer(Map<NamespacedKey, List<RecipeDataContainer>> container) {
+//        this.container = container;
+//    }
+//
+//    public boolean hasContainer() {
+//        if (this.container == null) return false;
+//        if (this.container.isEmpty()) return false;
+//        return true;
+//    }
+//
+//    public Map<Matter, List<String>> getUsingContainerValuesMetadata() {
+//        return usingContainerValuesMetadata;
+//    }
+//
+//    public void setUsingContainerValuesMetadata(Map<Matter, List<String>> usingContainerValuesMetadata) {
+//        this.usingContainerValuesMetadata = usingContainerValuesMetadata;
+//    }
+//
+//    public boolean hasUsingContainerValuesMetadata() {
+//        return !(this.usingContainerValuesMetadata == null || this.usingContainerValuesMetadata.isEmpty());
+//    }
 
 
     public List<Coordinate> getEnchantedItemCoordinateList() {
@@ -211,13 +220,29 @@ public class Recipe {
         return list;
     }
 
-    public List<Coordinate> getHasContainerDataItemList() {
+//    public List<Coordinate> getHasContainerDataItemList() {
+//        List<Coordinate> list = new ArrayList<>();
+//        for (Coordinate coordinate : getCoordinateNoAir()) {
+//            Matter matter = getMatterFromCoordinate(coordinate);
+//            if (!matter.hasContainer()) continue;
+//            list.add(coordinate);
+//        }
+//        return list;
+//    }
+
+    public List<Coordinate> getHasContainersDataItemList() {
         List<Coordinate> list = new ArrayList<>();
-        for (Coordinate coordinate : getCoordinateNoAir()) {
-            Matter matter = getMatterFromCoordinate(coordinate);
-            if (!matter.hasContainer()) continue;
-            list.add(coordinate);
-        }
+        getCoordinateNoAir().forEach(c -> {
+            if (getMatterFromCoordinate(c).hasContainers()) list.add(c);
+        });
+        return list;
+    }
+
+    public List<Coordinate> getHasPDCItemList() {
+        List<Coordinate> list = new ArrayList<>();
+        getCoordinateNoAir().forEach(c -> {
+            if (getMatterFromCoordinate(c).hasPDC()) list.add(c);
+        });
         return list;
     }
 

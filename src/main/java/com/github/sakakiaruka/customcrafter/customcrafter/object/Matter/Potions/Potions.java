@@ -215,14 +215,6 @@ public class Potions extends Matter implements Matters {
         return super.info()+ LINE_SEPARATOR +PotionInfo();
     }
 
-    public Map<Integer, ContainerWrapper> getContainerWrappers() {
-        return super.getContainerWrappers();
-    }
-
-    public void setContainerWrappers(Map<Integer, ContainerWrapper> elements) {
-        super.setContainerWrappers(elements);
-    }
-
     public Potions copy(){
         Matter matter = super.copy();
         Map<PotionEffect,PotionStrict> data = hasAnyCustomEffect() ? this.data : null;
