@@ -281,6 +281,70 @@ public class NewAmorphousTest {
         );
     }
 
+    @Test
+    @Deprecated
+    public void string_container_data_parse_test() {
+        //
+    }
+
+    @Test
+    @Deprecated
+    public void numeric_container_data_parse_test() {
+        PersistentDataContainer pdc1 = new PersistentDataContainerMock();
+        pdc1.set(
+                new NamespacedKey("custom_crafter", "pdc1_0.double"),
+                PersistentDataType.DOUBLE,
+                20.0
+        );
+        PersistentDataContainer pdc1_1 = new PersistentDataContainerMock();
+        pdc1_1.set(
+                new NamespacedKey("custom_crafter", "pdc1_0.double"),
+                PersistentDataType.DOUBLE,
+                40.0
+        );
+        PersistentDataContainer pdc1_2 = new PersistentDataContainerMock();
+        pdc1_2.set(
+                new NamespacedKey("custom_crafter", "pdc1_0.double"),
+                PersistentDataType.DOUBLE,
+                60d
+        );
+        PersistentDataContainer pdc1_3 = new PersistentDataContainerMock();
+        pdc1_3.set(
+                new NamespacedKey("custom_crafter", "pdc1_0.double"),
+                PersistentDataType.DOUBLE,
+                80d
+        );
+        PersistentDataContainer pdc1_4 = new PersistentDataContainerMock();
+        pdc1_4.set(
+                new NamespacedKey("custom_crafter", "pdc1_0.double"),
+                PersistentDataType.DOUBLE,
+                100d
+        );
+        List<PersistentDataContainer> containers = List.of(pdc1, pdc1_1, pdc1_2, pdc1_3, pdc1_4);
+        Map<String, String> result1 = ContainerUtil.getData(containers);
+        Assertions.assertEquals("5", result1.get("pdc1_0.double.size"));
+        Assertions.assertEquals("20.0", result1.get("pdc1_0.double.min"));
+        Assertions.assertEquals("100.0", result1.get("pdc1_0.double.max"));
+        Assertions.assertEquals("60.0", result1.get("pdc1_0.double.average"));
+
+        PersistentDataContainer pdc2 = new PersistentDataContainerMock();
+        pdc2.set(
+                new NamespacedKey("custom_crafter", "pdc2_0.long"),
+                PersistentDataType.LONG,
+                20L
+        );
+        PersistentDataContainer pdc2_1 = new PersistentDataContainerMock();
+        pdc2_1.set(
+                new NamespacedKey("custom_crafter", "pdc2_0.long"),
+                PersistentDataType.LONG,
+                50L
+        );
+        List<PersistentDataContainer> containers2 = List.of(pdc2, pdc2_1);
+        Map<String, String> result2 = ContainerUtil.getData(containers2);
+        Assertions.assertEquals("35", result2.get("pdc2_0.long.average"));
+        Assertions.assertEquals("70", result2.get("pdc2_0.long.total"));
+    }
+
 
     private Recipe getDirtRecipe() {
         Recipe recipe = new Recipe();

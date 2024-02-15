@@ -3,6 +3,7 @@ package com.github.sakakiaruka.customcrafter.customcrafter.util;
 import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter;
 import com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad;
 import com.github.sakakiaruka.customcrafter.customcrafter.interfaces.TriConsumer;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.AnchorTagType;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Container.MatterContainer;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordinate;
@@ -548,9 +549,9 @@ public class ContainerUtil {
             item.setItemMeta(meta);
         } else if (type.equals("modify")) {
             String element = matcher.group(5);
-            if (element.matches("attribute=(.+),op=(.+),value=(.+),slot=(.+)")) {
+            if (element.matches("attribute=([a-zA-Z_]+),op=([a-zA-Z_]+),value=([\\d.-]+),slot=([a-zA-Z_]+)")) {
                 ATTRIBUTE_MODIFIER_EQUIPMENT.accept(data, item, matcher.group(5));
-            } else if (element.matches("attribute=(.+),op=(.+),value=(.+)")) {
+            } else if (element.matches("attribute=([a-zA-Z_]+),op=([a-zA-Z_]+),value=([\\d.-]+)")) {
                 ATTRIBUTE_MODIFIER.accept(data, item, matcher.group(5));
             }
         }
@@ -625,7 +626,7 @@ public class ContainerUtil {
         Map<String, String> result = new HashMap<>();
         for (NamespacedKey key : container.getKeys()) {
             String name = key.getKey();
-            Matcher matcher = Pattern.compile("(.+)\\.(string|double|long|anchor)").matcher(name);
+            Matcher matcher = Pattern.compile("([a-zA-Z0-9_]+)\\.(string|double|long|anchor)").matcher(name);
             if (!matcher.matches()) return new HashMap<>();
             String typeString = matcher.group(2);
             if (typeString.matches("(?i)(anchor)")) {
@@ -649,10 +650,10 @@ public class ContainerUtil {
         Map<String, List<Long>> longData = new HashMap<>();
         Map<String, List<String>> stringData = new HashMap<>();
         for (PersistentDataContainer pdc : containers) {
-            if (!pdc.isEmpty()) continue;
+            if (pdc.isEmpty()) continue;
             for (NamespacedKey key : pdc.getKeys()) {
-                Matcher matcher = Pattern.compile("(.+)\\.(string|double|long|anchor)").matcher(key.getKey());
-                if (!matcher.matches() || matcher.group(2).equals("anchor")) continue;
+                Matcher matcher = Pattern.compile("([a-zA-Z0-9_]+)\\.(string|double|long|anchor)").matcher(key.getKey());
+                if (!matcher.matches()) continue;
                 String name = matcher.group(1);
                 PersistentDataType<?,?> type = getPersistentDataType(matcher.group(2));
                 if (type == null) continue;
@@ -665,6 +666,8 @@ public class ContainerUtil {
                 } else if (type.equals(PersistentDataType.STRING)) {
                     if (!stringData.containsKey(name)) stringData.put(name, new LinkedList<>());
                     stringData.get(name).add(pdc.get(key, PersistentDataType.STRING));
+                } else if (type.equals(new AnchorTagType())) {
+                    result.put(name, "");
                 }
             }
         }
@@ -710,24 +713,36 @@ public class ContainerUtil {
     public static Map<String, Double> getDerivedDataDouble(List<Double> data) {
         Map<String, Double> result = new HashMap<>();
         double total = data.stream().mapToDouble(d -> d).sum();
-        result.put("total", total);
-        result.put("average", total / data.size());
-        result.put("max", Collections.max(data));
-        result.put("min", Collections.min(data));
-        Collections.sort(data); // natural
-        result.put("median", data.get(data.size() / 2 - (data.size() % 2 == 0 ? 1 : 0)));
-        return result;
-    }
-
-    public static Map<String, Long> getDerivedDataLong(List<Long> data) {
-        Map<String, Long> result = new HashMap<>();
-        long total = data.stream().mapToLong(l -> l).sum();
+        int size = data.size();
         result.put("total", total);
         result.put("average", total / data.size());
         Collections.sort(data); // natural
         result.put("max", data.get(data.size() - 1));
         result.put("min", data.get(0));
-        result.put("median", data.get(data.size() / 2 - (data.size() % 2 == 0 ? 1 : 0)));
+        if (size < 3) {
+            result.put("median", result.get("average"));
+            return result;
+        }
+        double median = size % 2 == 0 ? (data.get(size / 2 - 1) + data.get(size / 2)) / 2 : data.get(size / 2);
+        result.put("median", median);
+        return result;
+    }
+
+    public static Map<String, Long> getDerivedDataLong(List<Long> data) {
+        Map<String, Long> result = new HashMap<>();
+        int size = data.size();
+        long total = data.stream().mapToLong(l -> l).sum();
+        result.put("total", total);
+        result.put("average", total / size);
+        Collections.sort(data); // natural
+        result.put("max", data.get(size - 1));
+        result.put("min", data.get(0));
+        if (size < 3) {
+            result.put("median", result.get("average"));
+            return result;
+        }
+        long median = size % 2 == 0 ? (data.get(size / 2 - 1) + data.get(size / 2)) / 2 : data.get(size / 2);
+        result.put("median", median);
         return result;
     }
 
@@ -735,6 +750,7 @@ public class ContainerUtil {
         if (type.equalsIgnoreCase("double")) return PersistentDataType.DOUBLE;
         if (type.equalsIgnoreCase("string")) return PersistentDataType.STRING;
         if (type.equalsIgnoreCase("long")) return PersistentDataType.LONG;
+        if (type.equals("anchor")) return new AnchorTagType();
         return null;
     }
 
