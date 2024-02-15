@@ -175,40 +175,6 @@ public class Recipe {
         return null;
     }
 
-//    public int getContainerHasAmount() {
-//        int result = 0;
-//        for (Matter matter : coordinate.values()) {
-//            if (matter.hasContainer()) result++;
-//        }
-//        return result;
-//    }
-
-//    public Map<NamespacedKey, List<RecipeDataContainer>> getContainer() {
-//        return container;
-//    }
-//
-//    public void setContainer(Map<NamespacedKey, List<RecipeDataContainer>> container) {
-//        this.container = container;
-//    }
-//
-//    public boolean hasContainer() {
-//        if (this.container == null) return false;
-//        if (this.container.isEmpty()) return false;
-//        return true;
-//    }
-//
-//    public Map<Matter, List<String>> getUsingContainerValuesMetadata() {
-//        return usingContainerValuesMetadata;
-//    }
-//
-//    public void setUsingContainerValuesMetadata(Map<Matter, List<String>> usingContainerValuesMetadata) {
-//        this.usingContainerValuesMetadata = usingContainerValuesMetadata;
-//    }
-//
-//    public boolean hasUsingContainerValuesMetadata() {
-//        return !(this.usingContainerValuesMetadata == null || this.usingContainerValuesMetadata.isEmpty());
-//    }
-
 
     public List<Coordinate> getEnchantedItemCoordinateList() {
         List<Coordinate> list = new ArrayList<>();
@@ -220,15 +186,6 @@ public class Recipe {
         return list;
     }
 
-//    public List<Coordinate> getHasContainerDataItemList() {
-//        List<Coordinate> list = new ArrayList<>();
-//        for (Coordinate coordinate : getCoordinateNoAir()) {
-//            Matter matter = getMatterFromCoordinate(coordinate);
-//            if (!matter.hasContainer()) continue;
-//            list.add(coordinate);
-//        }
-//        return list;
-//    }
 
     public List<Coordinate> getHasContainersDataItemList() {
         List<Coordinate> list = new ArrayList<>();

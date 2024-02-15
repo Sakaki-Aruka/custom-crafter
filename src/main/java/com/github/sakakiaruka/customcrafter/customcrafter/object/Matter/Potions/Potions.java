@@ -1,7 +1,6 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions;
 
 import com.github.sakakiaruka.customcrafter.customcrafter.interfaces.Matters;
-import com.github.sakakiaruka.customcrafter.customcrafter.object.ContainerWrapper;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantWrap;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.PotionUtil;

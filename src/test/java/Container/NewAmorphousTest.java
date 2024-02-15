@@ -6,6 +6,7 @@ import be.seeseemelk.mockbukkit.inventory.ItemFactoryMock;
 import be.seeseemelk.mockbukkit.inventory.meta.ItemMetaMock;
 import be.seeseemelk.mockbukkit.persistence.PersistentDataContainerMock;
 import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.AnchorTagType;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Container.ContainerType;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Container.MatterContainer;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
@@ -25,6 +26,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -32,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
+import java.util.UUID;
 
 public class NewAmorphousTest {
 
@@ -230,11 +233,11 @@ public class NewAmorphousTest {
         pdc.set(
                 new NamespacedKey("custom_crafter", "test_container_1.double"),
                 PersistentDataType.DOUBLE,
-                20d);
+                20.0);
         MatterContainer container = new MatterContainer(
                 ContainerUtil.VALUE_ALLOW,
                 ContainerType.ALLOW_VALUE,
-                "{(%test_container_1%*2)==40.0}"
+                "{(%test_container_1.double%*2)==40.0}"
         );
 
         matter.setContainers(List.of(container));
@@ -244,7 +247,38 @@ public class NewAmorphousTest {
         for (MatterContainer c : matter.getContainers()) {
             if (c.judge(data)) count++;
         }
+
         Assertions.assertEquals(count, matter.getContainers().size());
+    }
+
+    @Test
+    @Deprecated
+    public void get_anchor_data_test() {
+        PersistentDataContainer pdc1 = new PersistentDataContainerMock();
+        pdc1.set(
+                new NamespacedKey("custom_crafter", "pdc1.anchor"),
+                new AnchorTagType(),
+                UUID.randomUUID()
+        );
+
+        Map<String, String> result = ContainerUtil.getData(pdc1);
+        Assertions.assertEquals("{pdc1.anchor=}", result.toString());
+
+        Assertions.assertEquals(
+                true,
+                ContainerUtil.TAG_ALLOW.apply(result, "pdc1.anchor"));
+
+        pdc1.set(
+                new NamespacedKey("custom_crafter", "pdc1_2.anchor"),
+                new AnchorTagType(),
+                UUID.randomUUID()
+        );
+
+        Map<String, String> result2 = ContainerUtil.getData(pdc1);
+        Assertions.assertEquals(
+                true,
+                ContainerUtil.TAG_ALLOW.apply(result2, "pdc1.anchor,pdc1_2.anchor")
+        );
     }
 
 
