@@ -1,21 +1,18 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.util;
 
+import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter;
 import com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad;
 import com.github.sakakiaruka.customcrafter.customcrafter.interfaces.TriConsumer;
-import com.github.sakakiaruka.customcrafter.customcrafter.object.ContainerWrapper;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Container.MatterContainer;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordinate;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.search.Search;
-import com.google.common.collect.Multimap;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
@@ -30,19 +27,13 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import javax.management.ObjectName;
-import java.io.ObjectStreamException;
-import java.nio.file.Path;
 import java.util.*;
-import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
-import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter.getInstance;
-
 public class ContainerUtil {
+
 
     public static boolean isPass(ItemStack item, Matter matter) {
         // item -> target, matter -> source (recipe)
@@ -495,7 +486,7 @@ public class ContainerUtil {
             meta.removeEnchant(enchant);
             meta.addEnchant(enchant, Integer.parseInt(getContent(data, right)), true);
         }
-
+        data.remove("$CURRENT_LEVEL$");
         item.setItemMeta(meta);
     };
 
@@ -515,6 +506,7 @@ public class ContainerUtil {
         if (meta.getLore() != null) lore.addAll(meta.getLore());
         data.put("$LINES$", String.valueOf(lore.size()));
         formula = getContent(data, formula);
+        data.remove("$LINES$");
         Matcher one = Pattern.compile("type=(clear|modify)(,value=type=(insert|remove),element=line=((\\d+),value=(.+)|(\\d+)))?").matcher(formula);
         if (!one.matches()) return;
         if (one.group(1).equalsIgnoreCase("clear")) {
@@ -563,6 +555,68 @@ public class ContainerUtil {
             }
         }
     };
+
+    public static final TriConsumer<Map<String, String>, ItemStack, String> RESULT_VALUE_RELOAD = (data, item, formula) -> {
+        // formula not used
+        data.entrySet().iterator().forEachRemaining(e -> {
+            if (e.getKey().startsWith("$result.")) data.remove(e.getKey());
+        });
+
+        ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
+        Map<String, String> NEW_MAP = getData(meta.getPersistentDataContainer());
+        NEW_MAP.forEach((k, v) -> NEW_MAP.put("$result." + k, v));
+        data.putAll(NEW_MAP);
+    };
+
+    public static final TriConsumer<Map<String, String>, ItemStack, String> CONTAINER = (data, item, formula) -> {
+        // type: container, value: type=(add|remove|modify),target=([a-zA-Z_]+)(,value=(.+))?
+        // e.g. type: container, value: type=add,target=variable-name.type,value=~~~
+        // e.g. type: container, value: type=remove,target=variable-name.type
+        // e.g. type: container, value: type=modify,target=variable-name.type,value=~~~
+        // a special variable that is named "$CURRENT_VALUE$" contains current value.
+        String pattern = "type=(add|remove|modify),target=([a-zA-Z0-9_.%$]*)(,value=(.+))?";
+        formula = getContent(data, formula);
+        Matcher m = Pattern.compile(pattern).matcher(formula);
+        if (!m.matches()) return;
+        ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
+        String type = m.group(1);
+        String target = m.group(2);
+
+        data.put("$CURRENT_VALUE$", data.getOrDefault(target, ""));
+        Matcher matcher = Pattern.compile(pattern).matcher(formula);
+        data.remove("$CURRENT_VALUES$");
+        int index = target.lastIndexOf(".");
+        PersistentDataType<?,?> pdt = getPersistentDataType(target.substring(index));
+        NamespacedKey nk = new NamespacedKey(CustomCrafter.getInstance(), target.substring(0, index));
+        if (pdt == null) return;
+        if (type.equals("remove") || type.equals("modify")) {
+            item.getItemMeta().getPersistentDataContainer().remove(nk);
+        }
+        if (type.equals("add") || type.equals("modify")) {
+            String value = matcher.group(4);
+            if (pdt.equals(PersistentDataType.STRING)) {
+                item.getItemMeta().getPersistentDataContainer().set(
+                        nk,
+                        PersistentDataType.STRING,
+                        value);
+            } else if (pdt.equals(PersistentDataType.DOUBLE)) {
+                item.getItemMeta().getPersistentDataContainer().set(
+                        nk,
+                        PersistentDataType.DOUBLE,
+                        Double.parseDouble(value)
+                );
+            } else if (pdt.equals(PersistentDataType.LONG)) {
+                item.getItemMeta().getPersistentDataContainer().set(
+                        nk,
+                        PersistentDataType.LONG,
+                        Long.parseLong(value)
+                );
+            }
+        }
+        item.setItemMeta(meta);
+        RESULT_VALUE_RELOAD.accept(data, item, "");
+    };
+
 
     public static Map<String, String> getData(PersistentDataContainer container) {
         //e.g. test_container_1.double
@@ -622,6 +676,7 @@ public class ContainerUtil {
                 result.put(key + ".string." + index, element);
                 index++;
             }
+            result.put(key + ".string.size", String.valueOf(entry.getValue().size()));
             result.put(key + ".string.all", String.join(",", entry.getValue()));
         }
 

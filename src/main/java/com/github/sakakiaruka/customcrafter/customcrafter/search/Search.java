@@ -254,11 +254,10 @@ public class Search {
         if(item.getType().equals(Material.AIR))return;
 
         WHAT_MAKING.put(player.getUniqueId(),item.getType());
+
         for (RecipeContainer container : recipe.getContainers()) {
             container.run(inputContainerData, item);
         }
-//        ContainerUtil.setRecipeDataContainerToResultItem(item, input, recipe);
-//        if (recipe.hasUsingContainerValuesMetadata()) ContainerUtil.setRecipeUsingContainerValueMetadata(inventory, recipe, item);
 
         if(inventory.getItem(CRAFTING_TABLE_RESULT_SLOT) == null){
             // empty a result item's slot
