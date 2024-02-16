@@ -318,7 +318,7 @@ public class SettingsLoad {
     }
 
     private List<MatterContainer> getMatterContainerList(FileConfiguration config) {
-        // - predicate: ((allow|deny)_(value|tag)|anchor)
+        // - predicate: ((allow|deny)_(value|tag)|anchor|string_match)
         //   formula: (.+)
         //
         List<MatterContainer> result = new ArrayList<>();
@@ -327,7 +327,7 @@ public class SettingsLoad {
             BiFunction<Map<String, String>, String, Boolean> predicate;
             ContainerType type;
             String p = map.get("predicate").toLowerCase();
-            if (!p.matches("(allow|deny)_(tag|value)")) continue;
+            if (!p.matches("((allow|deny)_(tag|value)|string_match)")) continue;
 
             switch (p) {
                 case "allow_value" -> {
@@ -345,6 +345,10 @@ public class SettingsLoad {
                 case "deny_tag" -> {
                     predicate = ContainerUtil.DENY_TAG;
                     type = ContainerType.DENY_VALUE;
+                }
+                case "string_match" -> {
+                    predicate = ContainerUtil.STRING_MATCH;
+                    type = ContainerType.ALLOW_VALUE;
                 }
                 default -> {
                     continue;

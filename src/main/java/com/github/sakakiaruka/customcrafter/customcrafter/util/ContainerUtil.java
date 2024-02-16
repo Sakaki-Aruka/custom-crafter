@@ -107,9 +107,9 @@ public class ContainerUtil {
             if (formula.charAt(i) != ',') continue;
             count++;
             if (count != splitIndex) continue;
-            String source = setEvalValue(setPlaceholderValue(data, formula.substring(0, i)));
-            String target = setEvalValue(setPlaceholderValue(data, formula.substring(i + 1)));
-            return target.matches(source);
+            String left = setEvalValue(setPlaceholderValue(data, formula.substring(0, i)));
+            String right = setEvalValue(setPlaceholderValue(data, formula.substring(i + 1)));
+            return right.matches(left);
         }
         return false;
     };

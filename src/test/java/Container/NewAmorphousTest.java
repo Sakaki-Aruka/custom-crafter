@@ -146,7 +146,7 @@ public class NewAmorphousTest {
         recipe.getMatterFromCoordinate(new Coordinate(-1, 2)).setContainers(List.of(mc1));
 
         Map<String, String> result = asStringMap(sortXYNatural(ContainerUtil._amorphous(recipe, input)));
-        Assertions.assertEquals("[x=0,y=2]", result.get("[x=-1,y=0]"));
+        Assertions.assertEquals("[x=0,y=2]", result.get("[x=-1,y=2]"));
 
     }
 
