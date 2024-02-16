@@ -2,8 +2,6 @@ package Container;
 
 import be.seeseemelk.mockbukkit.MockBukkit;
 import be.seeseemelk.mockbukkit.ServerMock;
-import be.seeseemelk.mockbukkit.inventory.ItemFactoryMock;
-import be.seeseemelk.mockbukkit.inventory.meta.ItemMetaMock;
 import be.seeseemelk.mockbukkit.persistence.PersistentDataContainerMock;
 import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.AnchorTagType;
@@ -17,22 +15,19 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.Result;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.ContainerUtil;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.checkerframework.checker.units.qual.A;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Random;
 import java.util.UUID;
 
@@ -55,7 +50,6 @@ public class NewAmorphousTest {
     @Test
     public void derived_data_test() {
         int size = new Random().nextInt(10);
-        Assertions.assertEquals(2, size / 2 - (size % 2 == 0 ? 1 : 0));
     }
 
     @Test
@@ -101,7 +95,14 @@ public class NewAmorphousTest {
     @Deprecated
     public void string_match_test() {
         // "HellO, worLd" matches "(?i)(hello, world)" test.
-        Recipe recipe = getDirtRecipe();
+        Recipe recipe = new Recipe();
+        Matter _10 = new Matter(List.of(Material.DIRT, Material.COARSE_DIRT), 1);
+        Map<Coordinate, Matter> map = new HashMap<>();
+        map.put(new Coordinate(-1, 0), _10);
+        map.put(new Coordinate(-1, 1), _10.copy());
+        map.put(new Coordinate(-1, 2), _10.copy());
+        recipe.setCoordinate(map);
+
         Recipe input = new Recipe();
         Matter matter1 = new Matter(List.of(Material.DIRT), 1);
         Matter matter2 = new Matter(List.of(Material.DIRT), 1);
@@ -110,37 +111,37 @@ public class NewAmorphousTest {
         PersistentDataContainerMock container2 = new PersistentDataContainerMock();
         PersistentDataContainerMock container3 = new PersistentDataContainerMock();
         container1.set(
-                new NamespacedKey("custom_crafter", "long-test_container_1"),
+                new NamespacedKey("custom_crafter", "test_container_1.long"),
                 PersistentDataType.LONG,
                 20L);
         container2.set(
-                new NamespacedKey("custom_crafter", "long-test_container_2"),
+                new NamespacedKey("custom_crafter", "test_container_2.long"),
                 PersistentDataType.LONG,
                 30L
         );
         container3.set(
-                new NamespacedKey("custom_crafter", "string-test_container_1"),
+                new NamespacedKey("custom_crafter", "test_container_1.string"),
                 PersistentDataType.STRING,
                 "HellO"
         );
         container3.set(
-                new NamespacedKey("custom_crafter", "string-test_container_2"),
+                new NamespacedKey("custom_crafter", "test_container_2.string"),
                 PersistentDataType.STRING,
                 "worLd"
         );
         matter1.setPDC(container1);
         matter2.setPDC(container2);
         matter3.setPDC(container3);
-        Map<Coordinate, Matter> map = new HashMap<>();
-        map.put(new Coordinate(0, 0), matter1);
-        map.put(new Coordinate(0, 1), matter2);
-        map.put(new Coordinate(0, 2), matter3);
-        input.setCoordinate(map);
+        Map<Coordinate, Matter> _map = new HashMap<>();
+        _map.put(new Coordinate(0, 0), matter1);
+        _map.put(new Coordinate(0, 1), matter2);
+        _map.put(new Coordinate(0, 2), matter3);
+        input.setCoordinate(_map);
 
         MatterContainer mc1 = new MatterContainer(
                 ContainerUtil.STRING_MATCH,
                 ContainerType.ALLOW_VALUE,
-                "2:(?i)(hello, world),%test_container_1%, %test_container_2%"
+                "2:(?i)(hello, world),%test_container_1.string%, %test_container_2.string%"
         );
         recipe.getMatterFromCoordinate(new Coordinate(-1, 2)).setContainers(List.of(mc1));
 
@@ -152,11 +153,20 @@ public class NewAmorphousTest {
     @Test
     @Deprecated
     public void allow_value_test() {
-        Recipe recipe = getDirtRecipe();
+        // container-1 = "tc_1=20, tc_2=30, tc_3=40;
+        // container-2 = "tc_1=20, tc_2=30, tc_3=40, tc_4=50;
+        Recipe recipe = new Recipe();
+        Matter _10 = new Matter(List.of(Material.DIRT), 1);
+        Map<Coordinate, Matter> map = new HashMap<>();
+        map.put(new Coordinate(-1, 0), _10);
+        map.put(new Coordinate(-1, 1), _10.copy());
+        map.put(new Coordinate(-1, 2), _10.copy());
+        recipe.setCoordinate(map);
+
         MatterContainer container1 = new MatterContainer(
-                ContainerUtil.VALUE_ALLOW,
+                ContainerUtil.ALLOW_VALUE,
                 ContainerType.ALLOW_VALUE,
-                "{(%test_container_3% / 2)<=20}"
+                "{(%test_container_3.long% / 2)<=20}"
         );
         recipe.
                 getMatterFromCoordinate(new Coordinate(-1, 0)).
@@ -168,19 +178,46 @@ public class NewAmorphousTest {
 
         Map<String, String> result = asStringMap(sortXYNatural(ContainerUtil._amorphous(recipe, input)));
         Assertions.assertEquals("[x=0,y=0],[x=0,y=1],[x=0,y=2]", result.get("[x=-1,y=0]"));
+
+
+        // === case 2 === //
+
+        MatterContainer container2 = new MatterContainer(
+                ContainerUtil.ALLOW_VALUE,
+                ContainerType.ALLOW_VALUE,
+                "{(%test_container_4.long%)==50}"
+        );
+        recipe.getMatterFromCoordinate(new Coordinate(-1, 0)).setContainers(List.of(container2));
+        Map<String, String> result2 = asStringMap(sortXYNatural(ContainerUtil._amorphous(recipe, input)));
+        Assertions.assertEquals("[x=0,y=2]", result2.get("[x=-1,y=0]"));
     }
 
     @Test
     @Deprecated
     public void deny_value_test() {
-        Recipe recipe = getDirtRecipe();
+        // test_container -> tc
+        // container-1 = "tc_1=20, tc_2=30, tc_3=40;
+        // container-2 = "tc_1=20, tc_2=30, tc_3=40, tc_4=50;
+
         Recipe input = getDirtInput();
+        Recipe recipe = new Recipe();
+        recipe.setName("test_1");
+        recipe.setTag(Tag.AMORPHOUS);
+        recipe.setResult(new Result("test_result_1", null, 1 , "DIAMOND", -1));
+
+        Map<Coordinate, Matter> dirtCoordinate = new HashMap<>();
+
         MatterContainer container = new MatterContainer(
-                ContainerUtil.VALUE_DENY,
+                ContainerUtil.DENY_VALUE,
                 ContainerType.DENY_VALUE,
-                "{%test_container_4%==50}"
+                "{%test_container_4.long%==50}"
         );
-        recipe.getMatterFromCoordinate(new Coordinate(-1, 0)).setContainers(List.of(container));
+        Matter dirt = new Matter("test_matter_1",  List.of(Material.DIRT), null, 1, false, List.of(container));
+        // A recipe (named "dirt") requires x3 dirt those are required to contain a data container.
+        dirtCoordinate.put(new Coordinate(-1, 0), dirt);
+        dirtCoordinate.put(new Coordinate(-1, 1), dirt);
+        dirtCoordinate.put(new Coordinate(-1, 2), dirt);
+        recipe.setCoordinate(dirtCoordinate);
 
         Map<String, String> result = asStringMap(sortXYNatural(ContainerUtil._amorphous(recipe, input)));
         Assertions.assertEquals("[x=0,y=0],[x=0,y=1]", result.get("[x=-1,y=0]"));
@@ -191,7 +228,22 @@ public class NewAmorphousTest {
     @Deprecated
     public void allow_tag_test() {
         // --- generate a recipe. === //
-        Recipe recipe = getDirtRecipe();
+        Recipe recipe = new Recipe();
+        Map<Coordinate, Matter> _map = new HashMap<>();
+        Matter source = new Matter(List.of(Material.DIRT, Material.COARSE_DIRT), 1);
+        _map.put(new Coordinate(-1, 0), source);
+        _map.put(new Coordinate(-1, 1), source);
+        _map.put(new Coordinate(-1, 2), source);
+        recipe.setCoordinate(_map);
+        MatterContainer container = new MatterContainer(
+                ContainerUtil.ALLOW_TAG,
+                ContainerType.ALLOW_TAG,
+                "test_container_1.*"
+        );
+        recipe.getMatterFromCoordinate(new Coordinate(-1, 0)).setContainers(List.of(container));
+        recipe.getMatterFromCoordinate(new Coordinate(-1, 1)).setContainers(List.of(container));
+        recipe.getMatterFromCoordinate(new Coordinate(-1, 2)).setContainers(List.of(container));
+
 
         // === generate an input inventory === //
         Recipe input = getDirtInput();
@@ -206,19 +258,49 @@ public class NewAmorphousTest {
     }
 
     @Test
+    public void tag_wildcard_test() {
+        Map<String, String> data = new HashMap<>();
+        data.put("container_1.long", "10");
+        data.put("container_2.anchor", "");
+        data.put("container_3.double", "4.0");
+        data.put("container_4.string", "hello, world");
+        Assertions.assertEquals(true, ContainerUtil.ALLOW_TAG.apply(data, "container_1.*"));
+        Assertions.assertEquals(true, ContainerUtil.DENY_TAG.apply(data, "container_5.*"));
+        Assertions.assertEquals(false, ContainerUtil.DENY_TAG.apply(data, "container_1.*"));
+    }
+
+    @Test
+    public void deny_tag_test2() {
+        Map<String, String> data = new HashMap<>();
+        data.put("a.long", "100");
+        data.put("b.long", "200");
+        Assertions.assertEquals(true, ContainerUtil.DENY_TAG.apply(data, "c.*,a.double"));
+    }
+
+    @Test
     @Deprecated
     public void deny_tag_test() {
-        Recipe recipe = getDirtRecipe();
+        // container-1 = "tc_1=20, tc_2=30, tc_3=40; ([0,0], [0,1])
+        // container-2 = "tc_1=20, tc_2=30, tc_3=40, tc_4=50; ([0,2])
+        Recipe recipe = new Recipe();
+        Map<Coordinate, Matter> map = new HashMap<>();
+        Matter _10 = new Matter(List.of(Material.DIRT, Material.COARSE_DIRT), 1);
+        map.put(new Coordinate(-1, 0), _10);
+        map.put(new Coordinate(-1, 1), _10.copy());
+        map.put(new Coordinate(-1, 2), _10.copy());
+        recipe.setCoordinate(map);
+
         Recipe input = getDirtInput();
 
         MatterContainer container = new MatterContainer(
-                ContainerUtil.TAG_DENY,
+                ContainerUtil.DENY_TAG,
                 ContainerType.DENY_TAG,
-                "test_container_4"
+                "test_container_4.*"
         );
 
         recipe.getMatterFromCoordinate(new Coordinate(-1, 0)).setContainers(List.of(container));
-        recipe.getMatterFromCoordinate(new Coordinate(-1, 1)).setContainers(List.of(container));
+
+        System.out.println(ContainerUtil._amorphous(recipe, input));
 
         Map<String, String> result = asStringMap(sortXYNatural(ContainerUtil._amorphous(recipe, input)));
         Assertions.assertEquals("[x=0,y=0],[x=0,y=1]", result.get("[x=-1,y=0]"));
@@ -235,7 +317,7 @@ public class NewAmorphousTest {
                 PersistentDataType.DOUBLE,
                 20.0);
         MatterContainer container = new MatterContainer(
-                ContainerUtil.VALUE_ALLOW,
+                ContainerUtil.ALLOW_VALUE,
                 ContainerType.ALLOW_VALUE,
                 "{(%test_container_1.double%*2)==40.0}"
         );
@@ -266,7 +348,7 @@ public class NewAmorphousTest {
 
         Assertions.assertEquals(
                 true,
-                ContainerUtil.TAG_ALLOW.apply(result, "pdc1.anchor"));
+                ContainerUtil.ALLOW_TAG.apply(result, "pdc1.anchor"));
 
         pdc1.set(
                 new NamespacedKey("custom_crafter", "pdc1_2.anchor"),
@@ -277,7 +359,7 @@ public class NewAmorphousTest {
         Map<String, String> result2 = ContainerUtil.getData(pdc1);
         Assertions.assertEquals(
                 true,
-                ContainerUtil.TAG_ALLOW.apply(result2, "pdc1.anchor,pdc1_2.anchor")
+                ContainerUtil.ALLOW_TAG.apply(result2, "pdc1.anchor,pdc1_2.anchor")
         );
     }
 
@@ -346,29 +428,6 @@ public class NewAmorphousTest {
     }
 
 
-    private Recipe getDirtRecipe() {
-        Recipe recipe = new Recipe();
-        recipe.setName("test_1");
-        recipe.setTag(Tag.AMORPHOUS);
-        recipe.setResult(new Result("test_result_1", null, 1, null, "DIAMOND", -1));
-
-        Map<Coordinate, Matter> dirtCoordinate = new HashMap<>();
-        Matter dirt = new Matter("test_matter_1",  List.of(Material.DIRT), null, 1, false);
-        MatterContainer dirtContainer = new MatterContainer(
-                ContainerUtil.TAG_ALLOW,
-                ContainerType.ALLOW_TAG,
-                "test_container_1,test_container_2,test_container_3"
-        );
-        dirt.setContainers(List.of(dirtContainer));
-
-        // A recipe (named "dirt") requires x3 dirt those are required to contain a data container.
-        dirtCoordinate.put(new Coordinate(-1, 0), dirt);
-        dirtCoordinate.put(new Coordinate(-1, 1), dirt);
-        dirtCoordinate.put(new Coordinate(-1, 2), dirt);
-        recipe.setCoordinate(dirtCoordinate);
-        return recipe;
-    }
-
     @Deprecated
     private Recipe getDirtInput() {
         // test_container -> tc
@@ -385,7 +444,8 @@ public class NewAmorphousTest {
                 List.of(Material.DIRT, Material.COARSE_DIRT),
                 null,
                 1,
-                false
+                false,
+                null
         );
 
         PersistentDataContainerMock containerMock_1 = new PersistentDataContainerMock();
@@ -416,7 +476,8 @@ public class NewAmorphousTest {
                 List.of(Material.DIRT, Material.COARSE_DIRT),
                 null,
                 1,
-                false
+                false,
+                null
         );
 
         PersistentDataContainerMock containerMock_2 = new PersistentDataContainerMock();

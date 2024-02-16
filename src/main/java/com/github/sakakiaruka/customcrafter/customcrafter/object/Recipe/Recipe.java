@@ -21,19 +21,15 @@ public class Recipe {
     private RecipePermission permission;
     private Result result;
     private List<RecipeContainer> containers;
-//    private Map<NamespacedKey, List<RecipeDataContainer>> container;
-//    private Map<Matter, List<String>> usingContainerValuesMetadata;
 
-    public Recipe(String name,String tag,Map<Coordinate,Matter> coordinate,Map<Material,ItemStack> returnItems,Result result, RecipePermission permission){
+    public Recipe(String name,String tag,Map<Coordinate,Matter> coordinate,Map<Material,ItemStack> returnItems,Result result, RecipePermission permission, List<RecipeContainer> containers){
         this.name = name;
         this.tag = Tag.valueOf(tag);
         this.coordinate = coordinate;
         this.returnItems = returnItems;
         this.result = result;
         this.permission = permission;
-        // TODO: write here List<RecipeContainer>
-//        this.container = container;
-//        this.usingContainerValuesMetadata = usingContainerValuesMetadata;
+        this.containers = containers;
     }
 
     public Recipe(){ //only used for temporary (mainly real) -> tag is "Normal"
@@ -43,8 +39,6 @@ public class Recipe {
         this.returnItems = null;
         this.result = null;
         this.permission = null;
-//        this.container = new HashMap<>();
-//        this.usingContainerValuesMetadata = new HashMap<>();
     }
 
     public void addCoordinate(int x,int y,Matter matter){

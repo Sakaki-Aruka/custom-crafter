@@ -20,12 +20,13 @@ public class Matter {
     private List<MatterContainer> containers;
     private PersistentDataContainer pdc;
 
-    public Matter(String name,List<Material> candidate,List<EnchantWrap> wrap,int amount,boolean mass){
+    public Matter(String name,List<Material> candidate,List<EnchantWrap> wrap,int amount,boolean mass, List<MatterContainer> containers){
         this.name = name;
         this.candidate = candidate;
         this.wrap = wrap;
         this.amount = amount;
         this.mass = mass;
+        this.containers = containers;
     }
 
     public Matter(List<Material> materials,int amount){
@@ -51,11 +52,12 @@ public class Matter {
         this.amount = matter.getAmount();
         this.mass = matter.isMass();
         this.containers = matter.getContainers();
+        this.pdc = matter.getPDC();
     }
 
     public Matter(ItemStack item){
         this.name = "";
-        this.candidate = Arrays.asList(item.getType());
+        this.candidate = List.of(item.getType());
         if(item.hasItemMeta() && item.getItemMeta().hasEnchants() && !candidate.get(0).equals(Material.ENCHANTED_BOOK)){
             // an enchanted item (not an Enchanted_book)
             List<EnchantWrap> list = new ArrayList<>();
@@ -81,6 +83,7 @@ public class Matter {
         }
         this.mass = false;
         this.amount = item.getAmount();
+        this.pdc = item.getItemMeta().getPersistentDataContainer();
     }
 
     public String getName() {
@@ -113,9 +116,6 @@ public class Matter {
 
     public boolean hasWrap(){
         return !((wrap == null) || wrap.isEmpty());
-//
-//        if(wrap == null) return false;
-//        return !wrap.isEmpty();
     }
 
     public void addWrap(EnchantWrap in){
@@ -173,7 +173,9 @@ public class Matter {
         int amount = this.amount;
         List<EnchantWrap> wrap = hasWrap() ? this.wrap : null;
         boolean mass = this.mass;
-        Matter matter = new Matter(name,candidate,wrap,amount,mass);
+        List<MatterContainer> containers = this.containers;
+        Matter matter = new Matter(name, candidate, wrap, amount, mass, containers);
+        matter.setPDC(this.pdc);
         return matter;
     }
 
@@ -183,23 +185,18 @@ public class Matter {
         int amount = 1;
         List<EnchantWrap> wrap = hasWrap() ? this.wrap : null;
         boolean mass = this.mass;
-        Matter matter = new Matter(name,candidate,wrap,amount,mass);
-        return matter;
+        List<MatterContainer> containers = this.containers;
+        return new Matter(name, candidate, wrap, amount, mass, containers);
     }
 
-    public boolean sameCandidate(Matter matter) {
-        if(this.candidate.size() != matter.candidate.size()) return false;
-        return this.candidate.containsAll(matter.candidate);
-    }
+
 
     public String info(){
-        StringBuilder builder = new StringBuilder();
-        builder.append(String.format("name : %s"+ LINE_SEPARATOR,name != null && !name.isEmpty() ? candidate.get(0).name() : name));
-        builder.append(String.format("candidate : %s"+ LINE_SEPARATOR,candidate.toString()));
-        builder.append(String.format("wrap : %s",hasWrap() ? getAllWrapInfo() : "null"+ LINE_SEPARATOR));
-        builder.append(String.format("amount : %d"+ LINE_SEPARATOR,amount));
-        builder.append(String.format("mass : %b"+ LINE_SEPARATOR,isMass()));
-        return builder.toString();
+        return String.format("name : %s" + LINE_SEPARATOR, name != null && !name.isEmpty() ? candidate.get(0).name() : name) +
+                String.format("candidate : %s" + LINE_SEPARATOR, candidate.toString()) +
+                String.format("wrap : %s", hasWrap() ? getAllWrapInfo() : "null" + LINE_SEPARATOR) +
+                String.format("amount : %d" + LINE_SEPARATOR, amount) +
+                String.format("mass : %b" + LINE_SEPARATOR, isMass());
     }
 
 
@@ -249,8 +246,7 @@ public class Matter {
         Matter matter =(Matter) obj;
         if (!this.candidate.equals(matter.candidate)) return false;
         if (this.mass != matter.mass) return false;
-        if (this.amount != matter.amount) return false;
-        return true;
+        return this.amount == matter.amount;
     }
 
     @Override

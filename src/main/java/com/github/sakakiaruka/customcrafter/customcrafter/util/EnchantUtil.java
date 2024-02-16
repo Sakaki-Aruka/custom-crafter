@@ -5,7 +5,6 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantW
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordinate;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.search.Search;
-import org.bukkit.enchantments.Enchantment;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,22 +13,6 @@ import java.util.Map;
 
 
 public class EnchantUtil {
-    public static List<String> strValuesNoInput(){
-        List<String> list = new ArrayList<>();
-        for(EnchantStrict es : EnchantStrict.values()){
-            if(es.equals(EnchantStrict.INPUT)) continue;
-            list.add(es.toStr());
-        }
-        return list;
-    }
-
-    public static List<String> getEnchantmentStrList(){
-        List<String> list = new ArrayList<>();
-        for(Enchantment enchant : Enchantment.values()){
-            list.add(enchant.getName().toUpperCase());
-        }
-        return list;
-    }
 
 //====
     public static Map<Coordinate, List<Coordinate>> amorphous(Recipe recipe, Recipe input) {

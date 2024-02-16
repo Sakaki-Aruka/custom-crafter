@@ -30,6 +30,7 @@ import org.bukkit.potion.PotionEffectType;
 
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.function.BiPredicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -113,33 +114,51 @@ public class ContainerUtil {
         return false;
     };
 
-    public static final BiFunction<Map<String, String>, String, Boolean> VALUE_ALLOW = (data, predicate) -> {
+    public static final BiFunction<Map<String, String>, String, Boolean> ALLOW_VALUE = (data, predicate) -> {
         // type: (?i)(Allow)Value, predicate: ~~~~
         return Expression.eval(setEvalValue(setPlaceholderValue(data, predicate))).asBoolean();
     };
 
-    public static final BiFunction<Map<String, String>, String, Boolean> VALUE_DENY = (data, predicate) -> {
+    public static final BiFunction<Map<String, String>, String, Boolean> DENY_VALUE = (data, predicate) -> {
         // type: (?i)(Deny)Value, predicate: ~~~~
         return !Expression.eval(setEvalValue(setPlaceholderValue(data, predicate))).asBoolean();
     };
 
-    private static boolean getTagResult(Map<String, String> data, String predicate, boolean isAllow) {
-        for (String key : predicate.replace(" ", "").split(",")) {
-            if (!(data.containsKey(key) == isAllow)) return false;
-        }
-        return true;
+    private static boolean anyContained(Map<String, String> data, String key) {
+        int count = 0;
+        if (data.containsKey(key + "long")) count++;
+        if (data.containsKey(key + "double")) count++;
+        if (data.containsKey(key + "string")) count++;
+        if (data.containsKey(key + "anchor")) count++;
+        return count != 0;
     }
 
-    public static final BiFunction<Map<String, String>, String, Boolean> TAG_ALLOW = (data, predicate) -> {
+    public static final BiFunction<Map<String, String>, String, Boolean> ALLOW_TAG = (data, predicate) -> {
         // type: (?i)(Allow)Tag, predicate: ~~~,~~~,~~~
         // divided ",".
-        return getTagResult(data, predicate, true);
+        int count = 0;
+        String[] sources = predicate.replace(" ", "").split(",");
+        for (String key : sources) {
+            if (key.endsWith("*")) {
+                String removed = key.substring(0, key.length() - 1);
+                count += anyContained(data, removed) ? 1 : 0;
+            } else if (data.containsKey(key)) count++;
+        }
+        return count == sources.length;
     };
 
-    public static final BiFunction<Map<String, String>, String, Boolean> TAG_DENY = (data, predicate) -> {
+    public static final BiFunction<Map<String, String>, String, Boolean> DENY_TAG = (data, predicate) -> {
         // type: (?i)(Deny)Tag, predicate: ~~~,~~~,~~~
         // divided ",".
-        return getTagResult(data, predicate, false);
+        int count = 0;
+        String[] sources = predicate.replace(" ", "").split(",");
+        for (String key : sources) {
+            if (key.endsWith("*")) {
+                String removed = key.substring(0, key.length() - 1);
+                count += anyContained(data, removed) ? 0 : 1;
+            } else if (!data.containsKey(key)) count++;
+        }
+        return count == sources.length;
     };
 
     // ====================================================================
@@ -623,6 +642,9 @@ public class ContainerUtil {
         //e.g. test_container_1.double
         // in pdc: variableName does not contains "."
         // in map: variableName contains "."
+        // the types overview "long, double, string, anchor, *"
+        // -> anchor is only used to "tag".
+        // -> "*" is a wildcard. (it means all types.)
         Map<String, String> result = new HashMap<>();
         for (NamespacedKey key : container.getKeys()) {
             String name = key.getKey();

@@ -62,14 +62,6 @@ public class PotionUtil {
         return false;
     }
 
-    public static List<String> getPotionEffectTypeStringList(){
-        List<String> list = new ArrayList<>();
-        for(PotionEffectType e : PotionEffectType.values()){
-            list.add(e.getName());
-        }
-        return list;
-    }
-
     public static List<String> getPotionStrictStringList(){
         List<String> list = new ArrayList<>();
         for(PotionStrict strict : PotionStrict.values()){

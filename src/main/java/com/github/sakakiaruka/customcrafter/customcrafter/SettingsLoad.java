@@ -1,6 +1,9 @@
 package com.github.sakakiaruka.customcrafter.customcrafter;
 
 import com.github.sakakiaruka.customcrafter.customcrafter.command.Processor;
+import com.github.sakakiaruka.customcrafter.customcrafter.interfaces.TriConsumer;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Container.ContainerType;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Container.MatterContainer;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantStrict;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantWrap;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
@@ -8,11 +11,11 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.PotionStrict;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.Potions;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Permission.RecipePermission;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Container.RecipeContainer;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordinate;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
-import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.MetadataType;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.Result;
-import com.github.sakakiaruka.customcrafter.customcrafter.util.DataCheckerUtil;
+import com.github.sakakiaruka.customcrafter.customcrafter.util.ContainerUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.PotionUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil;
 import org.bukkit.Bukkit;
@@ -34,6 +37,7 @@ import java.time.Duration;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.*;
+import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -50,7 +54,7 @@ public class SettingsLoad {
     public static final int CRAFTING_TABLE_TOTAL_SIZE = 54;
     public static final int VANILLA_CRAFTING_SLOTS = 9;
     public static final int VANILLA_CRAFTING_SQUARE_SIZE = 3;
-    public static final String LINE_SEPARATOR = System.getProperty("line.separator");
+    public static final String LINE_SEPARATOR = System.lineSeparator();
     public static final String BAR = String.join("",Collections.nCopies(40,"="));
     public static final String SHORT_BAR = String.join("",Collections.nCopies(20,"="));
     public static final String UPPER_ARROW = "↑";
@@ -71,15 +75,6 @@ public class SettingsLoad {
     public static Map<String, Result> CUSTOM_RESULTS = new HashMap<>();
     public static Map<String, Matter> CUSTOM_MATTERS = new HashMap<>();
     public static Set<String> COMMAND_ARGS = new HashSet<>();
-
-    // === for runnable task === //
-    private List<String> downloadUri;
-    private List<String> failed = new ArrayList<>();
-
-    private int returnCode = -1;
-    private int times = 0;
-    private int threshold;
-    private int load_interval;
 
     // === for recipe load === //
     private static final String USING_CONTAINER_VALUES_METADATA_PATTERN = "^([0-9a-zA-Z_\\-]+) <--> (.+)$";
@@ -126,7 +121,6 @@ public class SettingsLoad {
     private void main(){
         RESULTS.clear();
         MATTERS.clear();
-        failed.clear();
 
         List<Path> resultPaths = new ArrayList<>();
         List<Path> matterPaths = new ArrayList<>();
@@ -203,14 +197,12 @@ public class SettingsLoad {
         for(Path path:paths){
             FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
 
-            new DataCheckerUtil().resultCheck(new StringBuilder(),config,path);
-
             String name = config.getString("name");
             int amount = config.getInt("amount");
             String nameOrRegex = config.getString("nameOrRegex");
             int matchPoint = config.getInt("matchPoint"); // default value is -1;
             Map<Enchantment,Integer> enchantInfo = null;
-            Map<MetadataType,List<String>> metadata = null;
+
             if(config.contains("enchant")){
                 enchantInfo = new HashMap<>();
                 for(String s:config.getStringList("enchant")){
@@ -226,24 +218,7 @@ public class SettingsLoad {
                 }
             }
 
-            if(config.contains("metadata")){
-                metadata = new HashMap<>();
-                for(String s:config.getStringList("metadata")){
-                    /*
-                    * 0,1
-                    * 0 : key (String | lore, displayName, enchantment (deprecated), itemFlag, customModelData, potionData, potionColor
-                    * 1 : value (Object | List<String>, String, Enchantment & int, boolean, int
-                     */
-                    Matcher matcher = Pattern.compile(RESULT_METADATA_COLLECT_PATTERN).matcher(s);
-                    if (!matcher.matches()) continue;
-                    MetadataType key = MetadataType.valueOf(matcher.group(1).toUpperCase());
-                    String value = matcher.group(2);
-                    if(!metadata.containsKey(key))metadata.put(key,new ArrayList<>());
-                    metadata.get(key).add(value);
-                }
-            }
-
-            Result result = new Result(name,enchantInfo,amount,metadata,nameOrRegex,matchPoint);
+            Result result = new Result(name,enchantInfo,amount,nameOrRegex,matchPoint);
             RESULTS.put(name,result);
             CUSTOM_RESULTS.put(name, result);
         }
@@ -272,8 +247,6 @@ public class SettingsLoad {
 
         Top : for(Path path:paths){
             FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
-
-            new DataCheckerUtil().matterCheck(new StringBuilder(),config,path);
 
             String name = config.getString("name");
             int amount = config.getInt("amount");
@@ -330,8 +303,8 @@ public class SettingsLoad {
 
             if(wrapList.isEmpty())wrapList = null;
 
-
-            Matter matter = new Matter(name,candidate,wrapList,amount,mass);
+            List<MatterContainer> containers = getMatterContainerList(config);
+            Matter matter = new Matter(name,candidate,wrapList,amount,mass, containers);
 
             //PotionData collect
             if(config.contains("potion") && config.contains("bottleTypeMatch")){
@@ -339,12 +312,48 @@ public class SettingsLoad {
                 if(potions != null) MATTERS.put(name,potions);
                 continue;
             }
-
-//            Map<Integer, ContainerWrapper> elements = ContainerUtil.mattersLoader(path);
-//            matter.setContainerWrappers(elements);
             MATTERS.put(name,matter);
             CUSTOM_MATTERS.put(name, matter);
         }
+    }
+
+    private List<MatterContainer> getMatterContainerList(FileConfiguration config) {
+        // - predicate: ((allow|deny)_(value|tag)|anchor)
+        //   formula: (.+)
+        //
+        List<MatterContainer> result = new ArrayList<>();
+        if (!config.contains("container")) return result;
+        for (Map<String, String> map : (List<Map<String, String>>) config.getList("container")) {
+            BiFunction<Map<String, String>, String, Boolean> predicate;
+            ContainerType type;
+            String p = map.get("predicate").toLowerCase();
+            if (!p.matches("(allow|deny)_(tag|value)")) continue;
+
+            switch (p) {
+                case "allow_value" -> {
+                    predicate = ContainerUtil.ALLOW_VALUE;
+                    type = ContainerType.ALLOW_VALUE;
+                }
+                case "deny_value" -> {
+                    predicate = ContainerUtil.DENY_VALUE;
+                    type = ContainerType.DENY_VALUE;
+                }
+                case "allow_tag" -> {
+                    predicate = ContainerUtil.ALLOW_TAG;
+                    type = ContainerType.ALLOW_TAG;
+                }
+                case "deny_tag" -> {
+                    predicate = ContainerUtil.DENY_TAG;
+                    type = ContainerType.DENY_VALUE;
+                }
+                default -> {
+                    continue;
+                }
+            }
+
+            result.add(new MatterContainer(predicate, type, map.get("formula")));
+        }
+        return result;
     }
 
     private void addNull(){
@@ -399,8 +408,6 @@ public class SettingsLoad {
     private void getRecipe(List<Path> paths){
         for(Path path:paths){
             FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
-
-            new DataCheckerUtil().recipeCheck(new StringBuilder(),config,path);
 
             String name = config.getString("name");
             String tag = config.getString("tag").toUpperCase();
@@ -511,41 +518,7 @@ public class SettingsLoad {
                 permission = RECIPE_PERMISSION_MAP.getOrDefault(key, null);
             }
 
-//            Map<NamespacedKey, List<RecipeDataContainer>> map = new HashMap<>();
-//            if (config.contains("container_modify")) {
-//                int counter = 0;
-//
-//                while (true) {
-//                    String address = "container_modify."+counter+".";
-//                    if (!config.contains(address)) break;
-//                    NamespacedKey key = new NamespacedKey(getInstance(), config.getString(address+"key"));
-//                    RecipeDataContainerModifyType modifyType = RecipeDataContainerModifyType.valueOf(config.getString(address+"modify_type").toUpperCase());
-//                    PersistentDataType type = ContainerUtil.getDataType(config.getString(address+"type").toUpperCase());
-//                    String term = config.getString(address+"term");
-//                    String action = Objects.requireNonNullElse(config.getString(address + "action"), "");
-//                    boolean end = config.getBoolean(address+"return");
-//                    counter++;
-//                    RecipeDataContainer data = new RecipeDataContainer(type, term, action, end, modifyType);
-//
-//                    if (!map.containsKey(key)) map.put(key, new ArrayList<>());
-//                    map.get(key).add(data);
-//                }
-//            }
-
-//            Map<Matter, List<String>> usingContainerValuesMetadata = new HashMap<>();
-//            if (config.contains("using_container_values_metadata")) {
-//                for (String s : config.getStringList("using_container_values_metadata")) {
-//                    Matcher matcher = Pattern.compile(USING_CONTAINER_VALUES_METADATA_PATTERN).matcher(s);
-//                    if (!matcher.matches()) continue;
-//                    String matterName = matcher.group(1);
-//                    if (!MATTERS.containsKey(matterName) && !ALL_MATERIALS.contains(matterName.toUpperCase())) continue;
-//                    Matter matter = MATTERS.get(matterName);
-//                    String order = matcher.group(2);
-//                    if (!usingContainerValuesMetadata.containsKey(matter)) usingContainerValuesMetadata.put(matter, new ArrayList<>());
-//                    usingContainerValuesMetadata.get(matter).add(order);
-//
-//                }
-//            }
+            List<RecipeContainer> containers = getRecipeContainerList(config);
 
             if (config.contains("lock")) {
                 String lockTimeRow = config.getString("lock");
@@ -601,7 +574,7 @@ public class SettingsLoad {
                     };
                     runnable.runTaskLater(CustomCrafter.getInstance(), delayTicks);
                     int taskID = runnable.getTaskId();
-                    REGISTERED_RECIPES.put(name, new Recipe(name, tag, coordinates, returns, result, permission));
+                    REGISTERED_RECIPES.put(name, new Recipe(name, tag, coordinates, returns, result, permission, containers));
                     UNLOCK_TASK_ID_WITH_RECIPE_NAME.put(taskID, name);
 
                     Bukkit.getLogger().info(String.format("[CustomCrafter] Named Recipe=%s will be unlocked in %s", name, ZonedDateTime.parse(unlockTimeRow).toString()));
@@ -609,7 +582,7 @@ public class SettingsLoad {
                 }
             }
 
-            Recipe recipe = new Recipe(name, tag, coordinates, returns, result, permission);
+            Recipe recipe = new Recipe(name, tag, coordinates, returns, result, permission, containers);
             RECIPE_LIST.add(recipe);
             NAMED_RECIPES_MAP.put(name,recipe);
             if (!ITEM_PLACED_SLOTS_RECIPE_MAP.containsKey(recipe.getContentsNoAir().size())) {
@@ -617,6 +590,62 @@ public class SettingsLoad {
             }
             ITEM_PLACED_SLOTS_RECIPE_MAP.get(recipe.getContentsNoAir().size()).add(recipe);
         }
+    }
+
+    private List<RecipeContainer> getRecipeContainerList(FileConfiguration config) {
+        if (!config.contains("container")) return List.of();
+        List<RecipeContainer> result = new ArrayList<>();
+        // -
+        //    predicate: (none|string|value)
+        //    (formula: (.+))
+        //    type: (lore|enchant|potion_color_rgb|potion_color_name|texture_id|...)
+        //    value: (.+)
+        for (Map<String, String> map : (List<Map<String, String>>) config.getList("container")) {
+            String type = map.get("predicate").toLowerCase();
+            BiFunction<Map<String, String>, String, Boolean> predicate;
+            switch (type) {
+                case "none" -> predicate = ContainerUtil.NONE;
+                case "string" -> predicate = ContainerUtil.STRING_MATCH;
+                case "value" -> predicate = ContainerUtil.ALLOW_VALUE;
+                default -> {
+                    continue;
+                }
+            }
+
+            String formula = !type.equals("none") ? map.get("formula") : "";
+
+            TriConsumer<Map<String, String>, ItemStack, String> consumer;
+            String cType = map.get("type").toLowerCase();
+            switch (cType) {
+                case "lore" -> consumer = ContainerUtil.LORE;
+                case "enchant" -> consumer = ContainerUtil.ENCHANT;
+                case "potion_color_rgb" -> consumer = ContainerUtil.POTION_COLOR_RGB;
+                case "potion_color_name" -> consumer = ContainerUtil.POTION_COLOR_NAME;
+                case "texture_id" -> consumer = ContainerUtil.TEXTURE_ID;
+                case "tool_durability_percentage" -> consumer = ContainerUtil.TOOL_DURABILITY_PERCENTAGE;
+                case "tool_durability_real" -> consumer = ContainerUtil.TOOL_DURABILITY_REAL;
+                case "item_name" -> consumer = ContainerUtil.ITEM_NAME;
+                case "attribute_modifier" -> consumer = ContainerUtil.ATTRIBUTE_MODIFIER;
+                case "attribute_modifier_equipment" -> consumer = ContainerUtil.ATTRIBUTE_MODIFIER_EQUIPMENT;
+                case "item_flag" -> consumer = ContainerUtil.ITEM_FLAG;
+                case "unbreakable" -> consumer = ContainerUtil.UNBREAKABLE;
+                case "potion_effect" -> consumer = ContainerUtil.POTION_EFFECT;
+                case "leather_armor_color" -> consumer = ContainerUtil.LEATHER_ARMOR_COLOR;
+                case "book" -> consumer = ContainerUtil.BOOK;
+                case "enchant_modify" -> consumer = ContainerUtil.ENCHANT_MODIFY;
+                case "lore_modify" -> consumer = ContainerUtil.LORE_MODIFY;
+                case "attribute_modifier_modify" -> consumer = ContainerUtil.ATTRIBUTE_MODIFIER_MODIFY;
+                case "result_reload" -> consumer = ContainerUtil.RESULT_VALUE_RELOAD;
+                case "container" -> consumer = ContainerUtil.CONTAINER;
+                default -> {
+                    continue;
+                }
+            }
+
+            String actionFormula = map.get("value");
+            result.add(new RecipeContainer(predicate, consumer, formula, actionFormula));
+        }
+        return result;
     }
 
     private Duration getDuration(String dateRow, boolean delete) {

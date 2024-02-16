@@ -192,8 +192,6 @@ public class Search {
             // result has defined material
             Material m = Material.valueOf(recipe.getResult().getNameOrRegex().toUpperCase());
             item = new ItemStack(m, amount);
-            //recipe.getResult().setMetaData(item);
-            //setMetaData(item,recipe.getResult()); //set result itemStack's metadata
         } else if (recipe.getResult().getNameOrRegex().matches(PASS_THROUGH_PATTERN)) {
             // pass through mode
             // nameOrRegex: pass -> material name (there are only one in the inventory.)
@@ -222,8 +220,6 @@ public class Search {
 
             item = items.get(0);
 
-            //recipe.getResult().setMetaData(item);
-
         } else {
             // not contains -> A result has written by regex pattern.
             List<String> list = Arrays.asList(recipe.getResult().getNameOrRegex().split("@"));
@@ -246,8 +242,6 @@ public class Search {
 
             Material material = Material.valueOf(materials.get(0).toUpperCase());
             item = new ItemStack(material,amount);
-            //recipe.getResult().setMetaData(item);
-            //setMetaData(item,recipe.getResult());
         }
 
         if(item == null)return;

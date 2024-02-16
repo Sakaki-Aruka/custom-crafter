@@ -38,11 +38,6 @@ import java.util.regex.Pattern;
 import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.*;
 
 public class InventoryUtil {
-
-    private static final String LEATHER_ARMOR_COLOR_RGB_PATTERN = "^type:(?i)(RGB)/value:R->(\\d{1,3}),G->(\\d{1,3}),B->(\\d{1,3})$";
-    private static final String LEATHER_ARMOR_COLOR_NAME_PATTERN = "^type:(?i)(NAME)/value:([\\w_]+)$";
-    private static final String LEATHER_ARMOR_COLOR_RANDOM_PATTERN = "^type:(?i)(RANDOM)$";
-
     public static List<Integer> getTableSlots(int size) {
         List<Integer> list = new ArrayList<>();
         for (int i = 0; i < size; i++) {
