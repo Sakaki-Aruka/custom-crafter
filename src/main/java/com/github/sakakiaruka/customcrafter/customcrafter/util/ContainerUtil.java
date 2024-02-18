@@ -9,6 +9,8 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordinate;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.search.Search;
+import net.kyori.adventure.text.Component;
+import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -28,9 +30,16 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Random;
+import java.util.UUID;
 import java.util.function.BiFunction;
-import java.util.function.BiPredicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -163,10 +172,9 @@ public class ContainerUtil {
 
     // ====================================================================
 
-    private static String getContent(Map<String, String> data, String key) {
-        return setEvalValue(setPlaceholderValue(data, data.get(key)));
+    private static String getContent(Map<String, String> data, String formula) {
+        return setEvalValue(setPlaceholderValue(data, formula));
     }
-
 
     public static String setPlaceholderValue(Map<String, String> data, String formula) {
         // debug (in release, this method must be private)
@@ -248,34 +256,46 @@ public class ContainerUtil {
         return true;
     }
 
+    private static void sendIllegalTemplateWarn(String type, String source, String pattern) {
+        Bukkit.getLogger().warning(String.format("===%s[Custom Crafter] Illegal %s pattern. (%s)", SettingsLoad.LINE_SEPARATOR, type, source));
+        Bukkit.getLogger().warning(String.format("[Custom Crafter] The source pattern is %s.%s===", pattern, SettingsLoad.LINE_SEPARATOR));
+    }
+
+    private static void sendNoSuchTemplateWarn(String type, String source) {
+        Bukkit.getLogger().warning(String.format("===%s[Custom Crafter] No such %s. (%s)%s===", SettingsLoad.LINE_SEPARATOR, type, source, SettingsLoad.LINE_SEPARATOR));
+    }
+
     public static final TriConsumer<Map<String, String>, ItemStack, String> LORE = (data, item, formula) -> {
         // type: lore, value: ~~~
         // formula -> ~~~
         ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
         if (formula == null) {
-            meta.setLore(null);
+            meta.lore(null);
             item.setItemMeta(meta);
             return;
         }
-        List<String> lore = new ArrayList<>();
-        if (meta.getLore() != null) lore.addAll(meta.getLore());
-        lore.add(getContent(data, formula));
-        meta.setLore(lore);
+        List<Component> lore = new ArrayList<>();
+        if (meta.lore() != null) lore.addAll(meta.lore());
+        lore.add(Component.text(getContent(data, formula)));
+        meta.lore(lore);
         item.setItemMeta(meta);
     };
 
     public static final TriConsumer<Map<String, String>, ItemStack, String> ENCHANT = (data, item, formula) -> {
         // type: enchant, value: enchant=~~~,level=~~~
-        // data.get("%ENCHANT%") -> enchantment name
-        // data.get("%LEVEL%") -> enchantment level
-        // formula -> enchant: ~~~, level: ~~~
         ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
-        Matcher matcher = Pattern.compile("enchant=(.+),level=(.+)").matcher(formula);
-        if (!matcher.matches()) return;
-        String enchantName = getContent(data, matcher.group(1));
-        Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(enchantName));
-        if (enchantment == null) return;
-        int level = (int) Double.parseDouble(getContent(data, matcher.group(2)));
+        formula = getContent(data, formula);
+        Matcher matcher = Pattern.compile("enchant=([a-zA-Z_]+),level=([0-9]+)").matcher(formula);
+        if (!matcher.matches()) {
+            sendIllegalTemplateWarn("enchant", formula, "enchant=([a-zA-Z_]+),level=([0-9]+)");
+            return;
+        }
+        Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(matcher.group(1).toLowerCase()));
+        if (enchantment == null) {
+            sendNoSuchTemplateWarn("enchant", matcher.group(1));
+            return;
+        }
+        int level = (int) Double.parseDouble(matcher.group(2));
         meta.addEnchant(enchantment, level, true);
         item.setItemMeta(meta);
     };
@@ -283,14 +303,21 @@ public class ContainerUtil {
     public static final TriConsumer<Map<String, String>, ItemStack, String> POTION_COLOR_RGB = (data, item, formula) -> {
         // type: potion_color, value: r=100,g=100,b=100
         // %RED%, %GREEN%, %BLUE%
+        formula = getContent(data, formula);
         ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
         PotionMeta potionMeta = (PotionMeta) meta;
-        Matcher matcher = Pattern.compile("red=(.+),green=(.+),blue=(.+)").matcher(formula);
-        if (!matcher.matches()) return;
-        int red = (int) Double.parseDouble(getContent(data, matcher.group(1)));
-        int green = (int) Double.parseDouble(getContent(data, matcher.group(2)));
-        int blue = (int) Double.parseDouble(getContent(data, matcher.group(3)));
-        if (!inRGBRange(red, green, blue)) return;
+        Matcher matcher = Pattern.compile("red=([0-9]+),green=([0-9]+),blue=([0-9]+)").matcher(formula);
+        if (!matcher.matches()) {
+            sendIllegalTemplateWarn("potion color rgb", formula, "red=([0-9]+),green=([0-9]+),blue=([0-9]+)");
+            return;
+        }
+        int red = (int) Double.parseDouble(matcher.group(1));
+        int green = (int) Double.parseDouble(matcher.group(2));
+        int blue = (int) Double.parseDouble(matcher.group(3));
+        if (!inRGBRange(red, green, blue)) {
+            Bukkit.getLogger().warning("[Custom Crafter] Illegal rgb element. (Out of 0 ~ 255)");
+            return;
+        }
         Color color = Color.fromRGB(red, green, blue);
         potionMeta.setColor(color);
         item.setItemMeta(meta);
@@ -300,10 +327,11 @@ public class ContainerUtil {
         // type: potion_color, value: white
         // %COLOR%
         ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
-        Matcher matcher = Pattern.compile("color=(.+)").matcher(formula);
-        if (!matcher.matches()) return;
-        Color color = InventoryUtil.getColor(getContent(data, matcher.group(1).toUpperCase()));
-        if (color == null) return;
+        Color color = InventoryUtil.getColor(getContent(data, formula.toUpperCase()));
+        if (color == null) {
+            sendNoSuchTemplateWarn("color name", formula);
+            return;
+        }
         ((PotionMeta) meta).setColor(color);
         item.setItemMeta(meta);
     };
@@ -311,10 +339,14 @@ public class ContainerUtil {
     public static final TriConsumer<Map<String, String>, ItemStack, String> TEXTURE_ID = (data, item, formula) -> {
         // type: texture_id, value: 100
         // %TEXTURE_ID%
+        formula = getContent(data, formula);
         ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
-        Matcher matcher = Pattern.compile("texture_id=(.+)").matcher(formula);
-        if (!matcher.matches()) return;
-        int id = (int) Double.parseDouble(getContent(data, matcher.group(1)));
+        Matcher matcher = Pattern.compile("([0-9]+)").matcher(formula);
+        if (!matcher.matches()) {
+            sendIllegalTemplateWarn("texture id", formula, "([0-9]+)");
+            return;
+        }
+        int id = (int) Double.parseDouble(matcher.group(1));
         meta.setCustomModelData(id);
         item.setItemMeta(meta);
     };
@@ -322,24 +354,31 @@ public class ContainerUtil {
     public static final TriConsumer<Map<String, String>, ItemStack, String> TOOL_DURABILITY_PERCENTAGE = (data, item, formula) -> {
         // type: tool_durability_percentage, value: 100%
         // %DAMAGE%, %MATERIAL%
+        formula = getContent(data, formula);
         ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
-        Matcher matcher = Pattern.compile("durability_percentage=(.+)").matcher(formula);
-        if (!matcher.matches()) return;
+        Matcher matcher = Pattern.compile("([0-9]*)\\.?([0-9]+)").matcher(formula);
+        if (!matcher.matches()) {
+            sendIllegalTemplateWarn("tool durability percentage", formula, "([0-9]*)\\.?([0-9]+)");
+            return;
+        }
         Material material = item.getType();
         int lastOne = material.getMaxDurability() - 1;
-        double percentage = Double.parseDouble(getContent(data, matcher.group(1)));
+        double percentage = Double.parseDouble(formula);
         int damage = Math.max(lastOne, (int) (material.getMaxDurability() * percentage));
         ((Damageable) meta).setDamage(damage);
     };
 
     public static final TriConsumer<Map<String, String>, ItemStack, String> TOOL_DURABILITY_REAL = (data, item, formula) -> {
         // type: tool_durability_real_number, value: 100
-        // %DAMAGE%, %MATERIAL%
+        formula = getContent(data, formula);
         ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
-        Matcher matcher = Pattern.compile("durability_real=(.+)").matcher(formula);
-        if (!matcher.matches()) return;
+        Matcher matcher = Pattern.compile("([0-9]+)").matcher(formula);
+        if (!matcher.matches()) {
+            sendIllegalTemplateWarn("tool durability real", formula, "([0-9]+)");
+            return;
+        }
         Material material = item.getType();
-        int damage = (int) Double.parseDouble(getContent(data, matcher.group(1)));
+        int damage = (int) Double.parseDouble(formula);
         if (material.getMaxDurability() - damage <= 0) damage = material.getMaxDurability() - 1;
         ((Damageable) meta).setDamage(Math.min(damage, material.getMaxDurability()));
     };
@@ -347,36 +386,41 @@ public class ContainerUtil {
     public static final TriConsumer<Map<String, String>, ItemStack, String> ITEM_NAME = (data, item, formula) -> {
         // type: item_name, value: this is an item
         // "" (empty string)
-        // %NAME%
         ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
-        Matcher matcher = Pattern.compile("item_name=(.+)").matcher(formula);
-        if (!matcher.matches()) return;
-        meta.setDisplayName(getContent(data, matcher.group(1)));
+        meta.displayName(Component.text(getContent(data,formula)));
         item.setItemMeta(meta);
     };
 
     public static final TriConsumer<Map<String, String>, ItemStack, String> ATTRIBUTE_MODIFIER = (data, item, formula) -> {
         ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
-        Matcher matcher = Pattern.compile("attribute=(.+),op=(.+),value=(.+)").matcher(formula);
-        if (!matcher.matches()) return;
-        Attribute attribute = Attribute.valueOf(getContent(data, matcher.group(1)).toUpperCase());
-        AttributeModifier.Operation operation = AttributeModifier.Operation.valueOf(getContent(data, matcher.group(2)).toUpperCase());
-        double value = Double.parseDouble(getContent(data, matcher.group(3)));
+        formula = getContent(data, formula);
+        Matcher matcher = Pattern.compile("attribute=([a-zA-Z_]+),op=(?i)(add_number|add_scalar|multiply_scalar_1),value=(-?[0-9]*\\.?[0-9]+)").matcher(formula);
+        if (!matcher.matches()) {
+            sendIllegalTemplateWarn("attribute modifier", formula, "attribute=([a-zA-Z_]+),op=(?i)(add_number|add_scalar|multiply_scalar_1),value=(-?[0-9]*\\.?[0-9]+)");
+            return;
+        }
+        Attribute attribute = Attribute.valueOf(matcher.group(1).toLowerCase());
+        AttributeModifier.Operation operation = AttributeModifier.Operation.valueOf(matcher.group(2).toUpperCase());
+        double value = Double.parseDouble(matcher.group(3));
         AttributeModifier modifier = new AttributeModifier(UUID.randomUUID(), UUID.randomUUID().toString(), value, operation);
         meta.addAttributeModifier(attribute, modifier);
         item.setItemMeta(meta);
     };
 
     public static final TriConsumer<Map<String, String>, ItemStack, String> ATTRIBUTE_MODIFIER_EQUIPMENT = (data, item, formula) -> {
-        // type: attribute_modifier_slot, value: attribute=~~~, ope=~~~, value=~~~, slot=~~~
+        // type: attribute_modifier_equipment, value: attribute=~~~, ope=~~~, value=~~~, slot=~~~
         // %ATTRIBUTE%, %OPE_TYPE%, %VALUE%, %SLOT%
+        formula = getContent(data, formula);
         ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
-        Matcher matcher = Pattern.compile("attribute=(.+),op=(.+),value=(.+),slot=(.+)").matcher(formula);
-        if (!matcher.matches()) return;
-        Attribute attribute = Attribute.valueOf(getContent(data, matcher.group(1)).toUpperCase());
-        AttributeModifier.Operation operation = AttributeModifier.Operation.valueOf(getContent(data, matcher.group(2)).toUpperCase());
-        double value = Double.parseDouble(getContent(data, matcher.group(3)));
-        EquipmentSlot slot = EquipmentSlot.valueOf(getContent(data, matcher.group(4)).toUpperCase());
+        Matcher matcher = Pattern.compile("attribute=([a-zA-Z_]+),op=(?i)(add_number|add_scalar|multiply_scalar_1),value=(-?[0-9]*\\.?[0-9]+),slot=([a-zA-Z_]+)").matcher(formula);
+        if (!matcher.matches()) {
+            sendIllegalTemplateWarn("attribute modifier equipment", formula, "attribute=([a-zA-Z_]+),op=([a-zA-Z_]+),op=(?i)(add_number|add_scalar|multiply_scalar_1),value=(-?[0-9]*\\.?[0-9]+),slot=([a-zA-Z_]+)");
+            return;
+        }
+        Attribute attribute = Attribute.valueOf(matcher.group(1).toUpperCase());
+        AttributeModifier.Operation operation = AttributeModifier.Operation.valueOf(matcher.group(2).toUpperCase());
+        double value = Double.parseDouble(matcher.group(3));
+        EquipmentSlot slot = EquipmentSlot.valueOf(matcher.group(4).toUpperCase());
         AttributeModifier modifier = new AttributeModifier(UUID.randomUUID(), UUID.randomUUID().toString(), value, operation, slot);
         meta.addAttributeModifier(attribute, modifier);
         item.setItemMeta(meta);
@@ -385,16 +429,20 @@ public class ContainerUtil {
     public static final TriConsumer<Map<String, String>, ItemStack, String> ITEM_FLAG = (data, item, formula) -> {
         // type: item_flag, value: flag=~~~, action=(clear, remove, add)
         // %FLAG%, %ACTION%
+        formula = getContent(data, formula);
         ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
-        Matcher matcher = Pattern.compile("flag=(.+),action=(.+)").matcher(formula);
-        if (!matcher.matches()) return;
-        String type = getContent(data, matcher.group(2));
+        Matcher matcher = Pattern.compile("flag=([a-zA-Z_]+),action=(?i)(clear|remove|add)").matcher(formula);
+        if (!matcher.matches()) {
+            sendIllegalTemplateWarn("item flag", formula, "flag=([a-zA-Z_]+),action=(?i)(clear|remove|add)");
+            return;
+        }
+        String type = matcher.group(2);
         if (type.equalsIgnoreCase("clear")) {
             meta.getItemFlags().forEach(meta::removeItemFlags);
             return;
         }
 
-        ItemFlag flag = ItemFlag.valueOf(getContent(data, matcher.group(1)).toUpperCase());
+        ItemFlag flag = ItemFlag.valueOf(matcher.group(1).toUpperCase());
         if (type.equalsIgnoreCase("remove")) {
             meta.removeItemFlags(flag);
         } else if (type.equalsIgnoreCase("add")) {
@@ -404,22 +452,27 @@ public class ContainerUtil {
 
     public static final TriConsumer<Map<String, String>, ItemStack, String> UNBREAKABLE = (data, item, formula) -> {
         // type: unbreakable, value: ~~~
-        // %BOOL%
-        Matcher matcher = Pattern.compile("unbreak=(.+)").matcher(formula);
-        if (!matcher.matches()) return;
         ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
-        meta.setUnbreakable(Boolean.parseBoolean(getContent(data, matcher.group(1))));
+        meta.setUnbreakable(Boolean.parseBoolean(getContent(data, formula)));
     };
 
     public static final TriConsumer<Map<String, String>, ItemStack, String> POTION_EFFECT = (data, item, formula) -> {
         // type: potion_effect, value: effect=~~~,level=~~~,duration=~~~
-        Matcher matcher = Pattern.compile("effect=(.+),level=(.+),duration=(.+)").matcher(formula);
-        if (!matcher.matches()) return;
+        // duration is game tick
+        formula = getContent(data, formula);
+        Matcher matcher = Pattern.compile("effect=([a-zA-Z_]+),level=([0-9]+),duration=([0-9]+)").matcher(formula);
+        if (!matcher.matches()) {
+            sendIllegalTemplateWarn("potion effect", formula, "effect=([a-zA-Z_]+),level=([0-9]+),duration=([0-9]+)");
+            return;
+        }
         PotionMeta meta = (PotionMeta) Objects.requireNonNull(item.getItemMeta());
-        PotionEffectType effect = PotionEffectType.getByName(getContent(data, matcher.group(1).toUpperCase()));
-        if (effect == null) return;
-        int level = (int) Double.parseDouble(getContent(data, matcher.group(2)));
-        int duration = (int) Double.parseDouble(getContent(data, matcher.group(3)));
+        PotionEffectType effect = PotionEffectType.getByName(matcher.group(1).toUpperCase());
+        if (effect == null) {
+            sendNoSuchTemplateWarn("potion effect", matcher.group(1));
+            return;
+        }
+        int level = (int) Double.parseDouble(matcher.group(2));
+        int duration = (int) Double.parseDouble(matcher.group(3));
         PotionEffect potion = new PotionEffect(effect, duration, level);
         meta.addCustomEffect(potion, true);
         item.setItemMeta(meta);
@@ -427,20 +480,27 @@ public class ContainerUtil {
 
     public static final TriConsumer<Map<String, String>, ItemStack, String> LEATHER_ARMOR_COLOR = (data, item, formula) -> {
         // type: leather_armor_color, value: (r=~~,g=~~,b=~~|colorName|random)
-        Matcher rgb = Pattern.compile("r=(.+),g=(.+),b=(.+)").matcher(formula);
-        Matcher name = Pattern.compile("color=(.+)").matcher(formula);
-        Matcher random = Pattern.compile("random").matcher(formula);
-        if (!(rgb.matches() || name.matches() || random.matches())) return;
         LeatherArmorMeta meta = (LeatherArmorMeta) Objects.requireNonNull(item.getItemMeta());
+        data.put("$CURRENT_RED$", String.valueOf(meta.getColor().getRed()));
+        data.put("$CURRENT_GREEN$", String.valueOf(meta.getColor().getGreen()));
+        data.put("$CURRENT_BLUE$", String.valueOf(meta.getColor().getBlue()));
+        data.put("$CURRENT_RGB$", String.valueOf(meta.getColor().asRGB()));
+        formula = getContent(data, formula);
+        removeCurrentVariables(data);
+
+        Matcher rgb = Pattern.compile("r=([0-9]+),g=([0-9]+),b=([0-9]+)").matcher(formula);
+        Matcher name = Pattern.compile("([a-zA-Z_]+)").matcher(formula);
+        Matcher random = Pattern.compile("(?i)random").matcher(formula);
+        if (!rgb.matches() || !name.matches() || !random.matches()) return;
         Color color;
         if (rgb.matches()) {
-            int red = (int) Double.parseDouble(getContent(data, rgb.group(1)));
-            int green = (int) Double.parseDouble(getContent(data, rgb.group(2)));
-            int blue = (int) Double.parseDouble(getContent(data, rgb.group(3)));
+            int red = (int) Double.parseDouble(rgb.group(1));
+            int green = (int) Double.parseDouble(rgb.group(2));
+            int blue = (int) Double.parseDouble(rgb.group(3));
             if (!inRGBRange(red, green, blue)) return;
             color = Color.fromRGB(red, green, blue);
-        } else if (name.matches()) {
-            color = InventoryUtil.getColor(getContent(data, name.group(1).toUpperCase()));
+        } else if (name.matches() && !random.matches()) {
+            color = InventoryUtil.getColor(name.group(1));
         } else if (random.matches()) {
             color = Color.fromRGB(new Random().nextInt(256));
         } else return;
@@ -451,11 +511,11 @@ public class ContainerUtil {
 
     public static TriConsumer<Map<String, String>, ItemStack, String> BOOK = (data, item, formula) -> {
         // type: book, value: type=(?i)(author|title|add_page|from_file|long_field|gen), element=(.+)
-        Matcher matcher = Pattern.compile("type=(.+),element=(.+)").matcher(formula);
+        formula = getContent(data, formula);
+        Matcher matcher = Pattern.compile("type=(author|title|add_page|add_long|from_file|gen),element=(.+)").matcher(formula);
         if (!matcher.matches()) return;
-        String type = getContent(data, matcher.group(1));
-        String element = getContent(data, matcher.group(2));
-        if (!matcher.group(1).matches("(?i)(author|title|add_page|add_long|from_file|gen)")) return;
+        String type = matcher.group(1);
+        String element = matcher.group(2);
         BookMeta meta = (BookMeta) Objects.requireNonNull(item.getItemMeta());
         if (type.equalsIgnoreCase("author")) {
             meta.setAuthor(element);
@@ -482,15 +542,16 @@ public class ContainerUtil {
         // e.g. type: enchant_modify, value: type=level,action=luck->2 (luck's level change (to 2))
         // e.g. type: enchant_modify, value: type=level,action=luck->None (remove enchant(luck))
         // a special variable that is named $CURRENT_LEVEL$ contains current enchants level. (in using "%$CURRENT_LEVEL$%")
-        Matcher matcher = Pattern.compile("type=(.+),action=(.+)->(.+)").matcher(formula);
+        ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
+        formula = getContent(data, formula);
+        Matcher matcher = Pattern.compile("type=(enchant|level),action=([a-zA-Z_]+)->([{}+\\-*/\\\\^%$a-zA-Z0-9_]+)").matcher(formula);
         if (!matcher.matches()) return;
         String type = matcher.group(1);
-        if (!type.matches("(?i)(enchant|level)")) return;
         String left = matcher.group(2);
         String right = matcher.group(3);
-        boolean toNone = right.equals("None");
-        boolean changeEnchant = type.equalsIgnoreCase("enchant");
-        ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
+        boolean toNone = right.equalsIgnoreCase("None");
+        boolean changeEnchant = type.equals("enchant");
+
         Enchantment enchant = Enchantment.getByKey(NamespacedKey.minecraft(getContent(data, left.toLowerCase())));
         if (enchant == null || !meta.getEnchants().containsKey(enchant)) return;
         data.put("$CURRENT_LEVEL$", String.valueOf(meta.getEnchantLevel(enchant)));
@@ -522,15 +583,15 @@ public class ContainerUtil {
         //
         // a special variable named %$LINES$% contains lore lines.
         ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
-        List<String> lore = new ArrayList<>();
-        if (meta.getLore() != null) lore.addAll(meta.getLore());
-        data.put("$LINES$", String.valueOf(lore.size()));
+        List<Component> lore = new ArrayList<>();
+        if (meta.lore() != null) lore.addAll(meta.lore());
+        data.put("$CURRENT_LINES$", String.valueOf(lore.size()));
         formula = getContent(data, formula);
-        data.remove("$LINES$");
+        removeCurrentVariables(data);
         Matcher one = Pattern.compile("type=(clear|modify)(,value=type=(insert|remove),element=line=((\\d+),value=(.+)|(\\d+)))?").matcher(formula);
         if (!one.matches()) return;
         if (one.group(1).equalsIgnoreCase("clear")) {
-            meta.setLore(null);
+            meta.lore(null);
             return;
         }
 
@@ -541,9 +602,9 @@ public class ContainerUtil {
             int line = (int) Double.parseDouble(getContent(data, one.group(5)));
             if (line <= 0) return; // to small
             String element = one.group(6);
-            lore.add(line, element);
+            lore.add(line, Component.text(element));
         }
-        meta.setLore(lore);
+        meta.lore(lore);
         item.setItemMeta(meta);
     };
 
@@ -594,8 +655,8 @@ public class ContainerUtil {
         // e.g. type: container, value: type=remove,target=variable-name.type
         // e.g. type: container, value: type=modify,target=variable-name.type,value=~~~
         // a special variable that is named "$CURRENT_VALUE$" contains current value.
-        String pattern = "type=(add|remove|modify),target=([a-zA-Z0-9_.%$]*)(,value=(.+))?";
         formula = getContent(data, formula);
+        String pattern = "type=(add|remove|modify),target=([a-zA-Z0-9_.%$]*)(,value=(.+))?";
         Matcher m = Pattern.compile(pattern).matcher(formula);
         if (!m.matches()) return;
         ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
@@ -604,7 +665,8 @@ public class ContainerUtil {
 
         data.put("$CURRENT_VALUE$", data.getOrDefault(target, ""));
         Matcher matcher = Pattern.compile(pattern).matcher(formula);
-        data.remove("$CURRENT_VALUES$");
+        removeCurrentVariables(data);
+
         int index = target.lastIndexOf(".");
         PersistentDataType<?,?> pdt = getPersistentDataType(target.substring(index));
         NamespacedKey nk = new NamespacedKey(CustomCrafter.getInstance(), target.substring(0, index));
@@ -631,6 +693,13 @@ public class ContainerUtil {
                         PersistentDataType.LONG,
                         Long.parseLong(value)
                 );
+            } else if (pdt.getPrimitiveType().equals(UUID.class) && pdt.getComplexType().equals(UUID.class)) {
+                // AnchorTagType
+                item.getItemMeta().getPersistentDataContainer().set(
+                        nk,
+                        new AnchorTagType(),
+                        UUID.randomUUID()
+                );
             }
         }
         item.setItemMeta(meta);
@@ -638,9 +707,13 @@ public class ContainerUtil {
     };
 
 
+    private static void removeCurrentVariables(Map<String, String> data) {
+        data.entrySet().stream().filter(e -> e.getKey().matches("\\$CURRENT_[A-Z0-9_]+\\$")).iterator().remove();
+    }
+
     public static Map<String, String> getData(PersistentDataContainer container) {
         //e.g. test_container_1.double
-        // in pdc: variableName does not contains "."
+        // in pdc: variableName does not contain "."
         // in map: variableName contains "."
         // the types overview "long, double, string, anchor, *"
         // -> anchor is only used to "tag".

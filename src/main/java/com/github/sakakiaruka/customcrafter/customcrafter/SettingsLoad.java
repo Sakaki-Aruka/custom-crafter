@@ -235,7 +235,7 @@ public class SettingsLoad {
 
             RESULTS.put(name, result);
 
-            Matter matter = new Matter(Arrays.asList(material), 1);
+            Matter matter = new Matter(List.of(material), 1);
             MATTERS.put(name, matter);
         }
     }
@@ -361,7 +361,7 @@ public class SettingsLoad {
     }
 
     private void addNull(){
-        Matter matter = new Matter(Arrays.asList(Material.AIR),0);
+        Matter matter = new Matter(List.of(Material.AIR),0);
         MATTERS.put("null",matter);
         //matters.put("NULL",matter);
     }
@@ -465,13 +465,12 @@ public class SettingsLoad {
                 List<String> l = config.getStringList("coordinate");
                 int x = -1;
                 int count = 0;
-                for(int i=0;i<l.size();i++){
-                    List<String> list = Arrays.asList(l.get(i).split(","));
-                    for(int j=0;j<list.size();j++){
-                        Coordinate coordinate = new Coordinate(x,count);
-                        String matterName = list.get(j);
-                        Matter matter = getMatterFromString(matterName,overrides);
-                        coordinates.put(coordinate,matter);
+                for (String s : l) {
+                    String[] list = s.split(",");
+                    for (String string : list) {
+                        Coordinate coordinate = new Coordinate(x, count);
+                        Matter matter = getMatterFromString(string, overrides);
+                        coordinates.put(coordinate, matter);
                         count++;
                     }
                 }
@@ -604,6 +603,10 @@ public class SettingsLoad {
         //    (formula: (.+))
         //    type: (lore|enchant|potion_color_rgb|potion_color_name|texture_id|...)
         //    value: (.+)
+
+        // debug
+        System.out.println(config.getList("container"));
+
         for (Map<String, String> map : (List<Map<String, String>>) config.getList("container")) {
             String type = map.get("predicate").toLowerCase();
             BiFunction<Map<String, String>, String, Boolean> predicate;
@@ -616,7 +619,7 @@ public class SettingsLoad {
                 }
             }
 
-            String formula = !type.equals("none") ? map.get("formula") : "";
+            String formula = type.equalsIgnoreCase("none") ? "" : map.get("formula");
 
             TriConsumer<Map<String, String>, ItemStack, String> consumer;
             String cType = map.get("type").toLowerCase();
@@ -687,7 +690,7 @@ public class SettingsLoad {
         String upper = name.toUpperCase();
         if(name.equalsIgnoreCase("null")){
             // null
-            matter = new Matter(Arrays.asList(Material.AIR),0,false);
+            matter = new Matter(List.of(Material.AIR),0,false);
         }else if(MATTERS.containsKey(name)){
             // 'name' is contained 'matters'
             matter = MATTERS.get(name);
@@ -697,28 +700,28 @@ public class SettingsLoad {
         }else if(ALL_MATERIALS.contains(upper)){
             // normal material-name
             Material material = Material.valueOf(name.toUpperCase());
-            matter = new Matter(Arrays.asList(material),1,false);
+            matter = new Matter(List.of(material),1,false);
         }else if(overrides.containsKey(name) && ALL_MATERIALS.contains(overrides.get(name).toUpperCase())){
             // replaced the shorted name and contained 'allMaterials'
             Material material = Material.valueOf(overrides.get(name).toUpperCase());
-            matter = new Matter(Arrays.asList(material),1,false);
+            matter = new Matter(List.of(material),1,false);
         }else if(name.startsWith("m-")){
             // normal material-name and 'mass=true'
             name = name.replace("m-","").toUpperCase();
             Material material = Material.valueOf(name);
-            matter = new Matter(Arrays.asList(material),1,true);
+            matter = new Matter(List.of(material),1,true);
         }else if (overrides.containsKey(name)){
             // replaced to the shorted name and contained 'matters'
             String before = overrides.get(name).replace("m-","").toUpperCase();
             if(before.equals("NULL")){
-                matter = new Matter(Arrays.asList(Material.AIR),0,false);
+                matter = new Matter(List.of(Material.AIR),0,false);
             }else{
                 Material material = Material.valueOf(before);
-                matter = new Matter(Arrays.asList(material),1,true);
+                matter = new Matter(List.of(material),1,true);
             }
         }else{
             // nothing other
-            matter = new Matter(Arrays.asList(Material.AIR),0);
+            matter = new Matter(List.of(Material.AIR),0);
         }
         return matter;
     }

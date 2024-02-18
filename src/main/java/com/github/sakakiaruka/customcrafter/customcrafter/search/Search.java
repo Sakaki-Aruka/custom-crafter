@@ -432,8 +432,8 @@ public class Search {
     private Matter toMatter(Inventory inventory,int slot){
         Matter matter;
         ItemStack item = inventory.getItem(slot);
-        if(item == null){
-            matter = new Matter(List.of(Material.AIR),0);
+        if(item == null || item.getType().equals(Material.AIR)){
+            return new Matter(List.of(Material.AIR),0);
         }else if(PotionUtil.isPotion(item.getType())){
             matter = new Potions(inventory.getItem(slot), PotionStrict.INPUT);
         }else{

@@ -17,7 +17,6 @@ import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import org.checkerframework.checker.units.qual.A;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,7 +27,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.UUID;
 
 public class NewAmorphousTest {
@@ -45,11 +43,6 @@ public class NewAmorphousTest {
     @AfterEach
     void tearDown() {
         MockBukkit.unmock();
-    }
-
-    @Test
-    public void derived_data_test() {
-        int size = new Random().nextInt(10);
     }
 
     @Test
