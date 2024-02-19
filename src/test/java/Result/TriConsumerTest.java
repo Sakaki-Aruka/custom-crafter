@@ -2,19 +2,26 @@ package Result;
 
 import be.seeseemelk.mockbukkit.MockBukkit;
 import be.seeseemelk.mockbukkit.ServerMock;
+import com.destroystokyo.paper.profile.PlayerProfile;
+import com.destroystokyo.paper.profile.ProfileProperty;
 import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.ContainerUtil;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.profile.PlayerTextures;
 import org.checkerframework.checker.units.qual.A;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 public class TriConsumerTest {
     private ServerMock server;

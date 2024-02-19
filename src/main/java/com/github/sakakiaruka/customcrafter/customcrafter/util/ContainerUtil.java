@@ -1,5 +1,7 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.util;
 
+import com.destroystokyo.paper.profile.PlayerProfile;
+import com.destroystokyo.paper.profile.ProfileProperty;
 import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter;
 import com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad;
 import com.github.sakakiaruka.customcrafter.customcrafter.interfaces.TriConsumer;
@@ -10,10 +12,12 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordina
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.search.Search;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
@@ -25,14 +29,19 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
+import org.bukkit.profile.PlayerTextures;
 
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -257,12 +266,16 @@ public class ContainerUtil {
     }
 
     private static void sendIllegalTemplateWarn(String type, String source, String pattern) {
-        Bukkit.getLogger().warning(String.format("===%s[Custom Crafter] Illegal %s pattern. (%s)", SettingsLoad.LINE_SEPARATOR, type, source));
+        Bukkit.getLogger().warning(String.format("%s===%s[Custom Crafter] Illegal %s pattern. (%s)", SettingsLoad.LINE_SEPARATOR,SettingsLoad.LINE_SEPARATOR, type, source));
         Bukkit.getLogger().warning(String.format("[Custom Crafter] The source pattern is %s.%s===", pattern, SettingsLoad.LINE_SEPARATOR));
     }
 
     private static void sendNoSuchTemplateWarn(String type, String source) {
-        Bukkit.getLogger().warning(String.format("===%s[Custom Crafter] No such %s. (%s)%s===", SettingsLoad.LINE_SEPARATOR, type, source, SettingsLoad.LINE_SEPARATOR));
+        Bukkit.getLogger().warning(String.format("%s===%s[Custom Crafter] No such %s. (%s)%s===", SettingsLoad.LINE_SEPARATOR,SettingsLoad.LINE_SEPARATOR, type, source, SettingsLoad.LINE_SEPARATOR));
+    }
+
+    private static void sendOrdinalWarn(String warn) {
+        Bukkit.getLogger().warning(String.format("%s===%s[Custom Crafter] %s%s===", SettingsLoad.LINE_SEPARATOR, SettingsLoad.LINE_SEPARATOR, warn, SettingsLoad.LINE_SEPARATOR));
     }
 
     public static final TriConsumer<Map<String, String>, ItemStack, String> LORE = (data, item, formula) -> {
@@ -315,7 +328,7 @@ public class ContainerUtil {
         int green = (int) Double.parseDouble(matcher.group(2));
         int blue = (int) Double.parseDouble(matcher.group(3));
         if (!inRGBRange(red, green, blue)) {
-            Bukkit.getLogger().warning("[Custom Crafter] Illegal rgb element. (Out of 0 ~ 255)");
+            sendOrdinalWarn("Illegal rgb element. (Out of 0 ~ 255)");
             return;
         }
         Color color = Color.fromRGB(red, green, blue);
@@ -535,6 +548,51 @@ public class ContainerUtil {
         item.setItemMeta(meta);
     };
 
+    public static final TriConsumer<Map<String, String>, ItemStack, String> HEAD = (data, item, formula) -> {
+        // type: head, value: type=(name|url),value=(.+)
+        // e.g. type: head, value:  type=name,value=notch (notch's head)
+        // e.g. type: head, value: type=url,value=eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjRhODgyY2MyNjczM2Q5ZGEyYjVmYjYyMTE4ZDdlMzdkMDNjM2Q2YWY3ZWI1MzczYmIwYjE5N2Y5OTc5YjliOCJ9fX0= (BLT sandwich head)
+        if (!(item.getItemMeta() instanceof SkullMeta)) {
+            sendOrdinalWarn("The subject item cannot retain data on the skull.");
+            return;
+        }
+        SkullMeta meta = (SkullMeta) Objects.requireNonNull(item.getItemMeta());
+        formula = getContent(data, formula);
+        String pattern = "type=(name|url),value=(.+)";
+        Matcher formulaParse = Pattern.compile(pattern).matcher(formula);
+        if (!formulaParse.matches()) {
+            sendIllegalTemplateWarn("head", formula, pattern);
+            return;
+        }
+        String type = formulaParse.group(1);
+        String value = formulaParse.group(2);
+        if (type.equals("name")) {
+            meta.setOwningPlayer(Bukkit.getOfflinePlayer(value));
+            item.setItemMeta(meta);
+            return;
+        }
+        PlayerProfile profile = Bukkit.createProfile(null, UUID.randomUUID().toString());
+        PlayerTextures textures = profile.getTextures();
+        URL url;
+        try {
+            String preURL = new String(Base64.getDecoder().decode(value));
+            Matcher u = Pattern.compile("[\"{a-zA-Z:]+(http://[a-zA-Z0-9./]+)[}\"]+").matcher(preURL);
+            if (!u.matches()) {
+                sendOrdinalWarn("head url parse error. (internal error)");
+                return;
+            }
+            url = new URL(u.group(1));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return;
+        }
+        textures.setSkin(url);
+        profile.setTextures(textures);
+
+        meta.setPlayerProfile(profile);
+        item.setItemMeta(meta);
+    };
+
     public static final TriConsumer<Map<String, String>, ItemStack, String> ENCHANT_MODIFY = (data, item, formula) -> {
         // type: enchant_modify, value: type=(enchant|level),action=(.+)->(.+)
         // e.g. type: enchant_modify, value: type=enchant,action=luck->mending (luck to mending)
@@ -584,23 +642,34 @@ public class ContainerUtil {
         // a special variable named %$LINES$% contains lore lines.
         ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
         List<Component> lore = new ArrayList<>();
-        if (meta.lore() != null) lore.addAll(meta.lore());
+        if (meta.hasLore()) {
+            lore.addAll(meta.lore());
+            for (int i = 0; i < meta.lore().size(); i++) {
+                data.put("$CURRENT_LINE."+ i +"$", ((TextComponent) meta.lore().get(i)).content());
+            }
+        }
         data.put("$CURRENT_LINES$", String.valueOf(lore.size()));
         formula = getContent(data, formula);
         removeCurrentVariables(data);
-        Matcher one = Pattern.compile("type=(clear|modify)(,value=type=(insert|remove),element=line=((\\d+),value=(.+)|(\\d+)))?").matcher(formula);
-        if (!one.matches()) return;
+        Matcher one = Pattern.compile("type=(clear|modify)(,value=type=(remove|insert),line=([0-9]+)(,value=(.+))*)?").matcher(formula);
+        if (!one.matches()) {
+            sendIllegalTemplateWarn("lore modify", formula, "type=(clear|modify)(,value=type=(remove|insert),line=([0-9]+)(,value=(.+))*)?");
+            return;
+        }
         if (one.group(1).equalsIgnoreCase("clear")) {
             meta.lore(null);
+            item.setItemMeta(meta);
             return;
         }
 
+        int line = Integer.parseInt(one.group(4));
+        if (line < 0) {
+            sendOrdinalWarn("A specified line index is out of the valid range.");
+            return;
+        }
         if (one.group(3).equalsIgnoreCase("remove")) {
-            int line = (int) Double.parseDouble(one.group(4));
             lore.remove(line);
         } else if (one.group(3).equalsIgnoreCase("insert")) {
-            int line = (int) Double.parseDouble(getContent(data, one.group(5)));
-            if (line <= 0) return; // to small
             String element = one.group(6);
             lore.add(line, Component.text(element));
         }
@@ -645,8 +714,7 @@ public class ContainerUtil {
 
         ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
         Map<String, String> NEW_MAP = getData(meta.getPersistentDataContainer());
-        NEW_MAP.forEach((k, v) -> NEW_MAP.put("$result." + k, v));
-        data.putAll(NEW_MAP);
+        NEW_MAP.forEach((k, v) -> data.put("$result." + k, v));
     };
 
     public static final TriConsumer<Map<String, String>, ItemStack, String> CONTAINER = (data, item, formula) -> {
@@ -658,7 +726,10 @@ public class ContainerUtil {
         formula = getContent(data, formula);
         String pattern = "type=(add|remove|modify),target=([a-zA-Z0-9_.%$]*)(,value=(.+))?";
         Matcher m = Pattern.compile(pattern).matcher(formula);
-        if (!m.matches()) return;
+        if (!m.matches()) {
+            sendIllegalTemplateWarn("container", formula, pattern);
+            return;
+        }
         ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
         String type = m.group(1);
         String target = m.group(2);
@@ -666,36 +737,43 @@ public class ContainerUtil {
         data.put("$CURRENT_VALUE$", data.getOrDefault(target, ""));
         Matcher matcher = Pattern.compile(pattern).matcher(formula);
         removeCurrentVariables(data);
+        if (!matcher.matches()) {
+            sendIllegalTemplateWarn("container", formula, pattern);
+            return;
+        }
 
         int index = target.lastIndexOf(".");
         PersistentDataType<?,?> pdt = getPersistentDataType(target.substring(index + 1));
         NamespacedKey nk = new NamespacedKey(CustomCrafter.getInstance(), target);
-        if (pdt == null) return;
+        if (pdt == null) {
+            sendNoSuchTemplateWarn("persistent data type", target.substring(index + 1));
+            return;
+        }
         if (type.equals("remove") || type.equals("modify")) {
-            item.getItemMeta().getPersistentDataContainer().remove(nk);
+            if (meta.getPersistentDataContainer().has(nk)) meta.getPersistentDataContainer().remove(nk);
         }
         if (type.equals("add") || type.equals("modify")) {
             String value = matcher.group(4);
             if (pdt.equals(PersistentDataType.STRING)) {
-                item.getItemMeta().getPersistentDataContainer().set(
+                meta.getPersistentDataContainer().set(
                         nk,
                         PersistentDataType.STRING,
                         value);
             } else if (pdt.equals(PersistentDataType.DOUBLE)) {
-                item.getItemMeta().getPersistentDataContainer().set(
+                meta.getPersistentDataContainer().set(
                         nk,
                         PersistentDataType.DOUBLE,
                         Double.parseDouble(value)
                 );
             } else if (pdt.equals(PersistentDataType.LONG)) {
-                item.getItemMeta().getPersistentDataContainer().set(
+                meta.getPersistentDataContainer().set(
                         nk,
                         PersistentDataType.LONG,
                         Long.parseLong(value)
                 );
             } else if (pdt.getPrimitiveType().equals(UUID.class) && pdt.getComplexType().equals(UUID.class)) {
                 // AnchorTagType
-                item.getItemMeta().getPersistentDataContainer().set(
+                meta.getPersistentDataContainer().set(
                         nk,
                         new AnchorTagType(),
                         UUID.randomUUID()
@@ -708,7 +786,7 @@ public class ContainerUtil {
 
 
     private static void removeCurrentVariables(Map<String, String> data) {
-        data.entrySet().stream().filter(e -> e.getKey().matches("\\$CURRENT_[A-Z0-9_]+\\$")).iterator().remove();
+        data.entrySet().removeIf(element -> element.getKey().matches("\\$CURRENT_[A-Z0-9_.]+\\$"));
     }
 
     public static Map<String, String> getData(PersistentDataContainer container) {

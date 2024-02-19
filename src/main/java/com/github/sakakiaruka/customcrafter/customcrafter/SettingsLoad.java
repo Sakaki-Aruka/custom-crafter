@@ -644,12 +644,13 @@ public class SettingsLoad {
                 case "attribute_modifier_modify" -> consumer = ContainerUtil.ATTRIBUTE_MODIFIER_MODIFY;
                 case "result_reload" -> consumer = ContainerUtil.RESULT_VALUE_RELOAD;
                 case "container" -> consumer = ContainerUtil.CONTAINER;
+                case "head" -> consumer = ContainerUtil.HEAD;
                 default -> {
                     continue;
                 }
             }
 
-            String actionFormula = map.get("value");
+            String actionFormula = map.getOrDefault("value", "");
             result.add(new RecipeContainer(predicate, consumer, formula, actionFormula));
         }
         return result;
