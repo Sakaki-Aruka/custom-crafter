@@ -623,7 +623,7 @@ public class ContainerUtil {
             item.setItemMeta(meta);
             return;
         }
-        Attribute attribute = Attribute.valueOf(matcher.group(3));
+        Attribute attribute = Attribute.valueOf(matcher.group(3).toUpperCase());
         if (type.equals("remove")) {
             meta.removeAttributeModifier(attribute);
             item.setItemMeta(meta);
@@ -668,8 +668,8 @@ public class ContainerUtil {
         removeCurrentVariables(data);
 
         int index = target.lastIndexOf(".");
-        PersistentDataType<?,?> pdt = getPersistentDataType(target.substring(index));
-        NamespacedKey nk = new NamespacedKey(CustomCrafter.getInstance(), target.substring(0, index));
+        PersistentDataType<?,?> pdt = getPersistentDataType(target.substring(index + 1));
+        NamespacedKey nk = new NamespacedKey(CustomCrafter.getInstance(), target);
         if (pdt == null) return;
         if (type.equals("remove") || type.equals("modify")) {
             item.getItemMeta().getPersistentDataContainer().remove(nk);

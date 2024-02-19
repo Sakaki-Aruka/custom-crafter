@@ -18,9 +18,6 @@ import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.*;
 import static com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil.RECIPE_PERMISSION_MAP;
 
 public class Processor implements CommandExecutor, TabCompleter {
-
-    private static final String CONTAINER_KEY = "([a-z0-9-_]+)";
-    private static final String CONTAINER_TYPE = "(?i)(string|double|int)";
     private static final String NUMBER_ALPHABET = "(.+)";
     private static final String OPERATOR = "(\\+|-|\\*|/|^)";
     private static String RECIPE;
@@ -57,12 +54,6 @@ public class Processor implements CommandExecutor, TabCompleter {
 
         map.put(12, "help all");
         if (noEmpty(getCustomElementsPattern(COMMAND_ARGS))) map.put(13, "help "+getCustomElementsPattern(COMMAND_ARGS));
-
-        map.put(14 + 100, "container add "+CONTAINER_KEY+" "+CONTAINER_TYPE+" "+NUMBER_ALPHABET);
-        map.put(15 + 100, "container remove "+CONTAINER_KEY+" "+CONTAINER_TYPE);
-        map.put(16 + 100, "container set "+CONTAINER_KEY+" "+CONTAINER_TYPE+" "+NUMBER_ALPHABET);
-        map.put(17 + 100, "container value_modify "+CONTAINER_KEY+" "+CONTAINER_TYPE+" "+OPERATOR+" "+CONTAINER_KEY+" "+NUMBER_ALPHABET);
-        map.put(18 + 100, "container data show");
         return map;
     }
 
@@ -144,10 +135,6 @@ public class Processor implements CommandExecutor, TabCompleter {
         else if (id == 11) new PermissionCheck().remove(args[3], args[5], sender);
         else if (id == 12) new Help().all(sender);
         else if (id == 13) new Help().one(args[1], sender);
-//        else if (id == 14 + 100 || id == 16 + 100) new ContainerModify().addSet(args, sender);
-//        else if (id == 15 + 100) new ContainerModify().remove(args, sender);
-//        else if (id == 17 + 100) new ContainerModify().valueModify(args, sender);
-//        else if (id == 18 + 100) new ContainerModify().data(sender);
 
         return false;
     }
@@ -155,7 +142,7 @@ public class Processor implements CommandExecutor, TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
         List<String> list = new ArrayList<>();
-        List<String> arg = new ArrayList<>(Arrays.asList("reload", "open", "show", "give", "file", "permission", "help", "container"));
+        List<String> arg = List.of("reload", "open", "show", "give", "file", "permission", "help");
         if (args.length == 1) {
             list.addAll(arg);
             if (!(sender instanceof Player)) {
@@ -193,13 +180,6 @@ public class Processor implements CommandExecutor, TabCompleter {
                     list.add("help");
                     list.add("container");
                     break;
-                case "container":
-                    list.add("add");
-                    list.add("remove");
-                    list.add("set");
-                    list.add("value_modify");
-                    list.add("data");
-                    break;
             }
         } else if (args.length == 3) {
 
@@ -219,30 +199,15 @@ public class Processor implements CommandExecutor, TabCompleter {
                         list.add("modify");
                     }
                     break;
-                case "container":
-                    if (args[1].equals("data")) list.add("show");
-                    break;
             }
         } else if (args.length == 4) {
             if (args[0].equals("permission")) {
                 if (args[2].equals("modify")) list.addAll(getOnlinePlayers());
-            } else if (args[0].equals("container")) {
-                list.add("string");
-                list.add("double");
-                list.add("int");
             }
         } else if (args.length == 5) {
             if (args[0].equals("permission")) {
                 list.add("add");
                 list.add("remove");
-            } else if (args[0].equals("container")) {
-                if (args[1].equals("value_modify")) {
-                    list.add("+");
-                    list.add("-");
-                    list.add("*");
-                    list.add("/");
-                    list.add("^");
-                }
             }
         } else if (args.length == 6) {
             if (args[0].equals("permission")) list.addAll(RECIPE_PERMISSION_MAP.keySet());

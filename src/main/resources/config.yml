@@ -17,14 +17,8 @@ notice:
   - ""
   - "=========="
 
-# Download Settings
-download_threshold: 20
-load_interval: 20
-download:
-  - ""
-
 # DO NOT TOUCH CONTENTS THAT ARE UNDER THIS LINE.
-COMMAND_ARGS: ["reload", "open", "show", "give", "file", "permission", "help", "container"]
+COMMAND_ARGS: ["reload", "open", "show", "give", "file", "permission", "help"]
 
 reload:
   - "When this command executing, the system save and load info from config files."
@@ -63,17 +57,3 @@ help:
   - "help {COMMAND_ARGS}"
   - "    This command shows the specified commands info."
   - "For example, when you send '/cc help help' command, the system shows the description that above."
-
-container:
-  - "If a sender sends this command from a console, this command will not work."
-  - "If a sender has not any items in their MainHand, this command will not complete to processing."
-  - "container add {CONTAINER_KEY} {CONTAINER_TYPE} {CHARACTER}"
-  - "    This command adds the specified data to an item that a sender has."
-  - "container remove {CONTAINER_KEY} {CONTAINER_TYPE}"
-  - "    This command removes the specified data from an item that a sender has."
-  - "container set {CONTAINER_KEY} {CONTAINER_TYPE} {CHARACTERS}"
-  - "    This command sets the specified data to an item that a sender has."
-  - "container value_modify {CONTAINER_KEY} {CONTAINER_TYPE} {OPERATOR} {CONTAINER_KEY} {CHARACTERS}"
-  - "    This command modifies the specified data that the specified container and keyed with a mathematical operator."
-  - "container data show"
-  - "    This command shows the containers info that is the sender has in their MainHand."

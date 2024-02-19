@@ -39,15 +39,4 @@ public class TriConsumerTest {
         Assertions.assertEquals("hello, world", ContainerUtil.setEvalValue(ContainerUtil.setPlaceholderValue(data, "%test.string%, %test2.string%")));
         Assertions.assertEquals("None, None", ContainerUtil.setEvalValue(ContainerUtil.setPlaceholderValue(Collections.emptyMap(), "%test.string%, %test.string%")));
     }
-
-//    @Test
-//    public void consumer_test() {
-//        ItemStack sword = new ItemStack(Material.DIAMOND_SWORD, 1);
-//        Map<String, String> data = new HashMap<>();
-//        data.put("test.string", "hello");
-//        data.put("test2.string", "world");
-//        ContainerUtil.LORE.accept(data, sword, "{%test.string%, %test2.string%}");
-//        Assertions.assertEquals("hello, world", sword.lore().get(0).insertion());
-//    }
-
 }
