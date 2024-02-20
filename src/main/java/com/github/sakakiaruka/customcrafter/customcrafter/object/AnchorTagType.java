@@ -8,6 +8,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.UUID;
 
 public class AnchorTagType implements PersistentDataType<UUID, UUID> {
+
+    public static final AnchorTagType TYPE = new AnchorTagType();
+
     @org.jetbrains.annotations.NotNull
     @Override
     public Class<UUID> getPrimitiveType() {

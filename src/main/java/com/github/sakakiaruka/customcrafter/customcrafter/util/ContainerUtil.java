@@ -772,7 +772,7 @@ public class ContainerUtil {
                 // AnchorTagType
                 meta.getPersistentDataContainer().set(
                         nk,
-                        new AnchorTagType(),
+                        AnchorTagType.TYPE,
                         UUID.randomUUID()
                 );
             }
@@ -847,7 +847,7 @@ public class ContainerUtil {
                 } else if (type.equals(PersistentDataType.STRING)) {
                     if (!stringData.containsKey(name)) stringData.put(name, new LinkedList<>());
                     stringData.get(name).add(pdc.get(key, PersistentDataType.STRING));
-                } else if (type.equals(new AnchorTagType())) {
+                } else if (type.equals(AnchorTagType.TYPE)) {
                     result.put(name, "");
                 }
             }
@@ -931,7 +931,7 @@ public class ContainerUtil {
         if (type.equalsIgnoreCase("double")) return PersistentDataType.DOUBLE;
         if (type.equalsIgnoreCase("string")) return PersistentDataType.STRING;
         if (type.equalsIgnoreCase("long")) return PersistentDataType.LONG;
-        if (type.equals("anchor")) return new AnchorTagType();
+        if (type.equals("anchor")) return AnchorTagType.TYPE;
         return null;
     }
 

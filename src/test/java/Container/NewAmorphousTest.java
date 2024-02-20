@@ -332,7 +332,7 @@ public class NewAmorphousTest {
         PersistentDataContainer pdc1 = new PersistentDataContainerMock();
         pdc1.set(
                 new NamespacedKey("custom_crafter", "pdc1.anchor"),
-                new AnchorTagType(),
+                AnchorTagType.TYPE,
                 UUID.randomUUID()
         );
 
@@ -345,7 +345,7 @@ public class NewAmorphousTest {
 
         pdc1.set(
                 new NamespacedKey("custom_crafter", "pdc1_2.anchor"),
-                new AnchorTagType(),
+                AnchorTagType.TYPE,
                 UUID.randomUUID()
         );
 
