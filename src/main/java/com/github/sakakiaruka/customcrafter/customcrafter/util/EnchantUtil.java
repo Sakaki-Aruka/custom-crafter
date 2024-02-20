@@ -55,10 +55,6 @@ public class EnchantUtil {
             }
         }
 
-        //debug
-        System.out.println("[EnchantUtil]r size="+r.size()+", i size="+i.size());
-        map.forEach((key, value) -> System.out.printf("index=%s, list=%s%n", key.toString(), value.toString()));
-        result.forEach((s, t) -> t.forEach(e -> System.out.printf("index=%s, element=%s%n", s.toString(), e.toString())));
         return result.isEmpty() ? Search.AMORPHOUS_NULL_ANCHOR : result;
     }
 

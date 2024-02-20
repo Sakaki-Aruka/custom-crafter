@@ -604,9 +604,6 @@ public class SettingsLoad {
         //    type: (lore|enchant|potion_color_rgb|potion_color_name|texture_id|...)
         //    value: (.+)
 
-        // debug
-        System.out.println(config.getList("container"));
-
         for (Map<String, String> map : (List<Map<String, String>>) config.getList("container")) {
             String type = map.get("predicate").toLowerCase();
             BiFunction<Map<String, String>, String, Boolean> predicate;
@@ -646,6 +643,8 @@ public class SettingsLoad {
                 case "container" -> consumer = ContainerUtil.CONTAINER;
                 case "head" -> consumer = ContainerUtil.HEAD;
                 case "material" -> consumer = ContainerUtil.MATERIAL;
+                case "run_command_as_player" -> consumer = ContainerUtil.RUN_COMMAND_AS_PLAYER;
+                case "run_command_as_console" -> consumer = ContainerUtil.RUN_COMMAND_AS_CONSOLE;
                 default -> {
                     continue;
                 }

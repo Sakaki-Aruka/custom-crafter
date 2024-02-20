@@ -290,9 +290,6 @@ public class PotionUtil {
             }
         }
 
-        //debug
-        result.forEach((key, value) -> System.out.println("PotionList(key)="+key.toString()+" / value="+value.toString()));
-
         return result.isEmpty() ? Search.AMORPHOUS_NULL_ANCHOR : result;
     }
 

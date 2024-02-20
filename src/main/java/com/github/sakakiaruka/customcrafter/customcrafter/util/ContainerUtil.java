@@ -19,6 +19,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -72,16 +73,6 @@ public class ContainerUtil {
         List<Coordinate> r = recipe.getHasContainersDataItemList();
         List<Coordinate> i = input.getHasPDCItemList();
         Map<Coordinate, List<Coordinate>> map = new HashMap<>();
-
-        //debug
-        for (Coordinate c : r) {
-            System.out.print(c.toString() + ",");
-        }
-        System.out.println("\nrecipe ↑ | input ↓");
-        for (Coordinate c : i) {
-            System.out.print(c.toString() + ",");
-        }
-        System.out.println();
 
         // returns NON_REQUIRED = non require container elements
         // returns NULL         = an input does not matched
@@ -788,8 +779,25 @@ public class ContainerUtil {
         try {
             item.setType(Material.valueOf(formula));
         } catch (Exception e) {
-            sendOrdinalWarn("set material is failed.");
+            sendOrdinalWarn("Failed to set a material.");
         }
+    };
+
+    public static final TriConsumer<Map<String, String>, ItemStack, String> RUN_COMMAND_AS_CONSOLE = (data, item, formula) -> {
+        // type: run_command_as_player, value: ~~~
+        formula = getContent(data, formula);
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), formula);
+    };
+
+    public static final TriConsumer<Map<String, String>, ItemStack, String> RUN_COMMAND_AS_PLAYER = (data, item, formula) -> {
+        // type: run_command_as_player, value: ~~~
+        formula = getContent(data, formula);
+        Player player = Bukkit.getPlayer(UUID.fromString(data.get("$PLAYER_UUID$")));
+        if (player == null) {
+            sendNoSuchTemplateWarn("player (from UUID)", formula);
+            return;
+        }
+        Bukkit.dispatchCommand(player, formula);
     };
 
 

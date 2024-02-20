@@ -190,6 +190,9 @@ public class Search {
         inputContainerData.put("$PLAYER_CURRENT_X$", String.valueOf(player.getLocation().getX())); // double
         inputContainerData.put("$PLAYER_CURRENT_Y$", String.valueOf(player.getLocation().getY())); // double
         inputContainerData.put("$PLAYER_CURRENT_Z$", String.valueOf(player.getLocation().getZ())); // double
+        inputContainerData.put("$PLAYER_CURRENT_Xi$", String.valueOf(player.getLocation().getBlockX())); // int
+        inputContainerData.put("$PLAYER_CURRENT_Yi$", String.valueOf(player.getLocation().getBlockY())); // int
+        inputContainerData.put("$PLAYER_CURRENT_Zi$", String.valueOf(player.getLocation().getBlockZ())); // int
         inputContainerData.put("$PLAYER_CURRENT_PITCH$", String.valueOf(player.getLocation().getPitch())); // float
         inputContainerData.put("$PLAYER_CURRENT_YAW$", String.valueOf(player.getLocation().getYaw())); // float
         inputContainerData.put("$PLAYER_IN_WATER$", String.valueOf(player.isInWater())); // true|false
