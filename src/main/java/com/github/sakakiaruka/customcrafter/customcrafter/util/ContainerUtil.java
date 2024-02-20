@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -97,6 +98,24 @@ public class ContainerUtil {
             }
         }
         return map.isEmpty() ? Search.AMORPHOUS_NULL_ANCHOR : map;
+    }
+
+    public static void commandMain(Player player, String[] args) {
+        ItemStack item = player.getInventory().getItemInMainHand();
+        if (item.getType().equals(Material.AIR)) {
+            player.sendMessage("[Custom Crafter] No items in your main hand.");
+            return;
+        }
+
+        if (args[1].equals("show")) {
+            // /cc container (show container in main hand)
+            getData(item.getItemMeta().getPersistentDataContainer())
+                    .forEach((k, v) -> player.sendMessage("key=" + k + ", value=" + v));
+        } else {
+            Map<String, String> data = getData(item.getItemMeta().getPersistentDataContainer());
+            args[0] = "";
+            CONTAINER.accept(data, item, String.join(" ", args));
+        }
     }
 
     public static final BiFunction<Map<String, String>, String, Boolean> NONE = (data, predicate) -> true;
@@ -696,9 +715,7 @@ public class ContainerUtil {
 
     public static final TriConsumer<Map<String, String>, ItemStack, String> RESULT_VALUE_RELOAD = (data, item, formula) -> {
         // formula not used
-        data.entrySet().iterator().forEachRemaining(e -> {
-            if (e.getKey().startsWith("$result.")) data.remove(e.getKey());
-        });
+        data.entrySet().removeIf(e -> e.getKey().startsWith("$result."));
 
         ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
         Map<String, String> NEW_MAP = getData(meta.getPersistentDataContainer());

@@ -1,11 +1,14 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.command;
 
+import com.github.sakakiaruka.customcrafter.customcrafter.util.ContainerUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,6 +57,7 @@ public class Processor implements CommandExecutor, TabCompleter {
 
         map.put(12, "help all");
         if (noEmpty(getCustomElementsPattern(COMMAND_ARGS))) map.put(13, "help "+getCustomElementsPattern(COMMAND_ARGS));
+        map.put(14 + 100, "container (.*)");
         return map;
     }
 
@@ -70,7 +74,7 @@ public class Processor implements CommandExecutor, TabCompleter {
                 if (player.hasPermission("cc."+arg.toLowerCase())) return true;
             }
             return false;
-        } else if (14 + 100 <= id && id <= 18 + 100) return player.hasPermission("cc.container");
+        } else if (id == 14 + 100) return player.hasPermission("cc.container");
 
         return false;
     }
@@ -135,6 +139,7 @@ public class Processor implements CommandExecutor, TabCompleter {
         else if (id == 11) new PermissionCheck().remove(args[3], args[5], sender);
         else if (id == 12) new Help().all(sender);
         else if (id == 13) new Help().one(args[1], sender);
+        else if (id == 14 + 100) ContainerUtil.commandMain((Player) sender, args);
 
         return false;
     }
