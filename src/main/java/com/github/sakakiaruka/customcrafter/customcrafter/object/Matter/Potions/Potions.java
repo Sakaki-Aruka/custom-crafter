@@ -1,7 +1,6 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions;
 
 import com.github.sakakiaruka.customcrafter.customcrafter.interfaces.Matters;
-import com.github.sakakiaruka.customcrafter.customcrafter.object.ContainerWrapper;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantWrap;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.PotionUtil;
@@ -213,14 +212,6 @@ public class Potions extends Matter implements Matters {
 
     public String info(){
         return super.info()+ LINE_SEPARATOR +PotionInfo();
-    }
-
-    public Map<Integer, ContainerWrapper> getContainerWrappers() {
-        return super.getContainerWrappers();
-    }
-
-    public void setContainerWrappers(Map<Integer, ContainerWrapper> elements) {
-        super.setContainerWrappers(elements);
     }
 
     public Potions copy(){

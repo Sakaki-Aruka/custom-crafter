@@ -62,14 +62,6 @@ public class PotionUtil {
         return false;
     }
 
-    public static List<String> getPotionEffectTypeStringList(){
-        List<String> list = new ArrayList<>();
-        for(PotionEffectType e : PotionEffectType.values()){
-            list.add(e.getName());
-        }
-        return list;
-    }
-
     public static List<String> getPotionStrictStringList(){
         List<String> list = new ArrayList<>();
         for(PotionStrict strict : PotionStrict.values()){
@@ -280,10 +272,6 @@ public class PotionUtil {
         List<Coordinate> r = recipe.getPotionCoordinateList();
         List<Coordinate> i = input.getPotionCoordinateList();
 
-        //debug
-        Bukkit.getLogger().info("potion pre list(recipe)="+r);
-        Bukkit.getLogger().info("potion pre list(input)="+i);
-
         if (r.isEmpty()) return Search.AMORPHOUS_NON_REQUIRED_ANCHOR; // no required potion elements
         if (r.size() > i.size()) return Search.AMORPHOUS_NULL_ANCHOR; // failed to match
 
@@ -297,9 +285,6 @@ public class PotionUtil {
                 result.get(a).add(b);
             }
         }
-
-        //debug
-        result.forEach((key, value) -> System.out.println("PotionList(key)="+key.toString()+" / value="+value.toString()));
 
         return result.isEmpty() ? Search.AMORPHOUS_NULL_ANCHOR : result;
     }

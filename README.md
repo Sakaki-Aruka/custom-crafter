@@ -5,10 +5,10 @@ custom crafter is a plugin for minecraft servers (Spigot and Paper) that provide
 
 # Recommended environment
 - Paper (above 1.19.2)
-- Spigot (above 1.19.2)
+- ~~Spigot (above 1.19.2)~~ (Deprecated from `pdc_fix` branch.)
 
 Tested in Paper 1.20.2.  
-This plugin does not work in the server that is less than 1.19.2 ver.
+This plugin does not work in the server whose version is less than 1.19.2 ver.
 
 ---
 

@@ -82,7 +82,7 @@ public class Give {
                 modifiedCandidate.add("§f"+ SHORT_BAR);
                 meta.setLore(modifiedCandidate);
                 item.setItemMeta(meta);
-                result.setMetaData(item);
+                //result.setMetaData(item);
 
                 InventoryUtil.safetyItemDrop(player, Collections.singletonList(item));
             }

@@ -1,15 +1,19 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.search;
 
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Container.ContainerType;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Container.MatterContainer;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantStrict;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantWrap;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.PotionStrict;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.Potions;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Permission.RecipePermission;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Container.RecipeContainer;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordinate;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Tag;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.*;
+import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -17,6 +21,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
+import org.bukkit.persistence.PersistentDataContainer;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -88,33 +93,33 @@ public class Search {
     }
 
     private boolean isMatchNormal(List<ItemStack> interestedItems,Recipe recipe, Recipe input) {
-        if(getSquareSize(recipe.getCoordinateList()) != getSquareSize(input.getCoordinateList())) return false;
-        if(!isSameShape(getCoordinateNoAir(recipe),getCoordinateNoAir(input))) return false;
-        if(!isAllCandidateContains(recipe,input)) return false;
+        if (getSquareSize(recipe.getCoordinateList()) != getSquareSize(input.getCoordinateList())) return false;
+        if (!isSameShape(getCoordinateNoAir(recipe), getCoordinateNoAir(input))) return false;
+        if (!isAllCandidateContains(recipe,input)) return false;
 
         // check mass matter is one
-        for(int i=0;i<recipe.getContentsNoAir().size();i++){
+        for (int i = 0; i<recipe.getContentsNoAir().size(); i++){
             Matter recipeMatter = recipe.getContentsNoAir().get(i);
             Matter inputMatter = input.getContentsNoAir().get(i);
 
-            if (!ContainerUtil.isPass(interestedItems.get(i), recipeMatter)) return false;
 
+            if (!ContainerUtil.isPass(interestedItems.get(i), recipeMatter)) return false;
+            if (inputMatter.getAmount() < recipeMatter.getAmount()) return false;
             //(amount one virtual test)
             Matter recipeOne = recipeMatter.oneCopy();
             Matter inputOne = inputMatter.oneCopy();
 
-            if(!isSameMatter(recipeOne,inputOne)) return false;
-            if(!(recipeOne.getClass().equals(Potions.class) && inputOne.getClass().equals(Potions.class))) continue;
-            if(!PotionUtil.isSamePotion((Potions)recipeOne,(Potions) inputOne)) return false;
-
+            if (!isSameMatter(recipeOne,inputOne)) return false;
+            if (recipeOne.getClass().equals(Potions.class)) {
+                if (!inputOne.getClass().equals(Potions.class)) return false;
+                if(!PotionUtil.isSamePotion((Potions)recipeOne, (Potions) inputOne)) return false;
+            }
             //end (amount one virtual test end)
 
-            if(recipe.getContentsNoAir().get(i).isMass()){
+            if (recipe.getContentsNoAir().get(i).isMass()) {
                 if(inputMatter.getAmount() != 1) return false;
             }
-
-            if(inputMatter.getAmount() < recipeMatter.getAmount()) return false;
-            if(!getEnchantWrapCongruence(recipeMatter,inputMatter)) return false; // enchant check
+            if (!getEnchantWrapCongruence(recipeMatter, inputMatter)) return false; // enchant check
         }
         return true;
     }
@@ -122,7 +127,7 @@ public class Search {
     private boolean isMatchAmorphous(Recipe recipe, Recipe input) {
         List<Map<Coordinate, List<Coordinate>>> temp = new ArrayList<>();
         Map<Coordinate, List<Coordinate>> enchant = EnchantUtil.amorphous(recipe, input);
-        Map<Coordinate, List<Coordinate>> container = ContainerUtil.amorphous(recipe, input);
+        Map<Coordinate, List<Coordinate>> container = ContainerUtil._amorphous(recipe, input);
         Map<Coordinate,List<Coordinate>> candidate = InventoryUtil.amorphous(recipe, input);
         Map<Coordinate, List<Coordinate>> potion = PotionUtil.amorphous(recipe, input);
 
@@ -173,15 +178,38 @@ public class Search {
 
     private void setResultItem(Inventory inventory, Recipe recipe, Recipe input, Player player, int amount, boolean oneCraft){
         ItemStack item = null;
+        List<PersistentDataContainer> pdcList = new ArrayList<>();
+        for (Coordinate coordinate : input.getHasPDCItemList()) {
+            int slot = coordinate.getY() * 9 + coordinate.getX();
+            pdcList.add(inventory.getItem(slot).getItemMeta().getPersistentDataContainer());
+        }
+        Map<String, String> inputContainerData = ContainerUtil.getData(pdcList);
+        inputContainerData.put("$PLAYER_NAME$", player.getName());
+        inputContainerData.put("$PLAYER_UUID$", player.getUniqueId().toString());
+        inputContainerData.put("$PLAYER_CURRENT_WORLD$", player.getWorld().getName());
+        inputContainerData.put("$PLAYER_CURRENT_X$", String.valueOf(player.getLocation().getX())); // double
+        inputContainerData.put("$PLAYER_CURRENT_Y$", String.valueOf(player.getLocation().getY())); // double
+        inputContainerData.put("$PLAYER_CURRENT_Z$", String.valueOf(player.getLocation().getZ())); // double
+        inputContainerData.put("$PLAYER_CURRENT_Xi$", String.valueOf(player.getLocation().getBlockX())); // int
+        inputContainerData.put("$PLAYER_CURRENT_Yi$", String.valueOf(player.getLocation().getBlockY())); // int
+        inputContainerData.put("$PLAYER_CURRENT_Zi$", String.valueOf(player.getLocation().getBlockZ())); // int
+        inputContainerData.put("$PLAYER_CURRENT_PITCH$", String.valueOf(player.getLocation().getPitch())); // float
+        inputContainerData.put("$PLAYER_CURRENT_YAW$", String.valueOf(player.getLocation().getYaw())); // float
+        inputContainerData.put("$PLAYER_IN_WATER$", String.valueOf(player.isInWater())); // true|false
+        inputContainerData.put("$PLAYER_CURRENT_FOOD_LEVEL$", String.valueOf(player.getFoodLevel()));
+        inputContainerData.put("$PLAYER_PING$", String.valueOf(player.getPing()));
+        inputContainerData.put("$PLAYER_EXP$", String.valueOf(player.getExp()));
+        inputContainerData.put("$PLAYER_EXP_LEVEL$", String.valueOf(player.getLevel()));
+        inputContainerData.put("$PLAYER_DISPLAYED_NAME$", ((TextComponent) player.displayName()).content());
+        inputContainerData.put("$PLAYER_MAXIMUM_NO_DAMAGE_TICKS$", String.valueOf(player.getMaximumNoDamageTicks()));
+
         if (ALL_MATERIALS.contains(recipe.getResult().getNameOrRegex())
         && recipe.getResult().getMatchPoint() == -1
         && !recipe.getResult().getNameOrRegex().contains("@")) {
             // result has defined material
             Material m = Material.valueOf(recipe.getResult().getNameOrRegex().toUpperCase());
             item = new ItemStack(m, amount);
-            recipe.getResult().setMetaData(item);
-            //setMetaData(item,recipe.getResult()); //set result itemStack's metadata
-        }else if (recipe.getResult().getNameOrRegex().matches(PASS_THROUGH_PATTERN)) {
+        } else if (recipe.getResult().getNameOrRegex().matches(PASS_THROUGH_PATTERN)) {
             // pass through mode
             // nameOrRegex: pass -> material name (there are only one in the inventory.)
             // example): nameOrRegex: pass -> cobblestone
@@ -208,7 +236,6 @@ public class Search {
             }
 
             item = items.get(0);
-            recipe.getResult().setMetaData(item);
 
         } else {
             // not contains -> A result has written by regex pattern.
@@ -232,8 +259,6 @@ public class Search {
 
             Material material = Material.valueOf(materials.get(0).toUpperCase());
             item = new ItemStack(material,amount);
-            recipe.getResult().setMetaData(item);
-            //setMetaData(item,recipe.getResult());
         }
 
         if(item == null)return;
@@ -241,8 +266,9 @@ public class Search {
 
         WHAT_MAKING.put(player.getUniqueId(),item.getType());
 
-        ContainerUtil.setRecipeDataContainerToResultItem(item, input, recipe);
-        if (recipe.hasUsingContainerValuesMetadata()) ContainerUtil.setRecipeUsingContainerValueMetadata(inventory, recipe, item);
+        for (RecipeContainer container : recipe.getContainers()) {
+            container.run(inputContainerData, item);
+        }
 
         if(inventory.getItem(CRAFTING_TABLE_RESULT_SLOT) == null){
             // empty a result item's slot
@@ -347,7 +373,6 @@ public class Search {
 
 
     public static int getSquareSize(List<Coordinate> list){
-//        List<Coordinate> list = getCoordinateNoAir(recipe);
         if(list.isEmpty())return -1;
         if(list.get(0).getX() < 0 || list.get(0).getY() < 0)return -1;
 
@@ -412,8 +437,6 @@ public class Search {
                         matter.addWrap(wrap);
                     }
                 }
-                ContainerUtil.setContainerDataItemStackToMatter(inventory.getItem(i), matter);
-
                 recipe.addCoordinate(x,y,matter);
             }
         }
@@ -422,13 +445,20 @@ public class Search {
 
     private Matter toMatter(Inventory inventory,int slot){
         Matter matter;
-        if(inventory.getItem(slot) == null){
-            matter = new Matter(Arrays.asList(Material.AIR),0);
-        }else if(PotionUtil.isPotion(inventory.getItem(slot).getType())){
+        ItemStack item = inventory.getItem(slot);
+        if(item == null || item.getType().equals(Material.AIR)){
+            return new Matter(List.of(Material.AIR),0);
+        }else if(PotionUtil.isPotion(item.getType())){
             matter = new Potions(inventory.getItem(slot), PotionStrict.INPUT);
         }else{
-            matter = new Matter(inventory.getItem(slot));
+            matter = new Matter(item);
         }
+
+        if (!item.getItemMeta().getPersistentDataContainer().isEmpty()) return matter;
+
+        PersistentDataContainer pdc = item.getItemMeta().getPersistentDataContainer();
+        matter.setPDC(pdc);
+
         return matter;
     }
 }

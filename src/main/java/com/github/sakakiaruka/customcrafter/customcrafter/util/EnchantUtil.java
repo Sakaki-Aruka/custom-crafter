@@ -5,7 +5,6 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantW
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordinate;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.search.Search;
-import org.bukkit.enchantments.Enchantment;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,22 +13,6 @@ import java.util.Map;
 
 
 public class EnchantUtil {
-    public static List<String> strValuesNoInput(){
-        List<String> list = new ArrayList<>();
-        for(EnchantStrict es : EnchantStrict.values()){
-            if(es.equals(EnchantStrict.INPUT)) continue;
-            list.add(es.toStr());
-        }
-        return list;
-    }
-
-    public static List<String> getEnchantmentStrList(){
-        List<String> list = new ArrayList<>();
-        for(Enchantment enchant : Enchantment.values()){
-            list.add(enchant.getName().toUpperCase());
-        }
-        return list;
-    }
 
 //====
     public static Map<Coordinate, List<Coordinate>> amorphous(Recipe recipe, Recipe input) {
@@ -72,10 +55,6 @@ public class EnchantUtil {
             }
         }
 
-        //debug
-        System.out.println("[EnchantUtil]r size="+r.size()+", i size="+i.size());
-        map.forEach((key, value) -> System.out.printf("index=%s, list=%s%n", key.toString(), value.toString()));
-        result.forEach((s, t) -> t.forEach(e -> System.out.printf("index=%s, element=%s%n", s.toString(), e.toString())));
         return result.isEmpty() ? Search.AMORPHOUS_NULL_ANCHOR : result;
     }
 

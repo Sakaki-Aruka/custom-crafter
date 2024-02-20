@@ -1,30 +1,32 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.object.Matter;
 
-import com.github.sakakiaruka.customcrafter.customcrafter.interfaces.Matters;
-import com.github.sakakiaruka.customcrafter.customcrafter.object.ContainerWrapper;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Container.MatterContainer;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
+import org.bukkit.persistence.PersistentDataContainer;
 
 import java.util.*;
 
 import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.LINE_SEPARATOR;
 
-public class Matter implements Matters {
+public class Matter {
     private String name;
     private List<Material> candidate;
     private List<EnchantWrap> wrap;
     private int amount;
     private boolean mass;
-    private Map<Integer, ContainerWrapper> container;
+    private List<MatterContainer> containers;
+    private PersistentDataContainer pdc;
 
-    public Matter(String name,List<Material> candidate,List<EnchantWrap> wrap,int amount,boolean mass){
+    public Matter(String name,List<Material> candidate,List<EnchantWrap> wrap,int amount,boolean mass, List<MatterContainer> containers){
         this.name = name;
         this.candidate = candidate;
         this.wrap = wrap;
         this.amount = amount;
         this.mass = mass;
+        this.containers = containers;
     }
 
     public Matter(List<Material> materials,int amount){
@@ -49,11 +51,13 @@ public class Matter implements Matters {
         this.wrap = matter.hasWrap() ? matter.getWrap() : null;
         this.amount = matter.getAmount();
         this.mass = matter.isMass();
+        this.containers = matter.getContainers();
+        this.pdc = matter.getPDC();
     }
 
     public Matter(ItemStack item){
         this.name = "";
-        this.candidate = Arrays.asList(item.getType());
+        this.candidate = List.of(item.getType());
         if(item.hasItemMeta() && item.getItemMeta().hasEnchants() && !candidate.get(0).equals(Material.ENCHANTED_BOOK)){
             // an enchanted item (not an Enchanted_book)
             List<EnchantWrap> list = new ArrayList<>();
@@ -79,6 +83,7 @@ public class Matter implements Matters {
         }
         this.mass = false;
         this.amount = item.getAmount();
+        this.pdc = item.getItemMeta().getPersistentDataContainer();
     }
 
     public String getName() {
@@ -111,9 +116,6 @@ public class Matter implements Matters {
 
     public boolean hasWrap(){
         return !((wrap == null) || wrap.isEmpty());
-//
-//        if(wrap == null) return false;
-//        return !wrap.isEmpty();
     }
 
     public void addWrap(EnchantWrap in){
@@ -153,7 +155,7 @@ public class Matter implements Matters {
     public String getAllWrapInfo(){
         if(!hasWrap())return "";
         StringBuilder builder = new StringBuilder();
-        getWrap().forEach(s->builder.append(s.info()+ LINE_SEPARATOR));
+        getWrap().forEach(s-> builder.append(s.info()).append(LINE_SEPARATOR));
         return builder.toString();
     }
 
@@ -171,7 +173,9 @@ public class Matter implements Matters {
         int amount = this.amount;
         List<EnchantWrap> wrap = hasWrap() ? this.wrap : null;
         boolean mass = this.mass;
-        Matter matter = new Matter(name,candidate,wrap,amount,mass);
+        List<MatterContainer> containers = this.containers;
+        Matter matter = new Matter(name, candidate, wrap, amount, mass, containers);
+        matter.setPDC(this.pdc);
         return matter;
     }
 
@@ -181,50 +185,51 @@ public class Matter implements Matters {
         int amount = 1;
         List<EnchantWrap> wrap = hasWrap() ? this.wrap : null;
         boolean mass = this.mass;
-        Matter matter = new Matter(name,candidate,wrap,amount,mass);
-        return matter;
+        List<MatterContainer> containers = this.containers;
+        return new Matter(name, candidate, wrap, amount, mass, containers);
     }
 
-    public boolean sameCandidate(Matter matter) {
-        if(this.candidate.size() != matter.candidate.size()) return false;
-        return this.candidate.containsAll(matter.candidate);
-    }
+
 
     public String info(){
-        StringBuilder builder = new StringBuilder();
-        builder.append(String.format("name : %s"+ LINE_SEPARATOR,name != null && !name.isEmpty() ? candidate.get(0).name() : name));
-        builder.append(String.format("candidate : %s"+ LINE_SEPARATOR,candidate.toString()));
-        builder.append(String.format("wrap : %s",hasWrap() ? getAllWrapInfo() : "null"+ LINE_SEPARATOR));
-        builder.append(String.format("amount : %d"+ LINE_SEPARATOR,amount));
-        builder.append(String.format("mass : %b"+ LINE_SEPARATOR,isMass()));
-        if (container == null || container.isEmpty()) builder.append("container: No contents in the container."+ LINE_SEPARATOR);
-        else {
-            container.entrySet().forEach(s->builder.append("container: "+ LINE_SEPARATOR +s.getValue().info()+ LINE_SEPARATOR));
-        }
-        return builder.toString();
-    }
-
-    public boolean hasContainer() {
-        return !((container == null) || container.isEmpty());
+        return String.format("name : %s" + LINE_SEPARATOR, name != null && !name.isEmpty() ? candidate.get(0).name() : name) +
+                String.format("candidate : %s" + LINE_SEPARATOR, candidate.toString()) +
+                String.format("wrap : %s", hasWrap() ? getAllWrapInfo() : "null" + LINE_SEPARATOR) +
+                String.format("amount : %d" + LINE_SEPARATOR, amount) +
+                String.format("mass : %b" + LINE_SEPARATOR, isMass());
     }
 
 
-    public Map<Integer, ContainerWrapper> getContainerWrappers() {
-        return container;
+    public boolean hasContainers() {
+        return !((containers == null) || containers.isEmpty());
     }
 
-    public void setContainerWrappers(Map<Integer, ContainerWrapper> elements) {
-        this.container = elements;
+    public List<MatterContainer> getContainers() {
+        return containers;
     }
 
-    public Map<Integer, ContainerWrapper> containerElementsDeepCopy() {
-        Map<Integer, ContainerWrapper> map = new HashMap<>();
-        if (!hasContainer()) return map;
-        for (Map.Entry<Integer, ContainerWrapper> entry : this.container.entrySet()) {
-            map.put(entry.getKey(), entry.getValue());
-        }
-        return map;
+    public void setContainers(List<MatterContainer> containers) {
+        this.containers = containers;
     }
+
+    public void addContainers(List<MatterContainer> containers) {
+        this.containers.addAll(containers);
+    }
+
+    public PersistentDataContainer getPDC() {
+        if (!hasPDC()) return null;
+        return this.pdc;
+    }
+
+    public boolean hasPDC() {
+        return pdc != null;
+    }
+
+    public void setPDC(PersistentDataContainer pdc) {
+        this.pdc = pdc;
+    }
+
+
 
     @Override
     public boolean equals(Object obj) {
@@ -241,8 +246,7 @@ public class Matter implements Matters {
         Matter matter =(Matter) obj;
         if (!this.candidate.equals(matter.candidate)) return false;
         if (this.mass != matter.mass) return false;
-        if (this.amount != matter.amount) return false;
-        return true;
+        return this.amount == matter.amount;
     }
 
     @Override
