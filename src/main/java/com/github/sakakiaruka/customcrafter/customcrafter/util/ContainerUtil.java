@@ -37,6 +37,7 @@ import org.bukkit.profile.PlayerTextures;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
@@ -113,8 +114,7 @@ public class ContainerUtil {
                     .forEach((k, v) -> player.sendMessage("key=" + k + ", value=" + v));
         } else {
             Map<String, String> data = getData(item.getItemMeta().getPersistentDataContainer());
-            args[0] = "";
-            CONTAINER.accept(data, item, String.join(" ", args));
+            CONTAINER.accept(data, item, String.join(" ", Arrays.copyOfRange(args, 1, args.length, String[].class)));
         }
     }
 
