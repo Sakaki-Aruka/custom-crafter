@@ -639,7 +639,7 @@ public class SettingsLoad {
                 case "enchant_modify" -> consumer = ContainerUtil.ENCHANT_MODIFY;
                 case "lore_modify" -> consumer = ContainerUtil.LORE_MODIFY;
                 case "attribute_modifier_modify" -> consumer = ContainerUtil.ATTRIBUTE_MODIFIER_MODIFY;
-                case "result_reload" -> consumer = ContainerUtil.RESULT_VALUE_RELOAD;
+                case "result_sync" -> consumer = ContainerUtil.RESULT_VALUE_SYNC;
                 case "container" -> consumer = ContainerUtil.CONTAINER;
                 case "head" -> consumer = ContainerUtil.HEAD;
                 case "material" -> consumer = ContainerUtil.MATERIAL;

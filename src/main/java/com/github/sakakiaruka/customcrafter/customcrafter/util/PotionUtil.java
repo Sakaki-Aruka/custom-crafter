@@ -272,10 +272,6 @@ public class PotionUtil {
         List<Coordinate> r = recipe.getPotionCoordinateList();
         List<Coordinate> i = input.getPotionCoordinateList();
 
-        //debug
-        Bukkit.getLogger().info("potion pre list(recipe)="+r);
-        Bukkit.getLogger().info("potion pre list(input)="+i);
-
         if (r.isEmpty()) return Search.AMORPHOUS_NON_REQUIRED_ANCHOR; // no required potion elements
         if (r.size() > i.size()) return Search.AMORPHOUS_NULL_ANCHOR; // failed to match
 

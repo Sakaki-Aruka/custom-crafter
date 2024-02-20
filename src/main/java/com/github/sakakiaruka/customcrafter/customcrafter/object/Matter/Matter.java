@@ -155,7 +155,7 @@ public class Matter {
     public String getAllWrapInfo(){
         if(!hasWrap())return "";
         StringBuilder builder = new StringBuilder();
-        getWrap().forEach(s->builder.append(s.info()+ LINE_SEPARATOR));
+        getWrap().forEach(s-> builder.append(s.info()).append(LINE_SEPARATOR));
         return builder.toString();
     }
 

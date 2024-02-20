@@ -3,22 +3,15 @@ package com.github.sakakiaruka.customcrafter.customcrafter.util;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.Potions;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.*;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeModifier;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.entity.Damageable;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.LeatherArmorMeta;
 
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -30,10 +23,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.*;
 
@@ -56,8 +46,8 @@ public class InventoryUtil {
             list.add(i);
         }
         list.removeAll(getTableSlots(size));
-        list.removeAll(Arrays.asList(CRAFTING_TABLE_MAKE_BUTTON));
-        list.removeAll(Arrays.asList(CRAFTING_TABLE_RESULT_SLOT));
+        list.removeAll(List.of(CRAFTING_TABLE_MAKE_BUTTON));
+        list.removeAll(List.of(CRAFTING_TABLE_RESULT_SLOT));
         return list;
     }
 
@@ -66,7 +56,7 @@ public class InventoryUtil {
         // amount -> decrement amount
         List<Integer> slots = getTableSlots(CRAFTING_TABLE_SIZE);
         for (int i : slots) {
-            if (inventory.getItem(i) == null) continue;
+            if (inventory.getItem(i) == null || inventory.getItem(i).getType().equals(Material.AIR)) continue;
             int oldAmount = inventory.getItem(i).getAmount();
             int newAmount = Math.max(oldAmount - amount, 0);
             inventory.getItem(i).setAmount(newAmount);
@@ -139,7 +129,7 @@ public class InventoryUtil {
 
         if (ONE_BOOK_CHAR_LIMIT < value.length()) {
             Bukkit.getLogger().warning("[CustomCrafter] Set result metadata (addLong) failed. (Over 25600 characters.)");
-            meta.addPage("Overflown");
+            meta.addPages(Component.text("Overflown"));
             return;
         }
 
@@ -163,7 +153,7 @@ public class InventoryUtil {
                     return;
                 }
 
-                meta.addPage(element.toString());
+                meta.addPages(Component.text(element.toString()));
                 element.setLength(0);
 
                 horizontal = evaluation;
@@ -185,7 +175,7 @@ public class InventoryUtil {
             }
         }
 
-        meta.addPage(element.toString()); // add remaining string
+        meta.addPages(Component.text(element.toString())); // add remaining string
     }
 
 
@@ -194,26 +184,28 @@ public class InventoryUtil {
         // if the value is not a color-name, returns null.
         Color color;
         value = value.toUpperCase();
-        if (value.equals("AQUA")) color = Color.AQUA;
-        else if (value.equals("BLACK")) color = Color.BLACK;
-        else if (value.equals("BLUE")) color = Color.BLUE;
-        else if (value.equals("FUCHSIA")) color = Color.FUCHSIA;
-        else if (value.equals("GRAY")) color = Color.GRAY;
-        else if (value.equals("GREEN")) color = Color.GREEN;
-        else if (value.equals("LIME")) color = Color.LIME;
-        else if (value.equals("MAROON")) color = Color.MAROON;
-        else if (value.equals("NAVY")) color = Color.NAVY;
-        else if (value.equals("OLIVE")) color = Color.OLIVE;
-        else if (value.equals("ORANGE")) color = Color.ORANGE;
-        else if (value.equals("PURPLE")) color = Color.PURPLE;
-        else if (value.equals("RED")) color = Color.RED;
-        else if (value.equals("SILVER")) color = Color.SILVER;
-        else if (value.equals("TEAL")) color = Color.TEAL;
-        else if (value.equals("WHITE")) color = Color.WHITE;
-        else if (value.equals("YELLOW")) color = Color.YELLOW;
-        else {
-            Bukkit.getLogger().warning("[CustomCrafter] (ColorName) failed. Input -> " + value);
-            return null;
+        switch (value) {
+            case "AQUA" -> color = Color.AQUA;
+            case "BLACK" -> color = Color.BLACK;
+            case "BLUE" -> color = Color.BLUE;
+            case "FUCHSIA" -> color = Color.FUCHSIA;
+            case "GRAY" -> color = Color.GRAY;
+            case "GREEN" -> color = Color.GREEN;
+            case "LIME" -> color = Color.LIME;
+            case "MAROON" -> color = Color.MAROON;
+            case "NAVY" -> color = Color.NAVY;
+            case "OLIVE" -> color = Color.OLIVE;
+            case "ORANGE" -> color = Color.ORANGE;
+            case "PURPLE" -> color = Color.PURPLE;
+            case "RED" -> color = Color.RED;
+            case "SILVER" -> color = Color.SILVER;
+            case "TEAL" -> color = Color.TEAL;
+            case "WHITE" -> color = Color.WHITE;
+            case "YELLOW" -> color = Color.YELLOW;
+            default -> {
+                Bukkit.getLogger().warning("[CustomCrafter] (ColorName) failed. Input -> " + value);
+                return null;
+            }
         }
         return color;
     }
@@ -273,7 +265,7 @@ public class InventoryUtil {
             }
         }
 
-        Bukkit.getLogger().info("merged map="+merged);
+//        Bukkit.getLogger().info("merged map="+merged);
 
         Map<Coordinate, List<Coordinate>> conflict = new HashMap<>();
         Map<Coordinate, Coordinate> finished = new HashMap<>();
@@ -284,18 +276,18 @@ public class InventoryUtil {
                     continue;
                 }
                 // finished has already contained this value
-                Bukkit.getLogger().info("combination error (value duplication)");
+//                Bukkit.getLogger().info("combination error (value duplication)");
                 return new HashMap<>();
             }
 
             conflict.put(entry.getKey(), entry.getValue());
         }
 
-        Bukkit.getLogger().info("finished="+finished);
-        Bukkit.getLogger().info("conflict="+conflict);
+//        Bukkit.getLogger().info("finished="+finished);
+//        Bukkit.getLogger().info("conflict="+conflict);
 
         if (hasDuplicate(finished)) {
-            Bukkit.getLogger().info("contains duplicate coordinate.");
+//            Bukkit.getLogger().info("contains duplicate coordinate.");
             return new HashMap<>();
         }
 
@@ -328,7 +320,7 @@ public class InventoryUtil {
             non_duplicate.add(Arrays.toString(ss));
         }
 
-        Bukkit.getLogger().info("non_duplicate="+non_duplicate);
+//        Bukkit.getLogger().info("non_duplicate="+non_duplicate);
 
         List<String> non_duplcicate_list = new ArrayList<>(non_duplicate);
         for (int i = 0; i < non_duplcicate_list.size(); i++) {
@@ -337,8 +329,8 @@ public class InventoryUtil {
             for (Map.Entry<Coordinate, List<Coordinate>> entry : conflict.entrySet()) {
                 Coordinate key = entry.getKey();
 
-                // debug ^ 2
-                Bukkit.getLogger().info("conflict loop (i="+i+", temp[index])="+temp[index]);
+                // debug
+//                Bukkit.getLogger().info("conflict loop (i="+i+", temp[index])="+temp[index]);
 
                 String indexParse = temp[index]
                         .replace("[", "")
@@ -357,15 +349,15 @@ public class InventoryUtil {
             }
 
             if (hasDuplicate(finished)) {
-                Bukkit.getLogger().info("contains duplicate coordinate (in loop)");
+//                Bukkit.getLogger().info("contains duplicate coordinate (in loop)");
                 continue;
             }
 
-            Bukkit.getLogger().info("finished (index="+index+")="+finished);
+//            Bukkit.getLogger().info("finished (index="+index+")="+finished);
             return finished;
         }
 
-        Bukkit.getLogger().info("recipe match failed.");
+//        Bukkit.getLogger().info("recipe match failed.");
         return new HashMap<>();
     }
 

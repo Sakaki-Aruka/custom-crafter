@@ -41,7 +41,6 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -239,7 +238,6 @@ public class ContainerUtil {
             char c = formula.charAt(i);
             if (c != '{' && c != '}' && c != '\\' && flag == 0) {
                 result.append(c);
-                continue;
             } else if (c == '\\' && i <= formula.length() - 2 && flag == 0) {
                 char after = formula.charAt(i + 1);
                 if (after != '{' && after != '}') {
@@ -542,7 +540,7 @@ public class ContainerUtil {
         } else if (type.equalsIgnoreCase("title")) {
             meta.setTitle(element);
         } else if (type.equalsIgnoreCase("add_page")) {
-            meta.addPage(element);
+            meta.addPages(Component.text(element));
         } else if (type.equalsIgnoreCase("add_long")) {
             element = element.replace("\\n", SettingsLoad.LINE_SEPARATOR);
             InventoryUtil.addLong(meta, element, false);
@@ -713,7 +711,7 @@ public class ContainerUtil {
         }
     };
 
-    public static final TriConsumer<Map<String, String>, ItemStack, String> RESULT_VALUE_RELOAD = (data, item, formula) -> {
+    public static final TriConsumer<Map<String, String>, ItemStack, String> RESULT_VALUE_SYNC = (data, item, formula) -> {
         // formula not used
         data.entrySet().removeIf(e -> e.getKey().startsWith("$result."));
 
@@ -786,7 +784,7 @@ public class ContainerUtil {
             }
         }
         item.setItemMeta(meta);
-        RESULT_VALUE_RELOAD.accept(data, item, "");
+        RESULT_VALUE_SYNC.accept(data, item, "");
     };
 
     public static final TriConsumer<Map<String, String>, ItemStack, String> MATERIAL = (data, item, formula) -> {
