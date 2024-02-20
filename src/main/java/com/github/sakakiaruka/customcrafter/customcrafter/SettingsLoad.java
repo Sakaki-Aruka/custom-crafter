@@ -645,6 +645,7 @@ public class SettingsLoad {
                 case "result_reload" -> consumer = ContainerUtil.RESULT_VALUE_RELOAD;
                 case "container" -> consumer = ContainerUtil.CONTAINER;
                 case "head" -> consumer = ContainerUtil.HEAD;
+                case "material" -> consumer = ContainerUtil.MATERIAL;
                 default -> {
                     continue;
                 }

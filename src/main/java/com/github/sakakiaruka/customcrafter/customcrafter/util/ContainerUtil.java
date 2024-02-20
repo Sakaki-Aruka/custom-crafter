@@ -1,7 +1,6 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.util;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
-import com.destroystokyo.paper.profile.ProfileProperty;
 import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter;
 import com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad;
 import com.github.sakakiaruka.customcrafter.customcrafter.interfaces.TriConsumer;
@@ -17,7 +16,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
@@ -41,7 +39,6 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -782,6 +779,17 @@ public class ContainerUtil {
         }
         item.setItemMeta(meta);
         RESULT_VALUE_RELOAD.accept(data, item, "");
+    };
+
+    public static final TriConsumer<Map<String, String>, ItemStack, String> MATERIAL = (data, item, formula) -> {
+        // type: material, value: ~~~
+        // e.g. type: material, value: air
+        formula = getContent(data, formula).toUpperCase();
+        try {
+            item.setType(Material.valueOf(formula));
+        } catch (Exception e) {
+            sendOrdinalWarn("set material is failed.");
+        }
     };
 
 
