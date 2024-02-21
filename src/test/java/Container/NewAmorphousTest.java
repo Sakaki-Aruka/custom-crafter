@@ -82,6 +82,9 @@ public class NewAmorphousTest {
         Assertions.assertEquals("{tc_1} = 20", getValue(data, "\\{tc_1\\} = %test_container_1%"));
         Assertions.assertEquals("false", getValue(null, "{None==50}"));
         Assertions.assertEquals("true", getValue(data, "{(%test_container_1%+%test_container_2%)*2<(%test_container_3%*4)}"));
+
+        Assertions.assertEquals("20", ContainerUtil.setEvalValue("{long:10*2.0}"));
+        Assertions.assertEquals("20.0", ContainerUtil.setEvalValue("{double:10*2}"));
     }
 
     @Test

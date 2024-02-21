@@ -645,6 +645,7 @@ public class SettingsLoad {
                 case "material" -> consumer = ContainerUtil.MATERIAL;
                 case "run_command_as_player" -> consumer = ContainerUtil.RUN_COMMAND_AS_PLAYER;
                 case "run_command_as_console" -> consumer = ContainerUtil.RUN_COMMAND_AS_CONSOLE;
+                case "amount" -> consumer = ContainerUtil.AMOUNT;
                 default -> {
                     continue;
                 }

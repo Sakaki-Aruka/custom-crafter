@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -202,6 +203,13 @@ public class Search {
         inputContainerData.put("$PLAYER_EXP_LEVEL$", String.valueOf(player.getLevel()));
         inputContainerData.put("$PLAYER_DISPLAYED_NAME$", ((TextComponent) player.displayName()).content());
         inputContainerData.put("$PLAYER_MAXIMUM_NO_DAMAGE_TICKS$", String.valueOf(player.getMaximumNoDamageTicks()));
+        inputContainerData.put("$PLAYER_CLIENT_BRAND_NAME$", Objects.toString(player.getClientBrandName()));
+        inputContainerData.put("$PLAYER_IS_FLYING$", String.valueOf(player.isFlying()));
+        inputContainerData.put("$PLAYER_CURRENT_GAME_MODE$", player.getGameMode().name());
+        inputContainerData.put("$PLAYER_IN_RAIN$", String.valueOf(player.isInRain()));
+        inputContainerData.put("$PLAYER_IN_LAVA$", String.valueOf(player.isInLava()));
+        inputContainerData.put("$PLAYER_FACING$", player.getFacing().name());
+        inputContainerData.put("$PLAYER_CURRENT_HEALTH$", String.valueOf(player.getHealth()));
 
         if (ALL_MATERIALS.contains(recipe.getResult().getNameOrRegex())
         && recipe.getResult().getMatchPoint() == -1
@@ -265,7 +273,8 @@ public class Search {
         if(item.getType().equals(Material.AIR))return;
 
         WHAT_MAKING.put(player.getUniqueId(),item.getType());
-
+        inputContainerData.put("$RESULT_MATERIAL$", item.getType().name());
+        inputContainerData.put("$RESULT_AMOUNT$", String.valueOf(item.getAmount()));
         for (RecipeContainer container : recipe.getContainers()) {
             container.run(inputContainerData, item);
         }

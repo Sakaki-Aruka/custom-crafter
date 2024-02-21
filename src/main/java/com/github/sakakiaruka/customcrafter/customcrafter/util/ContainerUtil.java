@@ -253,7 +253,17 @@ public class ContainerUtil {
                 buffer.append(c);
             } else if (c == '}') {
                 flag = 0;
-                result.append(Expression.eval(buffer.toString()).asString());
+                String key = buffer.toString();
+                if (key.startsWith("long:")) {
+                    // {long:~~~~~}
+                    result.append((long) Expression.eval(key.substring(5)).asDouble());
+                } else if (key.startsWith("double:")) {
+                    // {double:~~~~}
+                    result.append(Expression.eval(key.substring(7)).asDouble());
+                }else {
+                    // {~~~~}
+                    result.append(Expression.eval(key).asString());
+                }
                 buffer.setLength(0);
             }
         }
@@ -292,9 +302,12 @@ public class ContainerUtil {
             item.setItemMeta(meta);
             return;
         }
+        formula = getContent(data, formula);
         List<Component> lore = new ArrayList<>();
         if (meta.lore() != null) lore.addAll(meta.lore());
-        lore.add(Component.text(getContent(data, formula)));
+        for (String s : formula.split(SettingsLoad.LINE_SEPARATOR)) {
+            lore.add(Component.text(s));
+        }
         meta.lore(lore);
         item.setItemMeta(meta);
     };
@@ -477,8 +490,9 @@ public class ContainerUtil {
     public static final TriConsumer<Map<String, String>, ItemStack, String> POTION_EFFECT = (data, item, formula) -> {
         // type: potion_effect, value: effect=~~~,level=~~~,duration=~~~
         // duration is game tick
+        // duration == -1 -> INFINITY
         formula = getContent(data, formula);
-        Matcher matcher = Pattern.compile("effect=([a-zA-Z_]+),level=([0-9]+),duration=([0-9]+)").matcher(formula);
+        Matcher matcher = Pattern.compile("effect=([a-zA-Z_]+),level=([0-9]+),duration=(-*[0-9]+)").matcher(formula);
         if (!matcher.matches()) {
             sendIllegalTemplateWarn("potion effect", formula, "effect=([a-zA-Z_]+),level=([0-9]+),duration=([0-9]+)");
             return;
@@ -581,7 +595,7 @@ public class ContainerUtil {
         URL url;
         try {
             String preURL = new String(Base64.getDecoder().decode(value));
-            Matcher u = Pattern.compile("[\"{a-zA-Z:]+(http://[a-zA-Z0-9./]+)[}\"]+").matcher(preURL);
+            Matcher u = Pattern.compile("[\"{a-zA-Z:]+(https*://[a-zA-Z0-9./%!*'();:@&=+$,?#\\[\\]]+)[}\"]+").matcher(preURL);
             if (!u.matches()) {
                 sendOrdinalWarn("head url parse error. (internal error)");
                 return;
@@ -718,6 +732,8 @@ public class ContainerUtil {
         ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
         Map<String, String> NEW_MAP = getData(meta.getPersistentDataContainer());
         NEW_MAP.forEach((k, v) -> data.put("$result." + k, v));
+        data.put("$RESULT_MATERIAL$", item.getType().name());
+        data.put("$RESULT_AMOUNT$", String.valueOf(item.getAmount()));
     };
 
     public static final TriConsumer<Map<String, String>, ItemStack, String> CONTAINER = (data, item, formula) -> {
@@ -784,7 +800,6 @@ public class ContainerUtil {
             }
         }
         item.setItemMeta(meta);
-        RESULT_VALUE_SYNC.accept(data, item, "");
     };
 
     public static final TriConsumer<Map<String, String>, ItemStack, String> MATERIAL = (data, item, formula) -> {
@@ -795,6 +810,28 @@ public class ContainerUtil {
             item.setType(Material.valueOf(formula));
         } catch (Exception e) {
             sendOrdinalWarn("Failed to set a material.");
+        }
+    };
+
+    public static final TriConsumer<Map<String, String>, ItemStack, String> AMOUNT = (data, item, formula) -> {
+        // type: amount, value: limit=(true|false),amount=(\\d+)
+        // "limit=true" means won't over the material's amount limit.
+        // e.g. type: amount, value: limit=true,amount=10
+        String pattern = "limit=(true|false),amount=([0-9]{1,4})";
+        formula = getContent(data, formula);
+        Matcher matcher = Pattern.compile(pattern).matcher(formula);
+        if (!matcher.matches()) {
+            sendIllegalTemplateWarn("amount", formula, pattern);
+            return;
+        }
+
+        int amount = Integer.parseInt(matcher.group(2));
+        if (Boolean.parseBoolean(matcher.group(1))) {
+            // follow the material limit
+            int limit = item.getType().getMaxStackSize();
+            item.setAmount(Math.min(amount, limit));
+        } else {
+            item.setAmount(amount);
         }
     };
 
