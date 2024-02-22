@@ -427,7 +427,7 @@ public class ContainerUtil {
         formula = getContent(data, formula);
         Matcher matcher = Pattern.compile("attribute=([a-zA-Z_]+),op=(?i)(add_number|add_scalar|multiply_scalar_1),value=(-?[0-9]*\\.?[0-9]+)").matcher(formula);
         if (!matcher.matches()) {
-            sendIllegalTemplateWarn("attribute modifier", formula, "attribute=([a-zA-Z_]+),op=(?i)(add_number|add_scalar|multiply_scalar_1),value=(-?[0-9]*\\.?[0-9]+)");
+            sendIllegalTemplateWarn("attribute modifier", formula, "attribute=([a-zA-Z_.]+),op=(?i)(add_number|add_scalar|multiply_scalar_1),value=(-?[0-9]*\\.?[0-9]+)");
             return;
         }
         Attribute attribute = Attribute.valueOf(matcher.group(1).toLowerCase());
@@ -439,13 +439,13 @@ public class ContainerUtil {
     };
 
     public static final TriConsumer<Map<String, String>, ItemStack, String> ATTRIBUTE_MODIFIER_EQUIPMENT = (data, item, formula) -> {
-        // type: attribute_modifier_equipment, value: attribute=~~~, ope=~~~, value=~~~, slot=~~~
+        // type: attribute_modifier_equipment, value: attribute=~~~, op=~~~, value=~~~, slot=~~~
         // %ATTRIBUTE%, %OPE_TYPE%, %VALUE%, %SLOT%
         formula = getContent(data, formula);
         ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
         Matcher matcher = Pattern.compile("attribute=([a-zA-Z_]+),op=(?i)(add_number|add_scalar|multiply_scalar_1),value=(-?[0-9]*\\.?[0-9]+),slot=([a-zA-Z_]+)").matcher(formula);
         if (!matcher.matches()) {
-            sendIllegalTemplateWarn("attribute modifier equipment", formula, "attribute=([a-zA-Z_]+),op=([a-zA-Z_]+),op=(?i)(add_number|add_scalar|multiply_scalar_1),value=(-?[0-9]*\\.?[0-9]+),slot=([a-zA-Z_]+)");
+            sendIllegalTemplateWarn("attribute modifier equipment", formula, "attribute=([a-zA-Z_]+),op=(?i)(add_number|add_scalar|multiply_scalar_1),value=(-?[0-9]*\\.?[0-9]+),slot=([a-zA-Z_]+)");
             return;
         }
         Attribute attribute = Attribute.valueOf(matcher.group(1).toUpperCase());
