@@ -215,7 +215,6 @@ public class InventoryUtil {
         for (ItemStack item : items) {
             Item dropped = player.getWorld().dropItem(player.getLocation(), item);
             dropped.setOwner(player.getUniqueId());
-            dropped.setGravity(false);
         }
     }
 
