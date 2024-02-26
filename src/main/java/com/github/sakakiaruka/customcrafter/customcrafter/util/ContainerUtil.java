@@ -1036,7 +1036,6 @@ public class ContainerUtil {
         System.out.println(item.serialize());
     };
 
-
     private static void removeCurrentVariables(Map<String, String> data) {
         data.entrySet().removeIf(element -> element.getKey().matches("\\$CURRENT_[A-Z0-9_.]+\\$"));
     }
