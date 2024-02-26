@@ -625,6 +625,9 @@ public class SettingsLoad {
             case "amount" -> consumer = ContainerUtil.AMOUNT;
             case "set_storage_item" -> consumer = ContainerUtil.SET_STORAGE_ITEM;
             case "item_define" -> consumer = ContainerUtil.ITEM_DEFINE;
+            case "can_place_on" -> consumer = ContainerUtil.CAN_PLACE_ON;
+            case "can_destroy" -> consumer = ContainerUtil.CAN_DESTROY;
+            case "repair_cost" -> consumer = ContainerUtil.REPAIR_COST;
             default -> {
                 consumer = null;
             }
