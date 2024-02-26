@@ -1,5 +1,6 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.util;
 
+import com.destroystokyo.paper.Namespaced;
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter;
 import com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad;
@@ -29,6 +30,7 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.inventory.meta.Repairable;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
@@ -978,6 +980,60 @@ public class ContainerUtil {
             }
         } else meta.addItem(defined);
         item.setItemMeta(meta);
+    };
+
+    public static final TriConsumer<Map<String, String>, ItemStack, String> CAN_PLACE_ON = (data, item, formula) -> {
+        // type: can_place_on, value: ([A-Za-z_0-9,]+)
+        // separate with ","
+        formula = getContent(data, formula);
+        final String pattern = "([A-Za-z0-9,_]+)";
+        if (!formula.matches(pattern)) {
+            sendIllegalTemplateWarn("can place on", formula, pattern);
+            return;
+        }
+        ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
+        List<Namespaced> keys = new ArrayList<>();
+        for (String block : formula.split(",")) {
+            keys.add(NamespacedKey.minecraft(block.toLowerCase()));
+        }
+        meta.setPlaceableKeys(keys);
+        item.setItemMeta(meta);
+    };
+
+    public static final TriConsumer<Map<String, String>, ItemStack, String> CAN_DESTROY = (data, item, formula) -> {
+        // type: can_destroy, value: ([a-zA-Z0-9,_]+)
+        // separate with ","
+        formula = getContent(data, formula);
+        final String pattern = "([a-zA-Z0-9,_]+)";
+        if (!formula.matches(pattern)) {
+            sendIllegalTemplateWarn("can destroy", formula, pattern);
+            return;
+        }
+        ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
+        List<Namespaced> keys = new ArrayList<>();
+        for (String block : formula.split(",")) {
+            keys.add(NamespacedKey.minecraft(block.toLowerCase()));
+        }
+        meta.setDestroyableKeys(keys);
+        item.setItemMeta(meta);
+
+        //debug
+        System.out.println(item.serialize());
+    };
+
+    public static final TriConsumer<Map<String, String>, ItemStack, String> REPAIR_COST = (data, item, formula) -> {
+        // type: repair_cost, value: (\\d+)
+        formula = getContent(data, formula);
+        if (!formula.matches("\\d+")) {
+            sendIllegalTemplateWarn("repair cost", formula, "\\d+");
+            return;
+        }
+        Repairable meta = (Repairable) Objects.requireNonNull(item.getItemMeta());
+        meta.setRepairCost(Integer.parseInt(formula));
+        item.setItemMeta(meta);
+
+        //debug
+        System.out.println(item.serialize());
     };
 
 
