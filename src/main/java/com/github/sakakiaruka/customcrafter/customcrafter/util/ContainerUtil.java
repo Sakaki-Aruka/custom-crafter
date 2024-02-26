@@ -24,6 +24,7 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
+import org.bukkit.inventory.meta.BundleMeta;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
@@ -53,6 +54,7 @@ import java.util.regex.Pattern;
 
 public class ContainerUtil {
 
+    public static Map<String, ItemStack> DEFINED_ITEMS = new HashMap<>();
 
     public static boolean isPass(ItemStack item, Matter matter) {
         // item -> target, matter -> source (recipe)
@@ -850,6 +852,132 @@ public class ContainerUtil {
             return;
         }
         Bukkit.dispatchCommand(player, formula);
+    };
+
+    public static final TriConsumer<Map<String, String>, ItemStack, String> ITEM_DEFINE = (data, item, formula) -> {
+        /*
+         * define:
+         *   - name: [([a-zA-Z_0-9]+)]
+         *     base: [([A-Z_]+)]
+         *     value: - type: ~~~, value: ~~~
+         *            - type: ~~~, value: ~~~
+         *
+         *
+         * putting to the data whose key is "name" and value is ItemStack.
+         *
+         * format -> |name,base,value-1-length:value-1,value-2-length:value-2|name,base....
+         * e.g.) test,stone,21:type:amount, value:10,~~~
+         * e.g.) test_2,stone,0
+         * e.g.) test_3,stone,0|test_4,dirt,0
+         * item does not used.
+         */
+
+        formula = getContent(data, formula);
+        // flag = 0 (separator = "|"), 1 = (name section), 2 = (base section), 3 = (element section)
+        int flag = 0;
+        // keys = name, base, values
+        Map<String, String> map = new HashMap<>();
+        StringBuilder buffer = new StringBuilder();
+        for (int i = 0; i < formula.length(); i++) {
+            char c = formula.charAt(i);
+            if (c == '|') {
+                flag = 0;
+                buffer.setLength(0);
+                map.clear();
+                continue;
+            }
+
+            if (flag == 0) {
+                flag = 1;
+                buffer.append(c);
+                continue;
+            }
+
+            if (flag == 1) {
+                if (c != ',') buffer.append(c);
+                else {
+                    map.put("name", buffer.toString());
+                    flag = 2;
+                    buffer.setLength(0);
+                }
+                continue;
+            }
+
+            if (flag == 2) {
+                if (c != ',') buffer.append(c);
+                else {
+                    map.put("base", buffer.toString().toUpperCase());
+                    DEFINED_ITEMS.put("$" + data.get("$RECIPE_NAME$") + "." + map.get("name") + "$", new ItemStack(Material.valueOf(map.get("base").toUpperCase())));
+                    if (i < formula.length() - 1) {
+                        if (formula.charAt(i + 1) == '0') {
+                            flag = 0;
+                            map.clear();
+                        }
+                        else flag = 3;
+                    }
+                    buffer.setLength(0);
+                }
+            }
+
+            if (flag == 3) {
+                if (c != ':') {
+                    buffer.append(c);
+                    continue;
+                }
+                // ":"
+                int len = Integer.parseInt(buffer.toString().replace(",", ""));
+                buffer.setLength(0);
+                String element = formula.substring(i + 1, i + 1 + len);
+                i += len;
+
+                Matcher parsed = Pattern.compile("type: ([a-zA-Z_0-9]+), value: (.+)").matcher(element);
+                if (!parsed.matches()) {
+                    sendIllegalTemplateWarn("item define", element, "type: ([a-zA-Z_0-9]+), value: (.+)");
+                    return;
+                }
+
+                TriConsumer<Map<String, String>, ItemStack, String> consumer = SettingsLoad.getConsumer(parsed.group(1).toLowerCase());
+                if (consumer == null) {
+                    sendNoSuchTemplateWarn("item define", element);
+                    return;
+                }
+
+                ItemStack defined = DEFINED_ITEMS.get("$" + data.get("$RECIPE_NAME$") + "." + map.get("name") + "$");
+                consumer.accept(data, defined, parsed.group(2));
+            }
+        }
+    };
+
+    public static final TriConsumer<Map<String, String>, ItemStack, String> SET_STORAGE_ITEM = (data, item, formula) -> {
+        // type: set_storage_item, value: name=([a-zA-Z_0-9]+),slot=(\\d+),amount=(\\d+)
+        // bundle only
+
+        if (!item.getType().equals(Material.BUNDLE)) {
+            sendOrdinalWarn("(set storage item) Required BUNDLE.");
+            return;
+        }
+
+        formula = getContent(data, formula);
+        final String pattern = "name=([a-zA-Z_0-9]+)(,amount=(\\d+))?(,times=(\\d+))?";
+        Matcher parsed = Pattern.compile(pattern).matcher(formula);
+        if (!parsed.matches()) {
+            sendIllegalTemplateWarn("set storage item", formula, pattern);
+            return;
+        }
+        String name = "$" + data.get("$RECIPE_NAME$") + "." + parsed.group(1) + "$";
+        if (!DEFINED_ITEMS.containsKey(name)) {
+            sendNoSuchTemplateWarn("defined item", name);
+            return;
+        }
+        BundleMeta meta = (BundleMeta) Objects.requireNonNull(item.getItemMeta());
+        ItemStack defined = new ItemStack(DEFINED_ITEMS.get(name));
+        if (parsed.group(3) != null) defined.setAmount(Integer.parseInt(parsed.group(3)));
+        if (parsed.group(5) != null) {
+            for (int i = 0; i < Integer.parseInt(parsed.group(5)); i++) {
+                meta.addItem(new ItemStack(defined));
+            }
+        } else meta.addItem(defined);
+        item.setItemMeta(meta);
     };
 
 

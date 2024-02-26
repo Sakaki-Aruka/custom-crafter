@@ -7,6 +7,7 @@ import com.destroystokyo.paper.profile.ProfileProperty;
 import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.ContainerUtil;
 import org.bukkit.Material;
+import org.bukkit.block.Chest;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.profile.PlayerTextures;
 import org.checkerframework.checker.units.qual.A;
@@ -21,6 +22,7 @@ import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 
 public class TriConsumerTest {
@@ -28,15 +30,15 @@ public class TriConsumerTest {
     private CustomCrafter plugin;
 
 
-    @BeforeEach
-    void setup() {
-        server = MockBukkit.getMock();
-    }
-
-    @AfterEach
-    void tearDown() {
-        MockBukkit.unmock();
-    }
+//    @BeforeEach
+//    void setup() {
+//        server = MockBukkit.getMock();
+//    }
+//
+//    @AfterEach
+//    void tearDown() {
+//        MockBukkit.unmock();
+//    }
 
     @Test
     public void set_placeholder_value_test() {

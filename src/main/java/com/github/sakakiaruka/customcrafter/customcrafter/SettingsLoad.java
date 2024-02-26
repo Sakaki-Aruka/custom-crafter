@@ -595,6 +595,43 @@ public class SettingsLoad {
         }
     }
 
+    public static TriConsumer<Map<String, String>, ItemStack, String> getConsumer(String type) {
+        TriConsumer<Map<String, String>, ItemStack, String> consumer;
+        switch (type) {
+            case "lore" -> consumer =  ContainerUtil.LORE;
+            case "enchant" -> consumer = ContainerUtil.ENCHANT;
+            case "potion_color_rgb" -> consumer = ContainerUtil.POTION_COLOR_RGB;
+            case "potion_color_name" -> consumer = ContainerUtil.POTION_COLOR_NAME;
+            case "texture_id" -> consumer = ContainerUtil.TEXTURE_ID;
+            case "tool_durability_percentage" -> consumer = ContainerUtil.TOOL_DURABILITY_PERCENTAGE;
+            case "tool_durability_real" -> consumer = ContainerUtil.TOOL_DURABILITY_REAL;
+            case "item_name" -> consumer = ContainerUtil.ITEM_NAME;
+            case "attribute_modifier" -> consumer = ContainerUtil.ATTRIBUTE_MODIFIER;
+            case "attribute_modifier_equipment" -> consumer = ContainerUtil.ATTRIBUTE_MODIFIER_EQUIPMENT;
+            case "item_flag" -> consumer = ContainerUtil.ITEM_FLAG;
+            case "unbreakable" -> consumer = ContainerUtil.UNBREAKABLE;
+            case "potion_effect" -> consumer = ContainerUtil.POTION_EFFECT;
+            case "leather_armor_color" -> consumer = ContainerUtil.LEATHER_ARMOR_COLOR;
+            case "book" -> consumer = ContainerUtil.BOOK;
+            case "enchant_modify" -> consumer = ContainerUtil.ENCHANT_MODIFY;
+            case "lore_modify" -> consumer = ContainerUtil.LORE_MODIFY;
+            case "attribute_modifier_modify" -> consumer = ContainerUtil.ATTRIBUTE_MODIFIER_MODIFY;
+            case "result_sync" -> consumer = ContainerUtil.RESULT_VALUE_SYNC;
+            case "container" -> consumer = ContainerUtil.CONTAINER;
+            case "head" -> consumer = ContainerUtil.HEAD;
+            case "material" -> consumer = ContainerUtil.MATERIAL;
+            case "run_command_as_player" -> consumer = ContainerUtil.RUN_COMMAND_AS_PLAYER;
+            case "run_command_as_console" -> consumer = ContainerUtil.RUN_COMMAND_AS_CONSOLE;
+            case "amount" -> consumer = ContainerUtil.AMOUNT;
+            case "set_storage_item" -> consumer = ContainerUtil.SET_STORAGE_ITEM;
+            case "item_define" -> consumer = ContainerUtil.ITEM_DEFINE;
+            default -> {
+                consumer = null;
+            }
+        }
+        return consumer;
+    }
+
     private List<RecipeContainer> getRecipeContainerList(FileConfiguration config) {
         if (!config.contains("container")) return List.of();
         List<RecipeContainer> result = new ArrayList<>();
@@ -605,7 +642,7 @@ public class SettingsLoad {
         //    value: (.+)
 
         for (Map<String, String> map : (List<Map<String, String>>) config.getList("container")) {
-            String type = map.get("predicate").toLowerCase();
+            String type = map.containsKey("predicate") ? map.get("predicate").toLowerCase() : "none";
             BiFunction<Map<String, String>, String, Boolean> predicate;
             switch (type) {
                 case "none" -> predicate = ContainerUtil.NONE;
@@ -618,43 +655,40 @@ public class SettingsLoad {
 
             String formula = type.equalsIgnoreCase("none") ? "" : map.get("formula");
 
-            TriConsumer<Map<String, String>, ItemStack, String> consumer;
-            String cType = map.get("type").toLowerCase();
-            switch (cType) {
-                case "lore" -> consumer = ContainerUtil.LORE;
-                case "enchant" -> consumer = ContainerUtil.ENCHANT;
-                case "potion_color_rgb" -> consumer = ContainerUtil.POTION_COLOR_RGB;
-                case "potion_color_name" -> consumer = ContainerUtil.POTION_COLOR_NAME;
-                case "texture_id" -> consumer = ContainerUtil.TEXTURE_ID;
-                case "tool_durability_percentage" -> consumer = ContainerUtil.TOOL_DURABILITY_PERCENTAGE;
-                case "tool_durability_real" -> consumer = ContainerUtil.TOOL_DURABILITY_REAL;
-                case "item_name" -> consumer = ContainerUtil.ITEM_NAME;
-                case "attribute_modifier" -> consumer = ContainerUtil.ATTRIBUTE_MODIFIER;
-                case "attribute_modifier_equipment" -> consumer = ContainerUtil.ATTRIBUTE_MODIFIER_EQUIPMENT;
-                case "item_flag" -> consumer = ContainerUtil.ITEM_FLAG;
-                case "unbreakable" -> consumer = ContainerUtil.UNBREAKABLE;
-                case "potion_effect" -> consumer = ContainerUtil.POTION_EFFECT;
-                case "leather_armor_color" -> consumer = ContainerUtil.LEATHER_ARMOR_COLOR;
-                case "book" -> consumer = ContainerUtil.BOOK;
-                case "enchant_modify" -> consumer = ContainerUtil.ENCHANT_MODIFY;
-                case "lore_modify" -> consumer = ContainerUtil.LORE_MODIFY;
-                case "attribute_modifier_modify" -> consumer = ContainerUtil.ATTRIBUTE_MODIFIER_MODIFY;
-                case "result_sync" -> consumer = ContainerUtil.RESULT_VALUE_SYNC;
-                case "container" -> consumer = ContainerUtil.CONTAINER;
-                case "head" -> consumer = ContainerUtil.HEAD;
-                case "material" -> consumer = ContainerUtil.MATERIAL;
-                case "run_command_as_player" -> consumer = ContainerUtil.RUN_COMMAND_AS_PLAYER;
-                case "run_command_as_console" -> consumer = ContainerUtil.RUN_COMMAND_AS_CONSOLE;
-                case "amount" -> consumer = ContainerUtil.AMOUNT;
-                default -> {
-                    continue;
-                }
+            TriConsumer<Map<String, String>, ItemStack, String> consumer = getConsumer(map.get("type").toLowerCase());
+            if (consumer == null) continue;
+            String actionFormula;
+            if (!map.get("type").equalsIgnoreCase("item_define")){
+                actionFormula =  map.getOrDefault("value", "");
+            } else {
+                actionFormula = getItemDefineFormula(config);
             }
-
-            String actionFormula = map.getOrDefault("value", "");
             result.add(new RecipeContainer(predicate, consumer, formula, actionFormula));
         }
         return result;
+    }
+
+    private static String getItemDefineFormula(FileConfiguration config) {
+        StringBuilder builder = new StringBuilder();
+        List<Map<String, List<String>>> list = (List<Map<String, List<String>>>) config.getList("define");
+        for (Map<String, List<String>> map : list) {
+            builder.append("|");
+            builder.append(map.get("name").get(0)).append(",");
+            builder.append(map.get("base").get(0)).append(",");
+            if (!map.containsKey("value")) {
+                builder.append("0");
+                continue;
+            }
+
+            for (int i = 0; i < map.get("value").size(); i++) {
+                String element = map.get("value").get(i);
+                builder.append(element.length())
+                        .append(":")
+                        .append(element)
+                        .append(i == map.get("value").size() - 1 ? "" : ",");
+            }
+        }
+        return builder.toString();
     }
 
     private Duration getDuration(String dateRow, boolean delete) {
