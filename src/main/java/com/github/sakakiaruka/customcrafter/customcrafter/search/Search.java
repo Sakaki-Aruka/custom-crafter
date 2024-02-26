@@ -210,6 +210,7 @@ public class Search {
         inputContainerData.put("$PLAYER_IN_LAVA$", String.valueOf(player.isInLava()));
         inputContainerData.put("$PLAYER_FACING$", player.getFacing().name());
         inputContainerData.put("$PLAYER_CURRENT_HEALTH$", String.valueOf(player.getHealth()));
+        inputContainerData.put("$RECIPE_NAME$", recipe.getName());
 
         if (ALL_MATERIALS.contains(recipe.getResult().getNameOrRegex())
         && recipe.getResult().getMatchPoint() == -1
