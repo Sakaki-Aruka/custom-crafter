@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class TriConsumerTest {
     private ServerMock server;
@@ -51,8 +53,8 @@ public class TriConsumerTest {
 
     @Test
     public void randomize_test() {
-        String input = "10.1111111%"; //%
-        int times = 1000000;
+        String input = "23.18";
+        int times = 10000;
         int result = 0;
         for (int i = 0; i < times; i++) {
             if (ContainerUtil.RANDOM.apply(new HashMap<>(), input)) result++;

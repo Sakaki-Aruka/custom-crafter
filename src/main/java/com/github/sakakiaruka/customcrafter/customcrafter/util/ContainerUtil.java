@@ -46,13 +46,11 @@ import java.util.Arrays;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Random;
-import java.util.Set;
 import java.util.UUID;
 import java.util.function.BiFunction;
 import java.util.regex.Matcher;
@@ -126,14 +124,14 @@ public class ContainerUtil {
     }
 
     public static final BiFunction<Map<String, String>, String, Boolean> RANDOM = (data, predicate) -> {
-        // ([0-9.]+)%
+        if (predicate.isEmpty()) predicate = "50.00"; // %
         predicate = getContent(data, predicate);
-        final String pattern = "\\d+\\.?\\d*%";
-        if (predicate.matches(pattern)) {
+        final String pattern = "\\d+\\.?\\d*";
+        if (!predicate.matches(pattern)) {
             sendIllegalTemplateWarn("random predicate", predicate, pattern);
             return false;
         }
-        BigDecimal in = new BigDecimal(predicate.replace("%", ""), MathContext.DECIMAL128);
+        BigDecimal in = new BigDecimal(predicate, MathContext.DECIMAL128);
         if (in.compareTo(BigDecimal.ZERO) < 0) {
             sendOrdinalWarn("random predicate error. (The predicates probability is too small. It must be in range 0 ~ ).");
             return false;
