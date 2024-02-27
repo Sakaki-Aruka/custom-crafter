@@ -651,6 +651,7 @@ public class SettingsLoad {
                 case "none" -> predicate = ContainerUtil.NONE;
                 case "string" -> predicate = ContainerUtil.STRING_MATCH;
                 case "value" -> predicate = ContainerUtil.ALLOW_VALUE;
+                case "random" -> predicate = ContainerUtil.RANDOM;
                 default -> {
                     continue;
                 }

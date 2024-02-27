@@ -48,4 +48,16 @@ public class TriConsumerTest {
         Assertions.assertEquals("hello, world", ContainerUtil.setEvalValue(ContainerUtil.setPlaceholderValue(data, "%test.string%, %test2.string%")));
         Assertions.assertEquals("None, None", ContainerUtil.setEvalValue(ContainerUtil.setPlaceholderValue(Collections.emptyMap(), "%test.string%, %test.string%")));
     }
+
+    @Test
+    public void randomize_test() {
+        String input = "10.1111111%"; //%
+        int times = 1000000;
+        int result = 0;
+        for (int i = 0; i < times; i++) {
+            if (ContainerUtil.RANDOM.apply(new HashMap<>(), input)) result++;
+        }
+
+        System.out.println("in="+input+", result="+ 100 * ((double) result / (double) times) + "%");
+    }
 }
