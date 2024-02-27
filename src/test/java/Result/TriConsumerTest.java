@@ -24,6 +24,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 public class TriConsumerTest {
     private ServerMock server;
@@ -47,5 +49,17 @@ public class TriConsumerTest {
         data.put("test2.string", "world");
         Assertions.assertEquals("hello, world", ContainerUtil.setEvalValue(ContainerUtil.setPlaceholderValue(data, "%test.string%, %test2.string%")));
         Assertions.assertEquals("None, None", ContainerUtil.setEvalValue(ContainerUtil.setPlaceholderValue(Collections.emptyMap(), "%test.string%, %test.string%")));
+    }
+
+    @Test
+    public void randomize_test() {
+        String input = "23.18";
+        int times = 10000;
+        int result = 0;
+        for (int i = 0; i < times; i++) {
+            if (ContainerUtil.RANDOM.apply(new HashMap<>(), input)) result++;
+        }
+
+        System.out.println("in="+input+", result="+ 100 * ((double) result / (double) times) + "%");
     }
 }

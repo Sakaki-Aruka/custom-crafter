@@ -38,6 +38,8 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.profile.PlayerTextures;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -120,6 +122,34 @@ public class ContainerUtil {
             CONTAINER.accept(data, item, String.join(" ", Arrays.copyOfRange(args, 1, args.length, String[].class)));
         }
     }
+
+    public static final BiFunction<Map<String, String>, String, Boolean> RANDOM = (data, predicate) -> {
+        if (predicate.isEmpty()) predicate = "50.00"; // %
+        predicate = getContent(data, predicate);
+        final String pattern = "\\d+\\.?\\d*";
+        if (!predicate.matches(pattern)) {
+            sendIllegalTemplateWarn("random predicate", predicate, pattern);
+            return false;
+        }
+        BigDecimal in = new BigDecimal(predicate, MathContext.DECIMAL128);
+        if (in.compareTo(BigDecimal.ZERO) < 0) {
+            sendOrdinalWarn("random predicate error. (The predicates probability is too small. It must be in range 0 ~ ).");
+            return false;
+        }
+        else if (in.equals(BigDecimal.ZERO)) return false; // 0%
+        else if (-1 < in.compareTo(BigDecimal.TEN.pow(2))) return true; // (over) 100%
+
+        BigDecimal norm = BigDecimal.TEN.pow(in.scale() * -1, MathContext.DECIMAL128);
+        BigDecimal times = in.divide(norm, MathContext.DECIMAL128);
+        BigDecimal all = BigDecimal.TEN.pow(2).divide(norm, MathContext.DECIMAL128);
+        BigDecimal MAX = new BigDecimal(Integer.MAX_VALUE);
+        if (times.compareTo(MAX) + all.compareTo(MAX) != -2) {
+            sendOrdinalWarn("random predicate error. (The required precision is too high.)");
+            return false;
+        }
+
+        return new Random().nextInt(all.intValue()) > all.subtract(times).intValue();
+    };
 
     public static final BiFunction<Map<String, String>, String, Boolean> NONE = (data, predicate) -> true;
 
