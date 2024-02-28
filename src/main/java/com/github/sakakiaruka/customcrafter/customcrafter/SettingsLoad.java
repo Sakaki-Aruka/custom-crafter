@@ -628,6 +628,7 @@ public class SettingsLoad {
             case "can_place_on" -> consumer = ContainerUtil.CAN_PLACE_ON;
             case "can_destroy" -> consumer = ContainerUtil.CAN_DESTROY;
             case "repair_cost" -> consumer = ContainerUtil.REPAIR_COST;
+            case "enchant_book" -> consumer = ContainerUtil.ENCHANT_BOOK;
             default -> {
                 consumer = null;
             }
