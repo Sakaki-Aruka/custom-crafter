@@ -1049,9 +1049,6 @@ public class ContainerUtil {
         }
         meta.setDestroyableKeys(keys);
         item.setItemMeta(meta);
-
-        //debug
-        System.out.println(item.serialize());
     };
 
     public static final TriConsumer<Map<String, String>, ItemStack, String> REPAIR_COST = (data, item, formula) -> {
@@ -1064,97 +1061,181 @@ public class ContainerUtil {
         Repairable meta = (Repairable) Objects.requireNonNull(item.getItemMeta());
         meta.setRepairCost(Integer.parseInt(formula));
         item.setItemMeta(meta);
-
-        //debug
-        System.out.println(item.serialize());
     };
 
+
     public static final TriConsumer<Map<String, String>, ItemStack, String> ENCHANT_BOOK = (data, item, formula) -> {
-        // type: enchant_book, value: enchant=([a-z_]+),level=([0-9]+)
         // type: enchant_book, value: type=(enchant|level),action=([a-zA-Z_]+)->(.+)
+
         // e.g. type: enchant_book, value: type=enchant,action=fortune->5 (add fortune level 5)
-        // e.g. type: enchant_book, value: type=level,action=fortune->None (remove fortune)
+
         // e.g. type: enchant_book, value: type=enchant,action=fortune->None (remove fortune)
         // e.g. type: enchant_book, value: type=enchant,action=fortune->mending (fortune to mending)
-        // e.g. type: enchant_book, value: type=enchant,action=random->random (random(contained) to random(not contained))
+
+        // e.g. type: enchant_book, value: type=enchant,action=random->random[!(fortune,smite,looting)] (random(contained) to random(without fortune, smite, looting))
+        // e.g. type: enchant_book, value: type=enchant,action=random->random[(fortune, smite, looting)] (random(contained) to random(from fortune, smite, looting))
+
+        // e.g. type: enchant_book, value: type=enchant,action=random[(fortune,smite)]->random (random(fortune or smite) to random(without fortune, smite))
+        // e.g. type: enchant_book, value: type=enchant,action=random[(fortune,smite)]->random[(fortune,smite,looting,None)] (random(fortune or smite) to random(fortune, smite, looting) or remove)
+        // e.g. type: enchant_book, value: type=enchant,action=random[(!self)]->fortune (random (all, but does not contain self) to fortune)
+        // e.g. type: enchant_book, value: type=enchant,action=random[(all)]->fortune (random (all) to fortune)
+
+        // -------------------------------------------------------------------------------------------------------------
+
+        // e.g. type: enchant_book, value: type=level,action=fortune->None (remove fortune)
+
         // e.g. type: enchant_book, value: type=level,action=fortune->random (fortune's level to 1 ~ 255)
         // e.g. type: enchant_book, value: type=level,action=random->random (set random(contained)'s level to 1 ~ 255)
 
+        // e.g. type: enchant_book, value: type=level,action=fortune->random[3:] (set fortune's level to 3 ~ 256)
+        // e.g. type: enchant_book, value: type=level,action=fortune->random[:10] (set fortune's level 1 ~ 10)
+        // e.g. type: enchant_book, value: type=level,action=fortune->random[10:20] (set fortune's level 10 ~ 20)
+        // e.g. type: enchant_book, value: type=level,action=fortune->random[:] (1 ~ 256, same with "action=fortune->random")
+
+
         formula = getContent(data, formula);
-        final String pattern = "type=(enchant|level),action=([a-zA-Z_]+)->(.+)";
-        Matcher parsed = Pattern.compile(pattern).matcher(formula);
+        final String FORMULA_PATTERN = "type=(enchant|level),action=([a-zA-Z_\\[\\](),!]+)->(.+)";
+        final String TARGET_PATTERN = "[a-zA-Z_]+|random(\\[!?\\([A-Za-z_,]+\\)])?";
+        final String RANDOM_TARGET_PATTERN = "random(\\[!?\\([A-Za-z_,]+\\)])?";
+        final String RANDOM_NUMBER_PATTERN = "[0-9]+|random(\\[([0-9-]+)?:([0-9-]+)?])?";
+        Matcher parsed = Pattern.compile(FORMULA_PATTERN).matcher(formula);
         if (!parsed.matches()) {
-            sendIllegalTemplateWarn("enchant book", formula, pattern);
+            sendIllegalTemplateWarn("enchant book", formula, FORMULA_PATTERN);
             return;
         }
         EnchantmentStorageMeta meta = (EnchantmentStorageMeta) Objects.requireNonNull(item.getItemMeta());
         boolean isEnchant = parsed.group(1).equalsIgnoreCase("enchant");
-
-
-        Enchantment target;
-        if (parsed.group(2).equalsIgnoreCase("random")) {
-            if (!meta.hasStoredEnchants()) return;
-            target = getRandomEnchantment(meta.getStoredEnchants().keySet(), true);
-        } else target = Enchantment.getByKey(NamespacedKey.minecraft(parsed.group(2).toLowerCase()));
-        if (target == null) {
-            sendNoSuchTemplateWarn("enchant", parsed.group(2));
+        Matcher targetMatcher = Pattern.compile(TARGET_PATTERN).matcher(parsed.group(2));
+        if (!targetMatcher.matches()) {
+            sendIllegalTemplateWarn("enchant book (source)", parsed.group(2), TARGET_PATTERN);
             return;
         }
-
-        meta.getStoredEnchants().forEach((k, v) -> {
-            data.put("$CURRENT_" + k.toString() + "_LEVEL$", String.valueOf(v));
-        });
-        String element = getContent(data, parsed.group(3));
-        boolean toNumeric = element.matches("0-9+");
+        boolean isRandomTarget = parsed.group(2).matches(RANDOM_TARGET_PATTERN);
+        Enchantment target;
+        if (isRandomTarget) {
+            String element = parsed.group(2).replaceAll("[()\\[\\]]", "");
+            if (element.equals("!self")) {
+                target = getRandomEnchantment(meta.getStoredEnchants().keySet(), parsed.group(2));  // random[!(self)] (from all without self)
+            }
+            else if (element.equals("all")) target = getRandomEnchantment(null, parsed.group(2)); // random[(all)] (from all)
+            else target = getRandomEnchantment(null, parsed.group(2));  // random[!(~~~,~~~)] or random[(~~~,~~~)]
+        } else target = Enchantment.getByKey(NamespacedKey.minecraft(parsed.group(2).toLowerCase()));
+        if (target == null) {
+            sendNoSuchTemplateWarn("enchant book element", parsed.group(2));
+            return;
+        }
+        data.put("$CURRENT_ENCHANT_LEVEL$", meta.hasStoredEnchant(target) ? String.valueOf(meta.getStoredEnchantLevel(target)) : "0");
+        formula = getContent(data, formula);
+        Matcher reMatch = Pattern.compile(FORMULA_PATTERN).matcher(formula);
+        if (!reMatch.matches()) return;
         removeCurrentVariables(data);
+        boolean toNone = reMatch.group(3).equalsIgnoreCase("None");
+        boolean toNumeric = reMatch.group(3).matches(RANDOM_NUMBER_PATTERN);
 
-        if (!meta.hasStoredEnchant(target)) return;
-        if (parsed.group(2).equalsIgnoreCase("None")) {
-            // ->None
+        if (toNone) {
             if (meta.hasStoredEnchant(target)) meta.removeStoredEnchant(target);
-        } else {
-            // e.g. ->5
-            // e.g. ->fortune
-            if (!meta.hasStoredEnchants()) return; // non required an empty enchantment book.
-            if (isEnchant && toNumeric) {
-                int level = Integer.parseInt(element);
-                meta.addStoredEnchant(target, level, true);
-            } else if (isEnchant) {
-                // !toNumeric = enchant change
-                Enchantment replacer;
-                if (element.equalsIgnoreCase("random")) {
-                    replacer = Enchantment.getByKey(NamespacedKey.minecraft(element.toLowerCase()));
-                } else {
-                    Set<Enchantment> set = new HashSet<>(Arrays.asList(Enchantment.values()));
-                    set.removeAll(meta.getStoredEnchants().keySet());
-                    replacer = getRandomEnchantment(set, true);
-                }
-                if (replacer == null) {
-                    sendNoSuchTemplateWarn("enchant", element);
-                    return;
-                }
-                int level = meta.getStoredEnchantLevel(replacer);
-                meta.addStoredEnchant(replacer, level, true);
-            } else {
-                // !isEnchant = level change
-                int level;
-                if (element.equalsIgnoreCase("random")) level = new Random().nextInt(256);
-                else level = Integer.parseInt(element);
+        } else if (toNumeric) {
+            int level;
+            try {
+                level = Integer.parseInt(reMatch.group(3));
+            } catch (Exception e) {
+                level = getRandomNumber(reMatch.group(3), 1, 255);
+            }
+
+            if (isEnchant && !meta.hasStoredEnchant(target)) meta.addStoredEnchant(target, level, true);
+            else if (!isEnchant && meta.hasStoredEnchant(target)) {
                 meta.removeStoredEnchant(target);
                 meta.addStoredEnchant(target, level, true);
             }
+        } else if (!isEnchant) {
+            // !toNumeric && !isEnchant
+            if (meta.hasStoredEnchant(target)) meta.removeStoredEnchant(target);
+        } else {
+            // !toNumeric && isEnchant
+            if (!reMatch.group(3).matches(RANDOM_TARGET_PATTERN)) {
+                // !toRandom
+                int level = meta.getStoredEnchantLevel(target);
+                meta.removeStoredEnchant(target);
+                meta.addStoredEnchant(Enchantment.getByKey(NamespacedKey.minecraft(reMatch.group(3).toLowerCase())), level, true);
+            } else {
+                Enchantment destination = getRandomEnchantment(meta.getStoredEnchants().keySet(), reMatch.group(3));
+                if (destination == null) meta.removeStoredEnchant(target);
+                else {
+                    int level = meta.getStoredEnchantLevel(target);
+                    meta.removeStoredEnchant(target);
+                    meta.addStoredEnchant(destination, level, true);
+                }
+            }
         }
-
         item.setItemMeta(meta);
     };
 
-    private static Enchantment getRandomEnchantment(Set<Enchantment> enchants, boolean fromSet) {
-        if (fromSet) {
-            List<Enchantment> list = new ArrayList<>(enchants);
-            return list.get(new Random().nextInt(list.size()));
+    public static int getRandomNumber(String formula, int underLimit, int upperLimit) {
+        // e.g. [3:] (3 ~ upper limit)
+        // e.g. [:10] (under limit ~ 10)
+        // e.g. [5:20] (5 ~ 20)
+        // e.g. [:] (under limit ~ upper limit)
+
+        final String pattern = "random\\[([0-9-]+)?:([0-9-]+)?]";
+        Matcher parsed = Pattern.compile(pattern).matcher(formula);
+        if (!parsed.matches()) {
+            return 0;
         }
 
-        return Enchantment.values()[new Random().nextInt(Enchantment.values().length)];
+        if (underLimit == upperLimit) return upperLimit;
+        if (parsed.group(1) == null && parsed.group(2) == null) {
+            // [:]
+            return getInRange(underLimit, upperLimit);
+        } else if (parsed.group(1) != null && parsed.group(2) == null) {
+            // [([0-9-]+):]
+            return getInRange(Integer.parseInt(parsed.group(1)), upperLimit + 1);
+        } else if (parsed.group(1) == null && parsed.group(2) != null) {
+            // [:([0-9-]+)]
+            return getInRange(underLimit, Integer.parseInt(parsed.group(2)) + 1);
+        } else {
+            // [([0-9-]+):([0-9-]+)]
+            return getInRange(Integer.parseInt(parsed.group(1)), Integer.parseInt(parsed.group(2)) + 1);
+        }
+    }
+
+    private static int getInRange(int upper, int under) {
+        return new Random().ints(1, upper, under).toArray()[0];
+    }
+
+    private static Enchantment getRandomEnchantment(Set<Enchantment> enchants, String formula) {
+        // e.g. random[!(self)] (from all, but does not contain self)
+        // e.g. random[(all)] (from all)
+        // e.g. random[(fortune,lure,looting)] (from these 3)
+        // e.g. random[!(fortune,lure,looting)] (from all that does not contain these 3)
+
+        final String pattern = "random(\\[!?\\([A-Za-z,_]+\\)])?";
+        Matcher parsed = Pattern.compile(pattern).matcher(formula);
+        if (!parsed.matches()) {
+            return null;
+        }
+
+        Set<Enchantment> all = new HashSet<>(Arrays.asList(Enchantment.values()));
+        String element = parsed.group(1).replaceAll("[()\\[\\]]", "");
+        Set<String> enc = new HashSet<>(Arrays.asList(element.replace("!", "").split(",")));
+        if (element.startsWith("!")) {
+            // without
+            Set<Enchantment> remove = new HashSet<>();
+            enc.forEach(s -> {
+                if (s.equalsIgnoreCase("None")) remove.add(null);
+                else if (s.equalsIgnoreCase("self")) remove.addAll(enchants); // !self
+                else remove.add(Enchantment.getByKey(NamespacedKey.minecraft(s.toLowerCase())));
+            });
+            all.removeAll(remove);
+            return new ArrayList<>(all).get(new Random().nextInt(all.size()));
+        }
+
+        List<Enchantment> list = new ArrayList<>();
+        enc.forEach(s -> {
+            if (s.equalsIgnoreCase("None")) list.add(null);
+            else if (s.equalsIgnoreCase("all")) list.addAll(all); // all
+            else list.add(Enchantment.getByKey(NamespacedKey.minecraft(s.toLowerCase())));
+        });
+        return list.get(new Random().nextInt(list.size()));
     }
 
 
