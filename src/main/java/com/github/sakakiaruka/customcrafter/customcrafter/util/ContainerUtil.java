@@ -352,19 +352,9 @@ public class ContainerUtil {
     public static final TriConsumer<Map<String, String>, ItemStack, String> ENCHANT = (data, item, formula) -> {
         // type: enchant, value: enchant=~~~,level=~~~
         ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
-        formula = getContent(data, formula);
-        Matcher matcher = Pattern.compile("enchant=([a-zA-Z_]+),level=([0-9]+)").matcher(formula);
-        if (!matcher.matches()) {
-            sendIllegalTemplateWarn("enchant", formula, "enchant=([a-zA-Z_]+),level=([0-9]+)");
-            return;
-        }
-        Enchantment enchantment = Enchantment.getByKey(NamespacedKey.minecraft(matcher.group(1).toLowerCase()));
-        if (enchantment == null) {
-            sendNoSuchTemplateWarn("enchant", matcher.group(1));
-            return;
-        }
-        int level = (int) Double.parseDouble(matcher.group(2));
-        meta.addEnchant(enchantment, level, true);
+        Map<Enchantment, Integer> contained = new HashMap<>(meta.getEnchants());
+        contained.forEach((k, v) -> meta.removeEnchant(k));
+        enchantInternal(contained, formula, data).forEach((k, v) -> meta.addEnchant(k, v, true));
         item.setItemMeta(meta);
     };
 
@@ -649,41 +639,41 @@ public class ContainerUtil {
         item.setItemMeta(meta);
     };
 
-    public static final TriConsumer<Map<String, String>, ItemStack, String> ENCHANT_MODIFY = (data, item, formula) -> {
-        // type: enchant_modify, value: type=(enchant|level),action=(.+)->(.+)
-        // e.g. type: enchant_modify, value: type=enchant,action=luck->mending (luck to mending)
-        // e.g. type: enchant_modify, value: type=enchant,action=luck->None (remove enchant(luck))
-        // e.g. type: enchant_modify, value: type=level,action=luck->2 (luck's level change (to 2))
-        // e.g. type: enchant_modify, value: type=level,action=luck->None (remove enchant(luck))
-        // a special variable that is named $CURRENT_LEVEL$ contains current enchants level. (in using "%$CURRENT_LEVEL$%")
-        ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
-        formula = getContent(data, formula);
-        Matcher matcher = Pattern.compile("type=(enchant|level),action=([a-zA-Z_]+)->([{}+\\-*/\\\\^%$a-zA-Z0-9_]+)").matcher(formula);
-        if (!matcher.matches()) return;
-        String type = matcher.group(1);
-        String left = matcher.group(2);
-        String right = matcher.group(3);
-        boolean toNone = right.equalsIgnoreCase("None");
-        boolean changeEnchant = type.equals("enchant");
-
-        Enchantment enchant = Enchantment.getByKey(NamespacedKey.minecraft(getContent(data, left.toLowerCase())));
-        if (enchant == null || !meta.getEnchants().containsKey(enchant)) return;
-        data.put("$CURRENT_LEVEL$", String.valueOf(meta.getEnchantLevel(enchant)));
-        if (toNone) {
-            meta.removeEnchant(enchant);
-        } else if (changeEnchant) {
-            Enchantment replacer = Enchantment.getByKey(NamespacedKey.minecraft(right.toLowerCase()));
-            if (replacer == null) return;
-            int level = meta.getEnchantLevel(enchant);
-            meta.removeEnchant(enchant);
-            meta.addEnchant(replacer, level, true);
-        } else {
-            meta.removeEnchant(enchant);
-            meta.addEnchant(enchant, Integer.parseInt(getContent(data, right)), true);
-        }
-        data.remove("$CURRENT_LEVEL$");
-        item.setItemMeta(meta);
-    };
+//    public static final TriConsumer<Map<String, String>, ItemStack, String> ENCHANT_MODIFY = (data, item, formula) -> {
+//        // type: enchant_modify, value: type=(enchant|level),action=(.+)->(.+)
+//        // e.g. type: enchant_modify, value: type=enchant,action=luck->mending (luck to mending)
+//        // e.g. type: enchant_modify, value: type=enchant,action=luck->None (remove enchant(luck))
+//        // e.g. type: enchant_modify, value: type=level,action=luck->2 (luck's level change (to 2))
+//        // e.g. type: enchant_modify, value: type=level,action=luck->None (remove enchant(luck))
+//        // a special variable that is named $CURRENT_LEVEL$ contains current enchants level. (in using "%$CURRENT_LEVEL$%")
+//        ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
+//        formula = getContent(data, formula);
+//        Matcher matcher = Pattern.compile("type=(enchant|level),action=([a-zA-Z_]+)->([{}+\\-*/\\\\^%$a-zA-Z0-9_]+)").matcher(formula);
+//        if (!matcher.matches()) return;
+//        String type = matcher.group(1);
+//        String left = matcher.group(2);
+//        String right = matcher.group(3);
+//        boolean toNone = right.equalsIgnoreCase("None");
+//        boolean changeEnchant = type.equals("enchant");
+//
+//        Enchantment enchant = Enchantment.getByKey(NamespacedKey.minecraft(getContent(data, left.toLowerCase())));
+//        if (enchant == null || !meta.getEnchants().containsKey(enchant)) return;
+//        data.put("$CURRENT_LEVEL$", String.valueOf(meta.getEnchantLevel(enchant)));
+//        if (toNone) {
+//            meta.removeEnchant(enchant);
+//        } else if (changeEnchant) {
+//            Enchantment replacer = Enchantment.getByKey(NamespacedKey.minecraft(right.toLowerCase()));
+//            if (replacer == null) return;
+//            int level = meta.getEnchantLevel(enchant);
+//            meta.removeEnchant(enchant);
+//            meta.addEnchant(replacer, level, true);
+//        } else {
+//            meta.removeEnchant(enchant);
+//            meta.addEnchant(enchant, Integer.parseInt(getContent(data, right)), true);
+//        }
+//        data.remove("$CURRENT_LEVEL$");
+//        item.setItemMeta(meta);
+//    };
 
     public static final TriConsumer<Map<String, String>, ItemStack, String> LORE_MODIFY = (data, item, formula) -> {
         // type: lore_modify, value: type=(clear|modify)(,value=(.+))?
@@ -1063,6 +1053,83 @@ public class ContainerUtil {
         item.setItemMeta(meta);
     };
 
+    private static Map<Enchantment, Integer> enchantInternal(Map<Enchantment, Integer> contained, String formula, Map<String, String> data) {
+        // when detect illegal or invalid actions, this method returns the map that named "contained" contained in arguments.
+        formula = getContent(data, formula);
+        final String FORMULA_PATTERN = "type=(enchant|level),action=([a-zA-Z_\\[\\](),!]+)->(.+)";
+        final String TARGET_PATTERN = "[a-zA-Z_]+|random(\\[!?\\([A-Za-z_,]+\\)])?";
+        final String RANDOM_TARGET_PATTERN = "random(\\[!?\\([A-Za-z_,]+\\)])?";
+        final String RANDOM_NUMBER_PATTERN = "[0-9]+|random(\\[([0-9-]+)?:([0-9-]+)?])?";
+        Matcher parsed = Pattern.compile(FORMULA_PATTERN).matcher(formula);
+        if (!parsed.matches()) {
+            sendIllegalTemplateWarn("enchant", formula, FORMULA_PATTERN);
+            return contained;
+        }
+
+        boolean isEnchant = parsed.group(1).equalsIgnoreCase("enchant");
+        Matcher targetMatcher = Pattern.compile(TARGET_PATTERN).matcher(parsed.group(2));
+        if (!targetMatcher.matches()) {
+            sendIllegalTemplateWarn("enchant (source)", parsed.group(2), TARGET_PATTERN);
+            return contained;
+        }
+        boolean isRandomTarget = parsed.group(2).matches(RANDOM_TARGET_PATTERN);
+        Enchantment target;
+
+        if (isRandomTarget) {
+            String element = parsed.group(2).replaceAll("[()\\[\\]]", "");
+            if (element.equals("!self")) target = getRandomEnchantment(contained.keySet(), parsed.group(2)); // random[!(self)]
+            else if (element.equals("all")) target = getRandomEnchantment(null, parsed.group(2)); // random[(all)]
+            else target = getRandomEnchantment(null, parsed.group(2));
+        } else target = Enchantment.getByKey(NamespacedKey.minecraft(parsed.group(2).toLowerCase()));
+        if (target == null) {
+            sendNoSuchTemplateWarn("enchant element", parsed.group(2));
+            return contained;
+        }
+
+        data.put("$CURRENT_ENCHANT_LEVEL$", contained.containsKey(target)
+                ? String.valueOf(contained.get(target))
+                : "0"
+        );
+        formula = getContent(data, formula);
+        removeCurrentVariables(data);
+        Matcher reMatch = Pattern.compile(FORMULA_PATTERN).matcher(formula);
+        if (!reMatch.matches()) return contained;
+        boolean toNone = reMatch.group(3).equalsIgnoreCase("None");
+        boolean toNumeric = reMatch.group(3).matches(RANDOM_NUMBER_PATTERN);
+
+        if (toNone) contained.remove(target);
+        else if (toNumeric) {
+            int level = reMatch.group(3).matches("\\d+")
+                    ? Integer.parseInt(reMatch.group(3))
+                    : getRandomNumber(reMatch.group(3), 1, 255);
+
+            if (isEnchant && !contained.containsKey(target)) contained.put(target, level);
+            else if (!isEnchant && contained.containsKey(target)) {
+                contained.remove(target);
+                contained.put(target, level);
+            }
+        }
+        else if (!isEnchant) contained.remove(target); // !toNumeric && !isEnchant
+        else {
+            // !toNumeric && isEnchant
+            if (!reMatch.group(3).matches(RANDOM_TARGET_PATTERN)) {
+                // !toRandom
+                int level = contained.get(target);
+                contained.remove(target);
+                contained.put(Enchantment.getByKey(NamespacedKey.minecraft(reMatch.group(3).toLowerCase())), level);
+            } else {
+                Enchantment destination = getRandomEnchantment(contained.keySet(), reMatch.group(3));
+                if (destination == null) contained.remove(target);
+                else {
+                    int level = contained.get(target);
+                    contained.remove(target);
+                    contained.put(destination, level);
+                }
+            }
+        }
+        return contained;
+    }
+
 
     public static final TriConsumer<Map<String, String>, ItemStack, String> ENCHANT_BOOK = (data, item, formula) -> {
         // type: enchant_book, value: type=(enchant|level),action=([a-zA-Z_]+)->(.+)
@@ -1078,6 +1145,7 @@ public class ContainerUtil {
         // e.g. type: enchant_book, value: type=enchant,action=random[(fortune,smite)]->random (random(fortune or smite) to random(without fortune, smite))
         // e.g. type: enchant_book, value: type=enchant,action=random[(fortune,smite)]->random[(fortune,smite,looting,None)] (random(fortune or smite) to random(fortune, smite, looting) or remove)
         // e.g. type: enchant_book, value: type=enchant,action=random[(!self)]->fortune (random (all, but does not contain self) to fortune)
+        // e.g. type: enchant_book, value: type=enchant,action=random[(self)]->random[!(self,fortune)] (random(contained) to random(without contained and fortune))
         // e.g. type: enchant_book, value: type=enchant,action=random[(all)]->fortune (random (all) to fortune)
 
         // -------------------------------------------------------------------------------------------------------------
@@ -1090,83 +1158,12 @@ public class ContainerUtil {
         // e.g. type: enchant_book, value: type=level,action=fortune->random[3:] (set fortune's level to 3 ~ 256)
         // e.g. type: enchant_book, value: type=level,action=fortune->random[:10] (set fortune's level 1 ~ 10)
         // e.g. type: enchant_book, value: type=level,action=fortune->random[10:20] (set fortune's level 10 ~ 20)
-        // e.g. type: enchant_book, value: type=level,action=fortune->random[:] (1 ~ 256, same with "action=fortune->random")
+        // e.g. type: enchant_book, value: type=level,action=fortune->random[:] (1 ~ 255, same with "action=fortune->random")
 
-
-        formula = getContent(data, formula);
-        final String FORMULA_PATTERN = "type=(enchant|level),action=([a-zA-Z_\\[\\](),!]+)->(.+)";
-        final String TARGET_PATTERN = "[a-zA-Z_]+|random(\\[!?\\([A-Za-z_,]+\\)])?";
-        final String RANDOM_TARGET_PATTERN = "random(\\[!?\\([A-Za-z_,]+\\)])?";
-        final String RANDOM_NUMBER_PATTERN = "[0-9]+|random(\\[([0-9-]+)?:([0-9-]+)?])?";
-        Matcher parsed = Pattern.compile(FORMULA_PATTERN).matcher(formula);
-        if (!parsed.matches()) {
-            sendIllegalTemplateWarn("enchant book", formula, FORMULA_PATTERN);
-            return;
-        }
         EnchantmentStorageMeta meta = (EnchantmentStorageMeta) Objects.requireNonNull(item.getItemMeta());
-        boolean isEnchant = parsed.group(1).equalsIgnoreCase("enchant");
-        Matcher targetMatcher = Pattern.compile(TARGET_PATTERN).matcher(parsed.group(2));
-        if (!targetMatcher.matches()) {
-            sendIllegalTemplateWarn("enchant book (source)", parsed.group(2), TARGET_PATTERN);
-            return;
-        }
-        boolean isRandomTarget = parsed.group(2).matches(RANDOM_TARGET_PATTERN);
-        Enchantment target;
-        if (isRandomTarget) {
-            String element = parsed.group(2).replaceAll("[()\\[\\]]", "");
-            if (element.equals("!self")) {
-                target = getRandomEnchantment(meta.getStoredEnchants().keySet(), parsed.group(2));  // random[!(self)] (from all without self)
-            }
-            else if (element.equals("all")) target = getRandomEnchantment(null, parsed.group(2)); // random[(all)] (from all)
-            else target = getRandomEnchantment(null, parsed.group(2));  // random[!(~~~,~~~)] or random[(~~~,~~~)]
-        } else target = Enchantment.getByKey(NamespacedKey.minecraft(parsed.group(2).toLowerCase()));
-        if (target == null) {
-            sendNoSuchTemplateWarn("enchant book element", parsed.group(2));
-            return;
-        }
-        data.put("$CURRENT_ENCHANT_LEVEL$", meta.hasStoredEnchant(target) ? String.valueOf(meta.getStoredEnchantLevel(target)) : "0");
-        formula = getContent(data, formula);
-        Matcher reMatch = Pattern.compile(FORMULA_PATTERN).matcher(formula);
-        if (!reMatch.matches()) return;
-        removeCurrentVariables(data);
-        boolean toNone = reMatch.group(3).equalsIgnoreCase("None");
-        boolean toNumeric = reMatch.group(3).matches(RANDOM_NUMBER_PATTERN);
-
-        if (toNone) {
-            if (meta.hasStoredEnchant(target)) meta.removeStoredEnchant(target);
-        } else if (toNumeric) {
-            int level;
-            try {
-                level = Integer.parseInt(reMatch.group(3));
-            } catch (Exception e) {
-                level = getRandomNumber(reMatch.group(3), 1, 255);
-            }
-
-            if (isEnchant && !meta.hasStoredEnchant(target)) meta.addStoredEnchant(target, level, true);
-            else if (!isEnchant && meta.hasStoredEnchant(target)) {
-                meta.removeStoredEnchant(target);
-                meta.addStoredEnchant(target, level, true);
-            }
-        } else if (!isEnchant) {
-            // !toNumeric && !isEnchant
-            if (meta.hasStoredEnchant(target)) meta.removeStoredEnchant(target);
-        } else {
-            // !toNumeric && isEnchant
-            if (!reMatch.group(3).matches(RANDOM_TARGET_PATTERN)) {
-                // !toRandom
-                int level = meta.getStoredEnchantLevel(target);
-                meta.removeStoredEnchant(target);
-                meta.addStoredEnchant(Enchantment.getByKey(NamespacedKey.minecraft(reMatch.group(3).toLowerCase())), level, true);
-            } else {
-                Enchantment destination = getRandomEnchantment(meta.getStoredEnchants().keySet(), reMatch.group(3));
-                if (destination == null) meta.removeStoredEnchant(target);
-                else {
-                    int level = meta.getStoredEnchantLevel(target);
-                    meta.removeStoredEnchant(target);
-                    meta.addStoredEnchant(destination, level, true);
-                }
-            }
-        }
+        Map<Enchantment, Integer> contained = new HashMap<>(meta.getStoredEnchants());
+        contained.forEach((k, v) -> meta.removeStoredEnchant(k));
+        enchantInternal(contained, formula, data).forEach((k, v) -> meta.addStoredEnchant(k, v, true));
         item.setItemMeta(meta);
     };
 
@@ -1198,8 +1195,8 @@ public class ContainerUtil {
         }
     }
 
-    private static int getInRange(int upper, int under) {
-        return new Random().ints(1, upper, under).toArray()[0];
+    private static int getInRange(int under, int upper) {
+        return new Random().ints(1, under, upper).toArray()[0];
     }
 
     private static Enchantment getRandomEnchantment(Set<Enchantment> enchants, String formula) {
@@ -1223,19 +1220,21 @@ public class ContainerUtil {
             enc.forEach(s -> {
                 if (s.equalsIgnoreCase("None")) remove.add(null);
                 else if (s.equalsIgnoreCase("self")) remove.addAll(enchants); // !self
+                else if (s.equalsIgnoreCase("all")) remove.addAll(all);
                 else remove.add(Enchantment.getByKey(NamespacedKey.minecraft(s.toLowerCase())));
             });
             all.removeAll(remove);
             return new ArrayList<>(all).get(new Random().nextInt(all.size()));
         }
 
-        List<Enchantment> list = new ArrayList<>();
+        Set<Enchantment> set = new HashSet<>();
         enc.forEach(s -> {
-            if (s.equalsIgnoreCase("None")) list.add(null);
-            else if (s.equalsIgnoreCase("all")) list.addAll(all); // all
-            else list.add(Enchantment.getByKey(NamespacedKey.minecraft(s.toLowerCase())));
+            if (s.equalsIgnoreCase("None")) set.add(null);
+            else if (s.equalsIgnoreCase("self")) set.addAll(enchants); // self
+            else if (s.equalsIgnoreCase("all")) set.addAll(all); // all
+            else set.add(Enchantment.getByKey(NamespacedKey.minecraft(s.toLowerCase())));
         });
-        return list.get(new Random().nextInt(list.size()));
+        return new ArrayList<>(set).get(new Random().nextInt(set.size()));
     }
 
 
