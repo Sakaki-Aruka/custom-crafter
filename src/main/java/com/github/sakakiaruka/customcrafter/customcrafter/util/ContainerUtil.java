@@ -639,41 +639,6 @@ public class ContainerUtil {
         item.setItemMeta(meta);
     };
 
-//    public static final TriConsumer<Map<String, String>, ItemStack, String> ENCHANT_MODIFY = (data, item, formula) -> {
-//        // type: enchant_modify, value: type=(enchant|level),action=(.+)->(.+)
-//        // e.g. type: enchant_modify, value: type=enchant,action=luck->mending (luck to mending)
-//        // e.g. type: enchant_modify, value: type=enchant,action=luck->None (remove enchant(luck))
-//        // e.g. type: enchant_modify, value: type=level,action=luck->2 (luck's level change (to 2))
-//        // e.g. type: enchant_modify, value: type=level,action=luck->None (remove enchant(luck))
-//        // a special variable that is named $CURRENT_LEVEL$ contains current enchants level. (in using "%$CURRENT_LEVEL$%")
-//        ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
-//        formula = getContent(data, formula);
-//        Matcher matcher = Pattern.compile("type=(enchant|level),action=([a-zA-Z_]+)->([{}+\\-*/\\\\^%$a-zA-Z0-9_]+)").matcher(formula);
-//        if (!matcher.matches()) return;
-//        String type = matcher.group(1);
-//        String left = matcher.group(2);
-//        String right = matcher.group(3);
-//        boolean toNone = right.equalsIgnoreCase("None");
-//        boolean changeEnchant = type.equals("enchant");
-//
-//        Enchantment enchant = Enchantment.getByKey(NamespacedKey.minecraft(getContent(data, left.toLowerCase())));
-//        if (enchant == null || !meta.getEnchants().containsKey(enchant)) return;
-//        data.put("$CURRENT_LEVEL$", String.valueOf(meta.getEnchantLevel(enchant)));
-//        if (toNone) {
-//            meta.removeEnchant(enchant);
-//        } else if (changeEnchant) {
-//            Enchantment replacer = Enchantment.getByKey(NamespacedKey.minecraft(right.toLowerCase()));
-//            if (replacer == null) return;
-//            int level = meta.getEnchantLevel(enchant);
-//            meta.removeEnchant(enchant);
-//            meta.addEnchant(replacer, level, true);
-//        } else {
-//            meta.removeEnchant(enchant);
-//            meta.addEnchant(enchant, Integer.parseInt(getContent(data, right)), true);
-//        }
-//        data.remove("$CURRENT_LEVEL$");
-//        item.setItemMeta(meta);
-//    };
 
     public static final TriConsumer<Map<String, String>, ItemStack, String> LORE_MODIFY = (data, item, formula) -> {
         // type: lore_modify, value: type=(clear|modify)(,value=(.+))?
