@@ -638,7 +638,7 @@ public class SettingsLoad {
 
     private List<RecipeContainer> getRecipeContainerList(FileConfiguration config) {
         if (!config.contains("container")) return List.of();
-        List<RecipeContainer> result = new ArrayList<>();
+        List<RecipeContainer> result = new LinkedList<>();
         // -
         //    predicate: (none|string|value)
         //    (formula: (.+))

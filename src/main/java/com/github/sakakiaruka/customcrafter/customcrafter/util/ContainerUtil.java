@@ -38,6 +38,7 @@ import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.profile.PlayerTextures;
+import org.checkerframework.checker.units.qual.A;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -1040,12 +1041,9 @@ public class ContainerUtil {
         boolean isRandomTarget = parsed.group(2).matches(RANDOM_TARGET_PATTERN);
         Enchantment target;
 
-        if (isRandomTarget) {
-            String element = parsed.group(2).replaceAll("[()\\[\\]]", "");
-            if (element.equals("!self")) target = getRandomEnchantment(contained.keySet(), parsed.group(2)); // random[!(self)]
-            else if (element.equals("all")) target = getRandomEnchantment(null, parsed.group(2)); // random[(all)]
-            else target = getRandomEnchantment(null, parsed.group(2));
-        } else target = Enchantment.getByKey(NamespacedKey.minecraft(parsed.group(2).toLowerCase()));
+        if (isRandomTarget) target = getRandomEnchantment(contained.keySet(), parsed.group(2));
+        else target = Enchantment.getByKey(NamespacedKey.minecraft(parsed.group(2).toLowerCase()));
+
         if (target == null) {
             sendNoSuchTemplateWarn("enchant element", parsed.group(2));
             return contained;
@@ -1147,7 +1145,7 @@ public class ContainerUtil {
         if (underLimit == upperLimit) return upperLimit;
         if (parsed.group(1) == null && parsed.group(2) == null) {
             // [:]
-            return getInRange(underLimit, upperLimit);
+            return getInRange(underLimit, upperLimit + 1);
         } else if (parsed.group(1) != null && parsed.group(2) == null) {
             // [([0-9-]+):]
             return getInRange(Integer.parseInt(parsed.group(1)), upperLimit + 1);
@@ -1178,27 +1176,29 @@ public class ContainerUtil {
 
         Set<Enchantment> all = new HashSet<>(Arrays.asList(Enchantment.values()));
         String element = parsed.group(1).replaceAll("[()\\[\\]]", "");
-        Set<String> enc = new HashSet<>(Arrays.asList(element.replace("!", "").split(",")));
+        Set<String> enc = new HashSet<>(Arrays.asList(element.replace("!", "").toLowerCase().split(",")));
         if (element.startsWith("!")) {
             // without
             Set<Enchantment> remove = new HashSet<>();
             enc.forEach(s -> {
-                if (s.equalsIgnoreCase("None")) remove.add(null);
-                else if (s.equalsIgnoreCase("self")) remove.addAll(enchants); // !self
-                else if (s.equalsIgnoreCase("all")) remove.addAll(all);
+                if (s.equals("None")) remove.add(null);
+                else if (s.equals("self")) remove.addAll(enchants); // !self
+                else if (s.equals("all")) remove.addAll(all);
                 else remove.add(Enchantment.getByKey(NamespacedKey.minecraft(s.toLowerCase())));
             });
             all.removeAll(remove);
+            if (all.isEmpty()) return null;
             return new ArrayList<>(all).get(new Random().nextInt(all.size()));
         }
 
         Set<Enchantment> set = new HashSet<>();
         enc.forEach(s -> {
-            if (s.equalsIgnoreCase("None")) set.add(null);
-            else if (s.equalsIgnoreCase("self")) set.addAll(enchants); // self
-            else if (s.equalsIgnoreCase("all")) set.addAll(all); // all
+            if (s.equals("none")) set.add(null);
+            else if (s.equals("self")) set.addAll(enchants); // self
+            else if (s.equals("all")) set.addAll(all); // all
             else set.add(Enchantment.getByKey(NamespacedKey.minecraft(s.toLowerCase())));
         });
+        if (!enc.contains("none")) set.remove(null);
         return new ArrayList<>(set).get(new Random().nextInt(set.size()));
     }
 
