@@ -1184,7 +1184,7 @@ public class ContainerUtil {
                     case "None" -> remove.add(null);
                     case "self" -> remove.addAll(enchants); // !self
                     case "all" -> remove.addAll(all);
-                    default -> remove.add(Enchantment.getByKey(NamespacedKey.minecraft(s.toLowerCase())));
+                    default -> remove.add(Enchantment.getByKey(NamespacedKey.minecraft(s)));
                 }
             });
             all.removeAll(remove);
@@ -1198,7 +1198,7 @@ public class ContainerUtil {
                 case "none" -> set.add(null);
                 case "self" -> set.addAll(enchants); // self
                 case "all" -> set.addAll(all); // all
-                default -> set.add(Enchantment.getByKey(NamespacedKey.minecraft(s.toLowerCase())));
+                default -> set.add(Enchantment.getByKey(NamespacedKey.minecraft(s)));
             }
         });
         if (!enc.contains("none")) set.remove(null);
