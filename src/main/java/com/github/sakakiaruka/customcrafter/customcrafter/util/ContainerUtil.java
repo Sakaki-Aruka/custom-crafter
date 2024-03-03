@@ -1114,8 +1114,8 @@ public class ContainerUtil {
 
         // e.g. type: enchant_book, value: type=level,action=fortune->None (remove fortune)
 
-        // e.g. type: enchant_book, value: type=level,action=fortune->random (fortune's level to 1 ~ 255)
-        // e.g. type: enchant_book, value: type=level,action=random->random (set random(contained)'s level to 1 ~ 255)
+        // e.g. type: enchant_book, value: type=level,action=fortune->random[:] (fortune's level to 1 ~ 255)
+        // e.g. type: enchant_book, value: type=level,action=random->random[:] (set random(contained)'s level to 1 ~ 255)
 
         // e.g. type: enchant_book, value: type=level,action=fortune->random[3:] (set fortune's level to 3 ~ 256)
         // e.g. type: enchant_book, value: type=level,action=fortune->random[:10] (set fortune's level 1 ~ 10)
