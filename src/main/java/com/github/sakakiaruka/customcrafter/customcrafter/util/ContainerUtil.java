@@ -1180,10 +1180,12 @@ public class ContainerUtil {
             // without
             Set<Enchantment> remove = new HashSet<>();
             enc.forEach(s -> {
-                if (s.equals("None")) remove.add(null);
-                else if (s.equals("self")) remove.addAll(enchants); // !self
-                else if (s.equals("all")) remove.addAll(all);
-                else remove.add(Enchantment.getByKey(NamespacedKey.minecraft(s.toLowerCase())));
+                switch (s) {
+                    case "None" -> remove.add(null);
+                    case "self" -> remove.addAll(enchants); // !self
+                    case "all" -> remove.addAll(all);
+                    default -> remove.add(Enchantment.getByKey(NamespacedKey.minecraft(s.toLowerCase())));
+                }
             });
             all.removeAll(remove);
             if (all.isEmpty()) return null;
@@ -1192,10 +1194,12 @@ public class ContainerUtil {
 
         Set<Enchantment> set = new HashSet<>();
         enc.forEach(s -> {
-            if (s.equals("none")) set.add(null);
-            else if (s.equals("self")) set.addAll(enchants); // self
-            else if (s.equals("all")) set.addAll(all); // all
-            else set.add(Enchantment.getByKey(NamespacedKey.minecraft(s.toLowerCase())));
+            switch (s) {
+                case "none" -> set.add(null);
+                case "self" -> set.addAll(enchants); // self
+                case "all" -> set.addAll(all); // all
+                default -> set.add(Enchantment.getByKey(NamespacedKey.minecraft(s.toLowerCase())));
+            }
         });
         if (!enc.contains("none")) set.remove(null);
         return new ArrayList<>(set).get(new Random().nextInt(set.size()));
