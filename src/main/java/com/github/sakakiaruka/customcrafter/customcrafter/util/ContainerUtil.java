@@ -1050,7 +1050,7 @@ public class ContainerUtil {
         Set<String> types = Set.of("trail", "flicker", "color", "fade", "shape");
         for (String element : formula.toLowerCase().split(",")) {
             boolean ignore = element.startsWith("!");
-            Matcher parsed = Pattern.compile("!?([a-z]+)=(.+)").matcher(element);
+            Matcher parsed = Pattern.compile("!?([a-z]+)=(.+)").matcher(ignore ? element.substring(1) : element); // skipping first "!"
             if (!parsed.matches()) continue;
             if (!types.contains(parsed.group(1))) continue;
             switch (parsed.group(1)) {
@@ -1100,8 +1100,8 @@ public class ContainerUtil {
             if (parsed.matches()) {
                 // power = 0 ~ 127
                 int power = parsed.group(1).startsWith("random")
-                        ? getRandomNumber(parsed.group(1), 0, 127)
-                        : Integer.parseInt(parsed.group(1));
+                        ? getRandomNumber(parsed.group(1).replace("power=", ""), 0, 127)
+                        : Integer.parseInt(parsed.group(1).replace("power=", ""));
                 meta.setPower(power);
             }
         }
