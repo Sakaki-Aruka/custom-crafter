@@ -613,7 +613,6 @@ public class SettingsLoad {
             case "potion_effect" -> consumer = ContainerUtil.POTION_EFFECT;
             case "leather_armor_color" -> consumer = ContainerUtil.LEATHER_ARMOR_COLOR;
             case "book" -> consumer = ContainerUtil.BOOK;
-            //case "enchant_modify" -> consumer = ContainerUtil.ENCHANT_MODIFY;
             case "lore_modify" -> consumer = ContainerUtil.LORE_MODIFY;
             case "attribute_modifier_modify" -> consumer = ContainerUtil.ATTRIBUTE_MODIFIER_MODIFY;
             case "result_sync" -> consumer = ContainerUtil.RESULT_VALUE_SYNC;
@@ -629,6 +628,7 @@ public class SettingsLoad {
             case "can_destroy" -> consumer = ContainerUtil.CAN_DESTROY;
             case "repair_cost" -> consumer = ContainerUtil.REPAIR_COST;
             case "enchant_book" -> consumer = ContainerUtil.ENCHANT_BOOK;
+            case "firework" -> consumer = ContainerUtil.FIREWORK;
             default -> {
                 consumer = null;
             }

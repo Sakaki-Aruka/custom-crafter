@@ -15,6 +15,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
+import org.bukkit.FireworkEffect;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attribute;
@@ -28,6 +29,8 @@ import org.bukkit.inventory.meta.BookMeta;
 import org.bukkit.inventory.meta.BundleMeta;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
+import org.bukkit.inventory.meta.FireworkEffectMeta;
+import org.bukkit.inventory.meta.FireworkMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.PotionMeta;
@@ -55,6 +58,7 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -1016,6 +1020,113 @@ public class ContainerUtil {
         Repairable meta = (Repairable) Objects.requireNonNull(item.getItemMeta());
         meta.setRepairCost(Integer.parseInt(formula));
         item.setItemMeta(meta);
+    };
+
+    private static Color getRGBColor(String formula) {
+        formula = formula.toLowerCase();
+        final String RANDOM_PATTERN = "random\\[([0-9-]+)?:([0-9-]+)?]";
+        final String RGB_PATTERN = "([0-9a-z-\\[\\]:]+)-([0-9a-z-\\[\\]:]+)-([0-9a-z-\\[\\]:]+)";
+        Matcher parsed = Pattern.compile(RGB_PATTERN).matcher(formula);
+        if (!parsed.matches()) {
+            sendIllegalTemplateWarn("rgb", formula, RGB_PATTERN);
+            return null;
+        }
+        final int under = 0;
+        final int upper = 255;
+        int red = parsed.group(1).matches(RANDOM_PATTERN) ? getRandomNumber(parsed.group(1), under, upper) : Integer.parseInt(parsed.group(1));
+        int green = parsed.group(2).matches(RANDOM_PATTERN) ? getRandomNumber(parsed.group(2), under, upper) : Integer.parseInt(parsed.group(2));
+        int blue = parsed.group(3).matches(RANDOM_PATTERN) ? getRandomNumber(parsed.group(3), under, upper) : Integer.parseInt(parsed.group(3));
+        if (!inRGBRange(red, green, blue)) return null;
+        return Color.fromRGB(red, green, blue);
+    }
+
+    private static FireworkEffect getFireworkEffect(String formula) {
+        // enable to reverse : trail, flicker, color
+        // enable to multi value : color, fade
+        // exist or not : trail, flicker
+
+        // each rgb element = 0 ~ 255
+        FireworkEffect.Builder builder =  FireworkEffect.builder();
+        Set<String> types = Set.of("trail", "flicker", "color", "fade", "shape");
+        for (String element : formula.toLowerCase().split(",")) {
+            boolean ignore = element.startsWith("!");
+            Matcher parsed = Pattern.compile("!?([a-z]+)=(.+)").matcher(element);
+            if (!parsed.matches()) continue;
+            if (!types.contains(parsed.group(1))) continue;
+            switch (parsed.group(1)) {
+                case "trail" -> builder.trail(ignore);
+                case "flicker" -> builder.flicker(ignore);
+                case "shape" -> builder.with(FireworkEffect.Type.valueOf(parsed.group(2).toUpperCase()));
+                case "color" -> {
+                    for (String colorStr : parsed.group(2).split("/")) {
+                        Color color;
+                        if (colorStr.startsWith("rgb=")) color = getRGBColor(colorStr.replace("rgb=", ""));
+                        else color = InventoryUtil.getColor(colorStr);
+                        if (color == null) continue;
+                        builder.withColor(color);
+                    }
+                }
+                case "fade" -> {
+                    for (String fade : parsed.group(2).split("/")) {
+                        Color color;
+                        if (fade.startsWith("rgb=")) color = getRGBColor(fade.replace("rgb=", ""));
+                        else color = InventoryUtil.getColor(fade);
+                        if (color == null) continue;
+                        builder.withFade(color);
+                    }
+                }
+            }
+        }
+        return builder.build();
+    }
+
+    private static final TriConsumer<Map<String, String>, ItemStack, String> FIREWORK_STAR = (data, item, formula) -> {
+        FireworkEffectMeta meta = (FireworkEffectMeta) Objects.requireNonNull(item.getItemMeta());
+        formula = getContent(data, formula);
+        if (formula.equalsIgnoreCase("clear")) meta.setEffect(null);
+        else meta.setEffect(getFireworkEffect(formula));
+        item.setItemMeta(meta);
+    };
+
+    private static final TriConsumer<Map<String, String>, ItemStack, String> FIREWORK_ROCKET = (data, item, formula) -> {
+        // enable set "power"
+        FireworkMeta meta = (FireworkMeta) Objects.requireNonNull(item.getItemMeta());
+        formula = getContent(data, formula);
+        if (formula.equalsIgnoreCase("clear")) meta.clearEffects();
+        else meta.addEffect(getFireworkEffect(formula));
+
+        if (formula.contains("power=")) {
+            Matcher parsed = Pattern.compile(".*(power=[a-z0-9\\[\\]:]+).*").matcher(formula);
+            if (parsed.matches()) {
+                // power = 0 ~ 127
+                int power = parsed.group(1).startsWith("random")
+                        ? getRandomNumber(parsed.group(1), 0, 127)
+                        : Integer.parseInt(parsed.group(1));
+                meta.setPower(power);
+            }
+        }
+        item.setItemMeta(meta);
+    };
+
+    public static final TriConsumer<Map<String, String>, ItemStack, String> FIREWORK = (data, item, formula) -> {
+        // type: firework, value: type=(rocket|star),value=(.+)
+        // "trail", "flicker" don't have values. These are like anchor.
+        // "withColor" is single value sector.
+        // "withFade", "withColor" are enable to set multi values sectors. Those are separated with "/".
+        // "power" is just for "ROCKET".
+        // when use "!" before keys (trail, flicker, fade{need target color}, color {need target color}), remove the target element from a result.
+
+        // clear, trail, flicker, power, color, shape
+
+        // type is decision automatically from the material
+        // e.g. type: firework, value: clear  # clear all effects
+        // e.g. type: firework, value: power=10,color=green/rgb=100-100-100,shape=ball_large
+        // e.g. type: firework, value: fade=green/white/yellow/rgb=100-100-100
+        // e.g. type: firework, value: color=rgb=random[100:]-random[100:200]-random[:100]
+        // e.g. type: firework, value: trail,flicker,color=green   # add trail, flicker, color(green)
+        // e.g. type: firework, value: !trail,!flicker,!color=green   # remove trail, flicker, color(green)
+        if (item.getType().equals(Material.FIREWORK_STAR)) FIREWORK_STAR.accept(data, item, formula);
+        else if (item.getType().equals(Material.FIREWORK_ROCKET)) FIREWORK_ROCKET.accept(data, item, formula);
     };
 
     private static Map<Enchantment, Integer> enchantInternal(Map<Enchantment, Integer> contained, String formula, Map<String, String> data) {
