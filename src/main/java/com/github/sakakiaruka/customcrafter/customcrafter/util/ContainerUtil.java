@@ -1101,6 +1101,7 @@ public class ContainerUtil {
                 int power = parsed.group(1).startsWith("random")
                         ? getRandomNumber(parsed.group(1).replace("power=", ""), 0, 127)
                         : Integer.parseInt(parsed.group(1).replace("power=", ""));
+                if (!(0 <= power && power <= 127)) return;
                 meta.setPower(power);
             }
         }
