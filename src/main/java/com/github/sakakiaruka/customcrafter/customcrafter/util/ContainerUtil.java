@@ -58,7 +58,6 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -1292,7 +1291,7 @@ public class ContainerUtil {
             Set<Enchantment> remove = new HashSet<>();
             enc.forEach(s -> {
                 switch (s) {
-                    case "None" -> remove.add(null);
+                    case "none" -> remove.add(null);
                     case "self" -> remove.addAll(enchants); // !self
                     case "all" -> remove.addAll(all);
                     default -> remove.add(Enchantment.getByKey(NamespacedKey.minecraft(s)));
