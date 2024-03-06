@@ -1161,7 +1161,6 @@ public class ContainerUtil {
         final String RANDOM_EFFECT_PATTERN = "random\\[([a-zA-Z!,_]+)]:\\[([a-zA-Z0-9:,!=\\[\\]]+)]";
         final String EFFECT_CREATE_PATTERN = "([a-zA-Z\\[\\]!,_]+):\\[([a-zA-Z0-9:,!=\\[\\]]+)]";
         final String TO_NUMERIC_PATTERN = "\\[([a-zA-Z0-9:,!=\\[\\]]+)]";
-        final String ONLY_ADD_PATTERN = "\\[([a-zA-Z0-9:,!=\\[\\]]+)]:\\[([a-zA-Z0-9:,!=\\[\\]]+)]";
         Matcher parsed = Pattern.compile(BASE_PATTERN).matcher(formula);
         if (!parsed.matches()) {
             sendIllegalTemplateWarn("potion", formula, BASE_PATTERN);
@@ -1221,10 +1220,6 @@ public class ContainerUtil {
     private static PotionEffect getBuiltPotionEffect(PotionEffectType type, String formula) {
         Matcher a = Pattern.compile("[a-zA-Z0-9:,=\\[\\]!_]*,?(a|amplifier)=([0-9]+|random\\[[0-9]*:[0-9]*]),?.*").matcher(formula);
         Matcher d = Pattern.compile("[a-zA-Z0-9:,=\\[\\]!_]*,?(d|duration)=(-?[0-9]+|random\\[-?[0-9]*:-?[0-9]*]),?.*").matcher(formula);
-
-        //debug
-        System.out.println("formula(built)=" + formula);
-
         if (!a.matches() || !d.matches()) return null;
         int amplifier = a.group(2).matches("\\d+")
                 ? Integer.parseInt(a.group(2))
