@@ -629,6 +629,7 @@ public class SettingsLoad {
             case "repair_cost" -> consumer = ContainerUtil.REPAIR_COST;
             case "enchant_book" -> consumer = ContainerUtil.ENCHANT_BOOK;
             case "firework" -> consumer = ContainerUtil.FIREWORK;
+            case "stew" -> consumer = ContainerUtil.STEW;
             default -> {
                 consumer = null;
             }
