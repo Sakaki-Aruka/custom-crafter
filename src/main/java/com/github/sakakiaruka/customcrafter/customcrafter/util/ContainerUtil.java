@@ -523,25 +523,12 @@ public class ContainerUtil {
     };
 
     public static final TriConsumer<Map<String, String>, ItemStack, String> POTION_EFFECT = (data, item, formula) -> {
-        // type: potion_effect, value: effect=~~~,level=~~~,duration=~~~
-        // duration is game tick
-        // duration == -1 -> INFINITY
-        formula = getContent(data, formula);
-        Matcher matcher = Pattern.compile("effect=([a-zA-Z_]+),level=([0-9]+),duration=(-*[0-9]+)").matcher(formula);
-        if (!matcher.matches()) {
-            sendIllegalTemplateWarn("potion effect", formula, "effect=([a-zA-Z_]+),level=([0-9]+),duration=([0-9]+)");
-            return;
-        }
+        // same with "stew"
         PotionMeta meta = (PotionMeta) Objects.requireNonNull(item.getItemMeta());
-        PotionEffectType effect = PotionEffectType.getByName(matcher.group(1).toUpperCase());
-        if (effect == null) {
-            sendNoSuchTemplateWarn("potion effect", matcher.group(1));
-            return;
-        }
-        int level = (int) Double.parseDouble(matcher.group(2));
-        int duration = (int) Double.parseDouble(matcher.group(3));
-        PotionEffect potion = new PotionEffect(effect, duration, level);
-        meta.addCustomEffect(potion, true);
+        List<PotionEffect> contained = new ArrayList<>(meta.getCustomEffects());
+        potionInternal(contained, formula, data);
+        meta.clearCustomEffects();
+        contained.forEach(e -> meta.addCustomEffect(e, true));
         item.setItemMeta(meta);
     };
 
