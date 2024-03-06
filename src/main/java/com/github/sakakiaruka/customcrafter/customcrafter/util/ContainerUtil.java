@@ -18,6 +18,7 @@ import org.bukkit.Color;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
@@ -36,11 +37,14 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.Repairable;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.inventory.meta.SuspiciousStewMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.profile.PlayerTextures;
+
+import io.papermc.paper.potion.SuspiciousEffectEntry;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -61,6 +65,7 @@ import java.util.UUID;
 import java.util.function.BiFunction;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class ContainerUtil {
 
@@ -1129,6 +1134,223 @@ public class ContainerUtil {
         else if (item.getType().equals(Material.FIREWORK_ROCKET)) FIREWORK_ROCKET.accept(data, item, formula);
     };
 
+
+    private static Set<PotionEffect> potionInternal(List<PotionEffect> contained, String formula, Map<String, String> data) {
+        // P.E.T. = PotionEffectType
+        // e.g. value: random[self,!ambient,!particles]->random[beneficial,!self]:[a=1,d=1]
+        // non arguments value: ambient, icon, particles
+        // numeric arguments value: amplifier, duration
+        // enum arguments value: type
+        // PotionEffectCategory: beneficial, harmful, neutral
+        // can use "!" that means ignore
+
+        // e.g. value: random[self]->random[!self]:[amplifier=10,duration=200,ambient,icon,particles]
+        // -> result effect is amplifier = 10, duration = 200 ticks, ambient, icon, particles
+        // data that are between "{}" means potion's essential info. (need "amplifier"(alias "a") and "duration"(alias "d"))
+        // can use random[:] in amplifier, duration. and can use random[] in ambient, icon and particles.
+        // ambient, icon, particles random -> (ambient|icon|particles)=random[percentage] or =random[] (get random result from (BiFunction) this.RANDOM)
+
+        // add potion effect -> "value: random[!self]->[amplifier=10,duration=200]"
+        // when the target effect not contained the item, can skip to define the second effect.
+
+        Set<PotionEffect> result = new HashSet<>();
+
+        formula = getContent(data, formula);
+        final String BASE_PATTERN = "([a-zA-Z\\[\\]!,0-9=_]+)->(.+)";
+        final String RANDOM_BASE_PATTERN = "random\\[([a-zA-Z!,_]+)]";
+        final String RANDOM_EFFECT_PATTERN = "random\\[([a-zA-Z!,_]+)]:\\[([a-zA-Z0-9:,!=\\[\\]]+)]";
+        final String EFFECT_CREATE_PATTERN = "([a-zA-Z\\[\\]!,_]+):\\[([a-zA-Z0-9:,!=\\[\\]]+)]";
+        final String TO_NUMERIC_PATTERN = "\\[([a-zA-Z0-9:,!=\\[\\]]+)]";
+        final String ONLY_ADD_PATTERN = "\\[([a-zA-Z0-9:,!=\\[\\]]+)]:\\[([a-zA-Z0-9:,!=\\[\\]]+)]";
+        Matcher parsed = Pattern.compile(BASE_PATTERN).matcher(formula);
+        if (!parsed.matches()) {
+            sendIllegalTemplateWarn("potion", formula, BASE_PATTERN);
+            return new HashSet<>(contained);
+        }
+        PotionEffectType base;
+        if (parsed.group(1).matches(RANDOM_BASE_PATTERN)) base = getRandomPotionEffectType(new HashSet<>(contained), parsed.group(1));
+        else base = Registry.POTION_EFFECT_TYPE.get(NamespacedKey.minecraft(parsed.group(1).toLowerCase()));
+        if (base == null) {
+            sendNoSuchTemplateWarn("potion effect (base)", parsed.group(1));
+            return new HashSet<>(contained);
+        }
+
+        data.put("$CURRENT_POTION_DURATION$", String.valueOf(getCurrentDuration(contained, base)));
+        data.put("$CURRENT_POTION_AMPLIFIER$", String.valueOf(getCurrentAmplifier(contained, base)));
+        formula = getContent(data, formula);
+        removeCurrentVariables(data);
+        Matcher reParsed = Pattern.compile(BASE_PATTERN).matcher(formula);
+        if (!reParsed.matches()) return new HashSet<>(contained);
+        boolean toNone = reParsed.group(2).equalsIgnoreCase("none");
+        boolean toNumeric = reParsed.group(2).matches(TO_NUMERIC_PATTERN);
+        boolean change = potionContained(contained, base) && reParsed.group(2).matches(EFFECT_CREATE_PATTERN);
+
+        if (!potionContained(contained, base) && !toNone && toNumeric) {
+            // add
+            Matcher create = Pattern.compile(TO_NUMERIC_PATTERN).matcher(reParsed.group(2));
+            if (!create.matches()) {
+                sendIllegalTemplateWarn("potion",reParsed.group(2), TO_NUMERIC_PATTERN);
+                return new HashSet<>(contained);
+            }
+            PotionEffect temporary = getBuiltPotionEffect(base, create.group(1));
+            if (temporary != null) result.add(temporary);
+        } else if (potionContained(contained, base) && !toNone && toNumeric) {
+            // amplifier, duration change
+            PotionEffect temporary = getBuiltPotionEffect(base, reParsed.group(2));
+            if (temporary != null) result.add(temporary);
+        } else if (!toNone && change) {
+            // potion change
+            Matcher create = Pattern.compile(EFFECT_CREATE_PATTERN).matcher(reParsed.group(2));
+            if (!create.matches()) {
+                sendIllegalTemplateWarn("potion",reParsed.group(2), TO_NUMERIC_PATTERN);
+                return new HashSet<>(contained);
+            }
+            PotionEffectType type = reParsed.group(2).matches(RANDOM_EFFECT_PATTERN)
+                    ? getRandomPotionEffectType(new HashSet<>(contained), create.group(1))
+                    : Registry.POTION_EFFECT_TYPE.get(NamespacedKey.minecraft(create.group(1).toLowerCase()));
+            if (type == null) {
+                sendNoSuchTemplateWarn("potion effect (target)", create.group(1));
+                return new HashSet<>(contained);
+            }
+            PotionEffect temporary = getBuiltPotionEffect(type, reParsed.group(2));
+            if (temporary != null) result.add(temporary);
+        }
+        return result;
+    }
+
+    private static PotionEffect getBuiltPotionEffect(PotionEffectType type, String formula) {
+        Matcher a = Pattern.compile("[a-zA-Z0-9:,=\\[\\]!_]*,?(a|amplifier)=([0-9]+|random\\[[0-9]*:[0-9]*]),?.*").matcher(formula);
+        Matcher d = Pattern.compile("[a-zA-Z0-9:,=\\[\\]!_]*,?(d|duration)=(-?[0-9]+|random\\[-?[0-9]*:-?[0-9]*]),?.*").matcher(formula);
+
+        //debug
+        System.out.println("formula(built)=" + formula);
+
+        if (!a.matches() || !d.matches()) return null;
+        int amplifier = a.group(2).matches("\\d+")
+                ? Integer.parseInt(a.group(2))
+                : getRandomNumber(a.group(2), 0, 255);
+        int duration = d.group(2).matches("-?[0-9]+")
+                ? Integer.parseInt(d.group(2))
+                : getRandomNumber(d.group(2), 20, 20 * 60 * 60); // 20 * 60 * 60 ticks = 1 hour
+        PotionEffect effect = type.createEffect(duration, amplifier);
+        for (String element : formula.split(",")) {
+            if (element.matches("!?ambient")) effect = effect.withAmbient(!(element.startsWith("!")));
+            else if (element.matches("!?icon")) effect = effect.withIcon(!(element.startsWith("!")));
+            else if (element.matches("!?particles")) effect = effect.withParticles(!(element.startsWith("!")));
+        }
+        return effect;
+    }
+
+    private static boolean potionContained(List<PotionEffect> list, PotionEffectType type) {
+        return list.stream().anyMatch(e -> e.getType().equals(type));
+    }
+
+    private static int getCurrentDuration(List<PotionEffect> list, PotionEffectType type) {
+        for (PotionEffect p : list) {
+            if (p.getType().equals(type)) return p.getDuration();
+        }
+        return 0;
+    }
+
+    private static int getCurrentAmplifier(List<PotionEffect> list, PotionEffectType type) {
+        for (PotionEffect p : list) {
+            if (p.getType().equals(type)) return p.getAmplifier();
+        }
+        return 0;
+    }
+
+    private static PotionEffectType getRandomPotionEffectType(Set<PotionEffect> contained, String formula) {
+        List<PotionEffectType> candidate = new ArrayList<>();
+        Matcher parsed = Pattern.compile("random\\[([!a-zA-Z_,]+)]").matcher(formula);
+        if (!parsed.matches()) return null;
+        for (String element : parsed.group(1).split(",")) {
+            if (element.equalsIgnoreCase("self")) contained.forEach(e -> candidate.add(e.getType()));
+            else if (element.equalsIgnoreCase("!self")) contained.forEach(e -> candidate.remove(e.getType()));
+            else if (element.equalsIgnoreCase("all")) candidate.addAll(Registry.POTION_EFFECT_TYPE.stream().collect(Collectors.toSet()));
+            else if (element.equalsIgnoreCase("!all")) candidate.clear();
+            else if (element.equalsIgnoreCase("beneficial")) candidate.addAll(getAllBeneficialEffects());
+            else if (element.equalsIgnoreCase("!beneficial")) candidate.removeAll(getAllBeneficialEffects());
+            else if (element.equalsIgnoreCase("harmful")) candidate.addAll(getAllHarmfulEffects());
+            else if (element.equalsIgnoreCase("!harmful")) candidate.removeAll(getAllHarmfulEffects());
+            else if (element.equalsIgnoreCase("neural")) candidate.addAll(getAllNeuralEffects());
+            else if (element.equalsIgnoreCase("!neural")) candidate.removeAll(getAllNeuralEffects());
+            else if (element.matches(getAllPotionEffectsRegexPattern())) candidate.add(Registry.POTION_EFFECT_TYPE.get(NamespacedKey.minecraft(element.toLowerCase())));
+            else if (element.equalsIgnoreCase("ambient")) candidate.addAll(getAllAmbientEffects(contained));
+            else if (element.equalsIgnoreCase("!ambient")) candidate.removeAll(getAllAmbientEffects(contained));
+            else if (element.equalsIgnoreCase("icon")) candidate.addAll(getAllIconDisplayedEffects(contained));
+            else if (element.equalsIgnoreCase("!icon")) candidate.removeAll(getAllIconDisplayedEffects(contained));
+            else if (element.equalsIgnoreCase("particles")) candidate.addAll(getAllParticlesDisplayedEffects(contained));
+            else if (element.equalsIgnoreCase("!particles")) candidate.removeAll(getAllParticlesDisplayedEffects(contained));
+        }
+        return candidate.isEmpty() ? null : candidate.get(new Random().nextInt(candidate.size()));
+    }
+
+    private static Set<PotionEffectType> getAllAmbientEffects(Set<PotionEffect> data) {
+        return data
+                .stream()
+                .filter(PotionEffect::isAmbient)
+                .map(PotionEffect::getType)
+                .collect(Collectors.toSet());
+    }
+
+    private static Set<PotionEffectType> getAllIconDisplayedEffects(Set<PotionEffect> data) {
+        return data
+                .stream()
+                .filter(PotionEffect::hasIcon)
+                .map(PotionEffect::getType)
+                .collect(Collectors.toSet());
+    }
+
+    private static Set<PotionEffectType> getAllParticlesDisplayedEffects(Set<PotionEffect> data) {
+        return data
+                .stream()
+                .filter(PotionEffect::hasParticles)
+                .map(PotionEffect::getType)
+                .collect(Collectors.toSet());
+    }
+
+    private static Set<PotionEffectType> getAllBeneficialEffects() {
+        return Registry.POTION_EFFECT_TYPE
+                .stream()
+                .filter(e -> e.getEffectCategory().equals(PotionEffectType.Category.BENEFICIAL))
+                .collect(Collectors.toSet());
+    }
+
+    private static Set<PotionEffectType> getAllHarmfulEffects() {
+        return Registry.POTION_EFFECT_TYPE
+                .stream()
+                .filter(e -> e.getEffectCategory().equals(PotionEffectType.Category.HARMFUL))
+                .collect(Collectors.toSet());
+    }
+
+    private static Set<PotionEffectType> getAllNeuralEffects() {
+        return Registry.POTION_EFFECT_TYPE
+                .stream()
+                .filter(e -> e.getEffectCategory().equals(PotionEffectType.Category.NEUTRAL))
+                .collect(Collectors.toSet());
+    }
+
+    private static String getAllPotionEffectsRegexPattern() {
+        StringBuilder builder = new StringBuilder("(");
+        Registry.POTION_EFFECT_TYPE
+                .stream()
+                .forEach(e -> builder.append(Registry.POTION_EFFECT_TYPE.getKey(e).toString().replace("minecraft:", "")).append("|"));
+        builder.deleteCharAt(builder.length() - 1); // remove last "|"
+        builder.append(")");
+        return builder.toString();
+    }
+
+    public static final TriConsumer<Map<String, String>, ItemStack, String> STEW = (data, item, formula) -> {
+        // type: stew, value: {target}->(.+)
+        // the formula rule looks like "enchant"
+        SuspiciousStewMeta meta = (SuspiciousStewMeta) Objects.requireNonNull(item.getItemMeta());
+        List<PotionEffect> contained = new ArrayList<>(meta.getCustomEffects());
+        meta.clearCustomEffects();
+        Set<PotionEffect> temp =  potionInternal(contained, formula, data);
+        temp.forEach(s -> meta.addCustomEffect(SuspiciousEffectEntry.create(s.getType(), s.getDuration()), true));
+        item.setItemMeta(meta);
+    };
+
     private static Map<Enchantment, Integer> enchantInternal(Map<Enchantment, Integer> contained, String formula, Map<String, String> data) {
         // when detect illegal or invalid actions, this method returns the map that named "contained" contained in arguments.
         formula = getContent(data, formula);
@@ -1152,7 +1374,7 @@ public class ContainerUtil {
         Enchantment target;
 
         if (isRandomTarget) target = getRandomEnchantment(contained.keySet(), parsed.group(2));
-        else target = Enchantment.getByKey(NamespacedKey.minecraft(parsed.group(2).toLowerCase()));
+        else target = Registry.ENCHANTMENT.get(NamespacedKey.minecraft(parsed.group(2).toLowerCase()));
 
         if (target == null) {
             sendNoSuchTemplateWarn("enchant element", parsed.group(2));
@@ -1189,7 +1411,7 @@ public class ContainerUtil {
                 // !toRandom
                 int level = contained.get(target);
                 contained.remove(target);
-                contained.put(Enchantment.getByKey(NamespacedKey.minecraft(reMatch.group(3).toLowerCase())), level);
+                contained.put(Registry.ENCHANTMENT.get(NamespacedKey.minecraft(reMatch.group(3).toLowerCase())), level);
             } else {
                 Enchantment destination = getRandomEnchantment(contained.keySet(), reMatch.group(3));
                 if (destination == null) contained.remove(target);
@@ -1284,7 +1506,7 @@ public class ContainerUtil {
             return null;
         }
 
-        Set<Enchantment> all = new HashSet<>(Arrays.asList(Enchantment.values()));
+        Set<Enchantment> all = Registry.ENCHANTMENT.stream().collect(Collectors.toSet());
         String element = parsed.group(1).replaceAll("[()\\[\\]]", "");
         Set<String> enc = new HashSet<>(Arrays.asList(element.replace("!", "").toLowerCase().split(",")));
         if (element.startsWith("!")) {
@@ -1295,7 +1517,7 @@ public class ContainerUtil {
                     case "none" -> remove.add(null);
                     case "self" -> remove.addAll(enchants); // !self
                     case "all" -> remove.addAll(all);
-                    default -> remove.add(Enchantment.getByKey(NamespacedKey.minecraft(s)));
+                    default -> remove.add(Registry.ENCHANTMENT.get(NamespacedKey.minecraft(s)));
                 }
             });
             all.removeAll(remove);
@@ -1309,7 +1531,7 @@ public class ContainerUtil {
                 case "none" -> set.add(null);
                 case "self" -> set.addAll(enchants); // self
                 case "all" -> set.addAll(all); // all
-                default -> set.add(Enchantment.getByKey(NamespacedKey.minecraft(s)));
+                default -> set.add(Registry.ENCHANTMENT.get(NamespacedKey.minecraft(s)));
             }
         });
         if (!enc.contains("none")) set.remove(null);
