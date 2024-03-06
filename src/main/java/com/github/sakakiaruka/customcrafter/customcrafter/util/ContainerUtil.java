@@ -1135,7 +1135,7 @@ public class ContainerUtil {
     };
 
 
-    private static Set<PotionEffect> potionInternal(List<PotionEffect> contained, String formula, Map<String, String> data) {
+    private static void potionInternal(List<PotionEffect> contained, String formula, Map<String, String> data) {
         // P.E.T. = PotionEffectType
         // e.g. value: random[self,!ambient,!particles]->random[beneficial,!self]:[a=1,d=1]
         // non arguments value: ambient, icon, particles
@@ -1146,14 +1146,12 @@ public class ContainerUtil {
 
         // e.g. value: random[self]->random[!self]:[amplifier=10,duration=200,ambient,icon,particles]
         // -> result effect is amplifier = 10, duration = 200 ticks, ambient, icon, particles
-        // data that are between "{}" means potion's essential info. (need "amplifier"(alias "a") and "duration"(alias "d"))
+        // (need "amplifier"(alias "a") and "duration"(alias "d"))
         // can use random[:] in amplifier, duration. and can use random[] in ambient, icon and particles.
         // ambient, icon, particles random -> (ambient|icon|particles)=random[percentage] or =random[] (get random result from (BiFunction) this.RANDOM)
 
         // add potion effect -> "value: random[!self]->[amplifier=10,duration=200]"
         // when the target effect not contained the item, can skip to define the second effect.
-
-        Set<PotionEffect> result = new HashSet<>();
 
         formula = getContent(data, formula);
         final String BASE_PATTERN = "([a-zA-Z\\[\\]!,0-9=_]+)->(.+)";
@@ -1164,14 +1162,14 @@ public class ContainerUtil {
         Matcher parsed = Pattern.compile(BASE_PATTERN).matcher(formula);
         if (!parsed.matches()) {
             sendIllegalTemplateWarn("potion", formula, BASE_PATTERN);
-            return new HashSet<>(contained);
+            return;
         }
         PotionEffectType base;
         if (parsed.group(1).matches(RANDOM_BASE_PATTERN)) base = getRandomPotionEffectType(new HashSet<>(contained), parsed.group(1));
         else base = Registry.POTION_EFFECT_TYPE.get(NamespacedKey.minecraft(parsed.group(1).toLowerCase()));
         if (base == null) {
             sendNoSuchTemplateWarn("potion effect (base)", parsed.group(1));
-            return new HashSet<>(contained);
+            return;
         }
 
         data.put("$CURRENT_POTION_DURATION$", String.valueOf(getCurrentDuration(contained, base)));
@@ -1179,42 +1177,56 @@ public class ContainerUtil {
         formula = getContent(data, formula);
         removeCurrentVariables(data);
         Matcher reParsed = Pattern.compile(BASE_PATTERN).matcher(formula);
-        if (!reParsed.matches()) return new HashSet<>(contained);
+        if (!reParsed.matches()) return;
         boolean toNone = reParsed.group(2).equalsIgnoreCase("none");
         boolean toNumeric = reParsed.group(2).matches(TO_NUMERIC_PATTERN);
         boolean change = potionContained(contained, base) && reParsed.group(2).matches(EFFECT_CREATE_PATTERN);
+
+        Matcher overrideParse = Pattern.compile("[a-zA-Z0-9:,=\\[\\]!_]*,?(o|override)=(true|false),?.*").matcher(reParsed.group(2));
+        boolean override = !overrideParse.matches() || Boolean.parseBoolean(overrideParse.group(2));
 
         if (!potionContained(contained, base) && !toNone && toNumeric) {
             // add
             Matcher create = Pattern.compile(TO_NUMERIC_PATTERN).matcher(reParsed.group(2));
             if (!create.matches()) {
                 sendIllegalTemplateWarn("potion",reParsed.group(2), TO_NUMERIC_PATTERN);
-                return new HashSet<>(contained);
+                return;
             }
             PotionEffect temporary = getBuiltPotionEffect(base, create.group(1));
-            if (temporary != null) result.add(temporary);
+            if (temporary == null || (!override && potionContained(contained, temporary.getType()))) return;
+            contained.add(temporary);
         } else if (potionContained(contained, base) && !toNone && toNumeric) {
             // amplifier, duration change
             PotionEffect temporary = getBuiltPotionEffect(base, reParsed.group(2));
-            if (temporary != null) result.add(temporary);
+            if (temporary == null || (!override && potionContained(contained, temporary.getType()))) return;
+            if (!base.equals(temporary.getType())) contained.remove(getSpecifiedPotionEffectIndex(contained, base));
+            contained.add(temporary);
         } else if (!toNone && change) {
-            // potion change
+            // effect change (!toNone && potionContained && reParsed.group(2).matches(EFFECT_CREATE_PATTERN)
             Matcher create = Pattern.compile(EFFECT_CREATE_PATTERN).matcher(reParsed.group(2));
             if (!create.matches()) {
                 sendIllegalTemplateWarn("potion",reParsed.group(2), TO_NUMERIC_PATTERN);
-                return new HashSet<>(contained);
+                return;
             }
             PotionEffectType type = reParsed.group(2).matches(RANDOM_EFFECT_PATTERN)
                     ? getRandomPotionEffectType(new HashSet<>(contained), create.group(1))
                     : Registry.POTION_EFFECT_TYPE.get(NamespacedKey.minecraft(create.group(1).toLowerCase()));
             if (type == null) {
                 sendNoSuchTemplateWarn("potion effect (target)", create.group(1));
-                return new HashSet<>(contained);
-            }
+                return;
+            } else if (!override && potionContained(contained, type)) return;
             PotionEffect temporary = getBuiltPotionEffect(type, reParsed.group(2));
-            if (temporary != null) result.add(temporary);
+            if (temporary == null) return;
+            if (!base.equals(temporary.getType())) contained.remove(getSpecifiedPotionEffectIndex(contained, base));
+            contained.add(temporary);
         }
-        return result;
+    }
+
+    private static int getSpecifiedPotionEffectIndex(List<PotionEffect> effects, PotionEffectType type) {
+        for (int i = 0; i < effects.size(); i ++) {
+            if (effects.get(i).getType().equals(type)) return i;
+        }
+        return -1;
     }
 
     private static PotionEffect getBuiltPotionEffect(PotionEffectType type, String formula) {
@@ -1339,10 +1351,11 @@ public class ContainerUtil {
         // type: stew, value: {target}->(.+)
         // the formula rule looks like "enchant"
         SuspiciousStewMeta meta = (SuspiciousStewMeta) Objects.requireNonNull(item.getItemMeta());
+
         List<PotionEffect> contained = new ArrayList<>(meta.getCustomEffects());
+        potionInternal(contained, formula, data);
         meta.clearCustomEffects();
-        Set<PotionEffect> temp =  potionInternal(contained, formula, data);
-        temp.forEach(s -> meta.addCustomEffect(SuspiciousEffectEntry.create(s.getType(), s.getDuration()), true));
+        contained.forEach(e -> meta.addCustomEffect(SuspiciousEffectEntry.create(e.getType(), e.getDuration()), true));
         item.setItemMeta(meta);
     };
 
