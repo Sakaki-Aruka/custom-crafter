@@ -15,6 +15,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
+import org.bukkit.DyeColor;
 import org.bukkit.FireworkEffect;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -23,6 +24,7 @@ import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.TropicalFish;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -38,6 +40,7 @@ import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.Repairable;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.inventory.meta.SuspiciousStewMeta;
+import org.bukkit.inventory.meta.TropicalFishBucketMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffect;
@@ -1225,7 +1228,7 @@ public class ContainerUtil {
                 : getRandomNumber(a.group(2), 0, 255);
         int duration = d.group(2).matches("-?[0-9]+")
                 ? Integer.parseInt(d.group(2))
-                : getRandomNumber(d.group(2), 1, 60 * 60); // 20 * 60 * 60 ticks = 1 hour
+                : getRandomNumber(d.group(2), 1, 60 * 60); // 60 * 60 ticks = 1 hour
 
         PotionEffect effect = type.createEffect(duration == - 1 ? -1 : duration * 20, amplifier);
         for (String element : formula.split(",")) {
@@ -1532,6 +1535,90 @@ public class ContainerUtil {
         });
         if (!enc.contains("none")) set.remove(null);
         return new ArrayList<>(set).get(new Random().nextInt(set.size()));
+    }
+
+    public static final TriConsumer<Map<String, String>, ItemStack, String> TROPICAL_FISH = (data, item, formula) -> {
+        // type: tropical_fish, value: body_color=~~~,pattern=~~~,pattern_color=~~~
+        // can use "random" in each element. (e.g. pattern=random[all])
+        TropicalFishBucketMeta meta = (TropicalFishBucketMeta) Objects.requireNonNull(item.getItemMeta());
+        formula = getContent(data, formula);
+        final String pattern = "body_color=([a-zA-Z\\[\\]!,]+),pattern=([a-zA-Z\\[\\]!_,]+),pattern_color=([a-zA-Z\\[\\]!_,]+)";
+        Matcher parsed = Pattern.compile(pattern).matcher(formula);
+        if (!parsed.matches()) {
+            sendIllegalTemplateWarn("tropical fish", formula, pattern);
+            return;
+        }
+        // set temporary data
+        meta.setBodyColor(DyeColor.BLUE);
+        meta.setPattern(TropicalFish.Pattern.BETTY);
+        meta.setPatternColor(DyeColor.BLUE);
+
+        if (!meta.hasVariant()) {
+            sendOrdinalWarn("tropical fish warn. (couldn't get data.)");
+            return;
+        }
+        DyeColor bodyColor = parsed.group(1).startsWith("random")
+                ? getRandomDyeColor(parsed.group(1), meta.getBodyColor())
+                : DyeColor.valueOf(parsed.group(1).toUpperCase());
+        TropicalFish.Pattern fishPattern = parsed.group(2).startsWith("random")
+                ? getRandomTropicalFishPattern(parsed.group(2), meta.getPattern())
+                : TropicalFish.Pattern.valueOf(parsed.group(2).toUpperCase());
+        DyeColor patternColor = parsed.group(3).startsWith("random")
+                ? getRandomDyeColor(parsed.group(3), meta.getPatternColor())
+                : DyeColor.valueOf(parsed.group(3).toUpperCase());
+        if (bodyColor == null || fishPattern == null || patternColor == null) return;
+        meta.setBodyColor(bodyColor);
+        meta.setPattern(fishPattern);
+        meta.setPatternColor(patternColor);
+        item.setItemMeta(meta);
+    };
+
+    private static TropicalFish.Pattern getRandomTropicalFishPattern(String formula, TropicalFish.Pattern current) {
+        final String pattern = "random\\[([a-zA-Z!,_]+)]";
+        Matcher parsed = Pattern.compile(pattern).matcher(formula);
+        if (!parsed.matches()) return null;
+        Set<TropicalFish.Pattern> candidate = new HashSet<>();
+        for (String element : parsed.group(1).split(",")) {
+            if (element.equals("all")) candidate.addAll(Arrays.asList(TropicalFish.Pattern.values()));
+            else if (element.equals("!all")) Arrays.asList(TropicalFish.Pattern.values()).forEach(candidate::remove);
+            else if (element.equals("self")) candidate.add(current);
+            else if (element.equals("!self")) candidate.remove(current);
+            else if (element.startsWith("!") && element.replace("!", "").matches(getAllTropicalFishPatternRegexPattern())) candidate.remove(TropicalFish.Pattern.valueOf(element.toUpperCase()));
+            else if (element.matches(getAllTropicalFishPatternRegexPattern())) candidate.add(TropicalFish.Pattern.valueOf(element.toUpperCase()));
+        }
+        if (candidate.isEmpty()) return null;
+        return new ArrayList<>(candidate).get(new Random().nextInt(candidate.size()));
+    }
+
+    private static String getAllTropicalFishPatternRegexPattern() {
+        StringBuilder builder = new StringBuilder("(");
+        for (TropicalFish.Pattern pattern : TropicalFish.Pattern.values()) builder.append(pattern.name()).append("|");
+        builder.deleteCharAt(builder.length() - 1).append(")");
+        return builder.toString();
+    }
+
+    private static DyeColor getRandomDyeColor(String formula, DyeColor current) {
+        final String pattern = "random\\[([a-zA-Z!,_]+)]";
+        Matcher parsed = Pattern.compile(pattern).matcher(formula);
+        if (!parsed.matches()) return null;
+        Set<DyeColor> candidate = new HashSet<>();
+        for (String element : parsed.group(1).split(",")) {
+            if (element.equals("all")) candidate.addAll(Arrays.asList(DyeColor.values()));
+            else if (element.equals("!all")) Arrays.asList(DyeColor.values()).forEach(candidate::remove);
+            else if (element.equals("self")) candidate.add(current);
+            else if (element.equals("!self")) candidate.remove(current);
+            else if (element.startsWith("!") && element.replace("!", "").matches(getAllDyeColorRegexPattern())) candidate.remove(DyeColor.valueOf(element.toUpperCase()));
+            else if (element.matches(getAllDyeColorRegexPattern())) candidate.add(DyeColor.valueOf(element.toUpperCase()));
+        }
+        if (candidate.isEmpty()) return null;
+        return new ArrayList<>(candidate).get(new Random().nextInt(candidate.size()));
+    }
+
+    private static String getAllDyeColorRegexPattern() {
+        StringBuilder builder = new StringBuilder("(");
+        for (DyeColor color : DyeColor.values()) builder.append(color.name()).append("|");
+        builder.deleteCharAt(builder.length() - 1).append(")");
+        return builder.toString().toLowerCase();
     }
 
 

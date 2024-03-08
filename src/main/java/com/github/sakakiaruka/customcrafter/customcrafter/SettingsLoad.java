@@ -630,6 +630,7 @@ public class SettingsLoad {
             case "enchant_book" -> consumer = ContainerUtil.ENCHANT_BOOK;
             case "firework" -> consumer = ContainerUtil.FIREWORK;
             case "stew" -> consumer = ContainerUtil.STEW;
+            case "tropical_fish" -> consumer = ContainerUtil.TROPICAL_FISH;
             default -> {
                 consumer = null;
             }
