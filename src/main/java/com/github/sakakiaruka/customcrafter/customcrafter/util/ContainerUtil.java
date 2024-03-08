@@ -1228,7 +1228,7 @@ public class ContainerUtil {
                 : getRandomNumber(a.group(2), 0, 255);
         int duration = d.group(2).matches("-?[0-9]+")
                 ? Integer.parseInt(d.group(2))
-                : getRandomNumber(d.group(2), 1, 60 * 60); // 20 * 60 * 60 ticks = 1 hour
+                : getRandomNumber(d.group(2), 1, 60 * 60); // 60 * 60 ticks = 1 hour
 
         PotionEffect effect = type.createEffect(duration == - 1 ? -1 : duration * 20, amplifier);
         for (String element : formula.split(",")) {
@@ -1575,16 +1575,16 @@ public class ContainerUtil {
 
     private static TropicalFish.Pattern getRandomTropicalFishPattern(String formula, TropicalFish.Pattern current) {
         final String pattern = "random\\[([a-zA-Z!,_]+)]";
-        Matcher parsed = Pattern.compile(pattern).matcher(formula.toUpperCase());
+        Matcher parsed = Pattern.compile(pattern).matcher(formula);
         if (!parsed.matches()) return null;
         Set<TropicalFish.Pattern> candidate = new HashSet<>();
         for (String element : parsed.group(1).split(",")) {
-            if (element.equals("ALL")) candidate.addAll(Arrays.asList(TropicalFish.Pattern.values()));
-            else if (element.equals("!ALL")) Arrays.asList(TropicalFish.Pattern.values()).forEach(candidate::remove);
-            else if (element.equals("SELF")) candidate.add(current);
-            else if (element.equals("!SELF")) candidate.remove(current);
-            else if (element.startsWith("!") && element.replace("!", "").matches(getAllTropicalFishPatternRegexPattern())) candidate.remove(TropicalFish.Pattern.valueOf(element));
-            else if (element.matches(getAllTropicalFishPatternRegexPattern())) candidate.add(TropicalFish.Pattern.valueOf(element));
+            if (element.equals("all")) candidate.addAll(Arrays.asList(TropicalFish.Pattern.values()));
+            else if (element.equals("!all")) Arrays.asList(TropicalFish.Pattern.values()).forEach(candidate::remove);
+            else if (element.equals("self")) candidate.add(current);
+            else if (element.equals("!self")) candidate.remove(current);
+            else if (element.startsWith("!") && element.replace("!", "").matches(getAllTropicalFishPatternRegexPattern())) candidate.remove(TropicalFish.Pattern.valueOf(element.toUpperCase()));
+            else if (element.matches(getAllTropicalFishPatternRegexPattern())) candidate.add(TropicalFish.Pattern.valueOf(element.toUpperCase()));
         }
         if (candidate.isEmpty()) return null;
         return new ArrayList<>(candidate).get(new Random().nextInt(candidate.size()));
@@ -1599,16 +1599,16 @@ public class ContainerUtil {
 
     private static DyeColor getRandomDyeColor(String formula, DyeColor current) {
         final String pattern = "random\\[([a-zA-Z!,_]+)]";
-        Matcher parsed = Pattern.compile(pattern).matcher(formula.toUpperCase());
+        Matcher parsed = Pattern.compile(pattern).matcher(formula);
         if (!parsed.matches()) return null;
         Set<DyeColor> candidate = new HashSet<>();
         for (String element : parsed.group(1).split(",")) {
-            if (element.equals("ALL")) candidate.addAll(Arrays.asList(DyeColor.values()));
-            else if (element.equals("!ALL")) Arrays.asList(DyeColor.values()).forEach(candidate::remove);
-            else if (element.equals("SELF")) candidate.add(current);
-            else if (element.equals("!SELF")) candidate.remove(current);
-            else if (element.startsWith("!") && element.replace("!", "").matches(getAllDyeColorRegexPattern())) candidate.remove(DyeColor.valueOf(element));
-            else if (element.matches(getAllDyeColorRegexPattern())) candidate.add(DyeColor.valueOf(element));
+            if (element.equals("all")) candidate.addAll(Arrays.asList(DyeColor.values()));
+            else if (element.equals("!all")) Arrays.asList(DyeColor.values()).forEach(candidate::remove);
+            else if (element.equals("self")) candidate.add(current);
+            else if (element.equals("!self")) candidate.remove(current);
+            else if (element.startsWith("!") && element.replace("!", "").matches(getAllDyeColorRegexPattern())) candidate.remove(DyeColor.valueOf(element.toUpperCase()));
+            else if (element.matches(getAllDyeColorRegexPattern())) candidate.add(DyeColor.valueOf(element.toUpperCase()));
         }
         if (candidate.isEmpty()) return null;
         return new ArrayList<>(candidate).get(new Random().nextInt(candidate.size()));
@@ -1618,7 +1618,7 @@ public class ContainerUtil {
         StringBuilder builder = new StringBuilder("(");
         for (DyeColor color : DyeColor.values()) builder.append(color.name()).append("|");
         builder.deleteCharAt(builder.length() - 1).append(")");
-        return builder.toString();
+        return builder.toString().toLowerCase();
     }
 
 
