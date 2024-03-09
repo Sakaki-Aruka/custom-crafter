@@ -1621,6 +1621,10 @@ public class ContainerUtil {
         return builder.toString().toLowerCase();
     }
 
+    public static final TriConsumer<Map<String, String>, ItemStack, String> SPAWN_EGG = (data, item, formula) -> {
+        //
+    };
+
 
     private static void removeCurrentVariables(Map<String, String> data) {
         data.entrySet().removeIf(element -> element.getKey().matches("\\$CURRENT_[A-Z0-9_.]+\\$"));
