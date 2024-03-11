@@ -631,6 +631,7 @@ public class SettingsLoad {
             case "firework" -> consumer = ContainerUtil.FIREWORK;
             case "stew" -> consumer = ContainerUtil.STEW;
             case "tropical_fish" -> consumer = ContainerUtil.TROPICAL_FISH;
+            case "spawn_egg" -> consumer = ContainerUtil.SPAWN_EGG;
             default -> {
                 consumer = null;
             }

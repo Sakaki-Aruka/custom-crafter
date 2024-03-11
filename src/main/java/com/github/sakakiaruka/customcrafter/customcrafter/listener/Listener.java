@@ -1,9 +1,13 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.listener;
 
+import com.destroystokyo.paper.event.player.PlayerUseUnknownEntityEvent;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.entity.EntitySpawnEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerItemConsumeEvent;
 
 public class Listener implements org.bukkit.event.Listener {
     @EventHandler
@@ -19,5 +23,20 @@ public class Listener implements org.bukkit.event.Listener {
     @EventHandler
     public void onInventoryOpen(PlayerInteractEvent event){
         new OpenCraftingTable().onPlayerInteract(event);
+    }
+
+    @EventHandler
+    public void onEntitySpawn(EntitySpawnEvent event) {
+        new MobSpawn().onEntitySpawn(event);
+    }
+
+    @EventHandler
+    public void onPlayerConsumeItem(PlayerInteractEvent event) {
+        new PlayerUseSpawnEgg().onPlayerUseSpawnEgg(event);
+    }
+
+    @EventHandler
+    public void consume(PlayerUseUnknownEntityEvent event) {
+        Bukkit.getLogger().info(event.toString());
     }
 }
