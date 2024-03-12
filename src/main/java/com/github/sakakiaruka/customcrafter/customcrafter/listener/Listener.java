@@ -1,6 +1,9 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.listener;
 
 import com.destroystokyo.paper.event.player.PlayerUseUnknownEntityEvent;
+import com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad;
+import com.github.sakakiaruka.customcrafter.customcrafter.command.Check;
+import io.papermc.paper.event.server.ServerResourcesReloadedEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntitySpawnEvent;
@@ -38,5 +41,11 @@ public class Listener implements org.bukkit.event.Listener {
     @EventHandler
     public void consume(PlayerUseUnknownEntityEvent event) {
         Bukkit.getLogger().info(event.toString());
+    }
+
+    @EventHandler
+    public void onReload(ServerResourcesReloadedEvent event) {
+        new Check().reload();
+        new SettingsLoad().load();
     }
 }

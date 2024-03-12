@@ -1,5 +1,12 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.util;
 
+import com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad;
+import com.github.sakakiaruka.customcrafter.customcrafter.interfaces.PentaConsumer;
+import com.github.sakakiaruka.customcrafter.customcrafter.interfaces.TriConsumer;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
+
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.regex.Matcher;

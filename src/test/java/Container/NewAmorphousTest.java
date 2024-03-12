@@ -14,6 +14,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Tag;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.Result;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.CalcUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.ContainerUtil;
+import com.github.sakakiaruka.customcrafter.customcrafter.util.EntityUtil;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.persistence.PersistentDataContainer;

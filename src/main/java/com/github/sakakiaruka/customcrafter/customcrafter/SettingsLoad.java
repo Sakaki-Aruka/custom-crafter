@@ -633,6 +633,7 @@ public class SettingsLoad {
             case "stew" -> consumer = ContainerUtil.STEW;
             case "tropical_fish" -> consumer = ContainerUtil.TROPICAL_FISH;
             case "spawn_egg" -> consumer = EntityUtil.SPAWN_EGG;
+            case "entity_define" -> consumer = EntityUtil.ENTITY_DEFINE;
             default -> {
                 consumer = null;
             }
@@ -686,6 +687,10 @@ public class SettingsLoad {
             builder.append(map.get("base").get(0)).append(",");
             if (!map.containsKey("value")) {
                 builder.append("0");
+
+                //debug
+                System.out.println("raw item define=" + builder);
+
                 continue;
             }
 

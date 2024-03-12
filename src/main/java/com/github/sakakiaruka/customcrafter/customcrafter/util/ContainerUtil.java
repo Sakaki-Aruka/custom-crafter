@@ -786,6 +786,26 @@ public class ContainerUtil {
          */
 
         formula = CalcUtil.getContent(data, formula);
+
+        //debug
+        //System.out.println("item type=" + item.getType().name());
+        //System.out.println("has info key=" + item.getItemMeta().getPersistentDataContainer().has(EntityUtil.SPAWN_EGG_INFO_KEY));
+
+        if (!item.getType().equals(Material.AIR) && item.getType().name().matches("[A-Z_0-9]+_SPAWN_EGG") && item.getItemMeta().getPersistentDataContainer().has(EntityUtil.SPAWN_EGG_INFO_KEY)) {
+            ItemMeta meta = item.getItemMeta();
+            String temp = meta.getPersistentDataContainer().get(EntityUtil.SPAWN_EGG_INFO_KEY, PersistentDataType.STRING);
+            String value = "__internal__:item_define=" + formula;
+            temp += Objects.toString(temp, "").isEmpty() ? "" : "," + value.length() + ":" + value;
+            meta.getPersistentDataContainer().set(EntityUtil.SPAWN_EGG_INFO_KEY, PersistentDataType.STRING, temp);
+            item.setItemMeta(meta);
+
+            //debug
+            System.out.println("temp=" + temp);
+            System.out.println("value=" + value);
+            System.out.println("pdc=" + item.getItemMeta().getPersistentDataContainer().get(EntityUtil.SPAWN_EGG_INFO_KEY, PersistentDataType.STRING));
+
+            return;
+        }
         // flag = 0 (separator = "|"), 1 = (name section), 2 = (base section), 3 = (element section)
         int flag = 0;
         // keys = name, base, values
@@ -819,6 +839,10 @@ public class ContainerUtil {
             if (flag == 2) {
                 if (c != ',') buffer.append(c);
                 else {
+
+                    //debug
+                    System.out.println("item define base=" + buffer.toString().toUpperCase());
+
                     map.put("base", buffer.toString().toUpperCase());
                     DEFINED_ITEMS.put("$" + data.get("$RECIPE_NAME$") + "." + map.get("name") + "$", new ItemStack(Material.valueOf(map.get("base").toUpperCase())));
                     if (i < formula.length() - 1) {

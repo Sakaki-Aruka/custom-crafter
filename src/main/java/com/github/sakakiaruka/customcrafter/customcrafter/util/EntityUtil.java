@@ -1,10 +1,13 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.util;
 
 import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter;
+import com.github.sakakiaruka.customcrafter.customcrafter.interfaces.PentaConsumer;
 import com.github.sakakiaruka.customcrafter.customcrafter.interfaces.TriConsumer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.World;
 import org.bukkit.attribute.Attributable;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
@@ -17,13 +20,20 @@ import org.bukkit.entity.Mob;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.SpawnEggMeta;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
+import javax.net.ssl.SNIHostName;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -35,14 +45,127 @@ public class EntityUtil {
     public static Map<String, Entity> DEFINED_ENTITIES = new HashMap<>();
     public static final NamespacedKey SPAWN_EGG_INFO_KEY = new NamespacedKey(CustomCrafter.getInstance(), "spawn_info");
 
-    private static final String ALL_ENTITY_TYPE_REGEX_PATTERN = "(" + String.join("|", Arrays.stream(EntityType.values()).map(Enum::name).collect(Collectors.toSet())) + ")";
+    private static final String ALL_ENTITY_TYPE_REGEX_PATTERN = "(" + Arrays.stream(EntityType.values()).map(Enum::name).collect(Collectors.joining("|")) + ")";
+
+
+    public static final TriConsumer<Map<String, String>, ItemStack, String> ENTITY_DEFINE = (data, item, formula) -> {
+        // type: entity_define, value: name:([a-zA-Z_0-9]+),actions:~~~~~,~~~~~,~~~~~
+        final String pattern = "name:([a-zA-Z_0-9]+),actions:(.+)";
+        Matcher parsed = Pattern.compile(pattern).matcher(formula);
+        if (!parsed.matches()) return;
+        ItemMeta meta = item.getItemMeta();
+        PersistentDataContainer container = meta.getPersistentDataContainer();
+        String name = parsed.group(1);
+        StringBuilder builder = new StringBuilder(container.has(SPAWN_EGG_INFO_KEY) ? container.get(SPAWN_EGG_INFO_KEY, PersistentDataType.STRING) + "," : "");
+        StringBuilder buffer = new StringBuilder();
+        for (int i = 0; i < parsed.group(2).length(); i++) {
+            char c = parsed.group(2).charAt(i);
+            if (c == ',' && 0 < i - 1 && parsed.group(2).charAt(i - 1) != '\\') {
+                // separate
+                builder.append(name.length() + 1 + buffer.length())
+                        .append(":")
+                        .append(name)
+                        .append(":")
+                        .append(buffer)
+                        .append(",");
+                buffer.setLength(0);
+            } else if (c == ',' && 0 < i - 1 && parsed.group(2).charAt(i - 1) == '\\') {
+                // escape sequence
+                buffer.deleteCharAt(buffer.length() - 1);
+            } else buffer.append(c);
+        }
+        if (!buffer.isEmpty()) {
+            builder.append(name.length() + 1 + buffer.length())
+                    .append(":")
+                    .append(name)
+                    .append(":")
+                    .append(buffer);
+        }
+
+        //debug
+        Bukkit.getLogger().info("entity define builder=" + builder);
+
+        container.set(SPAWN_EGG_INFO_KEY, PersistentDataType.STRING, builder.toString());
+        item.setItemMeta(meta);
+    };
 
     public static final TriConsumer<Map<String, String>, ItemStack, String> SPAWN_EGG = (data, item, formula) -> {
         // type: spawn_egg, value: name:v1-length:v1,v2-length:v2
         if (!(item.getItemMeta() instanceof SpawnEggMeta)) return;
         SpawnEggMeta meta = (SpawnEggMeta) item.getItemMeta();
-        meta.getPersistentDataContainer().set(SPAWN_EGG_INFO_KEY, PersistentDataType.STRING, CalcUtil.getContent(data, formula));
+        meta.getPersistentDataContainer().set(SPAWN_EGG_INFO_KEY, PersistentDataType.STRING, "");
+        item.setItemMeta(meta);
+        ENTITY_DEFINE.accept(data, item, formula);
+        //meta.getPersistentDataContainer().set(SPAWN_EGG_INFO_KEY, PersistentDataType.STRING, CalcUtil.getContent(data, formula));
     };
+
+    public static void spawn(Map<String, String> data, String formula) {
+        // spawn info format = "length:name:info"
+        // "self" means base target
+        String uniqueID = UUID.randomUUID().toString();
+        data.put("uniqueID", uniqueID);
+        formula = CalcUtil.getContent(data, formula);
+        StringBuilder buffer = new StringBuilder();
+
+        for (int i = 0; i < formula.length(); i++) {
+            // read length = flag 0 | read name = flag 1 | read actions = flag 2
+            char c = formula.charAt(i);
+            if (c != ':') {
+                buffer.append(c);
+                continue;
+            }
+            int length = Integer.parseInt(buffer.toString().replace(",", ""));
+            if (i + length > formula.length()) break;
+            String element = formula.substring(i + 1, i + 1 + length);
+            i += length;
+
+            // debug
+            System.out.println("element=" + element);
+            //System.out.println("data=" + data);
+            System.out.println("formula=" + formula);
+
+            Matcher parsed = Pattern.compile("([a-zA-Z_0-9]+):([|a-z_0-9]+)=(.+)").matcher(element);
+            if (!parsed.matches()) break;
+            buffer.setLength(0);
+            String name = parsed.group(1);
+            String type = parsed.group(2);
+            String action = parsed.group(3);
+            String key = uniqueID + "." + name;
+
+            //debug
+            System.out.println("name=" + name);
+            System.out.println("type=" + type);
+            System.out.println("action=" + action);
+
+            if (type.equalsIgnoreCase("type") && !DEFINED_ENTITIES.containsKey(key)) {
+                Location location = getLocationFromData(data);
+                World world;
+                if ((world = Bukkit.getWorld(UUID.fromString(data.get("WORLD_UUID")))) == null) break;
+                Entity entity = world.spawn(location, Objects.requireNonNull(EntityType.valueOf(action.toUpperCase()).getEntityClass()));
+                DEFINED_ENTITIES.put(key, entity);
+                data.put(name, key);
+                continue;
+            }
+            if (!DEFINED_ENTITIES.containsKey(key) && !name.equals("__internal__")) continue;
+            Entity defined = DEFINED_ENTITIES.get(key);
+            if (type.equalsIgnoreCase("add_passenger")) ADD_PASSENGER.accept(action, data, defined);
+            else if (type.equalsIgnoreCase("set_armor")) SET_ARMOR.accept(action, data, defined);
+            else if (type.equalsIgnoreCase("set_drop_chance")) SET_DROP_CHANCE.accept(action, data, defined);
+            else if (type.equalsIgnoreCase("set_various_value")) SET_VARIOUS_VALUES.accept(action, data, defined);
+            else if (type.equalsIgnoreCase("add_attribute")) ADD_ATTRIBUTE.accept(action, data, defined);
+            else if (type.equalsIgnoreCase("item_define") && name.equals("__internal__")) {
+                // item define
+                Map<String, String> pseudoData = Map.of("$RECIPE_NAME$", uniqueID);
+                ItemStack pseudoItem = new ItemStack(Material.AIR);
+                ContainerUtil.ITEM_DEFINE.accept(pseudoData, pseudoItem, action);
+
+                //debug
+                System.out.println("defined item map(internal)=" + ContainerUtil.DEFINED_ITEMS);
+            }
+        }
+        DEFINED_ENTITIES.keySet().removeIf(e -> e.startsWith(uniqueID));
+        ContainerUtil.DEFINED_ITEMS.keySet().removeIf(e -> e.startsWith("$" + uniqueID + "."));
+    }
 
     private static Location getLocationFromData(Map<String, String> data) {
         return new Location(
@@ -58,24 +181,38 @@ public class EntityUtil {
         addEntityAndWorldData(data, base);
         data.put("$CURRENT_TARGET_PASSENGERS_COUNT$", String.valueOf(base.getPassengers().size()));
         formula = CalcUtil.getContent(data, formula);
+
+        //debug
+        System.out.println("add passenger formula=" + formula);
+        System.out.println("defined entities map=" + DEFINED_ENTITIES);
+
         ContainerUtil.removeCurrentVariables(data);
         Matcher parsed = Pattern.compile(pattern).matcher(formula);
         if (!parsed.matches()) return;
         if (parsed.group(2) != null && !Boolean.parseBoolean(parsed.group(2))) return;
-        Entity passenger = DEFINED_ENTITIES.get(parsed.group(3));
+        Entity passenger = DEFINED_ENTITIES.get(data.get(parsed.group(3)));
         if (!(base instanceof Mob) || !(passenger instanceof Mob)) return;
         base.addPassenger(passenger);
     };
 
     public static final TriConsumer<String, Map<String, String>, Entity> SET_ARMOR = (formula, data, base) -> {
         // (helmet|chest|leggings|boots)=~~~
-        final String pattern = "(predicate=(true|false)/)?(helmet|chest|leggings|boots|mainhand|offhand)=([a-zA-Z0-9_-]+)";
+        final String pattern = "(predicate=(true|false)/)?(helmet|chest|leggings|boots|mainhand|offhand)=([$.a-zA-Z0-9_-]+)";
         addEntityAndWorldData(data, base);
         formula = CalcUtil.getContent(data, formula);
+
+        //debug
+        System.out.println("set armor formula=" + formula);
+        System.out.println("defined item map=" + ContainerUtil.DEFINED_ITEMS);
+
         Matcher parsed = Pattern.compile(pattern).matcher(formula);
         if (!parsed.matches()) return;
         if (parsed.group(2) != null && !Boolean.parseBoolean(parsed.group(2))) return;
-        ItemStack item = ContainerUtil.DEFINED_ITEMS.get(parsed.group(4));
+        ItemStack item = ContainerUtil.DEFINED_ITEMS.get("$" + data.get("uniqueID") + "." + parsed.group(4) + "$");
+
+        //debug
+        System.out.println("defined item map key=" + parsed.group(4));
+
         if (!(base instanceof Mob) || item == null) return;
         EntityEquipment equipment = ((LivingEntity) base).getEquipment();
         switch (parsed.group(3)) {

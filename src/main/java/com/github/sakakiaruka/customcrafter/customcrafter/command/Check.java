@@ -4,6 +4,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter;
 import com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad;
 import com.github.sakakiaruka.customcrafter.customcrafter.listener.CloseCraftingTable;
 import com.github.sakakiaruka.customcrafter.customcrafter.listener.OpenCraftingTable;
+import com.github.sakakiaruka.customcrafter.customcrafter.util.ContainerUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.*;
@@ -46,6 +47,7 @@ public class Check{
         RECIPE_LIST.clear();
         NAMED_RECIPES_MAP.clear();
         ITEM_PLACED_SLOTS_RECIPE_MAP.clear();
+        ContainerUtil.DEFINED_ITEMS.clear();
 
         WHAT_MAKING.clear();
         opening.clear();
@@ -62,9 +64,8 @@ public class Check{
         new SettingsLoad().load();
         FileConfiguration config = CustomCrafter.getInstance().getConfig();
         if(config.contains("notice")){
-            if(config.getStringList("notice") == null)return;
             if(config.getStringList("notice").isEmpty())return;
-            config.getStringList("notice").forEach(s->Bukkit.broadcastMessage(s));
+            config.getStringList("notice").forEach(Bukkit::broadcastMessage);
         }
     }
 }
