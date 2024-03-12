@@ -16,6 +16,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordina
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.Result;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.ContainerUtil;
+import com.github.sakakiaruka.customcrafter.customcrafter.util.EntityUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.PotionUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil;
 import org.bukkit.Bukkit;
@@ -631,7 +632,7 @@ public class SettingsLoad {
             case "firework" -> consumer = ContainerUtil.FIREWORK;
             case "stew" -> consumer = ContainerUtil.STEW;
             case "tropical_fish" -> consumer = ContainerUtil.TROPICAL_FISH;
-            case "spawn_egg" -> consumer = ContainerUtil.SPAWN_EGG;
+            case "spawn_egg" -> consumer = EntityUtil.SPAWN_EGG;
             default -> {
                 consumer = null;
             }

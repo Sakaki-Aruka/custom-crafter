@@ -1,31 +1,57 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.util;
 
+import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter;
 import com.github.sakakiaruka.customcrafter.customcrafter.interfaces.TriConsumer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.NamespacedKey;
 import org.bukkit.attribute.Attributable;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SpawnEggMeta;
+import org.bukkit.persistence.PersistentDataType;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 
 public class EntityUtil {
     // name must be use only "a-zA-Z0-9_-"
     public static Map<String, Entity> DEFINED_ENTITIES = new HashMap<>();
+    public static final NamespacedKey SPAWN_EGG_INFO_KEY = new NamespacedKey(CustomCrafter.getInstance(), "spawn_info");
+
+    private static final String ALL_ENTITY_TYPE_REGEX_PATTERN = "(" + String.join("|", Arrays.stream(EntityType.values()).map(Enum::name).collect(Collectors.toSet())) + ")";
+
+    public static final TriConsumer<Map<String, String>, ItemStack, String> SPAWN_EGG = (data, item, formula) -> {
+        // type: spawn_egg, value: name:v1-length:v1,v2-length:v2
+        if (!(item.getItemMeta() instanceof SpawnEggMeta)) return;
+        SpawnEggMeta meta = (SpawnEggMeta) item.getItemMeta();
+        meta.getPersistentDataContainer().set(SPAWN_EGG_INFO_KEY, PersistentDataType.STRING, CalcUtil.getContent(data, formula));
+    };
+
+    private static Location getLocationFromData(Map<String, String> data) {
+        return new Location(
+                Bukkit.getWorld(UUID.fromString(data.get("WORLD_UUID"))),
+                Double.parseDouble(data.get("BLOCK_X")),
+                Double.parseDouble(data.get("BLOCK_Y")),
+                Double.parseDouble(data.get("BLOCK_Z")));
+    }
+
     public static final TriConsumer<String, Map<String, String>, Entity> ADD_PASSENGER = (formula, data, base) -> {
         // passenger=~~~
         final String pattern = "(predicate=(true|false)/)?passenger=([a-zA-Z0-9_-]+)";
@@ -38,12 +64,6 @@ public class EntityUtil {
         if (parsed.group(2) != null && !Boolean.parseBoolean(parsed.group(2))) return;
         Entity passenger = DEFINED_ENTITIES.get(parsed.group(3));
         if (!(base instanceof Mob) || !(passenger instanceof Mob)) return;
-        Location location = new Location(
-                Bukkit.getWorld(UUID.fromString(data.get("WORLD_UUID"))),
-                Double.parseDouble(data.get("BLOCK_X")),
-                Double.parseDouble(data.get("BLOCK_Y")),
-                Double.parseDouble(data.get("BLOCK_Z")));
-        passenger.spawnAt(location);
         base.addPassenger(passenger);
     };
 
@@ -93,11 +113,7 @@ public class EntityUtil {
         // type=~~~/value=~~~
         final String pattern = "(predicate=(true|false)/)?type=(delay|nearby|max_delay|min_delay|spawn_range|entities|in_player)/value=([0-9]+)";
         addEntityAndWorldData(data, base);
-        Location location = new Location(
-                Bukkit.getWorld(UUID.fromString(data.get("WORLD_UUID"))),
-                Double.parseDouble(data.get("BLOCK_X")),
-                Double.parseDouble(data.get("BLOCK_Y")),
-                Double.parseDouble(data.get("BLOCK_Z")));
+        Location location = getLocationFromData(data);
         CreatureSpawner spawner = (CreatureSpawner) Bukkit.getWorld(UUID.fromString(data.get("WORLD_UUID"))).getBlockAt(location);
         data.put("$CURRENT_SPAWNER_DELAY$", String.valueOf(spawner.getDelay()));
         data.put("$CURRENT_SPAWNER_MAX_DELAY$", String.valueOf(spawner.getMaxSpawnDelay()));

@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -37,10 +38,9 @@ public class PlayerUseSpawnEgg implements Listener {
         if (!consumed.getType().name().matches("(?i)([A-Z_0-9]+_SPAWN_EGG)")) return;
         event.setCancelled(true);
 
-        NamespacedKey key = new NamespacedKey(CustomCrafter.getInstance(), "spawn_info");
-        if (!consumed.getItemMeta().getPersistentDataContainer().has(key)) return;
-        String formula = consumed.getItemMeta().getPersistentDataContainer().get(key, PersistentDataType.STRING);
-        if (formula == null || formula.isEmpty()) return;
+        if (!consumed.getItemMeta().getPersistentDataContainer().has(EntityUtil.SPAWN_EGG_INFO_KEY)) return;
+        String formula = consumed.getItemMeta().getPersistentDataContainer().get(EntityUtil.SPAWN_EGG_INFO_KEY, PersistentDataType.STRING);
+        if (formula == null || formula.isEmpty() || !formula.matches("[a-zA-Z_0-9]+:.+")) return;
         SpawnEggMeta meta = (SpawnEggMeta) consumed.getItemMeta();
         Entity base = player.getWorld().spawn(player.getLocation(), meta.getCustomSpawnedType().getEntityClass());
         StringBuilder buffer = new StringBuilder();
@@ -48,15 +48,22 @@ public class PlayerUseSpawnEgg implements Listener {
         data.put("BLOCK_X", String.valueOf(player.getLocation().getBlockX()));
         data.put("BLOCK_Y", String.valueOf(player.getLocation().getBlockY()));
         data.put("BLOCK_Z", String.valueOf(player.getLocation().getBlockZ()));
-        for (int i = 0; i < formula.length(); i++) {
-            char c = formula.charAt(i);
-            if (c == ',' && (i - 1 < 0 || formula.charAt(i - 1) == '\\')) {
+        String name = formula.substring(0, formula.indexOf(":")); // name_test:~~~~,~~~~,~~~~....
+        String values = formula.substring(formula.indexOf(":") + 1);
+        for (int i = 0; i < values.length(); i++) {
+            char c = values.charAt(i);
+            if (c == ',' && (i - 1 < 0 || values.charAt(i - 1) == '\\')) {
                 // ~~~:~~~~~~~
                 // e.g. add_passenger:passenger=test,add_passenger:passenger=test_2
                 String f = buffer.toString();
                 String type = f.substring(0, f.indexOf(":"));
                 String value = f.substring(f.indexOf(":"));
                 switch (type) {
+                    case "type" -> {
+                        EntityType t;
+                        try {t = EntityType.valueOf(value.toUpperCase());} catch (IllegalArgumentException e) {continue;}
+                        meta.setCustomSpawnedType(t);
+                    }
                     case "add_passenger" -> EntityUtil.ADD_PASSENGER.accept(value, data, base);
                     case "set_armor" -> EntityUtil.SET_ARMOR.accept(value, data, base);
                     case "set_drop_chance" -> EntityUtil.SET_DROP_CHANCE.accept(value, data, base);
@@ -65,5 +72,6 @@ public class PlayerUseSpawnEgg implements Listener {
                 }
             } else buffer.append(c);
         }
+        EntityUtil.DEFINED_ENTITIES.put(name, base);
     }
 }
