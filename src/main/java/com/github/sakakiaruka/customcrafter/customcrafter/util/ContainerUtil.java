@@ -787,10 +787,6 @@ public class ContainerUtil {
 
         formula = CalcUtil.getContent(data, formula);
 
-        //debug
-        //System.out.println("item type=" + item.getType().name());
-        //System.out.println("has info key=" + item.getItemMeta().getPersistentDataContainer().has(EntityUtil.SPAWN_EGG_INFO_KEY));
-
         if (!item.getType().equals(Material.AIR) && item.getType().name().matches("[A-Z_0-9]+_SPAWN_EGG") && item.getItemMeta().getPersistentDataContainer().has(EntityUtil.SPAWN_EGG_INFO_KEY)) {
             ItemMeta meta = item.getItemMeta();
             String temp = meta.getPersistentDataContainer().get(EntityUtil.SPAWN_EGG_INFO_KEY, PersistentDataType.STRING);
