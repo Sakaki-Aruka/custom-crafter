@@ -44,8 +44,11 @@ public class CalcUtil {
             } else if (c == '%') {
                 flag = 0;
                 String key = buffer.toString();
-                if (!data.containsKey(key)) result.append("None");
-                else result.append(data.get(buffer.toString()));
+                if (!data.containsKey(key)) {
+                    if (key.matches("random\\[([0-9-]+)?:([0-9-]+)?]")) {
+                        result.append(getRandomNumber(key, Integer.MIN_VALUE, Integer.MAX_VALUE));
+                    } else result.append("None");
+                } else result.append(data.get(buffer.toString()));
                 buffer.setLength(0);
             }
         }
@@ -103,25 +106,36 @@ public class CalcUtil {
         // e.g. [5:20] (5 ~ 20)
         // e.g. [:] (under limit ~ upper limit)
 
-        final String pattern = "random\\[([0-9-]+)?:([0-9-]+)?]";
+        final String pattern = "random\\[(-?[0-9]{1,10})?:(-?[0-9]{1,10})?]";
         Matcher parsed = Pattern.compile(pattern).matcher(formula);
         if (!parsed.matches()) {
-            return 0;
+            if (formula.matches("-?[0-9]{1,10}+")) {
+                int value = Integer.parseInt(formula);
+                if (underLimit <= value && value <= upperLimit) return value;
+                else if (value < underLimit) return underLimit;
+                else return upperLimit;
+            }
+            return underLimit;
         }
 
         if (underLimit == upperLimit) return upperLimit;
+        if (upperLimit < underLimit) {
+            int temp = underLimit;
+            underLimit = upperLimit;
+            upperLimit = temp;
+        }
         if (parsed.group(1) == null && parsed.group(2) == null) {
             // [:]
             return getInRange(underLimit, upperLimit + 1);
         } else if (parsed.group(1) != null && parsed.group(2) == null) {
             // [([0-9-]+):]
-            return getInRange(Integer.parseInt(parsed.group(1)), upperLimit + 1);
+            return getInRange(Math.max(Integer.parseInt(parsed.group(1)), underLimit), upperLimit + 1);
         } else if (parsed.group(1) == null && parsed.group(2) != null) {
             // [:([0-9-]+)]
-            return getInRange(underLimit, Integer.parseInt(parsed.group(2)) + 1);
+            return getInRange(underLimit, Math.min(Integer.parseInt(parsed.group(2)), upperLimit) + 1);
         } else {
             // [([0-9-]+):([0-9-]+)]
-            return getInRange(Integer.parseInt(parsed.group(1)), Integer.parseInt(parsed.group(2)) + 1);
+            return getInRange(Math.max(Integer.parseInt(parsed.group(1)), underLimit), Math.min(Integer.parseInt(parsed.group(2)), upperLimit) + 1);
         }
     }
 

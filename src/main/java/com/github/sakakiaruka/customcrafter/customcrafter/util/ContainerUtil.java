@@ -795,10 +795,10 @@ public class ContainerUtil {
             meta.getPersistentDataContainer().set(EntityUtil.SPAWN_EGG_INFO_KEY, PersistentDataType.STRING, temp);
             item.setItemMeta(meta);
 
-            //debug
-            System.out.println("temp=" + temp);
-            System.out.println("value=" + value);
-            System.out.println("pdc=" + item.getItemMeta().getPersistentDataContainer().get(EntityUtil.SPAWN_EGG_INFO_KEY, PersistentDataType.STRING));
+//            //debug
+//            System.out.println("temp=" + temp);
+//            System.out.println("value=" + value);
+//            System.out.println("pdc=" + item.getItemMeta().getPersistentDataContainer().get(EntityUtil.SPAWN_EGG_INFO_KEY, PersistentDataType.STRING));
 
             return;
         }
@@ -835,10 +835,6 @@ public class ContainerUtil {
             if (flag == 2) {
                 if (c != ',') buffer.append(c);
                 else {
-
-                    //debug
-                    System.out.println("item define base=" + buffer.toString().toUpperCase());
-
                     map.put("base", buffer.toString().toUpperCase());
                     DEFINED_ITEMS.put("$" + data.get("$RECIPE_NAME$") + "." + map.get("name") + "$", new ItemStack(Material.valueOf(map.get("base").toUpperCase())));
                     if (i < formula.length() - 1) {

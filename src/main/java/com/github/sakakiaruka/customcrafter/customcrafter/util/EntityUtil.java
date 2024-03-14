@@ -1,7 +1,7 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.util;
 
 import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter;
-import com.github.sakakiaruka.customcrafter.customcrafter.interfaces.PentaConsumer;
+import com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad;
 import com.github.sakakiaruka.customcrafter.customcrafter.interfaces.TriConsumer;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -12,9 +12,13 @@ import org.bukkit.attribute.Attributable;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.block.BlockState;
 import org.bukkit.block.CreatureSpawner;
+import org.bukkit.block.spawner.SpawnRule;
+import org.bukkit.block.spawner.SpawnerEntry;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.inventory.EntityEquipment;
@@ -25,14 +29,13 @@ import org.bukkit.inventory.meta.SpawnEggMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 
-import javax.net.ssl.SNIHostName;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Matcher;
@@ -44,9 +47,21 @@ public class EntityUtil {
     // name must be use only "a-zA-Z0-9_-"
     public static Map<String, Entity> DEFINED_ENTITIES = new HashMap<>();
     public static final NamespacedKey SPAWN_EGG_INFO_KEY = new NamespacedKey(CustomCrafter.getInstance(), "spawn_info");
+    public static final String SPAWNER_INFO_KEY = "spawn_info";
+    public static final String ONLY_INFO_SETUP = "ONLY_INFO_SETUP";
+    public static final String FROM_SPAWNER_ANCHOR = "from_spawner_anchor";
+    public static final String FALLING_BLOCK_HAS_UNTRACKED_CHANGE_ANCHOR = "falling_block_has_untracked_change_anchor";
+    public static int MAX_NEARBY_ENTITIES = 1000;
+    public static int MAX_SPAWN_RANGE = 100;
+    public static int MAX_SPAWN_COUNT = 100;
+    public static int MAX_REQ_PLAYER_RANGE = 64;
+    public static int MAX_LIGHT_LEVEL = 15;
+    public static int MIN_LIGHT_LEVEL = 0;
+    public static int MAX_SPAWN_WEIGHT = 1000;
+    public static int MAX_SPAWN_DELAY = Integer.MAX_VALUE - 1;
 
     private static final String ALL_ENTITY_TYPE_REGEX_PATTERN = "(" + Arrays.stream(EntityType.values()).map(Enum::name).collect(Collectors.joining("|")) + ")";
-
+    private static final String UNIQUE_ID_KEY = "uniqueID";
 
     public static final TriConsumer<Map<String, String>, ItemStack, String> ENTITY_DEFINE = (data, item, formula) -> {
         // type: entity_define, value: name:([a-zA-Z_0-9]+),actions:~~~~~,~~~~~,~~~~~
@@ -62,6 +77,12 @@ public class EntityUtil {
             char c = parsed.group(2).charAt(i);
             if (c == ',' && 0 < i - 1 && parsed.group(2).charAt(i - 1) != '\\') {
                 // separate
+                if (buffer.toString().matches("->[a-zA-Z_0-9]+")) {
+                    // change target in one line
+                    name = buffer.substring(2);
+                    buffer.setLength(0);
+                    continue;
+                }
                 builder.append(name.length() + 1 + buffer.length())
                         .append(":")
                         .append(name)
@@ -81,10 +102,6 @@ public class EntityUtil {
                     .append(":")
                     .append(buffer);
         }
-
-        //debug
-        Bukkit.getLogger().info("entity define builder=" + builder);
-
         container.set(SPAWN_EGG_INFO_KEY, PersistentDataType.STRING, builder.toString());
         item.setItemMeta(meta);
     };
@@ -103,7 +120,7 @@ public class EntityUtil {
         // spawn info format = "length:name:info"
         // "self" means base target
         String uniqueID = UUID.randomUUID().toString();
-        data.put("uniqueID", uniqueID);
+        data.put(UNIQUE_ID_KEY, uniqueID);
         formula = CalcUtil.getContent(data, formula);
         StringBuilder buffer = new StringBuilder();
 
@@ -119,11 +136,6 @@ public class EntityUtil {
             String element = formula.substring(i + 1, i + 1 + length);
             i += length;
 
-            // debug
-            System.out.println("element=" + element);
-            //System.out.println("data=" + data);
-            System.out.println("formula=" + formula);
-
             Matcher parsed = Pattern.compile("([a-zA-Z_0-9]+):([|a-z_0-9]+)=(.+)").matcher(element);
             if (!parsed.matches()) break;
             buffer.setLength(0);
@@ -132,15 +144,24 @@ public class EntityUtil {
             String action = parsed.group(3);
             String key = uniqueID + "." + name;
 
-            //debug
-            System.out.println("name=" + name);
-            System.out.println("type=" + type);
-            System.out.println("action=" + action);
-
             if (type.equalsIgnoreCase("type") && !DEFINED_ENTITIES.containsKey(key)) {
-                Location location = getLocationFromData(data);
                 World world;
                 if ((world = Bukkit.getWorld(UUID.fromString(data.get("WORLD_UUID")))) == null) break;
+                Location location;
+                if (data.containsKey(FROM_SPAWNER_ANCHOR)) {
+                    CreatureSpawner spawner = (CreatureSpawner) world.getBlockAt(getLocationFromData(data)).getState();
+                    // random step is "0.5"
+                    int xzRandomRange = spawner.getSpawnRange();
+                    double x = Double.parseDouble(data.get("BLOCK_X"));
+                    double z = Double.parseDouble(data.get("BLOCK_Z"));
+                    if (1 < xzRandomRange) {
+                        List<Double> diffCandidate = new ArrayList<>();
+                        for (double d = 1; d < xzRandomRange; d += 0.2) diffCandidate.add(d);
+                        x += (new Random().nextBoolean() ? -1 : 1) * diffCandidate.get(new Random().nextInt(diffCandidate.size()));
+                        z += (new Random().nextBoolean() ? -1 : 1) * diffCandidate.get(new Random().nextInt(diffCandidate.size()));
+                    }
+                    location = new Location(world, x, Double.parseDouble(data.get("BLOCK_Y")), z);
+                } else location = getLocationFromData(data);  // when player using
                 Entity entity = world.spawn(location, Objects.requireNonNull(EntityType.valueOf(action.toUpperCase()).getEntityClass()));
                 DEFINED_ENTITIES.put(key, entity);
                 data.put(name, key);
@@ -153,14 +174,14 @@ public class EntityUtil {
             else if (type.equalsIgnoreCase("set_drop_chance")) SET_DROP_CHANCE.accept(action, data, defined);
             else if (type.equalsIgnoreCase("set_various_value")) SET_VARIOUS_VALUES.accept(action, data, defined);
             else if (type.equalsIgnoreCase("add_attribute")) ADD_ATTRIBUTE.accept(action, data, defined);
+            else if (type.equalsIgnoreCase("ai")) AI.accept(action, data, defined);
+            else if (type.equalsIgnoreCase("set_spawner_value")) SET_VARIOUS_SPAWNER_VALUE.accept(action, data, defined);
+            else if (type.equalsIgnoreCase("falling_type")) FALLING_TYPE.accept(action, data, defined);
             else if (type.equalsIgnoreCase("item_define") && name.equals("__internal__")) {
                 // item define
                 Map<String, String> pseudoData = Map.of("$RECIPE_NAME$", uniqueID);
                 ItemStack pseudoItem = new ItemStack(Material.AIR);
                 ContainerUtil.ITEM_DEFINE.accept(pseudoData, pseudoItem, action);
-
-                //debug
-                System.out.println("defined item map(internal)=" + ContainerUtil.DEFINED_ITEMS);
             }
         }
         DEFINED_ENTITIES.keySet().removeIf(e -> e.startsWith(uniqueID));
@@ -175,16 +196,167 @@ public class EntityUtil {
                 Double.parseDouble(data.get("BLOCK_Z")));
     }
 
+    public static final TriConsumer<String, Map<String, String>, Entity> AI = (formula, data, base) -> {
+        // ai=(true|false)
+        addEntityAndWorldData(data, base);
+        formula = CalcUtil.getContent(data, formula);
+        if (!(base instanceof Mob)) return;
+        ((Mob) base).setAI(formula.endsWith("true"));
+    };
+
+    public static final TriConsumer<String, Map<String, String>, Entity> SET_VARIOUS_SPAWNER_VALUE = (formula, data, base) -> {
+
+        //debug
+//        System.out.println("only info setup anchor has=" + data.containsKey(ONLY_INFO_SETUP));
+
+        if (!data.containsKey(ONLY_INFO_SETUP)) return;
+        final String pattern = "((delay|max_nearby_entities|max_spawn_delay|min_spawn_delay|spawn_range|spawn_count|req_player_range|spawn_weight|max_block_light|min_block_light|max_sky_light|min_sky_light|rough_control):([0-9]+|random\\[([0-9-]+)?:([0-9-]+)?]);)+";
+        final String singlePattern = "(delay|max_nearby_entities|max_spawn_delay|min_spawn_delay|spawn_range|spawn_count|req_player_range|spawn_weight|max_block_light|min_block_light|max_sky_light|min_sky_light|rough_control):([0-9]+|random\\[([0-9-]+)?:([0-9-]+)?])";
+        // if you want to set (min|max)_block_light, (min|max)_sky_light, need to write all of those elements
+        // in 'data', "uniqueID.(min|max)_(sky|block)_light" => new SpawnRule (with "spawn_weight")
+        // "SpawnCount" needs to set "MinSpawnDelay"
+        formula = CalcUtil.getContent(data, formula);
+
+//        //debug
+//        System.out.println("setup formula matches=" + formula.matches(pattern));
+//        for (String e : formula.split(";")) {
+//            System.out.println("e=" + e);
+//            System.out.println("e matches single pattern=" + e.matches(singlePattern));
+//        }
+
+        if (!formula.matches(pattern)) return;
+        World world = Bukkit.getWorld(UUID.fromString(data.get("WORLD_UUID")));
+        if (world == null) return;
+
+        for (String element : formula.split(";")) {
+//
+//            //debug
+//            System.out.println("setup each formula matches=" + element.matches(singlePattern));
+//            System.out.println("element=" + element);
+
+            CreatureSpawner spawner = (CreatureSpawner) world.getBlockAt(getLocationFromData(data)).getState();
+
+            Matcher parsed = Pattern.compile(singlePattern).matcher(element);
+            if (!parsed.matches()) continue;
+            String type = parsed.group(1);
+            String numSource = parsed.group(2);
+
+//            //debug
+//            System.out.println("type(parsed 1)=" + type);
+//            System.out.println("numSource(parsed 2)=" + numSource);
+
+
+            switch (type) {
+                case "delay" -> spawner.setDelay(CalcUtil.getRandomNumber(numSource, -1, Integer.MAX_VALUE - 1));
+                case "max_nearby_entities" -> spawner.setMaxNearbyEntities(CalcUtil.getRandomNumber(numSource, 1, MAX_NEARBY_ENTITIES));
+                case "max_spawn_delay" -> spawner.setMaxSpawnDelay(CalcUtil.getRandomNumber(numSource, spawner.getMinSpawnDelay(), MAX_SPAWN_DELAY));
+                case "min_spawn_delay" -> spawner.setMinSpawnDelay(CalcUtil.getRandomNumber(numSource, 1, MAX_SPAWN_DELAY));
+                case "spawn_range" -> spawner.setSpawnRange(CalcUtil.getRandomNumber(numSource, 0, MAX_SPAWN_RANGE));
+                case "spawn_count" -> spawner.setSpawnCount(CalcUtil.getRandomNumber(numSource, 1, MAX_SPAWN_COUNT));
+                case "req_player_range" -> spawner.setRequiredPlayerRange(CalcUtil.getRandomNumber(numSource, 0, MAX_REQ_PLAYER_RANGE));
+
+                case "min_block_light" -> data.put(data.get(UNIQUE_ID_KEY) + ".min_block_light", numSource);
+                case "max_block_light" -> data.put(data.get(UNIQUE_ID_KEY) + ".max_block_light", numSource);
+                case "min_sky_light" -> data.put(data.get(UNIQUE_ID_KEY) + ".min_sky_light", numSource);
+                case "max_sky_light" -> data.put(data.get(UNIQUE_ID_KEY) + ".max_sky_light", numSource);
+
+                case "spawn_weight" -> {
+                    String minBlockKey = data.get(UNIQUE_ID_KEY) + ".min_block_light";
+                    String maxBlockKey =  data.get(UNIQUE_ID_KEY) + ".max_block_light";
+                    String minSkyKey = data.get(UNIQUE_ID_KEY) + ".min_sky_light";
+                    String maxSkyKey = data.get(UNIQUE_ID_KEY) + ".max_sky_light";
+                    if (!data.keySet().containsAll(Set.of(minBlockKey, maxBlockKey, minSkyKey, maxSkyKey))) continue;
+
+                    int minBlock = CalcUtil.getRandomNumber(data.get(minBlockKey), MIN_LIGHT_LEVEL, MAX_LIGHT_LEVEL);
+                    int maxBlock = CalcUtil.getRandomNumber(data.get(maxBlockKey), Math.max(minBlock, MIN_LIGHT_LEVEL), MAX_LIGHT_LEVEL);
+                    int minSky = CalcUtil.getRandomNumber(data.get(minSkyKey), MIN_LIGHT_LEVEL, MAX_LIGHT_LEVEL);
+                    int maxSky = CalcUtil.getRandomNumber(data.get(maxSkyKey), Math.max(minSky, MIN_LIGHT_LEVEL), MAX_LIGHT_LEVEL);
+                    SpawnRule rule = new SpawnRule(minBlock, maxBlock, minSky, maxSky);
+                    int weight = CalcUtil.getRandomNumber(numSource, 1, MAX_SPAWN_WEIGHT);
+                    spawner.setPotentialSpawns(Set.of(new SpawnerEntry(base.createSnapshot(), weight, rule)));
+
+                    Bukkit.getLogger().info(
+                            "Spawner Setup done." + SettingsLoad.LINE_SEPARATOR +
+                                    "Location: " + spawner.getLocation() + SettingsLoad.LINE_SEPARATOR +
+                                    "  - require min block light: " + rule.getMinBlockLight() + SettingsLoad.LINE_SEPARATOR +
+                                    "  - require max block light: " + rule.getMaxBlockLight() + SettingsLoad.LINE_SEPARATOR +
+                                    "  - require min sky light: " + rule.getMinSkyLight() + SettingsLoad.LINE_SEPARATOR +
+                                    "  - require max sky light: " + rule.getMaxSkyLight() + SettingsLoad.LINE_SEPARATOR +
+                                    "  - spawn weight: " + weight
+                    );
+                }
+                case "rough_control" -> {
+                    spawner.setSpawnedEntity(base.createSnapshot());
+                    spawner.removeMetadata(SPAWNER_INFO_KEY, CustomCrafter.getInstance());
+                }
+            }
+            spawner.update(true, true);
+        }
+    };
+
+    public static final TriConsumer<String, Map<String, String>, Entity> FALLING_TYPE = (formula, data, base) -> {
+        // block:~~~
+
+        //debug
+        System.out.println("is falling block instance=" + (base instanceof FallingBlock));
+        System.out.println("formula(falling block)=" + CalcUtil.getContent(data, formula));
+
+        if (!(base instanceof FallingBlock)) return;
+        final String pattern = "(predicate:(true|false);)?name:([a-zA-Z_0-9]+);block:([a-zA-Z_0-9!;]+)(;toBlock:(true|false))?(;dropItem:(true|false))?";
+        addEntityAndWorldData(data, base);
+        formula = CalcUtil.getContent(data, formula);
+        Matcher parsed = Pattern.compile(pattern).matcher(formula);
+        if (!parsed.matches()) return;
+        if (parsed.group(2) != null && parsed.group(2).equalsIgnoreCase("false")) return;
+        boolean toBlock = parsed.group(6) != null && Boolean.parseBoolean(parsed.group(6));
+        boolean dropItem = parsed.group(8) != null && Boolean.parseBoolean(parsed.group(8));
+        Material material;
+        try {
+            if (parsed.group(4).startsWith("random")) material = RandomUtil.getRandomMaterial(parsed.group(4).replace(";", ","));
+            else material = Material.valueOf(parsed.group(4).toUpperCase());
+            if (material.equals(Material.AIR) || !RandomUtil.getBlockMaterials().contains(material)) return;
+        } catch (Exception e) {
+            return;
+        }
+
+        //debug
+        String name = parsed.group(3);
+        BlockState pseudoState = ((FallingBlock) base).getBlockState().copy();
+        pseudoState.setType(material);
+        //Entity pseudoEntity = base.copy();
+        //pseudoEntity.spawnAt(getLocationFromData(data));
+//        Bukkit.getWorld(UUID.fromString(data.get("WORLD_UUID"))).spawn;
+        //((FallingBlock) pseudoEntity).setBlockState(pseudoState);
+        ((FallingBlock) base).setBlockState(pseudoState);
+        String key = data.get(UNIQUE_ID_KEY) + "." + name;
+        //DEFINED_ENTITIES.put(key, pseudoEntity);
+        DEFINED_ENTITIES.put(key, base);
+        data.put(FALLING_BLOCK_HAS_UNTRACKED_CHANGE_ANCHOR, "");
+
+
+//        ((FallingBlock) base).getBlockState().setType(material);
+//        ((FallingBlock)base).getBlockState().update(true);
+//        if (toBlock) ((FallingBlock) base).setCancelDrop(false);
+//        if (dropItem) ((FallingBlock)base).setDropItem(true);
+//        ((FallingBlock)base).getBlockState().update(true);
+
+        //debug
+        //base.spawnAt(getLocationFromData(data));
+        System.out.println("base(from falling type)=" + base);
+        System.out.println("base data=" + ((FallingBlock) base).getBlockData().getAsString());
+        System.out.println("base type=" + ((FallingBlock) base).getBlockData().getMaterial().name());
+    };
+
     public static final TriConsumer<String, Map<String, String>, Entity> ADD_PASSENGER = (formula, data, base) -> {
         // passenger=~~~
-        final String pattern = "(predicate=(true|false)/)?passenger=([a-zA-Z0-9_-]+)";
+        final String pattern = "(predicate=(true|false)/)?\\+([a-zA-Z0-9_-]+)";
         addEntityAndWorldData(data, base);
         data.put("$CURRENT_TARGET_PASSENGERS_COUNT$", String.valueOf(base.getPassengers().size()));
         formula = CalcUtil.getContent(data, formula);
 
-        //debug
-        System.out.println("add passenger formula=" + formula);
-        System.out.println("defined entities map=" + DEFINED_ENTITIES);
+//        //debug
+//        System.out.println("add passenger formula=" + formula);
+//        System.out.println("defined entities map=" + DEFINED_ENTITIES);
 
         ContainerUtil.removeCurrentVariables(data);
         Matcher parsed = Pattern.compile(pattern).matcher(formula);
@@ -201,17 +373,17 @@ public class EntityUtil {
         addEntityAndWorldData(data, base);
         formula = CalcUtil.getContent(data, formula);
 
-        //debug
-        System.out.println("set armor formula=" + formula);
-        System.out.println("defined item map=" + ContainerUtil.DEFINED_ITEMS);
+//        //debug
+//        System.out.println("set armor formula=" + formula);
+//        System.out.println("defined item map=" + ContainerUtil.DEFINED_ITEMS);
 
         Matcher parsed = Pattern.compile(pattern).matcher(formula);
         if (!parsed.matches()) return;
         if (parsed.group(2) != null && !Boolean.parseBoolean(parsed.group(2))) return;
-        ItemStack item = ContainerUtil.DEFINED_ITEMS.get("$" + data.get("uniqueID") + "." + parsed.group(4) + "$");
+        ItemStack item = ContainerUtil.DEFINED_ITEMS.get("$" + data.get(UNIQUE_ID_KEY) + "." + parsed.group(4) + "$");
 
         //debug
-        System.out.println("defined item map key=" + parsed.group(4));
+//        System.out.println("defined item map key=" + parsed.group(4));
 
         if (!(base instanceof Mob) || item == null) return;
         EntityEquipment equipment = ((LivingEntity) base).getEquipment();

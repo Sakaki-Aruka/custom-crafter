@@ -7,6 +7,7 @@ import io.papermc.paper.event.server.ServerResourcesReloadedEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.EntitySpawnEvent;
+import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -44,8 +45,7 @@ public class Listener implements org.bukkit.event.Listener {
     }
 
     @EventHandler
-    public void onReload(ServerResourcesReloadedEvent event) {
-        new Check().reload();
-        new SettingsLoad().load();
+    public void onSpawnerSpawn(SpawnerSpawnEvent event) {
+        new SpawnerSpawn().onSpawnerSpawn(event);
     }
 }

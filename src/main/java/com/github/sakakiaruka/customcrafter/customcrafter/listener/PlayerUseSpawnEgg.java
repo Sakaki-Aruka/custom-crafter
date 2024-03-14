@@ -2,10 +2,10 @@ package com.github.sakakiaruka.customcrafter.customcrafter.listener;
 
 import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.EntityUtil;
-import org.bukkit.Bukkit;
-import org.bukkit.NamespacedKey;
+import org.bukkit.FluidCollisionMode;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
+import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -14,8 +14,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.SpawnEggMeta;
-import org.bukkit.inventory.meta.SuspiciousStewMeta;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.HashMap;
@@ -36,8 +35,31 @@ public class PlayerUseSpawnEgg implements Listener {
         String formula = consumed.getItemMeta().getPersistentDataContainer().get(EntityUtil.SPAWN_EGG_INFO_KEY, PersistentDataType.STRING);
         if (formula == null || formula.isEmpty()) return;
 
+        Block targetBlock = player.getTargetBlockExact(5, FluidCollisionMode.ALWAYS);
+        if (targetBlock != null && targetBlock.getType().equals(Material.SPAWNER)) {
+            targetBlock.setMetadata(EntityUtil.SPAWNER_INFO_KEY, new FixedMetadataValue(CustomCrafter.getInstance(), formula));
+            targetBlock.setMetadata(EntityUtil.ONLY_INFO_SETUP, new FixedMetadataValue(CustomCrafter.getInstance(), ""));
+
+            //debug
+            System.out.println("to write data to the spawner, ok");
+            targetBlock.getMetadata(EntityUtil.SPAWNER_INFO_KEY).forEach(e -> System.out.println("written data=" + e.asString()));
+
+            CreatureSpawner spawner = (CreatureSpawner) targetBlock.getState();
+            EntityType type;
+            try {
+                type = EntityType.valueOf(consumed.getType().name().replace("_SPAWN_EGG", ""));
+            } catch (Exception e) {
+                return;
+            }
+            spawner.setSpawnedType(type);
+            spawner.update();
+            return;
+        }
+
         //debug
         System.out.println("world uuid=" + player.getWorld().getUID());
+
+
         Map<String, String> data = new HashMap<>();
         data.put("BLOCK_X", String.valueOf(player.getLocation().x()));
         data.put("BLOCK_Y", String.valueOf(player.getLocation().y()));
