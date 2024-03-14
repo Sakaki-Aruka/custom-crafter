@@ -19,6 +19,7 @@ import org.bukkit.block.spawner.SpawnerEntry;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
 import org.bukkit.inventory.EntityEquipment;
@@ -177,6 +178,7 @@ public class EntityUtil {
             else if (type.equalsIgnoreCase("ai")) AI.accept(action, data, defined);
             else if (type.equalsIgnoreCase("set_spawner_value")) SET_VARIOUS_SPAWNER_VALUE.accept(action, data, defined);
             else if (type.equalsIgnoreCase("falling_type")) FALLING_TYPE.accept(action, data, defined);
+            else if (type.equalsIgnoreCase("dropped_item_detail")) DROPPED_ITEM_DETAIL.accept(action, data, defined);
             else if (type.equalsIgnoreCase("item_define") && name.equals("__internal__")) {
                 // item define
                 Map<String, String> pseudoData = Map.of("$RECIPE_NAME$", uniqueID);
@@ -294,6 +296,35 @@ public class EntityUtil {
         }
     };
 
+    public static final TriConsumer<String, Map<String, String>, Entity> DROPPED_ITEM_DETAIL = (formula, data, base) -> {
+        // item:~~~
+
+        //debug
+        System.out.println("defined item map=" + ContainerUtil.DEFINED_ITEMS);
+        System.out.println("current uniqueID=" + data.get(UNIQUE_ID_KEY));
+        System.out.println("instance check=" + (base instanceof Item));
+
+        if (!(base instanceof Item)) return;
+        final String pattern = "(predicate:(true|false);)?item:([a-zA-Z0-9_]+)";
+        addEntityAndWorldData(data, base);
+        formula = CalcUtil.getContent(data, formula);
+        Matcher parsed = Pattern.compile(pattern).matcher(formula);
+
+        //debug
+        System.out.println("matcher=" + parsed);
+
+        if (!parsed.matches()) return;
+        if (parsed.group(2) != null && parsed.group(2).equals("false")) return;
+        String name = "$" + data.get(UNIQUE_ID_KEY) + "." + parsed.group(3) + "$";
+
+        //debug
+        System.out.println("internal map key=" + name);
+        System.out.println("internal map contained=" + ContainerUtil.DEFINED_ITEMS.containsKey(name));
+
+        if (!ContainerUtil.DEFINED_ITEMS.containsKey(name)) return;
+        ((Item) base).setItemStack(ContainerUtil.DEFINED_ITEMS.get(name));
+    };
+
     public static final TriConsumer<String, Map<String, String>, Entity> FALLING_TYPE = (formula, data, base) -> {
         // block:~~~
 
@@ -302,17 +333,21 @@ public class EntityUtil {
         System.out.println("formula(falling block)=" + CalcUtil.getContent(data, formula));
 
         if (!(base instanceof FallingBlock)) return;
-        final String pattern = "(predicate:(true|false);)?name:([a-zA-Z_0-9]+);block:([a-zA-Z_0-9!;]+)(;toBlock:(true|false))?(;dropItem:(true|false))?";
+        final String pattern = "(predicate:(true|false);)?name:([a-zA-Z_0-9]+);block:([a-zA-Z_0-9\\[\\]!/]+)(;toBlock:(true|false))?(;dropItem:(true|false))?";
         addEntityAndWorldData(data, base);
         formula = CalcUtil.getContent(data, formula);
         Matcher parsed = Pattern.compile(pattern).matcher(formula);
+
+        //debug
+        System.out.println("falling block parsed=" + formula.matches(pattern));
+
         if (!parsed.matches()) return;
         if (parsed.group(2) != null && parsed.group(2).equalsIgnoreCase("false")) return;
         boolean toBlock = parsed.group(6) != null && Boolean.parseBoolean(parsed.group(6));
         boolean dropItem = parsed.group(8) != null && Boolean.parseBoolean(parsed.group(8));
         Material material;
         try {
-            if (parsed.group(4).startsWith("random")) material = RandomUtil.getRandomMaterial(parsed.group(4).replace(";", ","));
+            if (parsed.group(4).startsWith("random")) material = RandomUtil.getRandomMaterial(parsed.group(4).replace("/", ","), RandomUtil.getBlockMaterials());
             else material = Material.valueOf(parsed.group(4).toUpperCase());
             if (material.equals(Material.AIR) || !RandomUtil.getBlockMaterials().contains(material)) return;
         } catch (Exception e) {
@@ -320,25 +355,18 @@ public class EntityUtil {
         }
 
         //debug
+        System.out.println("falling block material=" + material.name());
+
+        //debug
         String name = parsed.group(3);
         BlockState pseudoState = ((FallingBlock) base).getBlockState().copy();
         pseudoState.setType(material);
-        //Entity pseudoEntity = base.copy();
-        //pseudoEntity.spawnAt(getLocationFromData(data));
-//        Bukkit.getWorld(UUID.fromString(data.get("WORLD_UUID"))).spawn;
-        //((FallingBlock) pseudoEntity).setBlockState(pseudoState);
+        if (toBlock) ((FallingBlock) base).setCancelDrop(false);
+        if (dropItem) ((FallingBlock) base).setDropItem(true);
         ((FallingBlock) base).setBlockState(pseudoState);
         String key = data.get(UNIQUE_ID_KEY) + "." + name;
-        //DEFINED_ENTITIES.put(key, pseudoEntity);
         DEFINED_ENTITIES.put(key, base);
         data.put(FALLING_BLOCK_HAS_UNTRACKED_CHANGE_ANCHOR, "");
-
-
-//        ((FallingBlock) base).getBlockState().setType(material);
-//        ((FallingBlock)base).getBlockState().update(true);
-//        if (toBlock) ((FallingBlock) base).setCancelDrop(false);
-//        if (dropItem) ((FallingBlock)base).setDropItem(true);
-//        ((FallingBlock)base).getBlockState().update(true);
 
         //debug
         //base.spawnAt(getLocationFromData(data));

@@ -14,6 +14,31 @@ import java.util.stream.Collectors;
 public class RandomUtil {
 
     private static final String ALL_MATERIAL_REGEX_PATTERN = "(" + Arrays.stream(Material.values()).map(Enum::name).collect(Collectors.joining("|")) + ")";
+
+    public static Material getRandomMaterial(String formula, Set<Material> limit) {
+        final String pattern = "random\\[([a-z_0-9!,]+)]";
+        Matcher parsed = Pattern.compile(pattern).matcher(formula.toLowerCase());
+        if (!parsed.matches()) return Material.AIR;
+        Set<Material> candidate = new HashSet<>();
+
+        //debug
+        System.out.println("random material split=" + Arrays.toString(parsed.group(1).split(",")));
+
+        for (String element : parsed.group(1).split(";")) {
+            boolean isIgnore = element.startsWith("!");
+            element = element.replace("!", "");
+            if (element.equals("all")) {
+                if (isIgnore) candidate.removeAll(Arrays.stream(Material.values()).collect(Collectors.toSet()));
+                else candidate.addAll(Arrays.stream(Material.values()).collect(Collectors.toSet()));
+            } else if (element.matches(ALL_MATERIAL_REGEX_PATTERN) && limit.contains(Material.valueOf(element.toUpperCase()))) {
+                if (isIgnore) candidate.remove(Material.valueOf(element.toUpperCase()));
+                else candidate.add(Material.valueOf(element.toUpperCase()));
+            }
+        }
+        if (candidate.isEmpty()) return Material.AIR;
+        return new ArrayList<>(candidate).get(new Random().nextInt(candidate.size()));
+    }
+
     public static Material getRandomMaterial(String formula) {
         // when not found from the specified formula, returns Material.AIR
         final String pattern = "random\\[([a-z_0-9!,]+)]";
@@ -56,6 +81,9 @@ public class RandomUtil {
             } else if (element.equals("solid")) {
                 if (isIgnore) candidate.removeAll(getSolidMaterials());
                 else candidate.addAll(getSolidMaterials());
+            } else if (element.equals("all")) {
+                if (isIgnore) candidate.removeAll(Arrays.stream(Material.values()).collect(Collectors.toSet()));
+                else candidate.addAll(Arrays.stream(Material.values()).collect(Collectors.toSet()));
             }
         }
         if (candidate.isEmpty()) return Material.AIR;
