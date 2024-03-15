@@ -21,9 +21,6 @@ public class RandomUtil {
         if (!parsed.matches()) return Material.AIR;
         Set<Material> candidate = new HashSet<>();
 
-        //debug
-        System.out.println("random material split=" + Arrays.toString(parsed.group(1).split(",")));
-
         for (String element : parsed.group(1).split(";")) {
             boolean isIgnore = element.startsWith("!");
             element = element.replace("!", "");

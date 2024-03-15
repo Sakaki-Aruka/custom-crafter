@@ -2,31 +2,33 @@ package com.github.sakakiaruka.customcrafter.customcrafter.listener;
 
 import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.EntityUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.FluidCollisionMode;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.CreatureSpawner;
+import org.bukkit.block.spawner.SpawnerEntry;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntitySnapshot;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Villager;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.SpawnEggMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.UUID;
+import java.util.Set;
 
 public class PlayerUseSpawnEgg implements Listener {
     @EventHandler
@@ -44,6 +46,7 @@ public class PlayerUseSpawnEgg implements Listener {
 
         Block targetBlock = player.getTargetBlockExact(5, FluidCollisionMode.ALWAYS);
         if (targetBlock != null && targetBlock.getType().equals(Material.SPAWNER)) {
+            CreatureSpawner spawner = (CreatureSpawner) targetBlock.getState();
             if (targetBlock.hasMetadata(EntityUtil.SPAWNER_INFO_KEY)) targetBlock.removeMetadata(EntityUtil.SPAWNER_INFO_KEY, CustomCrafter.getInstance());
             targetBlock.setMetadata(EntityUtil.SPAWNER_INFO_KEY, new FixedMetadataValue(CustomCrafter.getInstance(), formula));
             targetBlock.setMetadata(EntityUtil.ONLY_INFO_SETUP, new FixedMetadataValue(CustomCrafter.getInstance(), ""));
@@ -52,14 +55,6 @@ public class PlayerUseSpawnEgg implements Listener {
             System.out.println("to write data to the spawner, ok");
             targetBlock.getMetadata(EntityUtil.SPAWNER_INFO_KEY).forEach(e -> System.out.println("written data=" + e.asString()));
 
-            CreatureSpawner spawner = (CreatureSpawner) targetBlock.getState();
-//            EntityType type;
-//            try {
-//                type = EntityType.valueOf(consumed.getType().name().replace("_SPAWN_EGG", ""));
-//            } catch (Exception e) {
-//                return;
-//            }
-//            spawner.setSpawnedType(type);
             FallingBlock fallingBlock = (FallingBlock) targetBlock.getWorld().spawn(targetBlock.getLocation(), Objects.requireNonNull(EntityType.FALLING_BLOCK.getEntityClass()));
             BlockState pseudoState = fallingBlock.getBlockState().copy();
             pseudoState.setType(Material.AIR);

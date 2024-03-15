@@ -17,7 +17,6 @@ public class SpawnerSpawn implements Listener {
     @EventHandler
     public void onSpawnerSpawn(SpawnerSpawnEvent event) {
         CreatureSpawner spawner = event.getSpawner();
-        Entity entity = event.getEntity();
         if (spawner == null || !spawner.hasMetadata(EntityUtil.SPAWNER_INFO_KEY)) return;
         event.setCancelled(true);
         Map<String, String> data = new HashMap<>();
@@ -32,6 +31,5 @@ public class SpawnerSpawn implements Listener {
             spawner.removeMetadata(EntityUtil.ONLY_INFO_SETUP, CustomCrafter.getInstance());
         }
         spawner.getMetadata(EntityUtil.SPAWNER_INFO_KEY).forEach(e -> EntityUtil.spawn(data, e.asString()));
-        spawner.resetTimer();
     }
 }

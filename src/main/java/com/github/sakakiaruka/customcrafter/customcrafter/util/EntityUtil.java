@@ -33,6 +33,7 @@ import org.bukkit.persistence.PersistentDataType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -231,11 +232,6 @@ public class EntityUtil {
         if (world == null) return;
 
         for (String element : formula.split(";")) {
-//
-//            //debug
-//            System.out.println("setup each formula matches=" + element.matches(singlePattern));
-//            System.out.println("element=" + element);
-
             CreatureSpawner spawner = (CreatureSpawner) world.getBlockAt(getLocationFromData(data)).getState();
 
             Matcher parsed = Pattern.compile(singlePattern).matcher(element);
@@ -243,16 +239,11 @@ public class EntityUtil {
             String type = parsed.group(1);
             String numSource = parsed.group(2);
 
-//            //debug
-//            System.out.println("type(parsed 1)=" + type);
-//            System.out.println("numSource(parsed 2)=" + numSource);
-
-
             switch (type) {
                 case "delay" -> spawner.setDelay(CalcUtil.getRandomNumber(numSource, -1, Integer.MAX_VALUE - 1));
                 case "max_nearby_entities" -> spawner.setMaxNearbyEntities(CalcUtil.getRandomNumber(numSource, 1, MAX_NEARBY_ENTITIES));
-                case "max_spawn_delay" -> spawner.setMaxSpawnDelay(CalcUtil.getRandomNumber(numSource, spawner.getMinSpawnDelay(), MAX_SPAWN_DELAY));
-                case "min_spawn_delay" -> spawner.setMinSpawnDelay(CalcUtil.getRandomNumber(numSource, 1, MAX_SPAWN_DELAY));
+                case "min_spawn_delay" -> data.put(data.get(UNIQUE_ID_KEY) + ".min_delay", String.valueOf(CalcUtil.getRandomNumber(numSource, 1, MAX_SPAWN_DELAY)));
+                case "max_spawn_delay" -> data.put(data.get(UNIQUE_ID_KEY) + ".max_delay", String.valueOf(CalcUtil.getRandomNumber(numSource, 1, MAX_SPAWN_DELAY)));
                 case "spawn_range" -> spawner.setSpawnRange(CalcUtil.getRandomNumber(numSource, 0, MAX_SPAWN_RANGE));
                 case "spawn_count" -> spawner.setSpawnCount(CalcUtil.getRandomNumber(numSource, 1, MAX_SPAWN_COUNT));
                 case "req_player_range" -> spawner.setRequiredPlayerRange(CalcUtil.getRandomNumber(numSource, 0, MAX_REQ_PLAYER_RANGE));
@@ -292,34 +283,44 @@ public class EntityUtil {
                     spawner.removeMetadata(SPAWNER_INFO_KEY, CustomCrafter.getInstance());
                 }
             }
+
+            String minDelayKey = data.get(UNIQUE_ID_KEY) + ".min_delay";
+            String maxDelayKey = data.get(UNIQUE_ID_KEY) + ".max_delay";
+            if (data.containsKey(minDelayKey) && !data.containsKey(maxDelayKey)) {
+                // only min
+                int min = Integer.parseInt(data.get(minDelayKey));
+                if (min <= spawner.getMaxSpawnDelay()) spawner.setMinSpawnDelay(min);
+            } else if (!data.containsKey(minDelayKey) && data.containsKey(maxDelayKey)) {
+                // only max
+                int max = Integer.parseInt(data.get(maxDelayKey));
+                if (spawner.getMinSpawnDelay() <= max) spawner.setMaxSpawnDelay(max);
+            } else if (data.keySet().containsAll(Set.of(minDelayKey, maxDelayKey))) {
+                // set both
+                int min = Integer.parseInt(data.get(minDelayKey));
+                int max = Integer.parseInt(data.get(maxDelayKey));
+                if (min <= max) {
+                    spawner.setMinSpawnDelay(0);
+                    spawner.setMaxSpawnDelay(Integer.MAX_VALUE);
+                    spawner.update();
+                    spawner.setMinSpawnDelay(min);
+                    spawner.setMaxSpawnDelay(max);
+                }
+            }
             spawner.update(true, true);
         }
     };
 
     public static final TriConsumer<String, Map<String, String>, Entity> DROPPED_ITEM_DETAIL = (formula, data, base) -> {
         // item:~~~
-
-        //debug
-        System.out.println("defined item map=" + ContainerUtil.DEFINED_ITEMS);
-        System.out.println("current uniqueID=" + data.get(UNIQUE_ID_KEY));
-        System.out.println("instance check=" + (base instanceof Item));
-
         if (!(base instanceof Item)) return;
         final String pattern = "(predicate:(true|false);)?item:([a-zA-Z0-9_]+)";
         addEntityAndWorldData(data, base);
         formula = CalcUtil.getContent(data, formula);
         Matcher parsed = Pattern.compile(pattern).matcher(formula);
 
-        //debug
-        System.out.println("matcher=" + parsed);
-
         if (!parsed.matches()) return;
         if (parsed.group(2) != null && parsed.group(2).equals("false")) return;
         String name = "$" + data.get(UNIQUE_ID_KEY) + "." + parsed.group(3) + "$";
-
-        //debug
-        System.out.println("internal map key=" + name);
-        System.out.println("internal map contained=" + ContainerUtil.DEFINED_ITEMS.containsKey(name));
 
         if (!ContainerUtil.DEFINED_ITEMS.containsKey(name)) return;
         ((Item) base).setItemStack(ContainerUtil.DEFINED_ITEMS.get(name));
@@ -327,19 +328,11 @@ public class EntityUtil {
 
     public static final TriConsumer<String, Map<String, String>, Entity> FALLING_TYPE = (formula, data, base) -> {
         // block:~~~
-
-        //debug
-        System.out.println("is falling block instance=" + (base instanceof FallingBlock));
-        System.out.println("formula(falling block)=" + CalcUtil.getContent(data, formula));
-
         if (!(base instanceof FallingBlock)) return;
         final String pattern = "(predicate:(true|false);)?name:([a-zA-Z_0-9]+);block:([a-zA-Z_0-9\\[\\]!/]+)(;toBlock:(true|false))?(;dropItem:(true|false))?";
         addEntityAndWorldData(data, base);
         formula = CalcUtil.getContent(data, formula);
         Matcher parsed = Pattern.compile(pattern).matcher(formula);
-
-        //debug
-        System.out.println("falling block parsed=" + formula.matches(pattern));
 
         if (!parsed.matches()) return;
         if (parsed.group(2) != null && parsed.group(2).equalsIgnoreCase("false")) return;
@@ -347,32 +340,27 @@ public class EntityUtil {
         boolean dropItem = parsed.group(8) != null && Boolean.parseBoolean(parsed.group(8));
         Material material;
         try {
-            if (parsed.group(4).startsWith("random")) material = RandomUtil.getRandomMaterial(parsed.group(4).replace("/", ","), RandomUtil.getBlockMaterials());
+            if (parsed.group(4).startsWith("random")) {
+                Set<Material> limit = new HashSet<>();
+                limit.addAll(RandomUtil.getSolidMaterials());
+                limit.addAll(RandomUtil.getOccludingMaterials());
+                material = RandomUtil.getRandomMaterial(parsed.group(4).replace("/", ","), limit);
+            }
             else material = Material.valueOf(parsed.group(4).toUpperCase());
             if (material.equals(Material.AIR) || !RandomUtil.getBlockMaterials().contains(material)) return;
         } catch (Exception e) {
             return;
         }
 
-        //debug
-        System.out.println("falling block material=" + material.name());
-
-        //debug
         String name = parsed.group(3);
         BlockState pseudoState = ((FallingBlock) base).getBlockState().copy();
         pseudoState.setType(material);
-        if (toBlock) ((FallingBlock) base).setCancelDrop(false);
-        if (dropItem) ((FallingBlock) base).setDropItem(true);
+        ((FallingBlock) base).setCancelDrop(!toBlock);
+        ((FallingBlock) base).setDropItem(dropItem);
         ((FallingBlock) base).setBlockState(pseudoState);
         String key = data.get(UNIQUE_ID_KEY) + "." + name;
         DEFINED_ENTITIES.put(key, base);
         data.put(FALLING_BLOCK_HAS_UNTRACKED_CHANGE_ANCHOR, "");
-
-        //debug
-        //base.spawnAt(getLocationFromData(data));
-        System.out.println("base(from falling type)=" + base);
-        System.out.println("base data=" + ((FallingBlock) base).getBlockData().getAsString());
-        System.out.println("base type=" + ((FallingBlock) base).getBlockData().getMaterial().name());
     };
 
     public static final TriConsumer<String, Map<String, String>, Entity> ADD_PASSENGER = (formula, data, base) -> {
