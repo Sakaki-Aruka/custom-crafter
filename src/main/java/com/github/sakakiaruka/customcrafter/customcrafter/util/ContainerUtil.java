@@ -20,11 +20,17 @@ import org.bukkit.FireworkEffect;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
+import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Pose;
 import org.bukkit.entity.TropicalFish;
+import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -39,6 +45,7 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.Repairable;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.inventory.meta.SpawnEggMeta;
 import org.bukkit.inventory.meta.SuspiciousStewMeta;
 import org.bukkit.inventory.meta.TropicalFishBucketMeta;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -73,6 +80,7 @@ import java.util.stream.Collectors;
 public class ContainerUtil {
 
     public static Map<String, ItemStack> DEFINED_ITEMS = new HashMap<>();
+    public static Map<String, Entity> DEFINED_ENTITY = new HashMap<>();
 
     public static boolean isPass(ItemStack item, Matter matter) {
         // item -> target, matter -> source (recipe)
@@ -139,7 +147,7 @@ public class ContainerUtil {
 
     public static final BiFunction<Map<String, String>, String, Boolean> RANDOM = (data, predicate) -> {
         if (predicate.isEmpty()) predicate = "50.00"; // %
-        predicate = getContent(data, predicate);
+        predicate = CalcUtil.getContent(data, predicate);
         final String pattern = "\\d+\\.?\\d*";
         if (!predicate.matches(pattern)) {
             sendIllegalTemplateWarn("random predicate", predicate, pattern);
@@ -179,8 +187,8 @@ public class ContainerUtil {
             if (formula.charAt(i) != ',') continue;
             count++;
             if (count != splitIndex) continue;
-            String left = setEvalValue(setPlaceholderValue(data, formula.substring(0, i)));
-            String right = setEvalValue(setPlaceholderValue(data, formula.substring(i + 1)));
+            String left = CalcUtil.setEvalValue(CalcUtil.setPlaceholderValue(data, formula.substring(0, i)));
+            String right = CalcUtil.setEvalValue(CalcUtil.setPlaceholderValue(data, formula.substring(i + 1)));
             return right.matches(left);
         }
         return false;
@@ -188,12 +196,12 @@ public class ContainerUtil {
 
     public static final BiFunction<Map<String, String>, String, Boolean> ALLOW_VALUE = (data, predicate) -> {
         // type: (?i)(Allow)Value, predicate: ~~~~
-        return Expression.eval(setEvalValue(setPlaceholderValue(data, predicate))).asBoolean();
+        return Expression.eval(CalcUtil.setEvalValue(CalcUtil.setPlaceholderValue(data, predicate))).asBoolean();
     };
 
     public static final BiFunction<Map<String, String>, String, Boolean> DENY_VALUE = (data, predicate) -> {
         // type: (?i)(Deny)Value, predicate: ~~~~
-        return !Expression.eval(setEvalValue(setPlaceholderValue(data, predicate))).asBoolean();
+        return !Expression.eval(CalcUtil.setEvalValue(CalcUtil.setPlaceholderValue(data, predicate))).asBoolean();
     };
 
     private static boolean anyContained(Map<String, String> data, String key) {
@@ -235,89 +243,6 @@ public class ContainerUtil {
 
     // ====================================================================
 
-    private static String getContent(Map<String, String> data, String formula) {
-        return setEvalValue(setPlaceholderValue(data, formula));
-    }
-
-    public static String setPlaceholderValue(Map<String, String> data, String formula) {
-        // debug (in release, this method must be private)
-        // %variableName% -> replace
-        // \%variableName\% -> not replace
-        StringBuilder result = new StringBuilder();
-        StringBuilder buffer = new StringBuilder();
-        int flag = 0;
-        for (int i = 0; i < formula.length(); i++) {
-            char c = formula.charAt(i);
-            if (c != '%' && c != '\\' && flag == 0) {
-                result.append(c);
-            } else if (c == '\\' && i <= formula.length() - 2 && flag == 0) {
-                if (formula.charAt(i + 1) != '%') {
-                    result.append(c);
-                } else {
-                    // next char is '%'
-                    result.append('%');
-                    i++;
-                }
-            } else if (c == '%' && flag == 0) {
-                flag = 1;
-            } else if (c != '%' && flag == 1) {
-                buffer.append(c);
-            } else if (c == '%') {
-                flag = 0;
-                String key = buffer.toString();
-                if (!data.containsKey(key)) result.append("None");
-                else result.append(data.get(buffer.toString()));
-                buffer.setLength(0);
-            }
-        }
-        return result + (!buffer.isEmpty() ? buffer.toString() : "");
-    }
-
-    public static String setEvalValue(String formula) {
-        // debug (in release, this method must be private)
-        // {2+3} -> 5
-        // {2^3} -> 8
-        // setEvalValue(data, setPlaceholderValue(data, "{%TEST%+%TEST_2%}"))
-        // - TEST=1, TEST=2 -> 3
-        StringBuilder result = new StringBuilder();
-        StringBuilder buffer = new StringBuilder();
-        int flag = 0;
-        for (int i = 0; i < formula.length(); i++) {
-            char c = formula.charAt(i);
-            if (c != '{' && c != '}' && c != '\\' && flag == 0) {
-                result.append(c);
-            } else if (c == '\\' && i <= formula.length() - 2 && flag == 0) {
-                char after = formula.charAt(i + 1);
-                if (after != '{' && after != '}') {
-                    result.append(c);
-                } else {
-                    // next char is '{' or '}'
-                    result.append(after);
-                    i++;
-                }
-            } else if (c == '{' && flag == 0) {
-                flag = 1;
-            } else if (c != '}' && flag == 1) {
-                buffer.append(c);
-            } else if (c == '}') {
-                flag = 0;
-                String key = buffer.toString();
-                if (key.startsWith("long:")) {
-                    // {long:~~~~~}
-                    result.append((long) Expression.eval(key.substring(5)).asDouble());
-                } else if (key.startsWith("double:")) {
-                    // {double:~~~~}
-                    result.append(Expression.eval(key.substring(7)).asDouble());
-                }else {
-                    // {~~~~}
-                    result.append(Expression.eval(key).asString());
-                }
-                buffer.setLength(0);
-            }
-        }
-        return result + (!buffer.isEmpty() ? buffer.toString() : "");
-    }
-
 
     // === for RecipeContainer === //
 
@@ -350,7 +275,7 @@ public class ContainerUtil {
             item.setItemMeta(meta);
             return;
         }
-        formula = getContent(data, formula);
+        formula = CalcUtil.getContent(data, formula);
         List<Component> lore = new ArrayList<>();
         if (meta.lore() != null) lore.addAll(meta.lore());
         for (String s : formula.split(SettingsLoad.LINE_SEPARATOR)) {
@@ -372,7 +297,7 @@ public class ContainerUtil {
     public static final TriConsumer<Map<String, String>, ItemStack, String> POTION_COLOR_RGB = (data, item, formula) -> {
         // type: potion_color, value: r=100,g=100,b=100
         // %RED%, %GREEN%, %BLUE%
-        formula = getContent(data, formula);
+        formula = CalcUtil.getContent(data, formula);
         ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
         PotionMeta potionMeta = (PotionMeta) meta;
         Matcher matcher = Pattern.compile("red=([0-9]+),green=([0-9]+),blue=([0-9]+)").matcher(formula);
@@ -396,7 +321,7 @@ public class ContainerUtil {
         // type: potion_color, value: white
         // %COLOR%
         ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
-        Color color = InventoryUtil.getColor(getContent(data, formula.toUpperCase()));
+        Color color = InventoryUtil.getColor(CalcUtil.getContent(data, formula.toUpperCase()));
         if (color == null) {
             sendNoSuchTemplateWarn("color name", formula);
             return;
@@ -408,7 +333,7 @@ public class ContainerUtil {
     public static final TriConsumer<Map<String, String>, ItemStack, String> TEXTURE_ID = (data, item, formula) -> {
         // type: texture_id, value: 100
         // %TEXTURE_ID%
-        formula = getContent(data, formula);
+        formula = CalcUtil.getContent(data, formula);
         ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
         Matcher matcher = Pattern.compile("([0-9]+)").matcher(formula);
         if (!matcher.matches()) {
@@ -423,7 +348,7 @@ public class ContainerUtil {
     public static final TriConsumer<Map<String, String>, ItemStack, String> TOOL_DURABILITY_PERCENTAGE = (data, item, formula) -> {
         // type: tool_durability_percentage, value: 100%
         // %DAMAGE%, %MATERIAL%
-        formula = getContent(data, formula);
+        formula = CalcUtil.getContent(data, formula);
         ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
         Matcher matcher = Pattern.compile("([0-9]*)\\.?([0-9]+)").matcher(formula);
         if (!matcher.matches()) {
@@ -439,7 +364,7 @@ public class ContainerUtil {
 
     public static final TriConsumer<Map<String, String>, ItemStack, String> TOOL_DURABILITY_REAL = (data, item, formula) -> {
         // type: tool_durability_real_number, value: 100
-        formula = getContent(data, formula);
+        formula = CalcUtil.getContent(data, formula);
         ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
         Matcher matcher = Pattern.compile("([0-9]+)").matcher(formula);
         if (!matcher.matches()) {
@@ -456,13 +381,13 @@ public class ContainerUtil {
         // type: item_name, value: this is an item
         // "" (empty string)
         ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
-        meta.displayName(Component.text(getContent(data,formula)));
+        meta.displayName(Component.text(CalcUtil.getContent(data,formula)));
         item.setItemMeta(meta);
     };
 
     public static final TriConsumer<Map<String, String>, ItemStack, String> ATTRIBUTE_MODIFIER = (data, item, formula) -> {
         ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
-        formula = getContent(data, formula);
+        formula = CalcUtil.getContent(data, formula);
         Matcher matcher = Pattern.compile("attribute=([a-zA-Z_]+),op=(?i)(add_number|add_scalar|multiply_scalar_1),value=(-?[0-9]*\\.?[0-9]+)").matcher(formula);
         if (!matcher.matches()) {
             sendIllegalTemplateWarn("attribute modifier", formula, "attribute=([a-zA-Z_.]+),op=(?i)(add_number|add_scalar|multiply_scalar_1),value=(-?[0-9]*\\.?[0-9]+)");
@@ -479,7 +404,7 @@ public class ContainerUtil {
     public static final TriConsumer<Map<String, String>, ItemStack, String> ATTRIBUTE_MODIFIER_EQUIPMENT = (data, item, formula) -> {
         // type: attribute_modifier_equipment, value: attribute=~~~, op=~~~, value=~~~, slot=~~~
         // %ATTRIBUTE%, %OPE_TYPE%, %VALUE%, %SLOT%
-        formula = getContent(data, formula);
+        formula = CalcUtil.getContent(data, formula);
         ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
         Matcher matcher = Pattern.compile("attribute=([a-zA-Z_]+),op=(?i)(add_number|add_scalar|multiply_scalar_1),value=(-?[0-9]*\\.?[0-9]+),slot=([a-zA-Z_]+)").matcher(formula);
         if (!matcher.matches()) {
@@ -498,7 +423,7 @@ public class ContainerUtil {
     public static final TriConsumer<Map<String, String>, ItemStack, String> ITEM_FLAG = (data, item, formula) -> {
         // type: item_flag, value: flag=~~~, action=(clear, remove, add)
         // %FLAG%, %ACTION%
-        formula = getContent(data, formula);
+        formula = CalcUtil.getContent(data, formula);
         ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
         Matcher matcher = Pattern.compile("flag=([a-zA-Z_]+),action=(?i)(clear|remove|add)").matcher(formula);
         if (!matcher.matches()) {
@@ -522,7 +447,7 @@ public class ContainerUtil {
     public static final TriConsumer<Map<String, String>, ItemStack, String> UNBREAKABLE = (data, item, formula) -> {
         // type: unbreakable, value: ~~~
         ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
-        meta.setUnbreakable(Boolean.parseBoolean(getContent(data, formula)));
+        meta.setUnbreakable(Boolean.parseBoolean(CalcUtil.getContent(data, formula)));
     };
 
     public static final TriConsumer<Map<String, String>, ItemStack, String> POTION_EFFECT = (data, item, formula) -> {
@@ -542,7 +467,7 @@ public class ContainerUtil {
         data.put("$CURRENT_GREEN$", String.valueOf(meta.getColor().getGreen()));
         data.put("$CURRENT_BLUE$", String.valueOf(meta.getColor().getBlue()));
         data.put("$CURRENT_RGB$", String.valueOf(meta.getColor().asRGB()));
-        formula = getContent(data, formula);
+        formula = CalcUtil.getContent(data, formula);
         removeCurrentVariables(data);
 
         Matcher rgb = Pattern.compile("r=([0-9]+),g=([0-9]+),b=([0-9]+)").matcher(formula);
@@ -568,7 +493,7 @@ public class ContainerUtil {
 
     public static TriConsumer<Map<String, String>, ItemStack, String> BOOK = (data, item, formula) -> {
         // type: book, value: type=(?i)(author|title|add_page|from_file|long_field|gen), element=(.+)
-        formula = getContent(data, formula);
+        formula = CalcUtil.getContent(data, formula);
         Matcher matcher = Pattern.compile("type=(author|title|add_page|add_long|from_file|gen),element=(.+)").matcher(formula);
         if (!matcher.matches()) return;
         String type = matcher.group(1);
@@ -601,7 +526,7 @@ public class ContainerUtil {
             return;
         }
         SkullMeta meta = (SkullMeta) Objects.requireNonNull(item.getItemMeta());
-        formula = getContent(data, formula);
+        formula = CalcUtil.getContent(data, formula);
         String pattern = "type=(name|url),value=(.+)";
         Matcher formulaParse = Pattern.compile(pattern).matcher(formula);
         if (!formulaParse.matches()) {
@@ -658,7 +583,7 @@ public class ContainerUtil {
             }
         }
         data.put("$CURRENT_LINES$", String.valueOf(lore.size()));
-        formula = getContent(data, formula);
+        formula = CalcUtil.getContent(data, formula);
         removeCurrentVariables(data);
         Matcher one = Pattern.compile("type=(clear|modify)(,value=type=(remove|insert),line=([0-9]+)(,value=(.+))*)?").matcher(formula);
         if (!one.matches()) {
@@ -692,7 +617,7 @@ public class ContainerUtil {
         // e.g. type: attribute_modifier_modify, value: type=remove,attribute=GENERIC_ARMOR (remove "GENERIC_ARMOR")
         // e.g. type: attribute_modifier_modify, value: type=modify,attribute=GENERIC_ARMOR,value=attribute=(.+),op=(.+),value=(.),slot=(.+) (redirect to the TriConsumer "ATTRIBUTE_MODIFIER")
         ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
-        formula = getContent(data, formula);
+        formula = CalcUtil.getContent(data, formula);
         Matcher matcher = Pattern.compile("type=(clear|remove|modify)(,attribute=([a-zA-Z_]+)(,value=(.+))?)?").matcher(formula);
         if (!matcher.matches()) return;
         String type = matcher.group(1);
@@ -732,7 +657,7 @@ public class ContainerUtil {
         // e.g. type: container, value: type=remove,target=variable-name.type
         // e.g. type: container, value: type=modify,target=variable-name.type,value=~~~
         // a special variable that is named "$CURRENT_VALUE$" contains current value.
-        formula = getContent(data, formula);
+        formula = CalcUtil.getContent(data, formula);
         String pattern = "type=(add|remove|modify),target=([a-zA-Z0-9_.%$]*)(,value=(.+))?";
         Matcher m = Pattern.compile(pattern).matcher(formula);
         if (!m.matches()) {
@@ -795,7 +720,7 @@ public class ContainerUtil {
     public static final TriConsumer<Map<String, String>, ItemStack, String> MATERIAL = (data, item, formula) -> {
         // type: material, value: ~~~
         // e.g. type: material, value: air
-        formula = getContent(data, formula).toUpperCase();
+        formula = CalcUtil.getContent(data, formula).toUpperCase();
         try {
             item.setType(Material.valueOf(formula));
         } catch (Exception e) {
@@ -808,7 +733,7 @@ public class ContainerUtil {
         // "limit=true" means won't over the material's amount limit.
         // e.g. type: amount, value: limit=true,amount=10
         String pattern = "limit=(true|false),amount=([0-9]{1,4})";
-        formula = getContent(data, formula);
+        formula = CalcUtil.getContent(data, formula);
         Matcher matcher = Pattern.compile(pattern).matcher(formula);
         if (!matcher.matches()) {
             sendIllegalTemplateWarn("amount", formula, pattern);
@@ -827,13 +752,13 @@ public class ContainerUtil {
 
     public static final TriConsumer<Map<String, String>, ItemStack, String> RUN_COMMAND_AS_CONSOLE = (data, item, formula) -> {
         // type: run_command_as_player, value: ~~~
-        formula = getContent(data, formula);
+        formula = CalcUtil.getContent(data, formula);
         Bukkit.dispatchCommand(Bukkit.getConsoleSender(), formula);
     };
 
     public static final TriConsumer<Map<String, String>, ItemStack, String> RUN_COMMAND_AS_PLAYER = (data, item, formula) -> {
         // type: run_command_as_player, value: ~~~
-        formula = getContent(data, formula);
+        formula = CalcUtil.getContent(data, formula);
         Player player = Bukkit.getPlayer(UUID.fromString(data.get("$PLAYER_UUID$")));
         if (player == null) {
             sendNoSuchTemplateWarn("player (from UUID)", formula);
@@ -860,7 +785,17 @@ public class ContainerUtil {
          * item does not used.
          */
 
-        formula = getContent(data, formula);
+        formula = CalcUtil.getContent(data, formula);
+
+        if (!item.getType().equals(Material.AIR) && item.getType().name().matches("[A-Z_0-9]+_SPAWN_EGG") && item.getItemMeta().getPersistentDataContainer().has(EntityUtil.SPAWN_EGG_INFO_KEY)) {
+            ItemMeta meta = item.getItemMeta();
+            String temp = meta.getPersistentDataContainer().get(EntityUtil.SPAWN_EGG_INFO_KEY, PersistentDataType.STRING);
+            String value = "__internal__:item_define=" + formula;
+            temp += Objects.toString(temp, "").isEmpty() ? "" : "," + value.length() + ":" + value;
+            meta.getPersistentDataContainer().set(EntityUtil.SPAWN_EGG_INFO_KEY, PersistentDataType.STRING, temp);
+            item.setItemMeta(meta);
+            return;
+        }
         // flag = 0 (separator = "|"), 1 = (name section), 2 = (base section), 3 = (element section)
         int flag = 0;
         // keys = name, base, values
@@ -945,7 +880,7 @@ public class ContainerUtil {
             return;
         }
 
-        formula = getContent(data, formula);
+        formula = CalcUtil.getContent(data, formula);
         final String pattern = "name=([a-zA-Z_0-9]+)(,amount=(\\d+))?(,times=(\\d+))?";
         Matcher parsed = Pattern.compile(pattern).matcher(formula);
         if (!parsed.matches()) {
@@ -971,7 +906,7 @@ public class ContainerUtil {
     public static final TriConsumer<Map<String, String>, ItemStack, String> CAN_PLACE_ON = (data, item, formula) -> {
         // type: can_place_on, value: ([A-Za-z_0-9,]+)
         // separate with ","
-        formula = getContent(data, formula);
+        formula = CalcUtil.getContent(data, formula);
         final String pattern = "([A-Za-z0-9,_]+)";
         if (!formula.matches(pattern)) {
             sendIllegalTemplateWarn("can place on", formula, pattern);
@@ -989,7 +924,7 @@ public class ContainerUtil {
     public static final TriConsumer<Map<String, String>, ItemStack, String> CAN_DESTROY = (data, item, formula) -> {
         // type: can_destroy, value: ([a-zA-Z0-9,_]+)
         // separate with ","
-        formula = getContent(data, formula);
+        formula = CalcUtil.getContent(data, formula);
         final String pattern = "([a-zA-Z0-9,_]+)";
         if (!formula.matches(pattern)) {
             sendIllegalTemplateWarn("can destroy", formula, pattern);
@@ -1006,7 +941,7 @@ public class ContainerUtil {
 
     public static final TriConsumer<Map<String, String>, ItemStack, String> REPAIR_COST = (data, item, formula) -> {
         // type: repair_cost, value: (\\d+)
-        formula = getContent(data, formula);
+        formula = CalcUtil.getContent(data, formula);
         if (!formula.matches("\\d+")) {
             sendIllegalTemplateWarn("repair cost", formula, "\\d+");
             return;
@@ -1016,10 +951,10 @@ public class ContainerUtil {
         item.setItemMeta(meta);
     };
 
-    private static Color getRGBColor(String formula) {
+    public static Color getRGBColor(String formula) {
         formula = formula.toLowerCase();
         final String RANDOM_PATTERN = "random\\[([0-9-]+)?:([0-9-]+)?]";
-        final String RGB_PATTERN = "([0-9a-z-\\[\\]:]+)-([0-9a-z-\\[\\]:]+)-([0-9a-z-\\[\\]:]+)";
+        final String RGB_PATTERN = "([0-9a-z\\[\\]:]+)-([0-9a-z\\[\\]:]+)-([0-9a-z\\[\\]:]+)";
         Matcher parsed = Pattern.compile(RGB_PATTERN).matcher(formula);
         if (!parsed.matches()) {
             sendIllegalTemplateWarn("rgb", formula, RGB_PATTERN);
@@ -1027,9 +962,9 @@ public class ContainerUtil {
         }
         final int under = 0;
         final int upper = 255;
-        int red = parsed.group(1).matches(RANDOM_PATTERN) ? getRandomNumber(parsed.group(1), under, upper) : Integer.parseInt(parsed.group(1));
-        int green = parsed.group(2).matches(RANDOM_PATTERN) ? getRandomNumber(parsed.group(2), under, upper) : Integer.parseInt(parsed.group(2));
-        int blue = parsed.group(3).matches(RANDOM_PATTERN) ? getRandomNumber(parsed.group(3), under, upper) : Integer.parseInt(parsed.group(3));
+        int red = parsed.group(1).matches(RANDOM_PATTERN) ? CalcUtil.getRandomNumber(parsed.group(1), under, upper) : Integer.parseInt(parsed.group(1));
+        int green = parsed.group(2).matches(RANDOM_PATTERN) ? CalcUtil.getRandomNumber(parsed.group(2), under, upper) : Integer.parseInt(parsed.group(2));
+        int blue = parsed.group(3).matches(RANDOM_PATTERN) ? CalcUtil.getRandomNumber(parsed.group(3), under, upper) : Integer.parseInt(parsed.group(3));
         if (!inRGBRange(red, green, blue)) return null;
         return Color.fromRGB(red, green, blue);
     }
@@ -1076,7 +1011,7 @@ public class ContainerUtil {
 
     private static final TriConsumer<Map<String, String>, ItemStack, String> FIREWORK_STAR = (data, item, formula) -> {
         FireworkEffectMeta meta = (FireworkEffectMeta) Objects.requireNonNull(item.getItemMeta());
-        formula = getContent(data, formula);
+        formula = CalcUtil.getContent(data, formula);
         if (formula.equalsIgnoreCase("clear")) meta.setEffect(null);
         else meta.setEffect(getFireworkEffect(formula));
         item.setItemMeta(meta);
@@ -1085,7 +1020,7 @@ public class ContainerUtil {
     private static final TriConsumer<Map<String, String>, ItemStack, String> FIREWORK_ROCKET = (data, item, formula) -> {
         // enable set "power"
         FireworkMeta meta = (FireworkMeta) Objects.requireNonNull(item.getItemMeta());
-        formula = getContent(data, formula);
+        formula = CalcUtil.getContent(data, formula);
         if (formula.equalsIgnoreCase("clear")) meta.clearEffects();
         else meta.addEffect(getFireworkEffect(formula));
 
@@ -1094,7 +1029,7 @@ public class ContainerUtil {
             if (parsed.matches()) {
                 // power = 0 ~ 127
                 int power = parsed.group(1).startsWith("random")
-                        ? getRandomNumber(parsed.group(1).replace("power=", ""), 0, 127)
+                        ? CalcUtil.getRandomNumber(parsed.group(1).replace("power=", ""), 0, 127)
                         : Integer.parseInt(parsed.group(1).replace("power=", ""));
                 if (!(0 <= power && power <= 127)) return;
                 meta.setPower(power);
@@ -1143,7 +1078,7 @@ public class ContainerUtil {
         // add potion effect -> "value: random[!self]->[amplifier=10,duration=200]"
         // when the target effect not contained the item, can skip to define the second effect.
 
-        formula = getContent(data, formula);
+        formula = CalcUtil.getContent(data, formula);
         final String BASE_PATTERN = "([a-zA-Z\\[\\]!,0-9=_]+)->(.+)";
         final String RANDOM_BASE_PATTERN = "random\\[([a-zA-Z!,_]+)]";
         final String RANDOM_EFFECT_PATTERN = "random\\[([a-zA-Z!,_]+)]:\\[([a-zA-Z0-9:,!=\\[\\]-]+)]";
@@ -1162,9 +1097,10 @@ public class ContainerUtil {
             return;
         }
 
-        data.put("$CURRENT_POTION_DURATION$", String.valueOf(getCurrentDuration(contained, base)));
-        data.put("$CURRENT_POTION_AMPLIFIER$", String.valueOf(getCurrentAmplifier(contained, base)));
-        formula = getContent(data, formula);
+        String currentDuration, currentAmplifier;
+        if (!(currentDuration = String.valueOf(getCurrentDuration(contained, base))).equals("-1")) data.put("$CURRENT_POTION_DURATION$", currentDuration);
+        if (!(currentAmplifier = String.valueOf(getCurrentAmplifier(contained, base))).equals("-1")) data.put("$CURRENT_POTION_AMPLIFIER$", currentAmplifier);
+        formula = CalcUtil.getContent(data, formula);
         removeCurrentVariables(data);
         Matcher reParsed = Pattern.compile(BASE_PATTERN).matcher(formula);
         if (!reParsed.matches()) return;
@@ -1225,10 +1161,10 @@ public class ContainerUtil {
         if (!a.matches() || !d.matches()) return null;
         int amplifier = a.group(2).matches("\\d+")
                 ? Integer.parseInt(a.group(2))
-                : getRandomNumber(a.group(2), 0, 255);
+                : CalcUtil.getRandomNumber(a.group(2), 0, 255);
         int duration = d.group(2).matches("-?[0-9]+")
                 ? Integer.parseInt(d.group(2))
-                : getRandomNumber(d.group(2), 1, 60 * 60); // 60 * 60 ticks = 1 hour
+                : CalcUtil.getRandomNumber(d.group(2), 1, 60 * 60); // 60 * 60 ticks = 1 hour
 
         PotionEffect effect = type.createEffect(duration == - 1 ? -1 : duration * 20, amplifier);
         for (String element : formula.split(",")) {
@@ -1247,14 +1183,14 @@ public class ContainerUtil {
         for (PotionEffect p : list) {
             if (p.getType().equals(type)) return p.getDuration();
         }
-        return 0;
+        return -1;
     }
 
     private static int getCurrentAmplifier(List<PotionEffect> list, PotionEffectType type) {
         for (PotionEffect p : list) {
             if (p.getType().equals(type)) return p.getAmplifier();
         }
-        return 0;
+        return -1;
     }
 
     private static PotionEffectType getRandomPotionEffectType(Set<PotionEffect> contained, String formula) {
@@ -1352,7 +1288,7 @@ public class ContainerUtil {
 
     private static Map<Enchantment, Integer> enchantInternal(Map<Enchantment, Integer> contained, String formula, Map<String, String> data) {
         // when detect illegal or invalid actions, this method returns the map that named "contained" contained in arguments.
-        formula = getContent(data, formula);
+        formula = CalcUtil.getContent(data, formula);
         final String FORMULA_PATTERN = "type=(enchant|level),action=([a-zA-Z_\\[\\](),!]+)->(.+)";
         final String TARGET_PATTERN = "[a-zA-Z_]+|random(\\[!?\\([A-Za-z_,]+\\)])?";
         final String RANDOM_TARGET_PATTERN = "random(\\[!?\\([A-Za-z_,]+\\)])?";
@@ -1384,7 +1320,7 @@ public class ContainerUtil {
                 ? String.valueOf(contained.get(target))
                 : "0"
         );
-        formula = getContent(data, formula);
+        formula = CalcUtil.getContent(data, formula);
         removeCurrentVariables(data);
         Matcher reMatch = Pattern.compile(FORMULA_PATTERN).matcher(formula);
         if (!reMatch.matches()) return contained;
@@ -1395,7 +1331,7 @@ public class ContainerUtil {
         else if (toNumeric) {
             int level = reMatch.group(3).matches("\\d+")
                     ? Integer.parseInt(reMatch.group(3))
-                    : getRandomNumber(reMatch.group(3), 1, 255);
+                    : CalcUtil.getRandomNumber(reMatch.group(3), 1, 255);
 
             if (isEnchant && !contained.containsKey(target)) contained.put(target, level);
             else if (!isEnchant && contained.containsKey(target)) {
@@ -1461,38 +1397,6 @@ public class ContainerUtil {
         item.setItemMeta(meta);
     };
 
-    public static int getRandomNumber(String formula, int underLimit, int upperLimit) {
-        // e.g. [3:] (3 ~ upper limit)
-        // e.g. [:10] (under limit ~ 10)
-        // e.g. [5:20] (5 ~ 20)
-        // e.g. [:] (under limit ~ upper limit)
-
-        final String pattern = "random\\[([0-9-]+)?:([0-9-]+)?]";
-        Matcher parsed = Pattern.compile(pattern).matcher(formula);
-        if (!parsed.matches()) {
-            return 0;
-        }
-
-        if (underLimit == upperLimit) return upperLimit;
-        if (parsed.group(1) == null && parsed.group(2) == null) {
-            // [:]
-            return getInRange(underLimit, upperLimit + 1);
-        } else if (parsed.group(1) != null && parsed.group(2) == null) {
-            // [([0-9-]+):]
-            return getInRange(Integer.parseInt(parsed.group(1)), upperLimit + 1);
-        } else if (parsed.group(1) == null && parsed.group(2) != null) {
-            // [:([0-9-]+)]
-            return getInRange(underLimit, Integer.parseInt(parsed.group(2)) + 1);
-        } else {
-            // [([0-9-]+):([0-9-]+)]
-            return getInRange(Integer.parseInt(parsed.group(1)), Integer.parseInt(parsed.group(2)) + 1);
-        }
-    }
-
-    private static int getInRange(int under, int upper) {
-        return new Random().ints(1, under, upper).toArray()[0];
-    }
-
     private static Enchantment getRandomEnchantment(Set<Enchantment> enchants, String formula) {
         // e.g. random[!(self)] (from all, but does not contain self)
         // e.g. random[(all)] (from all)
@@ -1541,7 +1445,7 @@ public class ContainerUtil {
         // type: tropical_fish, value: body_color=~~~,pattern=~~~,pattern_color=~~~
         // can use "random" in each element. (e.g. pattern=random[all])
         TropicalFishBucketMeta meta = (TropicalFishBucketMeta) Objects.requireNonNull(item.getItemMeta());
-        formula = getContent(data, formula);
+        formula = CalcUtil.getContent(data, formula);
         final String pattern = "body_color=([a-zA-Z\\[\\]!,]+),pattern=([a-zA-Z\\[\\]!_,]+),pattern_color=([a-zA-Z\\[\\]!_,]+)";
         Matcher parsed = Pattern.compile(pattern).matcher(formula);
         if (!parsed.matches()) {
@@ -1558,13 +1462,13 @@ public class ContainerUtil {
             return;
         }
         DyeColor bodyColor = parsed.group(1).startsWith("random")
-                ? getRandomDyeColor(parsed.group(1), meta.getBodyColor())
+                ? RandomUtil.getRandomDyeColor(parsed.group(1), meta.getBodyColor())
                 : DyeColor.valueOf(parsed.group(1).toUpperCase());
         TropicalFish.Pattern fishPattern = parsed.group(2).startsWith("random")
                 ? getRandomTropicalFishPattern(parsed.group(2), meta.getPattern())
                 : TropicalFish.Pattern.valueOf(parsed.group(2).toUpperCase());
         DyeColor patternColor = parsed.group(3).startsWith("random")
-                ? getRandomDyeColor(parsed.group(3), meta.getPatternColor())
+                ? RandomUtil.getRandomDyeColor(parsed.group(3), meta.getPatternColor())
                 : DyeColor.valueOf(parsed.group(3).toUpperCase());
         if (bodyColor == null || fishPattern == null || patternColor == null) return;
         meta.setBodyColor(bodyColor);
@@ -1597,32 +1501,9 @@ public class ContainerUtil {
         return builder.toString();
     }
 
-    private static DyeColor getRandomDyeColor(String formula, DyeColor current) {
-        final String pattern = "random\\[([a-zA-Z!,_]+)]";
-        Matcher parsed = Pattern.compile(pattern).matcher(formula);
-        if (!parsed.matches()) return null;
-        Set<DyeColor> candidate = new HashSet<>();
-        for (String element : parsed.group(1).split(",")) {
-            if (element.equals("all")) candidate.addAll(Arrays.asList(DyeColor.values()));
-            else if (element.equals("!all")) Arrays.asList(DyeColor.values()).forEach(candidate::remove);
-            else if (element.equals("self")) candidate.add(current);
-            else if (element.equals("!self")) candidate.remove(current);
-            else if (element.startsWith("!") && element.replace("!", "").matches(getAllDyeColorRegexPattern())) candidate.remove(DyeColor.valueOf(element.toUpperCase()));
-            else if (element.matches(getAllDyeColorRegexPattern())) candidate.add(DyeColor.valueOf(element.toUpperCase()));
-        }
-        if (candidate.isEmpty()) return null;
-        return new ArrayList<>(candidate).get(new Random().nextInt(candidate.size()));
-    }
-
-    private static String getAllDyeColorRegexPattern() {
-        StringBuilder builder = new StringBuilder("(");
-        for (DyeColor color : DyeColor.values()) builder.append(color.name()).append("|");
-        builder.deleteCharAt(builder.length() - 1).append(")");
-        return builder.toString().toLowerCase();
-    }
 
 
-    private static void removeCurrentVariables(Map<String, String> data) {
+    public static void removeCurrentVariables(Map<String, String> data) {
         data.entrySet().removeIf(element -> element.getKey().matches("\\$CURRENT_[A-Z0-9_.]+\\$"));
     }
 

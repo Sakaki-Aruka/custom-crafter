@@ -12,7 +12,9 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordina
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Tag;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.Result;
+import com.github.sakakiaruka.customcrafter.customcrafter.util.CalcUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.ContainerUtil;
+import com.github.sakakiaruka.customcrafter.customcrafter.util.EntityUtil;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -53,14 +55,14 @@ public class NewAmorphousTest {
         data.put("test_container_3", "40");
         String formula1 = "{%test_container_1% * 2}";
         String formula2 = "{\\%test_container_1\\% = %test_container_1%}";
-        Assertions.assertEquals("{20 * 2}", ContainerUtil.setPlaceholderValue(data, formula1));
-        Assertions.assertEquals("{%test_container_1% = 20}", ContainerUtil.setPlaceholderValue(data, formula2));
-        Assertions.assertEquals("{None}", ContainerUtil.setPlaceholderValue(data, "{%a%}"));
-        Assertions.assertEquals("{a}", ContainerUtil.setPlaceholderValue(data, "{%a}"));
+        Assertions.assertEquals("{20 * 2}", CalcUtil.setPlaceholderValue(data, formula1));
+        Assertions.assertEquals("{%test_container_1% = 20}", CalcUtil.setPlaceholderValue(data, formula2));
+        Assertions.assertEquals("{None}", CalcUtil.setPlaceholderValue(data, "{%a%}"));
+        Assertions.assertEquals("{a}", CalcUtil.setPlaceholderValue(data, "{%a}"));
     }
 
     private String getValue(Map<String, String> data, String formula) {
-        return ContainerUtil.setEvalValue(ContainerUtil.setPlaceholderValue(data, formula));
+        return CalcUtil.setEvalValue(CalcUtil.setPlaceholderValue(data, formula));
     }
 
     @Test
@@ -83,8 +85,8 @@ public class NewAmorphousTest {
         Assertions.assertEquals("false", getValue(null, "{None==50}"));
         Assertions.assertEquals("true", getValue(data, "{(%test_container_1%+%test_container_2%)*2<(%test_container_3%*4)}"));
 
-        Assertions.assertEquals("20", ContainerUtil.setEvalValue("{long:10*2.0}"));
-        Assertions.assertEquals("20.0", ContainerUtil.setEvalValue("{double:10*2}"));
+        Assertions.assertEquals("20", CalcUtil.setEvalValue("{long:10*2.0}"));
+        Assertions.assertEquals("20.0", CalcUtil.setEvalValue("{double:10*2}"));
     }
 
     @Test
