@@ -4,9 +4,11 @@ import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter;
 import com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad;
 import com.github.sakakiaruka.customcrafter.customcrafter.interfaces.TriConsumer;
 import org.bukkit.Bukkit;
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.Particle;
 import org.bukkit.World;
 import org.bukkit.attribute.Attributable;
 import org.bukkit.attribute.Attribute;
@@ -16,22 +18,27 @@ import org.bukkit.block.BlockState;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.block.spawner.SpawnRule;
 import org.bukkit.block.spawner.SpawnerEntry;
+import org.bukkit.entity.AreaEffectCloud;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Mob;
+import org.bukkit.entity.ThrownPotion;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.SpawnEggMeta;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.potion.PotionEffect;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -180,9 +187,12 @@ public class EntityUtil {
             else if (type.equalsIgnoreCase("set_spawner_value")) SET_VARIOUS_SPAWNER_VALUE.accept(action, data, defined);
             else if (type.equalsIgnoreCase("falling_type")) FALLING_TYPE.accept(action, data, defined);
             else if (type.equalsIgnoreCase("dropped_item_detail")) DROPPED_ITEM_DETAIL.accept(action, data, defined);
+            else if (type.equalsIgnoreCase("splash_potion_detail")) SPLASH_POTION_DETAIL.accept(action, data, defined);
             else if (type.equalsIgnoreCase("item_define") && name.equals("__internal__")) {
                 // item define
-                Map<String, String> pseudoData = Map.of("$RECIPE_NAME$", uniqueID);
+                //Map<String, String> pseudoData = Map.of("$RECIPE_NAME$", uniqueID);
+                Map<String, String> pseudoData = new HashMap<>();
+                pseudoData.put("$RECIPE_NAME$", uniqueID);
                 ItemStack pseudoItem = new ItemStack(Material.AIR);
                 ContainerUtil.ITEM_DEFINE.accept(pseudoData, pseudoItem, action);
             }
@@ -208,10 +218,6 @@ public class EntityUtil {
     };
 
     public static final TriConsumer<String, Map<String, String>, Entity> SET_VARIOUS_SPAWNER_VALUE = (formula, data, base) -> {
-
-        //debug
-//        System.out.println("only info setup anchor has=" + data.containsKey(ONLY_INFO_SETUP));
-
         if (!data.containsKey(ONLY_INFO_SETUP)) return;
         final String pattern = "((delay|max_nearby_entities|max_spawn_delay|min_spawn_delay|spawn_range|spawn_count|req_player_range|spawn_weight|max_block_light|min_block_light|max_sky_light|min_sky_light|rough_control):([0-9]+|random\\[([0-9-]+)?:([0-9-]+)?]);)+";
         final String singlePattern = "(delay|max_nearby_entities|max_spawn_delay|min_spawn_delay|spawn_range|spawn_count|req_player_range|spawn_weight|max_block_light|min_block_light|max_sky_light|min_sky_light|rough_control):([0-9]+|random\\[([0-9-]+)?:([0-9-]+)?])";
@@ -219,14 +225,6 @@ public class EntityUtil {
         // in 'data', "uniqueID.(min|max)_(sky|block)_light" => new SpawnRule (with "spawn_weight")
         // "SpawnCount" needs to set "MinSpawnDelay"
         formula = CalcUtil.getContent(data, formula);
-
-//        //debug
-//        System.out.println("setup formula matches=" + formula.matches(pattern));
-//        for (String e : formula.split(";")) {
-//            System.out.println("e=" + e);
-//            System.out.println("e matches single pattern=" + e.matches(singlePattern));
-//        }
-
         if (!formula.matches(pattern)) return;
         World world = Bukkit.getWorld(UUID.fromString(data.get("WORLD_UUID")));
         if (world == null) return;
@@ -342,12 +340,12 @@ public class EntityUtil {
         try {
             if (parsed.group(4).startsWith("random")) {
                 Set<Material> limit = new HashSet<>();
-                limit.addAll(RandomUtil.getSolidMaterials());
-                limit.addAll(RandomUtil.getOccludingMaterials());
+                limit.addAll(RandomUtil.solidMaterials);
+                limit.addAll(RandomUtil.occludingMaterials);
                 material = RandomUtil.getRandomMaterial(parsed.group(4).replace("/", ","), limit);
             }
             else material = Material.valueOf(parsed.group(4).toUpperCase());
-            if (material.equals(Material.AIR) || !RandomUtil.getBlockMaterials().contains(material)) return;
+            if (material.equals(Material.AIR) || !RandomUtil.blockMaterials.contains(material)) return;
         } catch (Exception e) {
             return;
         }
@@ -363,16 +361,78 @@ public class EntityUtil {
         data.put(FALLING_BLOCK_HAS_UNTRACKED_CHANGE_ANCHOR, "");
     };
 
+    public static final TriConsumer<String, Map<String, String>, Entity> SPLASH_POTION_DETAIL = (formula, data, base) -> {
+        if (!(base instanceof ThrownPotion)) return;
+        final String pattern = "(predicate=(true|false);)?item:([a-zA-Z_0-9]+)(;cloudy;[a-zA-Z_0-9:\\[\\];]+)?";
+        final String eachElementPattern = "([a-zA-Z_0-9]+):(.+)";
+        addEntityAndWorldData(data, base);
+        formula = CalcUtil.getContent(data, formula);
+        Matcher parsed = Pattern.compile(pattern).matcher(formula);
+        if (!parsed.matches()) return;
+        if (parsed.group(2) != null && !Boolean.parseBoolean(parsed.group(2))) return;
+        String key = "$" + data.get(UNIQUE_ID_KEY) + "." + parsed.group(3) + "$";
+        if (!ContainerUtil.DEFINED_ITEMS.containsKey(key)) return;
+        ItemStack potion = ContainerUtil.DEFINED_ITEMS.get(key);
+        if (!(potion.getItemMeta() instanceof PotionMeta)) return;
+        ((ThrownPotion) base).setPotionMeta(((PotionMeta) potion.getItemMeta()).clone());
+        if (parsed.group(4) == null) return; // not contained "cloudy" section.
+        Location location = getLocationFromData(data);
+        World world = location.getWorld();
+        AreaEffectCloud aec = (AreaEffectCloud) world.spawn(location, EntityType.AREA_EFFECT_CLOUD.getEntityClass());
+        aec.setDuration(getMinPotionEffectDuration(((PotionMeta) potion.getItemMeta()).getCustomEffects()));
+        ((PotionMeta) potion.getItemMeta()).getCustomEffects().forEach(e -> aec.addCustomEffect(e, true));
+        for (String element : parsed.group(4).split(";")) {
+            Matcher mini = Pattern.compile(eachElementPattern).matcher(element);
+            if (!mini.matches()) continue;
+            String type = mini.group(1);
+            String value = mini.group(2);
+            if (value.matches("(-?[0-9]+|random\\[(-?[0-9-]+)?:(-?[0-9-]+)?])")) {
+                // set duration
+                int num = value.startsWith("random")
+                        ? CalcUtil.getRandomNumber(value, -1, 60 * 60)
+                        : Integer.parseInt(value);
+                if (type.matches("d|duration")) aec.setDuration(num);
+                else if (type.matches("dou|durationOnUse")) aec.setDurationOnUse(num);
+                else if (type.matches("rd|reapplicationDelay")) aec.setReapplicationDelay(num);
+                else if (type.matches("wt|waitTime")) aec.setWaitTime(num);
+            } else if (value.matches("([0-9.]+|random\\[([0-9-.]+)?:([0-9-.]+)?])")) {
+                float num = value.startsWith("random")
+                        ? RandomUtil.getRandomFloat(value, 1, 100)
+                        : Float.parseFloat(value);
+                if (!(1 <= num && num <= 100)) return;
+                if (type.matches("rou|radiusOnUse")) aec.setRadiusOnUse(num);
+                else if (type.matches("rpt|radiusPerTick")) aec.setRadiusPerTick(num);
+                else if (type.matches("r|radius")) aec.setRadius(num);
+            } else if (type.matches("p|particle")) {
+                Particle particle = value.startsWith("random")
+                        ? RandomUtil.getRandomParticle(value)
+                        : value.matches(RandomUtil.allParticlesRegexPattern) ? Particle.valueOf(value.toUpperCase()) : null;
+                if (particle == null) continue;
+                aec.setParticle(particle);
+            } else if (type.matches("c|color")) {
+                Color color = value.startsWith("random")
+                        ? RandomUtil.getRandomColor(value)
+                        : ContainerUtil.getRGBColor(value);
+                if (color == null) continue;
+                aec.setColor(color);
+            }
+        }
+    };
+
+    private static int getMinPotionEffectDuration(Collection<PotionEffect> effects) {
+        int result = Integer.MAX_VALUE;
+        for (PotionEffect effect : effects) {
+            if (effect.getDuration() < result) result = effect.getDuration();
+        }
+        return result;
+    }
+
     public static final TriConsumer<String, Map<String, String>, Entity> ADD_PASSENGER = (formula, data, base) -> {
         // passenger=~~~
         final String pattern = "(predicate=(true|false)/)?\\+([a-zA-Z0-9_-]+)";
         addEntityAndWorldData(data, base);
         data.put("$CURRENT_TARGET_PASSENGERS_COUNT$", String.valueOf(base.getPassengers().size()));
         formula = CalcUtil.getContent(data, formula);
-
-//        //debug
-//        System.out.println("add passenger formula=" + formula);
-//        System.out.println("defined entities map=" + DEFINED_ENTITIES);
 
         ContainerUtil.removeCurrentVariables(data);
         Matcher parsed = Pattern.compile(pattern).matcher(formula);
@@ -389,17 +449,10 @@ public class EntityUtil {
         addEntityAndWorldData(data, base);
         formula = CalcUtil.getContent(data, formula);
 
-//        //debug
-//        System.out.println("set armor formula=" + formula);
-//        System.out.println("defined item map=" + ContainerUtil.DEFINED_ITEMS);
-
         Matcher parsed = Pattern.compile(pattern).matcher(formula);
         if (!parsed.matches()) return;
         if (parsed.group(2) != null && !Boolean.parseBoolean(parsed.group(2))) return;
         ItemStack item = ContainerUtil.DEFINED_ITEMS.get("$" + data.get(UNIQUE_ID_KEY) + "." + parsed.group(4) + "$");
-
-        //debug
-//        System.out.println("defined item map key=" + parsed.group(4));
 
         if (!(base instanceof Mob) || item == null) return;
         EntityEquipment equipment = ((LivingEntity) base).getEquipment();

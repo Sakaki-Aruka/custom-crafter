@@ -687,10 +687,6 @@ public class SettingsLoad {
             builder.append(map.get("base").get(0)).append(",");
             if (!map.containsKey("value")) {
                 builder.append("0");
-
-                //debug
-                System.out.println("raw item define=" + builder);
-
                 continue;
             }
 

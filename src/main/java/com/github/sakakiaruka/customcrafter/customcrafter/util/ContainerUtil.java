@@ -794,12 +794,6 @@ public class ContainerUtil {
             temp += Objects.toString(temp, "").isEmpty() ? "" : "," + value.length() + ":" + value;
             meta.getPersistentDataContainer().set(EntityUtil.SPAWN_EGG_INFO_KEY, PersistentDataType.STRING, temp);
             item.setItemMeta(meta);
-
-//            //debug
-//            System.out.println("temp=" + temp);
-//            System.out.println("value=" + value);
-//            System.out.println("pdc=" + item.getItemMeta().getPersistentDataContainer().get(EntityUtil.SPAWN_EGG_INFO_KEY, PersistentDataType.STRING));
-
             return;
         }
         // flag = 0 (separator = "|"), 1 = (name section), 2 = (base section), 3 = (element section)
@@ -957,10 +951,10 @@ public class ContainerUtil {
         item.setItemMeta(meta);
     };
 
-    private static Color getRGBColor(String formula) {
+    public static Color getRGBColor(String formula) {
         formula = formula.toLowerCase();
         final String RANDOM_PATTERN = "random\\[([0-9-]+)?:([0-9-]+)?]";
-        final String RGB_PATTERN = "([0-9a-z-\\[\\]:]+)-([0-9a-z-\\[\\]:]+)-([0-9a-z-\\[\\]:]+)";
+        final String RGB_PATTERN = "([0-9a-z\\[\\]:]+)-([0-9a-z\\[\\]:]+)-([0-9a-z\\[\\]:]+)";
         Matcher parsed = Pattern.compile(RGB_PATTERN).matcher(formula);
         if (!parsed.matches()) {
             sendIllegalTemplateWarn("rgb", formula, RGB_PATTERN);
@@ -1103,8 +1097,9 @@ public class ContainerUtil {
             return;
         }
 
-        data.put("$CURRENT_POTION_DURATION$", String.valueOf(getCurrentDuration(contained, base)));
-        data.put("$CURRENT_POTION_AMPLIFIER$", String.valueOf(getCurrentAmplifier(contained, base)));
+        String currentDuration, currentAmplifier;
+        if (!(currentDuration = String.valueOf(getCurrentDuration(contained, base))).equals("-1")) data.put("$CURRENT_POTION_DURATION$", currentDuration);
+        if (!(currentAmplifier = String.valueOf(getCurrentAmplifier(contained, base))).equals("-1")) data.put("$CURRENT_POTION_AMPLIFIER$", currentAmplifier);
         formula = CalcUtil.getContent(data, formula);
         removeCurrentVariables(data);
         Matcher reParsed = Pattern.compile(BASE_PATTERN).matcher(formula);
@@ -1188,14 +1183,14 @@ public class ContainerUtil {
         for (PotionEffect p : list) {
             if (p.getType().equals(type)) return p.getDuration();
         }
-        return 0;
+        return -1;
     }
 
     private static int getCurrentAmplifier(List<PotionEffect> list, PotionEffectType type) {
         for (PotionEffect p : list) {
             if (p.getType().equals(type)) return p.getAmplifier();
         }
-        return 0;
+        return -1;
     }
 
     private static PotionEffectType getRandomPotionEffectType(Set<PotionEffect> contained, String formula) {
@@ -1467,13 +1462,13 @@ public class ContainerUtil {
             return;
         }
         DyeColor bodyColor = parsed.group(1).startsWith("random")
-                ? getRandomDyeColor(parsed.group(1), meta.getBodyColor())
+                ? RandomUtil.getRandomDyeColor(parsed.group(1), meta.getBodyColor())
                 : DyeColor.valueOf(parsed.group(1).toUpperCase());
         TropicalFish.Pattern fishPattern = parsed.group(2).startsWith("random")
                 ? getRandomTropicalFishPattern(parsed.group(2), meta.getPattern())
                 : TropicalFish.Pattern.valueOf(parsed.group(2).toUpperCase());
         DyeColor patternColor = parsed.group(3).startsWith("random")
-                ? getRandomDyeColor(parsed.group(3), meta.getPatternColor())
+                ? RandomUtil.getRandomDyeColor(parsed.group(3), meta.getPatternColor())
                 : DyeColor.valueOf(parsed.group(3).toUpperCase());
         if (bodyColor == null || fishPattern == null || patternColor == null) return;
         meta.setBodyColor(bodyColor);
@@ -1506,47 +1501,6 @@ public class ContainerUtil {
         return builder.toString();
     }
 
-    private static DyeColor getRandomDyeColor(String formula, DyeColor current) {
-        final String pattern = "random\\[([a-zA-Z!,_]+)]";
-        Matcher parsed = Pattern.compile(pattern).matcher(formula);
-        if (!parsed.matches()) return null;
-        Set<DyeColor> candidate = new HashSet<>();
-        for (String element : parsed.group(1).split(",")) {
-            if (element.equals("all")) candidate.addAll(Arrays.asList(DyeColor.values()));
-            else if (element.equals("!all")) Arrays.asList(DyeColor.values()).forEach(candidate::remove);
-            else if (element.equals("self")) candidate.add(current);
-            else if (element.equals("!self")) candidate.remove(current);
-            else if (element.startsWith("!") && element.replace("!", "").matches(getAllDyeColorRegexPattern())) candidate.remove(DyeColor.valueOf(element.toUpperCase()));
-            else if (element.matches(getAllDyeColorRegexPattern())) candidate.add(DyeColor.valueOf(element.toUpperCase()));
-        }
-        if (candidate.isEmpty()) return null;
-        return new ArrayList<>(candidate).get(new Random().nextInt(candidate.size()));
-    }
-
-    private static String getAllDyeColorRegexPattern() {
-        StringBuilder builder = new StringBuilder("(");
-        for (DyeColor color : DyeColor.values()) builder.append(color.name()).append("|");
-        builder.deleteCharAt(builder.length() - 1).append(")");
-        return builder.toString().toLowerCase();
-    }
-
-    private static EntityType getRandomEntityType(String formula) {
-        final String pattern = "random\\[([a-zA-Z!,_]+)]";
-        Matcher parsed = Pattern.compile(pattern).matcher(formula);
-        if (!parsed.matches()) return null;
-        Set<EntityType> candidate = new HashSet<>();
-        for (String element : parsed.group(1).split(",")) {
-            if (element.matches("(?i)(all)")) candidate.addAll(new HashSet<>(Arrays.asList(EntityType.values())));
-            else if (element.startsWith("!") && element.substring(1).matches(getAllEntityTypeRegexPattern())) candidate.remove(EntityType.valueOf(element.toUpperCase()));
-            else if (!element.startsWith("!") && element.matches(getAllEntityTypeRegexPattern())) candidate.add(EntityType.valueOf(element.toUpperCase()));
-        }
-        if (candidate.isEmpty()) return null;
-        return new ArrayList<>(candidate).get(new Random().nextInt(candidate.size()));
-    }
-
-    private static String getAllEntityTypeRegexPattern() {
-        return "(" + String.join("|", Arrays.stream(EntityType.values()).map(Enum::name).collect(Collectors.toSet())) + ")";
-    }
 
 
     public static void removeCurrentVariables(Map<String, String> data) {

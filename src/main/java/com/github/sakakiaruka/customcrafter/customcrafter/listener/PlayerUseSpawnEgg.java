@@ -51,10 +51,6 @@ public class PlayerUseSpawnEgg implements Listener {
             targetBlock.setMetadata(EntityUtil.SPAWNER_INFO_KEY, new FixedMetadataValue(CustomCrafter.getInstance(), formula));
             targetBlock.setMetadata(EntityUtil.ONLY_INFO_SETUP, new FixedMetadataValue(CustomCrafter.getInstance(), ""));
 
-            //debug
-            System.out.println("to write data to the spawner, ok");
-            targetBlock.getMetadata(EntityUtil.SPAWNER_INFO_KEY).forEach(e -> System.out.println("written data=" + e.asString()));
-
             FallingBlock fallingBlock = (FallingBlock) targetBlock.getWorld().spawn(targetBlock.getLocation(), Objects.requireNonNull(EntityType.FALLING_BLOCK.getEntityClass()));
             BlockState pseudoState = fallingBlock.getBlockState().copy();
             pseudoState.setType(Material.AIR);
@@ -64,11 +60,6 @@ public class PlayerUseSpawnEgg implements Listener {
             spawner.update();
             return;
         }
-
-        //debug
-        System.out.println("world uuid=" + player.getWorld().getUID());
-
-
         Map<String, String> data = new HashMap<>();
         data.put("BLOCK_X", String.valueOf(player.getLocation().x()));
         data.put("BLOCK_Y", String.valueOf(player.getLocation().y()));
