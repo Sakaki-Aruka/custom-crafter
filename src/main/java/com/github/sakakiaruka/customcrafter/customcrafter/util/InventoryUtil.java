@@ -63,6 +63,17 @@ public class InventoryUtil {
         }
     }
 
+    public static void decrementMaterialsForNormalRecipe(Inventory inventory, Recipe input, Recipe recipe) {
+        // input list is a list whose size is (9 * 6 =)54.
+        for (int i = 0; i < recipe.getContentsNoAir().size(); i++) {
+            Matter r = recipe.getContentsNoAir().get(i);
+            int slot = input.getCoordinateNoAir().get(i).getY() * 9 + input.getCoordinateNoAir().get(i).getX();
+            if (inventory.getItem(slot) == null) continue;
+            int amount = Math.max(inventory.getItem(slot).getAmount() -  r.getAmount(), 0);
+            inventory.getItem(slot).setAmount(amount);
+        }
+    }
+
     public static void decrementResult(Inventory inventory, Player player) {
         if (inventory.getItem(CRAFTING_TABLE_RESULT_SLOT) == null) return;
         ItemStack item = inventory.getItem(CRAFTING_TABLE_RESULT_SLOT);
