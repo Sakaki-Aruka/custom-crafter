@@ -85,12 +85,19 @@ public class Search {
         if (result != null) {
             // custom recipe found
             InventoryUtil.returnItems(result,inventory,massAmount,player);
-            int quantity = (isOneCraft ? 1 : massAmount) * result.getResult().getAmount();
+            int quantity = ((isOneCraft || containsMoreThanOneAmountMatter(result)) ? 1 : massAmount) * result.getResult().getAmount();
             setResultItem(inventory,result,input,player,quantity,isOneCraft);
         } else {
             // not found
             new VanillaSearch().main(player,inventory,isOneCraft);
         }
+    }
+
+    private static boolean containsMoreThanOneAmountMatter(Recipe recipe) {
+        for (Matter m : recipe.getContentsNoAir()) {
+            if (1 < m.getAmount()) return true;
+        }
+        return false;
     }
 
     private boolean isMatchNormal(List<ItemStack> interestedItems,Recipe recipe, Recipe input) {
@@ -103,6 +110,8 @@ public class Search {
             Matter recipeMatter = recipe.getContentsNoAir().get(i);
             Matter inputMatter = input.getContentsNoAir().get(i);
 
+            //debug
+            if (recipeMatter.getAmount() != 1 && recipeMatter.getAmount() != inputMatter.getAmount()) return false;
 
             if (!ContainerUtil.isPass(interestedItems.get(i), recipeMatter)) return false;
             if (inputMatter.getAmount() < recipeMatter.getAmount()) return false;
@@ -293,7 +302,8 @@ public class Search {
             }
         }
 
-        InventoryUtil.decrementMaterials(inventory,oneCraft ? 1 : getMinimalAmount(recipe,input));
+        if (recipe.getTag().equals(Tag.NORMAL)) InventoryUtil.decrementMaterialsForNormalRecipe(inventory, input, recipe);
+        else InventoryUtil.decrementMaterials(inventory,oneCraft ? 1 : getMinimalAmount(recipe,input));
 
     }
 

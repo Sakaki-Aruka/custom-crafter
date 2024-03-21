@@ -115,8 +115,8 @@ public class Recipe {
 
     public List<Coordinate> getCoordinateNoAir() {
         List<Coordinate> list = new ArrayList<>();
-        coordinate.entrySet().forEach(s -> {
-            if (!s.getValue().getCandidate().get(0).equals(Material.AIR)) list.add(s.getKey());
+        coordinate.forEach((k, v) -> {
+            if (!v.getCandidate().get(0).equals(Material.AIR)) list.add(k);
         });
         return list;
     }
