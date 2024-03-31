@@ -1063,7 +1063,7 @@ public class ContainerUtil {
         // PotionEffectCategory: beneficial, harmful, neutral
         // can use "!" that means ignore
 
-        // e.g. value: random[self]->random[!self]:[amplifier=10,duration=200,ambient,icon,particles]
+        // e.g. value: random[self]->random[all,!self]:[amplifier=10,duration=200,ambient,icon,particles]
         // -> result effect is amplifier = 10, duration = 200 ticks, ambient, icon, particles
         // (need "amplifier"(alias "a") and "duration"(alias "d"))
         // can use random[:] in amplifier, duration. and can use random[] in ambient, icon and particles.
@@ -1158,7 +1158,7 @@ public class ContainerUtil {
                 : CalcUtil.getRandomNumber(a.group(2), 0, 255);
         int duration = d.group(2).matches("-?[0-9]+")
                 ? Integer.parseInt(d.group(2))
-                : CalcUtil.getRandomNumber(d.group(2), 1, 60 * 60); // 60 * 60 ticks = 1 hour
+                : CalcUtil.getRandomNumber(d.group(2), -1, Integer.MAX_VALUE / 20);
 
         PotionEffect effect = type.createEffect(duration == - 1 ? -1 : duration * 20, amplifier);
         for (String element : formula.split(",")) {
@@ -1200,8 +1200,8 @@ public class ContainerUtil {
             else if (element.equalsIgnoreCase("!beneficial")) candidate.removeAll(getAllBeneficialEffects());
             else if (element.equalsIgnoreCase("harmful")) candidate.addAll(getAllHarmfulEffects());
             else if (element.equalsIgnoreCase("!harmful")) candidate.removeAll(getAllHarmfulEffects());
-            else if (element.equalsIgnoreCase("neural")) candidate.addAll(getAllNeuralEffects());
-            else if (element.equalsIgnoreCase("!neural")) candidate.removeAll(getAllNeuralEffects());
+            else if (element.equalsIgnoreCase("neutral")) candidate.addAll(getAllNeuralEffects());
+            else if (element.equalsIgnoreCase("!neutral")) candidate.removeAll(getAllNeuralEffects());
             else if (element.matches(getAllPotionEffectsRegexPattern())) candidate.add(Registry.POTION_EFFECT_TYPE.get(NamespacedKey.minecraft(element.toLowerCase())));
             else if (element.equalsIgnoreCase("ambient")) candidate.addAll(getAllAmbientEffects(contained));
             else if (element.equalsIgnoreCase("!ambient")) candidate.removeAll(getAllAmbientEffects(contained));
@@ -1284,8 +1284,8 @@ public class ContainerUtil {
         // when detect illegal or invalid actions, this method returns the map that named "contained" contained in arguments.
         formula = CalcUtil.getContent(data, formula);
         final String FORMULA_PATTERN = "type=(enchant|level),action=([a-zA-Z_\\[\\](),!]+)->(.+)";
-        final String TARGET_PATTERN = "[a-zA-Z_]+|random(\\[!?\\([A-Za-z_,]+\\)])?";
-        final String RANDOM_TARGET_PATTERN = "random(\\[!?\\([A-Za-z_,]+\\)])?";
+        final String TARGET_PATTERN = "[a-zA-Z_]+|random(\\[[!A-Za-z_,]+])?";
+        final String RANDOM_TARGET_PATTERN = "random(\\[[!A-Za-z_,]+])?";
         final String RANDOM_NUMBER_PATTERN = "[0-9]+|random(\\[([0-9-]+)?:([0-9-]+)?])?";
         Matcher parsed = Pattern.compile(FORMULA_PATTERN).matcher(formula);
         if (!parsed.matches()) {

@@ -128,7 +128,7 @@ public class RandomUtil {
     }
 
     public static float getRandomFloat(String formula, float min, float max) {
-        // random[10.1:10.5:0.1]
+        // random[10.1:10.5]
         if (max < min) {
             float temp = max;
             max = min;
