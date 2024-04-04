@@ -1139,6 +1139,9 @@ public class ContainerUtil {
             if (temporary == null) return;
             if (!base.equals(temporary.getType())) contained.remove(getSpecifiedPotionEffectIndex(contained, base));
             contained.add(temporary);
+        } else if (toNone) {
+            // remove from contained
+            contained.removeIf(e -> e.getType().equals(base));
         }
     }
 
