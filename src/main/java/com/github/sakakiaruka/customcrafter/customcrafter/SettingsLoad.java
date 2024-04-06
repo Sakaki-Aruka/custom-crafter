@@ -415,6 +415,7 @@ public class SettingsLoad {
             FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
 
             String name = config.getString("name");
+            Bukkit.getLogger().info("Now loading (Recipe Name): " + name);
             String tag = config.getString("tag").toUpperCase();
             Result result = RESULTS.getOrDefault(config.getString("result"), PASS_THROUGH_RESULT);
 

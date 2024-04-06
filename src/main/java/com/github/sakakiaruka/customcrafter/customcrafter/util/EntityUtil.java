@@ -439,7 +439,7 @@ public class EntityUtil {
         if (!parsed.matches()) return;
         if (parsed.group(2) != null && !Boolean.parseBoolean(parsed.group(2))) return;
         Entity passenger = DEFINED_ENTITIES.get(data.get(parsed.group(3)));
-        if (!(base instanceof Mob) || !(passenger instanceof Mob)) return;
+        if (passenger == null) return;
         base.addPassenger(passenger);
     };
 
