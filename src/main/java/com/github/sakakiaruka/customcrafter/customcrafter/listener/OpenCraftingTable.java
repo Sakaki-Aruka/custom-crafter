@@ -39,15 +39,9 @@ public class OpenCraftingTable implements Listener {
             }
         }
 
-        //open crafting inventory (delay 2ticks = 0.10s)
-        new BukkitRunnable(){
-            @Override
-            public void run(){
-                event.getPlayer().openInventory(setCraftingInventory());
-                opening.add(event.getPlayer());
-            }
-        }.runTaskLater(getInstance(),2);
-
+        event.setCancelled(true);
+        event.getPlayer().openInventory(setCraftingInventory());
+        opening.add(event.getPlayer());
     }
 
     public Inventory setCraftingInventory(){

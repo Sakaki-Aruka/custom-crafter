@@ -20,17 +20,12 @@ import org.bukkit.FireworkEffect;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
-import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Pose;
 import org.bukkit.entity.TropicalFish;
-import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
@@ -45,7 +40,6 @@ import org.bukkit.inventory.meta.LeatherArmorMeta;
 import org.bukkit.inventory.meta.PotionMeta;
 import org.bukkit.inventory.meta.Repairable;
 import org.bukkit.inventory.meta.SkullMeta;
-import org.bukkit.inventory.meta.SpawnEggMeta;
 import org.bukkit.inventory.meta.SuspiciousStewMeta;
 import org.bukkit.inventory.meta.TropicalFishBucketMeta;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -262,7 +256,7 @@ public class ContainerUtil {
         Bukkit.getLogger().warning(String.format("%s===%s[Custom Crafter] No such %s. (%s)%s===", SettingsLoad.LINE_SEPARATOR,SettingsLoad.LINE_SEPARATOR, type, source, SettingsLoad.LINE_SEPARATOR));
     }
 
-    private static void sendOrdinalWarn(String warn) {
+    public static void sendOrdinalWarn(String warn) {
         Bukkit.getLogger().warning(String.format("%s===%s[Custom Crafter] %s%s===", SettingsLoad.LINE_SEPARATOR, SettingsLoad.LINE_SEPARATOR, warn, SettingsLoad.LINE_SEPARATOR));
     }
 
@@ -1069,7 +1063,7 @@ public class ContainerUtil {
         // PotionEffectCategory: beneficial, harmful, neutral
         // can use "!" that means ignore
 
-        // e.g. value: random[self]->random[!self]:[amplifier=10,duration=200,ambient,icon,particles]
+        // e.g. value: random[self]->random[all,!self]:[amplifier=10,duration=200,ambient,icon,particles]
         // -> result effect is amplifier = 10, duration = 200 ticks, ambient, icon, particles
         // (need "amplifier"(alias "a") and "duration"(alias "d"))
         // can use random[:] in amplifier, duration. and can use random[] in ambient, icon and particles.
@@ -1145,6 +1139,9 @@ public class ContainerUtil {
             if (temporary == null) return;
             if (!base.equals(temporary.getType())) contained.remove(getSpecifiedPotionEffectIndex(contained, base));
             contained.add(temporary);
+        } else if (toNone) {
+            // remove from contained
+            contained.removeIf(e -> e.getType().equals(base));
         }
     }
 
@@ -1164,7 +1161,7 @@ public class ContainerUtil {
                 : CalcUtil.getRandomNumber(a.group(2), 0, 255);
         int duration = d.group(2).matches("-?[0-9]+")
                 ? Integer.parseInt(d.group(2))
-                : CalcUtil.getRandomNumber(d.group(2), 1, 60 * 60); // 60 * 60 ticks = 1 hour
+                : CalcUtil.getRandomNumber(d.group(2), -1, Integer.MAX_VALUE / 20);
 
         PotionEffect effect = type.createEffect(duration == - 1 ? -1 : duration * 20, amplifier);
         for (String element : formula.split(",")) {
@@ -1206,8 +1203,8 @@ public class ContainerUtil {
             else if (element.equalsIgnoreCase("!beneficial")) candidate.removeAll(getAllBeneficialEffects());
             else if (element.equalsIgnoreCase("harmful")) candidate.addAll(getAllHarmfulEffects());
             else if (element.equalsIgnoreCase("!harmful")) candidate.removeAll(getAllHarmfulEffects());
-            else if (element.equalsIgnoreCase("neural")) candidate.addAll(getAllNeuralEffects());
-            else if (element.equalsIgnoreCase("!neural")) candidate.removeAll(getAllNeuralEffects());
+            else if (element.equalsIgnoreCase("neutral")) candidate.addAll(getAllNeuralEffects());
+            else if (element.equalsIgnoreCase("!neutral")) candidate.removeAll(getAllNeuralEffects());
             else if (element.matches(getAllPotionEffectsRegexPattern())) candidate.add(Registry.POTION_EFFECT_TYPE.get(NamespacedKey.minecraft(element.toLowerCase())));
             else if (element.equalsIgnoreCase("ambient")) candidate.addAll(getAllAmbientEffects(contained));
             else if (element.equalsIgnoreCase("!ambient")) candidate.removeAll(getAllAmbientEffects(contained));
@@ -1290,8 +1287,8 @@ public class ContainerUtil {
         // when detect illegal or invalid actions, this method returns the map that named "contained" contained in arguments.
         formula = CalcUtil.getContent(data, formula);
         final String FORMULA_PATTERN = "type=(enchant|level),action=([a-zA-Z_\\[\\](),!]+)->(.+)";
-        final String TARGET_PATTERN = "[a-zA-Z_]+|random(\\[!?\\([A-Za-z_,]+\\)])?";
-        final String RANDOM_TARGET_PATTERN = "random(\\[!?\\([A-Za-z_,]+\\)])?";
+        final String TARGET_PATTERN = "[a-zA-Z_]+|random(\\[[!A-Za-z_,]+])?";
+        final String RANDOM_TARGET_PATTERN = "random(\\[[!A-Za-z_,]+])?";
         final String RANDOM_NUMBER_PATTERN = "[0-9]+|random(\\[([0-9-]+)?:([0-9-]+)?])?";
         Matcher parsed = Pattern.compile(FORMULA_PATTERN).matcher(formula);
         if (!parsed.matches()) {
@@ -1308,13 +1305,13 @@ public class ContainerUtil {
         boolean isRandomTarget = parsed.group(2).matches(RANDOM_TARGET_PATTERN);
         Enchantment target;
 
-        if (isRandomTarget) target = getRandomEnchantment(contained.keySet(), parsed.group(2));
+        if (isRandomTarget) target = EnchantUtil.getRandomEnchantment(contained.keySet(), parsed.group(2));
         else target = Registry.ENCHANTMENT.get(NamespacedKey.minecraft(parsed.group(2).toLowerCase()));
-
-        if (target == null) {
-            sendNoSuchTemplateWarn("enchant element", parsed.group(2));
-            return contained;
-        }
+//
+//        if (target == null) {
+//            sendNoSuchTemplateWarn("enchant element", parsed.group(2));
+//            return contained;
+//        }
 
         data.put("$CURRENT_ENCHANT_LEVEL$", contained.containsKey(target)
                 ? String.valueOf(contained.get(target))
@@ -1324,7 +1321,7 @@ public class ContainerUtil {
         removeCurrentVariables(data);
         Matcher reMatch = Pattern.compile(FORMULA_PATTERN).matcher(formula);
         if (!reMatch.matches()) return contained;
-        boolean toNone = reMatch.group(3).equalsIgnoreCase("None");
+        boolean toNone = reMatch.group(3).equalsIgnoreCase("None") || target == null;
         boolean toNumeric = reMatch.group(3).matches(RANDOM_NUMBER_PATTERN);
 
         if (toNone) contained.remove(target);
@@ -1348,7 +1345,7 @@ public class ContainerUtil {
                 contained.remove(target);
                 contained.put(Registry.ENCHANTMENT.get(NamespacedKey.minecraft(reMatch.group(3).toLowerCase())), level);
             } else {
-                Enchantment destination = getRandomEnchantment(contained.keySet(), reMatch.group(3));
+                Enchantment destination = EnchantUtil.getRandomEnchantment(contained.keySet(), reMatch.group(3));
                 if (destination == null) contained.remove(target);
                 else {
                     int level = contained.get(target);
@@ -1369,14 +1366,14 @@ public class ContainerUtil {
         // e.g. type: enchant_book, value: type=enchant,action=fortune->None (remove fortune)
         // e.g. type: enchant_book, value: type=enchant,action=fortune->mending (fortune to mending)
 
-        // e.g. type: enchant_book, value: type=enchant,action=random->random[!(fortune,smite,looting)] (random(contained) to random(without fortune, smite, looting))
-        // e.g. type: enchant_book, value: type=enchant,action=random->random[(fortune, smite, looting)] (random(contained) to random(from fortune, smite, looting))
+        // e.g. type: enchant_book, value: type=enchant,action=random->random[!fortune,!smite,!looting] (random(contained) to random(without fortune, smite, looting))
+        // e.g. type: enchant_book, value: type=enchant,action=random->random[fortune,smite,looting] (random(contained) to random(from fortune, smite, looting))
 
-        // e.g. type: enchant_book, value: type=enchant,action=random[(fortune,smite)]->random (random(fortune or smite) to random(without fortune, smite))
-        // e.g. type: enchant_book, value: type=enchant,action=random[(fortune,smite)]->random[(fortune,smite,looting,None)] (random(fortune or smite) to random(fortune, smite, looting) or remove)
-        // e.g. type: enchant_book, value: type=enchant,action=random[(!self)]->fortune (random (all, but does not contain self) to fortune)
-        // e.g. type: enchant_book, value: type=enchant,action=random[(self)]->random[!(self,fortune)] (random(contained) to random(without contained and fortune))
-        // e.g. type: enchant_book, value: type=enchant,action=random[(all)]->fortune (random (all) to fortune)
+        // e.g. type: enchant_book, value: type=enchant,action=random[fortune,smite]->random[all,!self] (random(fortune or smite) to random(without fortune, smite))
+        // e.g. type: enchant_book, value: type=enchant,action=random[fortune,smite]->random[fortune,smite,looting,None] (random(fortune or smite) to random(fortune, smite, looting) or remove)
+        // e.g. type: enchant_book, value: type=enchant,action=random[!self]->fortune (random (all, but does not contain self) to fortune)
+        // e.g. type: enchant_book, value: type=enchant,action=random[self]->random[all,!self,!fortune] (random(contained) to random(without contained and fortune))
+        // e.g. type: enchant_book, value: type=enchant,action=random[all]->random[:10] (add a random enchantment whose level is random (1 ~ 10))
 
         // -------------------------------------------------------------------------------------------------------------
 
@@ -1396,50 +1393,6 @@ public class ContainerUtil {
         enchantInternal(contained, formula, data).forEach((k, v) -> meta.addStoredEnchant(k, v, true));
         item.setItemMeta(meta);
     };
-
-    private static Enchantment getRandomEnchantment(Set<Enchantment> enchants, String formula) {
-        // e.g. random[!(self)] (from all, but does not contain self)
-        // e.g. random[(all)] (from all)
-        // e.g. random[(fortune,lure,looting)] (from these 3)
-        // e.g. random[!(fortune,lure,looting)] (from all that does not contain these 3)
-
-        final String pattern = "random(\\[!?\\([A-Za-z,_]+\\)])?";
-        Matcher parsed = Pattern.compile(pattern).matcher(formula);
-        if (!parsed.matches()) {
-            return null;
-        }
-
-        Set<Enchantment> all = Registry.ENCHANTMENT.stream().collect(Collectors.toSet());
-        String element = parsed.group(1).replaceAll("[()\\[\\]]", "");
-        Set<String> enc = new HashSet<>(Arrays.asList(element.replace("!", "").toLowerCase().split(",")));
-        if (element.startsWith("!")) {
-            // without
-            Set<Enchantment> remove = new HashSet<>();
-            enc.forEach(s -> {
-                switch (s) {
-                    case "none" -> remove.add(null);
-                    case "self" -> remove.addAll(enchants); // !self
-                    case "all" -> remove.addAll(all);
-                    default -> remove.add(Registry.ENCHANTMENT.get(NamespacedKey.minecraft(s)));
-                }
-            });
-            all.removeAll(remove);
-            if (all.isEmpty()) return null;
-            return new ArrayList<>(all).get(new Random().nextInt(all.size()));
-        }
-
-        Set<Enchantment> set = new HashSet<>();
-        enc.forEach(s -> {
-            switch (s) {
-                case "none" -> set.add(null);
-                case "self" -> set.addAll(enchants); // self
-                case "all" -> set.addAll(all); // all
-                default -> set.add(Registry.ENCHANTMENT.get(NamespacedKey.minecraft(s)));
-            }
-        });
-        if (!enc.contains("none")) set.remove(null);
-        return new ArrayList<>(set).get(new Random().nextInt(set.size()));
-    }
 
     public static final TriConsumer<Map<String, String>, ItemStack, String> TROPICAL_FISH = (data, item, formula) -> {
         // type: tropical_fish, value: body_color=~~~,pattern=~~~,pattern_color=~~~
