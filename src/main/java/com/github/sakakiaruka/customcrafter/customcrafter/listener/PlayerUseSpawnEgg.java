@@ -36,16 +36,13 @@ public class PlayerUseSpawnEgg implements Listener {
         Block targetBlock = event.getClickedBlock();
         if (targetBlock == null || !targetBlock.getType().equals(Material.SPAWNER)) return;
         CreatureSpawner spawner = (CreatureSpawner) targetBlock.getState();
-
-        event.setCancelled(true);
-
         if (spawner.getSpawnedType() != null) {
+            event.setCancelled(true);
             player.sendMessage(Component.text("§c[Custom Crafter] You can not rewrite those. This spawner has been already written entity data."));
             return;
-        } else if (!consumed.getItemMeta().getPersistentDataContainer().has(EntityUtil.SPAWN_INFO_NK)) {
-            event.setCancelled(false);
-            return;
-        }
+        } else if (!consumed.getItemMeta().getPersistentDataContainer().has(EntityUtil.SPAWN_INFO_NK)) return;
+
+        event.setCancelled(true);
 
         String formula = consumed.getItemMeta().getPersistentDataContainer().get(EntityUtil.SPAWN_INFO_NK, PersistentDataType.STRING);
         if (formula == null || formula.isEmpty()) return;
