@@ -31,7 +31,7 @@ public class PlayerUseSpawnEgg implements Listener {
         if (event.isBlockInHand()) return;
         Player player = event.getPlayer();
         ItemStack consumed = player.getInventory().getItemInMainHand();
-        if (!consumed.getType().name().matches("(?i)([A-Z_0-9]+_SPAWN_EGG)")) return;
+        if (!consumed.getType().name().matches("[A-Z_0-9]+_SPAWN_EGG")) return;
 
         Block targetBlock = event.getClickedBlock();
         if (targetBlock == null || !targetBlock.getType().equals(Material.SPAWNER)) return;
