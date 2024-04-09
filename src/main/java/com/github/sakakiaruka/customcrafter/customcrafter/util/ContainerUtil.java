@@ -781,12 +781,12 @@ public class ContainerUtil {
 
         formula = CalcUtil.getContent(data, formula);
 
-        if (!item.getType().equals(Material.AIR) && item.getType().name().matches("[A-Z_0-9]+_SPAWN_EGG") && item.getItemMeta().getPersistentDataContainer().has(EntityUtil.SPAWN_EGG_INFO_KEY)) {
+        if (!item.getType().equals(Material.AIR) && item.getType().name().matches("[A-Z_0-9]+_SPAWN_EGG") && item.getItemMeta().getPersistentDataContainer().has(EntityUtil.SPAWN_INFO_NK)) {
             ItemMeta meta = item.getItemMeta();
-            String temp = meta.getPersistentDataContainer().get(EntityUtil.SPAWN_EGG_INFO_KEY, PersistentDataType.STRING);
+            String temp = meta.getPersistentDataContainer().get(EntityUtil.SPAWN_INFO_NK, PersistentDataType.STRING);
             String value = "__internal__:item_define=" + formula;
             temp += Objects.toString(temp, "").isEmpty() ? "" : "," + value.length() + ":" + value;
-            meta.getPersistentDataContainer().set(EntityUtil.SPAWN_EGG_INFO_KEY, PersistentDataType.STRING, temp);
+            meta.getPersistentDataContainer().set(EntityUtil.SPAWN_INFO_NK, PersistentDataType.STRING, temp);
             item.setItemMeta(meta);
             return;
         }
