@@ -29,12 +29,11 @@ public class PlayerUseSpawnEgg implements Listener {
     public void onPlayerUseSpawnEgg(PlayerInteractEvent event) {
         if (!event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) return;
         if (event.isBlockInHand()) return;
-        EquipmentSlot slot = event.getHand();
         Player player = event.getPlayer();
-        ItemStack consumed = player.getInventory().getItem(Objects.requireNonNull(slot));
+        ItemStack consumed = player.getInventory().getItemInMainHand();
         if (!consumed.getType().name().matches("(?i)([A-Z_0-9]+_SPAWN_EGG)")) return;
 
-        Block targetBlock = player.getTargetBlockExact(5, FluidCollisionMode.ALWAYS);
+        Block targetBlock = event.getClickedBlock();
         if (targetBlock == null || !targetBlock.getType().equals(Material.SPAWNER)) return;
         CreatureSpawner spawner = (CreatureSpawner) targetBlock.getState();
 
