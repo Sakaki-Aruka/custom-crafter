@@ -55,7 +55,7 @@ import java.util.stream.Collectors;
 public class EntityUtil {
     // name must be use only "a-zA-Z0-9_-"
     public static Map<String, Entity> DEFINED_ENTITIES = new HashMap<>();
-    public static final NamespacedKey SPAWN_EGG_INFO_KEY = new NamespacedKey(CustomCrafter.getInstance(), "spawn_info");
+    public static final NamespacedKey SPAWN_INFO_NK = new NamespacedKey(CustomCrafter.getInstance(), "spawn_info");
     public static final String SPAWNER_INFO_KEY = "spawn_info";
     public static final String ONLY_INFO_SETUP = "ONLY_INFO_SETUP";
     public static final String FROM_SPAWNER_ANCHOR = "from_spawner_anchor";
@@ -80,7 +80,7 @@ public class EntityUtil {
         ItemMeta meta = item.getItemMeta();
         PersistentDataContainer container = meta.getPersistentDataContainer();
         String name = parsed.group(1);
-        StringBuilder builder = new StringBuilder(container.has(SPAWN_EGG_INFO_KEY) ? container.get(SPAWN_EGG_INFO_KEY, PersistentDataType.STRING) + "," : "");
+        StringBuilder builder = new StringBuilder(container.has(SPAWN_INFO_NK) ? container.get(SPAWN_INFO_NK, PersistentDataType.STRING) + "," : "");
         StringBuilder buffer = new StringBuilder();
         for (int i = 0; i < parsed.group(2).length(); i++) {
             char c = parsed.group(2).charAt(i);
@@ -111,7 +111,7 @@ public class EntityUtil {
                     .append(":")
                     .append(buffer);
         }
-        container.set(SPAWN_EGG_INFO_KEY, PersistentDataType.STRING, builder.toString());
+        container.set(SPAWN_INFO_NK, PersistentDataType.STRING, builder.toString());
         item.setItemMeta(meta);
     };
 
@@ -119,7 +119,7 @@ public class EntityUtil {
         // type: spawn_egg, value: name:v1-length:v1,v2-length:v2
         if (!(item.getItemMeta() instanceof SpawnEggMeta)) return;
         SpawnEggMeta meta = (SpawnEggMeta) item.getItemMeta();
-        meta.getPersistentDataContainer().set(SPAWN_EGG_INFO_KEY, PersistentDataType.STRING, "");
+        meta.getPersistentDataContainer().set(SPAWN_INFO_NK, PersistentDataType.STRING, "");
         item.setItemMeta(meta);
         ENTITY_DEFINE.accept(data, item, formula);
         //meta.getPersistentDataContainer().set(SPAWN_EGG_INFO_KEY, PersistentDataType.STRING, CalcUtil.getContent(data, formula));
@@ -264,7 +264,7 @@ public class EntityUtil {
                     int maxSky = CalcUtil.getRandomNumber(data.get(maxSkyKey), Math.max(minSky, MIN_LIGHT_LEVEL), MAX_LIGHT_LEVEL);
                     SpawnRule rule = new SpawnRule(minBlock, maxBlock, minSky, maxSky);
                     int weight = CalcUtil.getRandomNumber(numSource, 1, MAX_SPAWN_WEIGHT);
-                    spawner.setPotentialSpawns(Set.of(new SpawnerEntry(base.createSnapshot(), weight, rule)));
+                    spawner.addPotentialSpawn(new SpawnerEntry(base.createSnapshot(), weight, rule));
 
                     Bukkit.getLogger().info(
                             "Spawner Setup done." + SettingsLoad.LINE_SEPARATOR +
@@ -277,7 +277,8 @@ public class EntityUtil {
                     );
                 }
                 case "rough_control" -> {
-                    spawner.setSpawnedEntity(base.createSnapshot());
+                    int weight = Integer.parseInt(numSource);
+                    spawner.addPotentialSpawn(base.createSnapshot(), weight, null);
                     spawner.removeMetadata(SPAWNER_INFO_KEY, CustomCrafter.getInstance());
                 }
             }
