@@ -30,11 +30,6 @@ public class Listener implements org.bukkit.event.Listener {
     }
 
     @EventHandler
-    public void onEntitySpawn(EntitySpawnEvent event) {
-        new MobSpawn().onEntitySpawn(event);
-    }
-
-    @EventHandler
     public void onPlayerConsumeItem(PlayerInteractEvent event) {
         new PlayerUseSpawnEgg().onPlayerUseSpawnEgg(event);
     }

@@ -76,7 +76,8 @@ public class Search {
 
             if (judge == 0) continue;
             result = recipe;
-            massAmount = getMinimalAmount(result, input);
+            //massAmount = getMinimalAmount(result, input);
+            massAmount = input.getMinimalAmount();
 
             break;
         }
@@ -94,10 +95,7 @@ public class Search {
     }
 
     private static boolean containsMoreThanOneAmountMatter(Recipe recipe) {
-        for (Matter m : recipe.getContentsNoAir()) {
-            if (1 < m.getAmount()) return true;
-        }
-        return false;
+        return recipe.getContentsNoAir().stream().anyMatch(e -> 1 < e.getAmount());
     }
 
     private boolean isMatchNormal(List<ItemStack> interestedItems,Recipe recipe, Recipe input) {
@@ -302,8 +300,8 @@ public class Search {
             }
         }
 
-        if (recipe.getTag().equals(Tag.NORMAL)) InventoryUtil.decrementMaterialsForNormalRecipe(inventory, input, recipe);
-        else InventoryUtil.decrementMaterials(inventory,oneCraft ? 1 : getMinimalAmount(recipe,input));
+        if (recipe.getTag().equals(Tag.NORMAL)) InventoryUtil.decrementMaterialsForNormalRecipe(inventory, input, recipe, amount);
+        else InventoryUtil.decrementMaterials(inventory, oneCraft ? 1 : amount); // debug; amount, real; input.getMinimalAmount()l
 
     }
 

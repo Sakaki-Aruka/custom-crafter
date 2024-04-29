@@ -220,4 +220,13 @@ public class Recipe {
         return list;
     }
 
+    public int getMinimalAmount() {
+        int result = 128;
+        for (Matter matter : this.getContentsNoAir()) {
+            int amount = matter.getAmount();
+            if (amount < result) result = amount;
+        }
+        return result;
+    }
+
 }
