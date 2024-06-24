@@ -181,6 +181,10 @@ public class EntityUtil {
             }
             if (!DEFINED_ENTITIES.containsKey(key) && !name.equals("__internal__")) continue;
             Entity defined = DEFINED_ENTITIES.get(key);
+
+            //debug
+            System.out.println("action=" + action);
+
             if (type.equalsIgnoreCase("add_passenger")) ADD_PASSENGER.accept(action, data, defined);
             else if (type.equalsIgnoreCase("set_armor")) SET_ARMOR.accept(action, data, defined);
             else if (type.equalsIgnoreCase("set_drop_chance")) SET_DROP_CHANCE.accept(action, data, defined);
@@ -221,6 +225,10 @@ public class EntityUtil {
     };
 
     public static final TriConsumer<String, Map<String, String>, Entity> SET_VARIOUS_SPAWNER_VALUE = (formula, data, base) -> {
+
+        //debug
+        System.out.println("set various spawner value");
+
         if (!data.containsKey(ONLY_INFO_SETUP)) return;
         final String pattern = "((delay|max_nearby_entities|max_spawn_delay|min_spawn_delay|spawn_range|spawn_count|req_player_range|spawn_weight|max_block_light|min_block_light|max_sky_light|min_sky_light|rough_control):([0-9]+|random\\[([0-9-]+)?:([0-9-]+)?]);)+";
         final String singlePattern = "(delay|max_nearby_entities|max_spawn_delay|min_spawn_delay|spawn_range|spawn_count|req_player_range|spawn_weight|max_block_light|min_block_light|max_sky_light|min_sky_light|rough_control):([0-9]+|random\\[([0-9-]+)?:([0-9-]+)?])";
