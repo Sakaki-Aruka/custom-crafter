@@ -29,10 +29,6 @@ public class Listener implements org.bukkit.event.Listener {
         new OpenCraftingTable().onPlayerInteract(event);
     }
 
-    @EventHandler
-    public void onEntitySpawn(EntitySpawnEvent event) {
-        new MobSpawn().onEntitySpawn(event);
-    }
 
     @EventHandler
     public void onPlayerConsumeItem(PlayerInteractEvent event) {

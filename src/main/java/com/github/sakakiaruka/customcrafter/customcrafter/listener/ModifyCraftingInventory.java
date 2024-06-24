@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -23,12 +24,11 @@ public class ModifyCraftingInventory implements Listener {
 
 
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onInventoryClick(InventoryClickEvent event){
         Player player = Bukkit.getPlayer(event.getWhoClicked().getUniqueId());
 
-        if (player == null) return;
-        if (!opening.contains(player)) return;
+        if (player == null || !opening.contains(player) || event.isCancelled()) return;
 
         int slot = event.getRawSlot();
         if (slot < 0){

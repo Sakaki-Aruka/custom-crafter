@@ -9,7 +9,9 @@ import org.bukkit.block.CreatureSpawner;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.FallingBlock;
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -21,10 +23,11 @@ import java.util.Map;
 import java.util.Objects;
 
 public class PlayerUseSpawnEgg implements Listener {
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onPlayerUseSpawnEgg(PlayerInteractEvent event) {
         if (!event.getAction().equals(Action.RIGHT_CLICK_BLOCK)) return;
         if (event.isBlockInHand()) return;
+        if (event.useItemInHand().equals(Event.Result.DENY) || event.useInteractedBlock().equals(Event.Result.DENY)) return;
         Player player = event.getPlayer();
         ItemStack consumed = player.getInventory().getItemInMainHand();
         if (!consumed.getType().name().matches("[A-Z_0-9]+_SPAWN_EGG")) return;
