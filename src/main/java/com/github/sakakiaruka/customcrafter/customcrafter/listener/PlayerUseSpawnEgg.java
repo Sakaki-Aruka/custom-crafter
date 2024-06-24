@@ -1,6 +1,5 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.listener;
 
-import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.EntityUtil;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
@@ -15,7 +14,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.HashMap;
@@ -48,9 +46,6 @@ public class PlayerUseSpawnEgg implements Listener {
             return;
         }
 
-        //debug
-        System.out.println("spawn egg info=" + formula);
-
         event.setCancelled(true);
         CreatureSpawner spawner = (CreatureSpawner) targetBlock.getState();
         if (spawner.getSpawnedType() != null) {
@@ -62,12 +57,6 @@ public class PlayerUseSpawnEgg implements Listener {
 
         spawner.getPersistentDataContainer().set(EntityUtil.SPAWN_INFO_NK, PersistentDataType.STRING, formula);
         spawner.getPersistentDataContainer().set(EntityUtil.ONLY_INFO_SETUP_NK, PersistentDataType.STRING, "");
-
-        //debug
-        System.out.println("registered=" + spawner.getPersistentDataContainer().get(EntityUtil.SPAWN_INFO_NK, PersistentDataType.STRING));
-
-//        targetBlock.setMetadata(EntityUtil.SPAWNER_INFO_KEY, new FixedMetadataValue(CustomCrafter.getInstance(), formula));
-//        targetBlock.setMetadata(EntityUtil.ONLY_INFO_SETUP, new FixedMetadataValue(CustomCrafter.getInstance(), ""));
 
         FallingBlock fallingBlock = (FallingBlock) targetBlock.getWorld().spawn(targetBlock.getLocation(), Objects.requireNonNull(EntityType.FALLING_BLOCK.getEntityClass()));
         BlockState pseudoState = fallingBlock.getBlockState().copy();

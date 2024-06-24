@@ -1,10 +1,8 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.listener;
 
-import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.EntityUtil;
 import org.bukkit.Location;
 import org.bukkit.block.CreatureSpawner;
-import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
@@ -12,7 +10,6 @@ import org.bukkit.persistence.PersistentDataType;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 public class SpawnerSpawn implements Listener {
     @EventHandler
@@ -30,12 +27,8 @@ public class SpawnerSpawn implements Listener {
         if (spawner.getPersistentDataContainer().has(EntityUtil.ONLY_INFO_SETUP_NK)) { //if (spawner.hasMetadata(EntityUtil.ONLY_INFO_SETUP)) {
             data.put(EntityUtil.ONLY_INFO_SETUP, "");
             spawner.getPersistentDataContainer().remove(EntityUtil.ONLY_INFO_SETUP_NK);
-            //spawner.removeMetadata(EntityUtil.ONLY_INFO_SETUP, CustomCrafter.getInstance());
         }
         EntityUtil.spawn(data, spawner.getPersistentDataContainer().get(EntityUtil.SPAWN_INFO_NK, PersistentDataType.STRING));
-        //spawner.getMetadata(EntityUtil.SPAWNER_INFO_KEY).forEach(e -> EntityUtil.spawn(data, e.asString()));
 
-        //debug
-        System.out.println("data=" + data);
     }
 }
