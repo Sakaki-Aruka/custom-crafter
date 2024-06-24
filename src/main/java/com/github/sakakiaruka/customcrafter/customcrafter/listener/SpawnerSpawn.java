@@ -4,6 +4,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.util.EntityUtil;
 import org.bukkit.Location;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.persistence.PersistentDataType;
@@ -12,10 +13,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class SpawnerSpawn implements Listener {
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST)
     public void onSpawnerSpawn(SpawnerSpawnEvent event) {
         CreatureSpawner spawner = event.getSpawner();
-        if (spawner == null || !spawner.getPersistentDataContainer().has(EntityUtil.SPAWN_INFO_NK)) return;
+        if (spawner == null || !spawner.getPersistentDataContainer().has(EntityUtil.SPAWN_INFO_NK) || event.isCancelled()) return;
         event.setCancelled(true);
         Map<String, String> data = new HashMap<>();
         Location location = spawner.getLocation();
