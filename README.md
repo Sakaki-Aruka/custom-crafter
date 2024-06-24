@@ -4,11 +4,39 @@ custom crafter is a plugin for minecraft servers (Spigot and Paper) that provide
 ---
 
 # Recommended environment
-- Paper (above 1.19.2)
-- ~~Spigot (above 1.19.2)~~ (Deprecated from `pdc_fix` branch.)
+- Paper (above 1.20.4)
 
-Tested in Paper 1.20.2.  
-This plugin does not work in the server whose version is less than 1.19.2 ver.
+Tested in Paper 1.20.4.  
+
+---
+
+# Recipe Sample
+This recipe is provided by two files. 
+
+[Screencast from 2024-06-21 02-42-34.webm](https://github.com/Sakaki-Aruka/custom-crafter/assets/99568054/4dc6149a-4d31-41ae-849f-9b82ba725f04)
+
+<details><summary>Recipe files</summary>
+<div>
+
+```yaml
+name: multi_stair
+amount: 1
+candidate: ["R|[A-Z_]+_STAIRS"]
+mass: false
+```
+
+```yaml
+name: saddle_recipe
+tag: normal
+result: SADDLE
+override:
+  - LEATHER -> L
+coordinate:
+  - L,null,L
+  - L,multi_stair,L
+  - L,L,L
+```
+</div></details>
 
 ---
 
@@ -50,7 +78,7 @@ SOFTWARE.
 
 ---
 
-# Getting Start
+# Getting Started
 1. Install
    1. [Download from here.(GitHub release page)](https://github.com/Sakaki-Aruka/custom-crafter/releases/latest)
    2. Place the downloaded file to plugins directory. 
