@@ -60,6 +60,9 @@ public class EntityUtil {
     public static final String ONLY_INFO_SETUP = "ONLY_INFO_SETUP";
     public static final String FROM_SPAWNER_ANCHOR = "from_spawner_anchor";
     public static final String FALLING_BLOCK_HAS_UNTRACKED_CHANGE_ANCHOR = "falling_block_has_untracked_change_anchor";
+
+    public static final NamespacedKey ONLY_INFO_SETUP_NK = new NamespacedKey(CustomCrafter.getInstance(), "only_info_setup");
+    public static final NamespacedKey FROM_SPAWNER_ANCHOR_NK = new NamespacedKey(CustomCrafter.getInstance(), "from_spawner_anchor");
     public static int MAX_NEARBY_ENTITIES = 1000;
     public static int MAX_SPAWN_RANGE = 100;
     public static int MAX_SPAWN_COUNT = 100;
@@ -279,7 +282,8 @@ public class EntityUtil {
                 case "rough_control" -> {
                     int weight = Integer.parseInt(numSource);
                     spawner.addPotentialSpawn(base.createSnapshot(), weight, null);
-                    spawner.removeMetadata(SPAWNER_INFO_KEY, CustomCrafter.getInstance());
+                    //spawner.removeMetadata(SPAWNER_INFO_KEY, CustomCrafter.getInstance());
+                    spawner.getPersistentDataContainer().remove(EntityUtil.SPAWN_INFO_NK);
                 }
             }
 

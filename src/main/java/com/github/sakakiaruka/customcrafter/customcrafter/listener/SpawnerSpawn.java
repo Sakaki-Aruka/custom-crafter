@@ -8,6 +8,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
+import org.bukkit.persistence.PersistentDataType;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,7 +18,7 @@ public class SpawnerSpawn implements Listener {
     @EventHandler
     public void onSpawnerSpawn(SpawnerSpawnEvent event) {
         CreatureSpawner spawner = event.getSpawner();
-        if (spawner == null || !spawner.hasMetadata(EntityUtil.SPAWNER_INFO_KEY)) return;
+        if (spawner == null || !spawner.getPersistentDataContainer().has(EntityUtil.SPAWN_INFO_NK)) return;
         event.setCancelled(true);
         Map<String, String> data = new HashMap<>();
         Location location = spawner.getLocation();
@@ -28,8 +29,10 @@ public class SpawnerSpawn implements Listener {
         data.put(EntityUtil.FROM_SPAWNER_ANCHOR, "");
         if (spawner.hasMetadata(EntityUtil.ONLY_INFO_SETUP)) {
             data.put(EntityUtil.ONLY_INFO_SETUP, "");
-            spawner.removeMetadata(EntityUtil.ONLY_INFO_SETUP, CustomCrafter.getInstance());
+            spawner.getPersistentDataContainer().remove(EntityUtil.ONLY_INFO_SETUP_NK);
+            //spawner.removeMetadata(EntityUtil.ONLY_INFO_SETUP, CustomCrafter.getInstance());
         }
-        spawner.getMetadata(EntityUtil.SPAWNER_INFO_KEY).forEach(e -> EntityUtil.spawn(data, e.asString()));
+        EntityUtil.spawn(data, spawner.getPersistentDataContainer().get(EntityUtil.SPAWN_INFO_NK, PersistentDataType.STRING));
+        //spawner.getMetadata(EntityUtil.SPAWNER_INFO_KEY).forEach(e -> EntityUtil.spawn(data, e.asString()));
     }
 }
