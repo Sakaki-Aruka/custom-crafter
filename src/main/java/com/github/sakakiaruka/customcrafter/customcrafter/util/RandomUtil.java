@@ -24,7 +24,7 @@ public class RandomUtil {
         if (!parsed.matches()) return Material.AIR;
         Set<Material> candidate = new HashSet<>();
 
-        for (String element : parsed.group(1).split(";")) {
+        for (String element : parsed.group(1).split(",")) {
             boolean isIgnore = element.startsWith("!");
             element = element.replace("!", "");
             if (element.equals("all")) {
