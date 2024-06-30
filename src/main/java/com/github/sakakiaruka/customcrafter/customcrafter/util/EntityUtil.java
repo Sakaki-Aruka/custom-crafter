@@ -335,7 +335,7 @@ public class EntityUtil {
     public static final TriConsumer<String, Map<String, String>, Entity> FALLING_TYPE = (formula, data, base) -> {
         // block:~~~
         if (!(base instanceof FallingBlock)) return;
-        final String pattern = "(predicate:(true|false);)?name:([a-zA-Z_0-9]+);block:([a-zA-Z_0-9\\[\\]!/]+)(;toBlock:(true|false))?(;dropItem:(true|false))?";
+        final String pattern = "(predicate:(true|false);)?name:([a-zA-Z_0-9]+);block:([a-zA-Z_0-9\\[\\]!/]+)(;toBlock:(true|false))?(;dropItem:(true|false))?(;max_damage:(default|[0-9]+\\.?[0-9]*))?(;damage_per_block:([0-9]+\\.?[0-9]*))?";
         addEntityAndWorldData(data, base);
         formula = CalcUtil.getContent(data, formula);
         Matcher parsed = Pattern.compile(pattern).matcher(formula);
@@ -344,6 +344,8 @@ public class EntityUtil {
         if (parsed.group(2) != null && parsed.group(2).equalsIgnoreCase("false")) return;
         boolean toBlock = parsed.group(6) != null && Boolean.parseBoolean(parsed.group(6));
         boolean dropItem = parsed.group(8) != null && Boolean.parseBoolean(parsed.group(8));
+        boolean setMaxDamage = parsed.group(10) != null;
+        boolean setDamagePerBlock = parsed.group(12) != null;
         Material material;
         try {
             if (parsed.group(4).startsWith("random")) {
@@ -364,6 +366,31 @@ public class EntityUtil {
         ((FallingBlock) base).setCancelDrop(!toBlock);
         ((FallingBlock) base).setDropItem(dropItem);
         ((FallingBlock) base).setBlockState(pseudoState);
+
+        if (setMaxDamage) {
+            int maxDamage;
+            try {
+                if (parsed.group(10).equalsIgnoreCase("default")) {
+                    ((FallingBlock) base).setHurtEntities(true);
+                } else {
+                    maxDamage = (int) Math.round(Double.parseDouble(parsed.group(10)));
+                    if (maxDamage >= 0) ((FallingBlock) base).setMaxDamage(maxDamage);
+                }
+            } catch (Exception e) {
+                CustomCrafter.getInstance().getLogger().warning("falling_type error: invalid number format or the damage out of the range.");
+            }
+        }
+
+        if (setDamagePerBlock) {
+            float damagePerBlock;
+            try {
+                damagePerBlock = Float.parseFloat(parsed.group(12));
+                if (damagePerBlock > 0f) ((FallingBlock) base).setDamagePerBlock(damagePerBlock);
+            } catch (Exception e) {
+                CustomCrafter.getInstance().getLogger().warning("falling_type error: invalid number format or the damage per block out of the range.");
+            }
+        }
+
         String key = data.get(UNIQUE_ID_KEY) + "." + name;
         DEFINED_ENTITIES.put(key, base);
         data.put(FALLING_BLOCK_HAS_UNTRACKED_CHANGE_ANCHOR, "");
