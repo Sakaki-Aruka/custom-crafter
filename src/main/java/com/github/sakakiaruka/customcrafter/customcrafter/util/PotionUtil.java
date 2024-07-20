@@ -219,9 +219,9 @@ public class PotionUtil {
                     }
                 }
 
-                Bukkit.getLogger().info(BAR);
-                Bukkit.getLogger().info("[Custom Crafter] Finished creating default potion files.");
-                Bukkit.getLogger().info(BAR);
+                CustomCrafter.getInstance().getLogger().info(BAR);
+                CustomCrafter.getInstance().getLogger().info("[Custom Crafter] Finished creating default potion files.");
+                CustomCrafter.getInstance().getLogger().info(BAR);
 
             }
         }.runTaskAsynchronously(getInstance());
