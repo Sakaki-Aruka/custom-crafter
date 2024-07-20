@@ -1,5 +1,6 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.command;
 
+import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Permission.RecipePermission;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil;
 import org.bukkit.Bukkit;
@@ -34,7 +35,7 @@ public class PermissionCheck {
         if (RecipePermissionUtil.hasPermission(permission,player)) return;
         if (!PLAYER_PERMISSIONS.containsKey(uuid)) PLAYER_PERMISSIONS.put(uuid,new HashSet<>());
         PLAYER_PERMISSIONS.get(uuid).add(permission);
-        Bukkit.getLogger().info(String.format("Permission added: %s  Permission: %s%s  Target: %s", LINE_SEPARATOR,permission.getPermissionName(), LINE_SEPARATOR,player.getName()));
+        CustomCrafter.getInstance().getLogger().info(String.format("Permission added: %s  Permission: %s%s  Target: %s", LINE_SEPARATOR,permission.getPermissionName(), LINE_SEPARATOR,player.getName()));
         displayPlayerPermissions(uuid,sender);
     }
 
@@ -44,7 +45,7 @@ public class PermissionCheck {
         UUID uuid = player.getUniqueId();
         if (!PLAYER_PERMISSIONS.containsKey(uuid)) return;
         RecipePermission permission = RECIPE_PERMISSION_MAP.get(perm);
-        Bukkit.getLogger().info(String.format("Permission removed: %s  Permission: %s%s  Target: %s", LINE_SEPARATOR,permission.getPermissionName(), LINE_SEPARATOR,player.getName()));
+        CustomCrafter.getInstance().getLogger().info(String.format("Permission removed: %s  Permission: %s%s  Target: %s", LINE_SEPARATOR,permission.getPermissionName(), LINE_SEPARATOR,player.getName()));
         PLAYER_PERMISSIONS.get(uuid).remove(permission);
         displayPlayerPermissions(uuid,sender);
     }
@@ -61,7 +62,7 @@ public class PermissionCheck {
         builder.append("=== RecipePermissions (The player has) ==="+ LINE_SEPARATOR);
         if(!PLAYER_PERMISSIONS.containsKey(uuid)) {
             builder.append(String.format("Target player has no permissions.%s", LINE_SEPARATOR));
-            Bukkit.getLogger().info(builder.toString());
+            CustomCrafter.getInstance().getLogger().info(builder.toString());
             return;
         }
 

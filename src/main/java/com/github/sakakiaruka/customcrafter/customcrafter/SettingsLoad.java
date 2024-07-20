@@ -142,7 +142,7 @@ public class SettingsLoad {
 
         new Processor().init();
 
-        Bukkit.getLogger().info("===Custom-Crafter data loaded.===");
+        CustomCrafter.getInstance().getLogger().info("===Custom-Crafter data loaded.===");
     }
 
     private void configFileDirectoryCheck(Path path){
@@ -158,10 +158,10 @@ public class SettingsLoad {
             }
 
             //dir.mkdir();
-            Bukkit.getLogger().info(String.format("Not found the directory \"%s\"."+ LINE_SEPARATOR +"So, the system made the directory named that.",path.toUri().toString()));
+            CustomCrafter.getInstance().getLogger().info(String.format("Not found the directory \"%s\"."+ LINE_SEPARATOR +"So, the system made the directory named that.",path.toUri().toString()));
         }else if(!path.toFile().isDirectory()){
-            Bukkit.getLogger().warning(String.format("The path \"%s\" is not a directory.",path.toUri().toString()));
-            Bukkit.getLogger().warning("You must fix this problem when before you use this plugin.");
+            CustomCrafter.getInstance().getLogger().warning(String.format("The path \"%s\" is not a directory.",path.toUri().toString()));
+            CustomCrafter.getInstance().getLogger().warning("You must fix this problem when before you use this plugin.");
 
             new BukkitRunnable(){
                 public void run(){
@@ -176,7 +176,7 @@ public class SettingsLoad {
         try {
             paths = Files.list(path);
         } catch (Exception e){
-            Bukkit.getLogger().warning("[CustomCrafter] Error: Cannot get files from "+path);
+            CustomCrafter.getInstance().getLogger().warning("Error: Cannot get files from "+path);
             return null;
         }
 
@@ -264,13 +264,13 @@ public class SettingsLoad {
                     // enchanted book
                     if(!candidate.isEmpty()){
                         //invalid pattern (candidate over only one)
-                        Bukkit.getLogger().info("[Custom Crafter] Matter load fail. - Candidate Quarrel -");
+                        CustomCrafter.getInstance().getLogger().info("[Custom Crafter] Matter load fail. - Candidate Quarrel -");
                         continue Top;
                     }
 
                     if(!config.contains("enchant") || config.getStringList("enchant").isEmpty()){
                         // invalid pattern (enchantments not contained -> identity lost)
-                        Bukkit.getLogger().info("[Custom Crafter] Matter load fail. - Identity Lost -");
+                        CustomCrafter.getInstance().getLogger().info("[Custom Crafter] Matter load fail. - Identity Lost -");
                         continue Top;
                     }
 
@@ -378,7 +378,7 @@ public class SettingsLoad {
         for(String str : config.getStringList("potion")){
             List<String> list = Arrays.asList(str.split(","));
             if(list.size() != 4) {
-                Bukkit.getLogger().warning("[Custom Crafter] Potion Configuration Parameter are not enough.");
+                CustomCrafter.getInstance().getLogger().warning("[Custom Crafter] Potion Configuration Parameter are not enough.");
                 return null;
             }
             PotionEffectType effectType = PotionEffectType.getByName(list.get(0).toUpperCase());
@@ -415,7 +415,7 @@ public class SettingsLoad {
             FileConfiguration config = YamlConfiguration.loadConfiguration(path.toFile());
 
             String name = config.getString("name");
-            Bukkit.getLogger().info("Now loading (Recipe Name): " + name);
+            CustomCrafter.getInstance().getLogger().info("Now loading (Recipe Name): " + name);
             String tag = config.getString("tag").toUpperCase();
             Result result = RESULTS.getOrDefault(config.getString("result"), PASS_THROUGH_RESULT);
 
@@ -542,14 +542,14 @@ public class SettingsLoad {
                             NAMED_RECIPES_MAP.remove(targetName);
                             LOCK_TASK_ID_WITH_RECIPE_NAME.remove(id);
 
-                            Bukkit.getLogger().info("[CustomCrafter] "+targetName+" is disabled now!");
+                            CustomCrafter.getInstance().getLogger().info(targetName+" is disabled now!");
                         }
                     };
                     runnable.runTaskLater(CustomCrafter.getInstance(), delayTicks);
                     int taskID = runnable.getTaskId();
                     LOCK_TASK_ID_WITH_RECIPE_NAME.put(taskID, name);
 
-                    Bukkit.getLogger().info(String.format("[CustomCrafter] Named Recipe=%s will be locked in %s", name, ZonedDateTime.parse(lockTimeRow).toString()));
+                    CustomCrafter.getInstance().getLogger().info(String.format("Named Recipe=%s will be locked in %s", name, ZonedDateTime.parse(lockTimeRow).toString()));
                 }
             }
 
@@ -572,7 +572,7 @@ public class SettingsLoad {
                             }
                             ITEM_PLACED_SLOTS_RECIPE_MAP.get(target.getContentsNoAir().size()).add(target);
 
-                            Bukkit.getLogger().info("[CustomCrafter] "+targetName+" is enabled now!");
+                            CustomCrafter.getInstance().getLogger().info(targetName+" is enabled now!");
                             REGISTERED_RECIPES.remove(targetName);
                             UNLOCK_TASK_ID_WITH_RECIPE_NAME.remove(id);
                         }
@@ -582,7 +582,7 @@ public class SettingsLoad {
                     REGISTERED_RECIPES.put(name, new Recipe(name, tag, coordinates, returns, result, permission, containers));
                     UNLOCK_TASK_ID_WITH_RECIPE_NAME.put(taskID, name);
 
-                    Bukkit.getLogger().info(String.format("[CustomCrafter] Named Recipe=%s will be unlocked in %s", name, ZonedDateTime.parse(unlockTimeRow).toString()));
+                    CustomCrafter.getInstance().getLogger().info(String.format("Named Recipe=%s will be unlocked in %s", name, ZonedDateTime.parse(unlockTimeRow).toString()));
                     continue;
                 }
             }
@@ -710,8 +710,8 @@ public class SettingsLoad {
             // yyyy-mm-ddThh:mm:ss+offset with UTC[TIMEZONE]
             zonedDateTime = ZonedDateTime.parse(dateRow);
         } catch (DateTimeParseException e) {
-            Bukkit.getLogger().warning("[CustomCrafter] An invalid DateTime format found. (from java.time.ZonedDateTime=DateTimeParseException)");
-            Bukkit.getLogger().info("[CustomCrafter] So, the system will not load this recipe and register to the list about auto "+(delete ? "" : "un")+"lock.");
+            CustomCrafter.getInstance().getLogger().warning("An invalid DateTime format found. (from java.time.ZonedDateTime=DateTimeParseException)");
+            CustomCrafter.getInstance().getLogger().info("So, the system will not load this recipe and register to the list about auto "+(delete ? "" : "un")+"lock.");
             return null;
         }
         ZonedDateTime now = ZonedDateTime.now();
@@ -721,10 +721,10 @@ public class SettingsLoad {
             try {
                 duration = Duration.between(zonedDateTime, now).abs();
             } catch (DateTimeException e) {
-                Bukkit.getLogger().warning("[CustomCrafter] The system cannot get times diff about now and unlock date. (DateTimeException)");
+                CustomCrafter.getInstance().getLogger().warning("The system cannot get times diff about now and unlock date. (DateTimeException)");
                 return null;
             } catch (ArithmeticException e) {
-                Bukkit.getLogger().warning("[CustomCrafter] The system could not register to "+(delete ? "" : "un")+"lock the recipe. (Diff times over the limit.)");
+                CustomCrafter.getInstance().getLogger().warning("The system could not register to "+(delete ? "" : "un")+"lock the recipe. (Diff times over the limit.)");
                 return null;
             }
             return duration;

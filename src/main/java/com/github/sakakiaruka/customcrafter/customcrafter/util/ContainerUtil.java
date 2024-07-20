@@ -248,16 +248,16 @@ public class ContainerUtil {
     }
 
     private static void sendIllegalTemplateWarn(String type, String source, String pattern) {
-        Bukkit.getLogger().warning(String.format("%s===%s[Custom Crafter] Illegal %s pattern. (%s)", SettingsLoad.LINE_SEPARATOR,SettingsLoad.LINE_SEPARATOR, type, source));
-        Bukkit.getLogger().warning(String.format("[Custom Crafter] The source pattern is %s.%s===", pattern, SettingsLoad.LINE_SEPARATOR));
+        CustomCrafter.getInstance().getLogger().warning(String.format("%s===%s[Custom Crafter] Illegal %s pattern. (%s)", SettingsLoad.LINE_SEPARATOR,SettingsLoad.LINE_SEPARATOR, type, source));
+        CustomCrafter.getInstance().getLogger().warning(String.format("[Custom Crafter] The source pattern is %s.%s===", pattern, SettingsLoad.LINE_SEPARATOR));
     }
 
     private static void sendNoSuchTemplateWarn(String type, String source) {
-        Bukkit.getLogger().warning(String.format("%s===%s[Custom Crafter] No such %s. (%s)%s===", SettingsLoad.LINE_SEPARATOR,SettingsLoad.LINE_SEPARATOR, type, source, SettingsLoad.LINE_SEPARATOR));
+        CustomCrafter.getInstance().getLogger().warning(String.format("%s===%s[Custom Crafter] No such %s. (%s)%s===", SettingsLoad.LINE_SEPARATOR,SettingsLoad.LINE_SEPARATOR, type, source, SettingsLoad.LINE_SEPARATOR));
     }
 
     public static void sendOrdinalWarn(String warn) {
-        Bukkit.getLogger().warning(String.format("%s===%s[Custom Crafter] %s%s===", SettingsLoad.LINE_SEPARATOR, SettingsLoad.LINE_SEPARATOR, warn, SettingsLoad.LINE_SEPARATOR));
+        CustomCrafter.getInstance().getLogger().warning(String.format("%s===%s[Custom Crafter] %s%s===", SettingsLoad.LINE_SEPARATOR, SettingsLoad.LINE_SEPARATOR, warn, SettingsLoad.LINE_SEPARATOR));
     }
 
     public static final TriConsumer<Map<String, String>, ItemStack, String> LORE = (data, item, formula) -> {

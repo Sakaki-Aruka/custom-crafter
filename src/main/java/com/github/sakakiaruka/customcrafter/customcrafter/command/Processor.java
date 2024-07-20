@@ -114,15 +114,15 @@ public class Processor implements CommandExecutor, TabCompleter {
         }
 
         if (id == -1) {
-            sender.sendMessage("[CustomCrafter] This command is not a correct one.");
+            sender.sendMessage("This command is not a correct one.");
             return false;
         } else if (!(sender instanceof Player) && 100 < id) {
-            sender.sendMessage("[CustomCrafter] You cannot use this command from other than as a player.");
+            sender.sendMessage("You cannot use this command from other than as a player.");
             return false;
         }
 
         if (sender instanceof Player && !hasCorrectPermission((Player) sender, id)) {
-            sender.sendMessage("[CustomCrafter] You do not have enough permissions to use this command.");
+            sender.sendMessage("You do not have enough permissions to use this command.");
             return false;
         }
 

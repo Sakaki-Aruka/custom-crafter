@@ -272,7 +272,7 @@ public class EntityUtil {
                     int weight = CalcUtil.getRandomNumber(numSource, 1, MAX_SPAWN_WEIGHT);
                     spawner.addPotentialSpawn(new SpawnerEntry(base.createSnapshot(), weight, rule));
 
-                    Bukkit.getLogger().info(
+                    CustomCrafter.getInstance().getLogger().info(
                             "Spawner Setup done." + SettingsLoad.LINE_SEPARATOR +
                                     "Location: " + spawner.getLocation() + SettingsLoad.LINE_SEPARATOR +
                                     "  - require min block light: " + rule.getMinBlockLight() + SettingsLoad.LINE_SEPARATOR +

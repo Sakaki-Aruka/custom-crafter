@@ -24,8 +24,8 @@ public class Help {
 
     public void one(String type, CommandSender sender) {
         if (!COMMAND_ARGS.contains(type)) {
-            sender.sendMessage("[CustomCrafter] The specified argument is not exist.");
-            sender.sendMessage("[CustomCrafter] Choose one from these. = "+COMMAND_ARGS);
+            sender.sendMessage("The specified argument is not exist.");
+            sender.sendMessage("Choose one from these. = "+COMMAND_ARGS);
             return;
         }
         sender.sendMessage(BAR);
