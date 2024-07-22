@@ -17,12 +17,16 @@ import com.github.sakakiaruka.customcrafter.customcrafter.util.*;
 import net.kyori.adventure.text.TextComponent;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataHolder;
+import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.plugin.Plugin;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -221,6 +225,43 @@ public class Search {
         inputContainerData.put("$PLAYER_FACING$", player.getFacing().name());
         inputContainerData.put("$PLAYER_CURRENT_HEALTH$", String.valueOf(player.getHealth()));
         inputContainerData.put("$RECIPE_NAME$", recipe.getName());
+
+        if (recipe.getTag().equals(Tag.NORMAL)) {
+            List<ItemStack> items = getInterestedAreaItems(inventory);
+            // key: "slot#plugin_name#variable_name"
+            // slot: 0 ~ 36
+            // plugin_name: lowercase alphanumeric
+            // variable_name: variable_name
+            int index = 0;
+            for (ItemStack i : items) {
+                if (i.getType().equals(Material.AIR) || i.getItemMeta() == null) continue;  // PersistentDataHolder check
+                PersistentDataContainer container = i.getItemMeta().getPersistentDataContainer();
+                for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
+
+                    List<PersistentDataType<?, ?>> pList = List.of(
+                            PersistentDataType.DOUBLE,
+                            PersistentDataType.FLOAT,
+                            PersistentDataType.STRING,
+                            PersistentDataType.LONG,
+                            PersistentDataType.INTEGER,
+                            PersistentDataType.SHORT,
+                            PersistentDataType.BYTE,
+                            PersistentDataType.BOOLEAN
+                    );
+                    final String pluginName = plugin.getName();
+                    for (NamespacedKey namespacedKey : container.getKeys()) {
+                        if (!namespacedKey.getNamespace().equals(pluginName.toLowerCase())) continue;
+                        for (PersistentDataType<?, ?> pdt : pList) {
+                            if (!container.has(namespacedKey, pdt) || !container.has(namespacedKey, pdt)) continue;
+                            final String containerContent = Objects.requireNonNull(container.get(namespacedKey, pdt)).toString();
+                            final String containerKey = String.format("$%d#%s#%s$", index, pluginName.toLowerCase(), namespacedKey.getKey());
+                            inputContainerData.put(containerKey, containerContent);
+                        }
+                    }
+                }
+                index++;
+            }
+        }
 
         if (ALL_MATERIALS.contains(recipe.getResult().getNameOrRegex())
         && recipe.getResult().getMatchPoint() == -1
