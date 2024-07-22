@@ -1,5 +1,6 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.util;
 
+import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.Potions;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.*;
@@ -112,7 +113,7 @@ public class InventoryUtil {
 
     private static boolean isValidCharacters(BookMeta meta, String value, String section) {
         if (25600 < (meta.getPageCount() * 320) + value.length()) {
-            Bukkit.getLogger().warning("[CustomCrafter] Set result metadata (" + section + ") failed. (Over 25600 characters.)");
+            CustomCrafter.getInstance().getLogger().warning("Set result metadata (" + section + ") failed. (Over 25600 characters.)");
             return false;
         }
         return true;
@@ -130,8 +131,8 @@ public class InventoryUtil {
             try {
                 value = String.join(LINE_SEPARATOR, Files.readAllLines(Paths.get(value), StandardCharsets.UTF_8));
             } catch (Exception e) {
-                Bukkit.getLogger().warning("[CustomCrafter] Set result metadata (addLong - extend) failed. (About a file read.)");
-                Bukkit.getLogger().warning(e.getMessage());
+                CustomCrafter.getInstance().getLogger().warning("Set result metadata (addLong - extend) failed. (About a file read.)");
+                CustomCrafter.getInstance().getLogger().warning(e.getMessage());
                 return;
             }
         }
@@ -139,7 +140,7 @@ public class InventoryUtil {
         if (!isValidCharacters(meta, value, section)) return;
 
         if (ONE_BOOK_CHAR_LIMIT < value.length()) {
-            Bukkit.getLogger().warning("[CustomCrafter] Set result metadata (addLong) failed. (Over 25600 characters.)");
+            CustomCrafter.getInstance().getLogger().warning("Set result metadata (addLong) failed. (Over 25600 characters.)");
             meta.addPages(Component.text("Overflown"));
             return;
         }
@@ -159,8 +160,8 @@ public class InventoryUtil {
                 // make a new page
 
                 if (meta.getPageCount() == 100) {
-                    Bukkit.getLogger().warning("[CustomCrafter] Set result metadata (addLong) failed. (Over 100 pages.)");
-                    Bukkit.getLogger().warning("[CustomCrafter] Remaining " + (element.capacity() + (value.length() - i)) + " characters.");
+                    CustomCrafter.getInstance().getLogger().warning("Set result metadata (addLong) failed. (Over 100 pages.)");
+                    CustomCrafter.getInstance().getLogger().warning("Remaining " + (element.capacity() + (value.length() - i)) + " characters.");
                     return;
                 }
 
@@ -214,7 +215,7 @@ public class InventoryUtil {
             case "WHITE" -> color = Color.WHITE;
             case "YELLOW" -> color = Color.YELLOW;
             default -> {
-                Bukkit.getLogger().warning("[CustomCrafter] (ColorName) failed. Input -> " + value);
+                CustomCrafter.getInstance().getLogger().warning("(ColorName) failed. Input -> " + value);
                 return null;
             }
         }
@@ -275,7 +276,7 @@ public class InventoryUtil {
             }
         }
 
-//        Bukkit.getLogger().info("merged map="+merged);
+//        CustomCrafter.getInstance().getLogger().info("merged map="+merged);
 
         Map<Coordinate, List<Coordinate>> conflict = new HashMap<>();
         Map<Coordinate, Coordinate> finished = new HashMap<>();
@@ -286,18 +287,18 @@ public class InventoryUtil {
                     continue;
                 }
                 // finished has already contained this value
-//                Bukkit.getLogger().info("combination error (value duplication)");
+//                CustomCrafter.getInstance().getLogger().info("combination error (value duplication)");
                 return new HashMap<>();
             }
 
             conflict.put(entry.getKey(), entry.getValue());
         }
 
-//        Bukkit.getLogger().info("finished="+finished);
-//        Bukkit.getLogger().info("conflict="+conflict);
+//        CustomCrafter.getInstance().getLogger().info("finished="+finished);
+//        CustomCrafter.getInstance().getLogger().info("conflict="+conflict);
 
         if (hasDuplicate(finished)) {
-//            Bukkit.getLogger().info("contains duplicate coordinate.");
+//            CustomCrafter.getInstance().getLogger().info("contains duplicate coordinate.");
             return new HashMap<>();
         }
 
@@ -330,7 +331,7 @@ public class InventoryUtil {
             non_duplicate.add(Arrays.toString(ss));
         }
 
-//        Bukkit.getLogger().info("non_duplicate="+non_duplicate);
+//        CustomCrafter.getInstance().getLogger().info("non_duplicate="+non_duplicate);
 
         List<String> non_duplcicate_list = new ArrayList<>(non_duplicate);
         for (int i = 0; i < non_duplcicate_list.size(); i++) {
@@ -340,7 +341,7 @@ public class InventoryUtil {
                 Coordinate key = entry.getKey();
 
                 // debug
-//                Bukkit.getLogger().info("conflict loop (i="+i+", temp[index])="+temp[index]);
+//                CustomCrafter.getInstance().getLogger().info("conflict loop (i="+i+", temp[index])="+temp[index]);
 
                 String indexParse = temp[index]
                         .replace("[", "")
@@ -359,15 +360,15 @@ public class InventoryUtil {
             }
 
             if (hasDuplicate(finished)) {
-//                Bukkit.getLogger().info("contains duplicate coordinate (in loop)");
+//                CustomCrafter.getInstance().getLogger().info("contains duplicate coordinate (in loop)");
                 continue;
             }
 
-//            Bukkit.getLogger().info("finished (index="+index+")="+finished);
+//            CustomCrafter.getInstance().getLogger().info("finished (index="+index+")="+finished);
             return finished;
         }
 
-//        Bukkit.getLogger().info("recipe match failed.");
+//        CustomCrafter.getInstance().getLogger().info("recipe match failed.");
         return new HashMap<>();
     }
 

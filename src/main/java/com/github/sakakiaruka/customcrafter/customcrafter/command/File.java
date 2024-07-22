@@ -1,5 +1,6 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.command;
 
+import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.PotionUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
@@ -9,10 +10,10 @@ import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.LI
 
 public class File {
     public void defaultPotion() {
-        Bukkit.getLogger().info(BAR + LINE_SEPARATOR);
-        Bukkit.getLogger().info("The system is making default potion files.");
-        Bukkit.getLogger().info("Do not shutdown or stop a server.");
-        Bukkit.getLogger().info(LINE_SEPARATOR + BAR);
+        CustomCrafter.getInstance().getLogger().info(BAR + LINE_SEPARATOR);
+        CustomCrafter.getInstance().getLogger().info("The system is making default potion files.");
+        CustomCrafter.getInstance().getLogger().info("Do not shutdown or stop a server.");
+        CustomCrafter.getInstance().getLogger().info(LINE_SEPARATOR + BAR);
         PotionUtil.makeDefaultPotionFilesWrapper();
     }
 }

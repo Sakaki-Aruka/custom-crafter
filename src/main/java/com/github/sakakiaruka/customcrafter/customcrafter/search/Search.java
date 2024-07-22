@@ -1,7 +1,6 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.search;
 
 import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter;
-import com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Container.ContainerType;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Container.MatterContainer;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantStrict;
@@ -279,12 +278,12 @@ public class Search {
             try {
                 Matcher m = Pattern.compile(PASS_THROUGH_PATTERN).matcher(recipe.getResult().getNameOrRegex());
                 if (!m.matches()) {
-                    Bukkit.getLogger().warning("[CustomCrafter] pass-through mode failed. (Illegal Material name.)");
+                    CustomCrafter.getInstance().getLogger().warning("pass-through mode failed. (Illegal Material name.)");
                     return;
                 }
                 target = Material.valueOf(m.group(1).toUpperCase());
             } catch (Exception e) {
-                Bukkit.getLogger().warning("[CustomCrafter] pass-through mode failed. (Illegal Material name.)");
+                CustomCrafter.getInstance().getLogger().warning("pass-through mode failed. (Illegal Material name.)");
                 return;
             }
             List<ItemStack> items = new ArrayList<>();
@@ -293,7 +292,7 @@ public class Search {
                 if (inventory.getItem(i).getType().equals(target)) items.add(inventory.getItem(i));
             }
             if (items.size() != 1) {
-                Bukkit.getLogger().warning("[CustomCrafter] pass-through mode failed. (Same material some where.) ");
+                CustomCrafter.getInstance().getLogger().warning("pass-through mode failed. (Same material some where.) ");
                 return;
             }
 
