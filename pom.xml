@@ -6,7 +6,7 @@
 
     <groupId>com.github.sakakiaruka.cutom-crafter</groupId>
     <artifactId>custom-crafter</artifactId>
-    <version>4.1.6-0427</version>
+    <version>4.1.6-0722</version>
     <packaging>jar</packaging>
 
     <name>Custom Crafter</name>
