@@ -238,7 +238,6 @@ public class Search {
                 PersistentDataContainer container = i.getItemMeta().getPersistentDataContainer();
                 for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
 
-                    //debug
                     List<PersistentDataType<?, ?>> pList = List.of(
                             PersistentDataType.DOUBLE,
                             PersistentDataType.FLOAT,
