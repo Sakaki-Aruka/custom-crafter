@@ -435,7 +435,7 @@ public class EntityUtil {
             if (value.matches("(-?[0-9]+|random\\[(-?[0-9-]+)?:(-?[0-9-]+)?])")) {
                 // set duration
                 int num = value.startsWith("random")
-                        ? CalcUtil.getRandomNumber(value, -1, 60 * 60)
+                        ? CalcUtil.getRandomNumber(value, -1, 20 * 60 * 10)
                         : Integer.parseInt(value);
                 if (type.matches("d|duration")) aec.setDuration(num);
                 else if (type.matches("dou|durationOnUse")) aec.setDurationOnUse(num);
