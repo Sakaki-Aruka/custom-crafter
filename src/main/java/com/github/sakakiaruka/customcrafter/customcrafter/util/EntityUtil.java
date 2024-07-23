@@ -14,6 +14,7 @@ import org.bukkit.attribute.Attributable;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeInstance;
 import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.CreatureSpawner;
 import org.bukkit.block.spawner.SpawnRule;
@@ -74,6 +75,7 @@ public class EntityUtil {
 
     private static final String ALL_ENTITY_TYPE_REGEX_PATTERN = "(" + Arrays.stream(EntityType.values()).map(Enum::name).collect(Collectors.joining("|")) + ")";
     private static final String UNIQUE_ID_KEY = "uniqueID";
+    private static final NamespacedKey ALREADY_SPAWNER_SETUP_OK_KEY = new NamespacedKey(CustomCrafter.getInstance(), "already_spawner_setup_ok_key");
 
     public static final TriConsumer<Map<String, String>, ItemStack, String> ENTITY_DEFINE = (data, item, formula) -> {
         // type: entity_define, value: name:([a-zA-Z_0-9]+),actions:~~~~~,~~~~~,~~~~~
@@ -234,9 +236,14 @@ public class EntityUtil {
         if (!formula.matches(pattern)) return;
         World world = Bukkit.getWorld(UUID.fromString(data.get("WORLD_UUID")));
         if (world == null) return;
+        Block block = world.getBlockAt(getLocationFromData(data));
+        if (!block.getType().equals(Material.SPAWNER)) return;
+
+        CreatureSpawner spawner = (CreatureSpawner) world.getBlockAt(getLocationFromData(data)).getState();
+        if (spawner.getPersistentDataContainer().has(ALREADY_SPAWNER_SETUP_OK_KEY)) return;
 
         for (String element : formula.split(";")) {
-            CreatureSpawner spawner = (CreatureSpawner) world.getBlockAt(getLocationFromData(data)).getState();
+
 
             Matcher parsed = Pattern.compile(singlePattern).matcher(element);
             if (!parsed.matches()) continue;
@@ -273,6 +280,7 @@ public class EntityUtil {
                     spawner.addPotentialSpawn(new SpawnerEntry(base.createSnapshot(), weight, rule));
 
                     CustomCrafter.getInstance().getLogger().info(
+                            SettingsLoad.LINE_SEPARATOR +
                             "Spawner Setup done." + SettingsLoad.LINE_SEPARATOR +
                                     "Location: " + spawner.getLocation() + SettingsLoad.LINE_SEPARATOR +
                                     "  - require min block light: " + rule.getMinBlockLight() + SettingsLoad.LINE_SEPARATOR +
@@ -314,6 +322,9 @@ public class EntityUtil {
             }
             spawner.update(true, true);
         }
+
+        spawner.getPersistentDataContainer().set(ALREADY_SPAWNER_SETUP_OK_KEY, PersistentDataType.STRING, "");
+        spawner.update(true, true);
     };
 
     public static final TriConsumer<String, Map<String, String>, Entity> DROPPED_ITEM_DETAIL = (formula, data, base) -> {
