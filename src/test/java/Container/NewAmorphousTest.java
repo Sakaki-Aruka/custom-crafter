@@ -15,6 +15,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.Result;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.CalcUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.ContainerUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.EntityUtil;
+import com.github.sakakiaruka.customcrafter.customcrafter.util.Expression;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -29,6 +30,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 public class NewAmorphousTest {
@@ -87,6 +89,47 @@ public class NewAmorphousTest {
 
         Assertions.assertEquals("20", CalcUtil.setEvalValue("{long:10*2.0}"));
         Assertions.assertEquals("20.0", CalcUtil.setEvalValue("{double:10*2}"));
+
+        Assertions.assertTrue(Expression.eval("(!false) && true").asBoolean());
+        Assertions.assertTrue(ContainerUtil.RECIPE_CONTAINER_TAG.apply(
+                Map.of("a", "AAA"),
+                "{%a% && (!%b%)}"
+        ));
+        Assertions.assertTrue(ContainerUtil.RECIPE_CONTAINER_TAG.apply(Map.of(), "{(!%b%)}"));
+        Assertions.assertTrue(Expression.eval("(!false)").asBoolean());
+        Assertions.assertFalse(ContainerUtil.RECIPE_CONTAINER_TAG.apply(
+                Map.of("b", ""),
+                "{(!%b%) && %a%}"
+        ));
+        Assertions.assertTrue(ContainerUtil.RECIPE_CONTAINER_TAG.apply(
+                Map.of("c", ""),
+                "{(!%a%) && (%b% || %c%)}"
+        ));
+
+        Assertions.assertEquals("{%b-[0-9]+%}", CalcUtil.recipeContainerTagPlaceholder(
+                Set.of("a-1", "a-10"),
+                "{%b-[0-9]+\\%}"
+        ));
+
+        Assertions.assertTrue(Boolean.parseBoolean(CalcUtil.setEvalValue(CalcUtil.recipeContainerTagPlaceholder(
+                Set.of("a-1", "a-10", "a-100"),
+                "{%a-10[0-9]*%}"
+        ))));
+
+        Assertions.assertFalse(Boolean.parseBoolean(CalcUtil.setEvalValue(CalcUtil.recipeContainerTagPlaceholder(
+                Set.of("10.custom-crafter.not-available"),
+                "{(!%[0-9]+.+not-available%)}"
+        ))));
+
+        Assertions.assertTrue(Boolean.parseBoolean(CalcUtil.setEvalValue(CalcUtil.recipeContainerTagPlaceholder(
+                Set.of("1.custom-crafter.available", "2.custom-crafter.available"),
+                "{%[1|2].custom-crafter.available% && (!%[0-9]+.+not-available%)}"
+        ))));
+
+        Assertions.assertFalse(Boolean.parseBoolean(CalcUtil.setEvalValue(CalcUtil.recipeContainerTagPlaceholder(
+                Collections.emptySet(),
+                "{%.*custom-crafter.*not-available%}"
+        ))));
     }
 
     @Test

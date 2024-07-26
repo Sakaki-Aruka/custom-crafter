@@ -233,21 +233,22 @@ public class Search {
             // plugin_name: lowercase alphanumeric
             // variable_name: variable_name
             int index = 0;
+
+            List<PersistentDataType<?, ?>> pList = List.of(
+                    PersistentDataType.DOUBLE,
+                    PersistentDataType.FLOAT,
+                    PersistentDataType.STRING,
+                    PersistentDataType.LONG,
+                    PersistentDataType.INTEGER,
+                    PersistentDataType.SHORT,
+                    PersistentDataType.BYTE,
+                    PersistentDataType.BOOLEAN
+            );
+
             for (ItemStack i : items) {
                 if (i.getType().equals(Material.AIR) || i.getItemMeta() == null) continue;  // PersistentDataHolder check
                 PersistentDataContainer container = i.getItemMeta().getPersistentDataContainer();
                 for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
-
-                    List<PersistentDataType<?, ?>> pList = List.of(
-                            PersistentDataType.DOUBLE,
-                            PersistentDataType.FLOAT,
-                            PersistentDataType.STRING,
-                            PersistentDataType.LONG,
-                            PersistentDataType.INTEGER,
-                            PersistentDataType.SHORT,
-                            PersistentDataType.BYTE,
-                            PersistentDataType.BOOLEAN
-                    );
                     final String pluginName = plugin.getName();
                     for (NamespacedKey namespacedKey : container.getKeys()) {
                         if (!namespacedKey.getNamespace().equals(pluginName.toLowerCase())) continue;
