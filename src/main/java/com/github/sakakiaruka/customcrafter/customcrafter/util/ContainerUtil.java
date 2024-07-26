@@ -207,6 +207,20 @@ public class ContainerUtil {
         return count != 0;
     }
 
+    public static final BiFunction<Map<String, String>, String, Boolean> RECIPE_CONTAINER_TAG = (data, predicate) -> {
+        // predicate: tag
+        // formula: {(!%~~~~~%) && (%~~~~~% || %~~~%)}
+        //     "!" -> ban (requires brackets)
+        //     no sign -> required
+        //
+        // regex available in placeholders.
+
+        Map<String, String> map = new HashMap<>(data);
+        map.forEach((k, v) -> map.replace(k, v, "true"));
+        map.put("@default@", "false");
+        return Boolean.parseBoolean(CalcUtil.setEvalValue(CalcUtil.setPlaceholderValue(map, predicate)));
+    };
+
     public static final BiFunction<Map<String, String>, String, Boolean> ALLOW_TAG = (data, predicate) -> {
         // type: (?i)(Allow)Tag, predicate: ~~~,~~~,~~~
         // divided ",".

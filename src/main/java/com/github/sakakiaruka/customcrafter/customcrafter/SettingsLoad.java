@@ -659,6 +659,7 @@ public class SettingsLoad {
                 case "string" -> predicate = ContainerUtil.STRING_MATCH;
                 case "value" -> predicate = ContainerUtil.ALLOW_VALUE;
                 case "random" -> predicate = ContainerUtil.RANDOM;
+                case "tag" -> predicate = ContainerUtil.RECIPE_CONTAINER_TAG;
                 default -> {
                     continue;
                 }

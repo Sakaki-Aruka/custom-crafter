@@ -1,14 +1,8 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.util;
 
-import com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad;
-import com.github.sakakiaruka.customcrafter.customcrafter.interfaces.PentaConsumer;
-import com.github.sakakiaruka.customcrafter.customcrafter.interfaces.TriConsumer;
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
-
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,6 +10,25 @@ public class CalcUtil {
 
     public static String getContent(Map<String, String> data, String formula) {
         return setEvalValue(setPlaceholderValue(data, formula));
+    }
+
+    public static String recipeContainerTagPlaceholder(Set<String> data, String formula) {
+        StringBuilder result = new StringBuilder();
+        StringBuilder buffer = new StringBuilder();
+        for (int i = 0; i < formula.length(); i++) {
+            char c = formula.charAt(i);
+            if (buffer.isEmpty()) {
+                if (c == '%' && (i == 0 || formula.charAt(i - 1) != '\\')) {
+                    buffer.append(c);
+                } else result.append(c);
+            } else if (c != '%' || formula.charAt(i - 1) == '\\') {
+                buffer.append((i < formula.length() - 1 && formula.charAt(i + 1) == '%' && c == '\\') ? "" : c);
+            } else {
+                result.append(data.stream().anyMatch(e -> e.matches(buffer.substring(1)))); // skip the first character. (= "%")
+                buffer.setLength(0);
+            }
+        }
+        return result.append(!buffer.isEmpty() ? buffer : "").toString();
     }
 
     public static String setPlaceholderValue(Map<String, String> data, String formula) {
@@ -47,7 +60,7 @@ public class CalcUtil {
                 if (!data.containsKey(key)) {
                     if (key.matches("random\\[([0-9-]+)?:([0-9-]+)?]")) {
                         result.append(getRandomNumber(key, Integer.MIN_VALUE, Integer.MAX_VALUE));
-                    } else result.append("None");
+                    } else result.append(data.getOrDefault("@default@", "None"));
                 } else result.append(data.get(buffer.toString()));
                 buffer.setLength(0);
             }
