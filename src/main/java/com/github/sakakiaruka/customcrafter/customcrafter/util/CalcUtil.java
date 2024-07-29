@@ -100,62 +100,61 @@ public class CalcUtil {
             } else if (c == '}') {
                 flag = 0;
                 String key = buffer.toString();
+                buffer.setLength(0);
                 if (key.startsWith("long:")) {
                     // {long:~~~~~}
                     result.append((long) Expression.eval(key.substring(5)).asDouble());
                 } else if (key.startsWith("double:")) {
                     // {double:~~~~}
                     result.append(Expression.eval(key.substring(7)).asDouble());
+                } else if (key.matches("(double|long)->([1-9]([0-9])?)p:(.+)")) {
+                    // round
+                    Matcher matcher = Pattern.compile("(double|long)->([1-9]([0-9])?)p:(.+)").matcher(key);
+                    if (!matcher.matches()) {
+                        CustomCrafter.getInstance().getLogger().warning("Double or long round failed. Follow '(double|long)->([1-9]([0-9])?)p:(.+)'.");
+                        CustomCrafter.getInstance().getLogger().warning("The system returned 0 as a result of a expression '" + key + "'.");
+                        result.append("0");
+                        continue;
+                    }
+
+                    String value = Expression.eval(matcher.group(4)).asString();
+
+                    if (!value.matches("(-?[0-9]+)\\.([0-9]+)")) {
+                        CustomCrafter.getInstance().getLogger().warning("Double or long round failed. The value what is evaluated must follow '(-?[0-9]+)\\.([0-9]+)'.");
+                        CustomCrafter.getInstance().getLogger().warning("The system returned 0 as a result of a expression '" + value + "'.");
+                        result.append("0");
+                        continue;
+                    }
+
+                    int limit = Integer.parseInt(matcher.group(2));
+                    double d = Double.parseDouble(value);
+                    if (matcher.group(1).equals("double")) result.append(doubleRound(limit, d));
+                    else result.append(longRound(limit, Math.round(d)));
                 } else {
                     // {~~~~}
                     result.append(Expression.eval(key).asString());
                 }
-                buffer.setLength(0);
             }
         }
         return result + (!buffer.isEmpty() ? buffer.toString() : "");
     }
 
-    public static double doubleRound(String formula) {
-        // pattern = "double->([0-9]+)p:(-?[0-9]+)\.([0-9]+)"
-        // ~~~.0123456789
-        // e.g.) double->-3p:{1/3}
-        // --> 0.333
-        Matcher matcher = Pattern.compile("double->([1-9]([0-9])?)p:(-?[0-9]+)\\.([0-9]+)").matcher(formula);
-        if (!matcher.matches()) {
-            CustomCrafter.getInstance().getLogger().warning("Double round failed. Follow 'double->([1-9]([0-9])?)p:(-?[0-9]+)\\.([0-9]+)'.");
-            CustomCrafter.getInstance().getLogger().warning("The system returned 0.0 as a result of a expression '" + formula + "'.");
-            return 0.0d;
-        }
-        int limit = Integer.parseInt(matcher.group(1));
-        double d = Double.parseDouble(matcher.group(3) + "." + matcher.group(4));
+    public static String doubleRound(int limit, double d) {
+        if (limit == 0) return String.valueOf(d);
         DecimalFormat format = new DecimalFormat("#.#");
         format.setMaximumFractionDigits(Math.abs(limit));
-        return Double.parseDouble(format.format(d));
+        return format.format(d);
     }
 
-    public static long longRound(String formula) {
-        // pattern = "long->([0-9]+)p:([0-9]+)"
-        // if result's length is shorter than required, return direct
-        Matcher matcher = Pattern.compile("long->([1-9]([0-9])?)p:(-?[0-9]+)\\.([0-9]+)").matcher(formula);
-        if (!matcher.matches()) {
-            CustomCrafter.getInstance().getLogger().warning("Long round failed. Follow 'long->([1-9]([0-9])?)p:(-?[0-9]+)'.");
-            CustomCrafter.getInstance().getLogger().warning("The system returned 0 as a result of a expression '" + formula + "'.");
-            return 0L;
-        }
-        int limit = Integer.parseInt(matcher.group(1));
-        String number = matcher.group(3);
-        long l = Long.parseLong(number);
+    public static long longRound(int limit, long l) {
+        if (limit == 0) return l;
         long beforeDigits = Math.round(Math.floor(Math.log10(l)));
         if (beforeDigits + 1 <= limit) return l;
-
         do {
             l = Math.round(l / 10d);
         } while (Math.round(Math.floor(Math.log10(l))) + 1 > limit);
-
         long afterDigits = Math.round(Math.floor(Math.log10(l)));
-        long tens = beforeDigits - afterDigits;
-        return (long) (Math.pow(10, tens)) * l;
+        return (long) (Math.pow(10, beforeDigits - afterDigits)) * l;
     }
 
     public static int getRandomNumber(String formula, int underLimit, int upperLimit) {
