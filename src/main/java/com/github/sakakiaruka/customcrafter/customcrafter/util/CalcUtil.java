@@ -1,5 +1,8 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.util;
 
+import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter;
+
+import java.text.DecimalFormat;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -111,6 +114,48 @@ public class CalcUtil {
             }
         }
         return result + (!buffer.isEmpty() ? buffer.toString() : "");
+    }
+
+    public static double doubleRound(String formula) {
+        // pattern = "double->([0-9]+)p:(-?[0-9]+)\.([0-9]+)"
+        // ~~~.0123456789
+        // e.g.) double->-3p:{1/3}
+        // --> 0.333
+        Matcher matcher = Pattern.compile("double->([1-9]([0-9])?)p:(-?[0-9]+)\\.([0-9]+)").matcher(formula);
+        if (!matcher.matches()) {
+            CustomCrafter.getInstance().getLogger().warning("Double round failed. Follow 'double->([1-9]([0-9])?)p:(-?[0-9]+)\\.([0-9]+)'.");
+            CustomCrafter.getInstance().getLogger().warning("The system returned 0.0 as a result of a expression '" + formula + "'.");
+            return 0.0d;
+        }
+        int limit = Integer.parseInt(matcher.group(1));
+        double d = Double.parseDouble(matcher.group(3) + "." + matcher.group(4));
+        DecimalFormat format = new DecimalFormat("#.#");
+        format.setMaximumFractionDigits(Math.abs(limit));
+        return Double.parseDouble(format.format(d));
+    }
+
+    public static long longRound(String formula) {
+        // pattern = "long->([0-9]+)p:([0-9]+)"
+        // if result's length is shorter than required, return direct
+        Matcher matcher = Pattern.compile("long->([1-9]([0-9])?)p:(-?[0-9]+)\\.([0-9]+)").matcher(formula);
+        if (!matcher.matches()) {
+            CustomCrafter.getInstance().getLogger().warning("Long round failed. Follow 'long->([1-9]([0-9])?)p:(-?[0-9]+)'.");
+            CustomCrafter.getInstance().getLogger().warning("The system returned 0 as a result of a expression '" + formula + "'.");
+            return 0L;
+        }
+        int limit = Integer.parseInt(matcher.group(1));
+        String number = matcher.group(3);
+        long l = Long.parseLong(number);
+        long beforeDigits = Math.round(Math.floor(Math.log10(l)));
+        if (beforeDigits + 1 <= limit) return l;
+
+        do {
+            l = Math.round(l / 10d);
+        } while (Math.round(Math.floor(Math.log10(l))) + 1 > limit);
+
+        long afterDigits = Math.round(Math.floor(Math.log10(l)));
+        long tens = beforeDigits - afterDigits;
+        return (long) (Math.pow(10, tens)) * l;
     }
 
     public static int getRandomNumber(String formula, int underLimit, int upperLimit) {

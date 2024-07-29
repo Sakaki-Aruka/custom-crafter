@@ -14,7 +14,6 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Tag;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.Result;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.CalcUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.ContainerUtil;
-import com.github.sakakiaruka.customcrafter.customcrafter.util.EntityUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.Expression;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -130,6 +129,16 @@ public class NewAmorphousTest {
                 Collections.emptySet(),
                 "{%.*custom-crafter.*not-available%}"
         ))));
+
+        Assertions.assertEquals("166.7", String.valueOf(CalcUtil.doubleRound("double->1p:" + CalcUtil.setEvalValue("{1000/6}"))));
+        Assertions.assertEquals("0.333", String.valueOf(CalcUtil.doubleRound("double->3p:" + CalcUtil.setEvalValue("{1/3}"))));
+        Assertions.assertEquals("166.667", String.valueOf(CalcUtil.doubleRound("double->3p:" + CalcUtil.setEvalValue("{1000/6}"))));
+
+        Assertions.assertEquals("4516201" , CalcUtil.setEvalValue("{long:9032402/2}"));
+
+        for (int i = 10; i > 0; i--) {
+            System.out.printf("long->%dp:{9032402/2}=%d%n", i, CalcUtil.longRound("long->" + i + "p:" + CalcUtil.setEvalValue("{9032402/2}")));
+        }
     }
 
     @Test
