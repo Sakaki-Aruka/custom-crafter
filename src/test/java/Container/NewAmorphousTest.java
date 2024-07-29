@@ -14,7 +14,6 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Tag;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.Result;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.CalcUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.ContainerUtil;
-import com.github.sakakiaruka.customcrafter.customcrafter.util.EntityUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.Expression;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -130,6 +129,17 @@ public class NewAmorphousTest {
                 Collections.emptySet(),
                 "{%.*custom-crafter.*not-available%}"
         ))));
+
+        Assertions.assertEquals("166.7", CalcUtil.setEvalValue("{double->1p:1000/6}"));
+        Assertions.assertEquals("0.333", CalcUtil.setEvalValue("{double->3p:1/3}"));
+        Assertions.assertEquals("166.667", CalcUtil.setEvalValue("{double->3p:1000/6}"));
+
+        Assertions.assertEquals("4516201" , CalcUtil.setEvalValue("{long:9032402/2}"));
+        Assertions.assertEquals("4516201", CalcUtil.setEvalValue("{long->7p:9032402/2}"));
+        Assertions.assertEquals("4516200", CalcUtil.setEvalValue("{long->5p:9032402/2}"));
+        Assertions.assertEquals("4520000", CalcUtil.setEvalValue("{long->3p:9032402/2}"));
+        Assertions.assertEquals("4500000", CalcUtil.setEvalValue("{long->2p:9032402/2}"));
+        Assertions.assertEquals("5000000", CalcUtil.setEvalValue("{long->1p:9032402/2}"));
     }
 
     @Test
