@@ -39,6 +39,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -126,15 +127,36 @@ public class SettingsLoad {
         List<Path> resultPaths = new ArrayList<>();
         List<Path> matterPaths = new ArrayList<>();
         List<Path> recipePaths = new ArrayList<>();
+        List<Path> autoPaths = new ArrayList<>();
         DEFAULT_CONFIG.getStringList("results").forEach(s->resultPaths.add(Paths.get(s)));
         DEFAULT_CONFIG.getStringList("matters").forEach(s->matterPaths.add(Paths.get(s)));
         DEFAULT_CONFIG.getStringList("recipes").forEach(s->recipePaths.add(Paths.get(s)));
+        DEFAULT_CONFIG.getStringList("auto").forEach(s -> autoPaths.add(Paths.get(s)));
 
         resultPaths.forEach(this::configFileDirectoryCheck);
         matterPaths.forEach(this::configFileDirectoryCheck);
         recipePaths.forEach(this::configFileDirectoryCheck);
+        autoPaths.forEach(this::configFileDirectoryCheck);
 
         getBaseBlock();
+
+        for (Path directory : autoPaths) {
+            for (Path file : Objects.requireNonNull(getFiles(directory))) {
+                FileConfiguration config = YamlConfiguration.loadConfiguration(file.toFile());
+                if (!config.contains("type")) {
+                    CustomCrafter.getInstance().getLogger().warning("couldn't load configuration file = '" + file.getFileName() + "'. ('type' not found.)");
+                    continue;
+                }
+                String type = Objects.requireNonNull(config.getString("type"));
+                switch (type) {
+                    case "matter" -> resultPaths.add(file);
+                    case "result" -> matterPaths.add(file);
+                    case "recipe" -> recipePaths.add(file);
+                    default ->
+                            CustomCrafter.getInstance().getLogger().warning("couldn't detect type. Only 'matter', 'result', 'recipe'.");
+                }
+            }
+        }
 
         matterPaths.forEach(p->getMatter(getFiles(p)));
         resultPaths.forEach(p->getResult(Objects.requireNonNull(getFiles(p))));
@@ -173,6 +195,7 @@ public class SettingsLoad {
 
     private List<Path> getFiles(Path path){
         Stream<Path> paths;
+        if (path.toFile().isFile()) return List.of(path);
         try {
             paths = Files.list(path);
         } catch (Exception e){
@@ -181,7 +204,7 @@ public class SettingsLoad {
         }
 
         List<Path> list = new ArrayList<>();
-        paths.forEach(list::add);
+        paths.filter(e -> !e.toFile().isDirectory()).forEach(list::add);
         return list;
     }
 
