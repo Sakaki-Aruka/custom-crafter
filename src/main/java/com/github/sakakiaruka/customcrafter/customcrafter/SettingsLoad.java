@@ -144,14 +144,14 @@ public class SettingsLoad {
             for (Path file : Objects.requireNonNull(getFiles(directory))) {
                 FileConfiguration config = YamlConfiguration.loadConfiguration(file.toFile());
                 if (!config.contains("type")) {
-                    CustomCrafter.getInstance().getLogger().warning("couldn't load configuration file = '" + file.getFileName() + "'.");
+                    CustomCrafter.getInstance().getLogger().warning("couldn't load configuration file = '" + file.getFileName() + "'. ('type' not found.)");
                     continue;
                 }
                 String type = Objects.requireNonNull(config.getString("type"));
                 switch (type) {
-                    case "matter" -> getMatter(List.of(file));
-                    case "result" -> getResult(List.of(file));
-                    case "recipe" -> getRecipe(List.of(file));
+                    case "matter" -> resultPaths.add(file);
+                    case "result" -> matterPaths.add(file);
+                    case "recipe" -> recipePaths.add(file);
                     default ->
                             CustomCrafter.getInstance().getLogger().warning("couldn't detect type. Only 'matter', 'result', 'recipe'.");
                 }
@@ -195,6 +195,7 @@ public class SettingsLoad {
 
     private List<Path> getFiles(Path path){
         Stream<Path> paths;
+        if (path.toFile().isFile()) return List.of(path);
         try {
             paths = Files.list(path);
         } catch (Exception e){
@@ -203,7 +204,7 @@ public class SettingsLoad {
         }
 
         List<Path> list = new ArrayList<>();
-        paths.forEach(list::add);
+        paths.filter(e -> !e.toFile().isDirectory()).forEach(list::add);
         return list;
     }
 
