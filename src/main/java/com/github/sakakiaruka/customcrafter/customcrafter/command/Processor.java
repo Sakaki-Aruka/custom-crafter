@@ -66,7 +66,6 @@ public class Processor implements CommandExecutor, TabCompleter {
         if (id == 1) return player.hasPermission("cc.reload");
         else if (id == 2) return player.hasPermission("cc.open");
         else if (id == 3 || id == 4) return player.hasPermission("cc.show");
-        else if (id == 5 + 100 || id == 6 + 100) return player.hasPermission("cc.give");
         else if (id == 7) return player.hasPermission("cc.file");
         else if (8 <= id && id <= 11) return player.hasPermission("cc.permission");
         else if (id == 12 || id == 13) {
@@ -130,8 +129,6 @@ public class Processor implements CommandExecutor, TabCompleter {
         else if (id == 2 + 100) new Check().open(sender);
         else if (id == 3) new Show().one(args, sender);
         else if (id == 4) new Show().all(sender);
-        else if (id == 5 + 100) new Give().matter(args[1], sender);
-        else if (id == 6 + 100) new Give().result(args[1], sender);
         else if (id == 7) new File().defaultPotion();
         else if (id == 8) new PermissionCheck().tree(args[1], sender);
         else if (id == 9) new PermissionCheck().show(args[2], sender);
@@ -147,12 +144,11 @@ public class Processor implements CommandExecutor, TabCompleter {
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
         List<String> list = new ArrayList<>();
-        List<String> arg = List.of("reload", "open", "show", "give", "file", "permission", "help");
+        List<String> arg = List.of("reload", "open", "show", "file", "permission", "help");
         if (args.length == 1) {
             list.addAll(arg);
             if (!(sender instanceof Player)) {
                 list.remove("open");
-                list.remove("give");
                 list.remove("container");
             }
 
@@ -161,10 +157,6 @@ public class Processor implements CommandExecutor, TabCompleter {
                 case "show":
                     list.add("all");
                     list.addAll(NAMED_RECIPES_MAP.keySet());
-                    break;
-                case "give":
-                    list.add("matter");
-                    list.add("result");
                     break;
                 case "file":
                     list.add("make");
@@ -179,7 +171,6 @@ public class Processor implements CommandExecutor, TabCompleter {
                     list.add("reload");
                     list.add("open");
                     list.add("show");
-                    list.add("give");
                     list.add("file");
                     list.add("permission");
                     list.add("help");
@@ -189,10 +180,6 @@ public class Processor implements CommandExecutor, TabCompleter {
         } else if (args.length == 3) {
 
             switch (args[0]) {
-                case "give":
-                    if (args[1].equals("matter")) list.addAll(CUSTOM_MATTERS.keySet());
-                    if (args[1].equals("result")) list.addAll(CUSTOM_RESULTS.keySet());
-                    break;
                 case "file":
                     if (args[1].equals("make")) {
                         list.add("defaultPotion");
