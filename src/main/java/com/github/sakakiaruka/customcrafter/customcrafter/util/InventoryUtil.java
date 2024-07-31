@@ -5,7 +5,6 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.Potions;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.*;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.Material;
 import org.bukkit.entity.Item;
@@ -52,25 +51,28 @@ public class InventoryUtil {
         return list;
     }
 
-    public static void decrementMaterials(Inventory inventory, int amount) {
-        // decrement crafting tables material
-        // amount -> decrement amount
-        List<Integer> slots = getTableSlots(CRAFTING_TABLE_SIZE);
-        for (int i : slots) {
-            if (inventory.getItem(i) == null || inventory.getItem(i).getType().equals(Material.AIR)) continue;
-            int oldAmount = inventory.getItem(i).getAmount();
-            int newAmount = Math.max(oldAmount - amount, 0);
-            inventory.getItem(i).setAmount(newAmount);
+    public static void decrementMaterials(Inventory inventory, Recipe input, Recipe recipe, boolean oneCraft) {
+
+        Map<Coordinate, Coordinate> relate = input.getRelationWithRecipeAndInput(recipe);
+        int ratio = oneCraft ? 1 : input.amorphousRatioWith(recipe);
+        for (Map.Entry<Coordinate, Coordinate> entry : relate.entrySet()) {
+            Matter r = recipe.getCoordinate().get(entry.getKey());
+            int slot = entry.getValue().getX() + entry.getValue().getY() * 9;
+            if (inventory.getItem(slot) == null || inventory.getItem(slot).getType().equals(Material.AIR)) continue;
+            int amount = Math.max(inventory.getItem(slot).getAmount() - r.getAmount() * (r.isMass() ? 1 : ratio), 0);
+            inventory.getItem(slot).setAmount(amount);
         }
     }
 
-    public static void decrementMaterialsForNormalRecipe(Inventory inventory, Recipe input, Recipe recipe) {
-        // input list is a list whose size is (9 * 6 =)54.
+    public static void decrementMaterialsForNormalRecipe(Inventory inventory, Recipe input, Recipe recipe, boolean oneCraft) {
+
+        int ratio = oneCraft ? 1 : input.normalRatioWith(recipe);
+
         for (int i = 0; i < recipe.getContentsNoAir().size(); i++) {
             Matter r = recipe.getContentsNoAir().get(i);
             int slot = input.getCoordinateNoAir().get(i).getY() * 9 + input.getCoordinateNoAir().get(i).getX();
             if (inventory.getItem(slot) == null) continue;
-            int amount = Math.max(inventory.getItem(slot).getAmount() -  r.getAmount(), 0);
+            int amount = Math.max(inventory.getItem(slot).getAmount() -  r.getAmount() * (recipe.getContentsNoAir().get(i).isMass() ? 1 : ratio), 0);
             inventory.getItem(slot).setAmount(amount);
         }
     }
@@ -276,7 +278,6 @@ public class InventoryUtil {
             }
         }
 
-//        CustomCrafter.getInstance().getLogger().info("merged map="+merged);
 
         Map<Coordinate, List<Coordinate>> conflict = new HashMap<>();
         Map<Coordinate, Coordinate> finished = new HashMap<>();
@@ -286,19 +287,14 @@ public class InventoryUtil {
                     finished.put(entry.getKey(), entry.getValue().get(0));
                     continue;
                 }
-                // finished has already contained this value
-//                CustomCrafter.getInstance().getLogger().info("combination error (value duplication)");
+
                 return new HashMap<>();
             }
 
             conflict.put(entry.getKey(), entry.getValue());
         }
 
-//        CustomCrafter.getInstance().getLogger().info("finished="+finished);
-//        CustomCrafter.getInstance().getLogger().info("conflict="+conflict);
-
         if (hasDuplicate(finished)) {
-//            CustomCrafter.getInstance().getLogger().info("contains duplicate coordinate.");
             return new HashMap<>();
         }
 
@@ -330,18 +326,12 @@ public class InventoryUtil {
             }
             non_duplicate.add(Arrays.toString(ss));
         }
-
-//        CustomCrafter.getInstance().getLogger().info("non_duplicate="+non_duplicate);
-
         List<String> non_duplcicate_list = new ArrayList<>(non_duplicate);
         for (int i = 0; i < non_duplcicate_list.size(); i++) {
             String[] temp = non_duplcicate_list.get(i).split(",");
             int index = 0;
             for (Map.Entry<Coordinate, List<Coordinate>> entry : conflict.entrySet()) {
                 Coordinate key = entry.getKey();
-
-                // debug
-//                CustomCrafter.getInstance().getLogger().info("conflict loop (i="+i+", temp[index])="+temp[index]);
 
                 String indexParse = temp[index]
                         .replace("[", "")
@@ -359,16 +349,9 @@ public class InventoryUtil {
                 index++;
             }
 
-            if (hasDuplicate(finished)) {
-//                CustomCrafter.getInstance().getLogger().info("contains duplicate coordinate (in loop)");
-                continue;
-            }
-
-//            CustomCrafter.getInstance().getLogger().info("finished (index="+index+")="+finished);
+            if (hasDuplicate(finished)) continue;
             return finished;
         }
-
-//        CustomCrafter.getInstance().getLogger().info("recipe match failed.");
         return new HashMap<>();
     }
 

@@ -1,8 +1,6 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.search;
 
 import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter;
-import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Container.ContainerType;
-import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Container.MatterContainer;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantStrict;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantWrap;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
@@ -24,7 +22,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataHolder;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
 
@@ -90,7 +87,12 @@ public class Search {
         if (result != null) {
             // custom recipe found
             InventoryUtil.returnItems(result,inventory,massAmount,player);
-            int quantity = ((isOneCraft || containsMoreThanOneAmountMatter(result)) ? 1 : massAmount) * result.getResult().getAmount();
+            int quantity;
+            if (result.getTag().equals(Tag.NORMAL)) {
+                quantity = (isOneCraft ? 1 : input.normalRatioWith(result)) * result.getResult().getAmount();
+            } else {
+                quantity = (isOneCraft ? 1 : input.amorphousRatioWith(result)) * result.getResult().getAmount();
+            }
             setResultItem(inventory,result,input,player,quantity,isOneCraft);
         } else {
             // not found
@@ -345,8 +347,8 @@ public class Search {
             }
         }
 
-        if (recipe.getTag().equals(Tag.NORMAL)) InventoryUtil.decrementMaterialsForNormalRecipe(inventory, input, recipe);
-        else InventoryUtil.decrementMaterials(inventory,oneCraft ? 1 : getMinimalAmount(recipe,input));
+        if (recipe.getTag().equals(Tag.NORMAL)) InventoryUtil.decrementMaterialsForNormalRecipe(inventory, input, recipe, oneCraft);
+        else InventoryUtil.decrementMaterials(inventory, input, recipe, oneCraft);
 
     }
 

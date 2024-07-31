@@ -7,11 +7,17 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Permission.RecipePermission;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Container.RecipeContainer;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Result.Result;
+import com.github.sakakiaruka.customcrafter.customcrafter.util.ContainerUtil;
+import com.github.sakakiaruka.customcrafter.customcrafter.util.EnchantUtil;
+import com.github.sakakiaruka.customcrafter.customcrafter.util.InventoryUtil;
+import com.github.sakakiaruka.customcrafter.customcrafter.util.PotionUtil;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.persistence.PersistentDataContainer;
 
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static com.github.sakakiaruka.customcrafter.customcrafter.search.Search.AMORPHOUS_NON_REQUIRED_ANCHOR;
 
 public class Recipe {
     private String name;
@@ -112,6 +118,77 @@ public class Recipe {
         });
         return list;
     }
+
+    public List<Matter> getContentsNoAirWithoutMassMatter() {
+        // returns immutable list
+        return coordinate.values().stream()
+                .filter(e -> !e.isMass())
+                .filter(e -> !e.getCandidate().get(0).equals(Material.AIR))
+                .collect(Collectors.toList());
+    }
+
+    public List<Integer> getContentsNoAirWithoutMassMatterIndex() {
+        List<Integer> list = new ArrayList<>();
+        int index = -1;
+        for (Map.Entry<Coordinate, Matter> entry : coordinate.entrySet()) {
+            index ++;
+            if (entry.getValue().getCandidate().get(0).equals(Material.AIR)) continue;
+            else if (entry.getValue().isMass()) continue;
+            list.add(index);
+        }
+        return list;
+    }
+
+    public int normalRatioWith(Recipe recipe) {
+        int minAmount = Integer.MAX_VALUE;
+        List<Integer> recipeNoMassMatterIndexes = recipe.getContentsNoAirWithoutMassMatterIndex();
+        List<Coordinate> inputNoAirCoordinates = this.getCoordinateNoAir();
+        int ratio = 1;
+        for (int index : recipeNoMassMatterIndexes) {
+            int currentInputAmount = this.getCoordinate().get(inputNoAirCoordinates.get(index)).getAmount();
+            int currentRecipeAmount = recipe.getCoordinate().get(recipe.getCoordinateNoAir().get(index)).getAmount();
+            if (currentInputAmount < minAmount) {
+                ratio = currentInputAmount / currentRecipeAmount;
+            }
+        }
+        return ratio;
+    }
+
+    public int amorphousRatioWith(Recipe recipe) {
+        Map<Coordinate, Coordinate> relate = this.getRelationWithRecipeAndInput(recipe);
+        int ratio = 1;
+        int minAmount = Integer.MAX_VALUE;
+        for (Map.Entry<Coordinate, Coordinate> entry : relate.entrySet()) {
+            Matter r = recipe.getCoordinate().get(entry.getKey());
+            Matter i = this.getCoordinate().get(entry.getValue());
+            if (r.isMass() || r.getCandidate().get(0).equals(Material.AIR)) continue;
+            int recipeAmount = r.getAmount();
+            int inputAmount = i.getAmount();
+            if (inputAmount < minAmount) {
+                minAmount = inputAmount;
+                ratio = inputAmount / recipeAmount;
+            }
+        }
+        return ratio;
+    }
+
+    public Map<Coordinate, Coordinate> getRelationWithRecipeAndInput(Recipe recipe) {
+        List<Map<Coordinate, List<Coordinate>>> temp = new ArrayList<>();
+        Map<Coordinate, List<Coordinate>> enchant = EnchantUtil.amorphous(recipe, this);
+        Map<Coordinate, List<Coordinate>> container = ContainerUtil._amorphous(recipe, this);
+        Map<Coordinate,List<Coordinate>> candidate = InventoryUtil.amorphous(recipe, this);
+        Map<Coordinate, List<Coordinate>> potion = PotionUtil.amorphous(recipe, this);
+
+        if (!enchant.equals(AMORPHOUS_NON_REQUIRED_ANCHOR)) temp.add(enchant);
+        if (!container.equals(AMORPHOUS_NON_REQUIRED_ANCHOR)) temp.add(container);
+        if (!potion.equals(AMORPHOUS_NON_REQUIRED_ANCHOR)) temp.add(potion);
+
+        temp.add(candidate);
+        // recipe, input
+        return InventoryUtil.combination(temp);
+    }
+
+
 
     public List<Coordinate> getCoordinateNoAir() {
         List<Coordinate> list = new ArrayList<>();
