@@ -119,36 +119,19 @@ public class Recipe {
         return list;
     }
 
-    public List<Matter> getContentsNoAirWithoutMassMatter() {
-        // returns immutable list
-        return coordinate.values().stream()
-                .filter(e -> !e.isMass())
-                .filter(e -> !e.getCandidate().get(0).equals(Material.AIR))
-                .collect(Collectors.toList());
-    }
-
-    public List<Integer> getContentsNoAirWithoutMassMatterIndex() {
-        List<Integer> list = new ArrayList<>();
-        int index = -1;
-        for (Map.Entry<Coordinate, Matter> entry : coordinate.entrySet()) {
-            index ++;
-            if (entry.getValue().getCandidate().get(0).equals(Material.AIR)) continue;
-            else if (entry.getValue().isMass()) continue;
-            list.add(index);
-        }
-        return list;
-    }
-
     public int normalRatioWith(Recipe recipe) {
         int minAmount = Integer.MAX_VALUE;
-        List<Integer> recipeNoMassMatterIndexes = recipe.getContentsNoAirWithoutMassMatterIndex();
-        List<Coordinate> inputNoAirCoordinates = this.getCoordinateNoAir();
         int ratio = 1;
-        for (int index : recipeNoMassMatterIndexes) {
-            int currentInputAmount = this.getCoordinate().get(inputNoAirCoordinates.get(index)).getAmount();
-            int currentRecipeAmount = recipe.getCoordinate().get(recipe.getCoordinateNoAir().get(index)).getAmount();
+        List<Coordinate> recipeCoordinate = recipe.getCoordinateNoAir();
+        List<Coordinate> inputCoordinate = this.getCoordinateNoAir();
+        for (int i = 0; i < recipeCoordinate.size(); i++) {
+            Matter currentRecipeMatter = recipe.getCoordinate().get(recipeCoordinate.get(i));
+            if (currentRecipeMatter.isMass()) continue;
+            int currentRecipeAmount = currentRecipeMatter.getAmount();
+            int currentInputAmount = this.getCoordinate().get(inputCoordinate.get(i)).getAmount();
             if (currentInputAmount < minAmount) {
                 ratio = currentInputAmount / currentRecipeAmount;
+                minAmount = currentInputAmount;
             }
         }
         return ratio;
