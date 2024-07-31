@@ -669,16 +669,6 @@ public class SettingsLoad {
                 CustomCrafter.getInstance().getLogger().warning("It will fail to load a recipe-file what is written this temporary matters data.");
                 return Collections.emptyList();
             }
-
-            //debug
-            try {
-                BufferedReader reader = Files.newBufferedReader(newFile.toPath());
-                System.out.println("file="+ reader.lines().collect(Collectors.joining("\n")));
-            } catch (Exception e) {
-                //
-            }
-
-
             tempMatterNames.add(name);
             getMatter(List.of(newFile.toPath()));
 
