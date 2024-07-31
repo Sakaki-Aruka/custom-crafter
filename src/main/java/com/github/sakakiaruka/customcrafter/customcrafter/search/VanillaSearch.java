@@ -10,13 +10,14 @@ import org.bukkit.inventory.ItemStack;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.*;
 
 public class VanillaSearch {
-    public void main(Player player, Inventory inventory, boolean batchBool){
+    public void main(Player player, Inventory inventory, boolean isOneCraft){
         List<Coordinate> coordinates = getCoordinateList(inventory);
         if(coordinates.isEmpty())return;
         if(coordinates.size() > VANILLA_CRAFTING_SLOTS)return;
@@ -32,26 +33,33 @@ public class VanillaSearch {
         if(result.getType().equals(Material.AIR))return;
         WHAT_MAKING.put(player.getUniqueId(),result.getType());
 
-        if(batchBool) {
+        if(!isOneCraft) {
             // needed batch process
             int minimal = getMinimalAmount(itemStacks);
             result.setAmount(result.getAmount() * minimal);
-            InventoryUtil.decrementMaterials(inventory,minimal);
+            decrementMaterials(inventory, minimal);
 
-        }else{
+        } else {
             // not needed batch process
-            InventoryUtil.decrementMaterials(inventory,1);
+            decrementMaterials(inventory, 1);
 
         }
 
         if(result.getAmount() > result.getType().getMaxStackSize()){
             // amount over
             InventoryUtil.safetyItemDrop(player, Collections.singletonList(result));
-            inventory.setItem(CRAFTING_TABLE_RESULT_SLOT,new ItemStack(Material.AIR));
         }else{
-            inventory.setItem(CRAFTING_TABLE_RESULT_SLOT,result);
+            inventory.setItem(CRAFTING_TABLE_RESULT_SLOT, result);
         }
 
+    }
+
+    private void decrementMaterials(Inventory inventory, int minus) {
+        getCoordinateList(inventory).forEach(e -> {
+            int slot = e.getX() + e.getY() * 9;
+            int amount = Math.max(inventory.getItem(slot).getAmount() - minus, 0);
+            inventory.getItem(slot).setAmount(amount);
+        });
     }
 
     private int getMinimalAmount(ItemStack[] items){

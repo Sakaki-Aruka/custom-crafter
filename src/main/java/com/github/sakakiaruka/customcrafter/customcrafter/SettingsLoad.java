@@ -30,6 +30,9 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -42,6 +45,7 @@ import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter.getInstance;
@@ -81,6 +85,7 @@ public class SettingsLoad {
     // === for recipe load === //
     private static final String USING_CONTAINER_VALUES_METADATA_PATTERN = "^([0-9a-zA-Z_\\-]+) <--> (.+)$";
     private static final String MATTER_OVERRIDE_PATTERN = "^(\\w+) -> (\\w+)$";
+    private static final String MATTER_OVERRIDE_PATTERN_TEMP = "^([\\w@]+) -> ([\\w]+)$";
     private static final String MATTER_REGEX_COLLECT_PATTERN = "^R\\|(.+)$";
     private static final String RESULT_METADATA_COLLECT_PATTERN = "^([\\w_]+),(.+)$";
 
@@ -447,6 +452,11 @@ public class SettingsLoad {
             Map<String,String> overrides = new HashMap<>();
             RecipePermission permission = null;
 
+            List<String> tempMatterNames = Collections.emptyList();
+            if (config.contains("matter")) {
+                tempMatterNames = getMattersFromRecipeFilesMatterSection(config);
+            }
+
             if(config.contains("override")){
                 /* override:
                 *  - cobblestone -> c
@@ -455,7 +465,7 @@ public class SettingsLoad {
                 * MATTER_OVERRIDE_PATTERN = "^(\\w+) -> (\\w+)$";
                 */
                 for(String string : config.getStringList("override")){
-                    Matcher matcher = Pattern.compile(MATTER_OVERRIDE_PATTERN).matcher(string);
+                    Matcher matcher = Pattern.compile(config.contains("matter") ? MATTER_OVERRIDE_PATTERN_TEMP : MATTER_OVERRIDE_PATTERN).matcher(string);
                     if (!matcher.matches()) continue;
                     String source = matcher.group(1);
                     String shorter = matcher.group(2);
@@ -500,6 +510,7 @@ public class SettingsLoad {
                     }
                 }
             }
+            tempMatterNames.forEach(e -> MATTERS.remove(e));
 
 
             if(config.contains("returns")){
@@ -618,6 +629,53 @@ public class SettingsLoad {
             }
             ITEM_PLACED_SLOTS_RECIPE_MAP.get(recipe.getContentsNoAir().size()).add(recipe);
         }
+    }
+
+    private List<String> getMattersFromRecipeFilesMatterSection(FileConfiguration config) {
+        List<?> elements = config.getList("matter");
+        List<String> tempMatterNames = new ArrayList<>();
+        for (Object obj : elements) {
+            File newFile;
+            try {
+                // extension: ".tmp", directory: OS default temporary files directory
+                newFile = File.createTempFile("custom-crafter", null, null);
+            } catch (Exception e) {
+                CustomCrafter.getInstance().getLogger().warning(e.toString());
+                CustomCrafter.getInstance().getLogger().warning("Failed to create a temporary file to load a temporary matter that starts with '@'.");
+                CustomCrafter.getInstance().getLogger().warning("At " + config.getName());
+                CustomCrafter.getInstance().getLogger().warning("It will fail to load a recipe-file what is written this temporary matters data.");
+                return Collections.emptyList();
+            }
+
+            Map<String, Object> matterData = (Map<String, Object>) obj;
+            FileConfiguration newConfig = YamlConfiguration.loadConfiguration(newFile);
+            String name = Objects.toString(matterData.get("name"));
+            name = (!name.startsWith("@") ? "@" : "") + name;
+            newConfig.set("name", name);
+            newConfig.set("amount", matterData.get("amount"));
+            newConfig.set("mass", matterData.get("mass"));
+            newConfig.set("candidate", matterData.get("candidate"));
+            if (newConfig.contains("enchant")) newConfig.set("enchant", matterData.get("enchant"));
+            if (newConfig.contains("potion") && newConfig.contains("bottleTypeMatch")) {
+                newConfig.set("potion", matterData.get("potion"));
+                newConfig.set("bottleTypeMatch", matterData.get("bottleTypeMatch"));
+            }
+
+            try {
+                newConfig.save(newFile);
+            } catch (Exception e) {
+                CustomCrafter.getInstance().getLogger().warning(e.toString());
+                CustomCrafter.getInstance().getLogger().warning("Failed to save temporary file.");
+                CustomCrafter.getInstance().getLogger().warning("It will fail to load a recipe-file what is written this temporary matters data.");
+                return Collections.emptyList();
+            }
+            tempMatterNames.add(name);
+            getMatter(List.of(newFile.toPath()));
+
+            newFile.deleteOnExit();
+        }
+
+        return tempMatterNames;
     }
 
     public static TriConsumer<Map<String, String>, ItemStack, String> getConsumer(String type) {
