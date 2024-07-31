@@ -31,13 +31,6 @@ show:
   - "show all = This command shows all recipe info that enabled in this server. "
   - "show {RECIPE} = This command shows the specified recipe info that enabled in this server."
 
-give:
-  - "If you send this command from a console, the system cannot complete to processing this."
-  - "give matter {MATTER}"
-  - "    When you send this command, you can get like a specified Matter."
-  - "give result {RESULT}"
-  - "    When you send this command, you can get like a specified Result."
-
 file:
   - "file make defaultPotion = When you send this command. the system makes default-potion-Matter files."
 
