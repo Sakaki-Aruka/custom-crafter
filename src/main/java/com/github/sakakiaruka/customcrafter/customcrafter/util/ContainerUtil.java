@@ -76,7 +76,7 @@ public class ContainerUtil {
 
     public static Map<String, ItemStack> DEFINED_ITEMS = new HashMap<>();
     public static Map<String, Entity> DEFINED_ENTITY = new HashMap<>();
-    private static final String MANY_COMMAND_REGEX = "times=([0-9]+),command=(.+)";
+    private static final String MANY_COMMAND_REGEX = "times=([1-9]([0-9]{1,3})?),command=(.+)";
     private static final Pattern MANY_COMMAND_PATTERN = Pattern.compile(MANY_COMMAND_REGEX);
 
     public static boolean isPass(ItemStack item, Matter matter) {
@@ -769,7 +769,7 @@ public class ContainerUtil {
             Matcher m = Pattern.compile(MANY_COMMAND_REGEX).matcher(formula);
             if (!m.matches()) return;
             int times = Integer.parseInt(m.group(1));
-            String command = m.group(2);
+            String command = m.group(3);
             for (int i = 0; i < times; i++) Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
         }
     };
@@ -787,7 +787,7 @@ public class ContainerUtil {
             Matcher m = MANY_COMMAND_PATTERN.matcher(formula);
             if (!m.matches()) return;
             int times = Integer.parseInt(m.group(1));
-            String command = m.group(2);
+            String command = m.group(3);
             for (int i = 0; i < times; i++) player.performCommand(command);
         }
     };
