@@ -22,6 +22,7 @@ import org.bukkit.NamespacedKey;
 import org.bukkit.Registry;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.attribute.AttributeModifier;
+import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -75,6 +76,8 @@ public class ContainerUtil {
 
     public static Map<String, ItemStack> DEFINED_ITEMS = new HashMap<>();
     public static Map<String, Entity> DEFINED_ENTITY = new HashMap<>();
+    private static final String MANY_COMMAND_REGEX = "times=([0-9]+),command=(.+)";
+    private static final Pattern MANY_COMMAND_PATTERN = Pattern.compile(MANY_COMMAND_REGEX);
 
     public static boolean isPass(ItemStack item, Matter matter) {
         // item -> target, matter -> source (recipe)
@@ -761,7 +764,14 @@ public class ContainerUtil {
     public static final TriConsumer<Map<String, String>, ItemStack, String> RUN_COMMAND_AS_CONSOLE = (data, item, formula) -> {
         // type: run_command_as_player, value: ~~~
         formula = CalcUtil.getContent(data, formula);
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), formula);
+        if (!formula.matches(MANY_COMMAND_REGEX)) Bukkit.dispatchCommand(Bukkit.getConsoleSender(), formula);
+        else {
+            Matcher m = Pattern.compile(MANY_COMMAND_REGEX).matcher(formula);
+            if (!m.matches()) return;
+            int times = Integer.parseInt(m.group(1));
+            String command = m.group(2);
+            for (int i = 0; i < times; i++) Bukkit.dispatchCommand(Bukkit.getConsoleSender(), command);
+        }
     };
 
     public static final TriConsumer<Map<String, String>, ItemStack, String> RUN_COMMAND_AS_PLAYER = (data, item, formula) -> {
@@ -772,7 +782,14 @@ public class ContainerUtil {
             sendNoSuchTemplateWarn("player (from UUID)", formula);
             return;
         }
-        Bukkit.dispatchCommand(player, formula);
+        if (!formula.matches(MANY_COMMAND_REGEX)) player.performCommand(formula);
+        else {
+            Matcher m = MANY_COMMAND_PATTERN.matcher(formula);
+            if (!m.matches()) return;
+            int times = Integer.parseInt(m.group(1));
+            String command = m.group(2);
+            for (int i = 0; i < times; i++) player.performCommand(command);
+        }
     };
 
     public static final TriConsumer<Map<String, String>, ItemStack, String> ITEM_DEFINE = (data, item, formula) -> {
