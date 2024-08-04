@@ -49,7 +49,7 @@ public class VanillaSearch {
             // amount over
             InventoryUtil.safetyItemDrop(player, Collections.singletonList(result));
         }else{
-            inventory.setItem(CRAFTING_TABLE_RESULT_SLOT, result);
+            InventoryUtil.safetyItemPlace(player, List.of(result));
         }
 
     }
