@@ -6,7 +6,9 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.*;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Color;
+import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
@@ -24,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.*;
 
@@ -225,11 +228,42 @@ public class InventoryUtil {
     }
 
 
-    public static void safetyItemDrop(Player player, List<ItemStack> items) {
+    private static List<ItemStack> getSafetySlicedItems(List<ItemStack> items) {
+        List<ItemStack> result = new ArrayList<>();
         for (ItemStack item : items) {
-            Item dropped = player.getWorld().dropItem(player.getLocation(), item);
-            dropped.setOwner(player.getUniqueId());
+            int amount = item.getAmount();
+            int maxAmount = item.getType().getMaxStackSize();
+
+            if (amount <= maxAmount) {
+                result.add(item);
+                continue;
+            }
+            while (amount > 0) {
+                ItemStack modified = new ItemStack(item);
+                int q = Math.min(amount, maxAmount);
+                modified.setAmount(q);
+                result.add(modified);
+                amount -= q;
+            }
         }
+        return result;
+    }
+
+    public static void safetyItemPlace(Player player, List<ItemStack> items) {
+        Inventory inventory = player.getInventory();
+        getSafetySlicedItems(items).forEach(v -> {
+            inventory.addItem(v).forEach((k, w) -> safetyItemDrop(player, List.of(w)));
+        });
+    }
+
+    public static void safetyItemDrop(Player player, List<ItemStack> items) {
+        World world = player.getWorld();
+        Location location = player.getLocation();
+        UUID id = player.getUniqueId();
+        getSafetySlicedItems(items).forEach(v -> {
+            Item dropped = world.dropItem(location, v);
+            dropped.setOwner(id);
+        });
     }
 
 
