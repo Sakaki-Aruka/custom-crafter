@@ -4,6 +4,7 @@ main: com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter
 api-version: 1.19
 authors: [ SakakiAruka ]
 softdepend: ["PlaceholderAPI"]
+load: POSTWORLD
 commands:
   cc:
     permission: cc.op
