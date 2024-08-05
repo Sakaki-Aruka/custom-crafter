@@ -1,6 +1,8 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.util;
 
 import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter;
+import me.clip.placeholderapi.PlaceholderAPI;
+import org.bukkit.Bukkit;
 
 import java.text.DecimalFormat;
 import java.util.Map;
@@ -60,11 +62,16 @@ public class CalcUtil {
             } else if (c == '%') {
                 flag = 0;
                 String key = buffer.toString();
+
+                if (CustomCrafter.ENABLED_PLACEHOLDER_API) {
+                    key = PlaceholderAPI.setPlaceholders(Bukkit.getPlayer(data.get("$PLAYER_UUID$")), key);
+                }
+
                 if (!data.containsKey(key)) {
                     if (key.matches("random\\[([0-9-]+)?:([0-9-]+)?]")) {
                         result.append(getRandomNumber(key, Integer.MIN_VALUE, Integer.MAX_VALUE));
                     } else result.append(data.getOrDefault("@default@", "None"));
-                } else result.append(data.get(buffer.toString()));
+                } else result.append(data.get(key));
                 buffer.setLength(0);
             }
         }
