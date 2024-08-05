@@ -92,7 +92,7 @@ If you want to provide custom recipes and custom items to players, you have to w
 3. Place base block  
 custom crafter does not work only a work bench block.  
 If you want to use custom crafter features, place the base blocks under a work bench block 3 * 3.  
-The default base block is `GOLDEN_BLOCK`.
+The default base block is `GOLD_BLOCK`.
 
 ---
 
