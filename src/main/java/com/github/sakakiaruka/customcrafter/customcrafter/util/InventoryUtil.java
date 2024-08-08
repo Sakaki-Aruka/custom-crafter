@@ -232,6 +232,7 @@ public class InventoryUtil {
         List<ItemStack> result = new ArrayList<>();
         for (ItemStack item : items) {
             int amount = item.getAmount();
+            if (amount < 1) continue;
             int maxAmount = item.getType().getMaxStackSize();
 
             if (amount <= maxAmount) {
