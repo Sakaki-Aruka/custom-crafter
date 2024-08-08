@@ -68,7 +68,7 @@ public class VanillaSearch {
                     InventoryUtil.safetyItemPlace(player, List.of(resultSlot));
                     // remove result slot's items
                     inventory.setItem(CRAFTING_TABLE_RESULT_SLOT, new ItemStack(Material.AIR));
-                    if (resultAmount <= resultSlotAmount) {
+                    if (resultAmount <= resultStackMax) {
                         inventory.setItem(CRAFTING_TABLE_RESULT_SLOT, result);
                     } else {
                         ItemStack canSet = result.asQuantity(resultSlotAmount);
@@ -86,6 +86,7 @@ public class VanillaSearch {
                 }
             } else {
                 InventoryUtil.safetyItemPlace(player, List.of(resultSlot));
+                inventory.setItem(CRAFTING_TABLE_RESULT_SLOT, new ItemStack(Material.AIR));
                 if (resultAmount <= resultStackMax) {
                     inventory.setItem(CRAFTING_TABLE_RESULT_SLOT, result);
                 } else {
@@ -93,19 +94,7 @@ public class VanillaSearch {
                     InventoryUtil.safetyItemPlace(player, List.of(result.asQuantity(resultAmount - resultStackMax)));
                 }
             }
-
         }
-//        //if (inventory.getItem(CRAFTING_TABLE_RESULT_SLOT) == null)
-//
-//        InventoryUtil.safetyItemPlace(player, List.of(result));
-//
-////        if(result.getAmount() > result.getType().getMaxStackSize()){
-////            // amount over
-////            InventoryUtil.safetyItemDrop(player, Collections.singletonList(result));
-////        }else{
-////            InventoryUtil.safetyItemPlace(player, List.of(result));
-////        }
-
     }
 
     private void decrementMaterials(Inventory inventory, int minus) {

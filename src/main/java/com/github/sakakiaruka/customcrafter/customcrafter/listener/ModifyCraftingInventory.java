@@ -57,14 +57,6 @@ public class ModifyCraftingInventory implements Listener {
             }
             if (forCheck.isEmpty()) return;
             // empty checker ===>
-            if (inventory.getItem(CRAFTING_TABLE_RESULT_SLOT) != null) {
-                // replace old result items
-                ItemStack item = inventory.getItem(CRAFTING_TABLE_RESULT_SLOT);
-                if (item == null || item.getType().equals(Material.AIR)) return;
-                InventoryUtil.safetyItemPlace(player, List.of(item));
-                inventory.setItem(CRAFTING_TABLE_RESULT_SLOT, new ItemStack(Material.AIR));
-                return;
-            }
 
             if (clickType.equals(ClickType.SHIFT_LEFT)) {
                 // mass
