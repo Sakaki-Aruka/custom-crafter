@@ -231,6 +231,7 @@ public class InventoryUtil {
     private static List<ItemStack> getSafetySlicedItems(List<ItemStack> items) {
         List<ItemStack> result = new ArrayList<>();
         for (ItemStack item : items) {
+            if (item.getType().equals(Material.AIR)) continue;
             int amount = item.getAmount();
             if (amount < 1) continue;
             int maxAmount = item.getType().getMaxStackSize();
