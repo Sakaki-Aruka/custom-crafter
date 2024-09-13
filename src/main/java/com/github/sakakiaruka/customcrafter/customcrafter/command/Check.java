@@ -2,9 +2,9 @@ package com.github.sakakiaruka.customcrafter.customcrafter.command;
 
 import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter;
 import com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad;
-import com.github.sakakiaruka.customcrafter.customcrafter.listener.CloseCraftingTable;
 import com.github.sakakiaruka.customcrafter.customcrafter.listener.OpenCraftingTable;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.ContainerUtil;
+import com.github.sakakiaruka.customcrafter.customcrafter.util.InventoryUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.*;
@@ -13,7 +13,6 @@ import org.bukkit.entity.Player;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
 
 import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.*;
 import static com.github.sakakiaruka.customcrafter.customcrafter.listener.OpenCraftingTable.opening;
@@ -37,12 +36,19 @@ public class Check{
         *
          */
 
-        List<Player> copy = new ArrayList<>();
-        opening.forEach(s->copy.add(s));
-        copy.forEach(s->{
-            new CloseCraftingTable().close(s,s.getInventory());
+
+        opening.forEach(s -> {
+            InventoryUtil.safetyCraftingTableClose(s, s.getOpenInventory().getTopInventory());
             s.closeInventory();
         });
+
+//        List<Player> copy = new ArrayList<>();
+//        opening.forEach(s->copy.add(s));
+//        copy.forEach(s->{
+//
+//            new CloseCraftingTable().close(s,s.getInventory());
+//            s.closeInventory();
+//        });
 
         RECIPE_LIST.clear();
         NAMED_RECIPES_MAP.clear();

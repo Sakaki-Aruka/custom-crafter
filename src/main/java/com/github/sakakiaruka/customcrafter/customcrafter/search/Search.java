@@ -56,7 +56,7 @@ public class Search {
         Recipe result = null;
         int massAmount = 0;
         Recipe input = toRecipe(inventory);
-        List<ItemStack> interestedItems = getInterestedAreaItems(inventory);
+        List<ItemStack> interestedItems = InventoryUtil.getInterestedAreaItems(inventory);
         int itemContainedSlots = input.getContentsNoAir().size();
         if (itemContainedSlots == 0) return;
         if (ITEM_PLACED_SLOTS_RECIPE_MAP.get(itemContainedSlots) == null || ITEM_PLACED_SLOTS_RECIPE_MAP.get(itemContainedSlots).isEmpty()) {
@@ -229,7 +229,7 @@ public class Search {
         inputContainerData.put("$RECIPE_NAME$", recipe.getName());
 
         if (recipe.getTag().equals(Tag.NORMAL)) {
-            List<ItemStack> items = getInterestedAreaItems(inventory);
+            List<ItemStack> items = InventoryUtil.getInterestedAreaItems(inventory);
             // key: "slot#plugin_name#variable_name"
             // slot: 0 ~ 36
             // plugin_name: lowercase alphanumeric
@@ -468,17 +468,6 @@ public class Search {
         return true;
     }
 
-    private List<ItemStack> getInterestedAreaItems(Inventory inventory) {
-        List<ItemStack> list = new ArrayList<>();
-        for (int y = 0; y< CRAFTING_TABLE_SIZE; y++) {
-            for (int x = 0; x< CRAFTING_TABLE_SIZE; x++) {
-                int i = x+y*9;
-                if (inventory.getItem(i) == null || inventory.getItem(i).getType().equals(Material.AIR)) continue;
-                list.add(inventory.getItem(i));
-            }
-        }
-        return list;
-    }
 
     private Recipe toRecipe(Inventory inventory){
         Recipe recipe = new Recipe();

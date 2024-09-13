@@ -233,6 +233,7 @@ public class InventoryUtil {
         for (ItemStack item : items) {
             if (item.getType().equals(Material.AIR)) continue;
             int amount = item.getAmount();
+            if (amount < 1) continue;
             int maxAmount = item.getType().getMaxStackSize();
 
             if (amount <= maxAmount) {
@@ -265,6 +266,26 @@ public class InventoryUtil {
             Item dropped = world.dropItem(location, v);
             dropped.setOwner(id);
         });
+    }
+
+    public static List<ItemStack> getInterestedAreaItems(Inventory inventory) {
+        if (inventory.getHolder() != null) return Collections.emptyList();
+        List<ItemStack> list = new ArrayList<>();
+        for (int y = 0; y< CRAFTING_TABLE_SIZE; y++) {
+            for (int x = 0; x< CRAFTING_TABLE_SIZE; x++) {
+                int i = x+y*9;
+                if (inventory.getItem(i) == null || inventory.getItem(i).getType().equals(Material.AIR)) continue;
+                list.add(inventory.getItem(i));
+            }
+        }
+        return list;
+    }
+
+    public static void safetyCraftingTableClose(Player player, Inventory inventory) {
+        safetyItemPlace(player, getInterestedAreaItems(inventory));
+        ItemStack resultSlot = inventory.getItem(CRAFTING_TABLE_RESULT_SLOT);
+        if (resultSlot == null || resultSlot.getType().equals(Material.AIR)) return;
+        safetyItemPlace(player, List.of(resultSlot));
     }
 
 

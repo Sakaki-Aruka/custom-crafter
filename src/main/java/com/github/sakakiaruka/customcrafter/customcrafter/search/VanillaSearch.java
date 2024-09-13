@@ -1,7 +1,9 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.search;
 
+import com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordinate;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.InventoryUtil;
+import it.unimi.dsi.fastutil.ints.AbstractInt2ReferenceFunction;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -45,13 +47,54 @@ public class VanillaSearch {
 
         }
 
-        if(result.getAmount() > result.getType().getMaxStackSize()){
-            // amount over
-            InventoryUtil.safetyItemDrop(player, Collections.singletonList(result));
-        }else{
-            InventoryUtil.safetyItemPlace(player, List.of(result));
+        ItemStack resultSlot = inventory.getItem(CRAFTING_TABLE_RESULT_SLOT);
+        int resultAmount = result.getAmount();
+        int resultStackMax = result.getType().getMaxStackSize();
+        if (resultSlot == null || resultSlot.getType().equals(Material.AIR)) {
+            // if result slot is empty
+            if (result.getAmount() <= resultStackMax) {
+                inventory.setItem(CRAFTING_TABLE_RESULT_SLOT, result);
+            } else {
+                ItemStack canSet = result.asQuantity(resultStackMax);
+                ItemStack overflown = result.asQuantity(resultAmount - resultStackMax);
+                inventory.setItem(CRAFTING_TABLE_RESULT_SLOT, canSet);
+                InventoryUtil.safetyItemPlace(player, List.of(overflown));
+            }
+        } else {
+            int resultSlotAmount = resultSlot.getAmount();
+            if (resultSlot.asOne().equals(result.asOne())) {
+                if (resultSlotAmount >= resultStackMax) {
+                    // give old result to player
+                    InventoryUtil.safetyItemPlace(player, List.of(resultSlot));
+                    // remove result slot's items
+                    inventory.setItem(CRAFTING_TABLE_RESULT_SLOT, new ItemStack(Material.AIR));
+                    if (resultAmount <= resultStackMax) {
+                        inventory.setItem(CRAFTING_TABLE_RESULT_SLOT, result);
+                    } else {
+                        ItemStack canSet = result.asQuantity(resultSlotAmount);
+                        ItemStack overflown = result.asQuantity(resultAmount - resultStackMax);
+                        inventory.setItem(CRAFTING_TABLE_RESULT_SLOT, canSet);
+                        InventoryUtil.safetyItemPlace(player, List.of(overflown));
+                    }
+                } else {
+                    if (resultSlotAmount + resultAmount <= resultStackMax) {
+                        inventory.setItem(CRAFTING_TABLE_RESULT_SLOT, resultSlot.asQuantity(resultSlotAmount + resultAmount));
+                    } else {
+                        inventory.setItem(CRAFTING_TABLE_RESULT_SLOT, resultSlot.asQuantity(resultStackMax));
+                        InventoryUtil.safetyItemPlace(player, List.of(result.asQuantity(resultAmount - (resultStackMax - resultSlotAmount))));
+                    }
+                }
+            } else {
+                InventoryUtil.safetyItemPlace(player, List.of(resultSlot));
+                inventory.setItem(CRAFTING_TABLE_RESULT_SLOT, new ItemStack(Material.AIR));
+                if (resultAmount <= resultStackMax) {
+                    inventory.setItem(CRAFTING_TABLE_RESULT_SLOT, result);
+                } else {
+                    inventory.setItem(CRAFTING_TABLE_RESULT_SLOT, result.asQuantity(resultStackMax));
+                    InventoryUtil.safetyItemPlace(player, List.of(result.asQuantity(resultAmount - resultStackMax)));
+                }
+            }
         }
-
     }
 
     private void decrementMaterials(Inventory inventory, int minus) {
