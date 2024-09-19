@@ -280,4 +280,23 @@ public class Recipe {
         return list;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Recipe)) return false;
+        Recipe recipe = (Recipe) o;
+        return Objects.equals(name, recipe.name) && tag == recipe.tag && Objects.equals(coordinate, recipe.coordinate) && Objects.equals(returnItems, recipe.returnItems) && Objects.equals(permission, recipe.permission) && Objects.equals(result, recipe.result) && Objects.equals(containers, recipe.containers);
+    }
+
+    @Override
+    public int hashCode() {
+        int r = 17;
+        r = r * 31 + name.hashCode();
+        r = r * 31 + tag.hashCode();
+        r = r * 31 + coordinate.hashCode();
+        r = r * 31 + returnItems.hashCode();
+        r = r * 31 + permission.hashCode();
+        r = r * 31 + result.hashCode();
+        return r;
+    }
 }

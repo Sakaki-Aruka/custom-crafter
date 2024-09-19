@@ -5,6 +5,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.util.ContainerUtil;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.BiFunction;
 
 public class RecipeContainer {
@@ -50,5 +51,23 @@ public class RecipeContainer {
     public void run(Map<String, String> data, ItemStack item) {
         if (!predicate.apply(data, predicateFormula)) return;
         action.accept(data, item, actionFormula);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof RecipeContainer)) return false;
+        RecipeContainer that = (RecipeContainer) o;
+        return Objects.equals(predicate, that.predicate) && Objects.equals(action, that.action) && Objects.equals(predicateFormula, that.predicateFormula) && Objects.equals(actionFormula, that.actionFormula);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = result * 31 + predicate.hashCode();
+        result = result * 31 + action.hashCode();
+        result = result * 31 + predicateFormula.hashCode();
+        result = result * 31 + actionFormula.hashCode();
+        return result;
     }
 }

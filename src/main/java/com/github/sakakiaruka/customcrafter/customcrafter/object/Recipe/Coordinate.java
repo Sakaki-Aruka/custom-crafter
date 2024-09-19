@@ -1,5 +1,7 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe;
 
+import java.util.Objects;
+
 public class Coordinate {
 
     public static final Coordinate NULL_ANCHOR = new Coordinate(Integer.MIN_VALUE, Integer.MIN_VALUE);
@@ -37,5 +39,21 @@ public class Coordinate {
     @Override
     public String toString() {
         return "[x=" + x + ",y=" + y +"]";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Coordinate)) return false;
+        Coordinate that = (Coordinate) o;
+        return x == that.x && y == that.y;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = result * 31 + Integer.hashCode(x);
+        result = result * 31 + Integer.hashCode(y);
+        return result;
     }
 }
