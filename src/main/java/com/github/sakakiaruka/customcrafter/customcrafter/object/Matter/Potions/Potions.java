@@ -244,4 +244,23 @@ public class Potions extends Matter implements Matters {
         }
         return map;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Potions)) return false;
+        if (!super.equals(o)) return false;
+        Potions potions = (Potions) o;
+        return bottleTypeMatch == potions.bottleTypeMatch && Objects.equals(data, potions.data) && bottle == potions.bottle;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = result * 31 + super.hashCode();
+        result = result * 31 + data.hashCode();
+        result = result * 31 + bottle.hashCode();
+        result = result * 31 + Boolean.hashCode(bottleTypeMatch);
+        return result;
+    }
 }

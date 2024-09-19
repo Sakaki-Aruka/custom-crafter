@@ -3,6 +3,7 @@ package com.github.sakakiaruka.customcrafter.customcrafter.object.Result;
 import org.bukkit.enchantments.Enchantment;
 
 import java.util.Map;
+import java.util.Objects;
 
 public class Result {
 
@@ -76,5 +77,24 @@ public class Result {
     public Result setMatchPoint(int matchPoint) {
         this.matchPoint = matchPoint;
         return this;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Result)) return false;
+        Result result = (Result) o;
+        return amount == result.amount && matchPoint == result.matchPoint && Objects.equals(name, result.name) && Objects.equals(enchantsInfo, result.enchantsInfo) && Objects.equals(nameOrRegex, result.nameOrRegex);
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 17;
+        hash = hash * 31 + name.hashCode();
+        hash = hash * 31 + enchantsInfo.hashCode();
+        hash = hash * 31 + Integer.hashCode(amount);
+        hash = hash * 31 + nameOrRegex.hashCode();
+        hash = hash * 31 + Integer.hashCode(matchPoint);
+        return hash;
     }
 }

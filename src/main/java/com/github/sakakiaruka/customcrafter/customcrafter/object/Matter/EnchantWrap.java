@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 public class EnchantWrap {
@@ -49,4 +50,20 @@ public class EnchantWrap {
         return String.format("Enchant : %s | Level : %d | Strict : %s",e,lv,s);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof EnchantWrap)) return false;
+        EnchantWrap that = (EnchantWrap) o;
+        return level == that.level && Objects.equals(enchant, that.enchant) && strict == that.strict;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = result * 31 + Integer.hashCode(level);
+        result = result * 31 + enchant.hashCode();
+        result = result * 31 + strict.hashCode();
+        return result;
+    }
 }
