@@ -2,6 +2,7 @@ package com.github.sakakiaruka.customcrafter.customcrafter.listener;
 
 import com.destroystokyo.paper.event.player.PlayerUseUnknownEntityEvent;
 import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter;
+import com.github.sakakiaruka.customcrafter.customcrafter.event.CreateCustomItemEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;

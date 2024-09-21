@@ -9,9 +9,9 @@ import org.bukkit.event.Listener
 object CreateCustomItem: Listener {
     @EventHandler
     fun onCreate(e: CreateCustomItemEvent) {
-        HistoryUtil.addHistory(CraftHistory(e.player, e.recipe, e.made))
+        HistoryUtil.addHistory(CraftHistory(e.player, e.recipe, e.item))
 
         //debug
-        println("add create info=${CraftHistory(e.player, e.recipe, e.made)}")
+        println("add create info=${CraftHistory(e.player, e.recipe, e.item).toStringWithoutItem()}")
     }
 }
