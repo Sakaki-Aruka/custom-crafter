@@ -6,6 +6,7 @@ import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 import org.bukkit.persistence.PersistentDataContainer;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
@@ -14,6 +15,7 @@ import static com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad.LI
 public class Matter {
     private String name;
     private List<Material> candidate;
+    @Nullable
     private List<EnchantWrap> wrap;
     private int amount;
     private boolean mass;

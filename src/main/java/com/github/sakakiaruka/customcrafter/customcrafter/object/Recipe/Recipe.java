@@ -13,6 +13,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.util.InventoryUtil;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.PotionUtil;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,9 +24,9 @@ public class Recipe {
     private String name;
     private Tag tag;
     private Map<Coordinate, Matter> coordinate;
-    private Map<Material, ItemStack> returnItems;
-    private RecipePermission permission;
-    private Result result;
+    @Nullable private Map<Material, ItemStack> returnItems;
+    @Nullable private RecipePermission permission;
+    @Nullable private Result result;
     private List<RecipeContainer> containers;
 
     public Recipe(String name,String tag,Map<Coordinate,Matter> coordinate,Map<Material,ItemStack> returnItems,Result result, RecipePermission permission, List<RecipeContainer> containers){
@@ -75,7 +76,7 @@ public class Recipe {
         this.coordinate = coordinate;
     }
 
-    public Map<Material, ItemStack> getReturnItems() {
+    public @Nullable Map<Material, ItemStack> getReturnItems() {
         return returnItems;
     }
 
@@ -83,7 +84,7 @@ public class Recipe {
         this.returnItems = returnItems;
     }
 
-    public Result getResult() {
+    public @Nullable Result getResult() {
         return result;
     }
 
@@ -91,7 +92,7 @@ public class Recipe {
         this.result = result;
     }
 
-    public RecipePermission getPermission() {
+    public @Nullable RecipePermission getPermission() {
         return permission;
     }
 
@@ -294,9 +295,9 @@ public class Recipe {
         r = r * 31 + name.hashCode();
         r = r * 31 + tag.hashCode();
         r = r * 31 + coordinate.hashCode();
-        r = r * 31 + returnItems.hashCode();
-        r = r * 31 + permission.hashCode();
-        r = r * 31 + result.hashCode();
+        r = returnItems != null ? r * 31 + returnItems.hashCode() : r;
+        r = permission != null ? r * 31 + permission.hashCode() : r;
+        r = result != null ? r * 31 + result.hashCode() : r;
         return r;
     }
 }
