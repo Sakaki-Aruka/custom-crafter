@@ -2,10 +2,7 @@ package com.github.sakakiaruka.customcrafter.customcrafter.`object`.history
 
 import com.github.sakakiaruka.customcrafter.customcrafter.`object`.Recipe.Recipe
 import com.github.sakakiaruka.customcrafter.customcrafter.util.HistoryUtil.toExposedBlob
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.Serializable
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
+import com.google.gson.GsonBuilder
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -14,14 +11,14 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 class CraftHistory(
-    @Contextual val playerUUID: UUID,
-    val recipeName: String,// = recipe.name
-    val recipeHash: Int,// = recipe.hashCode()
-    val createdMCVersion: String,// = Bukkit.getMinecraftVersion()
-    @Contextual val createdItem: ExposedBlob,// = item.toExposedBlob()
-    val createdAmount: Int,// = item.amount
-    val createdTimestamp: Long,// = System.currentTimeMillis()
-    @Contextual val createdDate: LocalDateTime,// = LocalDateTime.now()
+    val playerUUID: UUID,
+    val recipeName: String,
+    val recipeHash: Int,
+    val createdMCVersion: String,
+    val createdItem: ExposedBlob,
+    val createdAmount: Int,
+    val createdTimestamp: Long,
+    val createdDate: LocalDateTime,
 )
  {
     constructor(
@@ -39,7 +36,16 @@ class CraftHistory(
         createdDate = LocalDateTime.now()
     ) {}
 
-    fun toStringWithoutItem(): String {
-        return ""
+    fun toStringWithoutItem(prettyPrint: Boolean = false): String {
+        val values: MutableMap<String, Any> = mutableMapOf()
+        values["player-uuid"] = playerUUID
+        values["recipe-name"] = recipeName
+        values["recipe-hash"] = recipeHash
+        values["mc-version"] = createdMCVersion
+        values["item-nbt-byte-array-length"] = createdItem.bytes.size
+        values["amount"] = createdAmount
+        values["timestamp"] = createdTimestamp
+        values["date"] = createdDate
+        return GsonBuilder().takeIf { prettyPrint }?.setPrettyPrinting()!!.create().toJson(values)
     }
 }

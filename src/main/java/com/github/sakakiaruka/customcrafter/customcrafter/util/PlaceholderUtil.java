@@ -6,6 +6,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordinate;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Tag;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.history.CraftHistoryQueryResult;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
@@ -45,6 +46,18 @@ public class PlaceholderUtil extends PlaceholderExpansion {
 
     @Override
     public @Nullable String onRequest(OfflinePlayer player, @NotNull String params) {
+        if (player != null) {
+            if (params.equals("history:player-craft")) {
+                List<CraftHistoryQueryResult> histories = HistoryUtil.INSTANCE.getPlayerCreatedRecipeUnique(player.getUniqueId());
+                if (!histories.isEmpty()) {
+                    List<String> convertedList = new ArrayList<>();
+                    histories.forEach(e -> convertedList.add(CraftHistoryQueryResult.Companion.toJson(e)));
+                    return new Gson().toJson(convertedList);
+                }
+            } else if (params.equals("history:player-craft-times")) {
+                return new Gson().toJson(Map.of("times", HistoryUtil.INSTANCE.getPlayerCreatedRecipeUnique(player.getUniqueId())));
+            }
+        }
         return ALL.get(params);
     }
 
@@ -147,8 +160,6 @@ public class PlaceholderUtil extends PlaceholderExpansion {
             }
 
 
-            //debug
-            System.out.println("json obj=" + new Gson().toJson(obj));
 
             SERIALIZED_CUSTOM_RECIPES.put("recipe:" + name, new Gson().toJson(obj));
         }
