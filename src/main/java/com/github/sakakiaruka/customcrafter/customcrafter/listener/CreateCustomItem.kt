@@ -12,6 +12,6 @@ object CreateCustomItem: Listener {
         HistoryUtil.addHistory(CraftHistory(e.player, e.recipe, e.item))
 
         //debug
-        println("add create info=${CraftHistory(e.player, e.recipe, e.item)}")
+        println("add create info=${CraftHistory(e.player, e.recipe, e.item).toStringWithoutItem()}")
     }
 }
