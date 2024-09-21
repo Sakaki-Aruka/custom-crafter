@@ -1,6 +1,7 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.search;
 
 import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter;
+import com.github.sakakiaruka.customcrafter.customcrafter.event.CreateCustomItemEvent;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantStrict;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.EnchantWrap;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
@@ -333,6 +334,8 @@ public class Search {
         for (RecipeContainer container : recipe.getContainers()) {
             container.run(inputContainerData, item);
         }
+
+        new CreateCustomItemEvent(player, recipe, item).callEvent();
 
         if(inventory.getItem(CRAFTING_TABLE_RESULT_SLOT) == null){
             // empty a result item's slot
