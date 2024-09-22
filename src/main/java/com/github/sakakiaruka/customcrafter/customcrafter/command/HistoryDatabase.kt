@@ -1,11 +1,13 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.command
 
+import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter
 import com.github.sakakiaruka.customcrafter.customcrafter.util.HistoryUtil
 import org.bukkit.Bukkit
 import org.bukkit.OfflinePlayer
 import org.bukkit.command.Command
 import org.bukkit.command.CommandExecutor
 import org.bukkit.command.CommandSender
+import org.bukkit.scheduler.BukkitRunnable
 import java.util.UUID
 
 object HistoryDatabase: CommandExecutor {
@@ -32,17 +34,20 @@ object HistoryDatabase: CommandExecutor {
             return false
         }
 
-        sender.sendMessage(HistoryUtil.convertToJsonList(
-            when (args[0]) {
-                "all" -> HistoryUtil.getPlayerCraftedHistoryAll(player.uniqueId)
-                "unique" -> HistoryUtil.getPlayerCreatedHistoryUnique(player.uniqueId)
-                else -> run {
-                    sender.sendMessage("'${args[0]}' is an illegal option.")
-                    return false
-                }
+        object: BukkitRunnable() {
+            override fun run() {
+                sender.sendMessage(HistoryUtil.convertToJsonList(
+                    when (args[0]) {
+                        "all" -> HistoryUtil.getPlayerCraftedHistoryAll(player.uniqueId)
+                        "unique" -> HistoryUtil.getPlayerCreatedHistoryUnique(player.uniqueId)
+                        else -> run {
+                            sender.sendMessage("'${args[0]}' is an illegal option.")
+                            return
+                        }
+                    }
+                ).joinToString(System.lineSeparator()))
             }
-        ).joinToString(System.lineSeparator()))
-
+        }.runTaskAsynchronously(CustomCrafter.getInstance())
         return true
     }
 }

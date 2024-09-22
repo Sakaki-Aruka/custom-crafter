@@ -37,7 +37,7 @@ object HistoryUtil {
         }
     }
 
-    fun getPlayerCraftedHistoryAll(playerUuid: UUID): List<CraftHistoryQueryResult> {
+    fun getPlayerCraftedHistoryAll(playerUuid: UUID, useLimit: Boolean = true): List<CraftHistoryQueryResult> {
         /*
          *
          * collects ALL histories what are about specified id's
@@ -47,6 +47,7 @@ object HistoryUtil {
 
         transaction {
             CraftHistoryTable.selectAll()
+                .limit(n = if (useLimit) QUERY_LIMIT else Int.MAX_VALUE)
                 .where { CraftHistoryTable.uuid eq playerUuid }
                 .forEach { line ->
                     val recipeName: String = line[CraftHistoryTable.recipeName]
@@ -62,7 +63,7 @@ object HistoryUtil {
         return result
     }
 
-    fun getPlayerCreatedHistoryUnique(playerUuid: UUID): List<CraftHistoryQueryResult> {
+    fun getPlayerCreatedHistoryUnique(playerUuid: UUID, useLimit: Boolean = true): List<CraftHistoryQueryResult> {
         /*
          *
          * > isLegacy == true -> There are some difference in current recipe and then.
@@ -73,7 +74,7 @@ object HistoryUtil {
         transaction {
             val map: MutableMap<String, CraftHistoryQueryResult> = mutableMapOf()
             CraftHistoryTable.selectAll()
-                .limit(n = QUERY_LIMIT)
+                .limit(n = if (useLimit) QUERY_LIMIT else Int.MAX_VALUE)
                 .where { CraftHistoryTable.uuid eq playerUuid }
                 .forEach { line ->
                     val recipeName: String = line[CraftHistoryTable.recipeName]

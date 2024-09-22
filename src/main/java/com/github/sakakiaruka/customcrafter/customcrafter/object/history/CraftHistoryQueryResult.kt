@@ -2,6 +2,7 @@ package com.github.sakakiaruka.customcrafter.customcrafter.`object`.history
 
 import com.google.gson.Gson
 import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 data class CraftHistoryQueryResult(
     val name: String,
@@ -15,10 +16,10 @@ data class CraftHistoryQueryResult(
             val map: Map<String, Any> = mapOf(
                 Pair("name", name),
                 Pair("is-legacy", isLegacy),
-                Pair("crafted-date", craftedDate.toString()),
+                Pair("crafted-date", craftedDate.toEpochSecond(ZoneOffset.of("+9")) * 1000),
                 Pair("item-nbt-array-charset", Charsets.UTF_8.name()),
                 Pair("item-nbt-array-length", craftedItemNBT.size),
-                Pair("crafted-item-nbt-array", if (needNBT) String(craftedItemNBT, Charsets.UTF_8) else "hidden")
+                Pair("crafted-item-nbt-array", if (needNBT) craftedItemNBT else ByteArray(0))
             )
 
             return Gson().toJson(map)
@@ -28,10 +29,10 @@ data class CraftHistoryQueryResult(
             return mapOf(
                 Pair("name", name),
                 Pair("is-legacy", isLegacy),
-                Pair("crafted-date", craftedDate.toString()),
+                Pair("crafted-date", craftedDate.toEpochSecond(ZoneOffset.of("+9")) * 1000),
                 Pair("item-nbt-array-charset", Charsets.UTF_8.name()),
                 Pair("item-nbt-array-length", craftedItemNBT.size),
-                Pair("crafted-item-nbt-array", if (needNBT) String(craftedItemNBT, Charsets.UTF_8) else "hidden")
+                Pair("crafted-item-nbt-array", if (needNBT) craftedItemNBT else "hidden".toByteArray(charset = Charsets.UTF_8))
             )
         }
     }
