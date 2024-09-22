@@ -9,6 +9,9 @@ commands:
   cc:
     permission: cc.op
 
+  history_database:
+    permission: cc.op
+
 permissions:
   cc.*:
     children:

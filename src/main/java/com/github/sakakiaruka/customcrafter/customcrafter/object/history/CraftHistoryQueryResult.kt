@@ -1,9 +1,6 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.`object`.history
 
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.decodeFromJsonElement
-import kotlinx.serialization.json.put
+import com.google.gson.Gson
 import java.time.LocalDateTime
 
 data class CraftHistoryQueryResult(
@@ -14,15 +11,28 @@ data class CraftHistoryQueryResult(
 ) {
 
     companion object {
-        fun CraftHistoryQueryResult.toJson(): String {
-            return Json.decodeFromJsonElement<String>(buildJsonObject {
-                put("name", name)
-                put("is-legacy", isLegacy)
-                put("crafted-date", craftedDate.toString())
-                put("item-nbt-array-charset", Charsets.UTF_8.name())
-                put("item-nbt-array-length", craftedItemNBT.size)
-                put("crafted-item-nbt-array", String(craftedItemNBT, Charsets.UTF_8))
-            })
+        fun CraftHistoryQueryResult.toJson(needNBT: Boolean): String {
+            val map: Map<String, Any> = mapOf(
+                Pair("name", name),
+                Pair("is-legacy", isLegacy),
+                Pair("crafted-date", craftedDate.toString()),
+                Pair("item-nbt-array-charset", Charsets.UTF_8.name()),
+                Pair("item-nbt-array-length", craftedItemNBT.size),
+                Pair("crafted-item-nbt-array", if (needNBT) String(craftedItemNBT, Charsets.UTF_8) else "hidden")
+            )
+
+            return Gson().toJson(map)
+        }
+
+        fun CraftHistoryQueryResult.toObjectMap(needNBT: Boolean): Map<String, Any> {
+            return mapOf(
+                Pair("name", name),
+                Pair("is-legacy", isLegacy),
+                Pair("crafted-date", craftedDate.toString()),
+                Pair("item-nbt-array-charset", Charsets.UTF_8.name()),
+                Pair("item-nbt-array-length", craftedItemNBT.size),
+                Pair("crafted-item-nbt-array", if (needNBT) String(craftedItemNBT, Charsets.UTF_8) else "hidden")
+            )
         }
     }
 

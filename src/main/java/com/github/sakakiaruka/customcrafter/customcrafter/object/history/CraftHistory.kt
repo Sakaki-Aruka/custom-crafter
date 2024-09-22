@@ -45,7 +45,10 @@ class CraftHistory(
         values["item-nbt-byte-array-length"] = createdItem.bytes.size
         values["amount"] = createdAmount
         values["timestamp"] = createdTimestamp
-        values["date"] = createdDate
-        return GsonBuilder().takeIf { prettyPrint }?.setPrettyPrinting()!!.create().toJson(values)
+        values["date"] = createdDate.toString()
+        GsonBuilder().let {
+            if (prettyPrint) it.setPrettyPrinting()
+            return it.create().toJson(values)
+        }
     }
 }

@@ -1,5 +1,6 @@
 package com.github.sakakiaruka.customcrafter.customcrafter;
 
+import com.github.sakakiaruka.customcrafter.customcrafter.command.HistoryDatabase;
 import com.github.sakakiaruka.customcrafter.customcrafter.command.Processor;
 import com.github.sakakiaruka.customcrafter.customcrafter.listener.Listener;
 import com.github.sakakiaruka.customcrafter.customcrafter.util.RecipePermissionUtil;
@@ -21,6 +22,7 @@ public final class CustomCrafter extends JavaPlugin {
         this.instance = this;
         new SettingsLoad().load();
         getCommand("cc").setExecutor(new Processor());
+        getCommand("history_database").setExecutor(HistoryDatabase.INSTANCE);
         getServer().getPluginManager().registerEvents(new Listener(),this);
         ENABLED_PLACEHOLDER_API = Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null;
     }

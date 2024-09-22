@@ -229,6 +229,9 @@ public class SettingsLoad {
 
     private void checkDBUse() {
         ENABLED_HISTORY_DATABASE = DEFAULT_CONFIG.getBoolean("history_db");
+        if (ENABLED_HISTORY_DATABASE) {
+            CustomCrafter.getInstance().getLogger().info("Crafting History Database: ENABLED");
+        }
     }
 
     private void getResult(List<Path> paths){

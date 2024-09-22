@@ -47,15 +47,22 @@ public class PlaceholderUtil extends PlaceholderExpansion {
     @Override
     public @Nullable String onRequest(OfflinePlayer player, @NotNull String params) {
         if (player != null) {
-            if (params.equals("history:player-craft")) {
-                List<CraftHistoryQueryResult> histories = HistoryUtil.INSTANCE.getPlayerCreatedRecipeUnique(player.getUniqueId());
+            if (params.equals("history:player-craft-history-unique")) {
+                List<CraftHistoryQueryResult> histories = HistoryUtil.INSTANCE.getPlayerCreatedHistoryUnique(player.getUniqueId());
                 if (!histories.isEmpty()) {
-                    List<String> convertedList = new ArrayList<>();
-                    histories.forEach(e -> convertedList.add(CraftHistoryQueryResult.Companion.toJson(e)));
-                    return new Gson().toJson(convertedList);
+                    List<Map<String, Object>> list = new ArrayList<>();
+                    histories.forEach(e -> list.add(CraftHistoryQueryResult.Companion.toObjectMap(e, true)));
+                    return new Gson().toJson(list);
                 }
             } else if (params.equals("history:player-craft-times")) {
-                return new Gson().toJson(Map.of("times", HistoryUtil.INSTANCE.getPlayerCreatedRecipeUnique(player.getUniqueId())));
+                return new Gson().toJson(Map.of("times", HistoryUtil.INSTANCE.getPlayerCreatedHistoryUnique(player.getUniqueId())));
+            } else if (params.equals("history:player-craft-history-all")) {
+                List<CraftHistoryQueryResult> histories = HistoryUtil.INSTANCE.getPlayerCraftedHistoryAll(player.getUniqueId());
+                if (!histories.isEmpty()) {
+                    List<Map<String, Object>> list = new ArrayList<>();
+                    histories.forEach(e -> list.add(CraftHistoryQueryResult.Companion.toObjectMap(e, true)));
+                    return new Gson().toJson(list);
+                }
             }
         }
         return ALL.get(params);
