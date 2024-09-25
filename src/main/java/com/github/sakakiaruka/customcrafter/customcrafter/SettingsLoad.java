@@ -90,6 +90,9 @@ public class SettingsLoad {
     private static final String MATTER_REGEX_COLLECT_PATTERN = "^R\\|(.+)$";
     private static final String RESULT_METADATA_COLLECT_PATTERN = "^([\\w_]+),(.+)$";
 
+    // === for settings toggle === //
+    public static boolean ENABLED_HISTORY_DATABASE = false;
+
     // === unlock registration === //
     public static Map<String, Recipe> REGISTERED_RECIPES = new HashMap<>();
     public static Map<Integer, List<Recipe>> ITEM_PLACED_SLOTS_RECIPE_MAP = new HashMap<>();
@@ -107,6 +110,7 @@ public class SettingsLoad {
         getAllMaterialsName();
         main();
         getCommandArgs();
+        checkDBUse();
         PlaceholderUtil.applyAll();
     }
 
@@ -221,6 +225,13 @@ public class SettingsLoad {
 
     private void getBaseBlock(){
         BASE_BLOCK = Material.valueOf(Objects.requireNonNull(DEFAULT_CONFIG.getString("baseBlock")).toUpperCase());
+    }
+
+    private void checkDBUse() {
+        ENABLED_HISTORY_DATABASE = DEFAULT_CONFIG.getBoolean("history_db");
+        if (ENABLED_HISTORY_DATABASE) {
+            CustomCrafter.getInstance().getLogger().info("Crafting History Database: ENABLED");
+        }
     }
 
     private void getResult(List<Path> paths){

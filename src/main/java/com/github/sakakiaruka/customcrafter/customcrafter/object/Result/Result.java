@@ -1,6 +1,7 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.object.Result;
 
 import org.bukkit.enchantments.Enchantment;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Objects;
@@ -8,7 +9,7 @@ import java.util.Objects;
 public class Result {
 
     private String name;
-    private Map<Enchantment,Integer> enchantsInfo;
+    @Nullable private Map<Enchantment,Integer> enchantsInfo;
     private int amount;
     private String nameOrRegex;
     private int matchPoint;
@@ -42,7 +43,7 @@ public class Result {
         return this;
     }
 
-    public Map<Enchantment, Integer> getEnchantsInfo() {
+    public @Nullable Map<Enchantment, Integer> getEnchantsInfo() {
         return enchantsInfo;
     }
 
@@ -91,7 +92,7 @@ public class Result {
     public int hashCode() {
         int hash = 17;
         hash = hash * 31 + name.hashCode();
-        hash = hash * 31 + enchantsInfo.hashCode();
+        hash = enchantsInfo != null ? hash * 31 + enchantsInfo.hashCode() : hash;
         hash = hash * 31 + Integer.hashCode(amount);
         hash = hash * 31 + nameOrRegex.hashCode();
         hash = hash * 31 + Integer.hashCode(matchPoint);

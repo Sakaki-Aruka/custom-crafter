@@ -6,6 +6,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Coordinate;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Tag;
+import com.github.sakakiaruka.customcrafter.customcrafter.object.history.CraftHistoryQueryResult;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
@@ -29,7 +30,7 @@ public class PlaceholderUtil extends PlaceholderExpansion {
 
     @Override
     public @NotNull String getIdentifier() {
-        return "custom-crafter";
+        return "Custom-Crafter";
     }
 
     @Override
@@ -44,7 +45,28 @@ public class PlaceholderUtil extends PlaceholderExpansion {
     }
 
     @Override
-    public @Nullable String onRequest(OfflinePlayer player, @NotNull String params) {
+    public String onRequest(OfflinePlayer player, @NotNull String params) {
+        if (player != null) {
+            if (params.equals("history:player_craft_history_unique")) {
+                List<CraftHistoryQueryResult> histories = HistoryUtil.INSTANCE.getPlayerCreatedHistoryUnique(player.getUniqueId(), true);
+                if (!histories.isEmpty()) {
+                    List<Map<String, Object>> list = new ArrayList<>();
+                    histories.forEach(e -> list.add(CraftHistoryQueryResult.Companion.toObjectMap(e, true)));
+                    return new Gson().toJson(list);
+                }
+            } else if (params.equals("history:player_craft_history_all")) {
+                List<CraftHistoryQueryResult> histories = HistoryUtil.INSTANCE.getPlayerCraftedHistoryAll(player.getUniqueId(), true);
+                if (!histories.isEmpty()) {
+                    List<Map<String, Object>> list = new ArrayList<>();
+                    histories.forEach(e -> list.add(CraftHistoryQueryResult.Companion.toObjectMap(e, true)));
+                    return new Gson().toJson(list);
+                }
+            } else if (params.equals("history:player_craft_unique_times")) {
+                return new Gson().toJson(Map.of("times", HistoryUtil.INSTANCE.getPlayerCreatedHistoryUnique(player.getUniqueId(), false).size()));
+            } else if (params.equals("history:player_craft_all_times")) {
+                return new Gson().toJson(Map.of("times", HistoryUtil.INSTANCE.getPlayerCraftedHistoryAll(player.getUniqueId(), false).size()));
+            }
+        }
         return ALL.get(params);
     }
 
@@ -72,8 +94,8 @@ public class PlaceholderUtil extends PlaceholderExpansion {
 
     private static void applyOverallCustomCrafterInfo() {
         OVERALL_INFO.put("info:recipes", String.format("{\"recipes\": %d}", SettingsLoad.NAMED_RECIPES_MAP.size()));
-        OVERALL_INFO.put("info:base-block", String.format("{\"base-block\": \"%s\"}", SettingsLoad.BASE_BLOCK.name()));
-        OVERALL_INFO.put("info:recipe-name-list", getJsonFormattedRecipeNameList());
+        OVERALL_INFO.put("info:base_block", String.format("{\"base-block\": \"%s\"}", SettingsLoad.BASE_BLOCK.name()));
+        OVERALL_INFO.put("info:recipe_name_list", getJsonFormattedRecipeNameList());
     }
 
     private static void applySerializedCustomRecipes() {
@@ -147,8 +169,6 @@ public class PlaceholderUtil extends PlaceholderExpansion {
             }
 
 
-            //debug
-            System.out.println("json obj=" + new Gson().toJson(obj));
 
             SERIALIZED_CUSTOM_RECIPES.put("recipe:" + name, new Gson().toJson(obj));
         }
