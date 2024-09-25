@@ -6,7 +6,7 @@
 
     <groupId>com.github.sakakiaruka.cutom-crafter</groupId>
     <artifactId>custom-crafter</artifactId>
-    <version>4.1.8</version>
+    <version>4.2</version>
     <packaging>jar</packaging>
 
     <name>Custom Crafter</name>
@@ -17,7 +17,6 @@
 
         <!-- Kotlin -->
         <kotlin.version>2.0.20</kotlin.version>
-        <serialization.version>1.7.3</serialization.version>
     </properties>
 
     <build>
@@ -38,9 +37,6 @@
                             <sourceDirs>
                                 <sourceDir>${project.basedir}/src/main/java</sourceDir>
                             </sourceDirs>
-<!--                            <compilerPlugins>-->
-<!--                                <plugin>kotlinx-serialization</plugin>-->
-<!--                            </compilerPlugins>-->
                         </configuration>
                     </execution>
                     <execution>
@@ -55,18 +51,6 @@
                         </configuration>
                     </execution>
                 </executions>
-                <configuration>
-                    <compilerPlugins>
-                        <plugin>kotlinx-serialization</plugin>
-                    </compilerPlugins>
-                </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.jetbrains.kotlin</groupId>
-                        <artifactId>kotlin-maven-serialization</artifactId>
-                        <version>${kotlin.version}</version>
-                    </dependency>
-                </dependencies>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
