@@ -11,8 +11,5 @@ object CreateCustomItem: Listener {
     @EventHandler
     fun onCreate(e: CreateCustomItemEvent) {
         if (SettingsLoad.ENABLED_HISTORY_DATABASE) HistoryUtil.addHistory(CraftHistory(e.player, e.recipe, e.item))
-
-        //debug
-        println("add create info=${CraftHistory(e.player, e.recipe, e.item).toStringWithoutItem(prettyPrint = true)}")
     }
 }

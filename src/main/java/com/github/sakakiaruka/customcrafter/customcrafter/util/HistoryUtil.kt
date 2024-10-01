@@ -12,13 +12,21 @@ import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.statements.api.ExposedBlob
 import org.jetbrains.exposed.sql.transactions.transaction
+import java.net.URI
+import java.nio.file.Paths
 import java.util.UUID
+import kotlin.io.path.exists
 
 object HistoryUtil {
     fun ItemStack.toExposedBlob() = ExposedBlob(serializeAsBytes())
 
-    private const val DB_URL: String = "jdbc:sqlite:./plugins/Custom_Crafter/history.db"
+    private const val DB_PATH: String = "./plugins/Custom_Crafter/history.db"
+    private const val DB_URL: String = "jdbc:sqlite:${DB_PATH}"
     private const val QUERY_LIMIT: Int = 300
+
+    private fun databaseExists(): Boolean {
+        return Paths.get(URI.create(DB_PATH)).exists()
+    }
 
     fun addHistory(history: CraftHistory) {
         Database.connect(url = DB_URL)
@@ -42,6 +50,7 @@ object HistoryUtil {
          *
          * collects ALL histories what are about specified id's
          */
+        if (!databaseExists()) return emptyList()
         val result: MutableList<CraftHistoryQueryResult> = mutableListOf()
         Database.connect(url = DB_URL)
 
@@ -69,6 +78,7 @@ object HistoryUtil {
          * > isLegacy == true -> There are some difference in current recipe and then.
          * > isLegacy = CraftHistory(from transaction).recipeHash == currentRecipe.hashCode()
          */
+        if (!databaseExists()) return emptyList()
         Database.connect(url = DB_URL)
         lateinit var list: List<CraftHistoryQueryResult>
         transaction {
