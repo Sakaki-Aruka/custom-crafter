@@ -13,6 +13,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.Recipe;
 import com.github.sakakiaruka.customcrafter.customcrafter.search.Search;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.Color;
 import org.bukkit.DyeColor;
@@ -291,7 +292,8 @@ public class ContainerUtil {
         List<Component> lore = new ArrayList<>();
         if (meta.lore() != null) lore.addAll(meta.lore());
         for (String s : formula.split(SettingsLoad.LINE_SEPARATOR)) {
-            lore.add(Component.text(s));
+            //lore.add(Component.text(s));
+            lore.add(MiniMessage.miniMessage().deserialize(s));
         }
         meta.lore(lore);
         item.setItemMeta(meta);
@@ -393,7 +395,8 @@ public class ContainerUtil {
         // type: item_name, value: this is an item
         // "" (empty string)
         ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
-        meta.displayName(Component.text(CalcUtil.getContent(data,formula)));
+        //meta.displayName(Component.text(CalcUtil.getContent(data,formula)));
+        meta.displayName(MiniMessage.miniMessage().deserialize(CalcUtil.getContent(data, formula)));
         item.setItemMeta(meta);
     };
 
@@ -535,7 +538,8 @@ public class ContainerUtil {
         } else if (type.equalsIgnoreCase("title")) {
             meta.setTitle(element);
         } else if (type.equalsIgnoreCase("add_page")) {
-            meta.addPages(Component.text(element));
+//            meta.addPages(Component.text(element));
+            meta.addPages(MiniMessage.miniMessage().deserialize(element));
         } else if (type.equalsIgnoreCase("add_long")) {
             element = element.replace("\\n", SettingsLoad.LINE_SEPARATOR);
             InventoryUtil.addLong(meta, element, false);
@@ -636,7 +640,8 @@ public class ContainerUtil {
             lore.remove(line);
         } else if (one.group(3).equalsIgnoreCase("insert")) {
             String element = one.group(6);
-            lore.add(line, Component.text(element));
+            //lore.add(line, Component.text(element));
+            lore.add(line, MiniMessage.miniMessage().deserialize(element));
         }
         meta.lore(lore);
         item.setItemMeta(meta);

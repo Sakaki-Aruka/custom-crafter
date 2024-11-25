@@ -5,6 +5,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Matter;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Matter.Potions.Potions;
 import com.github.sakakiaruka.customcrafter.customcrafter.object.Recipe.*;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -170,7 +171,8 @@ public class InventoryUtil {
                     return;
                 }
 
-                meta.addPages(Component.text(element.toString()));
+                //meta.addPages(Component.text(element.toString()));
+                meta.addPages(MiniMessage.miniMessage().deserialize(element.toString()));
                 element.setLength(0);
 
                 horizontal = evaluation;
@@ -192,7 +194,8 @@ public class InventoryUtil {
             }
         }
 
-        meta.addPages(Component.text(element.toString())); // add remaining string
+        //meta.addPages(Component.text(element.toString())); // add remaining string
+        meta.addPages(MiniMessage.miniMessage().deserialize(element.toString()));
     }
 
 
