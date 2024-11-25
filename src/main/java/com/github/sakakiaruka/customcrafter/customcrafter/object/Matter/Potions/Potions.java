@@ -8,7 +8,7 @@ import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.potion.PotionData;
+//import org.bukkit.potion.PotionData;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
@@ -38,27 +38,32 @@ public class Potions extends Matter implements Matters {
                 map.put(effect,strict);
             }
         }
-        PotionData baseData = meta.getBasePotionData();
-        PotionUtil util = new PotionUtil();
-        if(meta.getBasePotionData().getType().equals(PotionType.TURTLE_MASTER)){
-            int duration = PotionUtil.getDuration("turtle_master",baseData.isUpgraded(),baseData.isExtended(),util.getBottleType(item.getType()));
-            int slowLevel = baseData.isUpgraded() ? 6 : 4;
-            int resistanceLevel = baseData.isUpgraded() ? 4 : 3;
-            PotionEffect slow = new PotionEffect(PotionEffectType.SLOW,duration,slowLevel);
-            PotionEffect resistance = new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,duration,resistanceLevel);
-            map.put(slow,strict);
-            map.put(resistance,strict);
+//        PotionData baseData = meta.getBasePotionData();
+//        PotionUtil util = new PotionUtil();
+//        if(meta.getBasePotionData().getType().equals(PotionType.TURTLE_MASTER)){
+//            int duration = PotionUtil.getDuration("turtle_master",baseData.isUpgraded(),baseData.isExtended(),util.getBottleType(item.getType()));
+//            int slowLevel = baseData.isUpgraded() ? 6 : 4;
+//            int resistanceLevel = baseData.isUpgraded() ? 4 : 3;
+//            PotionEffect slow = new PotionEffect(PotionEffectType.SLOW,duration,slowLevel);
+//            PotionEffect resistance = new PotionEffect(PotionEffectType.DAMAGE_RESISTANCE,duration,resistanceLevel);
+//            map.put(slow,strict);
+//            map.put(resistance,strict);
+//
+//        } else if(!baseData.getType().equals(PotionType.WATER) && !baseData.getType().equals(PotionType.UNCRAFTABLE)){
+//            int duration = util.getDuration(baseData.getType().getEffectType().getName(), baseData.isUpgraded(), baseData.isExtended(),util.getBottleType(item.getType()));
+//            int level = baseData.isUpgraded() ? baseData.getType().getMaxLevel() : 1;
+//            PotionEffect effect = new PotionEffect(baseData.getType().getEffectType(),duration,level);
+//            map.put(effect,strict);
+//        } else {
+//            for(PotionEffect effect : meta.getCustomEffects()){
+//                map.put(effect,strict);
+//            }
+//        }
 
-        } else if(!baseData.getType().equals(PotionType.WATER) && !baseData.getType().equals(PotionType.UNCRAFTABLE)){
-            int duration = util.getDuration(baseData.getType().getEffectType().getName(), baseData.isUpgraded(), baseData.isExtended(),util.getBottleType(item.getType()));
-            int level = baseData.isUpgraded() ? baseData.getType().getMaxLevel() : 1;
-            PotionEffect effect = new PotionEffect(baseData.getType().getEffectType(),duration,level);
+        for(PotionEffect effect : meta.getCustomEffects()){
             map.put(effect,strict);
-        } else {
-            for(PotionEffect effect : meta.getCustomEffects()){
-                map.put(effect,strict);
-            }
         }
+
         data = map;
         bottle = PotionUtil.getBottleType(item.getType());
 
@@ -66,18 +71,18 @@ public class Potions extends Matter implements Matters {
         bottleTypeMatch = true;
     }
 
-    public ItemStack prescribe(){
-        ItemStack result = new ItemStack(bottle.getRelated());
-        PotionMeta meta = (PotionMeta) result.getItemMeta();
-
-        PotionData baseData = new PotionData(PotionType.WATER);
-        meta.setBasePotionData(baseData);
-        for(Map.Entry<PotionEffect,PotionStrict> entry : data.entrySet()){
-            meta.addCustomEffect(entry.getKey(),true);
-        }
-        result.setItemMeta(meta);
-        return result;
-    }
+//    public ItemStack prescribe(){
+//        ItemStack result = new ItemStack(bottle.getRelated());
+//        PotionMeta meta = (PotionMeta) result.getItemMeta();
+//
+//        PotionData baseData = new PotionData(PotionType.WATER);
+//        meta.setBasePotionData(baseData);
+//        for(Map.Entry<PotionEffect,PotionStrict> entry : data.entrySet()){
+//            meta.addCustomEffect(entry.getKey(),true);
+//        }
+//        result.setItemMeta(meta);
+//        return result;
+//    }
 
     public String PotionInfo(){
         StringBuilder builder = new StringBuilder();

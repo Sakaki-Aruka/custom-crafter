@@ -9,6 +9,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.Particle;
+import org.bukkit.Registry;
 import org.bukkit.World;
 import org.bukkit.attribute.Attributable;
 import org.bukkit.attribute.Attribute;
@@ -29,6 +30,7 @@ import org.bukkit.entity.Mob;
 import org.bukkit.entity.ThrownPotion;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.inventory.meta.PotionMeta;
@@ -571,13 +573,18 @@ public class EntityUtil {
         Matcher parsed = Pattern.compile(pattern).matcher(formula);
         if (!parsed.matches()) return;
         if (parsed.group(2) != null && !Boolean.parseBoolean(parsed.group(2))) return;
-        Attribute attribute = Attribute.valueOf(parsed.group(3).toUpperCase());
+        //Attribute attribute = Attribute.valueOf(parsed.group(3).toUpperCase());
+        Attribute attribute;
+        if ((attribute = Registry.ATTRIBUTE.get(NamespacedKey.minecraft(parsed.group(2).toUpperCase()))) == null) return;
         AttributeModifier.Operation operation = AttributeModifier.Operation.valueOf(parsed.group(4).toUpperCase());
         double value = Double.parseDouble(parsed.group(5));
-        EquipmentSlot slot = parsed.group(6) != null ? EquipmentSlot.valueOf(parsed.group(6)) : null;
+        //EquipmentSlot slot = parsed.group(6) != null ? EquipmentSlot.valueOf(parsed.group(6)) : null;
+        EquipmentSlotGroup group = EquipmentSlotGroup.getByName(parsed.group(6).toUpperCase());
         AttributeModifier modifier;
-        if (slot != null) modifier = new AttributeModifier(UUID.randomUUID(), UUID.randomUUID().toString(), value, operation, slot);
-        else modifier = new AttributeModifier(UUID.randomUUID(), UUID.randomUUID().toString(), value, operation);
+        //if (slot != null) modifier = new AttributeModifier(UUID.randomUUID(), UUID.randomUUID().toString(), value, operation, slot);
+        NamespacedKey randomNamespacedKey = new NamespacedKey(CustomCrafter.getInstance(), UUID.randomUUID().toString());
+        if (group != null) modifier = new AttributeModifier(randomNamespacedKey, value, operation, group);
+        else modifier = new AttributeModifier(randomNamespacedKey, value, operation);
 
         AttributeInstance instance;
         if ((instance = ((Attributable) base).getAttribute(attribute)) == null) {
