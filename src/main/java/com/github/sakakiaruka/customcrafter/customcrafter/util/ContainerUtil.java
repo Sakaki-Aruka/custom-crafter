@@ -1,6 +1,6 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.util;
 
-import com.destroystokyo.paper.Namespaced;
+//import com.destroystokyo.paper.Namespaced;
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter;
 import com.github.sakakiaruka.customcrafter.customcrafter.SettingsLoad;
@@ -28,6 +28,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TropicalFish;
 import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.EquipmentSlotGroup;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BookMeta;
@@ -404,10 +405,18 @@ public class ContainerUtil {
             sendIllegalTemplateWarn("attribute modifier", formula, "attribute=([a-zA-Z_.]+),op=(?i)(add_number|add_scalar|multiply_scalar_1),value=(-?[0-9]*\\.?[0-9]+)");
             return;
         }
-        Attribute attribute = Attribute.valueOf(matcher.group(1).toLowerCase());
+
+        Attribute attribute;
+        if ((attribute = Registry.ATTRIBUTE.get(NamespacedKey.minecraft(matcher.group(1).toUpperCase()))) == null) {
+            sendOrdinalWarn("[Attribute Modifier] Failed to get attribute from a specified string." + matcher.group(1).toUpperCase());
+            return;
+        }
+        //Attribute attribute = Attribute.valueOf(matcher.group(1).toLowerCase());
         AttributeModifier.Operation operation = AttributeModifier.Operation.valueOf(matcher.group(2).toUpperCase());
         double value = Double.parseDouble(matcher.group(3));
-        AttributeModifier modifier = new AttributeModifier(UUID.randomUUID(), UUID.randomUUID().toString(), value, operation);
+        NamespacedKey randomNamespacedKey = new NamespacedKey(CustomCrafter.getInstance(), UUID.randomUUID().toString());
+        AttributeModifier modifier = new AttributeModifier(randomNamespacedKey, value, operation);
+        //AttributeModifier modifier = new AttributeModifier(UUID.randomUUID(), UUID.randomUUID().toString(), value, operation);
         meta.addAttributeModifier(attribute, modifier);
         item.setItemMeta(meta);
     };
@@ -422,11 +431,22 @@ public class ContainerUtil {
             sendIllegalTemplateWarn("attribute modifier equipment", formula, "attribute=([a-zA-Z_]+),op=(?i)(add_number|add_scalar|multiply_scalar_1),value=(-?[0-9]*\\.?[0-9]+),slot=([a-zA-Z_]+)");
             return;
         }
-        Attribute attribute = Attribute.valueOf(matcher.group(1).toUpperCase());
+        //Attribute attribute = Attribute.valueOf(matcher.group(1).toUpperCase());
+        Attribute attribute;
+        if ((attribute = Registry.ATTRIBUTE.get(NamespacedKey.minecraft(matcher.group(1).toUpperCase()))) == null) {
+            sendOrdinalWarn("[Attribute Modifier Equipment] Failed to get attribute from a specified string (=" + matcher.group(1).toUpperCase());
+            return;
+        }
         AttributeModifier.Operation operation = AttributeModifier.Operation.valueOf(matcher.group(2).toUpperCase());
         double value = Double.parseDouble(matcher.group(3));
-        EquipmentSlot slot = EquipmentSlot.valueOf(matcher.group(4).toUpperCase());
-        AttributeModifier modifier = new AttributeModifier(UUID.randomUUID(), UUID.randomUUID().toString(), value, operation, slot);
+        //EquipmentSlot slot = EquipmentSlot.valueOf(matcher.group(4).toUpperCase());
+        EquipmentSlotGroup group;
+        if ((group = EquipmentSlotGroup.getByName(matcher.group(4).toUpperCase())) == null) {
+            sendOrdinalWarn("[Attribute Modifier Equipment] Failed to get equipment slot group from a specified string (=" + matcher.group(4).toUpperCase());
+        }
+        //AttributeModifier modifier = new AttributeModifier(UUID.randomUUID(), UUID.randomUUID().toString(), value, operation, slot);
+        NamespacedKey randomNamespacedKey = new NamespacedKey(CustomCrafter.getInstance(), UUID.randomUUID().toString());
+        AttributeModifier modifier = new AttributeModifier(randomNamespacedKey, value, operation, group);
         meta.addAttributeModifier(attribute, modifier);
         item.setItemMeta(meta);
     };
@@ -637,7 +657,13 @@ public class ContainerUtil {
             item.setItemMeta(meta);
             return;
         }
-        Attribute attribute = Attribute.valueOf(matcher.group(3).toUpperCase());
+        //Attribute attribute = Attribute.valueOf(matcher.group(3).toUpperCase());
+        Attribute attribute;
+        if ((attribute = Registry.ATTRIBUTE.get(NamespacedKey.minecraft(matcher.group(3).toUpperCase()))) == null) {
+            sendOrdinalWarn("[Attribute Modifier Modify] Failed to get attribute from a specified string (=" + matcher.group(3).toUpperCase());
+            return;
+        }
+
         if (type.equals("remove")) {
             meta.removeAttributeModifier(attribute);
             item.setItemMeta(meta);
@@ -928,41 +954,41 @@ public class ContainerUtil {
         item.setItemMeta(meta);
     };
 
-    public static final TriConsumer<Map<String, String>, ItemStack, String> CAN_PLACE_ON = (data, item, formula) -> {
-        // type: can_place_on, value: ([A-Za-z_0-9,]+)
-        // separate with ","
-        formula = CalcUtil.getContent(data, formula);
-        final String pattern = "([A-Za-z0-9,_]+)";
-        if (!formula.matches(pattern)) {
-            sendIllegalTemplateWarn("can place on", formula, pattern);
-            return;
-        }
-        ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
-        List<Namespaced> keys = new ArrayList<>();
-        for (String block : formula.split(",")) {
-            keys.add(NamespacedKey.minecraft(block.toLowerCase()));
-        }
-        meta.setPlaceableKeys(keys);
-        item.setItemMeta(meta);
-    };
-
-    public static final TriConsumer<Map<String, String>, ItemStack, String> CAN_DESTROY = (data, item, formula) -> {
-        // type: can_destroy, value: ([a-zA-Z0-9,_]+)
-        // separate with ","
-        formula = CalcUtil.getContent(data, formula);
-        final String pattern = "([a-zA-Z0-9,_]+)";
-        if (!formula.matches(pattern)) {
-            sendIllegalTemplateWarn("can destroy", formula, pattern);
-            return;
-        }
-        ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
-        List<Namespaced> keys = new ArrayList<>();
-        for (String block : formula.split(",")) {
-            keys.add(NamespacedKey.minecraft(block.toLowerCase()));
-        }
-        meta.setDestroyableKeys(keys);
-        item.setItemMeta(meta);
-    };
+//    public static final TriConsumer<Map<String, String>, ItemStack, String> CAN_PLACE_ON = (data, item, formula) -> {
+//        // type: can_place_on, value: ([A-Za-z_0-9,]+)
+//        // separate with ","
+//        formula = CalcUtil.getContent(data, formula);
+//        final String pattern = "([A-Za-z0-9,_]+)";
+//        if (!formula.matches(pattern)) {
+//            sendIllegalTemplateWarn("can place on", formula, pattern);
+//            return;
+//        }
+//        ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
+//        List<Namespaced> keys = new ArrayList<>();
+//        for (String block : formula.split(",")) {
+//            keys.add(NamespacedKey.minecraft(block.toLowerCase()));
+//        }
+//        meta.setPlaceableKeys(keys);
+//        item.setItemMeta(meta);
+//    };
+//
+//    public static final TriConsumer<Map<String, String>, ItemStack, String> CAN_DESTROY = (data, item, formula) -> {
+//        // type: can_destroy, value: ([a-zA-Z0-9,_]+)
+//        // separate with ","
+//        formula = CalcUtil.getContent(data, formula);
+//        final String pattern = "([a-zA-Z0-9,_]+)";
+//        if (!formula.matches(pattern)) {
+//            sendIllegalTemplateWarn("can destroy", formula, pattern);
+//            return;
+//        }
+//        ItemMeta meta = Objects.requireNonNull(item.getItemMeta());
+//        List<Namespaced> keys = new ArrayList<>();
+//        for (String block : formula.split(",")) {
+//            keys.add(NamespacedKey.minecraft(block.toLowerCase()));
+//        }
+//        meta.setDestroyableKeys(keys);
+//        item.setItemMeta(meta);
+//    };
 
     public static final TriConsumer<Map<String, String>, ItemStack, String> REPAIR_COST = (data, item, formula) -> {
         // type: repair_cost, value: (\\d+)
