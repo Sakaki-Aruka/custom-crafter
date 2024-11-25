@@ -4,9 +4,11 @@ custom crafter is a plugin for minecraft servers (Spigot and Paper) that provide
 ---
 
 # Recommended environment
-- Paper (above 1.20.4)
+- Paper
+  - v4.3: `1.21.3`
+  - v4.2: `1.20.x`
 
-Tested in Paper 1.20.4.  
+Tested in Paper 1.21.3, 1.20.4.  
 
 ---
 
