@@ -25,17 +25,17 @@ object VanillaSearch {
                 inventory.setItem(CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT, result)
             } else if (already.asOne().isSimilar(result.asOne())) {
                 if (already.amount + amount < already.type.maxStackSize) already.amount += amount
-                else {
-                    player.inventory.addItem(result).forEach { (_, overflown) ->
-                        player.world.dropItem(player.location, overflown) { item ->
-                            item.owner = player.uniqueId
-                        }
-                    }
+                else giveItem(result, player)
+            } else giveItem(result, player)
+        }
+    }
 
-                }
+    private fun giveItem(result: ItemStack, player: Player) {
+        player.inventory.addItem(result).forEach { (_, overflown) ->
+            player.world.dropItem(player.location, overflown) { item ->
+                item.owner = player.uniqueId
             }
         }
-
     }
 
     private fun decrementCraftingSlotMaterials(inventory: Inventory, slots: Set<CoordinateComponent>, amount: Int) {
