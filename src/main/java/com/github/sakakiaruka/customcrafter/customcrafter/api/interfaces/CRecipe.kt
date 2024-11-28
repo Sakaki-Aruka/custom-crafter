@@ -9,7 +9,7 @@ import org.bukkit.inventory.ItemStack
 
 interface CRecipe {
     val name: String
-    val items: List<CoordinateComponent>
+    val items: Map<CoordinateComponent, CMatter>
     val containers: List<CRecipeContainer>?
     val results: List<(player: Player) -> ItemStack>?
 
