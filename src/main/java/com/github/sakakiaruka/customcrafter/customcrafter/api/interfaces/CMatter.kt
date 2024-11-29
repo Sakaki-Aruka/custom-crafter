@@ -1,6 +1,7 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces
 
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.matter.CMatterContainer
+import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.CoordinateComponent
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -17,8 +18,10 @@ interface CMatter {
     fun hasContainers(): Boolean = containers != null
     fun hasPDC(): Boolean = persistentDataContainer != null
 
-    fun predicatesResult(player: Player, items: List<ItemStack>): Boolean {
-        return containers?.all { c -> c.predicates.all { p -> p(player, items) } } ?: true
+    fun predicatesResult(player: Player, items: Map<CoordinateComponent, ItemStack>, container: PersistentDataContainer): Boolean {
+        return containers?.all { c -> c.predicates.all { p -> p(player, items, container) } } ?: true
     }
+
+    fun asOne(): CMatter
 
 }

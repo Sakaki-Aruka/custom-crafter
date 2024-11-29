@@ -9,7 +9,8 @@ data class CRecipe(
     override val name: String,
     override val items: Map<CoordinateComponent, CMatter>,
     override val containers: List<CRecipeContainer>?,
-    override val results: List<(player: Player) -> ItemStack>?
+    override val results: List<(player: Player) -> ItemStack>?,
+    override val type: CRecipeType,
 ): CRecipe {
     //
 }

@@ -1,6 +1,7 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces
 
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.CRecipeContainer
+import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.CRecipeType
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.CoordinateComponent
 import org.bukkit.Location
 import org.bukkit.World
@@ -12,6 +13,7 @@ interface CRecipe {
     val items: Map<CoordinateComponent, CMatter>
     val containers: List<CRecipeContainer>?
     val results: List<(player: Player) -> ItemStack>?
+    val type: CRecipeType
 
     fun runContainers(player: Player, items: List<ItemStack>) {
         containers?.forEach { container ->

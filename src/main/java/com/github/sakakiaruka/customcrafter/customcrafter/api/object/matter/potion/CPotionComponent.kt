@@ -2,6 +2,7 @@ package com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.matter.p
 
 import org.bukkit.Material
 import org.bukkit.potion.PotionEffect
+import org.bukkit.potion.PotionEffectType
 
 data class CPotionComponent(
     val data: Map<PotionEffect, PotionStrict>,
@@ -11,8 +12,6 @@ data class CPotionComponent(
     enum class PotionStrict {
         INPUT,
         NOT_STRICT,
-        ONLY_DURATION,
-        ONLY_AMPLIFIER,
         ONLY_EFFECT,
         STRICT
     }

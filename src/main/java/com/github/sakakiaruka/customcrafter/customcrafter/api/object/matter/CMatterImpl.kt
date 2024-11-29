@@ -12,5 +12,14 @@ data class CMatterImpl(
     override val containers: Set<CMatterContainer>?,
     override val persistentDataContainer: PersistentDataContainer?,
 ): CMatter {
-    //
+    override fun asOne(): CMatter {
+        return CMatterImpl(
+            this.name,
+            this.candidate,
+            amount = 1,
+            this.mass,
+            this.containers,
+            this.persistentDataContainer
+        )
+    }
 }
