@@ -10,30 +10,58 @@ import com.github.sakakiaruka.customcrafter.customcrafter.api.processor.Potion
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.Recipe
 import org.bukkit.inventory.meta.EnchantmentStorageMeta
+import org.bukkit.inventory.meta.PotionMeta
 import kotlin.math.abs
 import kotlin.math.max
 
 object Search {
 
-    fun search(player: Player, inventory: Inventory, one: Boolean) {
+    class SearchResult(
+        val vanilla: Recipe?,
+        val customs: List<CRecipe>
+    ) {
+        // when call Search#search with natural: Boolean
+        // - true: when this finds matched custom recipes, does not search about vanilla.
+        // - false: always search vanilla, but this does not mean 'vanilla' is non-null.
+
+        // why 'customs' is List?
+        //  -> Cause the search method does not know recipes class implements 'hashCode' and 'equals'.
+        // why this class does not support 'hashCode' and 'equals'?
+        //  -> There is same reason with the above q.
+    }
+
+    // one: Boolean
+
+    fun search(player: Player, inventory: Inventory, natural: Boolean = true): SearchResult? {
         val mapped: Map<CoordinateComponent, ItemStack> = Converter.standardInputMapping(inventory)
-            .takeIf { it?.isNotEmpty() == true } ?: return
+            .takeIf { it?.isNotEmpty() == true } ?: return null
 
-        val candidate: List<CRecipe> = CustomCrafterAPI.RECIPES
+//        val candidate: List<CRecipe> = CustomCrafterAPI.RECIPES
+//            .filter { it.items.size == mapped.size }
+//            .takeIf { it.isNotEmpty() } ?: return null
+
+        val customs: List<CRecipe> = CustomCrafterAPI.RECIPES
             .filter { it.items.size == mapped.size }
-            .takeIf { it.isNotEmpty() } ?: return
-        for (recipe: CRecipe in candidate) {
-            // permission check here
+            .filter { recipe -> permission(mapped, recipe, player) }
+            .filter { recipe ->
+                when (recipe.type) {
+                    CRecipeType.NORMAL -> normal(mapped, recipe, player)
+                    CRecipeType.AMORPHOUS -> amorphous(mapped, recipe, player)
+                }
+            }
 
-            if (recipe.type == CRecipeType.NORMAL && normal(mapped, recipe, player)) {
-                // normal
-            } else if (recipe.type == CRecipeType.AMORPHOUS) {
-                // amorphous
-            } else continue
+        val vanilla: Recipe? =
+            if (natural && customs.isNotEmpty()) null
+            else VanillaSearch.search(player, inventory)
 
-            //
-        }
+        return SearchResult(vanilla, customs)
+    }
+
+    private fun permission(mapped: Map<CoordinateComponent, ItemStack>, recipe: CRecipe, player: Player): Boolean {
+        //
+        return true
     }
 
     private fun normal(mapped: Map<CoordinateComponent, ItemStack>, recipe: CRecipe, player: Player): Boolean {
@@ -62,14 +90,14 @@ object Search {
                 if (!Enchant.enchantStored(inOne, recipeOne as CEnchantmentStoreMatter)) return false
             }
 
-            if (recipeOne is CPotionMatter) {
+            if (recipeOne is CPotionMatter && inOne.itemMeta is PotionMeta) {
                 if (!Potion.potion(inOne, recipeOne as CPotionMatter)) return false
             }
         }
         return basic
     }
 
-    private fun amorphous(mapped: Map<CoordinateComponent, ItemStack>, recipe: CRecipe): Boolean {
+    private fun amorphous(mapped: Map<CoordinateComponent, ItemStack>, recipe: CRecipe, player: Player): Boolean {
         //
         return false
     }

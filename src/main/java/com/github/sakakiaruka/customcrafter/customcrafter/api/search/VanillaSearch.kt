@@ -8,26 +8,28 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.Recipe
 import kotlin.math.max
 import kotlin.math.min
 
 object VanillaSearch {
-    fun search(player: Player, inventory: Inventory, one: Boolean) {
-        val mapped: Map<CoordinateComponent, ItemStack> = Converter.standardInputMapping(inventory) ?: return
-        val nineArray: Array<ItemStack> = getNineItemStackArray(mapped) ?: return
-        Bukkit.getCraftingRecipe(nineArray, player.world)?.let { recipe ->
-            val min: Int = nineArray.filter { it.type != Material.AIR }.minOf { it.amount }
-            val amount: Int = if (one) 1 else min
-            val result: ItemStack = recipe.result.asQuantity(amount)
-            decrementCraftingSlotMaterials(inventory, mapped.keys, amount)
-            val already: ItemStack? = inventory.getItem(CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT)
-            if (already == null || already.type == Material.AIR) {
-                inventory.setItem(CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT, result)
-            } else if (already.asOne().isSimilar(result.asOne())) {
-                if (already.amount + amount < already.type.maxStackSize) already.amount += amount
-                else giveItem(result, player)
-            } else giveItem(result, player)
-        }
+    fun search(player: Player, inventory: Inventory): Recipe? {
+        val mapped: Map<CoordinateComponent, ItemStack> = Converter.standardInputMapping(inventory) ?: return null
+        val nineArray: Array<ItemStack> = getNineItemStackArray(mapped) ?: return null
+        return Bukkit.getCraftingRecipe(nineArray, player.world)
+//        Bukkit.getCraftingRecipe(nineArray, player.world)?.let { recipe ->
+//            val min: Int = nineArray.filter { it.type != Material.AIR }.minOf { it.amount }
+//            val amount: Int = if (one) 1 else min
+//            val result: ItemStack = recipe.result.asQuantity(amount)
+//            decrementCraftingSlotMaterials(inventory, mapped.keys, amount)
+//            val already: ItemStack? = inventory.getItem(CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT)
+//            if (already == null || already.type == Material.AIR) {
+//                inventory.setItem(CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT, result)
+//            } else if (already.asOne().isSimilar(result.asOne())) {
+//                if (already.amount + amount < already.type.maxStackSize) already.amount += amount
+//                else giveItem(result, player)
+//            } else giveItem(result, player)
+//        }
     }
 
     private fun giveItem(result: ItemStack, player: Player) {
