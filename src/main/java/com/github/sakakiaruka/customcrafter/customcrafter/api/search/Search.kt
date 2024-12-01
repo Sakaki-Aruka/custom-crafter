@@ -2,6 +2,7 @@ package com.github.sakakiaruka.customcrafter.customcrafter.api.search
 
 import com.github.sakakiaruka.customcrafter.customcrafter.api.CustomCrafterAPI
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.*
+import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.internal.AmorphousFilterCandidate
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.CRecipeType
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.CoordinateComponent
 import com.github.sakakiaruka.customcrafter.customcrafter.api.processor.Converter
@@ -18,10 +19,13 @@ import kotlin.math.max
 
 object Search {
 
-    class SearchResult(
-        val vanilla: Recipe?,
-        val customs: List<CRecipe>
+    class SearchResult internal constructor(
+        private val vanilla: Recipe?,
+        private val customs: List<CRecipe>
     ) {
+        fun vanilla() = this.vanilla
+        fun customs() = this.customs
+
         // when call Search#search with natural: Boolean
         // - true: when this finds matched custom recipes, does not search about vanilla.
         // - false: always search vanilla, but this does not mean 'vanilla' is non-null.
@@ -98,7 +102,11 @@ object Search {
     }
 
     private fun amorphous(mapped: Map<CoordinateComponent, ItemStack>, recipe: CRecipe, player: Player): Boolean {
-        //
+        val candidates: List<AmorphousFilterCandidate>
+        val containers: List<AmorphousFilterCandidate>?
+        val enchants: List<AmorphousFilterCandidate>?
+        val enchantStores: List<AmorphousFilterCandidate>?
+        val potions: List<AmorphousFilterCandidate>?
         return false
     }
 
