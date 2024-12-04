@@ -61,8 +61,7 @@ object Enchant {
 
         if (recipes.size > inputCoordinates.size) {
             return Pair(AmorphousFilterCandidate.Type.NOT_ENOUGH, emptyList())
-        }
-        else if (recipes.isEmpty()) {
+        } else if (recipes.isEmpty()) {
             return Pair(AmorphousFilterCandidate.Type.NOT_REQUIRED, emptyList())
         }
 
@@ -116,5 +115,56 @@ object Enchant {
             result.add(outerJudge == recipes.size)
         }
         return result
+    }
+
+    internal fun storesAmorphous(mapped: Map<CoordinateComponent, ItemStack>, recipe: CRecipe): Pair<AmorphousFilterCandidate.Type, List<AmorphousFilterCandidate>> {
+        val recipes: List<CoordinateComponent> = recipe.items
+            .filter { it.value is CEnchantmentStoreMatter }
+            .map { it.key }
+
+        val inputCoordinates: List<CoordinateComponent> = mapped.entries
+            .filter { it.value.itemMeta is EnchantmentStorageMeta }
+            .filter { (it.value.itemMeta as EnchantmentStorageMeta).storedEnchants.isNotEmpty() }
+            .map { it.key }
+        val inputEnchants: MutableMap<CoordinateComponent, List<EnchantComponent>> = mutableMapOf()
+        inputCoordinates.forEach { coordinate ->
+            inputEnchants[coordinate] = mapped[coordinate]!!.let { item ->
+                (item.itemMeta as EnchantmentStorageMeta).storedEnchants.entries.map { stored ->
+                    EnchantComponent(stored.key, stored.value)
+                }
+            }
+        }
+
+        if (recipes.size > inputCoordinates.size) {
+            return Pair(AmorphousFilterCandidate.Type.NOT_ENOUGH, emptyList())
+        } else if (recipes.isEmpty()) {
+            return Pair(AmorphousFilterCandidate.Type.NOT_REQUIRED, emptyList())
+        }
+
+        val map: MutableMap<Int, List<Int>> = mutableMapOf()
+        for (index: Int in recipes.indices) {
+            val enchants: Set<CEnchantComponent> = (recipe.items[recipes[index]]!! as CEnchantmentStoreMatter).storedEnchantComponents
+            val matched: List<Int> = matchList(inputEnchants.values.toList(), enchants)
+                .withIndex()
+                .filter { it.value }
+                .map { it.index }
+            map[index] = matched
+        }
+
+        val result: MutableList<AmorphousFilterCandidate> = mutableListOf()
+        for (slice in map.entries) {
+            val R: CoordinateComponent = recipes[slice.key]
+            val list: List<CoordinateComponent> = inputCoordinates
+                .withIndex()
+                .filter { slice.value.contains(it.index) }
+                .map { it.value }
+            result.add(AmorphousFilterCandidate(R, list))
+        }
+
+        val type =
+            if (result.isEmpty()) AmorphousFilterCandidate.Type.NOT_ENOUGH
+            else AmorphousFilterCandidate.Type.SUCCESSFUL
+
+        return Pair(type, result)
     }
 }

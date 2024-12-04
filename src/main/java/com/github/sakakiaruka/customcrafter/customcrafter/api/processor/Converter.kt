@@ -15,8 +15,8 @@ object Converter {
 
     fun getAvailableCraftingSlots(): List<CoordinateComponent> {
         val result: MutableList<CoordinateComponent> = mutableListOf()
-        (0..6).forEach { y ->
-            (0..9).forEach { x ->
+        (0..<6).forEach { y ->
+            (0..<6).forEach { x ->
                 result.add(CoordinateComponent(x, y))
             }
         }

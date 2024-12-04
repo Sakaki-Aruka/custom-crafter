@@ -9,7 +9,7 @@ data class CMatterImpl(
     override val candidate: Set<Material>,
     override val amount: Int,
     override val mass: Boolean,
-    override val containers: Set<CMatterContainer>?,
+    override val predicates: Set<CMatterPredicate>?,
     override val persistentDataContainer: PersistentDataContainer?,
 ): CMatter {
     override fun asOne(): CMatter {
@@ -18,7 +18,7 @@ data class CMatterImpl(
             this.candidate,
             amount = 1,
             this.mass,
-            this.containers,
+            this.predicates,
             this.persistentDataContainer
         )
     }
