@@ -5,7 +5,7 @@ import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
 import org.bukkit.inventory.Inventory
 
-class CreateCustomItemEvent(val player: Player, val input: Inventory): Event() {
+class CreateCustomItemEvent internal constructor(val player: Player, val input: Inventory): Event() {
     companion object {
         @JvmField
         val HANDLER_LIST: HandlerList = HandlerList()

@@ -5,7 +5,6 @@ import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.matter.
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.matter.CEnchantmentStoreMatter
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.matter.CMatter
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.matter.CPotionMatter
-import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.recipe.CPermissibleRecipe
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.recipe.CRecipe
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.internal.AmorphousFilterCandidate
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.CRecipeType
@@ -90,7 +89,6 @@ object Search {
 
         val customs: List<CRecipe> = CustomCrafterAPI.RECIPES
             .filter { it.items.size == mapped.size }
-            .filter { recipe -> if (recipe is CPermissibleRecipe) permission(mapped, recipe, player) else true }
             .filter { recipe ->
                 when (recipe.type) {
                     CRecipeType.NORMAL -> normal(mapped, recipe)
@@ -103,10 +101,6 @@ object Search {
             else VanillaSearch.search(player, inventory)
 
         return SearchResult(vanilla, customs)
-    }
-
-    private fun permission(mapped: Map<CoordinateComponent, ItemStack>, recipe: CPermissibleRecipe, player: Player): Boolean {
-        return true
     }
 
     private fun normal(mapped: Map<CoordinateComponent, ItemStack>, recipe: CRecipe): Boolean {
@@ -128,15 +122,15 @@ object Search {
             }
 
             if (recipeOne is CEnchantMatter) {
-                if (!Enchant.enchant(inOne, recipeOne as CEnchantMatter)) return false
+                if (!Enchant.enchant(inOne, recipeOne)) return false
             }
 
             if (recipeOne is CEnchantmentStoreMatter && inOne.itemMeta is EnchantmentStorageMeta) {
-                if (!Enchant.enchantStored(inOne, recipeOne as CEnchantmentStoreMatter)) return false
+                if (!Enchant.enchantStored(inOne, recipeOne)) return false
             }
 
             if (recipeOne is CPotionMatter && inOne.itemMeta is PotionMeta) {
-                if (!Potion.potion(inOne, recipeOne as CPotionMatter)) return false
+                if (!Potion.potion(inOne, recipeOne)) return false
             }
         }
         return basic

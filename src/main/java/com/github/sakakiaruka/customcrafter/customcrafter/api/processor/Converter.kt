@@ -7,7 +7,7 @@ import org.bukkit.inventory.ItemStack
 
 object Converter {
 
-    fun getAvailableCraftingSlots(): List<CoordinateComponent> {
+    fun getAvailableCraftingSlotComponents(): List<CoordinateComponent> {
         val result: MutableList<CoordinateComponent> = mutableListOf()
         (0..<6).forEach { y ->
             (0..<6).forEach { x ->
@@ -17,12 +17,16 @@ object Converter {
         return result
     }
 
+    fun getAvailableCraftingSlotIndices(): Set<Int> {
+        return getAvailableCraftingSlotComponents().map { it.x + it.y * 9 }.toSet()
+    }
+
     fun standardInputMapping(inventory: Inventory, noAir: Boolean = true): Map<CoordinateComponent, ItemStack>? {
         // CoordinateComponent: zero origin (x, y both)
         if (inventory.isEmpty) return null
         val result: MutableMap<CoordinateComponent, ItemStack> = mutableMapOf()
 
-        for (coordinate in getAvailableCraftingSlots()) {
+        for (coordinate in getAvailableCraftingSlotComponents()) {
             val index: Int = coordinate.x + coordinate.y * 9
             val item: ItemStack = inventory.getItem(index)?.takeIf { if (noAir) it.type != Material.AIR else true } ?: continue
             result[coordinate] = item

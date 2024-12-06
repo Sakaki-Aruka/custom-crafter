@@ -1,6 +1,5 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.api.search
 
-import com.github.sakakiaruka.customcrafter.customcrafter.api.CustomCrafterAPI
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.CoordinateComponent
 import com.github.sakakiaruka.customcrafter.customcrafter.api.processor.Converter
 import org.bukkit.Bukkit
@@ -54,7 +53,7 @@ object VanillaSearch {
         val start: CoordinateComponent = getUpperLeftCorner(mapped.keys)
         val end: CoordinateComponent = getBottomRightCorner(start)
         val result: Array<ItemStack> = Array(9) { ItemStack.empty() }
-        Converter.getAvailableCraftingSlots()
+        Converter.getAvailableCraftingSlotComponents()
             .filter { c -> (start.x..end.x).contains(c.x) && (start.y..end.y).contains(c.y) }
             .forEachIndexed { index, coordinate -> result[index] = mapped.getOrDefault(coordinate, ItemStack.empty()) }
         return result

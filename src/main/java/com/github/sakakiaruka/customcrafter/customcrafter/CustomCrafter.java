@@ -15,12 +15,14 @@ public final class CustomCrafter extends JavaPlugin {
 
     private static CustomCrafter instance;
     public static boolean ENABLED_PLACEHOLDER_API;
+    public static long INITIALIZED;
 
     @Override
     public void onEnable() {
         // Plugin startup logic
         saveDefaultConfig();
         this.instance = this;
+        INITIALIZED = System.currentTimeMillis();
         new SettingsLoad().load();
         getCommand("cc").setExecutor(new Processor());
         getCommand("history_database").setExecutor(HistoryDatabase.INSTANCE);

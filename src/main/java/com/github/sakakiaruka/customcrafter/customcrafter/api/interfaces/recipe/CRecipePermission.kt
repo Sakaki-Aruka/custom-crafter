@@ -11,11 +11,15 @@ interface CRecipePermission: ConfigurationSerializable {
      * `ConfigurationSerialization.registerClass(this.javaClass)`
      *
      */
-    val parent: CRecipePermission?
+
+    val parent: String?
     val name: String
 
     fun hasParent(): Boolean = parent != null
     override fun serialize(): MutableMap<String, Any>
     fun deserialize(): MutableMap<String, Any>
     fun register()
+    fun same(permission: CRecipePermission): Boolean {
+        return (this.name == permission.name && this.parent == permission.parent )
+    }
 }
