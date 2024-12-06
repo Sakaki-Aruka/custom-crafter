@@ -17,6 +17,7 @@ import org.bukkit.inventory.Recipe
 import org.bukkit.inventory.meta.EnchantmentStorageMeta
 import org.bukkit.inventory.meta.PotionMeta
 import kotlin.math.abs
+import kotlin.math.asin
 import kotlin.math.max
 
 object Search {
@@ -147,70 +148,72 @@ object Search {
             // potions
         )
 
-        val filters: List<Set<AmorphousFilterCandidate>> = filterCandidates
-            .takeIf { p ->
-                p.all { f -> f.first != AmorphousFilterCandidate.Type.NOT_ENOUGH }
-            }?.let { slice ->
-                slice
-                    .filter { pair -> pair.first != AmorphousFilterCandidate.Type.NOT_REQUIRED }
-                    .filter { pair -> pair.second.isNotEmpty() }
-                    .map { it.second.toSet() }
-            } ?: return false // have Type.NOT_ENOUGH
+        if (filterCandidates.any { pair -> pair.first == AmorphousFilterCandidate.Type.NOT_ENOUGH }) return false
 
-        if (filters.isEmpty()) return false
-        val relate: Map<CoordinateComponent, CoordinateComponent> = combination(filters)
-            .takeIf { it.isNotEmpty() } ?: return false
-    }
+        val targets: Set<CoordinateComponent> = filterCandidates
+            .map { e -> e.second.map { afc -> afc.coordinate } }
+            .flatten()
+            .toSet()
 
-    private fun combination(filters: List<Set<AmorphousFilterCandidate>>): Map<CoordinateComponent, CoordinateComponent> {
-        val merged: MutableSet<AmorphousFilterCandidate> = mutableSetOf()
-        for (filter: Set<AmorphousFilterCandidate> in filters) {
-            for (f: AmorphousFilterCandidate in filter) {
-                if (!merged.any { it.coordinate == f.coordinate }) {
-                    merged.add(f)
-                    continue
+        val limits: MutableMap<CoordinateComponent, Int> = mutableMapOf()
+        for (coordinate: CoordinateComponent in targets) {
+            filterCandidates
+                .filter { it.first != AmorphousFilterCandidate.Type.NOT_REQUIRED }
+                .let { pairs ->
+                    limits[coordinate] = pairs.count { p -> p.second.any { f -> f.coordinate == coordinate } }
                 }
-
-                val a: List<CoordinateComponent> = merged.first { it.coordinate == f.coordinate }.list
-                val b: List<CoordinateComponent> = f.list
-                val bothContained: List<CoordinateComponent> = bothContained(a, b)
-                if (bothContained.isEmpty()) return emptyMap()
-                merged.add(AmorphousFilterCandidate(f.coordinate, bothContained))
-            }
         }
 
-        val conflict: MutableSet<AmorphousFilterCandidate> = mutableSetOf()
-        val finished: MutableMap<CoordinateComponent, CoordinateComponent> = mutableMapOf()
-        for (element: AmorphousFilterCandidate in merged) {
-            if (element.list.size == 1) {
-                if (!finished.containsKey(element.coordinate)) {
-                    finished[element.coordinate] = element.list.first()
-                    continue
+        val filters: MutableSet<AmorphousFilterCandidate> = mutableSetOf()
+        for (coordinate: CoordinateComponent in targets) {
+            val list: MutableList<List<CoordinateComponent>> = mutableListOf()
+            filterCandidates
+                .filter { it.first != AmorphousFilterCandidate.Type.SUCCESSFUL }
+                .map { it.second } // List<List<AFC>>
+                .forEach { l -> // List<AFC>
+                    l.filter { f -> f.coordinate == coordinate }
+                        .takeIf { it.count() == limits[coordinate] }
+                        ?.forEach { f -> list.add(f.list) }
+                        ?: return false
                 }
-                return emptyMap()
-            }
-            conflict.add(element)
+            val merged: MutableList<CoordinateComponent> = mutableListOf()
+            list.forEach { e -> merged.addAll(e) }
+            filters.add(AmorphousFilterCandidate(coordinate, merged))
         }
 
-        if (hasDuplicate(finished)) return emptyMap()
+        val confirmed: MutableMap<CoordinateComponent, CoordinateComponent> = mutableMapOf()
+        val removeMarked: MutableSet<CoordinateComponent> = mutableSetOf()
+        filters.filter { f -> f.list.size == 1 }
+            .forEach { f ->
+                confirmed[f.coordinate] = f.list.first()
+                removeMarked.add(f.coordinate)
+            }
+        removeMarked.forEach { r -> filters.removeIf { f -> f.coordinate == r } }
 
-        // generate combination
-
+        // CSP solver here
+        confirmed.putAll(csp(filters).takeIf { it.isNotEmpty() } ?: return false)
+        return recipe.items.size == confirmed.size
     }
 
-    private fun applyCombination(conflict: MutableSet<AmorphousFilterCandidate>, finished: MutableMap<CoordinateComponent, CoordinateComponent>) {
-        val sizes: List<Int> = conflict.map { it.list.size }
-        // ???
-    }
+    private fun csp(candidates: Set<AmorphousFilterCandidate>): Map<CoordinateComponent, CoordinateComponent> {
+        val solution: MutableMap<CoordinateComponent, CoordinateComponent> = mutableMapOf()
 
-    private fun hasDuplicate(map: Map<CoordinateComponent, CoordinateComponent>): Boolean {
-        return map.values.toSet().size != map.values.size
-    }
+        fun backtrack(index: Int, candidateList: List<AmorphousFilterCandidate>): Boolean {
+            if (index == candidateList.size) return true
+            val current: AmorphousFilterCandidate = candidateList[index]
+            for (value: CoordinateComponent in current.list) {
+                if (!solution.values.contains(value)) {
+                    solution[current.coordinate] = value
+                    // next
+                    if (backtrack(index + 1, candidateList)) return true
 
-    private fun bothContained(a: List<CoordinateComponent>, b: List<CoordinateComponent>): List<CoordinateComponent> {
-        val target: List<CoordinateComponent> = if (a.size <= b.size) b else a //ed
-        val taker: List<CoordinateComponent> = if (a.size <= b.size) a else b //er
-        return taker.filter { c -> target.contains(c) }
+                    // back
+                    solution.remove(current.coordinate)
+                }
+            }
+            return false
+        }
+        return if (backtrack(0, candidates.toList())) solution else emptyMap()
     }
 
     private fun allCandidateContains(mapped: Map<CoordinateComponent, ItemStack>, recipe: CRecipe): Boolean {
