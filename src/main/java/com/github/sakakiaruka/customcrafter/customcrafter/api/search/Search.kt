@@ -17,7 +17,6 @@ import org.bukkit.inventory.Recipe
 import org.bukkit.inventory.meta.EnchantmentStorageMeta
 import org.bukkit.inventory.meta.PotionMeta
 import kotlin.math.abs
-import kotlin.math.asin
 import kotlin.math.max
 
 object Search {
@@ -145,7 +144,7 @@ object Search {
             Container.amorphous(mapped, recipe), // containers
             Enchant.amorphous(mapped, recipe), // enchants
             Enchant.storesAmorphous(mapped, recipe), // enchantStores
-            // potions
+            Potion.amorphous(mapped, recipe)// potions
         )
 
         if (filterCandidates.any { pair -> pair.first == AmorphousFilterCandidate.Type.NOT_ENOUGH }) return false

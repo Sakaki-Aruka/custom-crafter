@@ -5,7 +5,8 @@ import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 
 data class CPotionComponent(
-    val data: Map<PotionEffect, PotionStrict>,
+    val effect: PotionEffect,
+    val strict: PotionStrict,
     val bottleType: PotionBottleType,
     val enabledBottleTypes: Set<PotionBottleType>
 ) {

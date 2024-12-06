@@ -1,8 +1,6 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.api.processor
 
-import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.CEnchantMatter
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.CMatter
-import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.CPotionMatter
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.CoordinateComponent
 import org.bukkit.Material
 import org.bukkit.inventory.Inventory
