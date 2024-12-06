@@ -1,6 +1,6 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.api.processor
 
-import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.CRecipe
+import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.recipe.CRecipe
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.internal.AmorphousFilterCandidate
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.matter.CMatterPredicate
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.CoordinateComponent

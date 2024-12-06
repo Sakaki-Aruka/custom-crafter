@@ -1,5 +1,6 @@
-package com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces
+package com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.recipe
 
+import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.matter.CMatter
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.CRecipeContainer
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.CRecipeType
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.CoordinateComponent

@@ -1,8 +1,8 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.api.processor
 
-import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.CEnchantMatter
-import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.CEnchantmentStoreMatter
-import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.CRecipe
+import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.matter.CEnchantMatter
+import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.matter.CEnchantmentStoreMatter
+import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.recipe.CRecipe
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.internal.AmorphousFilterCandidate
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.matter.enchant.CEnchantComponent
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.matter.enchant.EnchantStrict

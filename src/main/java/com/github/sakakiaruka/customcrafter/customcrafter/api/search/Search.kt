@@ -1,7 +1,12 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.api.search
 
 import com.github.sakakiaruka.customcrafter.customcrafter.api.CustomCrafterAPI
-import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.*
+import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.matter.CEnchantMatter
+import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.matter.CEnchantmentStoreMatter
+import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.matter.CMatter
+import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.matter.CPotionMatter
+import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.recipe.CPermissibleRecipe
+import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.recipe.CRecipe
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.internal.AmorphousFilterCandidate
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.CRecipeType
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.CoordinateComponent
@@ -85,7 +90,7 @@ object Search {
 
         val customs: List<CRecipe> = CustomCrafterAPI.RECIPES
             .filter { it.items.size == mapped.size }
-            .filter { recipe -> permission(mapped, recipe, player) }
+            .filter { recipe -> if (recipe is CPermissibleRecipe) permission(mapped, recipe, player) else true }
             .filter { recipe ->
                 when (recipe.type) {
                     CRecipeType.NORMAL -> normal(mapped, recipe)
@@ -100,8 +105,7 @@ object Search {
         return SearchResult(vanilla, customs)
     }
 
-    private fun permission(mapped: Map<CoordinateComponent, ItemStack>, recipe: CRecipe, player: Player): Boolean {
-        //
+    private fun permission(mapped: Map<CoordinateComponent, ItemStack>, recipe: CPermissibleRecipe, player: Player): Boolean {
         return true
     }
 

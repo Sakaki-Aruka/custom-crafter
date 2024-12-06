@@ -1,9 +1,7 @@
-package com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces
+package com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.matter
 
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.matter.CMatterPredicate
-import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.CoordinateComponent
 import org.bukkit.Material
-import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataContainer
 
