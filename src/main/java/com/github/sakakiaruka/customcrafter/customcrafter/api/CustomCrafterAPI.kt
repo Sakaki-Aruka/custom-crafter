@@ -1,7 +1,7 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.api
 
 import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter
-import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.CRecipe
+import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.recipe.CRecipe
 import com.github.sakakiaruka.customcrafter.customcrafter.api.processor.Converter
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
