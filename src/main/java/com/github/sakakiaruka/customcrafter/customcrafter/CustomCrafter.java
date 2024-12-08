@@ -1,5 +1,6 @@
 package com.github.sakakiaruka.customcrafter.customcrafter;
 
+import com.github.sakakiaruka.customcrafter.customcrafter.api.CustomCrafterAPI;
 import com.github.sakakiaruka.customcrafter.customcrafter.command.HistoryDatabase;
 import com.github.sakakiaruka.customcrafter.customcrafter.command.Processor;
 import com.github.sakakiaruka.customcrafter.customcrafter.listener.Listener;
@@ -22,7 +23,10 @@ public final class CustomCrafter extends JavaPlugin {
         // Plugin startup logic
         saveDefaultConfig();
         this.instance = this;
+
         INITIALIZED = System.currentTimeMillis();
+        CustomCrafterAPI.INSTANCE.setup$custom_crafter();
+
         new SettingsLoad().load();
         getCommand("cc").setExecutor(new Processor());
         getCommand("history_database").setExecutor(HistoryDatabase.INSTANCE);

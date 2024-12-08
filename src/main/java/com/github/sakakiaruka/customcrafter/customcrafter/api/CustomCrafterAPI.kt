@@ -2,6 +2,9 @@ package com.github.sakakiaruka.customcrafter.customcrafter.api
 
 import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.recipe.CRecipe
+import com.github.sakakiaruka.customcrafter.customcrafter.api.listener.InventoryClickListener
+import com.github.sakakiaruka.customcrafter.customcrafter.api.listener.InventoryCloseListener
+import com.github.sakakiaruka.customcrafter.customcrafter.api.listener.PlayerInteractListener
 import com.github.sakakiaruka.customcrafter.customcrafter.api.processor.Converter
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
@@ -18,7 +21,7 @@ object CustomCrafterAPI {
 
     val AUTHORS: Set<String> = setOf("Sakaki-Aruka")
 
-    var CRAFT_CANCEL: Boolean = false
+    var RESULT_GIVE_CANCEL: Boolean = false
     val RECIPES: MutableList<CRecipe> = mutableListOf()
     var BASE_BLOCK: Material = Material.GOLD_BLOCK
 
@@ -27,9 +30,17 @@ object CustomCrafterAPI {
     const val CRAFTING_TABLE_RESULT_SLOT: Int = 44
     const val CRAFTING_TABLE_TOTAL_SIZE: Int = 54
 
-    fun setBaseBlockSideSize(size: Int) {
-        if (size <= 0 || size % 2 != 1) throw IllegalArgumentException("'size' must be bigger than 0 and an odd.")
+    internal fun setup() {
+        val instance: CustomCrafter = CustomCrafter.getInstance()
+        Bukkit.getPluginManager().registerEvents(InventoryClickListener, instance)
+        Bukkit.getPluginManager().registerEvents(InventoryCloseListener, instance)
+        Bukkit.getPluginManager().registerEvents(PlayerInteractListener, instance)
+    }
+
+    fun setBaseBlockSideSize(size: Int): Boolean {
+        if (size <= 0 || size % 2 != 1) return false
         BASE_BLOCK_SIDE = size
+        return true
     }
     fun getBaseBlockSideSize(): Int = BASE_BLOCK_SIDE
 

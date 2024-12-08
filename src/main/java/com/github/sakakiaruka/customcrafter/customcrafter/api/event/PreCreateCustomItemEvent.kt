@@ -1,27 +1,25 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.api.event
 
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.CraftView
-import com.github.sakakiaruka.customcrafter.customcrafter.api.search.Search
 import org.bukkit.entity.Player
+import org.bukkit.event.Cancellable
 import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
 import org.bukkit.event.inventory.ClickType
 
 /**
- * Called when a player did craft items what through custom crafting table.
+ * Called when a player click the making button and if crafting material slots are not empty.
  *
- * @param[player] A crafter
+ * @param[player] A clicked player
  * @param[view] A view of crafting gui
- * @param[result] A result of crafting
  * @param[clickType] A click type what is player did
  */
 
-class CreateCustomItemEvent internal constructor(
+class PreCreateCustomItemEvent internal constructor(
     val player: Player,
     val view: CraftView,
-    val result: Search.SearchResult?,
     val clickType: ClickType
-): Event() {
+): Event(), Cancellable {
     companion object {
         @JvmField
         val HANDLER_LIST: HandlerList = HandlerList()
@@ -29,5 +27,10 @@ class CreateCustomItemEvent internal constructor(
         @JvmStatic
         fun getHandlerList() = HANDLER_LIST
     }
+    private var cancelled: Boolean = false
     override fun getHandlers(): HandlerList = HANDLER_LIST
+    override fun isCancelled(): Boolean = cancelled
+    override fun setCancelled(p0: Boolean) {
+        cancelled = p0
+    }
 }
