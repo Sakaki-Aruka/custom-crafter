@@ -15,8 +15,8 @@ import com.github.sakakiaruka.customcrafter.customcrafter.api.processor.Containe
 import com.github.sakakiaruka.customcrafter.customcrafter.api.processor.Converter
 import com.github.sakakiaruka.customcrafter.customcrafter.api.processor.Enchant
 import com.github.sakakiaruka.customcrafter.customcrafter.api.processor.Potion
-import org.apache.maven.model.building.ModelProblemCollector
 import org.bukkit.Bukkit
+import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
@@ -152,9 +152,46 @@ object Search {
         return basic
     }
 
+    private fun candidateAmorphous(mapped: Map<CoordinateComponent, ItemStack>, recipe: CRecipe): Pair<AmorphousFilterCandidate.Type, List<AmorphousFilterCandidate>> {
+        val recipes: List<CoordinateComponent> = recipe.items.keys.toList()
+        val inputs: List<CoordinateComponent> = mapped.keys.toList()
+
+        if (recipes.size > inputs.size) return Pair(AmorphousFilterCandidate.Type.NOT_ENOUGH, emptyList())
+        else if (recipes.isEmpty()) return Pair(AmorphousFilterCandidate.Type.NOT_REQUIRED, emptyList())
+
+        val map: MutableMap<Int, List<Int>> = mutableMapOf()
+        for (index: Int in recipes.indices) {
+            val candidates: Set<Material> = recipe.items[recipes[index]]!!.candidate
+            val matched: List<Int> = inputs
+                .withIndex()
+                .filter { (_, component) ->
+                    val inType: Material = mapped[component]!!.type
+                    candidates.contains(inType)
+                }
+                .map { (index, _) -> index }
+            map[index] = matched
+        }
+
+        val result: MutableList<AmorphousFilterCandidate> = mutableListOf()
+        for (slice in map.entries) {
+            val R: CoordinateComponent = recipes[slice.key]
+            val list: List<CoordinateComponent> = inputs
+                .withIndex()
+                .filter { slice.value.contains(it.index) }
+                .map { it.value }
+            result.add(AmorphousFilterCandidate(R, list))
+        }
+
+        val type =
+            if (result.isEmpty()) AmorphousFilterCandidate.Type.NOT_ENOUGH
+            else AmorphousFilterCandidate.Type.SUCCESSFUL
+
+        return Pair(type, result)
+    }
+
     private fun amorphous(mapped: Map<CoordinateComponent, ItemStack>, recipe: CRecipe): MappedRelation? {
         val filterCandidates: List<(Pair<AmorphousFilterCandidate.Type, List<AmorphousFilterCandidate>>)> = listOf(
-            // candidates
+            candidateAmorphous(mapped, recipe), // candidates
             Container.amorphous(mapped, recipe), // containers
             Enchant.amorphous(mapped, recipe), // enchants
             Enchant.storesAmorphous(mapped, recipe), // enchantStores
