@@ -13,8 +13,8 @@ import org.bukkit.persistence.PersistentDataType
 
 object CustomCrafterAPI {
     const val VERSION: String = "0.1"
-    const val IS_STABLE: Boolean = true
-    const val IS_BETA: Boolean = false
+    const val IS_STABLE: Boolean = false
+    const val IS_BETA: Boolean = true
 
     val AUTHORS: Set<String> = setOf("Sakaki-Aruka")
 
