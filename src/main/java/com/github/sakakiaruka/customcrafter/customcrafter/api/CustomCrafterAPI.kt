@@ -22,6 +22,7 @@ object CustomCrafterAPI {
     val AUTHORS: Set<String> = setOf("Sakaki-Aruka")
 
     var RESULT_GIVE_CANCEL: Boolean = false
+    var ENABLE_HISTORY_DATABASE = false
     val RECIPES: MutableList<CRecipe> = mutableListOf()
     var BASE_BLOCK: Material = Material.GOLD_BLOCK
 
@@ -37,14 +38,27 @@ object CustomCrafterAPI {
         Bukkit.getPluginManager().registerEvents(PlayerInteractListener, instance)
     }
 
+    /**
+     * set base block's side size.
+     * default size = 3.
+     *
+     * @param[size] this argument must be odd and more than zero.
+     * @return[Boolean] if successful to change, returns true else false.
+     */
     fun setBaseBlockSideSize(size: Int): Boolean {
         if (size <= 0 || size % 2 != 1) return false
         BASE_BLOCK_SIDE = size
         return true
     }
+
+    /**
+     * get base block's side size.
+     *
+     * @return[Int] size
+     */
     fun getBaseBlockSideSize(): Int = BASE_BLOCK_SIDE
 
-    fun genCCKey() = Triple(
+    private fun genCCKey() = Triple(
         NamespacedKey(CustomCrafter.getInstance(), "gui-created"),
         PersistentDataType.LONG,
         System.currentTimeMillis()
@@ -61,7 +75,8 @@ object CustomCrafterAPI {
             persistentDataContainer.set(key.first, key.second, key.third)
         }
     }
-    fun getCraftingGUI(): Inventory {
+
+    internal fun getCraftingGUI(): Inventory {
         val gui: Inventory = Bukkit.createInventory(null, CRAFTING_TABLE_TOTAL_SIZE, Component.text("Custom Crafter"))
         Converter.getAvailableCraftingSlotComponents().forEach { c ->
             val index: Int = c.x + c.y * 9
@@ -71,7 +86,7 @@ object CustomCrafterAPI {
         return gui
     }
 
-    fun isCustomCrafterGUI(inventory: Inventory): Boolean {
+    internal fun isCustomCrafterGUI(inventory: Inventory): Boolean {
         val makeButton: ItemStack = inventory.getItem(CRAFTING_TABLE_MAKE_BUTTON_SLOT)
             ?.takeIf { it.type == makeButton.type }
             ?: return false
@@ -79,7 +94,7 @@ object CustomCrafterAPI {
         return makeButton.itemMeta.persistentDataContainer.has(key.first, key.second)
     }
 
-    fun isGUITooOld(inventory: Inventory): Boolean {
+    internal fun isGUITooOld(inventory: Inventory): Boolean {
         if (!isCustomCrafterGUI(inventory)) throw IllegalArgumentException("'inventory' must be a CustomCrafter's gui.")
         val button: ItemStack = inventory.getItem(CRAFTING_TABLE_MAKE_BUTTON_SLOT)!!
         val key = genCCKey()
