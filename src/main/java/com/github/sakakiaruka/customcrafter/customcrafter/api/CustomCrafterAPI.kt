@@ -58,8 +58,17 @@ object CustomCrafterAPI {
      */
     fun getBaseBlockSideSize(): Int = BASE_BLOCK_SIDE
 
-    private fun genCCKey() = Triple(
-        NamespacedKey(CustomCrafter.getInstance(), "gui-created"),
+    /**
+     * provides elements of custom crafter's gui component
+     * returned Triple contained below elements.
+     * first([NamespacedKey]): "custom_crafter:gui_created"
+     * second([PersistentDataType.LONG]): a type of 'third'
+     * third([Long]): epoch time when called this.
+     *
+     * @return[Triple]
+     */
+    fun genCCKey() = Triple(
+        NamespacedKey(CustomCrafter.getInstance(), "gui_created"),
         PersistentDataType.LONG,
         System.currentTimeMillis()
     )
@@ -76,7 +85,12 @@ object CustomCrafterAPI {
         }
     }
 
-    internal fun getCraftingGUI(): Inventory {
+    /**
+     * returns custom crafter gui
+     *
+     * @return[Inventory] custom crafter gui
+     */
+    fun getCraftingGUI(): Inventory {
         val gui: Inventory = Bukkit.createInventory(null, CRAFTING_TABLE_TOTAL_SIZE, Component.text("Custom Crafter"))
         Converter.getAvailableCraftingSlotComponents().forEach { c ->
             val index: Int = c.x + c.y * 9
@@ -86,7 +100,13 @@ object CustomCrafterAPI {
         return gui
     }
 
-    internal fun isCustomCrafterGUI(inventory: Inventory): Boolean {
+    /**
+     * returns the provided inventory is custom crafter gui or not.
+     *
+     * @param[inventory] input inventory
+     * @return[Boolean] is custom crafter gui or not
+     */
+    fun isCustomCrafterGUI(inventory: Inventory): Boolean {
         val makeButton: ItemStack = inventory.getItem(CRAFTING_TABLE_MAKE_BUTTON_SLOT)
             ?.takeIf { it.type == makeButton.type }
             ?: return false
@@ -94,7 +114,16 @@ object CustomCrafterAPI {
         return makeButton.itemMeta.persistentDataContainer.has(key.first, key.second)
     }
 
-    internal fun isGUITooOld(inventory: Inventory): Boolean {
+    /**
+     * returns the provided inventory is OLDER than custom crafter reloaded or enabled or not.
+     * if you provide an inventory what is not a custom crafter gui, this throws an Exception.
+     *
+     * @param[inventory] provided inventory
+     * @throws[IllegalArgumentException] thrown when the provided is not custom crafter gui
+     * @throws[IllegalStateException] thrown when get an error on get gui created epoch time
+     * @return[Boolean] older or not
+     */
+    fun isGUITooOld(inventory: Inventory): Boolean {
         if (!isCustomCrafterGUI(inventory)) throw IllegalArgumentException("'inventory' must be a CustomCrafter's gui.")
         val button: ItemStack = inventory.getItem(CRAFTING_TABLE_MAKE_BUTTON_SLOT)!!
         val key = genCCKey()
