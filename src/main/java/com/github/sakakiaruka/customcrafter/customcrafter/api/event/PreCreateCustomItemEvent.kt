@@ -9,6 +9,7 @@ import org.bukkit.event.inventory.ClickType
 
 /**
  * Called when a player click the making button and if crafting material slots are not empty.
+ * If you cancel this event, [CreateCustomItemEvent] is not fired.
  *
  * @param[player] A clicked player
  * @param[view] A view of crafting gui

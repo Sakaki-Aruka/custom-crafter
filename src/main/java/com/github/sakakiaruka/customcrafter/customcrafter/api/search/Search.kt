@@ -28,20 +28,32 @@ import kotlin.math.max
 
 object Search {
 
+    /**
+     * A result of [Search.search].
+     *
+     * @param[vanilla] A found vanilla recipe.
+     * @param[customs] Found custom recipes.
+     *
+     */
     class SearchResult internal constructor(
         private val vanilla: Recipe?,
         private val customs: List<Pair<CRecipe, MappedRelation>>,
     ) {
+        /**
+         * returns a nullable vanilla recipe.
+         * When below situations, [vanilla] is null.
+         * - If [customs] is not empty and a search query's 'natural' is true.
+         * - If an input is not matched all registered vanilla recipes.
+         * @return[vanilla] PaperMCs Recipe. This is NOT a [CRecipe].
+         */
         fun vanilla() = this.vanilla
-        fun customs() = this.customs
 
         /**
-         * A result of [Search.search].
-         *
-         * @param[vanilla] A found vanilla recipe.
-         * @param[customs] Found custom recipes.
+         * returns custom recipes.
          *
          */
+        fun customs() = this.customs
+
         // when call Search#search with natural: Boolean
         // - true: when this finds matched custom recipes, does not search about vanilla.
         // - false: always search vanilla, but this does not mean 'vanilla' is non-null.
@@ -62,7 +74,6 @@ object Search {
      * xxxxxx
      * xxxxxx
      * xxxxxx
-     *
      * zero origin & do not skip empty slots (use ItemStack#empty() )
      * A search-result is not guaranteed what is not empty.
      *

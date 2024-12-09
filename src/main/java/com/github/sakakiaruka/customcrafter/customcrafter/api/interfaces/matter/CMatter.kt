@@ -1,10 +1,14 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.matter
 
+import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.recipe.CRecipe
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.matter.CMatterPredicate
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataContainer
 
+/**
+ * This interface's implementing types can be used as materials for [CRecipe].
+ */
 interface CMatter {
     val name: String
     val candidate: Set<Material>

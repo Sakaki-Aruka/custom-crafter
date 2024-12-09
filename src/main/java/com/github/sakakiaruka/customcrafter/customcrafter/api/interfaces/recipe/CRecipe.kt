@@ -8,6 +8,9 @@ import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.Co
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
+/**
+ * This interface's implementing types can be used as recipes for CustomCrafter.
+ */
 interface CRecipe {
     val name: String
     val items: Map<CoordinateComponent, CMatter>
@@ -19,7 +22,7 @@ interface CRecipe {
 
     fun runContainers(player: Player, relate: MappedRelation, mapped: Map<CoordinateComponent, ItemStack>, results: MutableList<ItemStack>) {
         containers?.forEach { container ->
-            container.run(player, relate, mapped)
+            container.run(player, relate, mapped, results)
         }
     }
 
