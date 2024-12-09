@@ -107,6 +107,7 @@ object CustomCrafterAPI {
      * @return[Boolean] is custom crafter gui or not
      */
     fun isCustomCrafterGUI(inventory: Inventory): Boolean {
+        if (inventory.size != 54) return false
         val makeButton: ItemStack = inventory.getItem(CRAFTING_TABLE_MAKE_BUTTON_SLOT)
             ?.takeIf { it.type == makeButton.type }
             ?: return false
