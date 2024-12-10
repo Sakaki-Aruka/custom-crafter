@@ -6,7 +6,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.internal.
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
-data class CRecipe(
+data class CRecipeImpl(
     override val name: String,
     override val items: Map<CoordinateComponent, CMatter>,
     override val containers: List<CRecipeContainer>?,
@@ -14,7 +14,7 @@ data class CRecipe(
     override val type: CRecipeType,
 ): CRecipe {
     //
-    override fun replaceItems(newItems: Map<CoordinateComponent, CMatter>): com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.CRecipe {
-        return CRecipe(this.name, newItems, this.containers, this.results, this.type)
+    override fun replaceItems(newItems: Map<CoordinateComponent, CMatter>): CRecipeImpl {
+        return CRecipeImpl(this.name, newItems, this.containers, this.results, this.type)
     }
 }

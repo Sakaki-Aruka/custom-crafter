@@ -1,6 +1,9 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.api
 
 import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter
+import com.github.sakakiaruka.customcrafter.customcrafter.api.active_test.test.APITest
+import com.github.sakakiaruka.customcrafter.customcrafter.api.active_test.test.ConverterTest
+import com.github.sakakiaruka.customcrafter.customcrafter.api.active_test.test.EnchantTest
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.recipe.CRecipe
 import com.github.sakakiaruka.customcrafter.customcrafter.api.listener.InventoryClickListener
 import com.github.sakakiaruka.customcrafter.customcrafter.api.listener.InventoryCloseListener
@@ -36,6 +39,13 @@ object CustomCrafterAPI {
         Bukkit.getPluginManager().registerEvents(InventoryClickListener, instance)
         Bukkit.getPluginManager().registerEvents(InventoryCloseListener, instance)
         Bukkit.getPluginManager().registerEvents(PlayerInteractListener, instance)
+
+        if (IS_BETA) {
+            // run tests
+            APITest.run()
+            ConverterTest.run()
+            EnchantTest.run()
+        }
     }
 
     /**
@@ -92,9 +102,10 @@ object CustomCrafterAPI {
      */
     fun getCraftingGUI(): Inventory {
         val gui: Inventory = Bukkit.createInventory(null, CRAFTING_TABLE_TOTAL_SIZE, Component.text("Custom Crafter"))
+        (0..<54).forEach { slot -> gui.setItem(slot, blank) }
         Converter.getAvailableCraftingSlotComponents().forEach { c ->
             val index: Int = c.x + c.y * 9
-            gui.setItem(index, blank)
+            gui.setItem(index, ItemStack.empty())
         }
         gui.setItem(CRAFTING_TABLE_MAKE_BUTTON_SLOT, makeButton)
         return gui

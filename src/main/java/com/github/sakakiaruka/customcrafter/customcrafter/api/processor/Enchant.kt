@@ -15,6 +15,7 @@ object Enchant {
     internal fun enchant(item: ItemStack, e: CEnchantMatter): Boolean {
         val itemEnchants: Map<Enchantment, Int> = item.enchantments
         if (e.enchantComponents.isNotEmpty() && itemEnchants.isEmpty()) return false
+        else if (e.enchantComponents.isEmpty()) return true
         return e.enchantComponents.all { base(itemEnchants, it) }
     }
 

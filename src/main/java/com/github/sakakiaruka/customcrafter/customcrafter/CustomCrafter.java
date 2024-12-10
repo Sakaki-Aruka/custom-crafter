@@ -27,23 +27,23 @@ public final class CustomCrafter extends JavaPlugin {
         INITIALIZED = System.currentTimeMillis();
         CustomCrafterAPI.INSTANCE.setup$custom_crafter();
 
-        new SettingsLoad().load();
-        getCommand("cc").setExecutor(new Processor());
-        getCommand("history_database").setExecutor(HistoryDatabase.INSTANCE);
-        getServer().getPluginManager().registerEvents(new Listener(),this);
-        ENABLED_PLACEHOLDER_API = Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null;
-        if (ENABLED_PLACEHOLDER_API) {
-            new PlaceholderUtil().register();
-        }
+//        new SettingsLoad().load();
+//        getCommand("cc").setExecutor(new Processor());
+//        getCommand("history_database").setExecutor(HistoryDatabase.INSTANCE);
+//        getServer().getPluginManager().registerEvents(new Listener(),this);
+//        ENABLED_PLACEHOLDER_API = Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null;
+//        if (ENABLED_PLACEHOLDER_API) {
+//            new PlaceholderUtil().register();
+//        }
     }
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
-        if (getConfig().contains("permissions") && getConfig().contains("relate")) {
-            Path path = Paths.get(getConfig().getString("relate"));
-            RecipePermissionUtil.playerPermissionWriter(path);
-        }
+//        // Plugin shutdown logic
+//        if (getConfig().contains("permissions") && getConfig().contains("relate")) {
+//            Path path = Paths.get(getConfig().getString("relate"));
+//            RecipePermissionUtil.playerPermissionWriter(path);
+//        }
     }
 
     public static CustomCrafter getInstance(){

@@ -12,9 +12,11 @@ internal object CAssert {
         val stackTrace = Throwable().stackTrace
         stackTrace.getOrNull(1)?.let {
             val caller = stackTrace.getOrNull(1)!!
+            val methodName = caller.methodName
             val fileName = caller.fileName
             val lineNum = caller.lineNumber
-            CustomCrafter.getInstance().logger.info("Test from $fileName-$lineNum ${if (result) "Successful" else "Failed"}.")
+            val resultString = if (result) "Successful" else "Failed"
+            CustomCrafter.getInstance().logger.info("(Test) $fileName#$methodName ($lineNum) $resultString.")
         } ?: kotlin.run {
             CustomCrafter.getInstance().logger.warning("Failed to get caller.")
         }
@@ -25,9 +27,11 @@ internal object CAssert {
         val stackTrace = Throwable().stackTrace
         stackTrace.getOrNull(1)?.let {
             val caller = stackTrace.getOrNull(1)!!
+            val methodName = caller.methodName
             val fileName = caller.fileName
             val lineNum = caller.lineNumber
-            CustomCrafter.getInstance().logger.info("Exception Test from $fileName-$lineNum ${if (result) "Successful" else "Failed"}.")
+            val resultString = if (result) "Successful" else "Failed"
+            CustomCrafter.getInstance().logger.info("(Exception Test) $fileName#$methodName ($lineNum) $resultString.")
         } ?: kotlin.run {
             CustomCrafter.getInstance().logger.warning("Failed to get caller.")
         }
