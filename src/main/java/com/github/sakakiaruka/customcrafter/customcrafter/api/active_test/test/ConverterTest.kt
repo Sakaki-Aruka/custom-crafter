@@ -64,6 +64,14 @@ internal object ConverterTest {
         val slots: Set<Int> = Converter.getAvailableCraftingSlotIndices()
         CAssert.assertTrue(slots.size == intList.size)
         CAssert.assertTrue(slots.containsAll(intList))
+
+        val componentList = Converter.getAvailableCraftingSlotComponents()
+        val mappedIndices = componentList.map { it.x + it.y*9 }
+        val indices = Converter.getAvailableCraftingSlotIndices()
+
+        CAssert.assertTrue(mappedIndices.size == indices.size)
+        CAssert.assertTrue(indices.containsAll(mappedIndices))
+
     }
 
     private fun inputMappingTest() {

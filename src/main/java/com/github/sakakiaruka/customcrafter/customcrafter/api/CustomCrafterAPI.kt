@@ -4,6 +4,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter
 import com.github.sakakiaruka.customcrafter.customcrafter.api.active_test.test.APITest
 import com.github.sakakiaruka.customcrafter.customcrafter.api.active_test.test.ConverterTest
 import com.github.sakakiaruka.customcrafter.customcrafter.api.active_test.test.EnchantTest
+import com.github.sakakiaruka.customcrafter.customcrafter.api.active_test.test.VanillaSearchTest
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.recipe.CRecipe
 import com.github.sakakiaruka.customcrafter.customcrafter.api.listener.InventoryClickListener
 import com.github.sakakiaruka.customcrafter.customcrafter.api.listener.InventoryCloseListener
@@ -45,6 +46,7 @@ object CustomCrafterAPI {
             APITest.run()
             ConverterTest.run()
             EnchantTest.run()
+            VanillaSearchTest.run()
         }
     }
 
