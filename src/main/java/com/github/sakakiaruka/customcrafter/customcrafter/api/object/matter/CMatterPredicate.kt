@@ -14,5 +14,6 @@ data class CMatterPredicate(
     val predicate: (
         mapped: Map<CoordinateComponent, ItemStack>,
         container: PersistentDataContainer,
-        recipe: CRecipe, player: Player) -> Boolean
+        recipe: CRecipe,
+        player: Player) -> Boolean
 )

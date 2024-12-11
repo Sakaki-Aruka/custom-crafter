@@ -242,5 +242,57 @@ internal object EnchantTest {
         CAssert.assertTrue(candidateList3.isEmpty())
 
         // TODO amorphous test (multi CMatter recipes and multi inputs)
+        /*
+         * 1. matterX: CEnchantMatter
+         * 2. recipeX: CRecipe
+         * 3. itemStackX: ItemStack
+         * 4. mappedInputX: Map<CoordinateComponent, ItemStack>
+         */
+        val for4Components: Set<CEnchantComponent> = setOf(
+            CEnchantComponent(1, Enchantment.FLAME, EnchantStrict.STRICT),
+//            CEnchantComponent(1, Enchantment.AQUA_AFFINITY, EnchantStrict.STRICT),
+//            CEnchantComponent(1, Enchantment.BANE_OF_ARTHROPODS, EnchantStrict.STRICT)
+        )
+        val matter4: CEnchantMatter = enchantedStone(for4Components)
+
+        val for4Components1: Set<CEnchantComponent> = setOf(
+            CEnchantComponent(1, Enchantment.FLAME, EnchantStrict.STRICT),
+            CEnchantComponent(1, Enchantment.LURE, EnchantStrict.STRICT)
+        )
+        val matter4_1: CEnchantMatter = enchantedStone(for4Components1)
+
+        val recipe4: CRecipe = enchantedRecipe(mapOf(
+            Pair(CoordinateComponent(0, 0), matter4),
+            Pair(CoordinateComponent(0, 1), matter4),
+            Pair(CoordinateComponent(0, 2), matter4_1),
+            Pair(CoordinateComponent(0, 3), matter4)
+        ))
+
+        val for4ComponentsItem: Set<CEnchantComponent> = setOf(
+            CEnchantComponent(1, Enchantment.AQUA_AFFINITY, EnchantStrict.INPUT),
+            CEnchantComponent(1, Enchantment.FLAME, EnchantStrict.INPUT)
+        )
+        val for4ComponentsItem1: Set<CEnchantComponent> = setOf(
+            CEnchantComponent(1, Enchantment.LURE, EnchantStrict.INPUT),
+            CEnchantComponent(1, Enchantment.FLAME, EnchantStrict.INPUT)
+        )
+        val itemStack4 = enchantedStoneItemStack(for4ComponentsItem)
+        val itemStack4_1 = enchantedStoneItemStack(for4ComponentsItem1)
+        val mappedInput4: Map<CoordinateComponent, ItemStack> = mapOf(
+            Pair(CoordinateComponent(0, 0), itemStack4_1),
+            Pair(CoordinateComponent(0, 1), itemStack4_1),
+            Pair(CoordinateComponent(0, 2), itemStack4),
+            Pair(CoordinateComponent(0, 3), itemStack4_1)
+        )
+
+        val (type4, list4) = Enchant.amorphous(mappedInput4, recipe4)
+        CAssert.assertTrue(type4 == AmorphousFilterCandidate.Type.SUCCESSFUL)
+        CAssert.assertTrue(list4.size == 4)
+        val c0Matched = (0..<4).map { i -> CoordinateComponent(0, i) }.toSet()
+        val c1Matched = (0..<4).filter { it != 2 }.map { i -> CoordinateComponent(0, i) }.toSet()
+        CAssert.assertTrue(list4[0].list.toSet() == c0Matched)
+        CAssert.assertTrue(list4[1].list.toSet() == c0Matched)
+        CAssert.assertTrue(list4[2].list.toSet() == c1Matched)
+        CAssert.assertTrue(list4[3].list.toSet() == c0Matched)
     }
 }
