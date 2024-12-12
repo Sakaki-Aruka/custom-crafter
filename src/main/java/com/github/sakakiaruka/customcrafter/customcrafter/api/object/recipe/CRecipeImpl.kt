@@ -2,7 +2,7 @@ package com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe
 
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.matter.CMatter
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.recipe.CRecipe
-import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.internal.MappedRelation
+import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.MappedRelation
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 

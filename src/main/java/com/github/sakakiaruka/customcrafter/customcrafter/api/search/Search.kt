@@ -7,8 +7,8 @@ import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.matter.
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.matter.CPotionMatter
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.recipe.CRecipe
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.internal.AmorphousFilterCandidate
-import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.internal.MappedRelation
-import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.internal.MappedRelationComponent
+import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.MappedRelation
+import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.MappedRelationComponent
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.CRecipeType
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.CoordinateComponent
 import com.github.sakakiaruka.customcrafter.customcrafter.api.processor.Container

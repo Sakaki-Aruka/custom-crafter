@@ -5,7 +5,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.api.event.CreateCustom
 import com.github.sakakiaruka.customcrafter.customcrafter.api.event.PreCreateCustomItemEvent
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.recipe.CRecipe
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.CraftView
-import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.internal.MappedRelation
+import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.MappedRelation
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.CoordinateComponent
 import com.github.sakakiaruka.customcrafter.customcrafter.api.processor.Converter
 import com.github.sakakiaruka.customcrafter.customcrafter.api.search.Search
