@@ -5,7 +5,6 @@ import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.recipe.
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.internal.AmorphousFilterCandidate
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.matter.potion.CPotionComponent
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.CoordinateComponent
-import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.PotionMeta
 import org.bukkit.potion.PotionEffect
@@ -17,7 +16,6 @@ object Potion {
         meta.basePotionType?.let {
             effects.addAll(it.potionEffects)
         }
-        if (!p.potionComponents.all { it.enabledBottleTypes.contains(relate(item.type)) }) return false
 
         return p.potionComponents.all { c ->
             when (c.strict) {
@@ -31,15 +29,6 @@ object Potion {
                             && c.effect.amplifier == e.amplifier }
                 }
             }
-        }
-    }
-
-    private fun relate(type: Material): CPotionComponent.PotionBottleType? {
-        return when (type) {
-            Material.POTION -> CPotionComponent.PotionBottleType.NORMAL
-            Material.LINGERING_POTION -> CPotionComponent.PotionBottleType.LINGERING
-            Material.SPLASH_POTION -> CPotionComponent.PotionBottleType.SPLASH
-            else -> null
         }
     }
 

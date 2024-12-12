@@ -11,14 +11,10 @@ import org.bukkit.potion.PotionEffect
  *
  * @param[effect] A type of potion
  * @param[strict] required level
- * @param[bottleType] A bottle type
- * @param[enabledBottleTypes] Candidates of this potion bottle
  */
 data class CPotionComponent(
     val effect: PotionEffect,
-    val strict: PotionStrict,
-    val bottleType: PotionBottleType,
-    val enabledBottleTypes: Set<PotionBottleType>
+    val strict: PotionStrict
 ) {
 
     /**
@@ -34,20 +30,5 @@ data class CPotionComponent(
         NOT_STRICT,
         ONLY_EFFECT,
         STRICT
-    }
-
-    /**
-     * An enum what means potion glass bottle
-     *
-     * NORMAL: normal potion glass bottle
-     * LINGERING: lingering potion glass bottle
-     * SPLASH: splash potion glass bottle
-     *
-     * @param[material] A based material
-     */
-    enum class PotionBottleType(val material: Material) {
-        NORMAL(Material.POTION),
-        LINGERING(Material.LINGERING_POTION),
-        SPLASH(Material.SPLASH_POTION)
     }
 }

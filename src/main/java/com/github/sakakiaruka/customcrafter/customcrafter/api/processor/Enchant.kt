@@ -85,7 +85,7 @@ object Enchant {
             result.add(AmorphousFilterCandidate(R, list))
         }
         val type =
-            if (result.isEmpty() || result.size != recipes.size) AmorphousFilterCandidate.Type.NOT_ENOUGH
+            if (result.isEmpty()) AmorphousFilterCandidate.Type.NOT_ENOUGH
             else AmorphousFilterCandidate.Type.SUCCESSFUL
 
         return Pair(type, result)

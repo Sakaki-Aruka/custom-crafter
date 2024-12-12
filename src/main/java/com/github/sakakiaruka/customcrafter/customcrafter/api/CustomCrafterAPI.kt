@@ -4,6 +4,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter
 import com.github.sakakiaruka.customcrafter.customcrafter.api.active_test.test.APITest
 import com.github.sakakiaruka.customcrafter.customcrafter.api.active_test.test.ConverterTest
 import com.github.sakakiaruka.customcrafter.customcrafter.api.active_test.test.EnchantTest
+import com.github.sakakiaruka.customcrafter.customcrafter.api.active_test.test.PotionTest
 import com.github.sakakiaruka.customcrafter.customcrafter.api.active_test.test.VanillaSearchTest
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.recipe.CRecipe
 import com.github.sakakiaruka.customcrafter.customcrafter.api.listener.InventoryClickListener
@@ -17,6 +18,7 @@ import org.bukkit.NamespacedKey
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
+import org.bukkit.scheduler.BukkitRunnable
 
 object CustomCrafterAPI {
     const val VERSION: String = "0.1"
@@ -43,10 +45,15 @@ object CustomCrafterAPI {
 
         if (IS_BETA) {
             // run tests
-            APITest.run()
-            ConverterTest.run()
-            EnchantTest.run()
-            VanillaSearchTest.run()
+            object: BukkitRunnable() {
+                override fun run() {
+                    APITest.run()
+                    ConverterTest.run()
+                    EnchantTest.run()
+                    VanillaSearchTest.run()
+                    PotionTest.run()
+                }
+            }.runTaskAsynchronously(CustomCrafter.getInstance())
         }
     }
 
