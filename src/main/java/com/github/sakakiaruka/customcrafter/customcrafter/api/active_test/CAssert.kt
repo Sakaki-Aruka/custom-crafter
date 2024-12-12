@@ -1,6 +1,8 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.api.active_test
 
 import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter
+import net.kyori.adventure.text.minimessage.MiniMessage
+import org.bukkit.Bukkit
 import kotlin.Exception
 import kotlin.reflect.KClass
 
@@ -8,6 +10,7 @@ import kotlin.reflect.KClass
  * @suppress
  */
 internal object CAssert {
+    val console = Bukkit.getConsoleSender()
     fun assertTrue(result: Boolean) {
         val stackTrace = Throwable().stackTrace
         stackTrace.getOrNull(1)?.let {
@@ -15,10 +18,13 @@ internal object CAssert {
             val methodName = caller.methodName
             val fileName = caller.fileName
             val lineNum = caller.lineNumber
-            val resultString = if (result) "Successful" else "Failed"
-            CustomCrafter.getInstance().logger.info("(Test) $fileName#$methodName ($lineNum) $resultString.")
+            val resultComponent = if (result) "<aqua>Successful</aqua>" else "<yellow>Failed    </yellow>"
+            val line = MiniMessage.miniMessage().deserialize("(Test) $resultComponent: $fileName#$methodName ($lineNum)")
+            console.sendMessage(line)
+            //CustomCrafter.getInstance().logger.info()
         } ?: kotlin.run {
-            CustomCrafter.getInstance().logger.warning("Failed to get caller.")
+            console.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>Failed to get caller."))
+            //CustomCrafter.getInstance().logger.warning("Failed to get caller.")
         }
     }
 
@@ -30,10 +36,12 @@ internal object CAssert {
             val methodName = caller.methodName
             val fileName = caller.fileName
             val lineNum = caller.lineNumber
-            val resultString = if (result) "Successful" else "Failed"
-            CustomCrafter.getInstance().logger.info("(Exception Test) $fileName#$methodName ($lineNum) $resultString.")
+            val resultComponent = if (result) "<aqua>Successful</aqua>" else "<yellow>Failed    </yellow>"
+            console.sendMessage(MiniMessage.miniMessage().deserialize("(Exception Test) $resultComponent: $fileName#$methodName ($lineNum)"))
+            //CustomCrafter.getInstance().logger.info()
         } ?: kotlin.run {
-            CustomCrafter.getInstance().logger.warning("Failed to get caller.")
+            console.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>Failed to get caller."))
+            //CustomCrafter.getInstance().logger.warning("Failed to get caller.")
         }
     }
 }

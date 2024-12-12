@@ -249,9 +249,7 @@ internal object EnchantTest {
          * 4. mappedInputX: Map<CoordinateComponent, ItemStack>
          */
         val for4Components: Set<CEnchantComponent> = setOf(
-            CEnchantComponent(1, Enchantment.FLAME, EnchantStrict.STRICT),
-//            CEnchantComponent(1, Enchantment.AQUA_AFFINITY, EnchantStrict.STRICT),
-//            CEnchantComponent(1, Enchantment.BANE_OF_ARTHROPODS, EnchantStrict.STRICT)
+            CEnchantComponent(1, Enchantment.FLAME, EnchantStrict.STRICT)
         )
         val matter4: CEnchantMatter = enchantedStone(for4Components)
 
