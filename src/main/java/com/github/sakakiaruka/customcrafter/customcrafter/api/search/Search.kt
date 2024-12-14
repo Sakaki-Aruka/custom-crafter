@@ -175,7 +175,7 @@ object Search {
         val recipeSorted: List<CMatter> = coordinateSort(recipe.items)
 
         for ((i, m) in inputSorted.zip(recipeSorted)) {
-            if (!m.mass && m.amount != 1 && i.amount != m.amount) return false
+            if (!m.mass && m.amount != 1 && i.amount < m.amount) return false
             val inOne: ItemStack = i.asOne()
             val recipeOne: CMatter = m.asOne()
 

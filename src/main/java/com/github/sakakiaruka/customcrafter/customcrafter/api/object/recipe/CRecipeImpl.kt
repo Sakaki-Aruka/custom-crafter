@@ -5,12 +5,13 @@ import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.recipe.
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.MappedRelation
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import java.util.UUID
 
 data class CRecipeImpl(
     override val name: String,
     override val items: Map<CoordinateComponent, CMatter>,
     override val containers: List<CRecipeContainer>?,
-    override val results: List<(player: Player, relate: MappedRelation, mapped: Map<CoordinateComponent, ItemStack>) -> List<ItemStack>>?,
+    override val results: List<(crafterID: UUID, relate: MappedRelation, mapped: Map<CoordinateComponent, ItemStack>) -> List<ItemStack>>?,
     override val type: CRecipeType,
 ): CRecipe {
     //

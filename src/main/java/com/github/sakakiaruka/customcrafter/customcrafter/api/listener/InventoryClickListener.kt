@@ -113,10 +113,10 @@ object InventoryClickListener: Listener {
                 decrement(gui, slot, amount)
             }
 
-            recipe.getResults(player, relate, mapped)
+            recipe.getResults(player.uniqueId, relate, mapped)
                 .takeIf { it.isNotEmpty() }
                 ?.let { itemList ->
-                    recipe.runContainers(player, relate, mapped, itemList)
+                    recipe.runContainers(player.uniqueId, relate, mapped, itemList)
                     // TODO must impl add result items to the result slot
                     itemList.takeIf { it.isNotEmpty() }
                         ?.forEach { item ->

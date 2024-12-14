@@ -5,6 +5,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.api.active_test.CAsser
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.matter.CMatter
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.recipe.CRecipe
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.CraftView
+import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.MappedRelation
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.matter.CMatterImpl
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.CRecipeImpl
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.CRecipeType
@@ -25,6 +26,7 @@ internal object SearchTest {
 
     private fun customTest() {
         amorphousTest1()
+        amorphousTest2()
     }
 
     private fun amorphousTest1() {
@@ -82,7 +84,55 @@ internal object SearchTest {
         CustomCrafterAPI.RECIPES.remove(recipe)
     }
 
+    private fun amorphousTest2() {
+        // batch test
+        val slimeBall: CMatter = CMatterImpl(
+            "slimeBall",
+            setOf(Material.SLIME_BALL),
+            amount = 1,
+            mass = false,
+            predicates = null,
+            persistentDataContainer = null
+        )
 
+        val lavaBucket: CMatter = CMatterImpl(
+            "lavaBucket",
+            setOf(Material.LAVA_BUCKET),
+            amount = 1,
+            mass = true,
+            predicates = null,
+            persistentDataContainer = null
+        )
+
+        val recipe: CRecipe = CRecipeImpl(
+            "testRecipe",
+            mapOf(
+                Pair(CoordinateComponent(0, 0), slimeBall),
+                Pair(CoordinateComponent(0, 1), lavaBucket)
+            ),
+            containers = null,
+            results = null,
+            CRecipeType.AMORPHOUS
+        )
+
+        val gui = CustomCrafterAPI.getCraftingGUI()
+        gui.setItem(0, ItemStack(Material.SLIME_BALL, 10))
+        gui.setItem(1, ItemStack(Material.LAVA_BUCKET))
+        CustomCrafterAPI.RECIPES.add(recipe)
+        val result = Search.search(
+            UUID.randomUUID(),
+            CraftView.fromInventory(gui)!!,
+            natural = true
+        )
+
+        CAssert.assertTrue(result != null)
+        CAssert.assertTrue(result!!.vanilla() == null)
+        CAssert.assertTrue(result.customs().size == 1)
+        CAssert.assertTrue(result.customs().first().first == recipe)
+
+        // cleanup
+        CustomCrafterAPI.RECIPES.remove(recipe)
+    }
 
     private fun vanillaTest() {
         furnaceTest()
