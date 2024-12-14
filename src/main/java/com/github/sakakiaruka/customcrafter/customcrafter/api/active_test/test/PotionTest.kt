@@ -151,5 +151,83 @@ internal object PotionTest {
         val first1 = list1.first()
         CAssert.assertTrue(first1.coordinate == CoordinateComponent(0, 0))
         CAssert.assertTrue(first1.list == listOf(CoordinateComponent(0, 0)))
+
+        // 2. not strict test
+        /*
+         * 1. matterX: CEnchantMatter
+         * 2. recipeX: CRecipe
+         * 3. itemStackX: ItemStack
+         * 4. mappedInputX: Map<CoordinateComponent, ItemStack>
+         */
+        val matter2 = potionMatter(setOf())
+
+        val recipe2 = potionContainedRecipe(mapOf(
+            Pair(CoordinateComponent(0, 0), matter2)
+        ))
+
+        val item2 = potionItem(setOf(CPotionComponent(
+            PotionEffect(PotionEffectType.POISON, 100, 1),
+            CPotionComponent.PotionStrict.NOT_STRICT
+        )))
+        val mappedInput2 = mapOf(
+            Pair(CoordinateComponent(1, 1), item2)
+        )
+
+        val (type2, list2) = Potion.amorphous(mappedInput2, recipe2)
+        CAssert.assertTrue(type2 == AmorphousFilterCandidate.Type.NOT_REQUIRED)
+        CAssert.assertTrue(list2.isEmpty())
+
+        /*
+         * 1. type
+         * 2. list size
+         * 3. list.first.coordinate
+         * 4. list.coordinate.coordinate
+         */
+
+        val for4Components: Set<CPotionComponent> = setOf(
+            CPotionComponent(PotionEffect(PotionEffectType.LUCK, 100, 1), CPotionComponent.PotionStrict.STRICT)
+        )
+        val matter4: CPotionMatter = potionMatter(for4Components)
+
+        val for4Components1: Set<CPotionComponent> = setOf(
+            CPotionComponent(PotionEffect(PotionEffectType.LUCK, 100, 1), CPotionComponent.PotionStrict.STRICT),
+            CPotionComponent(PotionEffect(PotionEffectType.POISON, 100,1), CPotionComponent.PotionStrict.STRICT)
+        )
+        val matter4_1: CPotionMatter = potionMatter(for4Components1)
+
+        val recipe4: CRecipe = potionContainedRecipe(mapOf(
+            Pair(CoordinateComponent(0, 0), matter4),
+            Pair(CoordinateComponent(0, 1), matter4),
+            Pair(CoordinateComponent(0, 2), matter4_1),
+            Pair(CoordinateComponent(0, 3), matter4)
+        ))
+
+        val for4ComponentsItem: Set<CPotionComponent> = setOf(
+            CPotionComponent(PotionEffect(PotionEffectType.LUCK, 100, 1), CPotionComponent.PotionStrict.STRICT),
+            CPotionComponent(PotionEffect(PotionEffectType.HUNGER, 100, 1), CPotionComponent.PotionStrict.STRICT)
+        )
+
+        val for4ComponentsItem1: Set<CPotionComponent> = setOf(
+            CPotionComponent(PotionEffect(PotionEffectType.LUCK, 100, 1), CPotionComponent.PotionStrict.STRICT),
+            CPotionComponent(PotionEffect(PotionEffectType.POISON, 100, 1), CPotionComponent.PotionStrict.STRICT)
+        )
+        val itemStack4 = potionItem(for4ComponentsItem)
+        val itemStack4_1 = potionItem(for4ComponentsItem1)
+        val mappedInput4: Map<CoordinateComponent, ItemStack> = mapOf(
+            Pair(CoordinateComponent(1, 1), itemStack4_1),
+            Pair(CoordinateComponent(1, 2), itemStack4_1),
+            Pair(CoordinateComponent(1, 3), itemStack4),
+            Pair(CoordinateComponent(1, 4), itemStack4_1)
+        )
+
+        val (type4, list4) = Potion.amorphous(mappedInput4, recipe4)
+        CAssert.assertTrue(type4 == AmorphousFilterCandidate.Type.SUCCESSFUL)
+        CAssert.assertTrue(list4.size == 4)
+        val c0Matched = (1..4).map { i -> CoordinateComponent(1, i) }.toSet()
+        val c1Matched = (1..4).filter { it != 3 }.map { i -> CoordinateComponent(1, i) }.toSet()
+        CAssert.assertTrue(list4[0].list.toSet() == c0Matched)
+        CAssert.assertTrue(list4[1].list.toSet() == c0Matched)
+        CAssert.assertTrue(list4[2].list.toSet() == c1Matched)
+        CAssert.assertTrue(list4[3].list.toSet() == c0Matched)
     }
 }

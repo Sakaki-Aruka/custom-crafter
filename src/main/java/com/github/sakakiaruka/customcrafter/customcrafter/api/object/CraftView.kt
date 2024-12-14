@@ -18,8 +18,34 @@ data class CraftView internal constructor(
     val result: ItemStack
 ) {
     companion object {
-        internal fun fromInventory(inventory: Inventory): CraftView? {
-            val mapped: Map<CoordinateComponent, ItemStack> = Converter.standardInputMapping(inventory) ?: return null
+        /**
+         * converting an [Inventory] to [CraftView].
+         * ```
+         * // an example from Java.
+         * Inventory gui = CustomCrafterAPI.getCraftingGUI();
+         * CraftView view = CraftView.fromInventory(gui, true);
+         *
+         * // an example from Kotlin
+         * val gui = CustomCrafterAPI.getCraftingGUI()
+         * val view = CraftView.fromInventory(gui)
+         * ```
+         *
+         * @param[inventory] convert target
+         * @param[paddingAir] padding empty slots with [ItemStack.empty] or not. default value is true. (default value can only use from Kotlin.)
+         * @return[CraftView?] A result of converting. If a provided inventory is not custom crafter's gui, returns Null.
+         */
+        fun fromInventory(
+            inventory: Inventory,
+            paddingAir: Boolean = true
+        ): CraftView? {
+            val mapped: MutableMap<CoordinateComponent, ItemStack> = Converter.standardInputMapping(inventory)?.toMutableMap() ?: return null
+            if (paddingAir) {
+                Converter.getAvailableCraftingSlotComponents()
+                    .filter { !mapped.keys.contains(it) }
+                    .forEach { coordinate ->
+                        mapped[coordinate] = ItemStack.empty()
+                    }
+            }
             val result: ItemStack = inventory.getItem(CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT) ?: ItemStack.empty()
             return CraftView(mapped, result)
         }

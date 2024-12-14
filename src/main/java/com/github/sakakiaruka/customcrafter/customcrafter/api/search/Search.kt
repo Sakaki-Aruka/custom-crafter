@@ -76,6 +76,8 @@ object Search {
      * @param[natural] Force to search vanilla recipes or not.(true=not, false=force). The default is true.
      * @return[SearchResult] A result of a request. If you send one that contains invalid params, returns null.
      */
+    // TODO add other argument 'search' method
+    // - search(crafterID: UUID, view: CraftView, natural: Boolean = true)
     fun search(player: Player, items: List<ItemStack>, natural: Boolean = true): SearchResult? {
         if (items.size != 36) return null
         val inventory: Inventory = Bukkit.createInventory(null, 54)

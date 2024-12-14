@@ -241,7 +241,6 @@ internal object EnchantTest {
         CAssert.assertTrue(type3 == AmorphousFilterCandidate.Type.NOT_REQUIRED)
         CAssert.assertTrue(candidateList3.isEmpty())
 
-        // TODO amorphous test (multi CMatter recipes and multi inputs)
         /*
          * 1. matterX: CEnchantMatter
          * 2. recipeX: CRecipe
