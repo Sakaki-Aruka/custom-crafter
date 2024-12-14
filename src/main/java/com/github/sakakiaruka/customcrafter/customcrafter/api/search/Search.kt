@@ -160,12 +160,16 @@ object Search {
     private fun normal(
         mapped: Map<CoordinateComponent, ItemStack>,
         recipe: CRecipe,
-        crafterID: UUID
+        crafterID: UUID,
+        fromAmorphous: Boolean = false
     ): Boolean {
         val basic: Boolean =
-            squareSize(mapped.keys) == squareSize(recipe.items.keys)
-                    && sameShape(mapped.keys, recipe)
-                    && allCandidateContains(mapped, recipe)
+            if (fromAmorphous) allCandidateContains(mapped, recipe)
+            else {
+                squareSize(mapped.keys) == squareSize(recipe.items.keys)
+                        && sameShape(mapped.keys, recipe)
+                        && allCandidateContains(mapped, recipe)
+            }
 
         val inputSorted: List<ItemStack> = coordinateSort(mapped)
         val recipeSorted: List<CMatter> = coordinateSort(recipe.items)
@@ -226,6 +230,9 @@ object Search {
                 .withIndex()
                 .filter { slice.value.contains(it.index) }
                 .map { it.value }
+            if (list.isEmpty()) {
+                return Pair(AmorphousFilterCandidate.Type.NOT_ENOUGH, emptyList())
+            }
             result.add(AmorphousFilterCandidate(R, list))
         }
 
@@ -247,7 +254,9 @@ object Search {
             Enchant.amorphous(mapped, recipe), // enchants
             Enchant.storesAmorphous(mapped, recipe), // enchantStores
             Potion.amorphous(mapped, recipe)// potions
-        )
+        ).filter { (type, _) ->
+            type != AmorphousFilterCandidate.Type.NOT_REQUIRED
+        }
 
         if (filterCandidates.any { pair -> pair.first == AmorphousFilterCandidate.Type.NOT_ENOUGH }) return null//return false
 
@@ -269,7 +278,7 @@ object Search {
         for (coordinate: CoordinateComponent in targets) {
             val list: MutableList<List<CoordinateComponent>> = mutableListOf()
             filterCandidates
-                .filter { it.first != AmorphousFilterCandidate.Type.SUCCESSFUL }
+                .filter { it.first == AmorphousFilterCandidate.Type.SUCCESSFUL }
                 .map { it.second } // List<List<AFC>>
                 .forEach { l -> // List<AFC>
                     l.filter { f -> f.coordinate == coordinate }
@@ -365,7 +374,7 @@ object Search {
                     temporaryInventory.setItem(index, mapped[c])
                 }
                 val replaced: CRecipe = cRecipe.replaceItems(newItems)
-                normal(mapped, replaced, crafterID)
+                normal(mapped, replaced, crafterID, fromAmorphous = true)
 //                normal(mapped, replaced)
             }
         //return solutions
