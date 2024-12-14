@@ -6,6 +6,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.matter.
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.matter.CMatter
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.matter.CPotionMatter
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.recipe.CRecipe
+import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.CraftView
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.internal.AmorphousFilterCandidate
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.MappedRelation
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.MappedRelationComponent
@@ -17,12 +18,14 @@ import com.github.sakakiaruka.customcrafter.customcrafter.api.processor.Enchant
 import com.github.sakakiaruka.customcrafter.customcrafter.api.processor.Potion
 import org.bukkit.Bukkit
 import org.bukkit.Material
+import org.bukkit.World
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.Recipe
 import org.bukkit.inventory.meta.EnchantmentStorageMeta
 import org.bukkit.inventory.meta.PotionMeta
+import java.util.UUID
 import kotlin.math.abs
 import kotlin.math.max
 
@@ -44,7 +47,7 @@ object Search {
          * When below situations, [vanilla] is null.
          * - If [customs] is not empty and a search query's 'natural' is true.
          * - If an input is not matched all registered vanilla recipes.
-         * @return[vanilla] PaperMCs Recipe. This is NOT a [CRecipe].
+         * @return[vanilla] PaperMCs Recipe ([Recipe]). This is NOT a [CRecipe].
          */
         fun vanilla() = this.vanilla
 
@@ -67,6 +70,24 @@ object Search {
     // one: Boolean
 
     /**
+     * search main method.
+     * this is more recommended than [search] (use List<ItemStack>).
+     *
+     * @param[crafterID] a crafter's UUID
+     * @param[view] input crafting gui's view
+     * @param[natural] Force to search vanilla recipes or not.(true=not, false=force). The default is true.
+     * @return[SearchResult?] A result of a request. If you send one that contains invalid params, returns null.
+     */
+    fun search(
+        crafterID: UUID,
+        view: CraftView,
+        natural: Boolean = true
+    ): SearchResult? {
+        val gui: Inventory = CraftView.toCraftingGUI(view)
+        return search(crafterID, gui, natural)
+    }
+
+    /**
      * 6x6 crafting items.
      * zero origin & do not skip empty slots (do padding = use ItemStack#empty())
      * A search-result is not guaranteed what is not empty.
@@ -74,11 +95,13 @@ object Search {
      * @param[player] A craft-request sender.
      * @param[items] Materials of crafting. this size must equal 36(6*6).
      * @param[natural] Force to search vanilla recipes or not.(true=not, false=force). The default is true.
-     * @return[SearchResult] A result of a request. If you send one that contains invalid params, returns null.
+     * @return[SearchResult?] A result of a request. If you send one that contains invalid params, returns null.
      */
-    // TODO add other argument 'search' method
-    // - search(crafterID: UUID, view: CraftView, natural: Boolean = true)
-    fun search(player: Player, items: List<ItemStack>, natural: Boolean = true): SearchResult? {
+    fun search(
+        player: Player,
+        items: List<ItemStack>,
+        natural: Boolean = true
+    ): SearchResult? {
         if (items.size != 36) return null
         val inventory: Inventory = Bukkit.createInventory(null, 54)
         val chunkedInput: List<List<ItemStack>> = items.chunked(6)
@@ -89,11 +112,11 @@ object Search {
             }
         }
 
-        return search(player, inventory, natural)
+        return search(player.uniqueId, inventory, natural)
     }
 
     internal fun search(
-        player: Player,
+        crafterID: UUID,
         inventory: Inventory,
         natural: Boolean = true
     ): SearchResult? {
@@ -107,7 +130,7 @@ object Search {
                 val relation: MappedRelation? =
                     when (recipe.type) {
                         CRecipeType.NORMAL -> {
-                            if (normal(mapped, recipe, player)) {
+                            if (normal(mapped, recipe, crafterID)) {
                                 val components: Set<MappedRelationComponent> =
                                     recipe.items.keys.zip(mapped.keys)
                                         .map { MappedRelationComponent(it.first, it.second) }.toSet()
@@ -115,7 +138,7 @@ object Search {
                             }
                             else null
                         }
-                        CRecipeType.AMORPHOUS -> amorphous(mapped, recipe, player)
+                        CRecipeType.AMORPHOUS -> amorphous(mapped, recipe, crafterID)
                     }
                 Pair(recipe, relation)
             }
@@ -124,7 +147,12 @@ object Search {
 
         val vanilla: Recipe? =
             if (natural && customs.isNotEmpty()) null
-            else VanillaSearch.search(player.world, inventory)
+            else {
+                val world: World = Bukkit.getPlayer(crafterID)
+                    ?.world
+                    ?: Bukkit.getWorlds().first()
+                VanillaSearch.search(world, inventory)
+            }
 
         return SearchResult(vanilla, customs)
     }
@@ -132,7 +160,7 @@ object Search {
     private fun normal(
         mapped: Map<CoordinateComponent, ItemStack>,
         recipe: CRecipe,
-        player: Player
+        crafterID: UUID
     ): Boolean {
         val basic: Boolean =
             squareSize(mapped.keys) == squareSize(recipe.items.keys)
@@ -148,10 +176,9 @@ object Search {
             val recipeOne: CMatter = m.asOne()
 
             recipeOne.persistentDataContainer?.let {
-                if (!recipeOne.predicatesResult(mapped, recipe, player)) {
+                if (!recipeOne.predicatesResult(mapped, recipe, crafterID)) {
                     return false
                 }
-//                if (!recipeOne.predicatesResult(inOne, inOne.itemMeta.persistentDataContainer)) return false
             }
 
             if (recipeOne is CEnchantMatter) {
@@ -169,7 +196,10 @@ object Search {
         return basic
     }
 
-    private fun candidateAmorphous(mapped: Map<CoordinateComponent, ItemStack>, recipe: CRecipe): Pair<AmorphousFilterCandidate.Type, List<AmorphousFilterCandidate>> {
+    private fun candidateAmorphous(
+        mapped: Map<CoordinateComponent, ItemStack>,
+        recipe: CRecipe
+    ): Pair<AmorphousFilterCandidate.Type, List<AmorphousFilterCandidate>> {
         val recipes: List<CoordinateComponent> = recipe.items.keys.toList()
         val inputs: List<CoordinateComponent> = mapped.keys.toList()
 
@@ -209,11 +239,11 @@ object Search {
     private fun amorphous(
         mapped: Map<CoordinateComponent, ItemStack>,
         recipe: CRecipe,
-        player: Player
+        crafterID: UUID
     ): MappedRelation? {
         val filterCandidates: List<(Pair<AmorphousFilterCandidate.Type, List<AmorphousFilterCandidate>>)> = listOf(
             candidateAmorphous(mapped, recipe), // candidates
-            Container.amorphous(mapped, recipe, player), // containers
+            Container.amorphous(mapped, recipe, crafterID), // containers
             Enchant.amorphous(mapped, recipe), // enchants
             Enchant.storesAmorphous(mapped, recipe), // enchantStores
             Potion.amorphous(mapped, recipe)// potions
@@ -264,7 +294,7 @@ object Search {
         // CSP solver here
         //confirmed.putAll(csp(filters).takeIf { it.isNotEmpty() } ?: return null)//return false)
         // type =List<MappedRelation>?
-        return solveCSP(filters, mapped, recipe, player)
+        return solveCSP(filters, mapped, recipe, crafterID)
             .firstOrNull()
             ?.let { r ->
                 val components: MutableSet<MappedRelationComponent> = mutableSetOf()
@@ -281,7 +311,7 @@ object Search {
         candidates: Set<AmorphousFilterCandidate>,
         mapped: Map<CoordinateComponent, ItemStack>,
         cRecipe: CRecipe,
-        player: Player
+        crafterID: UUID
     ): List<MappedRelation> {
         val solutions = mutableListOf<Map<CoordinateComponent, CoordinateComponent>>()
         val currentSolution = mutableMapOf<CoordinateComponent, CoordinateComponent>()
@@ -335,7 +365,7 @@ object Search {
                     temporaryInventory.setItem(index, mapped[c])
                 }
                 val replaced: CRecipe = cRecipe.replaceItems(newItems)
-                normal(mapped, replaced, player)
+                normal(mapped, replaced, crafterID)
 //                normal(mapped, replaced)
             }
         //return solutions

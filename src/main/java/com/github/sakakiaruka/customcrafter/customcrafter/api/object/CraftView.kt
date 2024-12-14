@@ -49,5 +49,20 @@ data class CraftView internal constructor(
             val result: ItemStack = inventory.getItem(CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT) ?: ItemStack.empty()
             return CraftView(mapped, result)
         }
+
+        /**
+         * converts a view to Custom Crafter's gui.
+         *
+         * @param[view] input [CraftView]
+         * @return[Inventory] Custom Crafter's gui
+         */
+        fun toCraftingGUI(view: CraftView): Inventory {
+            val gui: Inventory = CustomCrafterAPI.getCraftingGUI()
+            view.materials.entries.forEach { (c, item) ->
+                gui.setItem(c.x + c.y * 9, item)
+            }
+            gui.setItem(CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT, view.result)
+            return gui
+        }
     }
 }

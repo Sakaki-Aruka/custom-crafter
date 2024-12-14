@@ -5,12 +5,16 @@ import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.internal.
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.CoordinateComponent
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import java.util.UUID
 
+/**
+ * @suppress
+ */
 object Container {
     internal fun amorphous(
         mapped: Map<CoordinateComponent, ItemStack>,
         recipe: CRecipe,
-        player: Player
+        crafterID: UUID
     ): Pair<AmorphousFilterCandidate.Type, List<AmorphousFilterCandidate>> {
         if (recipe.containers.isNullOrEmpty()) {
             return Pair(AmorphousFilterCandidate.Type.NOT_REQUIRED, emptyList())
@@ -32,7 +36,7 @@ object Container {
         val map: MutableMap<Int, List<Int>> = mutableMapOf()
         for (index: Int in recipes.indices) {
 
-            map[index] = matchList(mapped, recipe, player)
+            map[index] = matchList(mapped, recipe, crafterID)
                 .withIndex()
                 .filter { it.value }
                 .map { it.index }
@@ -64,14 +68,14 @@ object Container {
     private fun matchList(
         mapped: Map<CoordinateComponent, ItemStack>,
         recipe: CRecipe,
-        player: Player
+        crafterID: UUID
     ): List<Boolean> {
         val result: MutableList<Boolean> = mutableListOf()
         mapped.forEach { (_, item) ->
             val container = item.itemMeta.persistentDataContainer
             recipe.items.forEach { (_, m) ->
                 result.add(m.predicates?.all { p ->
-                    p.predicate(mapped, container, recipe, player)
+                    p.predicate(mapped, container, recipe, crafterID)
                 } ?: true)
             }
         }

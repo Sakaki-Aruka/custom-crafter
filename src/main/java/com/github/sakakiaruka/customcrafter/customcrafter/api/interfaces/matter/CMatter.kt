@@ -7,6 +7,7 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataContainer
+import java.util.UUID
 
 /**
  * This interface's implementing types can be used as materials for [CRecipe].
@@ -25,11 +26,11 @@ interface CMatter {
     fun predicatesResult(
         mapped: Map<CoordinateComponent, ItemStack>,
         recipe: CRecipe,
-        player: Player
+        crafterID: UUID
     ): Boolean {
         return if (predicates != null) {
             if (hasPDC()) {
-                predicates!!.all { p -> p.predicate(mapped, persistentDataContainer!!, recipe, player) }
+                predicates!!.all { p -> p.predicate(mapped, persistentDataContainer!!, recipe, crafterID) }
             } else false
         } else false
     }

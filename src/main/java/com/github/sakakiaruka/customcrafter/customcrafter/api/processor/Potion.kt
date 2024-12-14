@@ -10,6 +10,9 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.PotionMeta
 import org.bukkit.potion.PotionEffect
 
+/**
+ * @suppress
+ */
 object Potion {
     internal fun potion(item: ItemStack, p: CPotionMatter): Boolean {
         val meta: PotionMeta = item.itemMeta as? PotionMeta ?: return false

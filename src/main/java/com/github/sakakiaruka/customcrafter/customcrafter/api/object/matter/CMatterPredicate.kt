@@ -6,6 +6,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.Co
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataContainer
+import java.util.UUID
 
 /**
  * A [CMatter]'s predicate functions.
@@ -15,5 +16,5 @@ data class CMatterPredicate(
         mapped: Map<CoordinateComponent, ItemStack>,
         container: PersistentDataContainer,
         recipe: CRecipe,
-        player: Player) -> Boolean
+        crafterID: UUID) -> Boolean
 )

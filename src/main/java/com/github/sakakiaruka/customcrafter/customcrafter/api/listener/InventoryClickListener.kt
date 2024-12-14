@@ -23,6 +23,9 @@ import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import kotlin.math.max
 
+/**
+ * @suppress
+ */
 object InventoryClickListener: Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     fun InventoryClickEvent.onClick() {
@@ -74,7 +77,7 @@ object InventoryClickListener: Listener {
                 Bukkit.getPluginManager().callEvent(preEvent)
                 if (preEvent.isCancelled) return
 
-                val result: Search.SearchResult = Search.search(player, gui) ?: return
+                val result: Search.SearchResult = Search.search(player.uniqueId, gui) ?: return
 
                 CreateCustomItemEvent(player, view, result, click).callEvent()
                 if (CustomCrafterAPI.RESULT_GIVE_CANCEL) return
