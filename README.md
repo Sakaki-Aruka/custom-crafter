@@ -1,44 +1,15 @@
 # custom crafter  
-custom crafter is a plugin for minecraft servers (Spigot and Paper) that provides custom recipes. 
+custom crafter is a plugin for PaperMC servers that provides custom recipes. 
 
 ---
 
 # Recommended environment
 - Paper
+  - v5.0 (=api v0.1): `1.21.3~`
   - v4.3: `1.21.3`
   - v4.2: `1.20.x`
 
-Tested in Paper 1.21.3, 1.20.4.  
-
----
-
-# Recipe Sample
-This recipe is provided by two files. 
-
-[Screencast from 2024-06-21 02-42-34.webm](https://github.com/Sakaki-Aruka/custom-crafter/assets/99568054/4dc6149a-4d31-41ae-849f-9b82ba725f04)
-
-<details><summary>Recipe files</summary>
-<div>
-
-```yaml
-name: multi_stair
-amount: 1
-candidate: ["R|[A-Z_]+_STAIRS"]
-mass: false
-```
-
-```yaml
-name: saddle_recipe
-tag: normal
-result: SADDLE
-override:
-  - LEATHER -> L
-coordinate:
-  - L,null,L
-  - L,multi_stair,L
-  - L,L,L
-```
-</div></details>
+Tested in Paper 1.21.3, 1.20.4.
 
 ---
 
@@ -81,28 +52,20 @@ SOFTWARE.
 ---
 
 # Getting Started
+0. Make a plugin
+   1. create plugin that uses custom-crafter API
+
 1. Install
    1. [Download from here.(GitHub release page)](https://github.com/Sakaki-Aruka/custom-crafter/releases/latest)
    2. Place the downloaded file to plugins directory. 
    3. Reboot or reload your server.
 
-
-2. Write configuration files  
-If you want to provide custom recipes and custom items to players, you have to write configuration files.
-
-
-3. Place base block  
+    
+2. Place base block  
 custom crafter does not work only a work bench block.  
 If you want to use custom crafter features, place the base blocks under a work bench block 3 * 3.  
 The default base block is `GOLD_BLOCK`.
 
 ---
-
-# Help
-## about commands
-Run command `/cc help all` from Console or as a player in a server.
-
-## about configuration files
-Show [here](https://github.com/Sakaki-Aruka/custom-crafter-config/blob/master/config_description.md). (Jump to `custom-crafter-config/Sakaki-Aruka`)
 
 Written by Japanese only. (wip: English version)
