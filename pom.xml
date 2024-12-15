@@ -19,6 +19,14 @@
         <kotlin.version>2.0.20</kotlin.version>
     </properties>
 
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>Github Packages</name>
+            <url>https://maven.pkg.github.com/Sakaki-Aruka/custom-crafter</url>
+        </repository>
+    </distributionManagement>
+
     <build>
         <plugins>
             <plugin>
