@@ -3,6 +3,8 @@ package com.github.sakakiaruka.customcrafter.customcrafter.api.active_test.test
 import com.github.sakakiaruka.customcrafter.customcrafter.api.CustomCrafterAPI
 import com.github.sakakiaruka.customcrafter.customcrafter.api.active_test.CAssert
 import org.bukkit.Bukkit
+import org.bukkit.Material
+import org.bukkit.inventory.ItemStack
 
 /**
  * @suppress
@@ -11,7 +13,8 @@ import org.bukkit.Bukkit
 internal object APITest {
     fun run() {
         baseBlockTest()
-        craftingGUI()
+        craftingGUITest()
+        tooOldTest()
     }
     private fun baseBlockTest() {
         val base: Int = CustomCrafterAPI.getBaseBlockSideSize()
@@ -24,7 +27,7 @@ internal object APITest {
         CustomCrafterAPI.BASE_BLOCK_SIDE = base
     }
 
-    private fun craftingGUI() {
+    private fun craftingGUITest() {
         val gui = CustomCrafterAPI.getCraftingGUI()
         CAssert.assertTrue(CustomCrafterAPI.isCustomCrafterGUI(gui))
         CAssert.assertTrue(!CustomCrafterAPI.isGUITooOld(gui))
@@ -35,5 +38,18 @@ internal object APITest {
         } catch (illegalArgument: IllegalArgumentException) {
             illegalArgument.cause?.let { CAssert.assertThrow(it, IllegalArgumentException::class) }
         }
+    }
+
+    private fun tooOldTest() {
+        val gui = CustomCrafterAPI.getCraftingGUI()
+        val (key, type, _) = CustomCrafterAPI.genCCKey()
+        val item = ItemStack(Material.ANVIL).apply {
+            itemMeta = itemMeta.apply {
+                persistentDataContainer.set(key, type, 0L)
+            }
+        }
+        gui.setItem(CustomCrafterAPI.CRAFTING_TABLE_MAKE_BUTTON_SLOT, item)
+
+        CAssert.assertTrue(CustomCrafterAPI.isGUITooOld(gui))
     }
 }

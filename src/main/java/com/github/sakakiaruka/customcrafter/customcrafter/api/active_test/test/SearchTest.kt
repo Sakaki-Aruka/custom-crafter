@@ -88,11 +88,7 @@ internal object SearchTest {
         // batch test
         val slimeBall: CMatter = CMatterImpl(
             "slimeBall",
-            setOf(Material.SLIME_BALL),
-            amount = 1,
-            mass = false,
-            predicates = null,
-            persistentDataContainer = null
+            setOf(Material.SLIME_BALL)
         )
 
         val lavaBucket: CMatter = CMatterImpl(

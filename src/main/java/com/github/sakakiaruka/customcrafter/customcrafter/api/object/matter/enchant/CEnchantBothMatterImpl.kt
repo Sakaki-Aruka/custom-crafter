@@ -22,10 +22,10 @@ import org.bukkit.persistence.PersistentDataContainer
 data class CEnchantBothMatterImpl(
     override val name: String,
     override val candidate: Set<Material>,
-    override val amount: Int,
-    override val mass: Boolean,
-    override val predicates: Set<CMatterPredicate>?,
-    override val persistentDataContainer: PersistentDataContainer?,
+    override val amount: Int = 1,
+    override val mass: Boolean = false,
+    override val predicates: Set<CMatterPredicate>? = null,
+    override val persistentDataContainer: PersistentDataContainer? = null,
     override val enchantComponents: Set<CEnchantComponent>,
     override val storedEnchantComponents: Set<CEnchantComponent>
 ): CMatter, CEnchantMatter, CEnchantmentStoreMatter {

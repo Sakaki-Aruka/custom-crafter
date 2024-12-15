@@ -48,12 +48,15 @@ object CustomCrafterAPI {
             // run tests
             object: BukkitRunnable() {
                 override fun run() {
+                    val startAt = System.currentTimeMillis()
                     APITest.run()
                     ConverterTest.run()
                     EnchantTest.run()
                     VanillaSearchTest.run()
                     PotionTest.run()
                     SearchTest.run()
+                    val endAt = System.currentTimeMillis()
+                    CustomCrafter.getInstance().logger.info("tested in ${endAt - startAt} ms")
                 }
             }.runTaskAsynchronously(CustomCrafter.getInstance())
         }
