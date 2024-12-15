@@ -10,8 +10,8 @@ import java.util.UUID
 data class CRecipeImpl(
     override val name: String,
     override val items: Map<CoordinateComponent, CMatter>,
-    override val containers: List<CRecipeContainer>?,
-    override val results: List<(crafterID: UUID, relate: MappedRelation, mapped: Map<CoordinateComponent, ItemStack>) -> List<ItemStack>>?,
+    override val containers: List<CRecipeContainer>? = null,
+    override val results: List<(crafterID: UUID, relate: MappedRelation, mapped: Map<CoordinateComponent, ItemStack>) -> List<ItemStack>>? = null,
     override val type: CRecipeType,
 ): CRecipe {
     //

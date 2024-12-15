@@ -27,6 +27,84 @@ internal object SearchTest {
     private fun customTest() {
         amorphousTest1()
         amorphousTest2()
+        normalTest1()
+    }
+
+    private fun normalTest1() {
+        /*
+         * xxx
+         * x_x
+         * xxx
+         * x = STONE
+         * _ = AIR
+         *
+         */
+
+        val matter: CMatter = CMatterImpl(
+            "testMatter",
+            setOf(Material.COBBLESTONE)
+        )
+
+        val mapped: MutableMap<CoordinateComponent, CMatter> = mutableMapOf()
+        listOf(0, 1, 2, 9, 11, 18, 19, 20).map { i ->
+            CoordinateComponent(i % 9, i / 9)
+        }.forEach { c ->
+            mapped[c] = matter
+        }
+
+        val recipe: CRecipe = CRecipeImpl(
+            "testRecipe",
+            mapped,
+            type = CRecipeType.NORMAL
+        )
+
+        val gui = CustomCrafterAPI.getCraftingGUI()
+        setOf(0, 1, 2, 9, 11, 18, 19, 20).forEach { i ->
+            gui.setItem(i, ItemStack(Material.COBBLESTONE))
+        }
+        CustomCrafterAPI.RECIPES.add(recipe)
+
+        val resultOfNatural = Search.search(
+            UUID.randomUUID(),
+            CraftView.fromInventory(gui)!!,
+            natural = true
+        )
+
+        CAssert.assertTrue(resultOfNatural != null)
+        CAssert.assertTrue(resultOfNatural!!.vanilla() == null)
+        CAssert.assertTrue(resultOfNatural.customs().isNotEmpty())
+        CAssert.assertTrue(resultOfNatural.customs().first().first == recipe)
+        CAssert.assertTrue(resultOfNatural.customs().first().second.components.toSet().size == 8)
+
+        val resultOfUnnatural = Search.search(
+            UUID.randomUUID(),
+            CraftView.fromInventory(gui)!!,
+            natural = false
+        )
+
+        CAssert.assertTrue(resultOfUnnatural != null)
+        CAssert.assertTrue(resultOfUnnatural!!.vanilla() != null)
+        CAssert.assertTrue(resultOfUnnatural.vanilla()!!.result.type == Material.FURNACE)
+        CAssert.assertTrue(resultOfUnnatural.customs().isNotEmpty())
+        CAssert.assertTrue(resultOfUnnatural.customs().first().first == recipe)
+        CAssert.assertTrue(resultOfUnnatural.customs().first().second.components.toSet().size == 8)
+
+        val invalidInput = CustomCrafterAPI.getCraftingGUI()
+        setOf(0, 1, 2, 9, 11, 18, 19).forEach { i ->
+            invalidInput.setItem(i, ItemStack(Material.COBBLESTONE))
+        }
+        invalidInput.setItem(20, ItemStack(Material.STONE))
+        val invalidResult = Search.search(
+            UUID.randomUUID(),
+            CraftView.fromInventory(invalidInput)!!,
+            natural = true
+        )
+        CAssert.assertTrue(invalidResult != null)
+        CAssert.assertTrue(invalidResult!!.customs().isEmpty())
+        CAssert.assertTrue(invalidResult.vanilla() == null)
+
+        //cleanup
+        CustomCrafterAPI.RECIPES.remove(recipe)
     }
 
     private fun amorphousTest1() {
