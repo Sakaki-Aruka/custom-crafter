@@ -7,6 +7,8 @@ import com.github.sakakiaruka.customcrafter.customcrafter.api.active_test.test.E
 import com.github.sakakiaruka.customcrafter.customcrafter.api.active_test.test.PotionTest
 import com.github.sakakiaruka.customcrafter.customcrafter.api.active_test.test.SearchTest
 import com.github.sakakiaruka.customcrafter.customcrafter.api.active_test.test.VanillaSearchTest
+import com.github.sakakiaruka.customcrafter.customcrafter.api.event.RegisterCustomRecipeEvent
+import com.github.sakakiaruka.customcrafter.customcrafter.api.event.UnregisterCustomRecipeEvent
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.recipe.CRecipe
 import com.github.sakakiaruka.customcrafter.customcrafter.api.listener.InventoryClickListener
 import com.github.sakakiaruka.customcrafter.customcrafter.api.listener.InventoryCloseListener
@@ -22,15 +24,14 @@ import org.bukkit.persistence.PersistentDataType
 import org.bukkit.scheduler.BukkitRunnable
 
 object CustomCrafterAPI {
-    const val VERSION: String = "0.1"
+    const val API_VERSION: String = "0.1"
     const val IS_STABLE: Boolean = false
     const val IS_BETA: Boolean = true
 
     val AUTHORS: Set<String> = setOf("Sakaki-Aruka")
 
     var RESULT_GIVE_CANCEL: Boolean = false
-    var ENABLE_HISTORY_DATABASE = false
-    val RECIPES: MutableList<CRecipe> = mutableListOf()
+    internal val RECIPES: MutableList<CRecipe> = mutableListOf()
     var BASE_BLOCK: Material = Material.GOLD_BLOCK
 
     internal var BASE_BLOCK_SIDE: Int = 3
@@ -60,6 +61,34 @@ object CustomCrafterAPI {
                 }
             }.runTaskAsynchronously(CustomCrafter.getInstance())
         }
+    }
+
+    /**
+     * registers a provided recipe and calls [RegisterCustomRecipeEvent].
+     * if a called event is cancelled, always fail to register recipe.
+     * in normally, a result of `RECIPES.add(recipe)`.
+     *
+     * @param[recipe] a recipe what you want to register.
+     */
+    fun registerRecipe(recipe: CRecipe): Boolean {
+        val event = RegisterCustomRecipeEvent(recipe)
+        Bukkit.getPluginManager().callEvent(event)
+        if (event.isCancelled) return false
+        return RECIPES.add(recipe)
+    }
+
+    /**
+     * unregisters a provided recipe and calls [UnregisterCustomRecipeEvent].
+     * if a called event is cancelled, always fail to unregister recipe.
+     * in normally, a result of `RECIPES.remove(recipe)`
+     *
+     * @param[recipe] a recipe what you want to unregister.
+     */
+    fun unregisterRecipe(recipe: CRecipe): Boolean {
+        val event = UnregisterCustomRecipeEvent(recipe)
+        Bukkit.getPluginManager().callEvent(event)
+        if (event.isCancelled) return false
+        return RECIPES.remove(recipe)
     }
 
     /**
