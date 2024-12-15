@@ -5,7 +5,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.api.event.CreateCustom
 import com.github.sakakiaruka.customcrafter.customcrafter.api.event.PreCreateCustomItemEvent
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.recipe.CRecipe
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.CraftView
-import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.internal.MappedRelation
+import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.MappedRelation
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.CoordinateComponent
 import com.github.sakakiaruka.customcrafter.customcrafter.api.processor.Converter
 import com.github.sakakiaruka.customcrafter.customcrafter.api.search.Search
@@ -23,6 +23,9 @@ import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import kotlin.math.max
 
+/**
+ * @suppress
+ */
 object InventoryClickListener: Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     fun InventoryClickEvent.onClick() {
@@ -74,7 +77,7 @@ object InventoryClickListener: Listener {
                 Bukkit.getPluginManager().callEvent(preEvent)
                 if (preEvent.isCancelled) return
 
-                val result: Search.SearchResult = Search.search(player, gui) ?: return
+                val result: Search.SearchResult = Search.search(player.uniqueId, gui) ?: return
 
                 CreateCustomItemEvent(player, view, result, click).callEvent()
                 if (CustomCrafterAPI.RESULT_GIVE_CANCEL) return
@@ -110,10 +113,10 @@ object InventoryClickListener: Listener {
                 decrement(gui, slot, amount)
             }
 
-            recipe.getResults(player, relate, mapped)
+            recipe.getResults(player.uniqueId, relate, mapped)
                 .takeIf { it.isNotEmpty() }
                 ?.let { itemList ->
-                    recipe.runContainers(player, relate, mapped, itemList)
+                    recipe.runContainers(player.uniqueId, relate, mapped, itemList)
                     // TODO must impl add result items to the result slot
                     itemList.takeIf { it.isNotEmpty() }
                         ?.forEach { item ->

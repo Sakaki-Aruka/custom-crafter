@@ -1,9 +1,10 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe
 
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.recipe.CRecipe
-import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.internal.MappedRelation
+import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.MappedRelation
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
+import java.util.UUID
 
 /**
  * Containers for [CRecipe].
@@ -15,7 +16,7 @@ data class CRecipeContainer(
 ) {
     /**
      * A predicate of [CRecipeContainer].
-     * player: a crafter
+     * crafterID: a crafter's uuid.
      * relate: a coordinate mapping between a [CRecipe] and an input Inventory.
      * mapped: a coordinate and input items mapping
      * list: result items that are made by a [CRecipe]
@@ -24,7 +25,7 @@ data class CRecipeContainer(
      */
     data class Predicate(
         val func: (
-            player: Player,
+            crafterID: UUID,
             relate: MappedRelation,
             mapped: Map<CoordinateComponent, ItemStack>,
             list: MutableList<ItemStack>
@@ -33,7 +34,7 @@ data class CRecipeContainer(
 
     /**
      * A consumer of [CRecipeContainer].
-     * player: a crafter
+     * crafterID: a crafter's uuid.
      * relate: a coordinate mapping between a [CRecipe] and an input Inventory
      * mapped: a coordinate and input items mapping
      * list: result items that are made by a [CRecipe]
@@ -42,7 +43,7 @@ data class CRecipeContainer(
      */
     data class Consumer(
         val func: (
-            player: Player,
+            crafterID: UUID,
             relate: MappedRelation,
             mapped: Map<CoordinateComponent, ItemStack>,
             list: MutableList<ItemStack>
@@ -57,20 +58,20 @@ data class CRecipeContainer(
      *             .forEach { (_, c) -> c.func(player, relate, mapped, list) }
      * ```
      *
-     * @param[player] a crafter
+     * @param[crafterID] a crafter's uuid
      * @param[relate] a coordinate mapping between a [CRecipe] and an input Inventory
      * @param[mapped] a coordinate and input items mapping
      * @param[list] result items that are made by a [CRecipe]
      * @return[Unit] no return elements
      */
     fun run(
-        player: Player,
+        crafterID: UUID,
         relate: MappedRelation,
         mapped: Map<CoordinateComponent, ItemStack>,
         list: MutableList<ItemStack>
     ) {
         consumers
-            .filter { (p, _) -> p.func(player, relate, mapped, list) }
-            .forEach { (_, c) -> c.func(player, relate, mapped, list) }
+            .filter { (p, _) -> p.func(crafterID, relate, mapped, list) }
+            .forEach { (_, c) -> c.func(crafterID, relate, mapped, list) }
     }
 }

@@ -11,10 +11,14 @@ import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.EnchantmentStorageMeta
 
+/**
+ * @suppress
+ */
 object Enchant {
     internal fun enchant(item: ItemStack, e: CEnchantMatter): Boolean {
         val itemEnchants: Map<Enchantment, Int> = item.enchantments
         if (e.enchantComponents.isNotEmpty() && itemEnchants.isEmpty()) return false
+        else if (e.enchantComponents.isEmpty()) return true
         return e.enchantComponents.all { base(itemEnchants, it) }
     }
 
@@ -25,14 +29,6 @@ object Enchant {
     }
 
     private fun base(enchants: Map<Enchantment, Int>, required: CEnchantComponent): Boolean {
-        // when (component.strict) {
-        //                EnchantStrict.INPUT -> continue // not implemented
-        //                EnchantStrict.NOT_STRICT -> continue
-        //                EnchantStrict.ONLY_ENCHANT -> if (!itemEnchants.keys.contains(component.enchantment)) return false
-        //                EnchantStrict.STRICT -> {
-        //                    if (itemEnchants.getOrDefault(component.enchantment, -1) != component.level) return false
-        //                }
-        //            }
         return when (required.strict) {
             EnchantStrict.INPUT -> true // not implemented
             EnchantStrict.NOT_STRICT -> true
@@ -46,9 +42,13 @@ object Enchant {
         val level: Int
     )
 
-    internal fun amorphous(mapped: Map<CoordinateComponent, ItemStack>, recipe: CRecipe): Pair<AmorphousFilterCandidate.Type, List<AmorphousFilterCandidate>> {
+    internal fun amorphous(
+        mapped: Map<CoordinateComponent, ItemStack>,
+        recipe: CRecipe
+    ): Pair<AmorphousFilterCandidate.Type, List<AmorphousFilterCandidate>> {
         val recipes: List<CoordinateComponent> = recipe.items
             .filter { it.value is CEnchantMatter }
+            .filter { (it.value as CEnchantMatter).enchantComponents.isNotEmpty() }
             .map { it.key }
 
         val inputCoordinates: List<CoordinateComponent> = mapped.entries
@@ -82,6 +82,9 @@ object Enchant {
                 .withIndex()
                 .filter { slice.value.contains(it.index) }
                 .map { it.value }
+            if (list.isEmpty()) {
+                return Pair(AmorphousFilterCandidate.Type.NOT_ENOUGH, emptyList())
+            }
             result.add(AmorphousFilterCandidate(R, list))
         }
         val type =

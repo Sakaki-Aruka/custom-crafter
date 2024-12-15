@@ -1,4 +1,4 @@
-package com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.internal
+package com.github.sakakiaruka.customcrafter.customcrafter.api.`object`
 
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.CoordinateComponent
 

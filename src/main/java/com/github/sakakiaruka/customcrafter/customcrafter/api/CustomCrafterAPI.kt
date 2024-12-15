@@ -1,6 +1,12 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.api
 
 import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter
+import com.github.sakakiaruka.customcrafter.customcrafter.api.active_test.test.APITest
+import com.github.sakakiaruka.customcrafter.customcrafter.api.active_test.test.ConverterTest
+import com.github.sakakiaruka.customcrafter.customcrafter.api.active_test.test.EnchantTest
+import com.github.sakakiaruka.customcrafter.customcrafter.api.active_test.test.PotionTest
+import com.github.sakakiaruka.customcrafter.customcrafter.api.active_test.test.SearchTest
+import com.github.sakakiaruka.customcrafter.customcrafter.api.active_test.test.VanillaSearchTest
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.recipe.CRecipe
 import com.github.sakakiaruka.customcrafter.customcrafter.api.listener.InventoryClickListener
 import com.github.sakakiaruka.customcrafter.customcrafter.api.listener.InventoryCloseListener
@@ -13,6 +19,7 @@ import org.bukkit.NamespacedKey
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
+import org.bukkit.scheduler.BukkitRunnable
 
 object CustomCrafterAPI {
     const val VERSION: String = "0.1"
@@ -36,6 +43,23 @@ object CustomCrafterAPI {
         Bukkit.getPluginManager().registerEvents(InventoryClickListener, instance)
         Bukkit.getPluginManager().registerEvents(InventoryCloseListener, instance)
         Bukkit.getPluginManager().registerEvents(PlayerInteractListener, instance)
+
+        if (IS_BETA) {
+            // run tests
+            object: BukkitRunnable() {
+                override fun run() {
+                    val startAt = System.currentTimeMillis()
+                    APITest.run()
+                    ConverterTest.run()
+                    EnchantTest.run()
+                    VanillaSearchTest.run()
+                    PotionTest.run()
+                    SearchTest.run()
+                    val endAt = System.currentTimeMillis()
+                    CustomCrafter.getInstance().logger.info("tested in ${endAt - startAt} ms")
+                }
+            }.runTaskAsynchronously(CustomCrafter.getInstance())
+        }
     }
 
     /**
@@ -92,9 +116,10 @@ object CustomCrafterAPI {
      */
     fun getCraftingGUI(): Inventory {
         val gui: Inventory = Bukkit.createInventory(null, CRAFTING_TABLE_TOTAL_SIZE, Component.text("Custom Crafter"))
+        (0..<54).forEach { slot -> gui.setItem(slot, blank) }
         Converter.getAvailableCraftingSlotComponents().forEach { c ->
             val index: Int = c.x + c.y * 9
-            gui.setItem(index, blank)
+            gui.setItem(index, ItemStack.empty())
         }
         gui.setItem(CRAFTING_TABLE_MAKE_BUTTON_SLOT, makeButton)
         return gui
@@ -107,6 +132,7 @@ object CustomCrafterAPI {
      * @return[Boolean] is custom crafter gui or not
      */
     fun isCustomCrafterGUI(inventory: Inventory): Boolean {
+        if (inventory.size != 54) return false
         val makeButton: ItemStack = inventory.getItem(CRAFTING_TABLE_MAKE_BUTTON_SLOT)
             ?.takeIf { it.type == makeButton.type }
             ?: return false

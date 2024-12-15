@@ -1,4 +1,4 @@
-package com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.internal
+package com.github.sakakiaruka.customcrafter.customcrafter.api.`object`
 
 /**
  * A relation holder.

@@ -1,15 +1,18 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.api.processor
 
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.matter.CPotionMatter
+import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.recipe.CPermissibleRecipe
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.recipe.CRecipe
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.internal.AmorphousFilterCandidate
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.matter.potion.CPotionComponent
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.CoordinateComponent
-import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.PotionMeta
 import org.bukkit.potion.PotionEffect
 
+/**
+ * @suppress
+ */
 object Potion {
     internal fun potion(item: ItemStack, p: CPotionMatter): Boolean {
         val meta: PotionMeta = item.itemMeta as? PotionMeta ?: return false
@@ -17,7 +20,6 @@ object Potion {
         meta.basePotionType?.let {
             effects.addAll(it.potionEffects)
         }
-        if (!p.potionComponents.all { it.enabledBottleTypes.contains(relate(item.type)) }) return false
 
         return p.potionComponents.all { c ->
             when (c.strict) {
@@ -34,18 +36,13 @@ object Potion {
         }
     }
 
-    private fun relate(type: Material): CPotionComponent.PotionBottleType? {
-        return when (type) {
-            Material.POTION -> CPotionComponent.PotionBottleType.NORMAL
-            Material.LINGERING_POTION -> CPotionComponent.PotionBottleType.LINGERING
-            Material.SPLASH_POTION -> CPotionComponent.PotionBottleType.SPLASH
-            else -> null
-        }
-    }
-
-    internal fun amorphous(mapped: Map<CoordinateComponent, ItemStack>, recipe: CRecipe): Pair<AmorphousFilterCandidate.Type, List<AmorphousFilterCandidate>> {
+    internal fun amorphous(
+        mapped: Map<CoordinateComponent, ItemStack>,
+        recipe: CRecipe
+    ): Pair<AmorphousFilterCandidate.Type, List<AmorphousFilterCandidate>> {
         val recipes: List<CoordinateComponent> = recipe.items
             .filter { it.value is CPotionMatter }
+            .filter { (it.value as CPotionMatter).potionComponents.isNotEmpty() }
             .map { it.key }
 
         val inputCoordinates: List<CoordinateComponent> = mapped.entries
@@ -83,6 +80,9 @@ object Potion {
                 .withIndex()
                 .filter { slice.value.contains(it.index) }
                 .map { it.value }
+            if (list.isEmpty()) {
+                return Pair(AmorphousFilterCandidate.Type.NOT_ENOUGH, emptyList())
+            }
             result.add(AmorphousFilterCandidate(R, list))
         }
 
@@ -92,26 +92,36 @@ object Potion {
         return Pair(type, result)
     }
 
-    private fun matchList(ins: List<List<PotionEffect>>, recipes: Collection<CPotionComponent>): List<Boolean> {
-        val result: MutableList<Boolean> = mutableListOf() // relate in-recipe
-        ins.forEach { inEffects ->
-            result.add(
-                inEffects.all { inEffectSingle ->
-                    recipes.all { recipeComponentSingle ->
-                        when (recipeComponentSingle.strict) {
-                            CPotionComponent.PotionStrict.INPUT -> true // not implemented
-                            CPotionComponent.PotionStrict.NOT_STRICT -> true
-                            CPotionComponent.PotionStrict.ONLY_EFFECT -> {
-                                inEffectSingle.type == recipeComponentSingle.effect.type
-                            }
-                            CPotionComponent.PotionStrict.STRICT -> {
-                                inEffectSingle.type == recipeComponentSingle.effect.type
-                                        && inEffectSingle.amplifier == recipeComponentSingle.effect.amplifier
-                            }
-                        }
+    private fun effectsValidate(
+        inList: List<PotionEffect>,
+        components: Collection<CPotionComponent>
+    ): Boolean {
+        return components.all { c ->
+            inList.any { inEffect ->
+                when (c.strict) {
+                    CPotionComponent.PotionStrict.INPUT -> true
+                    CPotionComponent.PotionStrict.NOT_STRICT -> true
+                    CPotionComponent.PotionStrict.ONLY_EFFECT -> {
+                        c.effect.type == inEffect.type
+                    }
+                    CPotionComponent.PotionStrict.STRICT -> {
+                        c.effect.type == inEffect.type
+                                && c.effect.amplifier == inEffect.amplifier
                     }
                 }
-            )
+            }
+        }
+    }
+
+    // a list of List<PotionEffect> (= effects are contained one potion.)
+    // validate effects List<PotionEffect> and Collection<CPotionComponent>
+    private fun matchList(
+        ins: List<List<PotionEffect>>,
+        recipes: Collection<CPotionComponent>
+    ): List<Boolean> {
+        val result: MutableList<Boolean> = mutableListOf() // relate in-recipe
+        ins.forEach { inEffects ->
+            result.add(effectsValidate(inEffects, recipes))
         }
         return result
     }
