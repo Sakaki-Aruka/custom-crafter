@@ -24,14 +24,13 @@ import org.bukkit.persistence.PersistentDataType
 import org.bukkit.scheduler.BukkitRunnable
 
 object CustomCrafterAPI {
-    const val VERSION: String = "0.1"
+    const val API_VERSION: String = "0.1"
     const val IS_STABLE: Boolean = false
     const val IS_BETA: Boolean = true
 
     val AUTHORS: Set<String> = setOf("Sakaki-Aruka")
 
     var RESULT_GIVE_CANCEL: Boolean = false
-    var ENABLE_HISTORY_DATABASE = false
     internal val RECIPES: MutableList<CRecipe> = mutableListOf()
     var BASE_BLOCK: Material = Material.GOLD_BLOCK
 
