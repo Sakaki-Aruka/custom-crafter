@@ -6,7 +6,7 @@
 
     <groupId>com.github.sakakiaruka.cutom-crafter</groupId>
     <artifactId>custom-crafter</artifactId>
-    <version>5.0.1</version>
+    <version>5.0.2</version>
     <packaging>jar</packaging>
 
     <name>Custom Crafter</name>
@@ -18,16 +18,6 @@
         <!-- Kotlin -->
         <kotlin.version>2.0.20</kotlin.version>
     </properties>
-
-    <!-- GitHub Packages Settings -->
-    <distributionManagement>
-        <repository>
-            <id>github</id>
-            <name>Github Packages</name>
-            <url>https://maven.pkg.github.com/Sakaki-Aruka/custom-crafter</url>
-        </repository>
-    </distributionManagement>
-    <!-- /GitHub Packages Settings -->
 
     <build>
         <plugins>
