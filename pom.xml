@@ -6,7 +6,7 @@
 
     <groupId>com.github.sakakiaruka.cutom-crafter</groupId>
     <artifactId>custom-crafter</artifactId>
-    <version>5.0</version>
+    <version>5.0.1</version>
     <packaging>jar</packaging>
 
     <name>Custom Crafter</name>
@@ -19,6 +19,7 @@
         <kotlin.version>2.0.20</kotlin.version>
     </properties>
 
+    <!-- GitHub Packages Settings -->
     <distributionManagement>
         <repository>
             <id>github</id>
@@ -26,6 +27,7 @@
             <url>https://maven.pkg.github.com/Sakaki-Aruka/custom-crafter</url>
         </repository>
     </distributionManagement>
+    <!-- /GitHub Packages Settings -->
 
     <build>
         <plugins>
@@ -72,6 +74,11 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <outputDir>
+                        ${project.basedir}/docs
+                    </outputDir>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -141,41 +148,16 @@
             <id>sonatype</id>
             <url>https://oss.sonatype.org/content/groups/public/</url>
         </repository>
-        <repository>
-            <id>placeholderapi</id>
-            <url>https://repo.extendedclip.com/content/repositories/placeholderapi/</url>
-        </repository>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
-        </repository>
     </repositories>
 
     <dependencies>
-
         <!-- Kotlin -->
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib</artifactId>
             <version>${kotlin.version}</version>
         </dependency>
-
-        <!-- Kotlin Exposed (ORM library) -->
-        <dependency>
-            <groupId>org.jetbrains.exposed</groupId>
-            <artifactId>exposed-core</artifactId>
-            <version>0.54.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.exposed</groupId>
-            <artifactId>exposed-java-time</artifactId>
-            <version>0.54.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.exposed</groupId>
-            <artifactId>exposed-jdbc</artifactId>
-            <version>0.54.0</version>
-        </dependency>
+        <!-- /Kotlin -->
 
         <dependency>
             <groupId>io.papermc.paper</groupId>
@@ -183,30 +165,11 @@
             <version>1.21.3-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <version>RELEASE</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.github.seeseemelk</groupId>
-            <artifactId>MockBukkit-v1.20</artifactId>
-            <version>3.76.0</version>
-            <scope>test</scope>
-        </dependency>
 
         <dependency>
             <groupId>org.jetbrains</groupId>
             <artifactId>annotations</artifactId>
             <version>24.1.0</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>me.clip</groupId>
-            <artifactId>placeholderapi</artifactId>
-            <version>2.11.6</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
