@@ -28,20 +28,44 @@ Tested in Paper 1.21.3, 1.20.4.
 [KDoc](https://sakaki-aruka.github.io/custom-crafter/)
 
 ## Dependency Information
-Maven
 
+**Note: `<version>` must be real version string or `master-SNAPSHOT`.**
+
+Maven  
+(repository)
+```xml
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
 ```
+(dependency)
+```xml
 <dependency>
-  <groupId>com.github.sakakiaruka.cutom-crafter</groupId>
-  <artifactId>custom-crafter</artifactId>
-  <version>5.0.1</version>
+    <groupId>com.github.Sakaki-Aruka</groupId>
+    <artifactId>custom-crafter</artifactId>
+    <version>5.0.2</version>
 </dependency>
 ```
 
-Gradle
+
+Gradle  
+(repository)
+```groovy
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
+    }
+}
 ```
+(dependency)
+```groovy
 dependencies {
-    implementation("com.github.sakakiaruka.custom-crafter:custom-crafter:5.0.1")
+        implementation 'com.github.Sakaki-Aruka:custom-crafter:5.0.2'
 }
 ```
 
