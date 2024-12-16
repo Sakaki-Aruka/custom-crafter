@@ -25,8 +25,7 @@ Tested in Paper 1.21.3, 1.20.4.
 # API
 
 ## Documents
-KDoc  
-JavaDoc
+[KDoc](https://sakaki-aruka.github.io/custom-crafter/)
 
 ## Dependency Information
 Maven
