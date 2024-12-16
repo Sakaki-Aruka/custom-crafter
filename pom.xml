@@ -74,6 +74,11 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <outputDir>
+                        ${project.basedir}/docs
+                    </outputDir>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
