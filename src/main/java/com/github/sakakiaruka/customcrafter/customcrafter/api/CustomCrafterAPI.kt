@@ -13,6 +13,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.recipe.
 import com.github.sakakiaruka.customcrafter.customcrafter.api.listener.InventoryClickListener
 import com.github.sakakiaruka.customcrafter.customcrafter.api.listener.InventoryCloseListener
 import com.github.sakakiaruka.customcrafter.customcrafter.api.listener.PlayerInteractListener
+import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.CoordinateComponent
 import com.github.sakakiaruka.customcrafter.customcrafter.api.processor.Converter
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
@@ -22,6 +23,7 @@ import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 import org.bukkit.scheduler.BukkitRunnable
+import kotlin.random.Random
 
 object CustomCrafterAPI {
     const val API_VERSION: String = "0.1"
@@ -61,6 +63,23 @@ object CustomCrafterAPI {
                 }
             }.runTaskAsynchronously(CustomCrafter.getInstance())
         }
+    }
+
+    /**
+     * returns random generated coordinates.
+     *
+     * @param[n] amount of coordinates what you want to generate
+     * @throws[IllegalArgumentException] thrown if [n] < 1
+     * @return[Set<CoordinateComponent>] result coordinates
+     */
+    fun getRandomNCoordinates(n: Int): Set<CoordinateComponent> {
+        if (n < 1) throw IllegalArgumentException("'n' must be greater than zero.")
+        val result: MutableSet<CoordinateComponent> = mutableSetOf()
+        val random = Random
+        do {
+            result.add(CoordinateComponent(random.nextInt(), random.nextInt()))
+        } while (result.size != n)
+        return result
     }
 
     /**

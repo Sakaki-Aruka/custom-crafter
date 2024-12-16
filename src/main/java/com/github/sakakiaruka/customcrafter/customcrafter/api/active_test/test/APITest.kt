@@ -15,7 +15,21 @@ internal object APITest {
         baseBlockTest()
         craftingGUITest()
         tooOldTest()
+        randomCoordinatesTest()
     }
+
+    private fun randomCoordinatesTest() {
+        try {
+            CustomCrafterAPI.getRandomNCoordinates(0)
+        } catch (illegalArgument: IllegalArgumentException) {
+            illegalArgument.cause?.let { CAssert.assertThrow(it, IllegalArgumentException::class) }
+        }
+
+        val n = 100
+        val result = CustomCrafterAPI.getRandomNCoordinates(n)
+        CAssert.assertTrue(result.size == n)
+    }
+
     private fun baseBlockTest() {
         val base: Int = CustomCrafterAPI.getBaseBlockSideSize()
         CAssert.assertTrue(!CustomCrafterAPI.setBaseBlockSideSize(-1))
