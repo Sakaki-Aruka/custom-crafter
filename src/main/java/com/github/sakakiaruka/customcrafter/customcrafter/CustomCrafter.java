@@ -12,7 +12,6 @@ public final class CustomCrafter extends JavaPlugin {
     @Override
     public void onEnable() {
         // Plugin startup logic
-        saveDefaultConfig();
         this.instance = this;
 
         INITIALIZED = System.currentTimeMillis();
