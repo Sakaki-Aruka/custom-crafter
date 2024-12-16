@@ -180,7 +180,7 @@ object Search {
             val recipeOne: CMatter = m.asOne()
 
             recipeOne.persistentDataContainer?.let {
-                if (!recipeOne.predicatesResult(mapped, recipe, crafterID)) {
+                if (!recipeOne.predicatesResult(i, mapped, recipe, crafterID)) {
                     return false
                 }
             }

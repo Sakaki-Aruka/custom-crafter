@@ -13,6 +13,7 @@ import java.util.UUID
  */
 data class CMatterPredicate(
     val predicate: (
+        self: ItemStack,
         mapped: Map<CoordinateComponent, ItemStack>,
         container: PersistentDataContainer,
         recipe: CRecipe,

@@ -24,13 +24,14 @@ interface CMatter {
     fun hasPDC(): Boolean = persistentDataContainer != null
 
     fun predicatesResult(
+        self: ItemStack,
         mapped: Map<CoordinateComponent, ItemStack>,
         recipe: CRecipe,
         crafterID: UUID
     ): Boolean {
         return if (predicates != null) {
             if (hasPDC()) {
-                predicates!!.all { p -> p.predicate(mapped, persistentDataContainer!!, recipe, crafterID) }
+                predicates!!.all { p -> p.predicate(self, mapped, persistentDataContainer!!, recipe, crafterID) }
             } else false
         } else false
     }

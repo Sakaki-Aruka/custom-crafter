@@ -75,7 +75,7 @@ object Container {
             val container = item.itemMeta.persistentDataContainer
             recipe.items.forEach { (_, m) ->
                 result.add(m.predicates?.all { p ->
-                    p.predicate(mapped, container, recipe, crafterID)
+                    p.predicate(item, mapped, container, recipe, crafterID)
                 } ?: true)
             }
         }
