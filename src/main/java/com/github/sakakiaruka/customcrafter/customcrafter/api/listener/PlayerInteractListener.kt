@@ -26,7 +26,7 @@ object PlayerInteractListener: Listener {
         val range: IntRange = (-1 * halfSideSize..halfSideSize)
         for (dx: Int in range) {
             for (dz: Int in range) {
-                if (world.getBlockAt(x + dx, y, z + dz).type != CustomCrafterAPI.BASE_BLOCK) return
+                if (world.getBlockAt(x + dx, y - 1, z + dz).type != CustomCrafterAPI.BASE_BLOCK) return
             }
         }
 
