@@ -34,8 +34,6 @@ object InventoryClickListener: Listener {
             CustomCrafterAPI.isCustomCrafterGUI(it)
         } ?: return
 
-        isCancelled = true
-
         if (CustomCrafterAPI.isGUITooOld(gui)) {
             val world: World = player.world
             val location: Location = player.location
@@ -57,14 +55,14 @@ object InventoryClickListener: Listener {
             player.closeInventory()
             return
         } else if (rawSlot < 0 || isCancelled) {
-//            isCancelled = true
+            isCancelled = true
             player.closeInventory()
             return
         }
 
         if (rawSlot >= CustomCrafterAPI.CRAFTING_TABLE_TOTAL_SIZE) {
-//            if (click == ClickType.LEFT || click == ClickType.RIGHT || click == ClickType.SHIFT_LEFT) return
-////            isCancelled = true
+            if (click == ClickType.LEFT || click == ClickType.RIGHT || click == ClickType.SHIFT_LEFT) return
+            isCancelled = true
             return
         }
 
@@ -93,7 +91,9 @@ object InventoryClickListener: Listener {
                     player.world.dropItem(player.location, over)
                 }
             }
-            else -> {}//isCancelled = true
+            else -> {
+                isCancelled = true
+            }//isCancelled = true
         }
     }
 
