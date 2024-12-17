@@ -140,7 +140,7 @@ object CustomCrafterAPI {
      * @return[Triple]
      */
     fun genCCKey() = Triple(
-        NamespacedKey(CustomCrafter.getInstance(), "gui_created"),
+        NamespacedKey("custom_crafter", "gui_created"),
         PersistentDataType.LONG,
         System.currentTimeMillis()
     )

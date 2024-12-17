@@ -12,7 +12,7 @@ public final class CustomCrafter extends JavaPlugin {
     @Override
     public void onEnable() {
         // Plugin startup logic
-        this.instance = this;
+        instance = this;
 
         INITIALIZED = System.currentTimeMillis();
         CustomCrafterAPI.INSTANCE.setup$custom_crafter();
