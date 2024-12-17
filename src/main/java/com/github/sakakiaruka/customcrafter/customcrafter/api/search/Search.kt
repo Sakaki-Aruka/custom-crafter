@@ -124,6 +124,12 @@ object Search {
         val mapped: Map<CoordinateComponent, ItemStack> = Converter.standardInputMapping(inventory)
             .takeIf { it?.isNotEmpty() == true } ?: return null
 
+        //debug
+        println("mapped passed")
+        println("mapped.size=${mapped.size}")
+        println("matches=${CustomCrafterAPI.RECIPES.first { it.items.size == mapped.size }.name}")
+        println("mapped=${mapped}")
+
         val customs: List<Pair<CRecipe, MappedRelation>> = CustomCrafterAPI.RECIPES
             .filter { it.items.size == mapped.size }
             .map { recipe ->
@@ -166,13 +172,17 @@ object Search {
         val basic: Boolean =
             if (fromAmorphous) allCandidateContains(mapped, recipe)
             else {
-                squareSize(mapped.keys) == squareSize(recipe.items.keys)
-                        && sameShape(mapped.keys, recipe)
+                sameShape(mapped.keys, recipe)
                         && allCandidateContains(mapped, recipe)
             }
 
         val inputSorted: List<ItemStack> = coordinateSort(mapped)
         val recipeSorted: List<CMatter> = coordinateSort(recipe.items)
+
+
+        //debug
+        println("recipe normal=${recipe.name}")
+        println("predicate before basic=${basic}")
 
         for ((i, m) in inputSorted.zip(recipeSorted)) {
             if (!m.mass && m.amount != 1 && i.amount < m.amount) return false
@@ -184,6 +194,9 @@ object Search {
                     return false
                 }
             }
+
+            //debug
+            println("pdc ok")
 
             if (recipeOne is CEnchantMatter) {
                 if (!Enchant.enchant(inOne, recipeOne)) return false

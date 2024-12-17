@@ -47,6 +47,9 @@ object CustomCrafterAPI {
         Bukkit.getPluginManager().registerEvents(InventoryCloseListener, instance)
         Bukkit.getPluginManager().registerEvents(PlayerInteractListener, instance)
 
+        val temporary: MutableSet<CRecipe> = mutableSetOf()
+        temporary.addAll(RECIPES)
+
         if (IS_BETA) {
             // run tests
             object: BukkitRunnable() {
@@ -57,13 +60,24 @@ object CustomCrafterAPI {
                     EnchantTest.run()
                     VanillaSearchTest.run()
                     PotionTest.run()
-                    SearchTest.run()
+                    try {
+                        SearchTest.run()
+                    }catch (e: Exception){}
                     val endAt = System.currentTimeMillis()
                     CustomCrafter.getInstance().logger.info("tested in ${endAt - startAt} ms")
+
+                    RECIPES.addAll(temporary)
+
+                    //debug
+                    println("temporary.size=${temporary.size}")
+                    println("recipes=${RECIPES.size}")
+
                 }
             }.runTaskAsynchronously(CustomCrafter.getInstance())
         }
     }
+
+    fun getRecipes(): Set<CRecipe> = RECIPES.toSet()
 
     /**
      * returns random generated coordinates.
@@ -93,6 +107,10 @@ object CustomCrafterAPI {
         val event = RegisterCustomRecipeEvent(recipe)
         Bukkit.getPluginManager().callEvent(event)
         if (event.isCancelled) return false
+
+        //debug
+        println("register called. size=${RECIPES.size}")
+
         return RECIPES.add(recipe)
     }
 

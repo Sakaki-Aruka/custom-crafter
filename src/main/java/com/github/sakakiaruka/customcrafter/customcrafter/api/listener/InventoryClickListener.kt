@@ -20,8 +20,8 @@ import org.bukkit.event.Listener
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.Inventory
-import org.bukkit.inventory.InventoryView
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.PlayerInventory
 import kotlin.math.max
 
 /**
@@ -33,7 +33,20 @@ object InventoryClickListener: Listener {
         val player: Player = Bukkit.getPlayer(whoClicked.uniqueId) ?: return
         val gui: Inventory = clickedInventory?.takeIf {
             CustomCrafterAPI.isCustomCrafterGUI(it)
-        } ?: return
+        } ?: run {
+            clickedInventory?.let { inv ->
+                if (inv is PlayerInventory
+                    && CustomCrafterAPI.isCustomCrafterGUI(player.openInventory.topInventory)) {
+                    if (click == ClickType.LEFT
+                        || click == ClickType.RIGHT
+                        || click == ClickType.SHIFT_LEFT
+                    ) return
+                    isCancelled = true
+                    return
+                }
+            }
+            return
+        }
 
         if (CustomCrafterAPI.isGUITooOld(gui)) {
             isCancelled = true
@@ -57,22 +70,7 @@ object InventoryClickListener: Listener {
             player.closeInventory()
             return
         } else if (isCancelled) return
-        else if (rawSlot < 0) {
-            isCancelled = true
-            return
-        } else if (rawSlot >= CustomCrafterAPI.CRAFTING_TABLE_TOTAL_SIZE) {
-            if (click == ClickType.LEFT
-                || click == ClickType.RIGHT
-                || click == ClickType.SHIFT_LEFT
-                ) return
-            isCancelled = true
-            return
-        } else if ((0..54).contains(rawSlot)
-            && !Converter.getAvailableCraftingSlotIndices().contains(rawSlot)) {
-            // click a blank slot
-            isCancelled = true
-            return
-        } else if (rawSlot == CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT) {
+        else if (rawSlot == CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT) {
             // click result slot
             isCancelled = true
             gui.getItem(rawSlot)?.let { item ->
@@ -93,32 +91,35 @@ object InventoryClickListener: Listener {
 
             val result: Search.SearchResult = Search.search(player.uniqueId, gui) ?: return
 
+            //debug
+            println("make button 3")
+            println("result.customs=${result.customs()}")
+            println("result.vanilla=${result.vanilla()}")
+
             CreateCustomItemEvent(player, view, result, click).callEvent()
             if (CustomCrafterAPI.RESULT_GIVE_CANCEL) return
 
             if (result.customs().isEmpty() && result.vanilla() == null) return
+
+            //debug
+            println("make button 4")
+
             val mass: Boolean = click == ClickType.SHIFT_LEFT
 
             process(result, gui, mass, player)
+        } else if (!Converter.getAvailableCraftingSlotIndices().contains(rawSlot)) {
+            // click a blank slot
+            isCancelled = true
+            return
         }
-
-//        when (slot) {
-//            CustomCrafterAPI.CRAFTING_TABLE_MAKE_BUTTON_SLOT -> {
-//                //
-//            }
-//            CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT -> {
-//                val resultItem: ItemStack = gui.getItem(CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT) ?: return
-//                player.inventory.addItem(resultItem).forEach { (_, over) ->
-//                    player.world.dropItem(player.location, over)
-//                }
-//            }
-//            else -> {
-//                isCancelled = true
-//            }//isCancelled = true
-//        }
     }
 
-    private fun process(result: Search.SearchResult, gui: Inventory, mass: Boolean, player: Player) {
+    private fun process(
+        result: Search.SearchResult,
+        gui: Inventory,
+        mass: Boolean,
+        player: Player
+    ) {
         if (result.customs().isEmpty() && result.vanilla() == null) return
         val mapped: Map<CoordinateComponent, ItemStack> = Converter.standardInputMapping(gui) ?: return
 
