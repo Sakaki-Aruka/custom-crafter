@@ -20,6 +20,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.Inventory
+import org.bukkit.inventory.InventoryView
 import org.bukkit.inventory.ItemStack
 import kotlin.math.max
 
@@ -35,6 +36,7 @@ object InventoryClickListener: Listener {
         } ?: return
 
         if (CustomCrafterAPI.isGUITooOld(gui)) {
+            isCancelled = true
             val world: World = player.world
             val location: Location = player.location
             Converter.getAvailableCraftingSlotIndices().forEach { slot ->
@@ -54,47 +56,66 @@ object InventoryClickListener: Listener {
                 }
             player.closeInventory()
             return
-        } else if (rawSlot < 0 || isCancelled) {
-            isCancelled = true
-            player.closeInventory()
-            return
-        }
-
-        if (rawSlot >= CustomCrafterAPI.CRAFTING_TABLE_TOTAL_SIZE) {
-            if (click == ClickType.LEFT || click == ClickType.RIGHT || click == ClickType.SHIFT_LEFT) return
+        } else if (isCancelled) return
+        else if (rawSlot < 0) {
             isCancelled = true
             return
-        }
-
-        when (rawSlot) {
-            CustomCrafterAPI.CRAFTING_TABLE_MAKE_BUTTON_SLOT -> {
-                if (gui.contents.isEmpty()) return
-
-                val view: CraftView = CraftView.fromInventory(gui) ?: return
-                val preEvent = PreCreateCustomItemEvent(player, view, click)
-                Bukkit.getPluginManager().callEvent(preEvent)
-                if (preEvent.isCancelled) return
-
-                val result: Search.SearchResult = Search.search(player.uniqueId, gui) ?: return
-
-                CreateCustomItemEvent(player, view, result, click).callEvent()
-                if (CustomCrafterAPI.RESULT_GIVE_CANCEL) return
-
-                if (result.customs().isEmpty() && result.vanilla() == null) return
-                val mass: Boolean = click == ClickType.SHIFT_LEFT
-
-                process(result, gui, mass, player)
-            }
-            CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT -> {
-                val resultItem: ItemStack = gui.getItem(CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT) ?: return
-                player.inventory.addItem(resultItem).forEach { (_, over) ->
+        } else if (rawSlot >= CustomCrafterAPI.CRAFTING_TABLE_TOTAL_SIZE) {
+            if (click == ClickType.LEFT
+                || click == ClickType.RIGHT
+                || click == ClickType.SHIFT_LEFT
+                ) return
+            isCancelled = true
+            return
+        } else if ((0..54).contains(rawSlot)
+            && !Converter.getAvailableCraftingSlotIndices().contains(rawSlot)) {
+            // click a blank slot
+            isCancelled = true
+            return
+        } else if (rawSlot == CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT) {
+            // click result slot
+            isCancelled = true
+            gui.getItem(rawSlot)?.let { item ->
+                player.inventory.addItem(item).forEach { (_, over) ->
                     player.world.dropItem(player.location, over)
                 }
             }
-            else -> {
-                isCancelled = true
-            }//isCancelled = true
+            return
+        } else if (rawSlot == CustomCrafterAPI.CRAFTING_TABLE_MAKE_BUTTON_SLOT) {
+            // click make button
+            isCancelled = true
+            if (gui.contents.isEmpty()) return
+
+            val view: CraftView = CraftView.fromInventory(gui) ?: return
+            val preEvent = PreCreateCustomItemEvent(player, view, click)
+            Bukkit.getPluginManager().callEvent(preEvent)
+            if (preEvent.isCancelled) return
+
+            val result: Search.SearchResult = Search.search(player.uniqueId, gui) ?: return
+
+            CreateCustomItemEvent(player, view, result, click).callEvent()
+            if (CustomCrafterAPI.RESULT_GIVE_CANCEL) return
+
+            if (result.customs().isEmpty() && result.vanilla() == null) return
+            val mass: Boolean = click == ClickType.SHIFT_LEFT
+
+            process(result, gui, mass, player)
         }
+
+//        when (slot) {
+//            CustomCrafterAPI.CRAFTING_TABLE_MAKE_BUTTON_SLOT -> {
+//                //
+//            }
+//            CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT -> {
+//                val resultItem: ItemStack = gui.getItem(CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT) ?: return
+//                player.inventory.addItem(resultItem).forEach { (_, over) ->
+//                    player.world.dropItem(player.location, over)
+//                }
+//            }
+//            else -> {
+//                isCancelled = true
+//            }//isCancelled = true
+//        }
     }
 
     private fun process(result: Search.SearchResult, gui: Inventory, mass: Boolean, player: Player) {

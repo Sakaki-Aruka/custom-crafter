@@ -170,6 +170,7 @@ object CustomCrafterAPI {
             gui.setItem(index, ItemStack.empty())
         }
         gui.setItem(CRAFTING_TABLE_MAKE_BUTTON_SLOT, makeButton)
+        gui.setItem(CRAFTING_TABLE_RESULT_SLOT, ItemStack.empty())
         return gui
     }
 
