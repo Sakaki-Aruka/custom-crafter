@@ -10,7 +10,8 @@ import java.util.UUID
  * A [CMatter]'s predicate functions.
  */
 data class CMatterPredicate(
-    val predicate: (ItemStack, Map<CoordinateComponent, ItemStack>, CRecipe, UUID) -> Boolean) {
+    val predicate: Function4<ItemStack, Map<CoordinateComponent, ItemStack>, CRecipe, UUID, Boolean>
+) {
 
     operator fun invoke(
         self: ItemStack,

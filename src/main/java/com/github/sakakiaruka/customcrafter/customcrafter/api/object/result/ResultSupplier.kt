@@ -8,7 +8,7 @@ import org.bukkit.inventory.ItemStack
 import java.util.UUID
 
 data class ResultSupplier (
-    val func: (UUID, MappedRelation, Map<CoordinateComponent, ItemStack>, MutableList<ItemStack>) -> List<ItemStack>
+    val func: Function4<UUID, MappedRelation, Map<CoordinateComponent, ItemStack>, MutableList<ItemStack>, List<ItemStack>>
 ) {
         operator fun invoke(
             crafterID: UUID,

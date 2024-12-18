@@ -23,7 +23,7 @@ data class CRecipeContainer(
      * @param[func] a function what checks elements.
      */
     data class Predicate(
-        val func: (UUID, MappedRelation, Map<CoordinateComponent, ItemStack>, MutableList<ItemStack>) -> Boolean
+        val func: Function4<UUID, MappedRelation, Map<CoordinateComponent, ItemStack>, MutableList<ItemStack>, Boolean>
     ) {
         operator fun invoke(
             crafterID: UUID,
@@ -84,7 +84,7 @@ data class CRecipeContainer(
      * @param[func] a function what consume input data
      */
     data class Consumer(
-        val func: (UUID, MappedRelation, Map<CoordinateComponent, ItemStack>, MutableList<ItemStack>) -> Unit
+        val func: Function4<UUID, MappedRelation, Map<CoordinateComponent, ItemStack>, MutableList<ItemStack>, Unit>
     ) {
         operator fun invoke(
             crafterID: UUID,
