@@ -62,7 +62,7 @@ object CustomCrafterAPI {
                     PotionTest.run()
                     try {
                         SearchTest.run()
-                    }catch (e: Exception){}
+                    } catch (e: Exception){}
                     val endAt = System.currentTimeMillis()
                     CustomCrafter.getInstance().logger.info("tested in ${endAt - startAt} ms")
 
@@ -77,7 +77,7 @@ object CustomCrafterAPI {
         }
     }
 
-    fun getRecipes(): Set<CRecipe> = RECIPES.toSet()
+    fun getRecipes(): List<CRecipe> = RECIPES.toList()
 
     /**
      * returns random generated coordinates.

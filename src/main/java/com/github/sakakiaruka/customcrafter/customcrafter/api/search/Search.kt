@@ -127,7 +127,8 @@ object Search {
         //debug
         println("mapped passed")
         println("mapped.size=${mapped.size}")
-        println("matches=${CustomCrafterAPI.RECIPES.first { it.items.size == mapped.size }.name}")
+        println("recipes=${CustomCrafterAPI.RECIPES.size}")
+        //println("matches=${CustomCrafterAPI.RECIPES.first { it.items.size == mapped.size }.name}")
         println("mapped=${mapped}")
 
         val customs: List<Pair<CRecipe, MappedRelation>> = CustomCrafterAPI.RECIPES
