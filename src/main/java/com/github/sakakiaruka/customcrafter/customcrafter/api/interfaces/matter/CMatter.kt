@@ -18,10 +18,8 @@ interface CMatter {
     val amount: Int
     val mass: Boolean
     val predicates: Set<CMatterPredicate>?
-    val persistentDataContainer: PersistentDataContainer?
 
     fun hasPredicates(): Boolean = predicates != null
-    fun hasPDC(): Boolean = persistentDataContainer != null
 
     fun predicatesResult(
         self: ItemStack,
@@ -29,11 +27,9 @@ interface CMatter {
         recipe: CRecipe,
         crafterID: UUID
     ): Boolean {
-        return if (predicates != null) {
-            if (hasPDC()) {
-                predicates!!.all { p -> p.predicate(self, mapped, persistentDataContainer!!, recipe, crafterID) }
-            } else false
-        } else false
+        return if (!predicates.isNullOrEmpty()) {
+            predicates!!.all { p -> p.predicate.invoke(self, mapped, recipe, crafterID) }
+        } else true
     }
     fun asOne(): CMatter
 

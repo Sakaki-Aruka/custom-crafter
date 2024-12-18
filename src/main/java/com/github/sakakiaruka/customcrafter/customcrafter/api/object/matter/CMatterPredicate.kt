@@ -4,7 +4,6 @@ import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.matter.
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.recipe.CRecipe
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.CoordinateComponent
 import org.bukkit.inventory.ItemStack
-import org.bukkit.persistence.PersistentDataContainer
 import java.util.UUID
 
 /**
@@ -17,7 +16,6 @@ data class CMatterPredicate private constructor(
         fun invoke(
             self: ItemStack,
             mapped: Map<CoordinateComponent, ItemStack>,
-            container: PersistentDataContainer,
             recipe: CRecipe,
             crafterID: UUID
         ): Boolean
@@ -26,7 +24,6 @@ data class CMatterPredicate private constructor(
     companion object {
         fun of(func: (self: ItemStack,
                       mapped: Map<CoordinateComponent, ItemStack>,
-                      container: PersistentDataContainer,
                       recipe: CRecipe,
                       crafterID: UUID) -> Boolean): CMatterPredicate {
             return CMatterPredicate(MatterPredicateFunc(func))

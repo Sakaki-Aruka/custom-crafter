@@ -191,11 +191,7 @@ object Search {
             val inOne: ItemStack = i.asOne()
             val recipeOne: CMatter = m.asOne()
 
-            recipeOne.persistentDataContainer?.let {
-                if (!recipeOne.predicatesResult(i, mapped, recipe, crafterID)) {
-                    return false
-                }
-            }
+            if (!recipeOne.predicatesResult(i, mapped, recipe, crafterID)) return false
 
             //debug
             println("pdc ok")

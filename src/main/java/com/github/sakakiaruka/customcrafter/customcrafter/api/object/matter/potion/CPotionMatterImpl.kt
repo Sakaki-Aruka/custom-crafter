@@ -14,7 +14,6 @@ import org.bukkit.persistence.PersistentDataContainer
  * @param[amount] matter amount
  * @param[mass] this matter is mass or not
  * @param[predicates] if in checks, this matter requires to pass these all.
- * @param[persistentDataContainer] [PersistentDataContainer]
  * @param[potionComponents] potion predicates for contained. set of [CPotionComponent].
  */
 data class CPotionMatterImpl(
@@ -23,7 +22,6 @@ data class CPotionMatterImpl(
     override val amount: Int,
     override val mass: Boolean,
     override val predicates: Set<CMatterPredicate>?,
-    override val persistentDataContainer: PersistentDataContainer?,
     override val potionComponents: Set<CPotionComponent>
 ): CMatter, CPotionMatter {
     override fun asOne(): CPotionMatterImpl {
@@ -33,7 +31,6 @@ data class CPotionMatterImpl(
             amount = 1,
             mass,
             predicates,
-            persistentDataContainer,
             potionComponents
         )
     }

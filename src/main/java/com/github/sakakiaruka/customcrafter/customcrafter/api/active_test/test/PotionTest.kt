@@ -34,7 +34,7 @@ internal object PotionTest {
             setOf(Material.POTION),
             amount = 1,
             mass = false,
-            null, null,
+            null,
             setOf(
                 CPotionComponent(PotionEffect(PotionEffectType.LUCK, 100, 1), CPotionComponent.PotionStrict.STRICT)
             )
@@ -53,7 +53,7 @@ internal object PotionTest {
         val basicEnableSplash: CPotionMatter = CPotionMatterImpl(
             basicPotionMatter.name,
             setOf(Material.SPLASH_POTION),
-            amount = 1, mass = false, null, null,
+            amount = 1, mass = false, null,
             setOf(
                 CPotionComponent(PotionEffect(PotionEffectType.LUCK, 100, 1), CPotionComponent.PotionStrict.STRICT)
             )
@@ -63,7 +63,7 @@ internal object PotionTest {
         val containedNotStrict: CPotionMatter = CPotionMatterImpl(
             basicPotionMatter.name,
             setOf(Material.SPLASH_POTION),
-            amount = 1, mass = false, null, null,
+            amount = 1, mass = false, null,
             setOf(
                 CPotionComponent(PotionEffect(PotionEffectType.LUCK, 100, 1), CPotionComponent.PotionStrict.STRICT),
                 CPotionComponent(PotionEffect(PotionEffectType.POISON, 100, 1), CPotionComponent.PotionStrict.NOT_STRICT)
@@ -74,7 +74,7 @@ internal object PotionTest {
         val lv100LuckMatter: CPotionMatter = CPotionMatterImpl(
             basicPotionMatter.name,
             setOf(Material.SPLASH_POTION),
-            amount = 1, mass = false, null, null,
+            amount = 1, mass = false, null,
             setOf(
                 CPotionComponent(PotionEffect(PotionEffectType.LUCK, 100, 100), CPotionComponent.PotionStrict.STRICT)
             )
@@ -98,7 +98,7 @@ internal object PotionTest {
             return CPotionMatterImpl(
                 "potionTestMatter",
                 setOf(Material.POTION),
-                amount = 1, mass = false, null, null,
+                amount = 1, mass = false, null,
                 components
             )
         }

@@ -117,8 +117,7 @@ internal object SearchTest {
             setOf(Material.STONE),
             amount = 1,
             mass = false,
-            predicates = null,
-            persistentDataContainer = null
+            predicates = null
         )
 
         val recipe: CRecipe = CRecipeImpl(
@@ -173,8 +172,7 @@ internal object SearchTest {
             setOf(Material.LAVA_BUCKET),
             amount = 1,
             mass = true,
-            predicates = null,
-            persistentDataContainer = null
+            predicates = null
         )
 
         val recipe: CRecipe = CRecipeImpl(

@@ -40,12 +40,6 @@ object Container {
                 .withIndex()
                 .filter { it.value }
                 .map { it.index }
-
-//            val predicates: List<CMatterPredicate> = recipe.items.values.toList()[index].predicates!!.toList()
-//            map[index] = matchList(mapped.values.toList(), predicates)
-//                .withIndex()
-//                .filter { it.value }
-//                .map { it.index }
         }
 
         val result: MutableList<AmorphousFilterCandidate> = mutableListOf()
@@ -72,20 +66,12 @@ object Container {
     ): List<Boolean> {
         val result: MutableList<Boolean> = mutableListOf()
         mapped.forEach { (_, item) ->
-            val container = item.itemMeta.persistentDataContainer
             recipe.items.forEach { (_, m) ->
                 result.add(m.predicates?.all { p ->
-                    p.predicate(item, mapped, container, recipe, crafterID)
+                    p.predicate.invoke(item, mapped, recipe, crafterID)
                 } ?: true)
             }
         }
         return result
     }
-
-//    private fun matchList(ins: List<ItemStack>, predicates: List<CMatterPredicate>): List<Boolean> {
-//        return ins.map { item ->
-//            val container = item.itemMeta.persistentDataContainer
-//            predicates.all { p -> p.predicate(, container, )}
-//        }.toList()
-//    }
 }
