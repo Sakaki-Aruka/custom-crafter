@@ -1,6 +1,6 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.api.listener
 
-import com.github.sakakiaruka.customcrafter.customcrafter.api.CustomCrafterAPI
+import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafterAPI
 import com.github.sakakiaruka.customcrafter.customcrafter.api.event.CreateCustomItemEvent
 import com.github.sakakiaruka.customcrafter.customcrafter.api.event.PreCreateCustomItemEvent
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.recipe.CRecipe

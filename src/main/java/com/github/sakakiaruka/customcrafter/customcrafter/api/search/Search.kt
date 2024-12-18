@@ -1,6 +1,6 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.api.search
 
-import com.github.sakakiaruka.customcrafter.customcrafter.api.CustomCrafterAPI
+import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafterAPI
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.matter.CEnchantMatter
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.matter.CEnchantmentStoreMatter
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.matter.CMatter

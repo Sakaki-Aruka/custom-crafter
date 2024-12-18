@@ -1,6 +1,6 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.api.active_test.test
 
-import com.github.sakakiaruka.customcrafter.customcrafter.api.CustomCrafterAPI
+import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafterAPI
 import com.github.sakakiaruka.customcrafter.customcrafter.api.active_test.CAssert
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.CoordinateComponent
 import com.github.sakakiaruka.customcrafter.customcrafter.api.processor.Converter

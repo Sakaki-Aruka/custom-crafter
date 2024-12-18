@@ -1,6 +1,6 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.api.listener
 
-import com.github.sakakiaruka.customcrafter.customcrafter.api.CustomCrafterAPI
+import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafterAPI
 import com.github.sakakiaruka.customcrafter.customcrafter.api.processor.Converter
 import org.bukkit.Location
 import org.bukkit.World

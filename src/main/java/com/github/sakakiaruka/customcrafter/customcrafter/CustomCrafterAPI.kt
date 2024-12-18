@@ -1,6 +1,5 @@
-package com.github.sakakiaruka.customcrafter.customcrafter.api
+package com.github.sakakiaruka.customcrafter.customcrafter
 
-import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter
 import com.github.sakakiaruka.customcrafter.customcrafter.api.active_test.test.APITest
 import com.github.sakakiaruka.customcrafter.customcrafter.api.active_test.test.ConverterTest
 import com.github.sakakiaruka.customcrafter.customcrafter.api.active_test.test.EnchantTest
@@ -70,14 +69,14 @@ object CustomCrafterAPI {
 
                     //debug
                     println("temporary.size=${temporary.size}")
-                    println("recipes=${RECIPES.size}")
+                    println("cc recipes=${CustomCrafter.RECIPES.size}")
 
                 }
             }.runTaskAsynchronously(CustomCrafter.getInstance())
         }
     }
 
-    fun getRecipes(): List<CRecipe> = RECIPES.toList()
+    fun getRecipes(): List<CRecipe> = CustomCrafter.RECIPES.toList()
 
     /**
      * returns random generated coordinates.
@@ -109,9 +108,9 @@ object CustomCrafterAPI {
         if (event.isCancelled) return false
 
         //debug
-        println("register called. size=${RECIPES.size}")
+        println("register called. size=${CustomCrafter.RECIPES.size}")
 
-        return RECIPES.add(recipe)
+        return CustomCrafter.RECIPES.add(recipe)
     }
 
     /**
@@ -125,7 +124,7 @@ object CustomCrafterAPI {
         val event = UnregisterCustomRecipeEvent(recipe)
         Bukkit.getPluginManager().callEvent(event)
         if (event.isCancelled) return false
-        return RECIPES.remove(recipe)
+        return CustomCrafter.RECIPES.remove(recipe)
     }
 
     /**
