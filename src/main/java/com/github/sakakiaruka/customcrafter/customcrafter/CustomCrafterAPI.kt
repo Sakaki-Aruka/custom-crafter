@@ -46,9 +46,6 @@ object CustomCrafterAPI {
         Bukkit.getPluginManager().registerEvents(InventoryCloseListener, instance)
         Bukkit.getPluginManager().registerEvents(PlayerInteractListener, instance)
 
-        val temporary: MutableSet<CRecipe> = mutableSetOf()
-        temporary.addAll(TEST_RECIPES)
-
 //        if (IS_BETA) {
 //            // run tests
 //            object: BukkitRunnable() {

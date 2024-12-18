@@ -20,6 +20,9 @@ public final class CustomCrafter extends JavaPlugin {
 
         INITIALIZED = System.currentTimeMillis();
         CustomCrafterAPI.INSTANCE.setup$custom_crafter();
+
+        // debug
+        System.out.println("custom crafter's api instance=" + CustomCrafterAPI.INSTANCE);
     }
 
     @Override

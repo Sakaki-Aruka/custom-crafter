@@ -2,7 +2,6 @@ package com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe
 
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.recipe.CRecipe
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.MappedRelation
-import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import java.util.UUID
 
@@ -16,46 +15,117 @@ data class CRecipeContainer(
 ) {
     /**
      * A predicate of [CRecipeContainer].
-     * crafterID: a crafter's uuid.
-     * relate: a coordinate mapping between a [CRecipe] and an input Inventory.
-     * mapped: a coordinate and input items mapping
-     * list: result items that are made by a [CRecipe]
+     * ```
+     * // Java
+     * Predicate predicate = new Predicate((Function4<UUID, MappedRelation, Map<Coordinate
+     * ```
      *
      * @param[func] a function what checks elements.
      */
-    data class Predicate(
-        val func: (
-            crafterID: UUID,
-            relate: MappedRelation,
-            mapped: Map<CoordinateComponent, ItemStack>,
-            list: MutableList<ItemStack>
-                ) -> Boolean
-    )
+    class Predicate private constructor(
+        val func: PredicateFunc
+    ) {
+
+        fun interface PredicateFunc {
+            /**
+             * @param[crafterID] a crafter's uuid.
+             * @param[relate] a coordinate mapping between a [CRecipe] and an input Inventory.
+             * @param[mapped] a coordinate and input items mapping
+             * @param[list] result items that are made by a [CRecipe]
+             */
+            fun invoke(
+                crafterID: UUID,
+                relate: MappedRelation,
+                mapped: Map<CoordinateComponent, ItemStack>,
+                list: MutableList<ItemStack>
+            ): Boolean
+        }
+
+        companion object {
+            /**
+             * A predicate of [CRecipeContainer].
+             * Function parameters
+             * - [UUID]: a crafter's uuid.
+             * - [MappedRelation]: a coordinate mapping between a [CRecipe] and an input Inventory
+             * - [Map]<[CoordinateComponent], [ItemStack]>: a coordinate and input items mapping
+             * - [MutableList]<[ItemStack]>: result items that are made by a [CRecipe]
+             * ```
+             * // call example from Java
+             * CRecipeContainer.Predicate predicate = CRecipeContainer.Predicate.of((crafterID, relate, mapped, list) -> true);
+             *
+             * // call example from Kotlin
+             * val consumer = CRecipeContainer.Consumer.of { crafterID, relate, mapped, list -> true }
+             * ```
+             *
+             * @param[func] function.
+             * @return[CRecipeContainer.Predicate] predicate
+             */
+            fun of(func: (UUID,
+                          MappedRelation,
+                          Map<CoordinateComponent, ItemStack>,
+                          MutableList<ItemStack>
+                    ) -> Boolean): Predicate {
+                return Predicate(PredicateFunc(func))
+            }
+        }
+    }
 
     /**
-     * A consumer of [CRecipeContainer].
-     * crafterID: a crafter's uuid.
-     * relate: a coordinate mapping between a [CRecipe] and an input Inventory
-     * mapped: a coordinate and input items mapping
-     * list: result items that are made by a [CRecipe]
-     *
      * @param[func] a function what consume input data
      */
-    data class Consumer(
-        val func: (
-            crafterID: UUID,
-            relate: MappedRelation,
-            mapped: Map<CoordinateComponent, ItemStack>,
-            list: MutableList<ItemStack>
-                ) -> Unit
-    )
+    class Consumer private constructor(
+        val func: ConsumerFunc
+    ) {
+        fun interface ConsumerFunc {
+            fun invoke(
+                crafterID: UUID,
+                relate: MappedRelation,
+                mapped: Map<CoordinateComponent, ItemStack>,
+                list: MutableList<ItemStack>
+            )
+        }
+        companion object {
+            /**
+             * A consumer of [CRecipeContainer].
+             * Function parameters
+             * - [UUID]: a crafter's uuid.
+             * - [MappedRelation]: a coordinate mapping between a [CRecipe] and an input Inventory
+             * - [Map<CoordinateComponent, ItemStack>]: a coordinate and input items mapping
+             * - [MutableList<ItemStack>]: result items that are made by a [CRecipe]
+             * ```
+             * // call example from Java
+             * Consumer consumer = CRecipeContainer.Consumer.of((crafterID, relate, mapped, list) -> {
+             *   System.out.println("foo~~!!!");
+             *
+             *   // kotlin's "Unit" likes Java's "void".
+             *   return kotlin.Unit.INSTANCE;
+             * });
+             *
+             * // call example from Kotlin
+             * val consumer = CRecipeContainer.Consumer.of { crafterID, relate, mapped, list ->
+             *   println("foo~~~!!!")
+             * }
+             * ```
+             *
+             * @param[func] function.
+             * @return[CRecipeContainer.Consumer] consumer
+             */
+            fun of(func: (UUID,
+                          MappedRelation,
+                          Map<CoordinateComponent, ItemStack>,
+                          MutableList<ItemStack>
+            ) -> Unit): Consumer {
+                return Consumer(ConsumerFunc(func))
+            }
+        }
+    }
 
     /**
      * run all containers
      * ```
      *         consumers
-     *             .filter { (p, _) -> p.func(player, relate, mapped, list) }
-     *             .forEach { (_, c) -> c.func(player, relate, mapped, list) }
+     *             .filter { (p, _) -> p.func.invoke(player, relate, mapped, list) }
+     *             .forEach { (_, c) -> c.func.invoke(player, relate, mapped, list) }
      * ```
      *
      * @param[crafterID] a crafter's uuid
@@ -71,7 +141,7 @@ data class CRecipeContainer(
         list: MutableList<ItemStack>
     ) {
         consumers
-            .filter { (p, _) -> p.func(crafterID, relate, mapped, list) }
-            .forEach { (_, c) -> c.func(crafterID, relate, mapped, list) }
+            .filter { (p, _) -> p.func.invoke(crafterID, relate, mapped, list) }
+            .forEach { (_, c) -> c.func.invoke(crafterID, relate, mapped, list) }
     }
 }

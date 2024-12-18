@@ -5,6 +5,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.MappedRel
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.CRecipeContainer
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.CRecipeType
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.CoordinateComponent
+import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.result.ResultSupplier
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import java.util.UUID
@@ -16,7 +17,8 @@ interface CRecipe {
     val name: String
     val items: Map<CoordinateComponent, CMatter>
     val containers: List<CRecipeContainer>?
-    val results: List<(crafterID: UUID, relate: MappedRelation, mapped: Map<CoordinateComponent, ItemStack>) -> List<ItemStack>>?
+    //val results: List<(crafterID: UUID, relate: MappedRelation, mapped: Map<CoordinateComponent, ItemStack>) -> List<ItemStack>>?
+    val results: List<ResultSupplier>?
     val type: CRecipeType
 
     /**
@@ -30,7 +32,7 @@ interface CRecipe {
     /**
      * runs all [containers] if it is not null.
      *
-     * @param[player] a crafter
+     * @param[crafterID] a crafter's uuid
      * @param[relate] an input inventory and [CRecipe] coordinates relation.
      * @param[mapped] coordinates and input items relation.
      * @param[results] generated results by this recipe.
@@ -49,7 +51,7 @@ interface CRecipe {
     /**
      * returns results of suppliers made
      *
-     * @param[player] a crafter
+     * @param[crafterID] a crafter's uuid
      * @param[relate] an input inventory and [CRecipe] coordinates relation.
      * @param[mapped] coordinates and input items relation.
      * @return[MutableList<ItemStack>] generated items list. if no item supplier applied, returns an empty list.
@@ -59,10 +61,11 @@ interface CRecipe {
         relate: MappedRelation,
         mapped: Map<CoordinateComponent, ItemStack>
     ): MutableList<ItemStack> {
-        return results?.let { consumers ->
+        return results?.let { suppliers ->
             val list: MutableList<ItemStack> = mutableListOf()
-            consumers.map { c ->
-                list.addAll(c(crafterID, relate, mapped))
+            suppliers.map { s ->
+                s.func.invoke(crafterID, relate, mapped, list)
+                //list.addAll(c(crafterID, relate, mapped))
             }
             list
         } ?: mutableListOf()
