@@ -1,0 +1,20 @@
+$dokka.format:javadoc-v1
+$dokka.linkExtension:html
+$dokka.location:com.github.sakakiaruka.customcrafter.customcrafter.api.object.matter.potion/CPotionComponent.PotionStrict///PointingToDeclaration/com/github/sakakiaruka/customcrafter/customcrafter/api/object/matter/potion/CPotionComponent.PotionStrict.html
+$dokka.location:com.github.sakakiaruka.customcrafter.customcrafter.api.object.recipe/CRecipeContainer.Consumer///PointingToDeclaration/com/github/sakakiaruka/customcrafter/customcrafter/api/object/recipe/CRecipeContainer.Consumer.html
+$dokka.location:com.github.sakakiaruka.customcrafter.customcrafter.api.object.recipe/CRecipeContainer.Predicate///PointingToDeclaration/com/github/sakakiaruka/customcrafter/customcrafter/api/object/recipe/CRecipeContainer.Predicate.html
+$dokka.location:com.github.sakakiaruka.customcrafter.customcrafter.api.object/CraftView.Companion///PointingToDeclaration/com/github/sakakiaruka/customcrafter/customcrafter/api/object/CraftView.Companion.html
+$dokka.location:com.github.sakakiaruka.customcrafter.customcrafter.api.search/Search.SearchResult///PointingToDeclaration/com/github/sakakiaruka/customcrafter/customcrafter/api/search/Search.SearchResult.html
+com.github.sakakiaruka.customcrafter.customcrafter
+com.github.sakakiaruka.customcrafter.customcrafter.api.event
+com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.matter
+com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.recipe
+com.github.sakakiaruka.customcrafter.customcrafter.api.object
+com.github.sakakiaruka.customcrafter.customcrafter.api.object.matter
+com.github.sakakiaruka.customcrafter.customcrafter.api.object.matter.enchant
+com.github.sakakiaruka.customcrafter.customcrafter.api.object.matter.potion
+com.github.sakakiaruka.customcrafter.customcrafter.api.object.recipe
+com.github.sakakiaruka.customcrafter.customcrafter.api.object.result
+com.github.sakakiaruka.customcrafter.customcrafter.api.processor
+com.github.sakakiaruka.customcrafter.customcrafter.api.search
+
