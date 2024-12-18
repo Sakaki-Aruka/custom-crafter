@@ -20,6 +20,9 @@ data class CMatterImpl(
     override val mass: Boolean = false,
     override val predicates: Set<CMatterPredicate>? = null,
 ): CMatter {
+    /**
+     * @see[CMatter.asOne]
+     */
     override fun asOne(): CMatterImpl {
         return CMatterImpl(
             this.name,

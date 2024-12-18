@@ -49,11 +49,21 @@ Maven
 ```
 (dependency)
 ```xml
-<dependency>
-    <groupId>com.github.Sakaki-Aruka</groupId>
-    <artifactId>custom-crafter</artifactId>
-    <version>5.0.2</version>
-</dependency>
+<dependencies>
+   <dependency>
+      <groupId>com.github.Sakaki-Aruka</groupId>
+      <artifactId>custom-crafter</artifactId>
+      <version>5.0.2</version>
+   </dependency>
+   
+   <dependency>
+      <groupId>org.jetbrains.kotlin</groupId>
+      <artifactId>kotlin-stdlib</artifactId>
+      <version>${kotlin.version}</version>
+      <scope>provided</scope>
+   </dependency>
+</dependencies>
+
 ```
 
 
@@ -72,6 +82,7 @@ dependencyResolutionManagement {
 ```groovy
 dependencies {
         implementation 'com.github.Sakaki-Aruka:custom-crafter:5.0.2'
+        compileOnly 'org.jetbrains.kotlin:kotlin-stdlib:${kotlin.version}'
 }
 ```
 

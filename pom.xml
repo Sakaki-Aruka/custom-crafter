@@ -146,6 +146,7 @@
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib</artifactId>
             <version>${kotlin.version}</version>
+            <scope>compile</scope>
         </dependency>
         <!-- /Kotlin -->
 

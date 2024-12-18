@@ -10,9 +10,7 @@ import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.Co
 import com.github.sakakiaruka.customcrafter.customcrafter.api.processor.Converter
 import com.github.sakakiaruka.customcrafter.customcrafter.api.search.Search
 import org.bukkit.Bukkit
-import org.bukkit.Location
 import org.bukkit.Material
-import org.bukkit.World
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -50,23 +48,6 @@ object InventoryClickListener: Listener {
 
         if (CustomCrafterAPI.isGUITooOld(gui)) {
             isCancelled = true
-            val world: World = player.world
-            val location: Location = player.location
-            Converter.getAvailableCraftingSlotIndices().forEach { slot ->
-                gui.getItem(slot)?.takeIf { i -> i.type != Material.AIR }
-                    ?.let { item ->
-                        player.inventory.addItem(item).forEach { (_, over) ->
-                            world.dropItem(location, over)
-                        }
-                    }
-            }
-            gui.getItem(CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT)
-                ?.takeIf { it.type != Material.AIR }
-                ?.let { item ->
-                    player.inventory.addItem(item).forEach { (_, over) ->
-                        player.world.dropItem(player.location, over)
-                    }
-                }
             player.closeInventory()
             return
         } else if (isCancelled) return
@@ -91,18 +72,10 @@ object InventoryClickListener: Listener {
 
             val result: Search.SearchResult = Search.search(player.uniqueId, gui) ?: return
 
-            //debug
-            println("make button 3")
-            println("result.customs=${result.customs()}")
-            println("result.vanilla=${result.vanilla()}")
-
             CreateCustomItemEvent(player, view, result, click).callEvent()
             if (CustomCrafterAPI.RESULT_GIVE_CANCEL) return
 
             if (result.customs().isEmpty() && result.vanilla() == null) return
-
-            //debug
-            println("make button 4")
 
             val mass: Boolean = click == ClickType.SHIFT_LEFT
 
@@ -165,6 +138,8 @@ object InventoryClickListener: Listener {
 
     private fun getMinAmountWithoutMass(relation: MappedRelation, recipe: CRecipe, mapped: Map<CoordinateComponent, ItemStack>): Int {
         return relation.components
+            .filter { c -> Converter.getAvailableCraftingSlotComponents().contains(c.input) }
+            .filter { c -> mapped[c.input] != null && mapped[c.input]!!.type != Material.AIR }
             .filter { c -> !recipe.items[c.recipe]!!.mass }
             .minOf { (r, i) -> mapped[i]!!.amount / recipe.items[r]!!.amount }
     }

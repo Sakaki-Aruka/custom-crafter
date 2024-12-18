@@ -24,5 +24,10 @@ object InventoryCloseListener: Listener {
                 }
             }
         }
+        inventory.getItem(CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT)?.let { result ->
+            player.inventory.addItem(result).forEach { (_, over) ->
+                player.world.dropItem(player.location, over)
+            }
+        }
     }
 }

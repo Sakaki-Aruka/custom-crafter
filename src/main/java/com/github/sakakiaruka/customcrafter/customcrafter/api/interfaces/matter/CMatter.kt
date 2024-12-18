@@ -19,8 +19,18 @@ interface CMatter {
     val mass: Boolean
     val predicates: Set<CMatterPredicate>?
 
-    fun hasPredicates(): Boolean = predicates != null
+    /**
+     * returns this CMatter has some predicates or not.
+     *
+     * @return[Boolean] `predicates != null && predicates!!.isNotEmpty()`
+     */
+    fun hasPredicates(): Boolean = predicates != null && predicates!!.isNotEmpty()
 
+    /**
+     * returns a merged result of all predicates run.
+     *
+     * @return[Boolean] all or nothing.
+     */
     fun predicatesResult(
         self: ItemStack,
         mapped: Map<CoordinateComponent, ItemStack>,
@@ -31,6 +41,12 @@ interface CMatter {
             predicates!!.all { p -> p.predicate.invoke(self, mapped, recipe, crafterID) }
         } else true
     }
+
+    /**
+     * returns a matter what is applied `amount = 1`.
+     *
+     * @return[CMatter] applied `amount = 1`
+     */
     fun asOne(): CMatter
 
 }

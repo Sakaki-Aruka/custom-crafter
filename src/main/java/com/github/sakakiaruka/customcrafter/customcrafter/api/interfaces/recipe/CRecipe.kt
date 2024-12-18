@@ -6,7 +6,6 @@ import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.CR
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.CRecipeType
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.CoordinateComponent
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.result.ResultSupplier
-import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import java.util.UUID
 
@@ -17,7 +16,6 @@ interface CRecipe {
     val name: String
     val items: Map<CoordinateComponent, CMatter>
     val containers: List<CRecipeContainer>?
-    //val results: List<(crafterID: UUID, relate: MappedRelation, mapped: Map<CoordinateComponent, ItemStack>) -> List<ItemStack>>?
     val results: List<ResultSupplier>?
     val type: CRecipeType
 
@@ -64,8 +62,7 @@ interface CRecipe {
         return results?.let { suppliers ->
             val list: MutableList<ItemStack> = mutableListOf()
             suppliers.map { s ->
-                s.func.invoke(crafterID, relate, mapped, list)
-                //list.addAll(c(crafterID, relate, mapped))
+                list.addAll(s.func.invoke(crafterID, relate, mapped, list))
             }
             list
         } ?: mutableListOf()

@@ -1,6 +1,5 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.api.search
 
-import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter
 import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafterAPI
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.matter.CEnchantMatter
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.matter.CEnchantmentStoreMatter
@@ -45,6 +44,7 @@ object Search {
     ) {
         /**
          * returns a nullable vanilla recipe.
+         *
          * When below situations, [vanilla] is null.
          * - If [customs] is not empty and a search query's 'natural' is true.
          * - If an input is not matched all registered vanilla recipes.
@@ -72,6 +72,7 @@ object Search {
 
     /**
      * search main method.
+     *
      * this is more recommended than [search] (use List<ItemStack>).
      *
      * @param[crafterID] a crafter's UUID
@@ -90,8 +91,10 @@ object Search {
 
     /**
      * 6x6 crafting items.
+     *
      * zero origin & do not skip empty slots (do padding = use ItemStack#empty())
-     * A search-result is not guaranteed what is not empty.
+     *
+     *  A search-result is not guaranteed what is not empty.
      *
      * @param[player] A craft-request sender.
      * @param[items] Materials of crafting. this size must equal 36(6*6).
@@ -124,13 +127,6 @@ object Search {
         if (!CustomCrafterAPI.isCustomCrafterGUI(inventory) || CustomCrafterAPI.isGUITooOld(inventory)) return null
         val mapped: Map<CoordinateComponent, ItemStack> = Converter.standardInputMapping(inventory)
             .takeIf { it?.isNotEmpty() == true } ?: return null
-
-        //debug
-        println("mapped passed")
-        println("mapped.size=${mapped.size}")
-        println("recipes=${CustomCrafterAPI.getRecipes().size}")
-        //println("matches=${CustomCrafterAPI.RECIPES.first { it.items.size == mapped.size }.name}")
-        println("mapped=${mapped}")
 
         val customs: List<Pair<CRecipe, MappedRelation>> = CustomCrafterAPI.getRecipes()
             .filter { it.items.size == mapped.size }
@@ -181,20 +177,12 @@ object Search {
         val inputSorted: List<ItemStack> = coordinateSort(mapped)
         val recipeSorted: List<CMatter> = coordinateSort(recipe.items)
 
-
-        //debug
-        println("recipe normal=${recipe.name}")
-        println("predicate before basic=${basic}")
-
         for ((i, m) in inputSorted.zip(recipeSorted)) {
             if (!m.mass && m.amount != 1 && i.amount < m.amount) return false
             val inOne: ItemStack = i.asOne()
             val recipeOne: CMatter = m.asOne()
 
             if (!recipeOne.predicatesResult(i, mapped, recipe, crafterID)) return false
-
-            //debug
-            println("pdc ok")
 
             if (recipeOne is CEnchantMatter) {
                 if (!Enchant.enchant(inOne, recipeOne)) return false
@@ -386,7 +374,6 @@ object Search {
                 }
                 val replaced: CRecipe = cRecipe.replaceItems(newItems)
                 normal(mapped, replaced, crafterID, fromAmorphous = true)
-//                normal(mapped, replaced)
             }
         //return solutions
     }

@@ -62,13 +62,18 @@ object CustomCrafterAPI {
 //                    val endAt = System.currentTimeMillis()
 //                    CustomCrafter.getInstance().logger.info("tested in ${endAt - startAt} ms")
 //
-//                    TEST_RECIPES.addAll(temporary)
-//
 //                }
 //            }.runTaskAsynchronously(CustomCrafter.getInstance())
 //        }
     }
 
+    /**
+     * returns an IMMUTABLE list what contains all registered recipes.
+     *
+     * NOTICE: it is immutable, so you cannot modify its components.
+     *
+     * @return[List]<[CRecipe]> recipes list
+     */
     fun getRecipes(): List<CRecipe> = CustomCrafter.RECIPES.toList()
 
     /**
@@ -90,7 +95,9 @@ object CustomCrafterAPI {
 
     /**
      * registers a provided recipe and calls [RegisterCustomRecipeEvent].
+     *
      * if a called event is cancelled, always fail to register recipe.
+     *
      * in normally, a result of `RECIPES.add(recipe)`.
      *
      * @param[recipe] a recipe what you want to register.
@@ -100,16 +107,14 @@ object CustomCrafterAPI {
         Bukkit.getPluginManager().callEvent(event)
         if (event.isCancelled) return false
 
-        //debug
-        println("register called. size=${CustomCrafter.RECIPES.size}")
-        println("get method size=${getRecipes().size}")
-
         return CustomCrafter.RECIPES.add(recipe)
     }
 
     /**
      * unregisters a provided recipe and calls [UnregisterCustomRecipeEvent].
+     *
      * if a called event is cancelled, always fail to unregister recipe.
+     *
      * in normally, a result of `RECIPES.remove(recipe)`
      *
      * @param[recipe] a recipe what you want to unregister.
@@ -123,6 +128,7 @@ object CustomCrafterAPI {
 
     /**
      * set base block's side size.
+     *
      * default size = 3.
      *
      * @param[size] this argument must be odd and more than zero.
@@ -143,10 +149,11 @@ object CustomCrafterAPI {
 
     /**
      * provides elements of custom crafter's gui component
+     *
      * returned Triple contained below elements.
-     * first([NamespacedKey]): "custom_crafter:gui_created"
-     * second([PersistentDataType.LONG]): a type of 'third'
-     * third([Long]): epoch time when called this.
+     * - first([NamespacedKey]): "custom_crafter:gui_created"
+     * - second([PersistentDataType.LONG]): a type of 'third'
+     * - third([Long]): epoch time when called this.
      *
      * @return[Triple]
      */
@@ -202,6 +209,7 @@ object CustomCrafterAPI {
 
     /**
      * returns the provided inventory is OLDER than custom crafter reloaded or enabled or not.
+     *
      * if you provide an inventory what is not a custom crafter gui, this throws an Exception.
      *
      * @param[inventory] provided inventory

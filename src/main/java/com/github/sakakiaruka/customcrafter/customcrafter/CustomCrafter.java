@@ -1,6 +1,8 @@
 package com.github.sakakiaruka.customcrafter.customcrafter;
 
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.recipe.CRecipe;
+import com.github.sakakiaruka.customcrafter.customcrafter.api.object.recipe.CRecipeContainer;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
@@ -21,8 +23,6 @@ public final class CustomCrafter extends JavaPlugin {
         INITIALIZED = System.currentTimeMillis();
         CustomCrafterAPI.INSTANCE.setup$custom_crafter();
 
-        // debug
-        System.out.println("custom crafter's api instance=" + CustomCrafterAPI.INSTANCE);
     }
 
     @Override
