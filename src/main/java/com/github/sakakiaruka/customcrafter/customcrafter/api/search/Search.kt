@@ -1,5 +1,6 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.api.search
 
+import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter
 import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafterAPI
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.matter.CEnchantMatter
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.matter.CEnchantmentStoreMatter
@@ -127,11 +128,11 @@ object Search {
         //debug
         println("mapped passed")
         println("mapped.size=${mapped.size}")
-        println("recipes=${CustomCrafterAPI.RECIPES.size}")
+        println("recipes=${CustomCrafterAPI.getRecipes().size}")
         //println("matches=${CustomCrafterAPI.RECIPES.first { it.items.size == mapped.size }.name}")
         println("mapped=${mapped}")
 
-        val customs: List<Pair<CRecipe, MappedRelation>> = CustomCrafterAPI.RECIPES
+        val customs: List<Pair<CRecipe, MappedRelation>> = CustomCrafterAPI.getRecipes()
             .filter { it.items.size == mapped.size }
             .map { recipe ->
                 val relation: MappedRelation? =

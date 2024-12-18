@@ -32,7 +32,7 @@ object CustomCrafterAPI {
     val AUTHORS: Set<String> = setOf("Sakaki-Aruka")
 
     var RESULT_GIVE_CANCEL: Boolean = false
-    internal val RECIPES: MutableList<CRecipe> = mutableListOf()
+    internal val TEST_RECIPES: MutableList<CRecipe> = mutableListOf()
     var BASE_BLOCK: Material = Material.GOLD_BLOCK
 
     internal var BASE_BLOCK_SIDE: Int = 3
@@ -47,33 +47,29 @@ object CustomCrafterAPI {
         Bukkit.getPluginManager().registerEvents(PlayerInteractListener, instance)
 
         val temporary: MutableSet<CRecipe> = mutableSetOf()
-        temporary.addAll(RECIPES)
+        temporary.addAll(TEST_RECIPES)
 
-        if (IS_BETA) {
-            // run tests
-            object: BukkitRunnable() {
-                override fun run() {
-                    val startAt = System.currentTimeMillis()
-                    APITest.run()
-                    ConverterTest.run()
-                    EnchantTest.run()
-                    VanillaSearchTest.run()
-                    PotionTest.run()
-                    try {
-                        SearchTest.run()
-                    } catch (e: Exception){}
-                    val endAt = System.currentTimeMillis()
-                    CustomCrafter.getInstance().logger.info("tested in ${endAt - startAt} ms")
-
-                    RECIPES.addAll(temporary)
-
-                    //debug
-                    println("temporary.size=${temporary.size}")
-                    println("cc recipes=${CustomCrafter.RECIPES.size}")
-
-                }
-            }.runTaskAsynchronously(CustomCrafter.getInstance())
-        }
+//        if (IS_BETA) {
+//            // run tests
+//            object: BukkitRunnable() {
+//                override fun run() {
+//                    val startAt = System.currentTimeMillis()
+//                    APITest.run()
+//                    ConverterTest.run()
+//                    EnchantTest.run()
+//                    VanillaSearchTest.run()
+//                    PotionTest.run()
+//                    try {
+//                        SearchTest.run()
+//                    } catch (e: Exception){}
+//                    val endAt = System.currentTimeMillis()
+//                    CustomCrafter.getInstance().logger.info("tested in ${endAt - startAt} ms")
+//
+//                    TEST_RECIPES.addAll(temporary)
+//
+//                }
+//            }.runTaskAsynchronously(CustomCrafter.getInstance())
+//        }
     }
 
     fun getRecipes(): List<CRecipe> = CustomCrafter.RECIPES.toList()
@@ -109,6 +105,7 @@ object CustomCrafterAPI {
 
         //debug
         println("register called. size=${CustomCrafter.RECIPES.size}")
+        println("get method size=${getRecipes().size}")
 
         return CustomCrafter.RECIPES.add(recipe)
     }
