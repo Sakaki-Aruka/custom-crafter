@@ -42,7 +42,6 @@ internal object EnchantTest {
                 amount = 1,
                 mass = false,
                 predicates = null,
-                persistentDataContainer = null,
                 set
             )
         }
@@ -79,7 +78,6 @@ internal object EnchantTest {
                 amount = 1,
                 mass = false,
                 predicates = null,
-                persistentDataContainer = null,
                 set
             )
         }
@@ -135,7 +133,7 @@ internal object EnchantTest {
                 setOf(Material.STONE),
                 amount = 1,
                 mass = false,
-                null, null,
+                null,
                 components
             )
         }

@@ -1,6 +1,6 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.api.listener
 
-import com.github.sakakiaruka.customcrafter.customcrafter.api.CustomCrafterAPI
+import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafterAPI
 import com.github.sakakiaruka.customcrafter.customcrafter.api.processor.Converter
 import org.bukkit.Location
 import org.bukkit.World
@@ -22,6 +22,11 @@ object InventoryCloseListener: Listener {
                 player.inventory.addItem(item).forEach { (_, over) ->
                     world.dropItem(location, over)
                 }
+            }
+        }
+        inventory.getItem(CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT)?.let { result ->
+            player.inventory.addItem(result).forEach { (_, over) ->
+                player.world.dropItem(player.location, over)
             }
         }
     }

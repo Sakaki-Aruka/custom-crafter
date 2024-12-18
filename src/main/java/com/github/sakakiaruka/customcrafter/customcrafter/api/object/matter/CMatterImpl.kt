@@ -12,7 +12,6 @@ import org.bukkit.persistence.PersistentDataContainer
  * @param[amount] matter amount (default = 1)
  * @param[mass] this matter is mass or not (default = false)
  * @param[predicates] if in checks, this matter requires to pass these all. (default = null)
- * @param[persistentDataContainer] [PersistentDataContainer] (default = null)
  */
 data class CMatterImpl(
     override val name: String,
@@ -20,8 +19,10 @@ data class CMatterImpl(
     override val amount: Int = 1,
     override val mass: Boolean = false,
     override val predicates: Set<CMatterPredicate>? = null,
-    override val persistentDataContainer: PersistentDataContainer? = null,
 ): CMatter {
+    /**
+     * @see[CMatter.asOne]
+     */
     override fun asOne(): CMatterImpl {
         return CMatterImpl(
             this.name,
@@ -29,7 +30,6 @@ data class CMatterImpl(
             amount = 1,
             this.mass,
             this.predicates,
-            this.persistentDataContainer
         )
     }
 }

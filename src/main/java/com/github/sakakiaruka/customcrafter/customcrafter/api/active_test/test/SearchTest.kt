@@ -1,11 +1,10 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.api.active_test.test
 
-import com.github.sakakiaruka.customcrafter.customcrafter.api.CustomCrafterAPI
+import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafterAPI
 import com.github.sakakiaruka.customcrafter.customcrafter.api.active_test.CAssert
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.matter.CMatter
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.recipe.CRecipe
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.CraftView
-import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.MappedRelation
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.matter.CMatterImpl
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.CRecipeImpl
 import com.github.sakakiaruka.customcrafter.customcrafter.api.`object`.recipe.CRecipeType
@@ -62,7 +61,7 @@ internal object SearchTest {
         setOf(0, 1, 2, 9, 11, 18, 19, 20).forEach { i ->
             gui.setItem(i, ItemStack(Material.COBBLESTONE))
         }
-        CustomCrafterAPI.RECIPES.add(recipe)
+        CustomCrafterAPI.TEST_RECIPES.add(recipe)
 
         val resultOfNatural = Search.search(
             UUID.randomUUID(),
@@ -104,7 +103,7 @@ internal object SearchTest {
         CAssert.assertTrue(invalidResult.vanilla() == null)
 
         //cleanup
-        CustomCrafterAPI.RECIPES.remove(recipe)
+        CustomCrafterAPI.TEST_RECIPES.remove(recipe)
     }
 
     private fun amorphousTest1() {
@@ -118,8 +117,7 @@ internal object SearchTest {
             setOf(Material.STONE),
             amount = 1,
             mass = false,
-            predicates = null,
-            persistentDataContainer = null
+            predicates = null
         )
 
         val recipe: CRecipe = CRecipeImpl(
@@ -135,7 +133,7 @@ internal object SearchTest {
             type = CRecipeType.AMORPHOUS
         )
 
-        CustomCrafterAPI.RECIPES.add(recipe)
+        CustomCrafterAPI.TEST_RECIPES.add(recipe)
 
         val gui = CustomCrafterAPI.getCraftingGUI()
         setOf(0, 1, 45, 46).forEach { i ->
@@ -159,7 +157,7 @@ internal object SearchTest {
         CAssert.assertTrue(returnedComponents.map { it.input }.toSet().size == 4)
 
         // clean up
-        CustomCrafterAPI.RECIPES.remove(recipe)
+        CustomCrafterAPI.TEST_RECIPES.remove(recipe)
     }
 
     private fun amorphousTest2() {
@@ -174,8 +172,7 @@ internal object SearchTest {
             setOf(Material.LAVA_BUCKET),
             amount = 1,
             mass = true,
-            predicates = null,
-            persistentDataContainer = null
+            predicates = null
         )
 
         val recipe: CRecipe = CRecipeImpl(
@@ -192,7 +189,7 @@ internal object SearchTest {
         val gui = CustomCrafterAPI.getCraftingGUI()
         gui.setItem(0, ItemStack(Material.SLIME_BALL, 10))
         gui.setItem(1, ItemStack(Material.LAVA_BUCKET))
-        CustomCrafterAPI.RECIPES.add(recipe)
+        CustomCrafterAPI.TEST_RECIPES.add(recipe)
         val result = Search.search(
             UUID.randomUUID(),
             CraftView.fromInventory(gui)!!,
@@ -205,7 +202,7 @@ internal object SearchTest {
         CAssert.assertTrue(result.customs().first().first == recipe)
 
         // cleanup
-        CustomCrafterAPI.RECIPES.remove(recipe)
+        CustomCrafterAPI.TEST_RECIPES.remove(recipe)
     }
 
     private fun vanillaTest() {

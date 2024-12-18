@@ -18,23 +18,35 @@ interface CMatter {
     val amount: Int
     val mass: Boolean
     val predicates: Set<CMatterPredicate>?
-    val persistentDataContainer: PersistentDataContainer?
 
-    fun hasPredicates(): Boolean = predicates != null
-    fun hasPDC(): Boolean = persistentDataContainer != null
+    /**
+     * returns this CMatter has some predicates or not.
+     *
+     * @return[Boolean] `predicates != null && predicates!!.isNotEmpty()`
+     */
+    fun hasPredicates(): Boolean = predicates != null && predicates!!.isNotEmpty()
 
+    /**
+     * returns a merged result of all predicates run.
+     *
+     * @return[Boolean] all or nothing.
+     */
     fun predicatesResult(
         self: ItemStack,
         mapped: Map<CoordinateComponent, ItemStack>,
         recipe: CRecipe,
         crafterID: UUID
     ): Boolean {
-        return if (predicates != null) {
-            if (hasPDC()) {
-                predicates!!.all { p -> p.predicate(self, mapped, persistentDataContainer!!, recipe, crafterID) }
-            } else false
-        } else false
+        return if (!predicates.isNullOrEmpty()) {
+            predicates!!.all { p -> p.predicate.invoke(self, mapped, recipe, crafterID) }
+        } else true
     }
+
+    /**
+     * returns a matter what is applied `amount = 1`.
+     *
+     * @return[CMatter] applied `amount = 1`
+     */
     fun asOne(): CMatter
 
 }

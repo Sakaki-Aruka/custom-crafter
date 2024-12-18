@@ -14,7 +14,6 @@ import org.bukkit.persistence.PersistentDataContainer
  * @param[amount] matter amount
  * @param[mass] this matter is mass or not
  * @param[predicates] if in checks, this matter requires to pass these all.
- * @param[persistentDataContainer] [PersistentDataContainer]
  * @param[storedEnchantComponents] enchant predicates for stored enchantments. set of [CEnchantComponent].
  */
 data class CEnchantmentStoreMatterImpl(
@@ -23,7 +22,6 @@ data class CEnchantmentStoreMatterImpl(
     override val amount: Int,
     override val mass: Boolean,
     override val predicates: Set<CMatterPredicate>?,
-    override val persistentDataContainer: PersistentDataContainer?,
     override val storedEnchantComponents: Set<CEnchantComponent>
 ): CMatter, CEnchantmentStoreMatter {
     override fun asOne(): CEnchantmentStoreMatterImpl {
@@ -33,7 +31,6 @@ data class CEnchantmentStoreMatterImpl(
             amount = 1,
             mass,
             predicates,
-            persistentDataContainer,
             storedEnchantComponents
         )
     }

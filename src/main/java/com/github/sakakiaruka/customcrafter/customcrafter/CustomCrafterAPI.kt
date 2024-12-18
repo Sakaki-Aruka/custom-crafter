@@ -1,6 +1,5 @@
-package com.github.sakakiaruka.customcrafter.customcrafter.api
+package com.github.sakakiaruka.customcrafter.customcrafter
 
-import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafter
 import com.github.sakakiaruka.customcrafter.customcrafter.api.active_test.test.APITest
 import com.github.sakakiaruka.customcrafter.customcrafter.api.active_test.test.ConverterTest
 import com.github.sakakiaruka.customcrafter.customcrafter.api.active_test.test.EnchantTest
@@ -33,7 +32,7 @@ object CustomCrafterAPI {
     val AUTHORS: Set<String> = setOf("Sakaki-Aruka")
 
     var RESULT_GIVE_CANCEL: Boolean = false
-    internal val RECIPES: MutableList<CRecipe> = mutableListOf()
+    internal val TEST_RECIPES: MutableList<CRecipe> = mutableListOf()
     var BASE_BLOCK: Material = Material.GOLD_BLOCK
 
     internal var BASE_BLOCK_SIDE: Int = 3
@@ -47,23 +46,35 @@ object CustomCrafterAPI {
         Bukkit.getPluginManager().registerEvents(InventoryCloseListener, instance)
         Bukkit.getPluginManager().registerEvents(PlayerInteractListener, instance)
 
-        if (IS_BETA) {
-            // run tests
-            object: BukkitRunnable() {
-                override fun run() {
-                    val startAt = System.currentTimeMillis()
-                    APITest.run()
-                    ConverterTest.run()
-                    EnchantTest.run()
-                    VanillaSearchTest.run()
-                    PotionTest.run()
-                    SearchTest.run()
-                    val endAt = System.currentTimeMillis()
-                    CustomCrafter.getInstance().logger.info("tested in ${endAt - startAt} ms")
-                }
-            }.runTaskAsynchronously(CustomCrafter.getInstance())
-        }
+//        if (IS_BETA) {
+//            // run tests
+//            object: BukkitRunnable() {
+//                override fun run() {
+//                    val startAt = System.currentTimeMillis()
+//                    APITest.run()
+//                    ConverterTest.run()
+//                    EnchantTest.run()
+//                    VanillaSearchTest.run()
+//                    PotionTest.run()
+//                    try {
+//                        SearchTest.run()
+//                    } catch (e: Exception){}
+//                    val endAt = System.currentTimeMillis()
+//                    CustomCrafter.getInstance().logger.info("tested in ${endAt - startAt} ms")
+//
+//                }
+//            }.runTaskAsynchronously(CustomCrafter.getInstance())
+//        }
     }
+
+    /**
+     * returns an IMMUTABLE list what contains all registered recipes.
+     *
+     * NOTICE: it is immutable, so you cannot modify its components.
+     *
+     * @return[List]<[CRecipe]> recipes list
+     */
+    fun getRecipes(): List<CRecipe> = CustomCrafter.RECIPES.toList()
 
     /**
      * returns random generated coordinates.
@@ -84,7 +95,9 @@ object CustomCrafterAPI {
 
     /**
      * registers a provided recipe and calls [RegisterCustomRecipeEvent].
+     *
      * if a called event is cancelled, always fail to register recipe.
+     *
      * in normally, a result of `RECIPES.add(recipe)`.
      *
      * @param[recipe] a recipe what you want to register.
@@ -93,12 +106,15 @@ object CustomCrafterAPI {
         val event = RegisterCustomRecipeEvent(recipe)
         Bukkit.getPluginManager().callEvent(event)
         if (event.isCancelled) return false
-        return RECIPES.add(recipe)
+
+        return CustomCrafter.RECIPES.add(recipe)
     }
 
     /**
      * unregisters a provided recipe and calls [UnregisterCustomRecipeEvent].
+     *
      * if a called event is cancelled, always fail to unregister recipe.
+     *
      * in normally, a result of `RECIPES.remove(recipe)`
      *
      * @param[recipe] a recipe what you want to unregister.
@@ -107,11 +123,12 @@ object CustomCrafterAPI {
         val event = UnregisterCustomRecipeEvent(recipe)
         Bukkit.getPluginManager().callEvent(event)
         if (event.isCancelled) return false
-        return RECIPES.remove(recipe)
+        return CustomCrafter.RECIPES.remove(recipe)
     }
 
     /**
      * set base block's side size.
+     *
      * default size = 3.
      *
      * @param[size] this argument must be odd and more than zero.
@@ -132,15 +149,16 @@ object CustomCrafterAPI {
 
     /**
      * provides elements of custom crafter's gui component
+     *
      * returned Triple contained below elements.
-     * first([NamespacedKey]): "custom_crafter:gui_created"
-     * second([PersistentDataType.LONG]): a type of 'third'
-     * third([Long]): epoch time when called this.
+     * - first([NamespacedKey]): "custom_crafter:gui_created"
+     * - second([PersistentDataType.LONG]): a type of 'third'
+     * - third([Long]): epoch time when called this.
      *
      * @return[Triple]
      */
     fun genCCKey() = Triple(
-        NamespacedKey(CustomCrafter.getInstance(), "gui_created"),
+        NamespacedKey("custom_crafter", "gui_created"),
         PersistentDataType.LONG,
         System.currentTimeMillis()
     )
@@ -170,6 +188,7 @@ object CustomCrafterAPI {
             gui.setItem(index, ItemStack.empty())
         }
         gui.setItem(CRAFTING_TABLE_MAKE_BUTTON_SLOT, makeButton)
+        gui.setItem(CRAFTING_TABLE_RESULT_SLOT, ItemStack.empty())
         return gui
     }
 
@@ -190,6 +209,7 @@ object CustomCrafterAPI {
 
     /**
      * returns the provided inventory is OLDER than custom crafter reloaded or enabled or not.
+     *
      * if you provide an inventory what is not a custom crafter gui, this throws an Exception.
      *
      * @param[inventory] provided inventory

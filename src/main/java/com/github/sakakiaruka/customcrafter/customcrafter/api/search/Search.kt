@@ -1,6 +1,6 @@
 package com.github.sakakiaruka.customcrafter.customcrafter.api.search
 
-import com.github.sakakiaruka.customcrafter.customcrafter.api.CustomCrafterAPI
+import com.github.sakakiaruka.customcrafter.customcrafter.CustomCrafterAPI
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.matter.CEnchantMatter
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.matter.CEnchantmentStoreMatter
 import com.github.sakakiaruka.customcrafter.customcrafter.api.interfaces.matter.CMatter
@@ -44,6 +44,7 @@ object Search {
     ) {
         /**
          * returns a nullable vanilla recipe.
+         *
          * When below situations, [vanilla] is null.
          * - If [customs] is not empty and a search query's 'natural' is true.
          * - If an input is not matched all registered vanilla recipes.
@@ -71,6 +72,7 @@ object Search {
 
     /**
      * search main method.
+     *
      * this is more recommended than [search] (use List<ItemStack>).
      *
      * @param[crafterID] a crafter's UUID
@@ -89,8 +91,10 @@ object Search {
 
     /**
      * 6x6 crafting items.
+     *
      * zero origin & do not skip empty slots (do padding = use ItemStack#empty())
-     * A search-result is not guaranteed what is not empty.
+     *
+     *  A search-result is not guaranteed what is not empty.
      *
      * @param[player] A craft-request sender.
      * @param[items] Materials of crafting. this size must equal 36(6*6).
@@ -124,7 +128,7 @@ object Search {
         val mapped: Map<CoordinateComponent, ItemStack> = Converter.standardInputMapping(inventory)
             .takeIf { it?.isNotEmpty() == true } ?: return null
 
-        val customs: List<Pair<CRecipe, MappedRelation>> = CustomCrafterAPI.RECIPES
+        val customs: List<Pair<CRecipe, MappedRelation>> = CustomCrafterAPI.getRecipes()
             .filter { it.items.size == mapped.size }
             .map { recipe ->
                 val relation: MappedRelation? =
@@ -166,8 +170,7 @@ object Search {
         val basic: Boolean =
             if (fromAmorphous) allCandidateContains(mapped, recipe)
             else {
-                squareSize(mapped.keys) == squareSize(recipe.items.keys)
-                        && sameShape(mapped.keys, recipe)
+                sameShape(mapped.keys, recipe)
                         && allCandidateContains(mapped, recipe)
             }
 
@@ -179,11 +182,7 @@ object Search {
             val inOne: ItemStack = i.asOne()
             val recipeOne: CMatter = m.asOne()
 
-            recipeOne.persistentDataContainer?.let {
-                if (!recipeOne.predicatesResult(i, mapped, recipe, crafterID)) {
-                    return false
-                }
-            }
+            if (!recipeOne.predicatesResult(i, mapped, recipe, crafterID)) return false
 
             if (recipeOne is CEnchantMatter) {
                 if (!Enchant.enchant(inOne, recipeOne)) return false
@@ -375,7 +374,6 @@ object Search {
                 }
                 val replaced: CRecipe = cRecipe.replaceItems(newItems)
                 normal(mapped, replaced, crafterID, fromAmorphous = true)
-//                normal(mapped, replaced)
             }
         //return solutions
     }
