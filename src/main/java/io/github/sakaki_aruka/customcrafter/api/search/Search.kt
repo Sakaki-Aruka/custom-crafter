@@ -137,12 +137,8 @@ object Search {
                             if (normal(mapped, recipe, crafterID)) {
                                 val components: Set<MappedRelationComponent> =
                                     recipe.items.keys.zip(mapped.keys)
-                                        .map {
-                                            MappedRelationComponent(
-                                                it.first,
-                                                it.second
-                                            )
-                                        }.toSet()
+                                        .map { MappedRelationComponent(it.first, it.second) }
+                                        .toSet()
                                 MappedRelation(components)
                             }
                             else null
@@ -312,12 +308,7 @@ object Search {
             ?.let { r ->
                 val components: MutableSet<MappedRelationComponent> = mutableSetOf()
                 confirmed.forEach { (recipe, input) ->
-                    components.add(
-                        MappedRelationComponent(
-                            recipe,
-                            input
-                        )
-                    )
+                    components.add(MappedRelationComponent(recipe, input))
                 }
                 r.components.forEach { c -> components.add(c) }
                 MappedRelation(components)
