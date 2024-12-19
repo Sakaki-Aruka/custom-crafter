@@ -135,10 +135,10 @@ object Search {
                     when (recipe.type) {
                         CRecipeType.NORMAL -> {
                             if (normal(mapped, recipe, crafterID)) {
-                                val components: Set<io.github.sakaki_aruka.customcrafter.api.`object`.MappedRelationComponent> =
+                                val components: Set<MappedRelationComponent> =
                                     recipe.items.keys.zip(mapped.keys)
                                         .map {
-                                            io.github.sakaki_aruka.customcrafter.api.`object`.MappedRelationComponent(
+                                            MappedRelationComponent(
                                                 it.first,
                                                 it.second
                                             )
@@ -310,10 +310,10 @@ object Search {
         return solveCSP(filters, mapped, recipe, crafterID)
             .firstOrNull()
             ?.let { r ->
-                val components: MutableSet<io.github.sakaki_aruka.customcrafter.api.`object`.MappedRelationComponent> = mutableSetOf()
+                val components: MutableSet<MappedRelationComponent> = mutableSetOf()
                 confirmed.forEach { (recipe, input) ->
                     components.add(
-                        io.github.sakaki_aruka.customcrafter.api.`object`.MappedRelationComponent(
+                        MappedRelationComponent(
                             recipe,
                             input
                         )
@@ -360,11 +360,11 @@ object Search {
 
         return solutions
             .map { map ->
-            val components: MutableSet<io.github.sakaki_aruka.customcrafter.api.`object`.MappedRelationComponent> = mutableSetOf()
+            val components: MutableSet<MappedRelationComponent> = mutableSetOf()
             val temporalInventory: Inventory = Bukkit.createInventory(null, 54)
             val newItems: MutableMap<CoordinateComponent, CMatter> = mutableMapOf()
             map.entries.forEach { (recipe, input) ->
-                components.add(io.github.sakaki_aruka.customcrafter.api.`object`.MappedRelationComponent(recipe, input))
+                components.add(MappedRelationComponent(recipe, input))
                 val inputIndex: Int = input.x + input.y * 9
                 temporalInventory.setItem(inputIndex, mapped[input])
                 newItems[input] = cRecipe.items[recipe]!!

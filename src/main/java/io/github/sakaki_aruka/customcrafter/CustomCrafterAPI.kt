@@ -41,7 +41,7 @@ object CustomCrafterAPI {
     const val CRAFTING_TABLE_TOTAL_SIZE: Int = 54
 
     internal fun setup() {
-        val instance: io.github.sakaki_aruka.customcrafter.CustomCrafter = io.github.sakaki_aruka.customcrafter.CustomCrafter.getInstance()
+        val instance: CustomCrafter = CustomCrafter.getInstance()
         Bukkit.getPluginManager().registerEvents(InventoryClickListener, instance)
         Bukkit.getPluginManager().registerEvents(InventoryCloseListener, instance)
         Bukkit.getPluginManager().registerEvents(PlayerInteractListener, instance)
@@ -107,7 +107,7 @@ object CustomCrafterAPI {
         Bukkit.getPluginManager().callEvent(event)
         if (event.isCancelled) return false
 
-        return io.github.sakaki_aruka.customcrafter.CustomCrafter.RECIPES.add(recipe)
+        return CustomCrafter.RECIPES.add(recipe)
     }
 
     /**
@@ -123,7 +123,7 @@ object CustomCrafterAPI {
         val event = UnregisterCustomRecipeEvent(recipe)
         Bukkit.getPluginManager().callEvent(event)
         if (event.isCancelled) return false
-        return io.github.sakaki_aruka.customcrafter.CustomCrafter.RECIPES.remove(recipe)
+        return CustomCrafter.RECIPES.remove(recipe)
     }
 
     /**
@@ -223,6 +223,6 @@ object CustomCrafterAPI {
         val key = genCCKey()
         val time: Long = button.itemMeta.persistentDataContainer.get(key.first, key.second)
             ?: throw IllegalStateException("'time' not found. (Internal Error)")
-        return time < io.github.sakaki_aruka.customcrafter.CustomCrafter.INITIALIZED
+        return time < CustomCrafter.INITIALIZED
     }
 }
