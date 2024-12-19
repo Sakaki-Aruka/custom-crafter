@@ -104,7 +104,7 @@ internal object PotionTest {
         }
 
         fun potionContainedRecipe(items: Map<CoordinateComponent, CMatter>): CRecipe {
-            return io.github.sakaki_aruka.customcrafter.api.`object`.recipe.CRecipeImpl(
+            return CRecipeImpl(
                 "potionTestRecipe",
                 items,
                 null, null, CRecipeType.AMORPHOUS

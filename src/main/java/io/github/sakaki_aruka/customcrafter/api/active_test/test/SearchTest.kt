@@ -51,7 +51,7 @@ internal object SearchTest {
             mapped[c] = matter
         }
 
-        val recipe: CRecipe = io.github.sakaki_aruka.customcrafter.api.`object`.recipe.CRecipeImpl(
+        val recipe: CRecipe = CRecipeImpl(
             "testRecipe",
             mapped,
             type = CRecipeType.NORMAL
@@ -120,7 +120,7 @@ internal object SearchTest {
             predicates = null
         )
 
-        val recipe: CRecipe = io.github.sakaki_aruka.customcrafter.api.`object`.recipe.CRecipeImpl(
+        val recipe: CRecipe = CRecipeImpl(
             "testRecipe",
             mapOf(
                 Pair(CoordinateComponent(0, 0), matter),
@@ -175,7 +175,7 @@ internal object SearchTest {
             predicates = null
         )
 
-        val recipe: CRecipe = io.github.sakaki_aruka.customcrafter.api.`object`.recipe.CRecipeImpl(
+        val recipe: CRecipe = CRecipeImpl(
             "testRecipe",
             mapOf(
                 Pair(CoordinateComponent(0, 0), slimeBall),

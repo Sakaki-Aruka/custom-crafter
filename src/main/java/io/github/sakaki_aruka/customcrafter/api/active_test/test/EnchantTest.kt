@@ -149,7 +149,7 @@ internal object EnchantTest {
         }
 
         fun enchantedRecipe(items: Map<CoordinateComponent, CMatter>): CRecipe {
-            return io.github.sakaki_aruka.customcrafter.api.`object`.recipe.CRecipeImpl(
+            return CRecipeImpl(
                 "testRecipe",
                 items,
                 containers = null, results = null,
