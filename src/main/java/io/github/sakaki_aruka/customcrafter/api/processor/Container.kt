@@ -3,7 +3,6 @@ package io.github.sakaki_aruka.customcrafter.api.processor
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.`object`.internal.AmorphousFilterCandidate
 import io.github.sakaki_aruka.customcrafter.api.`object`.recipe.CoordinateComponent
-import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import java.util.UUID
 

@@ -2,7 +2,6 @@ package io.github.sakaki_aruka.customcrafter.api.`object`.matter
 
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import org.bukkit.Material
-import org.bukkit.persistence.PersistentDataContainer
 
 /**
  * A default [CMatter] implemented class.
@@ -31,5 +30,21 @@ data class CMatterImpl(
             this.mass,
             this.predicates,
         )
+    }
+
+    companion object {
+        /**
+         * returns single candidate [CMatterImpl].
+         *
+         * its name is [material]'s name. `material.name`.
+         *
+         * @param[material] a candidate of this matter.
+         */
+        fun single(material: Material): CMatter {
+            return CMatterImpl(
+                name = material.name,
+                candidate = setOf(material)
+            )
+        }
     }
 }

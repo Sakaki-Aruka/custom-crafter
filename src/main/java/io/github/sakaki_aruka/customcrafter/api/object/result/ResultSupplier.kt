@@ -29,10 +29,25 @@ data class ResultSupplier (
 
     val func: Function4<UUID, MappedRelation, Map<CoordinateComponent, ItemStack>, MutableList<ItemStack>, List<ItemStack>>
 ) {
-        operator fun invoke(
-            crafterID: UUID,
-            relation: MappedRelation,
-            mapped: Map<CoordinateComponent, ItemStack>,
-            list: MutableList<ItemStack>
-        ): List<ItemStack> = func(crafterID, relation, mapped, list)
+    operator fun invoke(
+        crafterID: UUID,
+        relation: MappedRelation,
+        mapped: Map<CoordinateComponent, ItemStack>,
+        list: MutableList<ItemStack>
+    ): List<ItemStack> = func(crafterID, relation, mapped, list)
+
+    companion object {
+        /**
+         * return single item lambda.
+         *
+         * ```
+         * return ResultSupplier { _, _, _, _ -> listOf(item) }
+         * ```
+         *
+         * @param[item] a supplied item
+         */
+        fun single(item: ItemStack): ResultSupplier {
+            return ResultSupplier { _, _, _, _ -> listOf(item) }
+        }
+    }
 }
