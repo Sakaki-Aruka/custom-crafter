@@ -50,6 +50,17 @@ data class CRecipeContainer(
             mapped: Map<CoordinateComponent, ItemStack>,
             list: MutableList<ItemStack>
         ): Boolean = func(crafterID, relate, mapped, list)
+
+        companion object {
+            /**
+             * this predicate is always true.
+             *
+             * ```
+             * val True: Predicate = Predicate { _, _, _, _ -> true }
+             * ```
+             */
+            val True: Predicate = Predicate { _, _, _, _ -> true }
+        }
     }
 
     /**
