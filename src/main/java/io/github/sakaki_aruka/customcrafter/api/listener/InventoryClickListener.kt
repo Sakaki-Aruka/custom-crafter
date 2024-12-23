@@ -100,15 +100,17 @@ object InventoryClickListener: Listener {
             // custom recipe
             val (recipe, relate) = result.customs().first()
             if (getMinAmountWithoutMass(relate, recipe, mapped) <= 0) return
+            var amount = 1
             recipe.items.forEach { (c, m) ->
                 val inputCoordinate = relate.components.find { it.recipe == c }?.input ?: return
                 val min: Int = getMinAmountWithoutMass(relate, recipe, mapped)
-                val amount: Int = if (m.mass) 1 else m.amount * (if (mass) min else 1)
+                amount = if (m.mass) 1 else (m.amount * (if (mass) min else 1))
+
                 val slot: Int = inputCoordinate.x + inputCoordinate.y * 9
                 decrement(gui, slot, amount)
             }
 
-            recipe.getResults(player.uniqueId, relate, mapped)
+            recipe.getResults(player.uniqueId, relate, mapped, mass, amount)
                 .takeIf { it.isNotEmpty() }
                 ?.let { itemList ->
                     recipe.runContainers(player.uniqueId, relate, mapped, itemList)

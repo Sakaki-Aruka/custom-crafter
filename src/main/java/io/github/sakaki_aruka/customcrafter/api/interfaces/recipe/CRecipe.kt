@@ -57,12 +57,14 @@ interface CRecipe {
     fun getResults(
         crafterID: UUID,
         relate: MappedRelation,
-        mapped: Map<CoordinateComponent, ItemStack>
+        mapped: Map<CoordinateComponent, ItemStack>,
+        shiftClicked: Boolean,
+        calledTimes: Int
     ): MutableList<ItemStack> {
         return results?.let { suppliers ->
             val list: MutableList<ItemStack> = mutableListOf()
             suppliers.map { s ->
-                list.addAll(s.func.invoke(crafterID, relate, mapped, list))
+                list.addAll(s.func.invoke(crafterID, relate, mapped, list, shiftClicked, calledTimes))
             }
             list
         } ?: mutableListOf()
