@@ -53,7 +53,7 @@ Maven
    <dependency>
       <groupId>com.github.Sakaki-Aruka</groupId>
       <artifactId>custom-crafter</artifactId>
-      <version>5.0.3</version>
+      <version>5.0.4</version>
    </dependency>
    
    <dependency>
@@ -81,7 +81,7 @@ dependencyResolutionManagement {
 (dependency)
 ```groovy
 dependencies {
-        implementation 'com.github.Sakaki-Aruka:custom-crafter:5.0.3'
+        implementation 'com.github.Sakaki-Aruka:custom-crafter:5.0.4'
         compileOnly 'org.jetbrains.kotlin:kotlin-stdlib:${kotlin.version}'
 }
 ```
