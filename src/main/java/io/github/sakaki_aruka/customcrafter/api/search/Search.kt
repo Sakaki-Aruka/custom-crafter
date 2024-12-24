@@ -7,7 +7,7 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CPotionMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.`object`.CraftView
-import io.github.sakaki_aruka.customcrafter.api.`object`.internal.AmorphousFilterCandidate
+import io.github.sakaki_aruka.customcrafter.api.`object`.AmorphousFilterCandidate
 import io.github.sakaki_aruka.customcrafter.api.`object`.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.`object`.MappedRelationComponent
 import io.github.sakaki_aruka.customcrafter.api.`object`.recipe.CRecipeType

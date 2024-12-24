@@ -1,9 +1,8 @@
 package io.github.sakaki_aruka.customcrafter.api.processor
 
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CPotionMatter
-import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CPermissibleRecipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
-import io.github.sakaki_aruka.customcrafter.api.`object`.internal.AmorphousFilterCandidate
+import io.github.sakaki_aruka.customcrafter.api.`object`.AmorphousFilterCandidate
 import io.github.sakaki_aruka.customcrafter.api.`object`.matter.potion.CPotionComponent
 import io.github.sakaki_aruka.customcrafter.api.`object`.recipe.CoordinateComponent
 import org.bukkit.inventory.ItemStack
