@@ -106,7 +106,7 @@ internal object PotionTest {
             return CRecipeImpl(
                 "potionTestRecipe",
                 items,
-                null, null, CRecipeType.AMORPHOUS
+                null, null, type = CRecipeType.AMORPHOUS
             )
         }
 

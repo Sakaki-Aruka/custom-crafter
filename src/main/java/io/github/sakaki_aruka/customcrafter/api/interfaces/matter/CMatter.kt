@@ -4,9 +4,7 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.`object`.matter.CMatterPredicate
 import io.github.sakaki_aruka.customcrafter.api.`object`.recipe.CoordinateComponent
 import org.bukkit.Material
-import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import org.bukkit.persistence.PersistentDataContainer
 import java.util.UUID
 
 /**
