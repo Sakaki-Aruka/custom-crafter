@@ -1,21 +1,16 @@
 package io.github.sakaki_aruka.customcrafter.api.search
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
-import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CEnchantMatter
-import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CEnchantmentStoreMatter
+import io.github.sakaki_aruka.customcrafter.api.interfaces.filter.CRecipeFilter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
-import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CPotionMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.`object`.CraftView
-import io.github.sakaki_aruka.customcrafter.api.`object`.internal.AmorphousFilterCandidate
+import io.github.sakaki_aruka.customcrafter.api.`object`.AmorphousFilterCandidate
 import io.github.sakaki_aruka.customcrafter.api.`object`.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.`object`.MappedRelationComponent
 import io.github.sakaki_aruka.customcrafter.api.`object`.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.`object`.recipe.CoordinateComponent
-import io.github.sakaki_aruka.customcrafter.api.processor.Container
 import io.github.sakaki_aruka.customcrafter.api.processor.Converter
-import io.github.sakaki_aruka.customcrafter.api.processor.Enchant
-import io.github.sakaki_aruka.customcrafter.api.processor.Potion
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.World
@@ -23,8 +18,6 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.Recipe
-import org.bukkit.inventory.meta.EnchantmentStorageMeta
-import org.bukkit.inventory.meta.PotionMeta
 import java.util.UUID
 import kotlin.math.abs
 import kotlin.math.max
@@ -185,19 +178,20 @@ object Search {
 
             if (!recipeOne.predicatesResult(i, mapped, recipe, crafterID)) return false
 
-            if (recipeOne is CEnchantMatter) {
-                if (!Enchant.enchant(inOne, recipeOne)) return false
-            }
-
-            if (recipeOne is CEnchantmentStoreMatter && inOne.itemMeta is EnchantmentStorageMeta) {
-                if (!Enchant.enchantStored(inOne, recipeOne)) return false
-            }
-
-            if (recipeOne is CPotionMatter && inOne.itemMeta is PotionMeta) {
-                if (!Potion.potion(inOne, recipeOne)) return false
+            recipe.filters?.forEach { filter ->
+                if (!applyNormalFilters(inOne, recipeOne, filter)) return false
             }
         }
         return basic
+    }
+
+    private inline fun <reified T: CMatter> applyNormalFilters(
+        item: ItemStack,
+        matter: T,
+        filter: CRecipeFilter<T>
+    ): Boolean {
+        if (!filter.metaTypeCheck(item.itemMeta)) return false
+        return filter.normal(item, matter)
     }
 
     private fun candidateAmorphous(
@@ -248,26 +242,40 @@ object Search {
         recipe: CRecipe,
         crafterID: UUID
     ): MappedRelation? {
-        val filterCandidates: List<(Pair<AmorphousFilterCandidate.Type, List<AmorphousFilterCandidate>>)> = listOf(
-            candidateAmorphous(mapped, recipe), // candidates
-            Container.amorphous(mapped, recipe, crafterID), // containers
-            Enchant.amorphous(mapped, recipe), // enchants
-            Enchant.storesAmorphous(mapped, recipe), // enchantStores
-            Potion.amorphous(mapped, recipe)// potions
-        ).filter { (type, _) ->
-            type != AmorphousFilterCandidate.Type.NOT_REQUIRED
+        val filterResults: MutableList<Pair<AmorphousFilterCandidate.Type, List<AmorphousFilterCandidate>>> = mutableListOf(
+            candidateAmorphous(mapped, recipe)
+        )
+
+        recipe.filters?.let { set ->
+            set.map { filter ->
+                filter.amorphous(mapped, recipe)
+            }.filter { filterResult ->
+                filterResult.first != AmorphousFilterCandidate.Type.NOT_REQUIRED
+            }.forEach { filterResult ->
+                filterResults.add(filterResult)
+            }
         }
 
-        if (filterCandidates.any { pair -> pair.first == AmorphousFilterCandidate.Type.NOT_ENOUGH }) return null//return false
+//        val filterCandidates: List<(Pair<AmorphousFilterCandidate.Type, List<AmorphousFilterCandidate>>)> = listOf(
+//            candidateAmorphous(mapped, recipe), // candidates
+//            Container.amorphous(mapped, recipe, crafterID), // containers
+//            Enchant.amorphous(mapped, recipe), // enchants
+//            Enchant.storesAmorphous(mapped, recipe), // enchantStores
+//            Potion.amorphous(mapped, recipe)// potions
+//        ).filter { (type, _) ->
+//            type != AmorphousFilterCandidate.Type.NOT_REQUIRED
+//        }
 
-        val targets: Set<CoordinateComponent> = filterCandidates
+        if (filterResults.any { pair -> pair.first == AmorphousFilterCandidate.Type.NOT_ENOUGH }) return null//return false
+
+        val targets: Set<CoordinateComponent> = filterResults
             .map { e -> e.second.map { afc -> afc.coordinate } }
             .flatten()
             .toSet()
 
         val limits: MutableMap<CoordinateComponent, Int> = mutableMapOf()
         for (coordinate: CoordinateComponent in targets) {
-            filterCandidates
+            filterResults
                 .filter { it.first != AmorphousFilterCandidate.Type.NOT_REQUIRED }
                 .let { pairs ->
                     limits[coordinate] = pairs.count { p -> p.second.any { f -> f.coordinate == coordinate } }
@@ -277,7 +285,7 @@ object Search {
         val filters: MutableSet<AmorphousFilterCandidate> = mutableSetOf()
         for (coordinate: CoordinateComponent in targets) {
             val list: MutableList<List<CoordinateComponent>> = mutableListOf()
-            filterCandidates
+            filterResults
                 .filter { it.first == AmorphousFilterCandidate.Type.SUCCESSFUL }
                 .map { it.second } // List<List<AFC>>
                 .forEach { l -> // List<AFC>

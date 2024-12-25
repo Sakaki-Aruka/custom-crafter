@@ -20,25 +20,3 @@ data class CMatterPredicate(
         crafterID: UUID
     ): Boolean = predicate(self, mapped, recipe, crafterID)
 }
-
-//data class CMatterPredicate private constructor(
-//    val predicate: MatterPredicateFunc
-//){
-//    fun interface MatterPredicateFunc {
-//        fun invoke(
-//            self: ItemStack,
-//            mapped: Map<CoordinateComponent, ItemStack>,
-//            recipe: CRecipe,
-//            crafterID: UUID
-//        ): Boolean
-//    }
-//
-//    companion object {
-//        fun of(func: (self: ItemStack,
-//                      mapped: Map<CoordinateComponent, ItemStack>,
-//                      recipe: CRecipe,
-//                      crafterID: UUID) -> Boolean): CMatterPredicate {
-//            return CMatterPredicate(MatterPredicateFunc(func))
-//        }
-//    }
-//}

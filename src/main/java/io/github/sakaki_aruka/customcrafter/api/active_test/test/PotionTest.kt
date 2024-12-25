@@ -4,8 +4,7 @@ import io.github.sakaki_aruka.customcrafter.api.active_test.CAssert
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CPotionMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
-import io.github.sakaki_aruka.customcrafter.api.`object`.internal.AmorphousFilterCandidate
-import io.github.sakaki_aruka.customcrafter.api.`object`.matter.enchant.CEnchantComponent
+import io.github.sakaki_aruka.customcrafter.api.`object`.AmorphousFilterCandidate
 import io.github.sakaki_aruka.customcrafter.api.`object`.matter.potion.CPotionComponent
 import io.github.sakaki_aruka.customcrafter.api.`object`.matter.potion.CPotionMatterImpl
 import io.github.sakaki_aruka.customcrafter.api.`object`.recipe.CRecipeImpl
@@ -107,7 +106,7 @@ internal object PotionTest {
             return CRecipeImpl(
                 "potionTestRecipe",
                 items,
-                null, null, CRecipeType.AMORPHOUS
+                null, null, type = CRecipeType.AMORPHOUS
             )
         }
 

@@ -1,5 +1,6 @@
 package io.github.sakaki_aruka.customcrafter.api.interfaces.recipe
 
+import io.github.sakaki_aruka.customcrafter.api.interfaces.filter.CRecipeFilter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.`object`.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.`object`.recipe.CRecipeContainer
@@ -17,8 +18,8 @@ interface CRecipe {
     val items: Map<CoordinateComponent, CMatter>
     val containers: List<CRecipeContainer>?
     val results: List<ResultSupplier>?
+    val filters: Set<CRecipeFilter<CMatter>>?
     val type: CRecipeType
-
     /**
      * replace [items]
      *

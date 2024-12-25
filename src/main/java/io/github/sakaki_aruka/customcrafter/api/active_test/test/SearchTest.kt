@@ -183,7 +183,7 @@ internal object SearchTest {
             ),
             containers = null,
             results = null,
-            CRecipeType.AMORPHOUS
+            type = CRecipeType.AMORPHOUS
         )
 
         val gui = CustomCrafterAPI.getCraftingGUI()
