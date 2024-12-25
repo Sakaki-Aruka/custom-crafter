@@ -13,11 +13,7 @@ data class CRecipeImpl(
     override val items: Map<CoordinateComponent, CMatter>,
     override val containers: List<CRecipeContainer>? = null,
     override val results: List<ResultSupplier>? = null,
-    override val filters: Set<CRecipeFilter<CMatter>>? = setOf(
-        EnchantFilter,
-        EnchantStorageFilter,
-        PotionFilter
-    ),
+    override val filters: Set<CRecipeFilter<CMatter>>? = getDefaultFilters(),
     override val type: CRecipeType,
 ): CRecipe {
     /**
@@ -32,5 +28,20 @@ data class CRecipeImpl(
             this.filters,
             this.type
         )
+    }
+
+    companion object {
+        /**
+         * returns default candidate filter what are used in search.
+         *
+         * @return[[Set]<[CRecipeFilter]>] a set of default filters
+         */
+        fun getDefaultFilters(): Set<CRecipeFilter<CMatter>> {
+            return setOf(
+                EnchantFilter,
+                EnchantStorageFilter,
+                PotionFilter
+            )
+        }
     }
 }

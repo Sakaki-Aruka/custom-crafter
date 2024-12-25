@@ -11,6 +11,9 @@ import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.inventory.meta.PotionMeta
 import org.bukkit.potion.PotionEffect
 
+/**
+ * @suppress
+ */
 internal object PotionFilter: CRecipeFilter<CPotionMatter> {
     override fun metaTypeCheck(meta: ItemMeta): Boolean {
         return meta is PotionMeta
