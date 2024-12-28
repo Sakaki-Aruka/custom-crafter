@@ -133,8 +133,9 @@ object Search {
                                         .map { MappedRelationComponent(it.first, it.second) }
                                         .toSet()
                                 MappedRelation(components)
+                            } else {
+                                null
                             }
-                            else null
                         }
                         CRecipeType.AMORPHOUS -> amorphous(mapped, recipe, crafterID)
                     }
@@ -176,10 +177,26 @@ object Search {
             val inOne: ItemStack = i.asOne()
             val recipeOne: CMatter = m.asOne()
 
-            if (!recipeOne.predicatesResult(i, mapped, recipe, crafterID)) return false
-
-            recipe.filters?.forEach { filter ->
-                if (!applyNormalFilters(inOne, recipeOne, filter)) return false
+            if (!recipeOne.predicatesResult(inOne, mapped, recipe, crafterID)) return false
+            recipe.filters?.let { set ->
+                for (filter in set) {
+                    try {
+                        val (type, result) = applyNormalFilters(inOne, recipeOne, filter)
+                        return when (type) {
+                            CRecipeFilter.ResultType.NOT_REQUIRED -> continue
+                            CRecipeFilter.ResultType.FAILED -> false
+                            CRecipeFilter.ResultType.SUCCESS -> {
+                                if (result) continue
+                                else false
+                            }
+                        }
+                    } catch (e: ClassCastException) {
+                        continue
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        return false
+                    }
+                }
             }
         }
         return basic
@@ -189,8 +206,7 @@ object Search {
         item: ItemStack,
         matter: T,
         filter: CRecipeFilter<T>
-    ): Boolean {
-        if (!filter.metaTypeCheck(item.itemMeta)) return false
+    ): Pair<CRecipeFilter.ResultType, Boolean> {
         return filter.normal(item, matter)
     }
 
@@ -248,12 +264,25 @@ object Search {
 
         recipe.filters?.let { set ->
             set.map { filter ->
+
+                //debug
+                println("filter=${filter.javaClass.name}")
+
                 filter.amorphous(mapped, recipe)
             }.filter { filterResult ->
+
+                //debug
+                println("type=${filterResult.first}, result=${filterResult.second}")
+
                 filterResult.first != AmorphousFilterCandidate.Type.NOT_REQUIRED
             }.forEach { filterResult ->
                 filterResults.add(filterResult)
             }
+        }
+
+        //debug
+        filterResults.forEach { (_, r) ->
+            println("filter=$r")
         }
 
 //        val filterCandidates: List<(Pair<AmorphousFilterCandidate.Type, List<AmorphousFilterCandidate>>)> = listOf(
@@ -359,17 +388,17 @@ object Search {
 
         return solutions
             .map { map ->
-            val components: MutableSet<MappedRelationComponent> = mutableSetOf()
-            val temporalInventory: Inventory = Bukkit.createInventory(null, 54)
-            val newItems: MutableMap<CoordinateComponent, CMatter> = mutableMapOf()
-            map.entries.forEach { (recipe, input) ->
-                components.add(MappedRelationComponent(recipe, input))
-                val inputIndex: Int = input.x + input.y * 9
-                temporalInventory.setItem(inputIndex, mapped[input])
-                newItems[input] = cRecipe.items[recipe]!!
-            }
+                val components: MutableSet<MappedRelationComponent> = mutableSetOf()
+                val temporalInventory: Inventory = Bukkit.createInventory(null, 54)
+                val newItems: MutableMap<CoordinateComponent, CMatter> = mutableMapOf()
+                map.entries.forEach { (recipe, input) ->
+                    components.add(MappedRelationComponent(recipe, input))
+                    val inputIndex: Int = input.x + input.y * 9
+                    temporalInventory.setItem(inputIndex, mapped[input])
+                    newItems[input] = cRecipe.items[recipe]!!
+                }
 
-            MappedRelation(components)
+                MappedRelation(components)
             }
             .filter { r ->
                 val newItems: MutableMap<CoordinateComponent, CMatter> = mutableMapOf()
@@ -382,7 +411,17 @@ object Search {
                     temporaryInventory.setItem(index, mapped[c])
                 }
                 val replaced: CRecipe = cRecipe.replaceItems(newItems)
-                normal(mapped, replaced, crafterID, fromAmorphous = true)
+
+                //debug
+                val temporaryMapped: MutableMap<CoordinateComponent, ItemStack> = mutableMapOf()
+                Converter.getAvailableCraftingSlotComponents().filter { i ->
+                    val item: ItemStack? = temporaryInventory.getItem(i.toIndex())
+                    item != null && item.type != Material.AIR
+                }.forEach { c ->
+                    temporaryMapped[c] = temporaryInventory.getItem(c.toIndex())!!
+                }
+
+                normal(temporaryMapped, replaced, crafterID, fromAmorphous = true)
             }
         //return solutions
     }

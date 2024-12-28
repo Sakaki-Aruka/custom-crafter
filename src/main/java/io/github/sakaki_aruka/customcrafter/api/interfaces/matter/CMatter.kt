@@ -9,6 +9,8 @@ import java.util.UUID
 
 /**
  * This interface's implementing types can be used as materials for [CRecipe].
+ *
+ * @since 5.0.0
  */
 interface CMatter {
     val name: String
@@ -35,9 +37,7 @@ interface CMatter {
         recipe: CRecipe,
         crafterID: UUID
     ): Boolean {
-        return if (!predicates.isNullOrEmpty()) {
-            predicates!!.all { p -> p.predicate.invoke(self, mapped, recipe, crafterID) }
-        } else true
+        return predicates?.all { p -> p.predicate(self, mapped, recipe, crafterID) } ?: true
     }
 
     /**

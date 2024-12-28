@@ -86,10 +86,9 @@ object CustomCrafterAPI {
     fun getRandomNCoordinates(n: Int): Set<CoordinateComponent> {
         if (n < 1) throw IllegalArgumentException("'n' must be greater than zero.")
         val result: MutableSet<CoordinateComponent> = mutableSetOf()
-        val random = Random
-        do {
-            result.add(CoordinateComponent(random.nextInt(), random.nextInt()))
-        } while (result.size != n)
+        repeat(n) { i ->
+            result.add(CoordinateComponent(i % 9, i / 9))
+        }
         return result
     }
 
@@ -103,10 +102,7 @@ object CustomCrafterAPI {
      * @param[recipe] a recipe what you want to register.
      */
     fun registerRecipe(recipe: CRecipe): Boolean {
-        val event = RegisterCustomRecipeEvent(recipe)
-        Bukkit.getPluginManager().callEvent(event)
-        if (event.isCancelled) return false
-
+        if (!RegisterCustomRecipeEvent(recipe).callEvent()) return false
         return CustomCrafter.RECIPES.add(recipe)
     }
 
