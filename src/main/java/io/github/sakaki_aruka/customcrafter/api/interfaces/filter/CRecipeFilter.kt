@@ -97,9 +97,11 @@ interface CRecipeFilter<out T: CMatter> {
      *
      * this method has a difference with [amorphous], because this checks item one by one.
      *
+     * @see[ResultType]
+     *
      * @param[item] an input item
      * @param[matter] one of a recipe
-     * @return[Boolean] [item] conforms [matter] or not
+     * @return[Pair] type of checks and [item] conforms [matter] or not
      */
     fun normal(item: ItemStack, matter: @UnsafeVariance T): Pair<ResultType, Boolean>
 }
