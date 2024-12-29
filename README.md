@@ -3,21 +3,6 @@ custom crafter is a plugin for PaperMC servers that provides custom recipes.
 
 ---
 
-# Support versions
-
-The stable operation on Spigot servers is not guaranteed.
-
-Paper
-- v5.0.x: `1.21.3 -`
-- v4.3: `1.21.3`
-- v4.2: `1.20.1 - 1.20.4`
-
-**(v4.x are not API.)**
-
-Tested in Paper 1.21.3, 1.20.4.
-
----
-
 # Features
 - Set custom recipes to vanilla items.
 - Set custom recipes to original items.
@@ -27,7 +12,22 @@ Tested in Paper 1.21.3, 1.20.4.
 
 ---
 
+# Support versions
+Paper
+- v5.0.x: `1.21.3 -`
+- v4.3: `1.21.3`
+- v4.2: `1.20.1 - 1.20.4`
+
+Tested in Paper 1.21.3, 1.20.4.
+
+**WARNING: custom crafter does not support to run on Spigot servers.**
+
+---
+
 # API
+
+custom crafter works API and also a plugin since version 5.0.0 .  
+You can make custom recipes in your plugin and register those.  
 
 ## Documents
 [KDoc](https://sakaki-aruka.github.io/custom-crafter/)  
@@ -35,9 +35,14 @@ You can build a document what type of JavaDoc with `mvn dokka:javadoc` on the pr
 
 ## Dependency Information
 
-**Note: `<version>` must be real version string or `master-SNAPSHOT`.**
+**Note: the version name must be a real version string or `master-SNAPSHOT`.**  
 
-Maven  
+The latest provided version  
+[![](https://jitpack.io/v/Sakaki-Aruka/custom-crafter.svg)](https://jitpack.io/#Sakaki-Aruka/custom-crafter)
+
+
+<details><summary>Maven</summary>
+
 (repository)
 ```xml
 <repositories>
@@ -53,21 +58,17 @@ Maven
    <dependency>
       <groupId>com.github.Sakaki-Aruka</groupId>
       <artifactId>custom-crafter</artifactId>
-      <version>5.0.4</version>
-   </dependency>
-   
-   <dependency>
-      <groupId>org.jetbrains.kotlin</groupId>
-      <artifactId>kotlin-stdlib</artifactId>
-      <version>${kotlin.version}</version>
-      <scope>provided</scope>
+      <version>5.0.7</version>
    </dependency>
 </dependencies>
 
 ```
 
+</details>
 
-Gradle  
+<details><summary>Gradle (Groovy) </summary>
+
+### Gradle (Groovy)  
 (repository)
 ```groovy
 dependencyResolutionManagement {
@@ -81,10 +82,32 @@ dependencyResolutionManagement {
 (dependency)
 ```groovy
 dependencies {
-        implementation 'com.github.Sakaki-Aruka:custom-crafter:5.0.4'
-        compileOnly 'org.jetbrains.kotlin:kotlin-stdlib:${kotlin.version}'
+        implementation 'com.github.Sakaki-Aruka:custom-crafter:5.0.7'
 }
 ```
+
+</details>
+
+<details><summary>Gradle (Kotlin DSL)</summary>
+
+(repository)
+```
+repositories { 
+    mavenCentral()
+    maven("https://jitpack.io") {
+        name = "jitpack"
+    }
+}
+```
+
+(dependency)
+```
+dependencies {
+    implementation("com.github.Sakaki-Aruka:custom-crafter:5.0.7")
+}
+```
+
+</details>
 
 ---
 
