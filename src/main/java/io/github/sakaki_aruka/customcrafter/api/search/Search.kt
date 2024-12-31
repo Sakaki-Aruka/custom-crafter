@@ -20,7 +20,6 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.Recipe
 import java.util.UUID
 import kotlin.math.abs
-import kotlin.math.max
 
 object Search {
 
@@ -71,15 +70,17 @@ object Search {
      * @param[crafterID] a crafter's UUID
      * @param[view] input crafting gui's view
      * @param[natural] Force to search vanilla recipes or not.(true=not, false=force). The default is true.
+     * @param[onlyFirst] get only first matched custom recipe and mapped. (default = false)
      * @return[SearchResult?] A result of a request. If you send one that contains invalid params, returns null.
      */
     fun search(
         crafterID: UUID,
         view: CraftView,
-        natural: Boolean = true
+        natural: Boolean = true,
+        onlyFirst: Boolean = false
     ): SearchResult? {
         val gui: Inventory = CraftView.toCraftingGUI(view)
-        return search(crafterID, gui, natural)
+        return search(crafterID, gui, natural, onlyFirst)
     }
 
     /**
@@ -92,12 +93,14 @@ object Search {
      * @param[player] A craft-request sender.
      * @param[items] Materials of crafting. this size must equal 36(6*6).
      * @param[natural] Force to search vanilla recipes or not.(true=not, false=force). The default is true.
+     * @param[onlyFirst] get only first matched custom recipe and mapped. (default = false)
      * @return[SearchResult?] A result of a request. If you send one that contains invalid params, returns null.
      */
     fun search(
         player: Player,
         items: List<ItemStack>,
-        natural: Boolean = true
+        natural: Boolean = true,
+        onlyFirst: Boolean = false
     ): SearchResult? {
         if (items.size != 36) return null
         val inventory: Inventory = Bukkit.createInventory(null, 54)
@@ -109,13 +112,14 @@ object Search {
             }
         }
 
-        return search(player.uniqueId, inventory, natural)
+        return search(player.uniqueId, inventory, natural, onlyFirst)
     }
 
     internal fun search(
         crafterID: UUID,
         inventory: Inventory,
-        natural: Boolean = true
+        natural: Boolean = true,
+        onlyFirst: Boolean = false
     ): SearchResult? {
         if (!CustomCrafterAPI.isCustomCrafterGUI(inventory) || CustomCrafterAPI.isGUITooOld(inventory)) return null
         val mapped: Map<CoordinateComponent, ItemStack> = Converter.standardInputMapping(inventory)
@@ -132,6 +136,7 @@ object Search {
                                     recipe.items.keys.zip(mapped.keys)
                                         .map { MappedRelationComponent(it.first, it.second) }
                                         .toSet()
+                                if (onlyFirst) return SearchResult(null, listOf(recipe to MappedRelation(components)))
                                 MappedRelation(components)
                             } else {
                                 null
@@ -263,37 +268,11 @@ object Search {
         )
 
         recipe.filters?.let { set ->
-            set.map { filter ->
-
-                //debug
-                println("filter=${filter.javaClass.name}")
-
-                filter.amorphous(mapped, recipe)
-            }.filter { filterResult ->
-
-                //debug
-                println("type=${filterResult.first}, result=${filterResult.second}")
-
-                filterResult.first != AmorphousFilterCandidate.Type.NOT_REQUIRED
-            }.forEach { filterResult ->
-                filterResults.add(filterResult)
-            }
+            set
+                .map { filter -> filter.amorphous(mapped, recipe) }
+                .filter { filterResult -> filterResult.first != AmorphousFilterCandidate.Type.NOT_REQUIRED }
+                .forEach { filterResult -> filterResults.add(filterResult) }
         }
-
-        //debug
-        filterResults.forEach { (_, r) ->
-            println("filter=$r")
-        }
-
-//        val filterCandidates: List<(Pair<AmorphousFilterCandidate.Type, List<AmorphousFilterCandidate>>)> = listOf(
-//            candidateAmorphous(mapped, recipe), // candidates
-//            Container.amorphous(mapped, recipe, crafterID), // containers
-//            Enchant.amorphous(mapped, recipe), // enchants
-//            Enchant.storesAmorphous(mapped, recipe), // enchantStores
-//            Potion.amorphous(mapped, recipe)// potions
-//        ).filter { (type, _) ->
-//            type != AmorphousFilterCandidate.Type.NOT_REQUIRED
-//        }
 
         if (filterResults.any { pair -> pair.first == AmorphousFilterCandidate.Type.NOT_ENOUGH }) return null//return false
 
@@ -357,7 +336,8 @@ object Search {
         candidates: Set<AmorphousFilterCandidate>,
         mapped: Map<CoordinateComponent, ItemStack>,
         cRecipe: CRecipe,
-        crafterID: UUID
+        crafterID: UUID,
+        getFull: Boolean = false
     ): List<MappedRelation> {
         val solutions = mutableListOf<Map<CoordinateComponent, CoordinateComponent>>()
         val currentSolution = mutableMapOf<CoordinateComponent, CoordinateComponent>()
@@ -386,65 +366,67 @@ object Search {
 
         backtrack(0, candidates.toList())
 
-        return solutions
-            .map { map ->
-                val components: MutableSet<MappedRelationComponent> = mutableSetOf()
-                val temporalInventory: Inventory = Bukkit.createInventory(null, 54)
-                val newItems: MutableMap<CoordinateComponent, CMatter> = mutableMapOf()
-                map.entries.forEach { (recipe, input) ->
-                    components.add(MappedRelationComponent(recipe, input))
-                    val inputIndex: Int = input.x + input.y * 9
-                    temporalInventory.setItem(inputIndex, mapped[input])
-                    newItems[input] = cRecipe.items[recipe]!!
-                }
+        if (getFull) {
+            return solutions.filter { solution ->
+                val mappedRelation: MappedRelation = mapToMappedRelation(solution)
+                val (temporaryRecipe, temporaryInventory) = replaced(mapped, cRecipe, mappedRelation)
+                val temporaryMapped: Map<CoordinateComponent, ItemStack> = temporaryMapped(temporaryInventory)
+                normal(temporaryMapped, temporaryRecipe, crafterID, fromAmorphous = true)
+            }.map { s -> mapToMappedRelation(s) }
+        } else {
+            val candidate: Map<CoordinateComponent, CoordinateComponent>? =
+                solutions
+                    .asSequence()
+                    .take(1)
+                    .firstOrNull { solution ->
+                        val mappedRelation: MappedRelation = mapToMappedRelation(solution)
+                        val (temporaryRecipe, temporaryInventory) = replaced(mapped, cRecipe, mappedRelation)
+                        val temporaryMapped: Map<CoordinateComponent, ItemStack> = temporaryMapped(temporaryInventory)
+                        normal(temporaryMapped, temporaryRecipe, crafterID, fromAmorphous = true)
+                    }
 
-                MappedRelation(components)
-            }
-            .filter { r ->
-                val newItems: MutableMap<CoordinateComponent, CMatter> = mutableMapOf()
-                val temporaryInventory: Inventory = Bukkit.createInventory(null, 54)
-                r.components.forEach { component ->
-                    val matter: CMatter = cRecipe.items[component.recipe]!!
-                    newItems[component.input] = matter
-                    val c: CoordinateComponent = component.input
-                    val index: Int = c.x + c.y * 9
-                    temporaryInventory.setItem(index, mapped[c])
-                }
-                val replaced: CRecipe = cRecipe.replaceItems(newItems)
-
-                //debug
-                val temporaryMapped: MutableMap<CoordinateComponent, ItemStack> = mutableMapOf()
-                Converter.getAvailableCraftingSlotComponents().filter { i ->
-                    val item: ItemStack? = temporaryInventory.getItem(i.toIndex())
-                    item != null && item.type != Material.AIR
-                }.forEach { c ->
-                    temporaryMapped[c] = temporaryInventory.getItem(c.toIndex())!!
-                }
-
-                normal(temporaryMapped, replaced, crafterID, fromAmorphous = true)
-            }
-        //return solutions
+            return candidate?.let { listOf(mapToMappedRelation(it)) } ?: emptyList()
+        }
     }
 
-    private fun csp(candidates: Set<AmorphousFilterCandidate>): Map<CoordinateComponent, CoordinateComponent> {
-        val solution: MutableMap<CoordinateComponent, CoordinateComponent> = mutableMapOf()
+    private fun mapToMappedRelation(
+        map: Map<CoordinateComponent, CoordinateComponent>
+    ): MappedRelation {
+        return MappedRelation(
+            map.entries
+                .map { pair -> MappedRelationComponent(pair.key, pair.value) }
+                .toSet()
+        )
+    }
 
-        fun backtrack(index: Int, candidateList: List<AmorphousFilterCandidate>): Boolean {
-            if (index == candidateList.size) return true
-            val current: AmorphousFilterCandidate = candidateList[index]
-            for (value: CoordinateComponent in current.list) {
-                if (!solution.values.contains(value)) {
-                    solution[current.coordinate] = value
-                    // next
-                    if (backtrack(index + 1, candidateList)) return true
-
-                    // back
-                    solution.remove(current.coordinate)
-                }
-            }
-            return false
+    private fun replaced(
+        mapped: Map<CoordinateComponent, ItemStack>,
+        cRecipe: CRecipe,
+        mappedRelation: MappedRelation
+    ): Pair<CRecipe, Inventory> {
+        val newItems: MutableMap<CoordinateComponent, CMatter> = mutableMapOf()
+        val temporaryInventory: Inventory = Bukkit.createInventory(null, 54)
+        mappedRelation.components.forEach { component ->
+            val matter: CMatter = cRecipe.items[component.recipe]!!
+            newItems[component.input] = matter
+            val c: CoordinateComponent = component.input
+            val index: Int = c.x + c.y * 9
+            temporaryInventory.setItem(index, mapped[c])
         }
-        return if (backtrack(0, candidates.toList())) solution else emptyMap()
+        return cRecipe.replaceItems(newItems) to temporaryInventory
+    }
+
+    private fun temporaryMapped(
+        temporaryInventory: Inventory
+    ): MutableMap<CoordinateComponent, ItemStack> {
+        val temporaryMapped: MutableMap<CoordinateComponent, ItemStack> = mutableMapOf()
+        Converter.getAvailableCraftingSlotComponents().filter { i ->
+            val item: ItemStack? = temporaryInventory.getItem(i.toIndex())
+            item != null && item.type != Material.AIR
+        }.forEach { c ->
+            temporaryMapped[c] = temporaryInventory.getItem(c.toIndex())!!
+        }
+        return temporaryMapped
     }
 
     private fun allCandidateContains(mapped: Map<CoordinateComponent, ItemStack>, recipe: CRecipe): Boolean {
@@ -454,14 +436,6 @@ object Search {
             if (!recipe.items[rc]!!.candidate.contains(mapped[ic]!!.type)) return false
         }
         return true
-    }
-
-    private fun squareSize(mapped: Set<CoordinateComponent>): Int {
-        val xSorted: List<CoordinateComponent> = mapped.sortedBy { it.x }
-        val xGap: Int = abs(xSorted.first().x - xSorted.last().x)
-        val ySorted: List<CoordinateComponent> = mapped.sortedBy { it.y }
-        val yGap: Int = abs(ySorted.first().x - ySorted.last().y)
-        return max(xGap, yGap)
     }
 
     private fun sameShape(mapped: Set<CoordinateComponent>, recipe: CRecipe): Boolean {
