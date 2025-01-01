@@ -22,8 +22,25 @@ import org.bukkit.inventory.meta.ItemMeta
  *
  *
  * @param[T] a type of target class or interface. subtype of [CMatter].
+ * @since 5.0.6
  */
 interface CRecipeFilter<out T: CMatter> {
+
+    /**
+     * SUCCESS not means success to input matter check passed.
+     * that only means success to pass any checks before final one.
+     *
+     * FAILED means failed to pass checks before final.
+     *
+     * NOT_REQUIRED means a provided matter does not require some checks.
+     *
+     * @since 5.0.7
+     */
+    enum class ResultType {
+        SUCCESS,
+        FAILED,
+        NOT_REQUIRED
+    }
 
     /**
      * returns a result of checks to [ItemMeta] type.
@@ -80,9 +97,11 @@ interface CRecipeFilter<out T: CMatter> {
      *
      * this method has a difference with [amorphous], because this checks item one by one.
      *
+     * @see[ResultType]
+     *
      * @param[item] an input item
      * @param[matter] one of a recipe
-     * @return[Boolean] [item] conforms [matter] or not
+     * @return[Pair] type of checks and [item] conforms [matter] or not
      */
-    fun normal(item: ItemStack, matter: @UnsafeVariance T): Boolean
+    fun normal(item: ItemStack, matter: @UnsafeVariance T): Pair<ResultType, Boolean>
 }

@@ -13,6 +13,7 @@ import org.bukkit.inventory.meta.ItemMeta
 
 /**
  * @suppress
+ * @since 5.0.6
  */
 internal object EnchantFilter: CRecipeFilter<CEnchantMatter> {
     override fun metaTypeCheck(meta: ItemMeta): Boolean = true
@@ -20,12 +21,12 @@ internal object EnchantFilter: CRecipeFilter<CEnchantMatter> {
     override fun normal(
         item: ItemStack,
         matter: CEnchantMatter
-    ): Boolean {
+    ): Pair<CRecipeFilter.ResultType, Boolean> {
         val itemEnchants: Map<Enchantment, Int> = item.enchantments
-        if (matter.enchantComponents.isNotEmpty() && itemEnchants.isEmpty()) return false
-        else if (matter.enchantComponents.isNotEmpty()) return true
+        if (matter.enchantComponents.isNotEmpty() && itemEnchants.isEmpty()) return CRecipeFilter.ResultType.FAILED to false
+        else if (matter.enchantComponents.isNotEmpty()) return CRecipeFilter.ResultType.NOT_REQUIRED to true
 
-        return matter.enchantComponents.all { base(itemEnchants, it) }
+        return CRecipeFilter.ResultType.SUCCESS to matter.enchantComponents.all { base(itemEnchants, it) }
     }
 
     override fun amorphous(

@@ -13,6 +13,7 @@ import org.bukkit.potion.PotionEffect
 
 /**
  * @suppress
+ * @since 5.0.6
  */
 internal object PotionFilter: CRecipeFilter<CPotionMatter> {
     override fun metaTypeCheck(meta: ItemMeta): Boolean {
@@ -110,14 +111,14 @@ internal object PotionFilter: CRecipeFilter<CPotionMatter> {
     override fun normal(
         item: ItemStack,
         matter: CPotionMatter
-    ): Boolean {
+    ): Pair<CRecipeFilter.ResultType ,Boolean> {
         val meta: PotionMeta = item.itemMeta as PotionMeta
         val effects: MutableList<PotionEffect> = meta.customEffects
         meta.basePotionType?.let {
             effects.addAll(it.potionEffects)
         }
 
-        return matter.potionComponents.all { c ->
+        return CRecipeFilter.ResultType.SUCCESS to matter.potionComponents.all { c ->
             when (c.strict) {
                 CPotionComponent.PotionStrict.INPUT -> true
                 CPotionComponent.PotionStrict.NOT_STRICT -> true
