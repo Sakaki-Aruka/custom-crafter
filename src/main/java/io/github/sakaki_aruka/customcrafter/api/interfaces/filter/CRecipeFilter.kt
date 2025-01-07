@@ -2,8 +2,6 @@ package io.github.sakaki_aruka.customcrafter.api.interfaces.filter
 
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
-import io.github.sakaki_aruka.customcrafter.api.`object`.AmorphousFilterCandidate
-import io.github.sakaki_aruka.customcrafter.api.`object`.recipe.CoordinateComponent
 import org.bukkit.inventory.ItemStack
 
 import io.github.sakaki_aruka.customcrafter.api.`object`.recipe.filter.EnchantFilter
@@ -71,31 +69,9 @@ interface CRecipeFilter<out T: CMatter> {
      */
     fun metaTypeCheck(meta: ItemMeta): Boolean
 
-    /**
-     * a candidate filter for amorphous recipes.
-     *
-     * a flow of implementation
-     * - collects recipe components what type is [T]
-     *   - if collected is empty, returns Type.NOT_REQUIRED and an empty list
-     * - collects input component what has attributes of you want to check
-     *   - if collected is empty, returns Type.NOT_ENOUGH and an empty list
-     * - checks collected components amount
-     * - checks
-     * - returns a result
-     *
-     * @param[mapped] an inventory input mapping
-     * @param[recipe] a target recipe
-     * @return[Pair] first = type of result, second = result
-     */
-    fun amorphous(
-        mapped: Map<CoordinateComponent, ItemStack>,
-        recipe: CRecipe
-    ): Pair<AmorphousFilterCandidate.Type, List<AmorphousFilterCandidate>>
 
     /**
      * a candidate checker for normal recipes.
-     *
-     * this method has a difference with [amorphous], because this checks item one by one.
      *
      * @see[ResultType]
      *
