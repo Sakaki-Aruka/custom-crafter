@@ -258,6 +258,29 @@ object Search {
         return Pair(type, result)
     }
 
+    private fun checkAmorphousCoordinates(
+        mapped: Map<CoordinateComponent, ItemStack>,
+        matter: CMatter,
+        matterCoordinate: CoordinateComponent,
+        filter: CRecipeFilter<CMatter>
+    ): Pair<AmorphousFilterCandidate.Type, List<AmorphousFilterCandidate>> {
+        val coordinateList: MutableSet<CoordinateComponent> = mutableSetOf()
+        for ((c, item) in mapped) {
+            try {
+                val (type, result) = filter.normal(item, matter)
+                if (type == CRecipeFilter.ResultType.SUCCESS && result) {
+                    coordinateList.add(c)
+                }
+            } catch (e: Exception) {
+                return AmorphousFilterCandidate.Type.NOT_ENOUGH to emptyList()
+            }
+        }
+
+        return if (coordinateList.isEmpty()) {
+            AmorphousFilterCandidate.Type.NOT_REQUIRED to emptyList()
+        } else AmorphousFilterCandidate.Type.SUCCESSFUL to listOf(AmorphousFilterCandidate(matterCoordinate, coordinateList.toList()))
+    }
+
     private fun amorphous(
         mapped: Map<CoordinateComponent, ItemStack>,
         recipe: CRecipe,
@@ -267,11 +290,13 @@ object Search {
             candidateAmorphous(mapped, recipe)
         )
 
-        recipe.filters?.let { set ->
-            set
-                .map { filter -> filter.amorphous(mapped, recipe) }
-                .filter { filterResult -> filterResult.first != AmorphousFilterCandidate.Type.NOT_REQUIRED }
-                .forEach { filterResult -> filterResults.add(filterResult) }
+        recipe.items.forEach { (c, matter) ->
+            recipe.filters?.forEach { filter ->
+                val (type, list) = checkAmorphousCoordinates(mapped, matter, c, filter)
+                if (type != AmorphousFilterCandidate.Type.NOT_REQUIRED) {
+                    filterResults.add(type to list)
+                }
+            }
         }
 
         if (filterResults.any { pair -> pair.first == AmorphousFilterCandidate.Type.NOT_ENOUGH }) return null//return false
