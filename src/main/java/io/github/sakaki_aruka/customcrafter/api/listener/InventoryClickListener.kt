@@ -87,7 +87,7 @@ object InventoryClickListener: Listener {
         }
     }
 
-    private fun process(
+    internal fun process(
         result: Search.SearchResult,
         gui: Inventory,
         mass: Boolean,

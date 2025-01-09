@@ -1,5 +1,8 @@
 package io.github.sakaki_aruka.customcrafter.api.`object`.recipe
 
+import io.github.sakaki_aruka.customcrafter.api.processor.Converter.toByteArray
+import io.github.sakaki_aruka.customcrafter.api.processor.Converter.toInt
+
 /**
  * A coordinate in Crafting slots.
  *
@@ -24,7 +27,38 @@ data class CoordinateComponent(
         return x + y * 9
     }
 
+    fun toByteArray(): ByteArray {
+        /*
+         * x: 4 Byte
+         * y: 4 Byte
+         *
+         * total: 8 Byte
+         */
+
+        val array = ByteArray(8)
+        x.toByteArray().withIndex().forEach { (index, byte) ->
+            array[index] = byte
+        }
+
+        y.toByteArray().withIndex().forEach { (index, byte) ->
+            array[index] = byte
+        }
+
+        return array
+    }
+
     companion object {
+
+        fun fromByteArray(
+            array: ByteArray
+        ): CoordinateComponent {
+            if (array.size != 8) {
+                throw IllegalArgumentException("The size of 'array' must be 8.")
+            }
+            val x: Int = array.sliceArray(0..<4).toInt()
+            val y: Int = array.sliceArray(4..<8).toInt()
+            return CoordinateComponent(x, y)
+        }
 
         private fun inRange(vararg c: Int): Boolean = c.all { (0..<6).contains(it) }
 

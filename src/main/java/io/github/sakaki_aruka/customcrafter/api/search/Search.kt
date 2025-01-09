@@ -11,6 +11,8 @@ import io.github.sakaki_aruka.customcrafter.api.`object`.MappedRelationComponent
 import io.github.sakaki_aruka.customcrafter.api.`object`.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.`object`.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.processor.Converter
+import io.github.sakaki_aruka.customcrafter.api.processor.Converter.toByteArray
+import io.github.sakaki_aruka.customcrafter.api.processor.Converter.toInt
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.World
@@ -58,6 +60,145 @@ object Search {
         //  -> Cause the search method does not know recipes class implements 'hashCode' and 'equals'.
         // why this class does not support 'hashCode' and 'equals'?
         //  -> There is same reason with the above q.
+
+        fun toByteArray(): ByteArray {
+            /*
+             * ByteArray payload
+             * [0 ~ 3] = contains vanilla result or not. ('0' or '1' / 0 = true, 1 = false)
+             * [4 ~ 7] = vanilla recipe ItemStack's ByteArray size (if [0 ~ 3] = 1, all bits are zero.)
+             * [8 ~ 11] = vanilla recipe hashcode (if [0 ~ 3] = 1, all bits are zero.)
+             * [12 ~ x] = vanilla recipe itemStack's ByteArray (if [0 ~ 3] = 1, only [8] exists and those all bits are zero.)
+             * [x+1 ~ x+4] = custom recipes info size (Int -> ByteArray(=4 Byte))
+             * [x+5 ~ ] = List<Pair<CRecipe, MappedRelation>> elements
+             *
+             * ---
+             *
+             * List<Pair<CRecipe, MappedRelation>> payload
+             *
+             * [0 ~ 3] = size of the list. (Int -> ByteArray)
+             * [4 ~ ] = Pair<CRecipe, MappedRelation> elements
+             *
+             * ---
+             *
+             * Pair<CRecipe, MappedRelation> payload
+             * [0 ~ 3] = CRecipe hashcode
+             * [4 ~ 7] = MappedRelationComponent amount what are contained MappedRelation (Int -> ByteArray)
+             * [8 ~ ] = MappedRelation (MappedRelation -> ByteArray)
+             */
+
+            val vanillaNull: Boolean = vanilla == null
+
+            val vanillaExists: ByteArray = (if (vanillaNull) 0 else 1).toByteArray()
+            val vanillaRecipeHashcode: ByteArray = (if (vanillaNull) 0 else this.vanilla!!.hashCode()).toByteArray()
+
+            val vanillaResultSize: ByteArray
+            val vanillaResult: ByteArray
+            if (vanillaNull) {
+                vanillaResultSize = 0.toByteArray()
+                vanillaResult = 0.toByteArray()
+            } else {
+                val result: ByteArray = vanilla!!.result.serializeAsBytes()
+                vanillaResultSize = result.size.toByteArray()
+                vanillaResult = result
+            }
+
+            val customsSize: ByteArray = customs.size.toByteArray()
+            val customsByteArray = ByteArray(this.customs.sumOf { (_, mr) -> 4 + 4 + mr.byteArrayLength() })
+            var index = 0
+            this.customs.forEach { (recipe, relation) ->
+                // Pair<CRecipe, MappedRelation>
+                // size: 4 Byte(hashcode) + 4 Byte(component amount) + x Byte(relation components)
+                val hashcodeByte: ByteArray = recipe.hashCode().toByteArray() // 4 Byte
+                val componentAmount: ByteArray = relation.components.size.toByteArray() // 4 Byte
+                val relationByteArray: ByteArray = relation.toByteArray()
+
+                hashcodeByte.withIndex().forEach { (offset, b) ->
+                    customsByteArray[index + offset] = b
+                    index++
+                }
+
+                componentAmount.withIndex().forEach { (offset, b) ->
+                    customsByteArray[index + offset] = b
+                    index++
+                }
+
+                relationByteArray.withIndex().forEach { (offset, b) ->
+                    customsByteArray[index + offset] = b
+                    index++
+                }
+            }
+
+            return vanillaExists + vanillaRecipeHashcode + vanillaResultSize + vanillaResult + customsSize + customsByteArray
+        }
+
+        companion object {
+            fun fromByteArray(
+                array: ByteArray
+            ): SearchResult {
+                /*
+                * ByteArray payload
+                * [0 ~ 3] = contains vanilla result or not. ('0' or '1' / 0 = true, 1 = false)
+                * [4 ~ 7] = vanilla recipe ItemStack's ByteArray size (if [0 ~ 3] = 1, all bits are zero.)
+                * [8 ~ 11] = vanilla recipe hashcode (if [0 ~ 3] = 1, all bits are zero.)
+                * [12 ~ x] = vanilla recipe itemStack's ByteArray (if [0 ~ 3] = 1, only [8] exists and those all bits are zero.)
+                * [x+1 ~ x+4] = custom recipes info size (Int -> ByteArray(=4 Byte))
+                * [x+5 ~ ] = List<Pair<CRecipe, MappedRelation>> elements
+                *
+                * ---
+                *
+                * List<Pair<CRecipe, MappedRelation>> payload
+                *
+                * [0 ~ 3] = size of the list. (Int -> ByteArray)
+                * [4 ~ ] = Pair<CRecipe, MappedRelation> elements
+                *
+                * ---
+                *
+                * Pair<CRecipe, MappedRelation> payload
+                * [0 ~ 3] = CRecipe hashcode
+                * [4 ~ 7] = MappedRelationComponent amount what are contained MappedRelation (Int -> ByteArray)
+                * [8 ~ ] = MappedRelation (MappedRelation -> ByteArray)
+                */
+
+                if (array.size < 4) throw IllegalArgumentException("'array' data not enough")
+                val vanillaRecipeHashcode: Int = array.sliceArray(4..<8).toInt()
+                var index = 8
+                val vanilla: ItemStack? =
+                    if (array.sliceArray(0..<4).toInt() == 0) {
+                        val end: Int = array.sliceArray(3..<8).toInt()
+                        index += end
+                        ItemStack.deserializeBytes(array.sliceArray(8..<8 + end))
+                    } else null
+
+                val vanillaRecipe: Recipe? = vanilla?.let { result ->
+                        Bukkit.getRecipesFor(result).firstOrNull { recipe ->
+                            recipe.hashCode() == vanillaRecipeHashcode
+                        } ?: throw NoSuchElementException("No recipe are there what provides specified item.")
+                    }
+
+                val customsSize: Int = array.sliceArray(index..<(index + 4)).toInt()
+                index += 8 // 2 times of custom size (4 Byte * 2)
+
+                val customs: MutableList<Pair<CRecipe, MappedRelation>> = mutableListOf()
+                repeat(customsSize) {
+                    val hashcode: Int = array.sliceArray(index..<(index + 4)).toInt()
+                    val recipe: CRecipe = CustomCrafterAPI.getRecipes()
+                        .firstOrNull { it.hashCode() == hashcode }
+                        ?: throw NoSuchElementException("'array' has a not registered recipe hashcode.")
+                    index += 4
+
+                    val mappedRelationComponentSize: Int = array.sliceArray(index..<index + 4).toInt()
+                    index += 4
+
+                    val mappedRelation = MappedRelation.fromByteArray(
+                        array.sliceArray(index..<index + mappedRelationComponentSize)
+                    )
+
+                    customs.add(recipe to mappedRelation)
+                }
+
+                return SearchResult(vanillaRecipe, customs)
+            }
+        }
     }
 
     // one: Boolean

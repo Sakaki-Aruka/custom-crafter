@@ -8,6 +8,46 @@ import org.bukkit.inventory.ItemStack
 
 object Converter {
 
+    /*
+     * Big-Endian
+     * [0] = 0-7 bit
+     * [1] = 8-15 bit
+     * [2] = 16-23 bit
+     * [3] = 24-31 bit
+     */
+    internal fun Int.toByteArray(): ByteArray {
+        val array = ByteArray(4)
+        array[0] = (this shr 24 and 0xFF).toByte()
+        array[1] = (this shr 16 and 0xFF).toByte()
+        array[2] = (this shr 8 and 0xFF).toByte()
+        array[3] = (this and 0xFF).toByte()
+
+        return array
+    }
+
+    /*
+     * Big-Endian
+     */
+    internal fun ByteArray.toInt(): Int {
+        if (this.size != 4) throw IllegalStateException("ByteArray size must be 4, but this is ${this.size}.")
+        return (this[0].toInt() and 0xFF shl 24) or
+            (this[1].toInt() and 0xFF shl 16) or
+            (this[2].toInt() and 0xFF shl 8) or
+            (this[3].toInt() and 0xFF)
+    }
+
+    /**
+     * @param[padding] an item what is used to 'null' items (empty slot item). default = ItemStack.empty()
+     * @since 5.0.8
+     */
+    fun Inventory.toByteArray(padding: ItemStack = ItemStack.empty()): ByteArray {
+        val items: MutableList<ItemStack> = mutableListOf()
+        (0..<this.size).forEach { index ->
+            items.add(this.getItem(index) ?: padding)
+        }
+        return ItemStack.serializeItemsAsBytes(items)
+    }
+
     /**
      * returns materials coordinate list
      *
