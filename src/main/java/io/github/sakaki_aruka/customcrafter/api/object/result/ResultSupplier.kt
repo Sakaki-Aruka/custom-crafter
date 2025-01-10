@@ -17,26 +17,30 @@ import java.util.UUID
  * - [MutableList]<[ItemStack]>: result items that are made by a [CRecipe]
  * - [Boolean]: shift clicked or not
  * - [Int]: calculated minimum amount with [CMatter].amount
+ * - [Boolean]: called from pre-displaying (multiple result display) or not.
  * ```
  * // call example from Java
- * ResultSupplier supplier = new ResultSupplier ((crafterID, relate, mapped, list, shiftClicked, calledTimes) -> List.of(ItemStack.empty()));
+ * ResultSupplier supplier = new ResultSupplier ((crafterID, relate, mapped, list, shiftClicked, calledTimes, preDisplaying) -> List.of(ItemStack.empty()));
  *
  * // call example from Kotlin
- * val supplier = ResultSupplier { crafterID, relate, mapped, list, shiftClicked, calledTimes -> listOf(ItemStack.empty()) }
+ * val supplier = ResultSupplier { crafterID, relate, mapped, list, shiftClicked, calledTimes, preDisplaying -> listOf(ItemStack.empty()) }
  * ```
+ *
+ * pre-displaying: since v5.0.8
  *
  * @param[func] function.
  * @return[ResultSupplier]
  */
 data class ResultSupplier (
 
-    val func: Function6<
+    val func: Function7<
             UUID,
             MappedRelation,
             Map<CoordinateComponent, ItemStack>,
             MutableList<ItemStack>,
             Boolean, //  shift clicked
             Int, // calledTimes
+            Boolean, // pre-displaying
             List<ItemStack>> // return
 ) {
     operator fun invoke(
@@ -45,8 +49,9 @@ data class ResultSupplier (
         mapped: Map<CoordinateComponent, ItemStack>,
         list: MutableList<ItemStack>,
         shiftClicked: Boolean,
-        calledTimes: Int
-    ): List<ItemStack> = func(crafterID, relation, mapped, list, shiftClicked, calledTimes)
+        calledTimes: Int,
+        preDisplaying: Boolean
+    ): List<ItemStack> = func(crafterID, relation, mapped, list, shiftClicked, calledTimes, preDisplaying)
 
     companion object {
         /**
@@ -57,13 +62,13 @@ data class ResultSupplier (
          * if you want to consider shift click, use [timesSingle] instead of this.
          *
          * ```
-         * return ResultSupplier { _, _, _, _, _, _ -> listOf(item) }
+         * return ResultSupplier { _, _, _, _, _, _, _ -> listOf(item) }
          * ```
          *
          * @param[item] a supplied item
          */
         fun single(item: ItemStack): ResultSupplier {
-            return ResultSupplier { _, _, _, _, _, _ -> listOf(item) }
+            return ResultSupplier { _, _, _, _, _, _, _ -> listOf(item) }
         }
 
         /**
@@ -78,7 +83,7 @@ data class ResultSupplier (
          * @param[item] a supplied item
          */
         fun timesSingle(item: ItemStack): ResultSupplier {
-            return ResultSupplier { _, _, _, _, shift, called ->
+            return ResultSupplier { _, _, _, _, shift, called, _ ->
                 if (shift) {
                     val modified = ItemStack(item)
                     modified.amount *= called

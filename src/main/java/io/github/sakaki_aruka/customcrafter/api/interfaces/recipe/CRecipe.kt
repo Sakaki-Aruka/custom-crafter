@@ -53,6 +53,7 @@ interface CRecipe {
      * @param[crafterID] a crafter's uuid
      * @param[relate] an input inventory and [CRecipe] coordinates relation.
      * @param[mapped] coordinates and input items relation.
+     * @param[preDisplaying] called from pre-displaying (multiple result display) or not. (default = false / since v5.0.8)
      * @return[MutableList<ItemStack>] generated items list. if no item supplier applied, returns an empty list.
      */
     fun getResults(
@@ -60,12 +61,13 @@ interface CRecipe {
         relate: MappedRelation,
         mapped: Map<CoordinateComponent, ItemStack>,
         shiftClicked: Boolean,
-        calledTimes: Int
+        calledTimes: Int,
+        preDisplaying: Boolean = false
     ): MutableList<ItemStack> {
         return results?.let { suppliers ->
             val list: MutableList<ItemStack> = mutableListOf()
             suppliers.map { s ->
-                list.addAll(s.func.invoke(crafterID, relate, mapped, list, shiftClicked, calledTimes))
+                list.addAll(s.func.invoke(crafterID, relate, mapped, list, shiftClicked, calledTimes, preDisplaying))
             }
             list
         } ?: mutableListOf()

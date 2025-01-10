@@ -8,6 +8,7 @@ import io.github.sakaki_aruka.customcrafter.api.`object`.CraftView
 import io.github.sakaki_aruka.customcrafter.api.`object`.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.`object`.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.processor.Converter
+import io.github.sakaki_aruka.customcrafter.api.processor.InventoryModifier
 import io.github.sakaki_aruka.customcrafter.api.search.Search
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -33,14 +34,17 @@ object InventoryClickListener: Listener {
             CustomCrafterAPI.isCustomCrafterGUI(it)
         } ?: run {
             clickedInventory?.let { inv ->
-                if (inv is PlayerInventory
-                    && CustomCrafterAPI.isCustomCrafterGUI(player.openInventory.topInventory)) {
-                    if (click == ClickType.LEFT
-                        || click == ClickType.RIGHT
-                        || click == ClickType.SHIFT_LEFT
-                    ) return
-                    isCancelled = true
-                    return
+                if (inv is PlayerInventory) {
+                    val topInventory: Inventory = player.openInventory.topInventory
+                    if (CustomCrafterAPI.isCustomCrafterGUI(topInventory)
+                        || CustomCrafterAPI.isCustomCrafterMultipleResultGUI(topInventory)) {
+                        if (click == ClickType.LEFT
+                            || click == ClickType.RIGHT
+                            || click == ClickType.SHIFT_LEFT
+                        ) return
+                        isCancelled = true
+                        return
+                    }
                 }
             }
             return
@@ -50,44 +54,66 @@ object InventoryClickListener: Listener {
             isCancelled = true
             player.closeInventory()
             return
-        } else if (isCancelled) return
-        else if (rawSlot == CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT) {
+        }
+
+        if (CustomCrafterAPI.isCustomCrafterGUI(gui)) {
+            craftingGUI(this, gui, player)
+        } else if (CustomCrafterAPI.isCustomCrafterMultipleResultGUI(gui)) {
+            multipleGUI(this, gui, player)
+        }
+    }
+
+    private fun craftingGUI(
+        event: InventoryClickEvent,
+        gui: Inventory,
+        player: Player
+    ) {
+        if (event.isCancelled) return
+        else if (event.rawSlot == CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT) {
             // click result slot
-            isCancelled = true
-            gui.getItem(rawSlot)?.let { item ->
+            event.isCancelled = true
+            gui.getItem(event.rawSlot)?.let { item ->
                 player.inventory.addItem(item).forEach { (_, over) ->
                     player.world.dropItem(player.location, over)
                 }
             }
             return
-        } else if (rawSlot == CustomCrafterAPI.CRAFTING_TABLE_MAKE_BUTTON_SLOT) {
+        } else if (event.rawSlot == CustomCrafterAPI.CRAFTING_TABLE_MAKE_BUTTON_SLOT) {
             // click make button
-            isCancelled = true
+            event.isCancelled = true
             if (gui.contents.isEmpty()) return
 
             val view: CraftView = CraftView.fromInventory(gui) ?: return
-            val preEvent = PreCreateCustomItemEvent(player, view, click)
+            val preEvent = PreCreateCustomItemEvent(player, view, event.click)
             Bukkit.getPluginManager().callEvent(preEvent)
             if (preEvent.isCancelled) return
 
             val result: Search.SearchResult = Search.search(player.uniqueId, gui) ?: return
 
-            CreateCustomItemEvent(player, view, result, click).callEvent()
+            CreateCustomItemEvent(player, view, result, event.click).callEvent()
             if (CustomCrafterAPI.RESULT_GIVE_CANCEL) return
 
             if (result.customs().isEmpty() && result.vanilla() == null) return
 
-            val mass: Boolean = click == ClickType.SHIFT_LEFT
+            val mass: Boolean = event.click == ClickType.SHIFT_LEFT
 
             process(result, gui, mass, player)
-        } else if (!Converter.getAvailableCraftingSlotIndices().contains(rawSlot)) {
+        } else if (!Converter.getAvailableCraftingSlotIndices().contains(event.rawSlot)) {
             // click a blank slot
-            isCancelled = true
+            event.isCancelled = true
             return
         }
     }
 
-    internal fun process(
+    private fun multipleGUI(
+        event: InventoryClickEvent,
+        gui: Inventory,
+        player: Player
+    ) {
+        //
+    }
+
+    private fun process(
         result: Search.SearchResult,
         gui: Inventory,
         mass: Boolean,
@@ -97,31 +123,45 @@ object InventoryClickListener: Listener {
         val mapped: Map<CoordinateComponent, ItemStack> = Converter.standardInputMapping(gui) ?: return
 
         if (result.customs().isNotEmpty()) {
-            // custom recipe
-            val (recipe, relate) = result.customs().first()
-            if (getMinAmountWithoutMass(relate, recipe, mapped) <= 0) return
-            var amount = 1
-            recipe.items.forEach { (c, m) ->
-                val inputCoordinate = relate.components.find { it.recipe == c }?.input ?: return
-                val min: Int = getMinAmountWithoutMass(relate, recipe, mapped)
-                amount = if (m.mass) 1 else (m.amount * (if (mass) min else 1))
+            if (CustomCrafterAPI.IS_ENABLE_MULTIPLE_RESULT) {
+                // multiple result display
+                val page: Inventory = InventoryModifier.getFirstMultipleResultGUI(
+                    gui, result, player.uniqueId
+                )
 
-                val slot: Int = inputCoordinate.x + inputCoordinate.y * 9
-                decrement(gui, slot, amount)
+                player.openInventory(page)
+                return
+
+            } else {
+                // normal (single) result display
+                // custom recipe
+                val (recipe, relate) = result.customs().first()
+                if (getMinAmountWithoutMass(relate, recipe, mapped) <= 0) return
+                var amount = 1
+                recipe.items.forEach { (c, m) ->
+                    val inputCoordinate = relate.components.find { it.recipe == c }?.input ?: return
+                    val min: Int = getMinAmountWithoutMass(relate, recipe, mapped)
+                    amount = if (m.mass) 1 else (m.amount * (if (mass) min else 1))
+
+                    val slot: Int = inputCoordinate.x + inputCoordinate.y * 9
+                    decrement(gui, slot, amount)
+                }
+
+                recipe.getResults(player.uniqueId, relate, mapped, mass, amount)
+                    .takeIf { it.isNotEmpty() }
+                    ?.let { itemList ->
+                        recipe.runContainers(player.uniqueId, relate, mapped, itemList)
+                        // TODO must impl add result items to the result slot
+                        itemList.takeIf { it.isNotEmpty() }
+                            ?.forEach { item ->
+                                player.inventory.addItem(item).forEach { (_, over) ->
+                                    player.world.dropItem(player.location, over)
+                                }
+                            }
+                    }
+
             }
 
-            recipe.getResults(player.uniqueId, relate, mapped, mass, amount)
-                .takeIf { it.isNotEmpty() }
-                ?.let { itemList ->
-                    recipe.runContainers(player.uniqueId, relate, mapped, itemList)
-                    // TODO must impl add result items to the result slot
-                    itemList.takeIf { it.isNotEmpty() }
-                        ?.forEach { item ->
-                            player.inventory.addItem(item).forEach { (_, over) ->
-                                player.world.dropItem(player.location, over)
-                            }
-                        }
-                }
 
         } else if (result.vanilla() != null) {
             val min: Int = mapped.values.minOf { it.amount }

@@ -2,9 +2,7 @@ package io.github.sakaki_aruka.customcrafter.api.processor
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafter
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
-import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
-import io.github.sakaki_aruka.customcrafter.api.listener.InventoryClickListener
-import io.github.sakaki_aruka.customcrafter.api.`object`.CraftView
+import io.github.sakaki_aruka.customcrafter.api.`object`.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.processor.Converter.toByteArray
 import io.github.sakaki_aruka.customcrafter.api.search.Search
 import net.kyori.adventure.text.Component
@@ -12,12 +10,15 @@ import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
-import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
+import org.bukkit.persistence.PersistentDataContainer
 import org.bukkit.persistence.PersistentDataType
+import java.util.UUID
+import kotlin.math.min
 
 /**
+ * @suppress
  * @since 5.0.8
  */
 object InventoryModifier {
@@ -37,24 +38,21 @@ object InventoryModifier {
     private val CURRENT_PAGE_INDEX_KEY = NamespacedKey(CustomCrafter.getInstance(), "current_page_index")
     private val CURRENT_PAGE_INDEX_TYPE = PersistentDataType.INTEGER
 
-    private fun pageCacheContainer(
-        currentPage: Int,
-        nextPage: Boolean // true = get a next page info, false = get a previous page info
-    ): Pair<NamespacedKey, PersistentDataType<*, *>> {
-        val targetPage: Int = currentPage + (if (nextPage) 1 else -1)
-        if (targetPage < 0) {
-            throw IllegalArgumentException("'currentPage' must be greater than zero.")
-        }
-        return NamespacedKey(CustomCrafter.getInstance(), "page_cache_${targetPage}") to PersistentDataType.BYTE_ARRAY
-    }
-
     private const val PREVIOUS_PAGE_INDEX = 45
-    private const val CURRENT_PAGE_INDEX = 49
+    internal const val CURRENT_PAGE_INDEX = 49
     private const val NEXT_PAGE_INDEX = 53
 
     private const val PAGE_SLOTS_SIZE = 54
     private const val ONE_PAGE_RESULT_LIMIT = 45
     private const val MULTIPLE_RESULT_PAGE_TITLE = "<black>Custom Crafter Multiple Result Page"
+
+    private fun pageBase(): Inventory {
+        return Bukkit.createInventory(
+            null,
+            PAGE_SLOTS_SIZE,
+            MiniMessage.miniMessage().deserialize(MULTIPLE_RESULT_PAGE_TITLE)
+        )
+    }
 
     private fun nextPage(): ItemStack {
         return ItemStack(Material.AMETHYST_CLUSTER).apply {
@@ -72,12 +70,64 @@ object InventoryModifier {
         }
     }
 
-    private fun currentPage(index: Int): ItemStack {
+    internal fun currentPage(index: Int): ItemStack {
         return ItemStack(Material.GRASS_BLOCK).apply {
             itemMeta = itemMeta.apply {
                 displayName(Component.text("Page $index"))
             }
         }
+    }
+
+    private fun updatePageIndex(
+        container: PersistentDataContainer,
+        diff: Int
+    ) {
+        val current: Int = container.get(CURRENT_PAGE_INDEX_KEY, CURRENT_PAGE_INDEX_TYPE)
+            ?: throw NoSuchElementException("could not read current page index from the provided 'container'.")
+        container[CURRENT_PAGE_INDEX_KEY, CURRENT_PAGE_INDEX_TYPE] = current + diff
+    }
+
+    internal fun getMultipleResultGUI(
+        current: Inventory,
+        diff: Int,
+        playerID: UUID
+    ): Inventory {
+        if (!CustomCrafterAPI.isCustomCrafterMultipleResultGUI(current)) {
+            throw IllegalArgumentException("'current' must be Custom Crafter Multiple Result gui.")
+        }
+
+        val currentPageItem: ItemStack = current.getItem(CURRENT_PAGE_INDEX)
+            ?: throw NoSuchElementException("'current' has no item in the current page info item's slot.")
+
+        val container: PersistentDataContainer = currentPageItem.itemMeta.persistentDataContainer
+        updatePageIndex(container, diff)
+
+        val movedPageIndex: Int = container.get(
+            CURRENT_PAGE_INDEX_KEY, CURRENT_PAGE_INDEX_TYPE
+        ) ?: throw NoSuchElementException("'currentPageIndex' not found from the provided inventory item.")
+
+        val searchResult: Search.SearchResult = Search.SearchResult.fromByteArray(
+            currentPageItem.itemMeta.persistentDataContainer.get(
+                SEARCH_RESULT_KEY, SEARCH_RESULT_TYPE
+            ) ?: throw NoSuchElementException("'searchResult' not found from the provided inventory item.")
+        )
+
+        val vanillaChoice: Int = if (searchResult.vanilla() != null) 1 else 0
+        val startIndex: Int = movedPageIndex * ONE_PAGE_RESULT_LIMIT - vanillaChoice
+
+        val displayItems: Map<Int, ItemStack> = getDisplayItems(
+            container,
+            startIndex,
+            displayVanilla = (startIndex == 0 && searchResult.vanilla() != null),
+            crafterID = playerID,
+            displayPreviousButton = startIndex > ONE_PAGE_RESULT_LIMIT,
+            displayNextButton = (startIndex + ONE_PAGE_RESULT_LIMIT) < (searchResult.customs().size + vanillaChoice)
+        )
+
+        val result: Inventory = pageBase()
+        displayItems.forEach { (index, item) -> result.setItem(index, item) }
+        result.setItem(CURRENT_PAGE_INDEX, currentPageItem)
+        return result
     }
 
     /**
@@ -92,10 +142,11 @@ object InventoryModifier {
      *
      * @since 5.0.8
      */
-    fun getFirstMultipleResultGui(
+    internal fun getFirstMultipleResultGUI(
         current: Inventory,
         result: Search.SearchResult,
-        clickEvents: Map<Int, (Player, CRecipe, Boolean) -> Unit>
+        //clickEvents: Map<Int, (Player, CRecipe, Boolean) -> Unit>,
+        playerID: UUID
     // Int -> slot, Player -> clicked player, CRecipe -> a target recipe, Boolean -> shift click
     ): Inventory {
         val resultsAmount: Int = result.customs().size + (if (result.vanilla() != null) 1 else 0)
@@ -110,52 +161,62 @@ object InventoryModifier {
         val vanillaResultByteArray: ByteArray? = result.vanilla()?.result?.serializeAsBytes()
         val currentPageDisplayItem: ItemStack = currentPage(0)
 
-        currentPageDisplayItem.itemMeta.apply {
-            persistentDataContainer.set(
-                INPUT_INVENTORY_KEY,
-                INPUT_INVENTORY_TYPE,
-                inputByteArray)
+        currentPageDisplayItem.apply {
+            itemMeta = itemMeta.apply {
+                persistentDataContainer.set(
+                    INPUT_INVENTORY_KEY,
+                    INPUT_INVENTORY_TYPE,
+                    inputByteArray)
 
-            persistentDataContainer.set(
-                SEARCH_RESULT_KEY,
-                SEARCH_RESULT_TYPE,
-                result.toByteArray()
-            )
+                persistentDataContainer.set(
+                    SEARCH_RESULT_KEY,
+                    SEARCH_RESULT_TYPE,
+                    result.toByteArray()
+                )
 
-            persistentDataContainer.set(
-                VANILLA_RESULT_KEY,
-                VANILLA_RESULT_TYPE,
-                vanillaResultByteArray ?: ByteArray(0)
-            )
+                persistentDataContainer.set(
+                    VANILLA_RESULT_KEY,
+                    VANILLA_RESULT_TYPE,
+                    vanillaResultByteArray ?: ByteArray(0)
+                )
 
-            persistentDataContainer.set(
-                CURRENT_PAGE_INDEX_KEY,
-                CURRENT_PAGE_INDEX_TYPE,
-                0
-            )
+                persistentDataContainer.set(
+                    CURRENT_PAGE_INDEX_KEY,
+                    CURRENT_PAGE_INDEX_TYPE,
+                    0
+                )
+
+                val (key, type, epochTime) = CustomCrafterAPI.genCCKey()
+                persistentDataContainer.set(key, type, epochTime)
+            }
+
         }
 
-        val page: Inventory = Bukkit.createInventory(
-            null,
-            PAGE_SLOTS_SIZE,
-            MiniMessage.miniMessage().deserialize(MULTIPLE_RESULT_PAGE_TITLE)
-        )
+        val page: Inventory = pageBase()
 
         page.setItem(CURRENT_PAGE_INDEX, currentPageDisplayItem)
         if (resultsAmount > ONE_PAGE_RESULT_LIMIT) {
             page.setItem(NEXT_PAGE_INDEX, nextPage())
         }
 
+        getDisplayItems(
+            currentPageDisplayItem.itemMeta.persistentDataContainer,
+            startIndex = 0,
+            displayVanilla = result.vanilla() != null,
+            crafterID = playerID,
+            displayPreviousButton = false,
+            displayNextButton = resultsAmount > ONE_PAGE_RESULT_LIMIT
+        ).forEach { (index, item) ->
+            page.setItem(index, item)
+        }
 
+        return page
     }
 
-    private val DEFAULT_CLICK_LAMBDA: (Player, CRecipe, Inventory, Boolean) -> Unit = { player, recipe, input, shift ->
-        InventoryClickListener.process()
-    }
-
+    private val NO_DISPLAYABLE_RESULT_ITEM_TYPE = PersistentDataType.BOOLEAN
     private fun noDisplayableResultItem(
         recipeName: String
-    ): Triple<NamespacedKey, PersistentDataType<*, *>, ItemStack> {
+    ): Pair<NamespacedKey, ItemStack> {
         val key = NamespacedKey(CustomCrafter.getInstance(), "no_displayable_result_item")
         val type = PersistentDataType.BOOLEAN
         val item = ItemStack(Material.BARRIER).apply {
@@ -164,32 +225,77 @@ object InventoryModifier {
                 persistentDataContainer.set(key, type, true) // marker
             }
         }
-        return Triple(key, type, item)
+        return Pair(key, item)
     }
 
     private fun getDisplayItems(
-        // refer 'currentPage' only here
-        page: Inventory
-    ): List<ItemStack> {
-        val tagItem: ItemStack = page.getItem(CURRENT_PAGE_INDEX)!!
+        container: PersistentDataContainer,
+        startIndex: Int, // from
+        displayVanilla: Boolean,
+        crafterID: UUID,
+        displayPreviousButton: Boolean,
+        displayNextButton: Boolean
+    ): Map<Int, ItemStack> {
+        /*
+         *
+         * this requires multiple Search.SearchResult
+         *
+         * 0. get various values from container ByteArray (e.g. SearchResult)
+         * 1. calc display items size
+         * 2. get display items
+         * 3. mapping items
+         * 4. return items
+         */
+
+        if (startIndex < 0) throw IllegalArgumentException("'startIndex' must be a positive integer.")
+
         val searchResult: Search.SearchResult = Search.SearchResult.fromByteArray(
-            tagItem.itemMeta.persistentDataContainer.get(SEARCH_RESULT_KEY, SEARCH_RESULT_TYPE
-            ) ?: run {
-                throw IllegalStateException("the current page item does not have a container what contains recipe's hashcode.")
-        })
-        val result: MutableList<ItemStack> = mutableListOf()
-        //
-    }
+            container.get(SEARCH_RESULT_KEY, SEARCH_RESULT_TYPE)
+                ?: throw IllegalArgumentException("'container' does not have a search result's binary array.")
+        )
 
-    fun getNextMultipleResultGui(
-        current: Inventory
-    ) {
-        //
-    }
+        val mapped: Map<CoordinateComponent, ItemStack> = Converter.standardInputMapping(
+            Converter.inventoryFromByteArray(
+                container.get(INPUT_INVENTORY_KEY, INPUT_INVENTORY_TYPE)
+                    ?: throw NoSuchElementException("'container' does not have an input inventory's binary array.")
+            )
+        ) ?: throw IllegalStateException("'container' has an illegal formatted inventory's binary array.")
 
-    private fun deserializeCraftView(
-        current: Inventory
-    ): CraftView {
-        //
+        val vanillaChoice: Int = if (searchResult.vanilla() != null) 1 else 0
+        if (searchResult.customs().size + vanillaChoice < startIndex) return emptyMap()
+
+        val vanillaResult: ItemStack? =
+            if (searchResult.vanilla() != null && displayVanilla && startIndex == 0) { // vanilla result must be placed in index 0 slot.
+                searchResult.vanilla()?.let { recipe ->
+                    val modified = ItemStack(recipe.result)
+                    modified.apply {
+                        itemMeta = itemMeta.apply {
+                            lore(listOf(MiniMessage.miniMessage().deserialize("<aqua><u><b>Vanilla Recipe Result")))
+                        }
+                    }
+                }
+            } else null
+
+        val customsLimit: Int = ONE_PAGE_RESULT_LIMIT - (if (vanillaResult != null) 1 else 0)
+        val end: Int = min(startIndex + customsLimit, searchResult.customs().size) // exclude
+        val items: MutableMap<Int, ItemStack> = mutableMapOf()
+
+        vanillaResult?.let { v -> items[0] = v }
+
+        for ((index, pair) in searchResult.customs().slice(startIndex..<end).withIndex()) {
+            val (recipe, relation) = pair
+            val item: ItemStack = recipe.getResults(
+                crafterID, relation, mapped,
+                shiftClicked = false,
+                calledTimes = 1,
+                preDisplaying = true
+            ).getOrElse(0) { _ -> noDisplayableResultItem(recipe.name).second }
+            items[index] = item
+        }
+
+        if (displayPreviousButton) items[PREVIOUS_PAGE_INDEX] = previousPage()
+        if (displayNextButton) items[NEXT_PAGE_INDEX] = nextPage()
+
+        return items
     }
 }

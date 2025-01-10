@@ -2,6 +2,7 @@ package io.github.sakaki_aruka.customcrafter.api.processor
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.`object`.recipe.CoordinateComponent
+import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
@@ -46,6 +47,22 @@ object Converter {
             items.add(this.getItem(index) ?: padding)
         }
         return ItemStack.serializeItemsAsBytes(items)
+    }
+
+    fun inventoryFromByteArray(
+        array: ByteArray,
+        customCrafterGUI: Boolean = true
+    ): Inventory {
+        val inventory: Inventory =
+            if (customCrafterGUI) CustomCrafterAPI.getCraftingGUI()
+            else Bukkit.createInventory(null, 54)
+
+        for ((index: Int, item: ItemStack) in ItemStack.deserializeItemsFromBytes(array).withIndex()) {
+            if (customCrafterGUI && index == CustomCrafterAPI.CRAFTING_TABLE_MAKE_BUTTON_SLOT) continue
+            inventory.setItem(index, item)
+        }
+
+        return inventory
     }
 
     /**

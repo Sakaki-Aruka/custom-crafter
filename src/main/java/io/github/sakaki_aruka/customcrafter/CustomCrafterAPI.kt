@@ -14,6 +14,7 @@ import io.github.sakaki_aruka.customcrafter.api.listener.InventoryCloseListener
 import io.github.sakaki_aruka.customcrafter.api.listener.PlayerInteractListener
 import io.github.sakaki_aruka.customcrafter.api.`object`.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.processor.Converter
+import io.github.sakaki_aruka.customcrafter.api.processor.InventoryModifier
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -39,6 +40,11 @@ object CustomCrafterAPI {
     const val CRAFTING_TABLE_MAKE_BUTTON_SLOT: Int = 35
     const val CRAFTING_TABLE_RESULT_SLOT: Int = 44
     const val CRAFTING_TABLE_TOTAL_SIZE: Int = 54
+
+    /**
+     * manage multiple result enabled or not.
+     */
+    var IS_ENABLE_MULTIPLE_RESULT: Boolean = false
 
     internal fun setup() {
         val instance: CustomCrafter = CustomCrafter.getInstance()
@@ -204,6 +210,18 @@ object CustomCrafterAPI {
     }
 
     /**
+     * @suppress
+     */
+    internal fun isCustomCrafterMultipleResultGUI(inventory: Inventory): Boolean {
+        if (inventory.size != 54) return false
+        val currentDisplayItem: ItemStack = inventory.getItem(InventoryModifier.CURRENT_PAGE_INDEX)
+            ?.takeIf { it.type == InventoryModifier.currentPage(0).type }
+            ?: return false
+        val (key, type, _) = genCCKey()
+        return currentDisplayItem.itemMeta.persistentDataContainer.has(key, type)
+    }
+
+    /**
      * returns the provided inventory is OLDER than custom crafter reloaded or enabled or not.
      *
      * if you provide an inventory what is not a custom crafter gui, this throws an Exception.
@@ -214,11 +232,20 @@ object CustomCrafterAPI {
      * @return[Boolean] older or not
      */
     fun isGUITooOld(inventory: Inventory): Boolean {
-        if (!isCustomCrafterGUI(inventory)) throw IllegalArgumentException("'inventory' must be a CustomCrafter's gui.")
-        val button: ItemStack = inventory.getItem(CRAFTING_TABLE_MAKE_BUTTON_SLOT)!!
-        val key = genCCKey()
-        val time: Long = button.itemMeta.persistentDataContainer.get(key.first, key.second)
-            ?: throw IllegalStateException("'time' not found. (Internal Error)")
+        if (!isCustomCrafterGUI(inventory)
+            && !isCustomCrafterMultipleResultGUI(inventory)) {
+            throw IllegalArgumentException("'inventory' must be a CustomCrafter's gui.")
+        }
+
+        val (key, type, _) = genCCKey()
+        val time: Long = inventory.contents
+            .firstOrNull { item ->
+                item != null && item.itemMeta.persistentDataContainer.has(key, type)
+            }?.let { item ->
+                item.itemMeta.persistentDataContainer.get(key, type)
+                    ?: throw IllegalStateException("'time' not found. (Internal Error)")
+            } ?: run {
+                throw NoSuchElementException("'inventory' does not contain an item what is has created epoch time.") }
         return time < CustomCrafter.INITIALIZED
     }
 }

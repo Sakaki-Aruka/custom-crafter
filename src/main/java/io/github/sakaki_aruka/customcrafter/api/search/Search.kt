@@ -193,6 +193,8 @@ object Search {
                         array.sliceArray(index..<index + mappedRelationComponentSize)
                     )
 
+                    index += mappedRelationComponentSize
+
                     customs.add(recipe to mappedRelation)
                 }
 
