@@ -23,20 +23,18 @@ import kotlin.math.min
  */
 object InventoryModifier {
 
-    private val INPUT_INVENTORY_KEY = NamespacedKey(CustomCrafter.getInstance(), "input_inventory")
-    private val INPUT_INVENTORY_TYPE = PersistentDataType.BYTE_ARRAY
+    internal val INPUT_INVENTORY_KEY = NamespacedKey(CustomCrafter.getInstance(), "input_inventory")
+    internal val INPUT_INVENTORY_TYPE = PersistentDataType.BYTE_ARRAY
 
-    private val SEARCH_RESULT_KEY = NamespacedKey(CustomCrafter.getInstance(), "search_result")
-    private val SEARCH_RESULT_TYPE = PersistentDataType.BYTE_ARRAY // Search#SearchResult#toByteArray
+    internal val SEARCH_RESULT_KEY = NamespacedKey(CustomCrafter.getInstance(), "search_result")
+    internal val SEARCH_RESULT_TYPE = PersistentDataType.BYTE_ARRAY // Search#SearchResult#toByteArray
 
     private val VANILLA_RESULT_KEY = NamespacedKey(CustomCrafter.getInstance(), "vanilla_result")
     private val VANILLA_RESULT_TYPE = PersistentDataType.BYTE_ARRAY
 
-    private val RESULT_INDEX_KEY = NamespacedKey(CustomCrafter.getInstance(), "result_index")
-    private val RESULT_INDEX_TYPE = PersistentDataType.INTEGER
+    internal val RESULT_INDEX_KEY = NamespacedKey(CustomCrafter.getInstance(), "result_index")
+    internal val RESULT_INDEX_TYPE = PersistentDataType.INTEGER
 
-    private val CURRENT_PAGE_INDEX_KEY = NamespacedKey(CustomCrafter.getInstance(), "current_page_index")
-    private val CURRENT_PAGE_INDEX_TYPE = PersistentDataType.INTEGER
 
     private const val PREVIOUS_PAGE_INDEX = 45
     internal const val CURRENT_PAGE_INDEX = 49
@@ -78,13 +76,18 @@ object InventoryModifier {
         }
     }
 
-    private fun updatePageIndex(
+    internal fun getBlankSlots(): Set<Int> {
+        return setOf(46, 47, 48, CURRENT_PAGE_INDEX, 50, 51, 52) // CURRENT_PAGE_INDEX does not have any processes
+    }
+
+
+    internal fun displayedPageButtonClick(
+        gui: Inventory,
+        slot: Int,
         container: PersistentDataContainer,
-        diff: Int
+        playerID: UUID
     ) {
-        val current: Int = container.get(CURRENT_PAGE_INDEX_KEY, CURRENT_PAGE_INDEX_TYPE)
-            ?: throw NoSuchElementException("could not read current page index from the provided 'container'.")
-        container[CURRENT_PAGE_INDEX_KEY, CURRENT_PAGE_INDEX_TYPE] = current + diff
+        //TODO: impl this
     }
 
     internal fun getMultipleResultGUI(
@@ -100,11 +103,6 @@ object InventoryModifier {
             ?: throw NoSuchElementException("'current' has no item in the current page info item's slot.")
 
         val container: PersistentDataContainer = currentPageItem.itemMeta.persistentDataContainer
-        updatePageIndex(container, diff)
-
-        val movedPageIndex: Int = container.get(
-            CURRENT_PAGE_INDEX_KEY, CURRENT_PAGE_INDEX_TYPE
-        ) ?: throw NoSuchElementException("'currentPageIndex' not found from the provided inventory item.")
 
         val searchResult: Search.SearchResult = Search.SearchResult.fromByteArray(
             currentPageItem.itemMeta.persistentDataContainer.get(
@@ -112,8 +110,7 @@ object InventoryModifier {
             ) ?: throw NoSuchElementException("'searchResult' not found from the provided inventory item.")
         )
 
-        val vanillaChoice: Int = if (searchResult.vanilla() != null) 1 else 0
-        val startIndex: Int = movedPageIndex * ONE_PAGE_RESULT_LIMIT - vanillaChoice
+        val startIndex: Int = getIndex(current, getMinimum = false) + 1
 
         val displayItems: Map<Int, ItemStack> = getDisplayItems(
             container,
@@ -121,7 +118,7 @@ object InventoryModifier {
             displayVanilla = (startIndex == 0 && searchResult.vanilla() != null),
             crafterID = playerID,
             displayPreviousButton = startIndex > ONE_PAGE_RESULT_LIMIT,
-            displayNextButton = (startIndex + ONE_PAGE_RESULT_LIMIT) < (searchResult.customs().size + vanillaChoice)
+            displayNextButton = (startIndex + ONE_PAGE_RESULT_LIMIT) < searchResult.size()
         )
 
         val result: Inventory = pageBase()
@@ -180,12 +177,6 @@ object InventoryModifier {
                     vanillaResultByteArray ?: ByteArray(0)
                 )
 
-                persistentDataContainer.set(
-                    CURRENT_PAGE_INDEX_KEY,
-                    CURRENT_PAGE_INDEX_TYPE,
-                    0
-                )
-
                 val (key, type, epochTime) = CustomCrafterAPI.genCCKey()
                 persistentDataContainer.set(key, type, epochTime)
             }
@@ -228,6 +219,25 @@ object InventoryModifier {
         return Pair(key, item)
     }
 
+    internal fun getIndex(
+        gui: Inventory,
+        getMinimum: Boolean
+    ): Int {
+        val candidate: MutableSet<Int> = mutableSetOf()
+        gui.contents
+            .filterNotNull()
+            .filter { it.type != Material.AIR }
+            .forEach { item ->
+                item.itemMeta.persistentDataContainer.get(
+                    RESULT_INDEX_KEY,
+                    RESULT_INDEX_TYPE
+                )?.let { v -> candidate.add(v) }
+            }
+
+        if (candidate.isEmpty()) throw IllegalArgumentException("'gui' does not have indexed display result.")
+        return if (getMinimum) candidate.min() else candidate.max()
+    }
+
     private fun getDisplayItems(
         container: PersistentDataContainer,
         startIndex: Int, // from
@@ -261,8 +271,7 @@ object InventoryModifier {
             )
         ) ?: throw IllegalStateException("'container' has an illegal formatted inventory's binary array.")
 
-        val vanillaChoice: Int = if (searchResult.vanilla() != null) 1 else 0
-        if (searchResult.customs().size + vanillaChoice < startIndex) return emptyMap()
+        if (searchResult.size() < startIndex) return emptyMap()
 
         val vanillaResult: ItemStack? =
             if (searchResult.vanilla() != null && displayVanilla && startIndex == 0) { // vanilla result must be placed in index 0 slot.
@@ -277,19 +286,30 @@ object InventoryModifier {
             } else null
 
         val customsLimit: Int = ONE_PAGE_RESULT_LIMIT - (if (vanillaResult != null) 1 else 0)
-        val end: Int = min(startIndex + customsLimit, searchResult.customs().size) // exclude
+        val end: Int = min(startIndex + customsLimit, searchResult.size()) // exclude
         val items: MutableMap<Int, ItemStack> = mutableMapOf()
 
         vanillaResult?.let { v -> items[0] = v }
 
-        for ((index, pair) in searchResult.customs().slice(startIndex..<end).withIndex()) {
-            val (recipe, relation) = pair
+        for (index in startIndex..<end) {
+            val (recipe, relation) = searchResult.getCustomResult(index)
             val item: ItemStack = recipe.getResults(
                 crafterID, relation, mapped,
                 shiftClicked = false,
                 calledTimes = 1,
                 preDisplaying = true
             ).getOrElse(0) { _ -> noDisplayableResultItem(recipe.name).second }
+                .let { item ->
+                    item.apply {
+                        itemMeta = itemMeta.apply {
+                            persistentDataContainer.set(
+                                RESULT_INDEX_KEY,
+                                RESULT_INDEX_TYPE,
+                                index
+                            )
+                        }
+                    }
+                }
             items[index] = item
         }
 

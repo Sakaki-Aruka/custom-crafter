@@ -21,6 +21,7 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.PlayerInventory
+import org.bukkit.persistence.PersistentDataContainer
 import kotlin.math.max
 
 /**
@@ -110,20 +111,98 @@ object InventoryClickListener: Listener {
         gui: Inventory,
         player: Player
     ) {
-        //
+        if (InventoryModifier.getBlankSlots().contains(event.rawSlot)) return
+        val clicked: ItemStack = gui.getItem(event.rawSlot)
+            ?.takeIf { it.type != Material.AIR }
+            ?: return
+        val currentPageInfoItem: ItemStack = gui.getItem(InventoryModifier.CURRENT_PAGE_INDEX)
+            ?: throw IllegalStateException("'gui' must have page info item, but not found.")
+
+        val container: PersistentDataContainer = currentPageInfoItem.itemMeta.persistentDataContainer
+
+        when (event.rawSlot) {
+            in 0..<45 -> run {
+                // click result (not air)
+                // need to decrement and re-calculating results.
+                val result: Search.SearchResult = Search.SearchResult.fromByteArray(
+                    container.get(
+                        InventoryModifier.SEARCH_RESULT_KEY,
+                        InventoryModifier.SEARCH_RESULT_TYPE
+                    ) ?: throw NoSuchElementException("'gui' does not have searchResult byte array.")
+                )
+
+                val resultIndex: Int = clicked.itemMeta.persistentDataContainer
+                    .get(
+                        InventoryModifier.RESULT_INDEX_KEY,
+                        InventoryModifier.RESULT_INDEX_TYPE
+                    ) ?: throw NoSuchElementException("clicked item does not have 'resultIndex' container.")
+                val pair: Pair<CRecipe, MappedRelation> = result.getCustomResult(resultIndex)
+
+                val inputInventory: Inventory = Converter.inventoryFromByteArray(
+                    container.get(
+                        InventoryModifier.INPUT_INVENTORY_KEY,
+                        InventoryModifier.INPUT_INVENTORY_TYPE
+                    ) ?: throw NoSuchElementException("'gui' does not have the input inventory byte array.")
+                )
+
+                //1つでも空になったらクラフト画面に戻る
+                //空にならなかった場合は、その時のインベントリで再度検索をかけてその結果を表示する(複数じゃなくても複数表示する)
+
+                fun getPlacedSlots(inventory: Inventory): Set<Int> {
+                    return inventory.contents
+                        .withIndex()
+                        .filter { (_, item) -> item != null && item.type != Material.AIR }
+                        .map { (slot, _) -> slot }
+                        .toSet()
+                }
+
+                val placedSlotsBefore: Set<Int> = getPlacedSlots(inputInventory)
+                val newSearchResult = Search.SearchResult(null, listOf(pair))
+                process(newSearchResult, gui,event.click == ClickType.SHIFT_LEFT, player)
+                val placedSlotsAfter: Set<Int> = getPlacedSlots(inputInventory)
+
+                if (placedSlotsBefore.size != placedSlotsAfter.size) {
+                    player.openInventory(inputInventory)
+                    return
+                }
+
+                val reSearchResult: Search.SearchResult = Search.search(
+                    crafterID = player.uniqueId,
+                    inventory = inputInventory
+                ) ?: run {
+                    player.openInventory(inputInventory)
+                    return
+                }
+
+                player.openInventory(
+                    InventoryModifier.getFirstMultipleResultGUI(
+                        inputInventory,
+                        reSearchResult,
+                        player.uniqueId
+                    ))
+            }
+
+            in InventoryModifier.getBlankSlots() -> return
+
+            else -> run {
+                // click page change button (not air)
+                InventoryModifier.displayedPageButtonClick(gui, event.rawSlot, container, player.uniqueId)
+            }
+        }
     }
 
     private fun process(
         result: Search.SearchResult,
         gui: Inventory,
         mass: Boolean,
-        player: Player
+        player: Player,
+        forceMultiple: Boolean = result.customs().size > 1
     ) {
         if (result.customs().isEmpty() && result.vanilla() == null) return
         val mapped: Map<CoordinateComponent, ItemStack> = Converter.standardInputMapping(gui) ?: return
 
         if (result.customs().isNotEmpty()) {
-            if (CustomCrafterAPI.IS_ENABLE_MULTIPLE_RESULT) {
+            if (CustomCrafterAPI.IS_ENABLE_MULTIPLE_RESULT && forceMultiple) {
                 // multiple result display
                 val page: Inventory = InventoryModifier.getFirstMultipleResultGUI(
                     gui, result, player.uniqueId

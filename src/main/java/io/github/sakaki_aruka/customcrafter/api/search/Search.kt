@@ -52,6 +52,32 @@ object Search {
          */
         fun customs() = this.customs
 
+        /**
+         * returns [vanilla] and [customs] result size.
+         *
+         * if [vanilla] is null, returned value is same with [customs]'s size.
+         *
+         * @return[Int] the size of results.
+         */
+        fun size(): Int {
+            return customs.size + (if (vanilla != null) 1 else 0)
+        }
+
+        /**
+         * returns a specified indexed pair from[customs].
+         *
+         * @param[index] an index of the result what you want to get
+         * @throws[IllegalArgumentException] 'index' must be a positive number.
+         * @throws[IllegalArgumentException] 'index' must be smaller than [customs] size.
+         * @return[Pair]<[CRecipe],[MappedRelation]> result of a query
+         */
+        fun getCustomResult(index: Int): Pair<CRecipe, MappedRelation> {
+            if (index < 0) throw IllegalArgumentException("'index' must be a positive number.")
+            else if (index >= customs.size) throw IllegalArgumentException("'index' must be smaller than 'customs' size.")
+            return customs[index]
+        }
+
+
         // when call Search#search with natural: Boolean
         // - true: when this finds matched custom recipes, does not search about vanilla.
         // - false: always search vanilla, but this does not mean 'vanilla' is non-null.
