@@ -84,15 +84,22 @@ object InventoryModifier {
     internal fun displayedPageButtonClick(
         gui: Inventory,
         slot: Int,
-        container: PersistentDataContainer,
+        //container: PersistentDataContainer,
         playerID: UUID
-    ) {
+    ): Inventory {
         //TODO: impl this
+        return when (slot) {
+            PREVIOUS_PAGE_INDEX ->  getMultipleResultGUI(gui, -1, playerID)
+
+            NEXT_PAGE_INDEX -> getMultipleResultGUI(gui, 1, playerID)
+
+            else -> throw IllegalArgumentException("'slot' must be ${PREVIOUS_PAGE_INDEX} or ${NEXT_PAGE_INDEX}.")
+        }
     }
 
     internal fun getMultipleResultGUI(
         current: Inventory,
-        diff: Int,
+        diff: Int, // -1 = previous, 1 = next
         playerID: UUID
     ): Inventory {
         if (!CustomCrafterAPI.isCustomCrafterMultipleResultGUI(current)) {
@@ -110,7 +117,11 @@ object InventoryModifier {
             ) ?: throw NoSuchElementException("'searchResult' not found from the provided inventory item.")
         )
 
-        val startIndex: Int = getIndex(current, getMinimum = false) + 1
+        val startIndex: Int =
+            if (diff == 1 ) getIndex(current, getMinimum = false) + 1
+            else (getIndex(current, getMinimum = true) - ONE_PAGE_RESULT_LIMIT)
+                .takeIf { i -> i >= 0 }
+                ?: throw IllegalArgumentException("minus 'diff' does not match this page.")
 
         val displayItems: Map<Int, ItemStack> = getDisplayItems(
             container,

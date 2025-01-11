@@ -186,7 +186,13 @@ object InventoryClickListener: Listener {
 
             else -> run {
                 // click page change button (not air)
-                InventoryModifier.displayedPageButtonClick(gui, event.rawSlot, container, player.uniqueId)
+                val newPage: Inventory = InventoryModifier.displayedPageButtonClick(
+                    gui,
+                    event.rawSlot,
+                    player.uniqueId
+                )//container, player.uniqueId)
+
+                player.openInventory(newPage)
             }
         }
     }
