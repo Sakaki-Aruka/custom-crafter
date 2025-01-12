@@ -30,10 +30,10 @@ data class MappedRelation internal constructor(
             array: ByteArray
         ): MappedRelation {
             if (array.size % 16 != 0) {
-                throw IllegalArgumentException("The size of 'array' must be 0 when divided by 16.")
+                throw IllegalArgumentException("The remainder of 'array' size must be 0 when divided by 16.")
             }
             val components: MutableSet<MappedRelationComponent> = mutableSetOf()
-            (0..(array.size / 16) step 16 ).forEach { point ->
+            (0..<(array.size / 16) step 16).forEach { point ->
                 val start: Int = point * 16
                 val end: Int = (point + 1) * 16 // until
                 val c: ByteArray = array.sliceArray(start..<end)
