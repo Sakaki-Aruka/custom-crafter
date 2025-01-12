@@ -41,7 +41,7 @@ data class CoordinateComponent(
         }
 
         y.toByteArray().withIndex().forEach { (index, byte) ->
-            array[index] = byte
+            array[index + 4] = byte
         }
 
         return array
