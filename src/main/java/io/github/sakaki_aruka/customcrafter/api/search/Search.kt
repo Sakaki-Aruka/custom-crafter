@@ -87,6 +87,37 @@ object Search {
         // why this class does not support 'hashCode' and 'equals'?
         //  -> There is same reason with the above q.
 
+        /**
+         * converts to [ByteArray]
+         *
+         * ```
+         *             /*
+         *              * ByteArray payload
+         *              * [0 ~ 3] = contains vanilla result or not. ('0' or '1' / 0 = true, 1 = false)
+         *              * [4 ~ 7] = vanilla recipe ItemStack's ByteArray size (if [0 ~ 3] = 1, all bits are zero.)
+         *              * [8 ~ 11] = vanilla recipe hashcode (if [0 ~ 3] = 1, all bits are zero.)
+         *              * [12 ~ x] = vanilla recipe itemStack's ByteArray (if [0 ~ 3] = 1, [12-15] equals 0.toByteArray())
+         *              * [x+1 ~ x+4] = custom recipes info size (Int -> ByteArray(=4 Byte))
+         *              * [x+5 ~ ] = List<Pair<CRecipe, MappedRelation>> elements
+         *              *
+         *              * ---
+         *              *
+         *              * List<Pair<CRecipe, MappedRelation>> payload
+         *              *
+         *              * [0 ~ 3] = size of the list. (Int -> ByteArray)
+         *              * [4 ~ ] = Pair<CRecipe, MappedRelation> elements
+         *              *
+         *              * ---
+         *              *
+         *              * Pair<CRecipe, MappedRelation> payload
+         *              * [0 ~ 3] = CRecipe hashcode
+         *              * [4 ~ 7] = MappedRelationComponent amount what are contained MappedRelation (Int -> ByteArray)
+         *              * [8 ~ ] = MappedRelation (MappedRelation -> ByteArray)
+         *              */
+         * ```
+         *
+         * @return[ByteArray] converted array
+         */
         fun toByteArray(): ByteArray {
             /*
              * ByteArray payload
@@ -158,6 +189,13 @@ object Search {
         }
 
         companion object {
+
+            /**
+             * returns [SearchResult] what is converted from the provided [ByteArray]
+             *
+             * @param[array] an input ByteArray
+             * @return[SearchResult] a result of convert
+             */
             fun fromByteArray(
                 array: ByteArray
             ): SearchResult {
