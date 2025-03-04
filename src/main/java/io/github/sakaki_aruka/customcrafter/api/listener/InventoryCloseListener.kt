@@ -7,7 +7,6 @@ import io.github.sakaki_aruka.customcrafter.api.processor.Converter
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.bukkit.World
-import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryCloseEvent

@@ -386,10 +386,5 @@ object CustomCrafterAPI {
             ?: throw IllegalStateException("'time' key contained item not found.")
 
         return time < CustomCrafter.INITIALIZED
-//        val button: ItemStack = inventory.getItem(CRAFTING_TABLE_MAKE_BUTTON_SLOT)!!
-//        val key = genCCKey()
-//        val time: Long = button.itemMeta.persistentDataContainer.get(key.first, key.second)
-//            ?: throw IllegalStateException("'time' not found. (Internal Error)")
-//        return time < CustomCrafter.INITIALIZED
     }
 }

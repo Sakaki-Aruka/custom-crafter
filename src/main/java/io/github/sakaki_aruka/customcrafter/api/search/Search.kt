@@ -14,7 +14,6 @@ import io.github.sakaki_aruka.customcrafter.api.processor.Converter
 import kotlinx.serialization.json.Json
 import org.bukkit.Bukkit
 import org.bukkit.Material
-import org.bukkit.NamespacedKey
 import org.bukkit.World
 import org.bukkit.entity.Player
 import org.bukkit.inventory.CraftingRecipe

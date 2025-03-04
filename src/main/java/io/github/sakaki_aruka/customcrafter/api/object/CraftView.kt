@@ -97,16 +97,14 @@ data class CraftView internal constructor(
     /**
      * converts a view to [ByteArray] (ByteArray equals byte[] in Java)
      *
-     * @param[paddingAir] padding empty slots or not. (default = true)
      * @return[String] a serialized CraftView string
      * @since 5.0.8
      */
-    fun toJson(paddingAir: Boolean = true): String {
+    fun toJson(): String {
         val converted: MutableMap<Int, String> = mutableMapOf()
         for (index in (0..<54)) {
             val item: ItemStack = this.materials[CoordinateComponent.fromIndex(index, followLimit = false)]
                 .takeIf { i -> i?.type != Material.AIR } ?: continue
-                //?: if (paddingAir) ItemStack.empty() else continue
             converted[index] = Base64.getEncoder().encodeToString(item.serializeAsBytes())
         }
 
@@ -115,10 +113,6 @@ data class CraftView internal constructor(
             ?.let { result ->
                 converted[Int.MAX_VALUE] = Base64.getEncoder().encodeToString(result.serializeAsBytes())
             }
-//        if (this.result.type != Material.AIR) {
-//            converted[Int.MAX_VALUE] = Base64.getEncoder().encodeToString(result.serializeAsBytes())
-//        }
-//        converted[Int.MAX_VALUE] = Base64.getEncoder().encodeToString(this.result.serializeAsBytes())
         return Json.encodeToString(converted)
     }
 }

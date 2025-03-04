@@ -74,7 +74,6 @@ object InventoryClickListener: Listener {
         gui: Inventory,
         event: InventoryClickEvent
     ) {
-        // TODO no drop marker place
         if (CustomCrafterAPI.isGUITooOld(gui)) {
             event.isCancelled = true
             player.closeInventory()
