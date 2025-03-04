@@ -24,7 +24,6 @@ object Container {
             .map { it.key }
 
         val inputCoordinates: List<CoordinateComponent> = mapped.keys.toList()
-        // val input = mapped
 
         if (recipes.size > inputCoordinates.size) {
             return Pair(AmorphousFilterCandidate.Type.NOT_ENOUGH, emptyList())

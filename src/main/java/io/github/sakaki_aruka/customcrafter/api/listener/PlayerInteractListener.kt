@@ -31,6 +31,6 @@ object PlayerInteractListener: Listener {
         }
 
         isCancelled = true
-        player.openInventory(CustomCrafterAPI.getCraftingGUI())
+        player.openInventory(CustomCrafterAPI.getCraftingGUI(dropItemsOnClose = true))
     }
 }

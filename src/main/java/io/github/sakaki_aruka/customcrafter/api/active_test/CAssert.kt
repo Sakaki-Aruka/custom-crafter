@@ -20,10 +20,8 @@ internal object CAssert {
             val resultComponent = if (result) "<aqua>Successful</aqua>" else "<yellow>Failed    </yellow>"
             val line = MiniMessage.miniMessage().deserialize("(Test) $resultComponent: $fileName#$methodName ($lineNum)")
             console.sendMessage(line)
-            //CustomCrafter.getInstance().logger.info()
         } ?: kotlin.run {
             console.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>Failed to get caller."))
-            //CustomCrafter.getInstance().logger.warning("Failed to get caller.")
         }
     }
 
@@ -37,10 +35,8 @@ internal object CAssert {
             val lineNum = caller.lineNumber
             val resultComponent = if (result) "<aqua>Successful</aqua>" else "<yellow>Failed    </yellow>"
             console.sendMessage(MiniMessage.miniMessage().deserialize("(Exception Test) $resultComponent: $fileName#$methodName ($lineNum)"))
-            //CustomCrafter.getInstance().logger.info()
         } ?: kotlin.run {
             console.sendMessage(MiniMessage.miniMessage().deserialize("<yellow>Failed to get caller."))
-            //CustomCrafter.getInstance().logger.warning("Failed to get caller.")
         }
     }
 }

@@ -6,7 +6,7 @@
 
     <groupId>io.github.sakaki_aruka</groupId>
     <artifactId>custom-crafter</artifactId>
-    <version>5.0.7</version>
+    <version>5.0.8</version>
     <packaging>jar</packaging>
 
     <name>Custom Crafter</name>
@@ -17,6 +17,7 @@
 
         <!-- Kotlin -->
         <kotlin.version>2.0.20</kotlin.version>
+        <serialization.version>1.8.0</serialization.version>
     </properties>
 
     <build>
@@ -51,6 +52,18 @@
                         </configuration>
                     </execution>
                 </executions>
+                <configuration>
+                    <compilerPlugins>
+                        <plugin>kotlinx-serialization</plugin>
+                    </compilerPlugins>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.jetbrains.kotlin</groupId>
+                        <artifactId>kotlin-maven-serialization</artifactId>
+                        <version>${kotlin.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
             <plugin>
                 <groupId>org.jetbrains.dokka</groupId>
@@ -149,6 +162,12 @@
             <scope>compile</scope>
         </dependency>
         <!-- /Kotlin -->
+
+        <dependency>
+            <groupId>org.jetbrains.kotlinx</groupId>
+            <artifactId>kotlinx-serialization-json</artifactId>
+            <version>${serialization.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>io.papermc.paper</groupId>

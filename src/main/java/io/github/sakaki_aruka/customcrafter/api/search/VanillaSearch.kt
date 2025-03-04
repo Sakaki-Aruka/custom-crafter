@@ -3,11 +3,11 @@ package io.github.sakaki_aruka.customcrafter.api.search
 import io.github.sakaki_aruka.customcrafter.api.`object`.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.processor.Converter
 import org.bukkit.Bukkit
+import org.bukkit.Material
 import org.bukkit.World
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.Recipe
-import kotlin.math.max
 
 object VanillaSearch {
     /**
@@ -27,23 +27,23 @@ object VanillaSearch {
         return Bukkit.getCraftingRecipe(nineArray, world)
     }
 
-    private fun getNineItemStackArray(mapped: Map<CoordinateComponent, ItemStack>): Array<ItemStack>? {
+    private fun getNineItemStackArray(
+        mapped: Map<CoordinateComponent, ItemStack>
+    ): Array<ItemStack>? {
         if (mapped.isEmpty()) return null
-        val xMin: CoordinateComponent = mapped.keys.minBy { it.x }
-        val xMax: CoordinateComponent = mapped.keys.maxBy { it.x }
-        val yMin: CoordinateComponent = mapped.keys.minBy { it.y }
-        val yMax: CoordinateComponent = mapped.keys.maxBy { it.y }
-        if (max(xMax.x - xMin.x, yMax.y - yMin.y) > 2) return null
-
-        val result: Array<ItemStack> = Array(9) { ItemStack.empty() }
-        Converter.getAvailableCraftingSlotComponents()
-            .filter { (xMin.x..xMax.x).contains(it.x)
-                    && (yMin.y..yMax.y).contains(it.y)
+        val minCoordinate: CoordinateComponent = mapped
+            .filter { (_, item) -> item.type != Material.AIR }
+            .keys.minBy { i -> i.toIndex() }
+        val list: MutableList<ItemStack> = mutableListOf()
+        CoordinateComponent.squareFill(
+            size = 3,
+            dx = minCoordinate.x,
+            dy = minCoordinate.y,
+            safeTrim = false
+        ).sortedBy { c -> c.toIndex() }
+            .forEach { c ->
+                list.add(mapped[c] ?: ItemStack.empty())
             }
-            .withIndex()
-            .map { (index, c) ->
-                result[index] = mapped.getOrDefault(c, ItemStack.empty())
-            }
-        return result
+        return list.toTypedArray()
     }
 }

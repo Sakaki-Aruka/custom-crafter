@@ -1,5 +1,7 @@
 package io.github.sakaki_aruka.customcrafter.api.`object`.recipe
 
+import kotlinx.serialization.Serializable
+
 /**
  * A coordinate in Crafting slots.
  *
@@ -11,6 +13,7 @@ package io.github.sakaki_aruka.customcrafter.api.`object`.recipe
  * @param[y] Y coordinate
  * @since 5.0.0
  */
+@Serializable
 data class CoordinateComponent(
     val x: Int,
     val y: Int

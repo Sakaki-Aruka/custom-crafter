@@ -58,7 +58,7 @@ The latest provided version
    <dependency>
       <groupId>com.github.Sakaki-Aruka</groupId>
       <artifactId>custom-crafter</artifactId>
-      <version>5.0.7</version>
+      <version>5.0.8</version>
    </dependency>
 </dependencies>
 
@@ -82,7 +82,7 @@ dependencyResolutionManagement {
 (dependency)
 ```groovy
 dependencies {
-        implementation 'com.github.Sakaki-Aruka:custom-crafter:5.0.7'
+        implementation 'com.github.Sakaki-Aruka:custom-crafter:5.0.8'
 }
 ```
 
@@ -103,7 +103,7 @@ repositories {
 (dependency)
 ```
 dependencies {
-    implementation("com.github.Sakaki-Aruka:custom-crafter:5.0.7")
+    implementation("com.github.Sakaki-Aruka:custom-crafter:5.0.8")
 }
 ```
 
@@ -131,7 +131,7 @@ The default base block is `GOLD_BLOCK`.
 # LICENSE
 MIT License
 
-Copyright (c) 2023 - 2024 Sakaki-Aruka
+Copyright (c) 2023 - 2025 Sakaki-Aruka
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

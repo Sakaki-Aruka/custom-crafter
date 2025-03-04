@@ -48,11 +48,34 @@ interface CRecipe {
     }
 
     /**
+     * This setting is only used for multiple candidate display when it enabled.
+     *
+     * This func returns false on default.
+     *
+     * @return[Boolean] default shift clicked
+     * @since 5.0.8
+     */
+    fun multipleCandidateDisplaySettingDefaultShiftClicked(): Boolean = false
+
+    /**
+     * This setting is only used for multiple candidate display when it enabled.
+     *
+     * This func returns 1 on default.
+     *
+     * @return[Int] default called time
+     * @since 5.0.8
+     */
+    fun multipleCandidateDisplaySettingDefaultCalledTimes(): Int = 1
+
+    /**
      * returns results of suppliers made
      *
      * @param[crafterID] a crafter's uuid
      * @param[relate] an input inventory and [CRecipe] coordinates relation.
      * @param[mapped] coordinates and input items relation.
+     * @param[shiftClicked] shift clicked or not
+     * @param[calledTimes] how many times called this
+     * @param[isMultipleDisplayCall] called from multiple craft result candidate collector or not (since 5.0.8)
      * @return[MutableList<ItemStack>] generated items list. if no item supplier applied, returns an empty list.
      */
     fun getResults(
@@ -60,12 +83,23 @@ interface CRecipe {
         relate: MappedRelation,
         mapped: Map<CoordinateComponent, ItemStack>,
         shiftClicked: Boolean,
-        calledTimes: Int
+        calledTimes: Int,
+        isMultipleDisplayCall: Boolean
     ): MutableList<ItemStack> {
         return results?.let { suppliers ->
             val list: MutableList<ItemStack> = mutableListOf()
             suppliers.map { s ->
-                list.addAll(s.func.invoke(crafterID, relate, mapped, list, shiftClicked, calledTimes))
+                list.addAll(s.func.invoke(
+                    ResultSupplier.Config(
+                        crafterID,
+                        relate,
+                        mapped,
+                        list,
+                        shiftClicked,
+                        calledTimes,
+                        isMultipleDisplayCall
+                    )
+                ))
             }
             list
         } ?: mutableListOf()
