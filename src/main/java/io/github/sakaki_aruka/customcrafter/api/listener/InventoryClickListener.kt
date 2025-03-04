@@ -253,21 +253,15 @@ object InventoryClickListener: Listener {
 
                 if (fromVanillaRecipe) {
                     result.vanilla()?.let { recipe ->
-                        val firstItemCoordinate: CoordinateComponent =
-                            CoordinateComponent.fromIndex(
-                                Converter.getAvailableCraftingSlotIndices()
-                                    .sorted()
-                                    .firstOrNull { i ->
-                                        input.materials[CoordinateComponent.fromIndex(i, followLimit = false)]?.type != Material.AIR
-                                    } ?: return,
-                                followLimit = false
-                            )
-                        val interestedSlots: Set<CoordinateComponent> = CoordinateComponent.squareFill(
+                        val firstItemCoordinate: CoordinateComponent = input.materials
+                            .filter { (_, item) -> item.type != Material.AIR }
+                            .keys.minBy { c -> c.toIndex() }
+                        val interestedSlots: List<CoordinateComponent> = CoordinateComponent.squareFill(
                             size = 3,
                             dx = firstItemCoordinate.x,
                             dy = firstItemCoordinate.y,
                             safeTrim = false
-                        )
+                        ).sortedBy { c -> c.toIndex() }
                         val materials: List<ItemStack> = interestedSlots.map { c ->
                             input.materials[c] ?: ItemStack.empty()
                         }
