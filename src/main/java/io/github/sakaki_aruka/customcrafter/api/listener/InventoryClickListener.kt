@@ -314,12 +314,19 @@ object InventoryClickListener: Listener {
                 }
                 player.closeInventory()
 
-                player.openInventory(newCraftView.toCraftingGUI())  // this gui will always close before open a new gui. So, needless to set 'no-drop marker'.
+                val preEvent = PreCreateCustomItemEvent(player, newCraftView, event.click)
+                Bukkit.getPluginManager().callEvent(preEvent)
+                if (preEvent.isCancelled) return
+
+                // this gui will always close before open a new gui. So, needless to set 'no-drop marker'.
+                player.openInventory(newCraftView.toCraftingGUI())
                 val continueResult: Search.SearchResult = Search.search(
                     player.uniqueId,
                     newCraftView,
                     natural = !CustomCrafterAPI.USE_MULTIPLE_RESULT_CANDIDATE_FEATURE
                 ) ?: return
+
+                CreateCustomItemEvent(player, newCraftView, continueResult, event.click).callEvent()
 
                 if (CustomCrafterAPI.USE_MULTIPLE_RESULT_CANDIDATE_FEATURE && continueResult.size() > 1) {
                     allCandidatesProcess(continueResult, newCraftView.toCraftingGUI(), player)
