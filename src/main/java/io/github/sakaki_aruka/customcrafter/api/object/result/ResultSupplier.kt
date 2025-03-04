@@ -10,43 +10,56 @@ import java.util.UUID
 /**
  * A result supplier of [CRecipe].
  *
- * Function parameters
- * - [UUID]: a crafter's uuid.
- * - [MappedRelation]: a coordinate mapping between a [CRecipe] and an input Inventory
- * - [Map]<[CoordinateComponent], [ItemStack]>: a coordinate and input items mapping
- * - [MutableList]<[ItemStack]>: result items that are made by a [CRecipe]
- * - [Boolean]: shift clicked or not
- * - [Int]: calculated minimum amount with [CMatter].amount
+ * This requires a single argument that is [ResultSupplier.Config]
+ *
  * ```
  * // call example from Java
- * ResultSupplier supplier = new ResultSupplier ((crafterID, relate, mapped, list, shiftClicked, calledTimes) -> List.of(ItemStack.empty()));
+ * ResultSupplier supplier = new ResultSupplier(
+ *     new ResultSupplier.Config(crafterID, relate, mapped, list, shiftClicked, calledTimes, isMultipleCalled) ->
+ *             List.of(ItemStack.empty()
+ *         ));
  *
  * // call example from Kotlin
- * val supplier = ResultSupplier { crafterID, relate, mapped, list, shiftClicked, calledTimes -> listOf(ItemStack.empty()) }
+ * val supplier = ResultSupplier {
+ *     ResultSupplier.Config(crafterID, relate, mapped, list, shiftClicked, calledTimes, isMultipleCalled) ->
+ *         listOf(ItemStack.empty())
+ * }
  * ```
  *
  * @param[func] function.
  * @return[ResultSupplier]
  */
 data class ResultSupplier (
-
-    val func: Function6<
-            UUID,
-            MappedRelation,
-            Map<CoordinateComponent, ItemStack>,
-            MutableList<ItemStack>,
-            Boolean, //  shift clicked
-            Int, // calledTimes
-            List<ItemStack>> // return
+    val func: Function1<ResultSupplier.Config, List<ItemStack>>,
 ) {
     operator fun invoke(
-        crafterID: UUID,
-        relation: MappedRelation,
-        mapped: Map<CoordinateComponent, ItemStack>,
-        list: MutableList<ItemStack>,
-        shiftClicked: Boolean,
-        calledTimes: Int
-    ): List<ItemStack> = func(crafterID, relation, mapped, list, shiftClicked, calledTimes)
+        config: Config
+    ): List<ItemStack> = func(config)
+
+    //TODO add data class `ResultSupplier.Config` (includes all arguments)
+    /**
+     * ResultSupplier's arguments
+     *
+     * (This class's constructor is internal. You cannot call it from your project.)
+     *
+     * @param[crafterID] a crafter's uuid.
+     * @param[relation] a coordinate mapping between a [CRecipe] and an input Inventory
+     * @param[mapped] a coordinate and input items mapping
+     * @param[list] result items that are made by a [CRecipe]
+     * @param[shiftClicked] shift clicked or not
+     * @param[calledTimes] calculated minimum amount with [CMatter].amount
+     * @param[isMultipleDisplayCall] `invoke` called from multiple result display item collector or not
+     * @since 5.0.8
+     */
+    data class Config(
+        val crafterID: UUID,
+        val relation: MappedRelation,
+        val mapped: Map<CoordinateComponent, ItemStack>,
+        val list: MutableList<ItemStack>,
+        val shiftClicked: Boolean,
+        val calledTimes: Int,
+        val isMultipleDisplayCall: Boolean
+    )
 
     companion object {
         /**
@@ -57,13 +70,13 @@ data class ResultSupplier (
          * if you want to consider shift click, use [timesSingle] instead of this.
          *
          * ```
-         * return ResultSupplier { _, _, _, _, _, _ -> listOf(item) }
+         * return ResultSupplier { _ -> listOf(item) }
          * ```
          *
          * @param[item] a supplied item
          */
         fun single(item: ItemStack): ResultSupplier {
-            return ResultSupplier { _, _, _, _, _, _ -> listOf(item) }
+            return ResultSupplier { _ -> listOf(item) }
         }
 
         /**
@@ -78,10 +91,10 @@ data class ResultSupplier (
          * @param[item] a supplied item
          */
         fun timesSingle(item: ItemStack): ResultSupplier {
-            return ResultSupplier { _, _, _, _, shift, called ->
-                if (shift) {
+            return ResultSupplier { config ->
+                if (config.shiftClicked) {
                     val modified = ItemStack(item)
-                    modified.amount *= called
+                    modified.amount *= config.calledTimes
                     listOf(modified)
                 } else listOf(item)
             }

@@ -3,6 +3,7 @@ package io.github.sakaki_aruka.customcrafter
 import io.github.sakaki_aruka.customcrafter.api.active_test.test.APITest
 import io.github.sakaki_aruka.customcrafter.api.active_test.test.ConverterTest
 import io.github.sakaki_aruka.customcrafter.api.active_test.test.EnchantTest
+import io.github.sakaki_aruka.customcrafter.api.active_test.test.MultipleCandidateTest
 import io.github.sakaki_aruka.customcrafter.api.active_test.test.PotionTest
 import io.github.sakaki_aruka.customcrafter.api.active_test.test.SearchTest
 import io.github.sakaki_aruka.customcrafter.api.active_test.test.VanillaSearchTest
@@ -12,8 +13,10 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.listener.InventoryClickListener
 import io.github.sakaki_aruka.customcrafter.api.listener.InventoryCloseListener
 import io.github.sakaki_aruka.customcrafter.api.listener.PlayerInteractListener
+import io.github.sakaki_aruka.customcrafter.api.`object`.CraftView
 import io.github.sakaki_aruka.customcrafter.api.`object`.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.processor.Converter
+import io.github.sakaki_aruka.customcrafter.api.search.Search
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -25,7 +28,7 @@ import org.bukkit.scheduler.BukkitRunnable
 import kotlin.random.Random
 
 object CustomCrafterAPI {
-    const val API_VERSION: String = "0.1.6"
+    const val API_VERSION: String = "0.1.8"
     const val IS_STABLE: Boolean = false
     const val IS_BETA: Boolean = true
 
@@ -35,10 +38,28 @@ object CustomCrafterAPI {
     internal val TEST_RECIPES: MutableList<CRecipe> = mutableListOf()
     var BASE_BLOCK: Material = Material.GOLD_BLOCK
 
+    /**
+     * use 'multiple result candidate' feature or not.
+     * true: if the system gets some result candidates, shows all candidates to a player.
+     * false: provides only a first matched item. (no prompt)
+     * @since 5.0.8
+     */
+    var USE_MULTIPLE_RESULT_CANDIDATE_FEATURE = false
+
     internal var BASE_BLOCK_SIDE: Int = 3
     const val CRAFTING_TABLE_MAKE_BUTTON_SLOT: Int = 35
     const val CRAFTING_TABLE_RESULT_SLOT: Int = 44
+    internal const val ALL_CANDIDATE_PREVIOUS_SLOT: Int = 45
+    internal const val ALL_CANDIDATE_SIGNATURE_SLOT: Int = 49
+    internal const val ALL_CANDIDATE_NEXT_SLOT: Int = 54
     const val CRAFTING_TABLE_TOTAL_SIZE: Int = 54
+
+    internal val ALL_CANDIDATE_CURRENT_PAGE_NK = NamespacedKey(
+        CustomCrafter.getInstance(), "all_candidate_current_page")
+    internal val ALL_CANDIDATE_RESULTS_NK = NamespacedKey(
+        CustomCrafter.getInstance(), "all_candidate_results")
+    internal val ALL_CANDIDATE_INPUT_NK = NamespacedKey(
+        CustomCrafter.getInstance(), "all_candidate_input")
 
     internal fun setup() {
         val instance: CustomCrafter = CustomCrafter.getInstance()
@@ -65,6 +86,7 @@ object CustomCrafterAPI {
 //                }
 //            }.runTaskAsynchronously(CustomCrafter.getInstance())
 //        }
+        MultipleCandidateTest.run()
     }
 
     /**
@@ -163,7 +185,7 @@ object CustomCrafterAPI {
             displayName(Component.empty())
         }
     }
-    private val makeButton = ItemStack(Material.ANVIL).apply {
+    private fun makeButton() = ItemStack(Material.ANVIL).apply {
         itemMeta = itemMeta.apply {
             displayName(Component.text("Making items"))
             val key = genCCKey()
@@ -174,15 +196,20 @@ object CustomCrafterAPI {
     /**
      * returns custom crafter gui
      *
+     * @param[dropItemsOnClose] drops materials or not when a player close this gui (default = false, since = 5.0.8)
      * @return[Inventory] custom crafter gui
      */
-    fun getCraftingGUI(): Inventory {
+    fun getCraftingGUI(
+        dropItemsOnClose: Boolean = false
+    ): Inventory {
         val gui: Inventory = Bukkit.createInventory(null, CRAFTING_TABLE_TOTAL_SIZE, Component.text("Custom Crafter"))
         (0..<54).forEach { slot -> gui.setItem(slot, blank) }
         Converter.getAvailableCraftingSlotComponents().forEach { c ->
             val index: Int = c.x + c.y * 9
             gui.setItem(index, ItemStack.empty())
         }
+        val makeButton: ItemStack = makeButton()
+        if (!dropItemsOnClose) InventoryCloseListener.setNoDropMarker(makeButton)
         gui.setItem(CRAFTING_TABLE_MAKE_BUTTON_SLOT, makeButton)
         gui.setItem(CRAFTING_TABLE_RESULT_SLOT, ItemStack.empty())
         return gui
@@ -197,10 +224,143 @@ object CustomCrafterAPI {
     fun isCustomCrafterGUI(inventory: Inventory): Boolean {
         if (inventory.size != 54) return false
         val makeButton: ItemStack = inventory.getItem(CRAFTING_TABLE_MAKE_BUTTON_SLOT)
-            ?.takeIf { it.type == makeButton.type }
+            ?.takeIf { it.type == makeButton().type }
             ?: return false
         val key = genCCKey()
         return makeButton.itemMeta.persistentDataContainer.has(key.first, key.second)
+    }
+
+
+    private val allCandidateSignatureNK = NamespacedKey(CustomCrafter.getInstance(), "all_candidate_signature")
+
+    /**
+     * @suppress
+     * @since 5.0.8
+     */
+    internal fun allCandidatesSignature(): ItemStack {
+        return ItemStack(Material.GRASS_BLOCK).apply {
+            itemMeta = itemMeta.apply {
+                displayName(Component.text("Signature"))
+                val (key, type, value) = genCCKey()
+                persistentDataContainer.set(key, type, value)
+                persistentDataContainer.set(
+                    allCandidateSignatureNK,
+                    PersistentDataType.STRING,
+                    "")
+            }
+        }
+    }
+
+    /**
+     * set currentPage, results and input values to the target items container.
+     *
+     * @suppress
+     * @since 5.0.8
+     */
+    internal fun setAllCandidatesSignatureValues(
+        page: Int,
+        result: Search.SearchResult,
+        input: CraftView,
+        target: ItemStack
+    ) {
+        target.editMeta { meta ->
+            meta.persistentDataContainer.set(
+                ALL_CANDIDATE_CURRENT_PAGE_NK,
+                PersistentDataType.INTEGER,
+                page
+            )
+
+            meta.persistentDataContainer.set(
+                ALL_CANDIDATE_RESULTS_NK,
+                PersistentDataType.STRING,
+                result.toJson()
+            )
+
+            meta.persistentDataContainer.set(
+                ALL_CANDIDATE_INPUT_NK,
+                PersistentDataType.STRING,
+                input.toJson()
+            )
+        }
+    }
+
+    /**
+     * @suppress
+     * @param[currentPage] currentPage index
+     * @param[items] display items
+     * @param[signature] signature item (default = null)
+     * @param[placePreviousButton] place a jump to previous page button or not (default = false)
+     * @param[placeNextButton] place a jump to next page button or not (default = false)
+     * @since 5.0.8
+     */
+    internal fun getAllCandidateGUI(
+        items: Map<CoordinateComponent, ItemStack>,
+        currentPage: Int = 0,
+        signature: ItemStack? = null,
+        placePreviousButton: Boolean = false,
+        placeNextButton: Boolean = false,
+        dropItemsOnClose: Boolean = false
+    ): Inventory {
+        val gui: Inventory = Bukkit.createInventory(null, 54, Component.text("Multiple Result"))
+        items.forEach { (c, item) -> gui.setItem(c.toIndex(), item) }
+        val pageWrittenSignature: ItemStack = (signature ?: allCandidatesSignature()).clone()
+        pageWrittenSignature.editMeta { meta ->
+            meta.persistentDataContainer.set(
+                ALL_CANDIDATE_CURRENT_PAGE_NK,
+                PersistentDataType.INTEGER,
+                currentPage)
+        }
+
+        if (!dropItemsOnClose) InventoryCloseListener.setNoDropMarker(pageWrittenSignature)
+
+        gui.setItem(ALL_CANDIDATE_SIGNATURE_SLOT, pageWrittenSignature)
+
+        if (placePreviousButton) {
+            val previous = ItemStack(Material.ENDER_PEARL)
+            previous.editMeta { meta ->
+                meta.persistentDataContainer.set(
+                    NamespacedKey(CustomCrafter.getInstance(), "all_candidate_page_jump_type"),
+                    PersistentDataType.STRING,
+                    "previous"
+                )
+            }
+            gui.setItem(45, previous)
+        }
+        if (placeNextButton) {
+            val next = ItemStack(Material.ENDER_EYE)
+            next.editMeta { meta ->
+                meta.persistentDataContainer.set(
+                    NamespacedKey(CustomCrafter.getInstance(), "all_candidate_page_jump_type"),
+                    PersistentDataType.STRING,
+                    "next"
+                )
+            }
+            gui.setItem(53, next)
+        }
+
+        /* signature item contains
+         * - (Int) current page
+         * - (String) input inventory Json
+         * - (String) Search.Result Json
+         */
+        return gui
+    }
+
+    /**
+     * returns the provided inventory is all-candidates-page gui or not.
+     *
+     * @param[inventory] input inventory
+     * @return[Boolean] is all-candidates-page gui or not
+     * @since 5.0.8
+     */
+    fun isAllCandidatesPageGUI(inventory: Inventory): Boolean {
+        if (inventory.size != 54) return false
+        val signature: ItemStack = inventory.getItem(ALL_CANDIDATE_SIGNATURE_SLOT) ?: return false
+        return signature.itemMeta.persistentDataContainer.getOrDefault(
+            allCandidateSignatureNK,
+            PersistentDataType.STRING,
+            "_" // default (if not found applied)
+        ) == ""
     }
 
     /**
@@ -214,11 +374,22 @@ object CustomCrafterAPI {
      * @return[Boolean] older or not
      */
     fun isGUITooOld(inventory: Inventory): Boolean {
-        if (!isCustomCrafterGUI(inventory)) throw IllegalArgumentException("'inventory' must be a CustomCrafter's gui.")
-        val button: ItemStack = inventory.getItem(CRAFTING_TABLE_MAKE_BUTTON_SLOT)!!
-        val key = genCCKey()
-        val time: Long = button.itemMeta.persistentDataContainer.get(key.first, key.second)
-            ?: throw IllegalStateException("'time' not found. (Internal Error)")
+        if (!isCustomCrafterGUI(inventory)
+            && !isAllCandidatesPageGUI(inventory)) {
+            throw IllegalArgumentException("'inventory' must be a CustomCrafter's gui.")
+        }
+        val (key, type, _) = genCCKey()
+        val time: Long = inventory.contents
+            .filterNotNull()
+            .firstOrNull { item -> item.itemMeta.persistentDataContainer.has(key, type) }
+            ?.let { i -> i.itemMeta.persistentDataContainer.get(key, type) }
+            ?: throw IllegalStateException("'time' key contained item not found.")
+
         return time < CustomCrafter.INITIALIZED
+//        val button: ItemStack = inventory.getItem(CRAFTING_TABLE_MAKE_BUTTON_SLOT)!!
+//        val key = genCCKey()
+//        val time: Long = button.itemMeta.persistentDataContainer.get(key.first, key.second)
+//            ?: throw IllegalStateException("'time' not found. (Internal Error)")
+//        return time < CustomCrafter.INITIALIZED
     }
 }

@@ -28,6 +28,7 @@ object VanillaSearch {
     }
 
     private fun getNineItemStackArray(mapped: Map<CoordinateComponent, ItemStack>): Array<ItemStack>? {
+        // TODO fix here (use default 'index')
         if (mapped.isEmpty()) return null
         val xMin: CoordinateComponent = mapped.keys.minBy { it.x }
         val xMax: CoordinateComponent = mapped.keys.maxBy { it.x }

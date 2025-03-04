@@ -3,8 +3,11 @@ package io.github.sakaki_aruka.customcrafter.api.`object`
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.`object`.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.processor.Converter
+import kotlinx.serialization.json.Json
+import org.bukkit.Material
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
+import java.util.Base64
 
 /**
  * A view of crafting gui.
@@ -51,18 +54,71 @@ data class CraftView internal constructor(
         }
 
         /**
-         * converts a view to Custom Crafter's gui.
+         * decodes a json string to CraftView
          *
-         * @param[view] input [CraftView]
-         * @return[Inventory] Custom Crafter's gui
+         * @param[json] an input json string
+         * @return[CraftView] a deserialized CraftView
+         * @since 5.0.8
          */
-        fun toCraftingGUI(view: CraftView): Inventory {
-            val gui: Inventory = CustomCrafterAPI.getCraftingGUI()
-            view.materials.entries.forEach { (c, item) ->
-                gui.setItem(c.x + c.y * 9, item)
+        fun fromJson(json: String): CraftView {
+            val map: Map<Int, String> = Json.decodeFromString(json)
+            val deserialized: MutableMap<CoordinateComponent, ItemStack> = mutableMapOf()
+            map.forEach { (index, item) ->
+                val itemByteArray: ByteArray = Base64.getDecoder().decode(item)
+                deserialized[CoordinateComponent.fromIndex(index, followLimit = false)] = ItemStack.deserializeBytes(itemByteArray)
             }
-            gui.setItem(CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT, view.result)
-            return gui
+            val result: ItemStack =
+                if (Int.MAX_VALUE in map.keys) {
+                    ItemStack.deserializeBytes(Base64.getDecoder().decode(map[Int.MAX_VALUE]))
+                }
+                else ItemStack.empty()
+            return CraftView(deserialized, result)
         }
+    }
+
+    /**
+     * converts a view to Custom Crafter's gui.
+     *
+     * @param[dropItemsOnClose] CustomCrafterAPI#getCraftingGUI 'dropItemsOnClose' (default = false, since 5.0.8)
+     * @see[CustomCrafterAPI.getCraftingGUI]
+     * @return[Inventory] Custom Crafter's gui
+     */
+    fun toCraftingGUI(
+        dropItemsOnClose: Boolean = false
+    ): Inventory {
+        val gui: Inventory = CustomCrafterAPI.getCraftingGUI(dropItemsOnClose = dropItemsOnClose)
+        this.materials.entries.forEach { (c, item) ->
+            gui.setItem(c.x + c.y * 9, item)
+        }
+        gui.setItem(CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT, this.result)
+        return gui
+    }
+
+    /**
+     * converts a view to [ByteArray] (ByteArray equals byte[] in Java)
+     *
+     * @param[paddingAir] padding empty slots or not. (default = true)
+     * @return[String] a serialized CraftView string
+     * @since 5.0.8
+     */
+    fun toJson(paddingAir: Boolean = true): String {
+        val converted: MutableMap<Int, String> = mutableMapOf()
+        for (index in (0..<54)) {
+            val item: ItemStack = this.materials[CoordinateComponent.fromIndex(index, followLimit = false)]
+                .takeIf { i -> i?.type != Material.AIR } ?: continue
+                //?: if (paddingAir) ItemStack.empty() else continue
+            converted[index] = Base64.getEncoder().encodeToString(item.serializeAsBytes())
+        }
+
+        this.result
+            .takeIf { i -> i.type != Material.AIR }
+            ?.let { result ->
+                converted[Int.MAX_VALUE] = Base64.getEncoder().encodeToString(result.serializeAsBytes())
+            }
+//        if (this.result.type != Material.AIR) {
+//            converted[Int.MAX_VALUE] = Base64.getEncoder().encodeToString(result.serializeAsBytes())
+//        }
+//        converted[Int.MAX_VALUE] = Base64.getEncoder().encodeToString(this.result.serializeAsBytes())
+        return Json.encodeToString(converted)
     }
 }
