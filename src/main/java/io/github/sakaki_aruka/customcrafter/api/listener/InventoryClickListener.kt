@@ -4,6 +4,7 @@ import io.github.sakaki_aruka.customcrafter.CustomCrafter
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.event.CreateCustomItemEvent
 import io.github.sakaki_aruka.customcrafter.api.event.PreCreateCustomItemEvent
+import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.`object`.CraftView
 import io.github.sakaki_aruka.customcrafter.api.`object`.MappedRelation
@@ -201,6 +202,11 @@ object InventoryClickListener: Listener {
         gui: Inventory,
         event: InventoryClickEvent,
     ) {
+        if (CustomCrafterAPI.isGUITooOld(gui)) {
+            player.closeInventory()
+            return
+        }
+
         if (event.rawSlot !in (0..<CustomCrafterAPI.CRAFTING_TABLE_TOTAL_SIZE)) {
             // a player clicks inventory or something
             return
@@ -210,11 +216,6 @@ object InventoryClickListener: Listener {
         }
 
         val signature: ItemStack = gui.getItem(CustomCrafterAPI.ALL_CANDIDATE_SIGNATURE_SLOT) ?: return
-
-        if (CustomCrafterAPI.isGUITooOld(gui)) {
-            player.closeInventory()
-            return
-        }
 
         val currentPage: Int = signature.itemMeta.persistentDataContainer.get(
             CustomCrafterAPI.ALL_CANDIDATE_CURRENT_PAGE_NK,
@@ -339,7 +340,7 @@ object InventoryClickListener: Listener {
                 }
             }
 
-            else -> return
+            else -> event.isCancelled = true
         }
     }
 
@@ -430,8 +431,12 @@ object InventoryClickListener: Listener {
         return forCustomSettings?.let { (cRecipe, mapped) ->
             val map: MutableMap<CoordinateComponent, ItemStack> = mutableMapOf()
             mapped.components.forEach { component ->
-                val isMass: Boolean = cRecipe.items[component.recipe]?.mass ?: false
-                val decrementAmount: Int = if (isMass || shiftUsed) 1 else minAmount
+                val matter: CMatter = cRecipe.items[component.recipe]!!
+                val isMass: Boolean = matter.mass
+                val decrementAmount: Int =
+                    if (isMass) 1
+                    else if (shiftUsed) (minAmount / matter.amount) * matter.amount
+                    else matter.amount
                 val newAmount: Int = max(0, view.materials[component.input]!!.amount - decrementAmount)
                 map[component.input] =
                     if (newAmount == 0) ItemStack.empty()
@@ -491,9 +496,9 @@ object InventoryClickListener: Listener {
         }
         val displayItems: MutableMap<CoordinateComponent, ItemStack> = mutableMapOf()
         displayItems[CoordinateComponent.fromIndex(0)] = result.vanilla()?.result ?: ItemStack.empty()
-        for (index in (1..<44)) {
-            if (index >= result.customs().size) continue
-            val (recipe: CRecipe, relation: MappedRelation) = result.customs()[index]
+        for (index in (1..<45)) {
+            if (index > result.customs().size) continue
+            val (recipe: CRecipe, relation: MappedRelation) = result.customs()[index - 1]
             displayItems[CoordinateComponent.fromIndex(index, followLimit = false)] = recipe.getResults(
                 player.uniqueId,
                 relation,
