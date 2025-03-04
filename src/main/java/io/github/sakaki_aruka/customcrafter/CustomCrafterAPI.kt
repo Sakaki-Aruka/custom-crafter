@@ -77,6 +77,7 @@ object CustomCrafterAPI {
 //                    EnchantTest.run()
 //                    VanillaSearchTest.run()
 //                    PotionTest.run()
+//                    MultipleCandidateTest.run()
 //                    try {
 //                        SearchTest.run()
 //                    } catch (e: Exception){}
@@ -86,7 +87,6 @@ object CustomCrafterAPI {
 //                }
 //            }.runTaskAsynchronously(CustomCrafter.getInstance())
 //        }
-        MultipleCandidateTest.run()
     }
 
     /**
