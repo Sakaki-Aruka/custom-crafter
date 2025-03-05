@@ -14,15 +14,16 @@ import java.util.UUID
  *
  * ```
  * // call example from Java
- * ResultSupplier supplier = new ResultSupplier(
- *     new ResultSupplier.Config(crafterID, relate, mapped, list, shiftClicked, calledTimes, isMultipleCalled) ->
- *             List.of(ItemStack.empty()
- *         ));
+ * ResultSupplier supplier = new ResultSupplier((config) ->
+ *     List.of(ItemStack.STONE);
+ * );
  *
  * // call example from Kotlin
- * val supplier = ResultSupplier {
- *     ResultSupplier.Config(crafterID, relate, mapped, list, shiftClicked, calledTimes, isMultipleCalled) ->
- *         listOf(ItemStack.empty())
+ * val supplier = ResultSupplier { config ->
+ *     if (config.crafterID == UUID.fromString("069a79f4-44e9-4726-a5be-fca90e38aaf5")) {
+ *         // Only for Notch
+ *         listOf(ItemStack(Material.ENCHANTED_GOLDEN_APPLE))
+ *     } else listOf(ItemStack.empty())
  * }
  * ```
  *
@@ -36,7 +37,6 @@ data class ResultSupplier (
         config: Config
     ): List<ItemStack> = func(config)
 
-    //TODO add data class `ResultSupplier.Config` (includes all arguments)
     /**
      * ResultSupplier's arguments
      *
