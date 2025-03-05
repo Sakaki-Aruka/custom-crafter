@@ -134,8 +134,8 @@ dependencies {
 ### Make Materials
 When creating a custom recipe, you need to specify the arrangement of materials (instances of an implementation class of [CMatterImpl](https://sakaki-aruka.github.io/custom-crafter/custom-crafter/io.github.sakaki_aruka.customcrafter.api.object.matter/-c-matter-impl/index.html) or  [CMatter](https://sakaki-aruka.github.io/custom-crafter/custom-crafter/io.github.sakaki_aruka.customcrafter.api.interfaces.matter/-c-matter/index.html) ) along with their coordinates.  
 Below is an example of how to create the material items used in this process.
-```
-# In Kotlin
+```Kotlin
+// In Kotlin
 val matter: CMatter = CMatterImpl(
     name = "test-matter",
     candidate = setOf(Material.STONE, Material.COBBLESTONE),
@@ -145,8 +145,8 @@ val matter: CMatter = CMatterImpl(
 )
 ```
 
-```
-# In Kotlin
+```Kotlin
+// In Kotlin
 val matter: CMatter = CMatterImpl.single(Material.STONE)
 ```
 This is a common example of creating a Matter that acts as a material when either "Stone" or "Cobblestone" is placed.  
@@ -160,20 +160,20 @@ In CustomCrafter, it is not mandatory to provide an item as a result of crafting
 
 The creation of results in a custom recipe is mainly handled by [ResultSupplier](https://sakaki-aruka.github.io/custom-crafter/custom-crafter/io.github.sakaki_aruka.customcrafter.api.object.result/-result-supplier/index.html) .
 It allows you to retrieve various conditions during crafting and determine the final output item accordingly.
-```
-# In Kotlin
+```Kotlin
+// In Kotlin
 val supplier = ResultSupplier { config ->
-    # 'config' is ResultSupplier.Config. 
-    # This contains some useful values.
+    // 'config' is ResultSupplier.Config. 
+    // This contains some useful values.
     
-    # Write processes here.
-    # ResultSupplier is a lambda expression.
-    # Return type is `List<ItemStack>`
+    // Write processes here.
+    // ResultSupplier is a lambda expression.
+    // Return type is `List<ItemStack>`
 }
 ```
 For recipes that do not require complex processing, CustomCrafter provides simplified versions of the above expression.
-```
-# In Kotlin
+```Kotlin
+// In Kotlin
 val supplier = ResultSupplier.single(ItemStack(Material.STONE))
 val supplier2 = ResultSupplier.timesSingle(ItemStack(Material.STONE))
 ```
@@ -189,8 +189,8 @@ They group together custom materials and results, registering them in the Custom
 The default implementation of recipes is [CRecipeImpl](https://sakaki-aruka.github.io/custom-crafter/custom-crafter/io.github.sakaki_aruka.customcrafter.api.object.recipe/-c-recipe-impl/index.html) , but if you require additional customization, you can implement your own `CRecipe` class.
 
 Below is an example of a simple recipe:
-```
-# In Kotlin
+```Kotlin
+// In Kotlin
 val recipe: CRecipe = CRecipeImpl(
     name = "test-recipe",
     items = mapOf(CoordinateComponent(0, 0) to matter), # 'matter' is CMatter
