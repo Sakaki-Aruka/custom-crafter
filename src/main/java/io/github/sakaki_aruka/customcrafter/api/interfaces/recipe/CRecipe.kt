@@ -18,7 +18,7 @@ interface CRecipe {
     val items: Map<CoordinateComponent, CMatter>
     val containers: List<CRecipeContainer>?
     val results: List<ResultSupplier>?
-    val filters: Set<CRecipeFilter<*>>?
+    val filters: Set<CRecipeFilter<CMatter>>?
     val type: CRecipeType
     /**
      * replace [items]
