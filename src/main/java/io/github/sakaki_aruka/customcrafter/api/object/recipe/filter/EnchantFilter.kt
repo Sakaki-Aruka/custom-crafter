@@ -9,10 +9,10 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 
 /**
- * @suppress
+ * A default [CEnchantMatter] filter implementation.
  * @since 5.0.6
  */
-internal object EnchantFilter: CRecipeFilter<CEnchantMatter> {
+object EnchantFilter: CRecipeFilter<CEnchantMatter> {
     override fun metaTypeCheck(meta: ItemMeta): Boolean = true
 
     override fun normal(

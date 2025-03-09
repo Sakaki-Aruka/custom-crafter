@@ -9,10 +9,10 @@ import org.bukkit.inventory.meta.PotionMeta
 import org.bukkit.potion.PotionEffect
 
 /**
- * @suppress
+ * A default [CPotionMatter] filter implementation.
  * @since 5.0.6
  */
-internal object PotionFilter: CRecipeFilter<CPotionMatter> {
+object PotionFilter: CRecipeFilter<CPotionMatter> {
     override fun metaTypeCheck(meta: ItemMeta): Boolean {
         return meta is PotionMeta
     }

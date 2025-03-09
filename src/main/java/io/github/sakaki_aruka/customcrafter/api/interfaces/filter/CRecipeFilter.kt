@@ -10,16 +10,11 @@ import org.bukkit.inventory.meta.ItemMeta
 /**
  * candidate filters for [CRecipe].
  *
- * if you want to implement this, recommended to show implementation of [EnchantFilter] more some default filters.
+ * If you want to implement this, recommended to show implementation of [EnchantFilter] more some default filters.
  *
- * you have to set a class what is a subtype of [CMatter] to generic type [T].
+ * [T] must be a subtype of [CMatter].
  *
- * you can set custom [CMatter] implemented class to [T].
- *
- * you do not use 'internal' or 'private' visibility modifier to classes what implements this interface.
- *
- *
- * @param[T] a type of target class or interface. subtype of [CMatter].
+ * @param[T] a type of target class or interface.
  * @since 5.0.6
  */
 interface CRecipeFilter<out T: CMatter> {

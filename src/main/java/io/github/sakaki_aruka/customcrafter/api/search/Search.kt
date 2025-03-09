@@ -246,21 +246,14 @@ object Search {
             if (!recipeOne.predicatesResult(inOne, mapped, recipe, crafterID)) return false
             recipe.filters?.let { set ->
                 for (filter in set) {
-                    try {
-                        val (type, result) = applyNormalFilters(inOne, recipeOne, filter)
-                        return when (type) {
-                            CRecipeFilter.ResultType.NOT_REQUIRED -> continue
-                            CRecipeFilter.ResultType.FAILED -> false
-                            CRecipeFilter.ResultType.SUCCESS -> {
-                                if (result) continue
-                                else false
-                            }
+                    val (type, result) = applyNormalFilters(inOne, recipeOne, filter) ?: continue
+                    return when (type) {
+                        CRecipeFilter.ResultType.NOT_REQUIRED -> continue
+                        CRecipeFilter.ResultType.FAILED -> false
+                        CRecipeFilter.ResultType.SUCCESS -> {
+                            if (result) continue
+                            else false
                         }
-                    } catch (e: ClassCastException) {
-                        continue
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                        return false
                     }
                 }
             }
@@ -270,10 +263,10 @@ object Search {
 
     private inline fun <reified T: CMatter> applyNormalFilters(
         item: ItemStack,
-        matter: T,
+        matter: CMatter,
         filter: CRecipeFilter<T>
-    ): Pair<CRecipeFilter.ResultType, Boolean> {
-        return filter.normal(item, matter)
+    ): Pair<CRecipeFilter.ResultType, Boolean>? {
+        return if (matter !is T) null else filter.normal(item, matter)
     }
 
     private fun candidateAmorphous(

@@ -8,10 +8,10 @@ import org.bukkit.inventory.meta.EnchantmentStorageMeta
 import org.bukkit.inventory.meta.ItemMeta
 
 /**
- * @suppress
+ * A default [CEnchantmentStoreMatter] filter implementation.
  * @since 5.0.6
  */
-internal object EnchantStorageFilter: CRecipeFilter<CEnchantmentStoreMatter> {
+object EnchantStorageFilter: CRecipeFilter<CEnchantmentStoreMatter> {
     override fun metaTypeCheck(meta: ItemMeta): Boolean {
         return meta is EnchantmentStorageMeta
     }
