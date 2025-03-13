@@ -104,9 +104,9 @@ internal object PotionTest {
 
         fun potionContainedRecipe(items: Map<CoordinateComponent, CMatter>): CRecipe {
             return CRecipeImpl(
-                "potionTestRecipe",
-                items,
-                null, null, type = CRecipeType.AMORPHOUS
+                name = "potionTestRecipe",
+                items = items,
+                type = CRecipeType.AMORPHOUS
             )
         }
 
