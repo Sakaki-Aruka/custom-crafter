@@ -12,6 +12,7 @@ import io.github.sakaki_aruka.customcrafter.api.`object`.recipe.CoordinateCompon
 import io.github.sakaki_aruka.customcrafter.api.processor.Converter
 import io.github.sakaki_aruka.customcrafter.api.search.Search
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.TextReplacementConfig
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -392,7 +393,9 @@ object InventoryClickListener: Listener {
                 isMultipleDisplayCall = true
             )
             items[CoordinateComponent.fromIndex(index, followLimit = false)] =
-                results.firstOrNull { item -> item.type.isItem } ?: notDisplayableItem(recipe.name)
+                results.firstOrNull { item ->
+                    item.type.isItem
+                } ?: replaceRecipeNameTemplate(CustomCrafterAPI.ALL_CANDIDATE_NO_DISPLAYABLE_ITEM, recipe.name)
             index++
         }
         // currentPage, results(SearchResult), input(CraftView)
@@ -532,5 +535,14 @@ object InventoryClickListener: Listener {
             meta.lore(listOf(Component.text("Recipe Name: $recipeName")))
         }
         return item
+    }
+
+    private fun replaceRecipeNameTemplate(
+        item: ItemStack,
+        name: String
+    ): ItemStack {
+        val clone: ItemStack = item.clone()
+        clone.lore(CustomCrafterAPI.ALL_CANDIDATE_NO_DISPLAYABLE_ITEM_LORE_SUPPLIER(name))
+        return clone
     }
 }
