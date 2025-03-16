@@ -510,7 +510,7 @@ object InventoryClickListener: Listener {
                 calledTimes = recipe.multipleCandidateDisplaySettingDefaultCalledTimes(),
                 isMultipleDisplayCall = true
             ).firstOrNull { item -> item.type != Material.AIR && item.type.isItem }
-                ?: notDisplayableItem(recipe.name)
+                ?: replaceRecipeNameTemplate(CustomCrafterAPI.ALL_CANDIDATE_NO_DISPLAYABLE_ITEM, recipe.name)
         }
         val allCandidateGUI: Inventory = CustomCrafterAPI.getAllCandidateGUI(
             displayItems,
@@ -526,15 +526,6 @@ object InventoryClickListener: Listener {
         player.closeInventory()
 
         player.openInventory(allCandidateGUI)
-    }
-
-    private fun notDisplayableItem(recipeName: String): ItemStack {
-        val item = ItemStack(Material.COMMAND_BLOCK)
-        item.editMeta { meta ->
-            meta.displayName(MiniMessage.miniMessage().deserialize("<red>Not Displayable Item"))
-            meta.lore(listOf(Component.text("Recipe Name: $recipeName")))
-        }
-        return item
     }
 
     private fun replaceRecipeNameTemplate(
