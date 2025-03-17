@@ -37,7 +37,7 @@ object CustomCrafterAPI {
 
     var RESULT_GIVE_CANCEL: Boolean = false
     internal val TEST_RECIPES: MutableList<CRecipe> = mutableListOf()
-    var BASE_BLOCK: Material = Material.GOLD_BLOCK
+    internal var BASE_BLOCK: Material = Material.GOLD_BLOCK
 
     /**
      * use 'multiple result candidate' feature or not.
@@ -109,6 +109,26 @@ object CustomCrafterAPI {
 //                }
 //            }.runTaskAsynchronously(CustomCrafter.getInstance())
 //        }
+    }
+
+    /**
+     * Get base block type.
+     * @return[Material] base block type
+     * @since 5.0.9
+     */
+    fun getBaseBlock(): Material = BASE_BLOCK
+
+    /**
+     * Set base block with given material.
+     *
+     * If a given material is not a block type, throws [IllegalArgumentException].
+     * @param[type] base block type
+     * @throws[IllegalArgumentException] when specified not block type
+     * @since 5.0.9
+     */
+    fun setBaseBlock(type: Material) {
+        if (!type.isBlock) throw IllegalArgumentException("'type' must meet 'Material#isBlock'.")
+        BASE_BLOCK = type
     }
 
     /**
