@@ -21,21 +21,21 @@ import org.bukkit.persistence.PersistentDataContainer
 data class CEnchantBothMatterImpl(
     override val name: String,
     override val candidate: Set<Material>,
+    override val enchantComponents: Set<CEnchantComponent>,
+    override val storedEnchantComponents: Set<CEnchantComponent>,
     override val amount: Int = 1,
     override val mass: Boolean = false,
-    override val predicates: Set<CMatterPredicate>? = null,
-    override val enchantComponents: Set<CEnchantComponent>,
-    override val storedEnchantComponents: Set<CEnchantComponent>
+    override val predicates: Set<CMatterPredicate>? = null
 ): CMatter, CEnchantMatter, CEnchantmentStoreMatter {
     override fun asOne(): CEnchantBothMatterImpl {
         return CEnchantBothMatterImpl(
-            name,
-            candidate,
+            name = name,
+            candidate = candidate,
             amount = 1,
-            mass,
-            predicates,
-            enchantComponents,
-            storedEnchantComponents
+            mass = mass,
+            predicates = predicates,
+            enchantComponents = enchantComponents,
+            storedEnchantComponents = storedEnchantComponents
         )
     }
 }

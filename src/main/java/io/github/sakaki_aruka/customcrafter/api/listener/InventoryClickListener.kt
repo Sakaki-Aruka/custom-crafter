@@ -12,6 +12,7 @@ import io.github.sakaki_aruka.customcrafter.api.`object`.recipe.CoordinateCompon
 import io.github.sakaki_aruka.customcrafter.api.processor.Converter
 import io.github.sakaki_aruka.customcrafter.api.search.Search
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.TextReplacementConfig
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -392,7 +393,9 @@ object InventoryClickListener: Listener {
                 isMultipleDisplayCall = true
             )
             items[CoordinateComponent.fromIndex(index, followLimit = false)] =
-                results.firstOrNull { item -> item.type.isItem } ?: notDisplayableItem(recipe.name)
+                results.firstOrNull { item ->
+                    item.type.isItem
+                } ?: replaceRecipeNameTemplate(CustomCrafterAPI.ALL_CANDIDATE_NO_DISPLAYABLE_ITEM, recipe.name)
             index++
         }
         // currentPage, results(SearchResult), input(CraftView)
@@ -507,7 +510,7 @@ object InventoryClickListener: Listener {
                 calledTimes = recipe.multipleCandidateDisplaySettingDefaultCalledTimes(),
                 isMultipleDisplayCall = true
             ).firstOrNull { item -> item.type != Material.AIR && item.type.isItem }
-                ?: notDisplayableItem(recipe.name)
+                ?: replaceRecipeNameTemplate(CustomCrafterAPI.ALL_CANDIDATE_NO_DISPLAYABLE_ITEM, recipe.name)
         }
         val allCandidateGUI: Inventory = CustomCrafterAPI.getAllCandidateGUI(
             displayItems,
@@ -525,12 +528,12 @@ object InventoryClickListener: Listener {
         player.openInventory(allCandidateGUI)
     }
 
-    private fun notDisplayableItem(recipeName: String): ItemStack {
-        val item = ItemStack(Material.COMMAND_BLOCK)
-        item.editMeta { meta ->
-            meta.displayName(MiniMessage.miniMessage().deserialize("<red>Not Displayable Item"))
-            meta.lore(listOf(Component.text("Recipe Name: $recipeName")))
-        }
-        return item
+    private fun replaceRecipeNameTemplate(
+        item: ItemStack,
+        name: String
+    ): ItemStack {
+        val clone: ItemStack = item.clone()
+        clone.lore(CustomCrafterAPI.ALL_CANDIDATE_NO_DISPLAYABLE_ITEM_LORE_SUPPLIER(name))
+        return clone
     }
 }

@@ -29,12 +29,12 @@ internal object PotionTest {
     private fun potionTest() {
         val nonPotionItem = ItemStack(Material.STONE)
         val basicPotionMatter: CPotionMatter = CPotionMatterImpl(
-            "potionTestBasic",
-            setOf(Material.POTION),
+            name = "potionTestBasic",
+            candidate = setOf(Material.POTION),
             amount = 1,
             mass = false,
-            null,
-            setOf(
+            predicates =  null,
+            potionComponents =  setOf(
                 CPotionComponent(PotionEffect(PotionEffectType.LUCK, 100, 1), CPotionComponent.PotionStrict.STRICT)
             )
         )
@@ -50,10 +50,11 @@ internal object PotionTest {
         CAssert.assertTrue(Potion.potion(splashPotionItem, basicPotionMatter))
 
         val basicEnableSplash: CPotionMatter = CPotionMatterImpl(
-            basicPotionMatter.name,
-            setOf(Material.SPLASH_POTION),
-            amount = 1, mass = false, null,
-            setOf(
+            name = basicPotionMatter.name,
+            candidate = setOf(Material.SPLASH_POTION),
+            amount = 1, mass = false,
+            predicates = null,
+            potionComponents = setOf(
                 CPotionComponent(PotionEffect(PotionEffectType.LUCK, 100, 1), CPotionComponent.PotionStrict.STRICT)
             )
         )
@@ -62,8 +63,9 @@ internal object PotionTest {
         val containedNotStrict: CPotionMatter = CPotionMatterImpl(
             basicPotionMatter.name,
             setOf(Material.SPLASH_POTION),
-            amount = 1, mass = false, null,
-            setOf(
+            amount = 1, mass = false,
+            predicates = null,
+            potionComponents = setOf(
                 CPotionComponent(PotionEffect(PotionEffectType.LUCK, 100, 1), CPotionComponent.PotionStrict.STRICT),
                 CPotionComponent(PotionEffect(PotionEffectType.POISON, 100, 1), CPotionComponent.PotionStrict.NOT_STRICT)
             )
@@ -73,8 +75,9 @@ internal object PotionTest {
         val lv100LuckMatter: CPotionMatter = CPotionMatterImpl(
             basicPotionMatter.name,
             setOf(Material.SPLASH_POTION),
-            amount = 1, mass = false, null,
-            setOf(
+            amount = 1, mass = false,
+            predicates = null,
+            potionComponents = setOf(
                 CPotionComponent(PotionEffect(PotionEffectType.LUCK, 100, 100), CPotionComponent.PotionStrict.STRICT)
             )
         )
@@ -97,16 +100,17 @@ internal object PotionTest {
             return CPotionMatterImpl(
                 "potionTestMatter",
                 setOf(Material.POTION),
-                amount = 1, mass = false, null,
-                components
+                amount = 1, mass = false,
+                predicates = null,
+                potionComponents = components
             )
         }
 
         fun potionContainedRecipe(items: Map<CoordinateComponent, CMatter>): CRecipe {
             return CRecipeImpl(
-                "potionTestRecipe",
-                items,
-                null, null, type = CRecipeType.AMORPHOUS
+                name = "potionTestRecipe",
+                items = items,
+                type = CRecipeType.AMORPHOUS
             )
         }
 

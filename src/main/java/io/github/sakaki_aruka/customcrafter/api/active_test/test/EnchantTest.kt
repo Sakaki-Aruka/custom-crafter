@@ -38,11 +38,11 @@ internal object EnchantTest {
         fun base(set: Set<CEnchantComponent>): CEnchantMatterImpl {
             return CEnchantMatterImpl(
                 name = "test",
-                setOf(Material.STONE),
+                candidate = setOf(Material.STONE),
                 amount = 1,
                 mass = false,
                 predicates = null,
-                set
+                enchantComponents = set
             )
         }
 
@@ -78,7 +78,7 @@ internal object EnchantTest {
                 amount = 1,
                 mass = false,
                 predicates = null,
-                set
+                storedEnchantComponents =  set
             )
         }
 
@@ -129,12 +129,12 @@ internal object EnchantTest {
     private fun enchantAmorphousTest() {
         fun enchantedStone(components: Set<CEnchantComponent>): CEnchantMatter {
             return CEnchantMatterImpl(
-                "oneEnchantRecipeMatter",
-                setOf(Material.STONE),
+                name = "oneEnchantRecipeMatter",
+                candidate = setOf(Material.STONE),
                 amount = 1,
                 mass = false,
-                null,
-                components
+                predicates = null,
+                enchantComponents =  components
             )
         }
 

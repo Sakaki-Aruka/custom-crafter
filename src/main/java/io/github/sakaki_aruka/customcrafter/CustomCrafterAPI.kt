@@ -18,6 +18,7 @@ import io.github.sakaki_aruka.customcrafter.api.`object`.recipe.CoordinateCompon
 import io.github.sakaki_aruka.customcrafter.api.processor.Converter
 import io.github.sakaki_aruka.customcrafter.api.search.Search
 import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
@@ -28,7 +29,7 @@ import org.bukkit.scheduler.BukkitRunnable
 import kotlin.random.Random
 
 object CustomCrafterAPI {
-    const val API_VERSION: String = "0.1.8"
+    const val API_VERSION: String = "0.1.9"
     const val IS_STABLE: Boolean = false
     const val IS_BETA: Boolean = true
 
@@ -36,7 +37,7 @@ object CustomCrafterAPI {
 
     var RESULT_GIVE_CANCEL: Boolean = false
     internal val TEST_RECIPES: MutableList<CRecipe> = mutableListOf()
-    var BASE_BLOCK: Material = Material.GOLD_BLOCK
+    internal var BASE_BLOCK: Material = Material.GOLD_BLOCK
 
     /**
      * use 'multiple result candidate' feature or not.
@@ -60,6 +61,27 @@ object CustomCrafterAPI {
         CustomCrafter.getInstance(), "all_candidate_results")
     internal val ALL_CANDIDATE_INPUT_NK = NamespacedKey(
         CustomCrafter.getInstance(), "all_candidate_input")
+
+    /**
+     * An item that is used for an all-candidates-menu's not displayable items slot.
+     *
+     * To get, use [getAllCandidateNotDisplayableItem].
+     *
+     * To set, use [setAllCandidateNotDisplayableItem].
+     *
+     * @since 5.0.9
+     */
+    internal var ALL_CANDIDATE_NO_DISPLAYABLE_ITEM = defaultAllCandidateNotDisplayableItems()
+
+    /**
+     * used for All Candidate feature (not displayable item lore generator)
+     *
+     * @suppress
+     * @since 5.0.9
+     */
+    internal var ALL_CANDIDATE_NO_DISPLAYABLE_ITEM_LORE_SUPPLIER: (String) -> List<Component>? = { recipeName ->
+        listOf(MiniMessage.miniMessage().deserialize("<white>Recipe Name: $recipeName"))
+    }
 
     internal fun setup() {
         val instance: CustomCrafter = CustomCrafter.getInstance()
@@ -87,6 +109,26 @@ object CustomCrafterAPI {
 //                }
 //            }.runTaskAsynchronously(CustomCrafter.getInstance())
 //        }
+    }
+
+    /**
+     * Get base block type.
+     * @return[Material] base block type
+     * @since 5.0.9
+     */
+    fun getBaseBlock(): Material = BASE_BLOCK
+
+    /**
+     * Set base block with given material.
+     *
+     * If a given material is not a block type, throws [IllegalArgumentException].
+     * @param[type] base block type
+     * @throws[IllegalArgumentException] when specified not block type
+     * @since 5.0.9
+     */
+    fun setBaseBlock(type: Material) {
+        if (!type.isBlock) throw IllegalArgumentException("'type' must meet 'Material#isBlock'.")
+        BASE_BLOCK = type
     }
 
     /**
@@ -386,5 +428,58 @@ object CustomCrafterAPI {
             ?: throw IllegalStateException("'time' key contained item not found.")
 
         return time < CustomCrafter.INITIALIZED
+    }
+
+    /**
+     * Get an item that is used for an all-candidates-menu's not displayable items slot.
+     * @return[ItemStack] An item what is displayed when no displayable items on all-candidates-menu.
+     * @since 5.0.9
+     */
+    fun getAllCandidateNotDisplayableItem() = ALL_CANDIDATE_NO_DISPLAYABLE_ITEM
+
+    /**
+     * Set an item that is used for an all-candidates-menu's not displayable items slot.
+     * If the specified items material is not `Material#isItem`, this throws Errors.
+     *
+     * `loreSupplier` must receive a recipe-name and return a lore-list.
+     *
+     * A default loreSupplier is
+     * ```
+     * // This is a very simple lore supplier.
+     * val supplier: (String) -> List<Component>? = { recipeName ->
+     *         listOf(MiniMessage.miniMessage().deserialize("<white>Recipe Name: $recipeName"))
+     *     }
+     * ```
+     * If this receives "Janssons frestelse", returns a white character component is "Recipe Name: Janssons frestelse".
+     *
+     * And also, you can set null to this.
+     * If you did, an all-candidates-menu's not displayable item does not show lore.
+     *
+     *
+     * @param[item] an item
+     * @param[loreSupplier] a lore supplier
+     * @throws[IllegalArgumentException] If the provided items material is not `Material#isItem`, thrown.
+     * @since 5.0.9
+     */
+    fun setAllCandidateNotDisplayableItem(
+        item: ItemStack,
+        loreSupplier: (String) -> List<Component>?
+    ) {
+        if (!item.type.isItem) throw IllegalArgumentException("'item' material must be 'Material#isItem'.")
+        ALL_CANDIDATE_NO_DISPLAYABLE_ITEM = item
+        ALL_CANDIDATE_NO_DISPLAYABLE_ITEM_LORE_SUPPLIER = loreSupplier
+    }
+
+    /**
+     * Get an item that is used for an all-candidates-menu's not displayable items slot in default.
+     * @return[ItemStack] an item
+     * @since 5.0.9
+     */
+    fun defaultAllCandidateNotDisplayableItems(): ItemStack {
+        val item = ItemStack(Material.COMMAND_BLOCK)
+        item.editMeta { meta ->
+            meta.displayName(MiniMessage.miniMessage().deserialize("<red>Not Displayable Item"))
+        }
+        return item
     }
 }
