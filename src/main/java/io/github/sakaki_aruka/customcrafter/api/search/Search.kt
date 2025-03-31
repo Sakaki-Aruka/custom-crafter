@@ -59,13 +59,13 @@ object Search {
          * @since 5.0.8
          */
         fun toJson(): String {
-            val vanillaHashcode: String = vanilla?.let { r -> (r as CraftingRecipe).key.toString() } ?: ""
+            val vanillaRecipeNamespacedKey: String = vanilla?.let { r -> (r as CraftingRecipe).key.toString() } ?: ""
             val customsList: MutableList<Pair<String, MappedRelation>> = mutableListOf()
             customs.forEach { (recipe, mapped) ->
                 val recipeString = "${recipe.name}-${recipe.items.hashCode()}-${recipe.type.name}"
                 customsList.add(recipeString to mapped)
             }
-            return Json.encodeToString(vanillaHashcode to customsList)
+            return Json.encodeToString(vanillaRecipeNamespacedKey to customsList)
         }
 
         /**
