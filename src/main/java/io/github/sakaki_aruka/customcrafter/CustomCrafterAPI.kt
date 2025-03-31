@@ -29,7 +29,7 @@ import org.bukkit.scheduler.BukkitRunnable
 import kotlin.random.Random
 
 object CustomCrafterAPI {
-    const val API_VERSION: String = "0.1.8"
+    const val API_VERSION: String = "0.1.9"
     const val IS_STABLE: Boolean = false
     const val IS_BETA: Boolean = true
 

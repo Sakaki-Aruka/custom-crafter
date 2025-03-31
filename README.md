@@ -30,7 +30,7 @@ custom crafter works API and also a plugin since version 5.0.0 .
 You can make custom recipes in your plugin and register those.
 
 ## Documents
-[KDoc](https://sakaki-aruka.github.io/custom-crafter/)  
+[KDoc](https://sakaki-aruka.github.io/custom-crafter/) / [Wiki (on GitHub)](https://github.com/Sakaki-Aruka/custom-crafter/wiki/Intro)  
 You can build a document what type of JavaDoc with `mvn dokka:javadoc` on the project root.
 
 ## Dependency Information
@@ -58,7 +58,7 @@ The latest provided version
    <dependency>
       <groupId>com.github.Sakaki-Aruka</groupId>
       <artifactId>custom-crafter</artifactId>
-      <version>5.0.8</version>
+      <version>5.0.9</version>
    </dependency>
 </dependencies>
 
@@ -82,7 +82,7 @@ dependencyResolutionManagement {
 (dependency)
 ```groovy
 dependencies {
-   implementation 'com.github.Sakaki-Aruka:custom-crafter:5.0.8'
+   implementation 'com.github.Sakaki-Aruka:custom-crafter:5.0.9'
 }
 ```
 
@@ -103,7 +103,7 @@ repositories {
 (dependency)
 ```
 dependencies {
-    implementation("com.github.Sakaki-Aruka:custom-crafter:5.0.8")
+    implementation("com.github.Sakaki-Aruka:custom-crafter:5.0.9")
 }
 ```
 
@@ -169,6 +169,7 @@ val supplier = ResultSupplier { config ->
     // Write processes here.
     // ResultSupplier is a lambda expression.
     // Return type is `List<ItemStack>`
+    emptyList<ItemStack>()
 }
 ```
 For recipes that do not require complex processing, CustomCrafter provides simplified versions of the above expression.
@@ -193,7 +194,7 @@ Below is an example of a simple recipe:
 // In Kotlin
 val recipe: CRecipe = CRecipeImpl(
     name = "test-recipe",
-    items = mapOf(CoordinateComponent(0, 0) to matter), # 'matter' is CMatter
+    items = mapOf(CoordinateComponent(0, 0) to matter), // 'matter' is CMatter
     containers = null,
     results = setOf(ResultSupplier.timesSingle(Material.STONE)),
     type = CRecipeType.NORMAL
