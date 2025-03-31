@@ -19,19 +19,19 @@ import org.bukkit.persistence.PersistentDataContainer
 data class CPotionMatterImpl(
     override val name: String,
     override val candidate: Set<Material>,
-    override val amount: Int,
-    override val mass: Boolean,
-    override val predicates: Set<CMatterPredicate>?,
-    override val potionComponents: Set<CPotionComponent>
+    override val potionComponents: Set<CPotionComponent>,
+    override val amount: Int = 1,
+    override val mass: Boolean = false,
+    override val predicates: Set<CMatterPredicate>? = null,
 ): CMatter, CPotionMatter {
     override fun asOne(): CPotionMatterImpl {
         return CPotionMatterImpl(
-            name,
-            candidate,
+            name = name,
+            candidate = candidate,
             amount = 1,
-            mass,
-            predicates,
-            potionComponents
+            mass = mass,
+            predicates = predicates,
+            potionComponents = potionComponents
         )
     }
 }
