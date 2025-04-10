@@ -40,10 +40,11 @@ interface CRecipe {
         crafterID: UUID,
         relate: MappedRelation,
         mapped: Map<CoordinateComponent, ItemStack>,
-        results: MutableList<ItemStack>
+        results: MutableList<ItemStack>,
+        isMultipleDisplayCall: Boolean
     ) {
         containers?.forEach { container ->
-            container.run(crafterID, relate, mapped, results)
+            container.run(crafterID, relate, mapped, results, isMultipleDisplayCall)
         }
     }
 

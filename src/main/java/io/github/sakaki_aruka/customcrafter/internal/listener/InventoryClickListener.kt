@@ -156,7 +156,7 @@ object InventoryClickListener: Listener {
             recipe.getResults(player.uniqueId, relate, mapped, mass, amount, isMultipleDisplayCall = false)
                 .takeIf { it.isNotEmpty() }
                 ?.let { itemList ->
-                    recipe.runContainers(player.uniqueId, relate, mapped, itemList)
+                    recipe.runContainers(player.uniqueId, relate, mapped, itemList, isMultipleDisplayCall = false)
                     // TODO must impl add result items to the result slot
                     itemList.takeIf { it.isNotEmpty() }
                         ?.forEach { item ->
@@ -299,9 +299,21 @@ object InventoryClickListener: Listener {
                         shiftClicked = shiftUsed,
                         calledTimes = times,
                         isMultipleDisplayCall = false
-                    ).toTypedArray().let { arr ->
-                        player.inventory.addItem(*arr).forEach { (_, over) ->
-                            player.world.dropItem(player.location, over)
+                    ).let { itemList ->
+                        cRecipe.containers?.forEach { container ->
+                            container.run(
+                                crafterID = player.uniqueId,
+                                relate = mapped,
+                                mapped = input.materials,
+                                list = itemList,
+                                isMultipleDisplayCall = false
+                            )
+                        }
+
+                        itemList.toTypedArray().let { arr ->
+                            player.inventory.addItem(*arr).forEach { (_, over) ->
+                                player.world.dropItem(player.location, over)
+                            }
                         }
                     }
 
@@ -382,7 +394,7 @@ object InventoryClickListener: Listener {
         }
         (startIndex..min(result.customs().size, endIndex)).forEach { i ->
             val (recipe, relate) = result.customs()[i]
-            val results: List<ItemStack> = recipe.getResults(
+            val results: MutableList<ItemStack> = recipe.getResults(
                 player.uniqueId,
                 relate,
                 Converter.standardInputMapping(input.toCraftingGUI())!!,
@@ -390,6 +402,25 @@ object InventoryClickListener: Listener {
                 recipe.multipleCandidateDisplaySettingDefaultCalledTimes(),
                 isMultipleDisplayCall = true
             )
+
+            results.let { itemList ->
+                recipe.containers?.forEach { container ->
+                    container.run(
+                        crafterID = player.uniqueId,
+                        relate = relate,
+                        mapped = input.materials,
+                        list = itemList,
+                        isMultipleDisplayCall = true
+                    )
+                }
+
+                itemList.toTypedArray().let { arr ->
+                    player.inventory.addItem(*arr).forEach { (_, over) ->
+                        player.world.dropItem(player.location, over)
+                    }
+                }
+            }
+
             items[CoordinateComponent.fromIndex(index, followLimit = false)] =
                 results.firstOrNull { item ->
                     item.type.isItem

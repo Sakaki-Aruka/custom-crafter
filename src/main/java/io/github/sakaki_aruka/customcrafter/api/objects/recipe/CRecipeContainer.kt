@@ -24,6 +24,7 @@ data class CRecipeContainer(
      * - relate([MappedRelation]): coordinate relation with recipes and inputs
      * - mapped([Map]<[CoordinateComponent], [ItemStack]>): a mapping of input inventory
      * - list([MutableList]<[ItemStack]>): provided result items contained list. you can modify its components.
+     * - isMultipleDisplayCall: called from multiple craft result candidate collector or not (since 5.0.10)
      * predicate return
      * - [Boolean]: a result of this predicate.
      *
@@ -42,14 +43,15 @@ data class CRecipeContainer(
      * @param[func] a function what checks elements.
      */
     data class Predicate(
-        val func: Function4<UUID, MappedRelation, Map<CoordinateComponent, ItemStack>, MutableList<ItemStack>, Boolean>
+        val func: Function5<UUID, MappedRelation, Map<CoordinateComponent, ItemStack>, MutableList<ItemStack>, Boolean, Boolean>
     ) {
         operator fun invoke(
             crafterID: UUID,
             relate: MappedRelation,
             mapped: Map<CoordinateComponent, ItemStack>,
-            list: MutableList<ItemStack>
-        ): Boolean = func(crafterID, relate, mapped, list)
+            list: MutableList<ItemStack>,
+            isMultipleDisplayCall: Boolean
+        ): Boolean = func(crafterID, relate, mapped, list, isMultipleDisplayCall)
 
         companion object {
             /**
@@ -59,7 +61,7 @@ data class CRecipeContainer(
              * val True: Predicate = Predicate { _, _, _, _ -> true }
              * ```
              */
-            val True: Predicate = Predicate { _, _, _, _ -> true }
+            val True: Predicate = Predicate { _, _, _, _, _ -> true }
         }
     }
 
@@ -70,6 +72,7 @@ data class CRecipeContainer(
      * - relate([MappedRelation]): coordinate relation with recipes and inputs
      * - mapped([Map]<[CoordinateComponent], [ItemStack]>): a mapping of input inventory
      * - list([MutableList]<[ItemStack]>): provided result items contained list. you can modify its components.
+     * - isMultipleDisplayCall: called from multiple craft result candidate collector or not (since 5.0.10)
      * consumer return
      * - [Unit]: Unit likes void.
      * ```
@@ -90,14 +93,15 @@ data class CRecipeContainer(
      * @param[func] a function what consume input data
      */
     data class Consumer(
-        val func: Function4<UUID, MappedRelation, Map<CoordinateComponent, ItemStack>, MutableList<ItemStack>, Unit>
+        val func: Function5<UUID, MappedRelation, Map<CoordinateComponent, ItemStack>, MutableList<ItemStack>, Boolean, Unit>
     ) {
         operator fun invoke(
             crafterID: UUID,
             relate: MappedRelation,
             mapped: Map<CoordinateComponent, ItemStack>,
-            list: MutableList<ItemStack>
-        ): Unit = func(crafterID, relate, mapped, list)
+            list: MutableList<ItemStack>,
+            isMultipleDisplayCall: Boolean
+        ): Unit = func(crafterID, relate, mapped, list, isMultipleDisplayCall)
     }
 
     /**
@@ -112,16 +116,18 @@ data class CRecipeContainer(
      * @param[relate] a coordinate mapping between a [CRecipe] and an input Inventory
      * @param[mapped] a coordinate and input items mapping
      * @param[list] result items that are made by a [CRecipe]
+     * @param[isMultipleDisplayCall] called from multiple craft result candidate collector or not (since 5.0.10)
      * @return[Unit] no return elements
      */
     fun run(
         crafterID: UUID,
         relate: MappedRelation,
         mapped: Map<CoordinateComponent, ItemStack>,
-        list: MutableList<ItemStack>
+        list: MutableList<ItemStack>,
+        isMultipleDisplayCall: Boolean
     ) {
         consumers
-            .filter { (p, _) -> p.func.invoke(crafterID, relate, mapped, list) }
-            .forEach { (_, c) -> c.func.invoke(crafterID, relate, mapped, list) }
+            .filter { (p, _) -> p.func.invoke(crafterID, relate, mapped, list, isMultipleDisplayCall) }
+            .forEach { (_, c) -> c.func.invoke(crafterID, relate, mapped, list, isMultipleDisplayCall) }
     }
 }
