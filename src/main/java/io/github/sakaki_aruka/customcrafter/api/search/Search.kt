@@ -91,10 +91,15 @@ object Search {
             /**
              * converts to a SearchResult instance from a specified json string
              *
+             * @param[json] A SearchResult json string
+             * @param[sourceRecipes] A list of source recipes. (default = CustomCrafterAPI.getRecipes() / since 5.0.10)
              * @return[SearchResult] deserialized SearchResult instance
              * @since 5.0.8
              */
-            fun fromJson(json: String): SearchResult {
+            fun fromJson(
+                json: String,
+                sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes()
+            ): SearchResult {
                 val pair: Pair<String, List<Pair<String, MappedRelation>>> = Json.decodeFromString(json)
                 val vanilla: Recipe? = Bukkit.recipeIterator()
                     .asSequence()
@@ -102,7 +107,7 @@ object Search {
                     .firstOrNull { r -> (r as CraftingRecipe).key.toString() == pair.first }
                 val list: List<Pair<String, MappedRelation>> = pair.second
                 val customs: List<Pair<CRecipe, MappedRelation>> = list.map { (cRecipe, mapped) ->
-                    val c: CRecipe = CustomCrafterAPI.getRecipes().first { r ->
+                    val c: CRecipe = sourceRecipes.first { r ->
                         "${r.name}-${r.items.hashCode()}-${r.type.name}" == cRecipe
                     }
                     c to mapped
@@ -132,16 +137,18 @@ object Search {
      * @param[view] input crafting gui's view
      * @param[natural] Force to search vanilla recipes or not.(true=not, false=force). The default is true.
      * @param[onlyFirst] get only first matched custom recipe and mapped. (default = false)
+     * @param[sourceRecipes] A list of searched recipes. (default = CustomCrafterAPI.getRecipes() / since 5.0.10)
      * @return[SearchResult?] A result of a request. If you send one that contains invalid params, returns null.
      */
     fun search(
         crafterID: UUID,
         view: CraftView,
         natural: Boolean = true,
-        onlyFirst: Boolean = false
+        onlyFirst: Boolean = false,
+        sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes()
     ): SearchResult? {
         val gui: Inventory = view.toCraftingGUI()
-        return search(crafterID, gui, natural, onlyFirst)
+        return search(crafterID, gui, natural, onlyFirst, sourceRecipes)
     }
 
     /**
@@ -155,13 +162,15 @@ object Search {
      * @param[items] Materials of crafting. this size must equal 36(6*6).
      * @param[natural] Force to search vanilla recipes or not.(true=not, false=force). The default is true.
      * @param[onlyFirst] get only first matched custom recipe and mapped. (default = false)
+     * @param[sourceRecipes] A list of searched recipes. (default = CustomCrafterAPI.getRecipes() / since 5.0.10)
      * @return[SearchResult?] A result of a request. If you send one that contains invalid params, returns null.
      */
     fun search(
         player: Player,
         items: List<ItemStack>,
         natural: Boolean = true,
-        onlyFirst: Boolean = false
+        onlyFirst: Boolean = false,
+        sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes()
     ): SearchResult? {
         if (items.size != 36) return null
         val inventory: Inventory = Bukkit.createInventory(null, 54)
@@ -173,20 +182,21 @@ object Search {
             }
         }
 
-        return search(player.uniqueId, inventory, natural, onlyFirst)
+        return search(player.uniqueId, inventory, natural, onlyFirst, sourceRecipes)
     }
 
     internal fun search(
         crafterID: UUID,
         inventory: Inventory,
         natural: Boolean = true,
-        onlyFirst: Boolean = false
+        onlyFirst: Boolean = false,
+        sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes()
     ): SearchResult? {
         if (!CustomCrafterAPI.isCustomCrafterGUI(inventory) || CustomCrafterAPI.isGUITooOld(inventory)) return null
         val mapped: Map<CoordinateComponent, ItemStack> = Converter.standardInputMapping(inventory)
             .takeIf { it?.isNotEmpty() == true } ?: return null
 
-        val customs: List<Pair<CRecipe, MappedRelation>> = CustomCrafterAPI.getRecipes()
+        val customs: List<Pair<CRecipe, MappedRelation>> = sourceRecipes
             .filter { it.items.size == mapped.size }
             .map { recipe ->
                 val relation: MappedRelation? =
