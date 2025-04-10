@@ -35,6 +35,7 @@ interface CRecipe {
      * @param[relate] an input inventory and [CRecipe] coordinates relation.
      * @param[mapped] coordinates and input items relation.
      * @param[results] generated results by this recipe.
+     * @param[isMultipleDisplayCall] called from multiple craft result candidate collector or not
      */
     fun runContainers(
         crafterID: UUID,
@@ -43,9 +44,23 @@ interface CRecipe {
         results: MutableList<ItemStack>,
         isMultipleDisplayCall: Boolean
     ) {
-        containers?.forEach { container ->
-            container.run(crafterID, relate, mapped, results, isMultipleDisplayCall)
+        containers?.filter{ container ->
+            container.consumer is CRecipeContainer.NormalConsumer
+        }?.forEach { container ->
+            if (container.predicate(
+                crafterID, relate, mapped, results, isMultipleDisplayCall
+            )) container.consumer(
+                crafterID, relate, mapped, results, isMultipleDisplayCall
+            )
         }
+
+        containers?.firstOrNull { container ->
+            container.predicate(crafterID, relate, mapped, results, isMultipleDisplayCall)
+                    && container.consumer is CRecipeContainer.CraftingGUIAccessor
+        }?.let { container ->
+            container.consumer(crafterID, relate, mapped, results, isMultipleDisplayCall)
+        }
+
     }
 
     /**
