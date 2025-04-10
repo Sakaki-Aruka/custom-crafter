@@ -7,10 +7,10 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.objects.AmorphousFilterCandidate
 import io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant.CEnchantComponent
-import io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant.CEnchantMatterImpl
-import io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant.CEnchantmentStoreMatterImpl
+import io.github.sakaki_aruka.customcrafter.impl.matter.enchant.CEnchantMatterImpl
+import io.github.sakaki_aruka.customcrafter.impl.matter.enchant.CEnchantmentStoreMatterImpl
 import io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant.EnchantStrict
-import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeImpl
+import io.github.sakaki_aruka.customcrafter.impl.recipe.CRecipeImpl
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.internal.processor.Enchant

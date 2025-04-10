@@ -6,8 +6,8 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CPotionMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.objects.AmorphousFilterCandidate
 import io.github.sakaki_aruka.customcrafter.api.objects.matter.potion.CPotionComponent
-import io.github.sakaki_aruka.customcrafter.api.objects.matter.potion.CPotionMatterImpl
-import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeImpl
+import io.github.sakaki_aruka.customcrafter.impl.matter.potion.CPotionMatterImpl
+import io.github.sakaki_aruka.customcrafter.impl.recipe.CRecipeImpl
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.internal.processor.Potion

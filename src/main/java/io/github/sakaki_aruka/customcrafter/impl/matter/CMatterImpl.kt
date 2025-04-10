@@ -1,6 +1,7 @@
-package io.github.sakaki_aruka.customcrafter.api.objects.matter
+package io.github.sakaki_aruka.customcrafter.impl.matter
 
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
+import io.github.sakaki_aruka.customcrafter.api.objects.matter.CMatterPredicate
 import org.bukkit.Material
 
 /**
