@@ -11,6 +11,7 @@ import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.internal.processor.Converter
 import io.github.sakaki_aruka.customcrafter.api.search.Search
+import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
@@ -396,9 +397,9 @@ object InventoryClickListener: Listener {
             index++
         }
         // currentPage, results(SearchResult), input(CraftView)
-        val signature: ItemStack = CustomCrafterAPI.allCandidatesSignature()
-        CustomCrafterAPI.setAllCandidatesSignatureValues(currentPage, result, input, signature)
-        val gui: Inventory = CustomCrafterAPI.getAllCandidateGUI(
+        val signature: ItemStack = InternalAPI.allCandidatesSignature()
+        InternalAPI.setAllCandidatesSignatureValues(currentPage, result, input, signature)
+        val gui: Inventory = InternalAPI.getAllCandidateGUI(
             items,
             currentPage = destinationPage,
             signature = signature,
@@ -480,7 +481,7 @@ object InventoryClickListener: Listener {
         val mapped: Map<CoordinateComponent, ItemStack> = Converter.standardInputMapping(gui) ?: return
         val craftViewJson: String = CraftView.fromInventory(gui)?.toJson() ?: return
         val resultJson: String = result.toJson()
-        val signatureItem: ItemStack = CustomCrafterAPI.allCandidatesSignature()
+        val signatureItem: ItemStack = InternalAPI.allCandidatesSignature()
         signatureItem.editMeta { meta ->
             meta.persistentDataContainer.set(
                 NamespacedKey(CustomCrafter.getInstance(), "all_candidate_input"),
@@ -509,7 +510,7 @@ object InventoryClickListener: Listener {
             ).firstOrNull { item -> item.type != Material.AIR && item.type.isItem }
                 ?: replaceRecipeNameTemplate(CustomCrafterAPI.ALL_CANDIDATE_NO_DISPLAYABLE_ITEM, recipe.name)
         }
-        val allCandidateGUI: Inventory = CustomCrafterAPI.getAllCandidateGUI(
+        val allCandidateGUI: Inventory = InternalAPI.getAllCandidateGUI(
             displayItems,
             currentPage = 0,
             signature = signatureItem,
