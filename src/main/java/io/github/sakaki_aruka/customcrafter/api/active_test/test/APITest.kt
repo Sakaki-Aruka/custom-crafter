@@ -8,7 +8,7 @@ import org.bukkit.inventory.ItemStack
 
 /**
  * @suppress
- * This is an active test object.
+ * This is an active test objects.
  */
 internal object APITest {
     fun run() {

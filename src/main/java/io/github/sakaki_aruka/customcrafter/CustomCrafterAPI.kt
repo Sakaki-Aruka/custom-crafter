@@ -1,21 +1,14 @@
 package io.github.sakaki_aruka.customcrafter
 
-import io.github.sakaki_aruka.customcrafter.api.active_test.test.APITest
-import io.github.sakaki_aruka.customcrafter.api.active_test.test.ConverterTest
-import io.github.sakaki_aruka.customcrafter.api.active_test.test.EnchantTest
-import io.github.sakaki_aruka.customcrafter.api.active_test.test.MultipleCandidateTest
-import io.github.sakaki_aruka.customcrafter.api.active_test.test.PotionTest
-import io.github.sakaki_aruka.customcrafter.api.active_test.test.SearchTest
-import io.github.sakaki_aruka.customcrafter.api.active_test.test.VanillaSearchTest
 import io.github.sakaki_aruka.customcrafter.api.event.RegisterCustomRecipeEvent
 import io.github.sakaki_aruka.customcrafter.api.event.UnregisterCustomRecipeEvent
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
-import io.github.sakaki_aruka.customcrafter.api.listener.InventoryClickListener
-import io.github.sakaki_aruka.customcrafter.api.listener.InventoryCloseListener
-import io.github.sakaki_aruka.customcrafter.api.listener.PlayerInteractListener
-import io.github.sakaki_aruka.customcrafter.api.`object`.CraftView
-import io.github.sakaki_aruka.customcrafter.api.`object`.recipe.CoordinateComponent
-import io.github.sakaki_aruka.customcrafter.api.processor.Converter
+import io.github.sakaki_aruka.customcrafter.internal.listener.InventoryClickListener
+import io.github.sakaki_aruka.customcrafter.internal.listener.InventoryCloseListener
+import io.github.sakaki_aruka.customcrafter.internal.listener.PlayerInteractListener
+import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
+import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
+import io.github.sakaki_aruka.customcrafter.internal.processor.Converter
 import io.github.sakaki_aruka.customcrafter.api.search.Search
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
@@ -25,8 +18,6 @@ import org.bukkit.NamespacedKey
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
-import org.bukkit.scheduler.BukkitRunnable
-import kotlin.random.Random
 
 object CustomCrafterAPI {
     const val API_VERSION: String = "0.1.9"
@@ -91,7 +82,7 @@ object CustomCrafterAPI {
 
 //        if (IS_BETA) {
 //            // run tests
-//            object: BukkitRunnable() {
+//            objects: BukkitRunnable() {
 //                override fun run() {
 //                    val startAt = System.currentTimeMillis()
 //                    APITest.run()

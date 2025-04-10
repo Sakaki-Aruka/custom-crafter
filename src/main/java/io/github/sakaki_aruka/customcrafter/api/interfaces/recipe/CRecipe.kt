@@ -2,11 +2,11 @@ package io.github.sakaki_aruka.customcrafter.api.interfaces.recipe
 
 import io.github.sakaki_aruka.customcrafter.api.interfaces.filter.CRecipeFilter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
-import io.github.sakaki_aruka.customcrafter.api.`object`.MappedRelation
-import io.github.sakaki_aruka.customcrafter.api.`object`.recipe.CRecipeContainer
-import io.github.sakaki_aruka.customcrafter.api.`object`.recipe.CRecipeType
-import io.github.sakaki_aruka.customcrafter.api.`object`.recipe.CoordinateComponent
-import io.github.sakaki_aruka.customcrafter.api.`object`.result.ResultSupplier
+import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
+import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeContainer
+import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
+import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
+import io.github.sakaki_aruka.customcrafter.api.objects.result.ResultSupplier
 import org.bukkit.inventory.ItemStack
 import java.util.UUID
 
