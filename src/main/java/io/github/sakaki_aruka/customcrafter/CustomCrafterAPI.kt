@@ -27,7 +27,6 @@ object CustomCrafterAPI {
     val AUTHORS: Set<String> = setOf("Sakaki-Aruka")
 
     var RESULT_GIVE_CANCEL: Boolean = false
-    internal val TEST_RECIPES: MutableList<CRecipe> = mutableListOf()
     internal var BASE_BLOCK: Material = Material.GOLD_BLOCK
 
     /**

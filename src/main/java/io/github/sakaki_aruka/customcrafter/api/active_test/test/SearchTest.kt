@@ -61,12 +61,14 @@ internal object SearchTest {
         setOf(0, 1, 2, 9, 11, 18, 19, 20).forEach { i ->
             gui.setItem(i, ItemStack(Material.COBBLESTONE))
         }
-        CustomCrafterAPI.TEST_RECIPES.add(recipe)
+
+        val testRecipes: MutableList<CRecipe> = mutableListOf(recipe)
 
         val resultOfNatural = Search.search(
             UUID.randomUUID(),
             CraftView.fromInventory(gui)!!,
-            natural = true
+            natural = true,
+            sourceRecipes = testRecipes
         )
 
         CAssert.assertTrue(resultOfNatural != null)
@@ -101,9 +103,6 @@ internal object SearchTest {
         CAssert.assertTrue(invalidResult != null)
         CAssert.assertTrue(invalidResult!!.customs().isEmpty())
         CAssert.assertTrue(invalidResult.vanilla() == null)
-
-        //cleanup
-        CustomCrafterAPI.TEST_RECIPES.remove(recipe)
     }
 
     private fun amorphousTest1() {
@@ -133,7 +132,7 @@ internal object SearchTest {
             type = CRecipeType.AMORPHOUS
         )
 
-        CustomCrafterAPI.TEST_RECIPES.add(recipe)
+        val testRecipes: MutableList<CRecipe> = mutableListOf(recipe)
 
         val gui = CustomCrafterAPI.getCraftingGUI()
         setOf(0, 1, 45, 46).forEach { i ->
@@ -142,7 +141,8 @@ internal object SearchTest {
         val result = Search.search(
             UUID.randomUUID(),
             CraftView.fromInventory(gui)!!,
-            natural = true
+            natural = true,
+            sourceRecipes = testRecipes
         )
         CAssert.assertTrue(result != null)
         CAssert.assertTrue(result!!.vanilla() == null)
@@ -155,9 +155,6 @@ internal object SearchTest {
         CAssert.assertTrue(returnedComponents.size == 4)
         CAssert.assertTrue(returnedComponents.map { it.recipe }.toSet().size == 4)
         CAssert.assertTrue(returnedComponents.map { it.input }.toSet().size == 4)
-
-        // clean up
-        CustomCrafterAPI.TEST_RECIPES.remove(recipe)
     }
 
     private fun amorphousTest2() {
@@ -189,20 +186,18 @@ internal object SearchTest {
         val gui = CustomCrafterAPI.getCraftingGUI()
         gui.setItem(0, ItemStack(Material.SLIME_BALL, 10))
         gui.setItem(1, ItemStack(Material.LAVA_BUCKET))
-        CustomCrafterAPI.TEST_RECIPES.add(recipe)
+        val testRecipes: MutableList<CRecipe> = mutableListOf(recipe)
         val result = Search.search(
             UUID.randomUUID(),
             CraftView.fromInventory(gui)!!,
-            natural = true
+            natural = true,
+            sourceRecipes = testRecipes
         )
 
         CAssert.assertTrue(result != null)
         CAssert.assertTrue(result!!.vanilla() == null)
         CAssert.assertTrue(result.customs().size == 1)
         CAssert.assertTrue(result.customs().first().first == recipe)
-
-        // cleanup
-        CustomCrafterAPI.TEST_RECIPES.remove(recipe)
     }
 
     private fun vanillaTest() {
