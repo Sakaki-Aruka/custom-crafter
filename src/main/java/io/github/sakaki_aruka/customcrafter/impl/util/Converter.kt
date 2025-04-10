@@ -1,4 +1,4 @@
-package io.github.sakaki_aruka.customcrafter.internal.processor
+package io.github.sakaki_aruka.customcrafter.impl.util
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent

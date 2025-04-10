@@ -1,7 +1,7 @@
 package io.github.sakaki_aruka.customcrafter.api.search
 
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
-import io.github.sakaki_aruka.customcrafter.internal.processor.Converter
+import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.World

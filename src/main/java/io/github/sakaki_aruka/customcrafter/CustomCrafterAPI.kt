@@ -6,10 +6,8 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.internal.listener.InventoryClickListener
 import io.github.sakaki_aruka.customcrafter.internal.listener.InventoryCloseListener
 import io.github.sakaki_aruka.customcrafter.internal.listener.PlayerInteractListener
-import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
-import io.github.sakaki_aruka.customcrafter.internal.processor.Converter
-import io.github.sakaki_aruka.customcrafter.api.search.Search
+import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
@@ -86,9 +84,9 @@ object CustomCrafterAPI {
 //                    val startAt = System.currentTimeMillis()
 //                    APITest.run()
 //                    ConverterTest.run()
-//                    EnchantTest.run()
+//
 //                    VanillaSearchTest.run()
-//                    PotionTest.run()
+//
 //                    MultipleCandidateTest.run()
 //                    try {
 //                        SearchTest.run()

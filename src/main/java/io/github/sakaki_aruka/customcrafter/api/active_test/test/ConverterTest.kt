@@ -3,7 +3,7 @@ package io.github.sakaki_aruka.customcrafter.api.active_test.test
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.active_test.CAssert
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
-import io.github.sakaki_aruka.customcrafter.internal.processor.Converter
+import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.inventory.Inventory

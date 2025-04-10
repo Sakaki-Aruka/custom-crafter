@@ -2,7 +2,7 @@ package io.github.sakaki_aruka.customcrafter.api.objects
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
-import io.github.sakaki_aruka.customcrafter.internal.processor.Converter
+import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import kotlinx.serialization.json.Json
 import org.bukkit.Material
 import org.bukkit.inventory.Inventory

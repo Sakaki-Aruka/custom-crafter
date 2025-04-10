@@ -10,7 +10,7 @@ import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelationComponent
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
-import io.github.sakaki_aruka.customcrafter.internal.processor.Converter
+import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import kotlinx.serialization.json.Json
 import org.bukkit.Bukkit
 import org.bukkit.Material

@@ -3,7 +3,7 @@ package io.github.sakaki_aruka.customcrafter.internal.listener
 import io.github.sakaki_aruka.customcrafter.CustomCrafter
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
-import io.github.sakaki_aruka.customcrafter.internal.processor.Converter
+import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import org.bukkit.Location
 import org.bukkit.NamespacedKey
 import org.bukkit.World
