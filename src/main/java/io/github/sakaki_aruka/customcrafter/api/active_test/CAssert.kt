@@ -5,10 +5,16 @@ import org.bukkit.Bukkit
 import kotlin.reflect.KClass
 
 /**
- * @suppress
+ * Assertion utilities for Active-Test.
  */
-internal object CAssert {
+object CAssert {
     val console = Bukkit.getConsoleSender()
+
+    /**
+     * Shows test (returns only Boolean)'s result, file name, method name and line number.
+     * @param[result] A result of a test.
+     * @since 5.0.10
+     */
     fun assertTrue(result: Boolean) {
         val stackTrace = Throwable().stackTrace
         stackTrace.getOrNull(1)?.let {
@@ -24,6 +30,22 @@ internal object CAssert {
         }
     }
 
+    /**
+     * Shows test (throws an exception)'s result, file name, method name and line number.
+     *
+     * If a lambda expression does not throw no exception or unexpected exception, shows those info.
+     *
+     * ```kotlin
+     * // example (APITest.kt at v5.0.10)
+     * CAssert.assertThrow(IllegalArgumentException::class) {
+     *     CustomCrafterAPI.getRandomNCoordinates(0)
+     * }
+     * // -> (Test) Successful: APITest.kt#randomCoordinatesTest (22)
+     * ```
+     * @param[exception] Expected (kotlin)exception class. (KClass)
+     * @param[e] Exception throw lambda expression.
+     * @since 5.0.10
+     */
     fun assertThrow(exception: KClass<out Exception>, e: () -> Unit) {
         val stackTrace = Throwable().stackTrace
         stackTrace.getOrNull(1)?.let { trace ->
