@@ -95,11 +95,12 @@ data class CRecipeContainer(
             /**
              * Get simple players crafting gui item replacer.
              *
-             * - CoordinateComponent: A coordinate of crafting gui
+             * - CoordinateComponent: A coordinate of crafting gui (If this is out of range [Converter.getAvailableCraftingSlotComponents], skipped run.)
              * - ItemStack: Replace item
              * - Boolean: Force-replace. If false, a target slots item must be null or empty.
              *
              * @param[mapping] A players crafting gui item replacer
+             * @return[CraftingGUIAccessor] Simple gui accessor (item replacer)
              */
             fun simpleAccessor(
                 mapping: Set<Triple<CoordinateComponent, ItemStack, Boolean>>
@@ -161,9 +162,9 @@ data class CRecipeContainer(
     /**
      * run all containers
      * ```
-     *         consumers
-     *             .filter { (p, _) -> p.func.invoke(player, relate, mapped, list) }
-     *             .forEach { (_, c) -> c.func.invoke(player, relate, mapped, list) }
+     *         containers
+     *             .filter { c -> c.predicate.func(player, relate, mapped, list) }
+     *             .forEach { c -> c.consumer.func(player, relate, mapped, list) }
      * ```
      *
      * @param[crafterID] a crafter's uuid
