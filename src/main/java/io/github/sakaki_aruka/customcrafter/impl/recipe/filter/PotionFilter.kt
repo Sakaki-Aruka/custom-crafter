@@ -1,4 +1,4 @@
-package io.github.sakaki_aruka.customcrafter.api.objects.recipe.filter
+package io.github.sakaki_aruka.customcrafter.impl.recipe.filter
 
 import io.github.sakaki_aruka.customcrafter.api.interfaces.filter.CRecipeFilter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CPotionMatter
