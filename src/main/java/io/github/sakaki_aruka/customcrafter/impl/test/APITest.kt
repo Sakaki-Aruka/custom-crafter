@@ -19,10 +19,8 @@ internal object APITest {
     }
 
     private fun randomCoordinatesTest() {
-        try {
+        CAssert.assertThrow(IllegalArgumentException::class) {
             CustomCrafterAPI.getRandomNCoordinates(0)
-        } catch (illegalArgument: IllegalArgumentException) {
-            illegalArgument.cause?.let { CAssert.assertThrow(it, IllegalArgumentException::class) }
         }
 
         val n = 100
@@ -47,10 +45,8 @@ internal object APITest {
         CAssert.assertTrue(!CustomCrafterAPI.isGUITooOld(gui))
         val dummy = Bukkit.createInventory(null, 54)
         CAssert.assertTrue(!CustomCrafterAPI.isCustomCrafterGUI(dummy))
-        try {
+        CAssert.assertThrow(IllegalArgumentException::class) {
             CustomCrafterAPI.isGUITooOld(dummy)
-        } catch (illegalArgument: IllegalArgumentException) {
-            illegalArgument.cause?.let { CAssert.assertThrow(it, IllegalArgumentException::class) }
         }
     }
 
