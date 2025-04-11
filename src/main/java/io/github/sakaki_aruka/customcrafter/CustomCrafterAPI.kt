@@ -71,34 +71,6 @@ object CustomCrafterAPI {
         listOf(MiniMessage.miniMessage().deserialize("<white>Recipe Name: $recipeName"))
     }
 
-    internal fun setup() {
-        val instance: CustomCrafter = CustomCrafter.getInstance()
-        Bukkit.getPluginManager().registerEvents(InventoryClickListener, instance)
-        Bukkit.getPluginManager().registerEvents(InventoryCloseListener, instance)
-        Bukkit.getPluginManager().registerEvents(PlayerInteractListener, instance)
-
-//        if (IS_BETA) {
-//            // run tests
-//            objects: BukkitRunnable() {
-//                override fun run() {
-//                    val startAt = System.currentTimeMillis()
-//                    APITest.run()
-//                    ConverterTest.run()
-//
-//                    VanillaSearchTest.run()
-//
-//                    MultipleCandidateTest.run()
-//                    try {
-//                        SearchTest.run()
-//                    } catch (e: Exception){}
-//                    val endAt = System.currentTimeMillis()
-//                    CustomCrafter.getInstance().logger.info("tested in ${endAt - startAt} ms")
-//
-//                }
-//            }.runTaskAsynchronously(CustomCrafter.getInstance())
-//        }
-    }
-
     /**
      * Get base block type.
      * @return[Material] base block type

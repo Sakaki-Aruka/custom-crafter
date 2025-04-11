@@ -41,9 +41,10 @@ object VanillaSearch {
             dy = minCoordinate.y,
             safeTrim = false
         ).sortedBy { c -> c.toIndex() }
-            .forEach { c ->
+            .takeIf { arr -> arr.containsAll(mapped.keys) }
+            ?.forEach { c ->
                 list.add(mapped[c] ?: ItemStack.empty())
-            }
+            } ?: return null
         return list.toTypedArray()
     }
 }

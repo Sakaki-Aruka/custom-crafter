@@ -5,11 +5,17 @@ import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI.ALL_CANDIDATE_CURRE
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI.ALL_CANDIDATE_INPUT_NK
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI.ALL_CANDIDATE_RESULTS_NK
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI.ALL_CANDIDATE_SIGNATURE_SLOT
+import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI.IS_BETA
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI.allCandidateSignatureNK
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI.genCCKey
 import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.search.Search
+import io.github.sakaki_aruka.customcrafter.impl.test.APITest
+import io.github.sakaki_aruka.customcrafter.impl.test.ConverterTest
+import io.github.sakaki_aruka.customcrafter.impl.test.MultipleCandidateTest
+import io.github.sakaki_aruka.customcrafter.impl.test.SearchTest
+import io.github.sakaki_aruka.customcrafter.impl.test.VanillaSearchTest
 import io.github.sakaki_aruka.customcrafter.internal.listener.InventoryCloseListener
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
@@ -18,11 +24,39 @@ import org.bukkit.NamespacedKey
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
+import org.bukkit.scheduler.BukkitRunnable
 
 /**
  * @suppress
  */
 internal object InternalAPI {
+
+    /**
+     * @since 5.0.10
+     */
+    fun runTests() {
+            if (IS_BETA) {
+                // run tests
+                object: BukkitRunnable() {
+                    override fun run() {
+                        val startAt = System.currentTimeMillis()
+                        APITest.run()
+                        ConverterTest.run()
+
+                        VanillaSearchTest.run()
+
+                        MultipleCandidateTest.run()
+                        try {
+                            SearchTest.run()
+                        } catch (_: Exception){}
+                        val endAt = System.currentTimeMillis()
+                        CustomCrafter.getInstance().logger.info("tested in ${endAt - startAt} ms")
+
+                    }
+                }.runTaskAsynchronously(CustomCrafter.getInstance())
+            }
+    }
+
     /**
      * @since 5.0.8
      */

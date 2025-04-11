@@ -1,6 +1,11 @@
 package io.github.sakaki_aruka.customcrafter;
 
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe;
+import io.github.sakaki_aruka.customcrafter.internal.InternalAPI;
+import io.github.sakaki_aruka.customcrafter.internal.listener.InventoryClickListener;
+import io.github.sakaki_aruka.customcrafter.internal.listener.InventoryCloseListener;
+import io.github.sakaki_aruka.customcrafter.internal.listener.PlayerInteractListener;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
@@ -19,8 +24,12 @@ public final class CustomCrafter extends JavaPlugin {
         instance = this;
 
         INITIALIZED = System.currentTimeMillis();
-        CustomCrafterAPI.INSTANCE.setup$custom_crafter();
 
+        Bukkit.getPluginManager().registerEvents(InventoryClickListener.INSTANCE, instance);
+        Bukkit.getPluginManager().registerEvents(InventoryCloseListener.INSTANCE, instance);
+        Bukkit.getPluginManager().registerEvents(PlayerInteractListener.INSTANCE, instance);
+
+        InternalAPI.INSTANCE.runTests();
     }
 
     @Override

@@ -1,4 +1,4 @@
-package io.github.sakaki_aruka.customcrafter.api.active_test.test
+package io.github.sakaki_aruka.customcrafter.impl.test
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.active_test.CAssert

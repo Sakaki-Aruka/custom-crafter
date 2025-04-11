@@ -330,14 +330,14 @@ object Search {
     ): Pair<AmorphousFilterCandidate.Type, List<AmorphousFilterCandidate>> {
         val coordinateList: MutableSet<CoordinateComponent> = mutableSetOf()
         for ((c, item) in mapped) {
-            try {
-                val (type, result) = filter.normal(item, matter)
-                if (type == CRecipeFilter.ResultType.SUCCESS && result) {
-                    coordinateList.add(c)
+
+            applyNormalFilters(item, matter, filter)
+                ?.let { (type, result) ->
+                    if (type == CRecipeFilter.ResultType.SUCCESS && result) {
+                        coordinateList.add(c)
+                    } else return AmorphousFilterCandidate.Type.NOT_ENOUGH to emptyList()
                 }
-            } catch (e: Exception) {
-                return AmorphousFilterCandidate.Type.NOT_ENOUGH to emptyList()
-            }
+                ?: return AmorphousFilterCandidate.Type.NOT_REQUIRED to emptyList()
         }
 
         return if (coordinateList.isEmpty()) {
@@ -363,7 +363,14 @@ object Search {
             }
         }
 
-        if (filterResults.any { pair -> pair.first == AmorphousFilterCandidate.Type.NOT_ENOUGH }) return null//return false
+        //debug
+        filterResults.forEach { (type, list) ->
+            list.forEach { e ->
+                println("$type / ${e.coordinate}: ${e.list}")
+            }
+        }
+
+        if (filterResults.any { (type, _) -> type == AmorphousFilterCandidate.Type.NOT_ENOUGH }) return null//return false
 
         val targets: Set<CoordinateComponent> = filterResults
             .map { e -> e.second.map { afc -> afc.coordinate } }
@@ -395,6 +402,12 @@ object Search {
             list.forEach { e -> merged.addAll(e) }
             filters.add(AmorphousFilterCandidate(coordinate, merged))
         }
+
+        //debug
+        println("filterResults=$filterResults")
+        println("targets=$targets")
+        println("limits=$limits")
+        println("filters=$filters")
 
         val confirmed: MutableMap<CoordinateComponent, CoordinateComponent> = mutableMapOf()
         val removeMarked: MutableSet<CoordinateComponent> = mutableSetOf()
