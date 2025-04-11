@@ -22,6 +22,7 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.Recipe
 import java.util.UUID
 import kotlin.math.abs
+import kotlin.reflect.KClass
 
 object Search {
 
@@ -271,12 +272,14 @@ object Search {
         return basic
     }
 
-    private inline fun <reified T: CMatter> applyNormalFilters(
+    private inline fun <reified T : CMatter> applyNormalFilters(
         item: ItemStack,
         matter: CMatter,
         filter: CRecipeFilter<T>
     ): Pair<CRecipeFilter.ResultType, Boolean>? {
-        return if (matter !is T) null else filter.normal(item, matter)
+        return try {
+            filter.normal(item, matter as T)
+        } catch (_: Exception) { null }
     }
 
     private fun candidateAmorphous(
@@ -366,12 +369,6 @@ object Search {
             }
         }
 
-        //debug
-        filterResults.forEach { (type, list) ->
-            list.forEach { e ->
-                println("$type / ${e.coordinate}: ${e.list}")
-            }
-        }
 
         if (filterResults.any { (type, _) -> type == AmorphousFilterCandidate.Type.NOT_ENOUGH }) return null//return false
 
@@ -405,12 +402,6 @@ object Search {
             list.forEach { e -> merged.addAll(e) }
             filters.add(AmorphousFilterCandidate(coordinate, merged))
         }
-
-        //debug
-        println("filterResults=$filterResults")
-        println("targets=$targets")
-        println("limits=$limits")
-        println("filters=$filters")
 
         val confirmed: MutableMap<CoordinateComponent, CoordinateComponent> = mutableMapOf()
         val removeMarked: MutableSet<CoordinateComponent> = mutableSetOf()

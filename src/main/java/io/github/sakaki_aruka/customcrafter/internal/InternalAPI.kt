@@ -48,7 +48,9 @@ internal object InternalAPI {
                         MultipleCandidateTest.run()
                         try {
                             SearchTest.run()
-                        } catch (_: Exception){}
+                        } catch (e: Exception){
+                            e.printStackTrace()
+                        }
                         val endAt = System.currentTimeMillis()
                         CustomCrafter.getInstance().logger.info("tested in ${endAt - startAt} ms")
 

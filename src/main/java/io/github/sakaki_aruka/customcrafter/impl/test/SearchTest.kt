@@ -80,7 +80,8 @@ internal object SearchTest {
         val resultOfUnnatural = Search.search(
             UUID.randomUUID(),
             CraftView.fromInventory(gui)!!,
-            natural = false
+            natural = false,
+            sourceRecipes = testRecipes
         )
 
         CAssert.assertTrue(resultOfUnnatural != null)
