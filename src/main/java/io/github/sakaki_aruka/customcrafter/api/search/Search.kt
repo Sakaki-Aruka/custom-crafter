@@ -330,14 +330,17 @@ object Search {
     ): Pair<AmorphousFilterCandidate.Type, List<AmorphousFilterCandidate>> {
         val coordinateList: MutableSet<CoordinateComponent> = mutableSetOf()
         for ((c, item) in mapped) {
-
             applyNormalFilters(item, matter, filter)
                 ?.let { (type, result) ->
-                    if (type == CRecipeFilter.ResultType.SUCCESS && result) {
-                        coordinateList.add(c)
-                    } else return AmorphousFilterCandidate.Type.NOT_ENOUGH to emptyList()
-                }
-                ?: return AmorphousFilterCandidate.Type.NOT_REQUIRED to emptyList()
+                    when (type) {
+                        CRecipeFilter.ResultType.SUCCESS -> {
+                            if (result) coordinateList.add(c)
+                            else return AmorphousFilterCandidate.Type.NOT_ENOUGH to emptyList()
+                        }
+                        CRecipeFilter.ResultType.FAILED -> return AmorphousFilterCandidate.Type.NOT_ENOUGH to emptyList()
+                        CRecipeFilter.ResultType.NOT_REQUIRED -> return AmorphousFilterCandidate.Type.NOT_REQUIRED to emptyList()
+                    }
+                } ?: return AmorphousFilterCandidate.Type.NOT_REQUIRED to emptyList()
         }
 
         return if (coordinateList.isEmpty()) {
