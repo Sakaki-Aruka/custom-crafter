@@ -16,6 +16,7 @@ internal object APITest {
         craftingGUITest()
         tooOldTest()
         randomCoordinatesTest()
+        allCandidateTest()
     }
 
     private fun randomCoordinatesTest() {
@@ -35,6 +36,10 @@ internal object APITest {
         CAssert.assertTrue(CustomCrafterAPI.setBaseBlockSideSize(5))
         CustomCrafterAPI.setBaseBlockSideSize(3)
         CAssert.assertTrue(CustomCrafterAPI.getBaseBlockSideSize() == 3)
+
+        CAssert.assertThrow(IllegalArgumentException::class) {
+            CustomCrafterAPI.setBaseBlock(Material.DIAMOND)
+        }
 
         CustomCrafterAPI.BASE_BLOCK_SIDE = base
     }
@@ -61,5 +66,11 @@ internal object APITest {
         gui.setItem(CustomCrafterAPI.CRAFTING_TABLE_MAKE_BUTTON_SLOT, item)
 
         CAssert.assertTrue(CustomCrafterAPI.isGUITooOld(gui))
+    }
+
+    private fun allCandidateTest() {
+        CAssert.assertThrow(IllegalArgumentException::class) {
+            CustomCrafterAPI.setAllCandidateNotDisplayableItem(ItemStack(Material.WATER)) { _ -> null }
+        }
     }
 }
