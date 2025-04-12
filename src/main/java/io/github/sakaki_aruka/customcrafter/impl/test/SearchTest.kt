@@ -2,16 +2,27 @@ package io.github.sakaki_aruka.customcrafter.impl.test
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.active_test.CAssert
+import io.github.sakaki_aruka.customcrafter.api.interfaces.filter.CRecipeFilter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
+import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelationComponent
+import io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant.CEnchantComponent
+import io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant.EnchantStrict
+import io.github.sakaki_aruka.customcrafter.api.objects.matter.potion.CPotionComponent
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
 import io.github.sakaki_aruka.customcrafter.impl.recipe.CRecipeImpl
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.search.Search
+import io.github.sakaki_aruka.customcrafter.impl.matter.enchant.CEnchantMatterImpl
+import io.github.sakaki_aruka.customcrafter.impl.matter.potion.CPotionMatterImpl
+import io.github.sakaki_aruka.customcrafter.impl.recipe.filter.EnchantFilter
 import org.bukkit.Material
+import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemStack
+import org.bukkit.potion.PotionEffect
+import org.bukkit.potion.PotionEffectType
 import java.util.UUID
 
 /**
@@ -27,6 +38,7 @@ internal object SearchTest {
         amorphousTest1()
         amorphousTest2()
         normalTest1()
+        enchantTest1()
     }
 
     private fun normalTest1() {
@@ -249,4 +261,121 @@ internal object SearchTest {
         )
         CAssert.assertTrue(result == null)
     }
+
+    private fun enchantTest1() {
+        val onlyEnchantment = CEnchantMatterImpl(
+            "oe",
+            setOf(Material.STONE),
+            setOf(CEnchantComponent(
+                level = 1, enchantment = Enchantment.EFFICIENCY, EnchantStrict.ONLY_ENCHANT
+            ))
+        )
+
+        val strict = CEnchantMatterImpl(
+            "s",
+            setOf(Material.STONE),
+            setOf(CEnchantComponent(
+                level = 1, enchantment = Enchantment.EFFICIENCY, EnchantStrict.STRICT
+            ))
+        )
+
+        val recipe = CRecipeImpl(
+            "r",
+            mapOf(
+                CoordinateComponent(0, 2) to onlyEnchantment,
+                CoordinateComponent(0, 3) to strict
+            ),
+            CRecipeType.AMORPHOUS
+        )
+
+        val input1 = ItemStack(Material.STONE)
+        input1.editMeta { meta -> meta.addEnchant(Enchantment.EFFICIENCY, 5, false) }
+
+        val input2 = ItemStack(Material.STONE)
+        input2.editMeta { meta -> meta.addEnchant(Enchantment.EFFICIENCY, 1, false) }
+
+        val gui = CustomCrafterAPI.getCraftingGUI()
+        gui.setItem(38, input1)
+        gui.setItem(46, input2)
+
+        val result = Search.search(
+            crafterID = UUID.randomUUID(),
+            view = CraftView.fromInventory(gui)!!,
+            sourceRecipes = listOf(recipe)
+        )
+
+        val stone = ItemStack(Material.STONE)
+        CAssert.assertTrue(
+            EnchantFilter.normal(stone, onlyEnchantment) == CRecipeFilter.ResultType.SUCCESS to false)
+        CAssert.assertTrue(
+            EnchantFilter.normal(stone, strict) == CRecipeFilter.ResultType.SUCCESS to false)
+
+        CAssert.assertTrue(result != null)
+        CAssert.assertTrue(result!!.vanilla() == null)
+        CAssert.assertTrue(result.customs().size == 1)
+        val (_, mapped) = result.customs().first()
+        CAssert.assertTrue(mapped.components
+            .contains(MappedRelationComponent(CoordinateComponent(0, 2), CoordinateComponent.fromIndex(38))))
+
+        CAssert.assertTrue(mapped.components
+            .contains(MappedRelationComponent(CoordinateComponent(0, 3), CoordinateComponent.fromIndex(46))))
+    }
+
+    private fun enchantNormalTest2() {
+        //
+    }
+
+    private fun enchantStoreNormalTest1() {
+        //
+    }
+
+    private fun enchantStoreNormalTest2() {
+        //
+    }
+
+    private fun potionNormalTest1() {
+        val onlyEffect = CPotionMatterImpl(
+            "oe",
+            setOf(Material.POTION),
+            setOf(CPotionComponent(
+                PotionEffect(
+                    PotionEffectType.POISON, 1, 1),
+                CPotionComponent.PotionStrict.ONLY_EFFECT
+            )))
+
+        val input = CPotionMatterImpl(
+            "i",
+            setOf(Material.POTION),
+            setOf(CPotionComponent(
+                PotionEffect(
+                    PotionEffectType.POISON, 1, 1),
+                CPotionComponent.PotionStrict.INPUT
+            )))
+
+        val notStrict = CPotionMatterImpl(
+            "ns",
+            setOf(Material.POTION),
+            setOf(CPotionComponent(
+                PotionEffect(
+                    PotionEffectType.POISON, 1, 1),
+                CPotionComponent.PotionStrict.NOT_STRICT
+            )))
+
+        val strict = CPotionMatterImpl(
+            "s",
+            setOf(Material.POTION),
+            setOf(CPotionComponent(
+                PotionEffect(
+                    PotionEffectType.POISON, 1, 1),
+                CPotionComponent.PotionStrict.STRICT
+            )))
+
+
+    }
+
+    private fun potionNormalTest2() {
+        //
+    }
+
+
 }

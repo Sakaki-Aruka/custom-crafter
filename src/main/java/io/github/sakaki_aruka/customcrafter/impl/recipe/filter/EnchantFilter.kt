@@ -20,9 +20,7 @@ object EnchantFilter: CRecipeFilter<CEnchantMatter> {
         matter: CEnchantMatter
     ): Pair<CRecipeFilter.ResultType, Boolean> {
         val itemEnchants: Map<Enchantment, Int> = item.enchantments
-        if (matter.enchantComponents.isNotEmpty() && itemEnchants.isEmpty()) return CRecipeFilter.ResultType.FAILED to false
-        else if (matter.enchantComponents.isNotEmpty()) return CRecipeFilter.ResultType.NOT_REQUIRED to true
-
+        if (matter.enchantComponents.isEmpty()) return CRecipeFilter.ResultType.NOT_REQUIRED to true
         return CRecipeFilter.ResultType.SUCCESS to matter.enchantComponents.all { base(itemEnchants, it) }
     }
 
@@ -31,8 +29,6 @@ object EnchantFilter: CRecipeFilter<CEnchantMatter> {
         required: CEnchantComponent
     ): Boolean {
         return when (required.strict) {
-            EnchantStrict.INPUT -> true
-            EnchantStrict.NOT_STRICT -> true
             EnchantStrict.ONLY_ENCHANT -> {
                 enchants.keys.contains(required.enchantment)
             }

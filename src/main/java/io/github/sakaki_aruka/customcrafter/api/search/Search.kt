@@ -22,6 +22,7 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.Recipe
 import java.util.UUID
 import kotlin.math.abs
+import kotlin.math.min
 import kotlin.reflect.KClass
 
 object Search {
@@ -338,7 +339,7 @@ object Search {
                     when (type) {
                         CRecipeFilter.ResultType.SUCCESS -> {
                             if (result) coordinateList.add(c)
-                            else return AmorphousFilterCandidate.Type.NOT_ENOUGH to emptyList()
+                            //else return AmorphousFilterCandidate.Type.NOT_ENOUGH to emptyList()
                         }
                         CRecipeFilter.ResultType.FAILED -> return AmorphousFilterCandidate.Type.NOT_ENOUGH to emptyList()
                         CRecipeFilter.ResultType.NOT_REQUIRED -> return AmorphousFilterCandidate.Type.NOT_REQUIRED to emptyList()
@@ -347,7 +348,7 @@ object Search {
         }
 
         return if (coordinateList.isEmpty()) {
-            AmorphousFilterCandidate.Type.NOT_REQUIRED to emptyList()
+            AmorphousFilterCandidate.Type.NOT_ENOUGH to emptyList()//NOT_REQUIRED to emptyList()
         } else AmorphousFilterCandidate.Type.SUCCESSFUL to listOf(AmorphousFilterCandidate(matterCoordinate, coordinateList.toList()))
     }
 
@@ -369,38 +370,34 @@ object Search {
             }
         }
 
-
         if (filterResults.any { (type, _) -> type == AmorphousFilterCandidate.Type.NOT_ENOUGH }) return null//return false
 
         val targets: Set<CoordinateComponent> = filterResults
-            .map { e -> e.second.map { afc -> afc.coordinate } }
+            .map { (_, list) -> list.map { afc -> afc.coordinate } }
             .flatten()
             .toSet()
 
         val limits: MutableMap<CoordinateComponent, Int> = mutableMapOf()
-        for (coordinate: CoordinateComponent in targets) {
-            filterResults
-                .filter { it.first != AmorphousFilterCandidate.Type.NOT_REQUIRED }
-                .let { pairs ->
-                    limits[coordinate] = pairs.count { p -> p.second.any { f -> f.coordinate == coordinate } }
-                }
-        }
+        filterResults
+            .filter { (type, _) -> type == AmorphousFilterCandidate.Type.SUCCESSFUL }
+            .map { (_, list) -> list }
+            .flatten()
+            .forEach { afc ->
+                limits[afc.coordinate] = min(limits.getOrDefault(afc.coordinate, Int.MAX_VALUE), afc.list.size)
+            }
 
         val filters: MutableSet<AmorphousFilterCandidate> = mutableSetOf()
         for (coordinate: CoordinateComponent in targets) {
-            val list: MutableList<List<CoordinateComponent>> = mutableListOf()
+            val uniqueCandidate: MutableSet<CoordinateComponent> = mutableSetOf()
             filterResults
-                .filter { it.first == AmorphousFilterCandidate.Type.SUCCESSFUL }
-                .map { it.second } // List<List<AFC>>
-                .forEach { l -> // List<AFC>
-                    l.filter { f -> f.coordinate == coordinate }
-                        .takeIf { it.count() == limits[coordinate] }
-                        ?.forEach { f -> list.add(f.list) }
-                        ?: return null//return false
+                .filter { (type, _) -> type == AmorphousFilterCandidate.Type.SUCCESSFUL }
+                .map { (_, list) -> list }
+                .flatten()
+                .filter { e -> e.coordinate == coordinate }
+                .forEach { candidate ->
+                    uniqueCandidate.addAll(candidate.list)
                 }
-            val merged: MutableList<CoordinateComponent> = mutableListOf()
-            list.forEach { e -> merged.addAll(e) }
-            filters.add(AmorphousFilterCandidate(coordinate, merged))
+            filters.add(AmorphousFilterCandidate(coordinate, uniqueCandidate.toList()))
         }
 
         val confirmed: MutableMap<CoordinateComponent, CoordinateComponent> = mutableMapOf()
