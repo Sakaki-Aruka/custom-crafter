@@ -29,8 +29,6 @@ object PotionFilter: CRecipeFilter<CPotionMatter> {
 
         return CRecipeFilter.ResultType.SUCCESS to matter.potionComponents.all { c ->
             when (c.strict) {
-                CPotionComponent.PotionStrict.INPUT -> true
-                CPotionComponent.PotionStrict.NOT_STRICT -> true
                 CPotionComponent.PotionStrict.ONLY_EFFECT -> {
                     effects.any { e -> c.effect.type == e.type }
                 }

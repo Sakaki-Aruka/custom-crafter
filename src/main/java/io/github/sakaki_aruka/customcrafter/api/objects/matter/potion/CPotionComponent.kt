@@ -19,14 +19,10 @@ data class CPotionComponent(
     /**
      * An enum what means potion required level.
      *
-     * (INPUT: only for internal uses)
-     * NOT_STRICT: The system does not check amplifier and type.
      * ONLY_EFFECT: The system checks only type.
      * STRICT: The system checks amplifier and type.
      */
     enum class PotionStrict {
-        INPUT,
-        NOT_STRICT,
         ONLY_EFFECT,
         STRICT
     }

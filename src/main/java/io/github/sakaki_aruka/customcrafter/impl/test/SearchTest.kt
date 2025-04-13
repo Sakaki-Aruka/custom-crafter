@@ -21,6 +21,7 @@ import io.github.sakaki_aruka.customcrafter.impl.recipe.filter.EnchantFilter
 import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.meta.PotionMeta
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
 import java.util.UUID
@@ -39,6 +40,7 @@ internal object SearchTest {
         amorphousTest2()
         normalTest1()
         enchantTest1()
+        potionTest1()
     }
 
     private fun normalTest1() {
@@ -321,7 +323,7 @@ internal object SearchTest {
             .contains(MappedRelationComponent(CoordinateComponent(0, 3), CoordinateComponent.fromIndex(46))))
     }
 
-    private fun enchantNormalTest2() {
+    private fun enchantTest2() {
         //
     }
 
@@ -333,32 +335,14 @@ internal object SearchTest {
         //
     }
 
-    private fun potionNormalTest1() {
+    private fun potionTest1() {
         val onlyEffect = CPotionMatterImpl(
             "oe",
             setOf(Material.POTION),
             setOf(CPotionComponent(
                 PotionEffect(
-                    PotionEffectType.POISON, 1, 1),
+                    PotionEffectType.POISON, 1, 3),
                 CPotionComponent.PotionStrict.ONLY_EFFECT
-            )))
-
-        val input = CPotionMatterImpl(
-            "i",
-            setOf(Material.POTION),
-            setOf(CPotionComponent(
-                PotionEffect(
-                    PotionEffectType.POISON, 1, 1),
-                CPotionComponent.PotionStrict.INPUT
-            )))
-
-        val notStrict = CPotionMatterImpl(
-            "ns",
-            setOf(Material.POTION),
-            setOf(CPotionComponent(
-                PotionEffect(
-                    PotionEffectType.POISON, 1, 1),
-                CPotionComponent.PotionStrict.NOT_STRICT
             )))
 
         val strict = CPotionMatterImpl(
@@ -370,7 +354,40 @@ internal object SearchTest {
                 CPotionComponent.PotionStrict.STRICT
             )))
 
+        val recipe: CRecipe = CRecipeImpl(
+            "potionTestRecipe",
+            mapOf(
+                CoordinateComponent(0, 0) to onlyEffect,
+                CoordinateComponent(0, 1) to strict
+            ),
+            CRecipeType.AMORPHOUS
+        )
 
+        val input1 = ItemStack(Material.POTION)
+        input1.editMeta { m ->
+            (m as PotionMeta).addCustomEffect(PotionEffect(PotionEffectType.POISON, 1, 1), true)
+        }
+
+        val gui = CustomCrafterAPI.getCraftingGUI()
+        gui.setItem(0, input1)
+        gui.setItem(30, input1)
+
+        val result = Search.search(
+            UUID.randomUUID(),
+            CraftView.fromInventory(gui)!!,
+            sourceRecipes = listOf(recipe)
+        )
+
+        CAssert.assertTrue(result != null)
+        CAssert.assertTrue(result!!.vanilla() == null)
+        CAssert.assertTrue(result.customs().size == 1)
+        val (returnedRecipe, mapped) = result.customs().first()
+        CAssert.assertTrue(returnedRecipe == recipe)
+        CAssert.assertTrue(mapped.components.size == 2)
+        CAssert.assertTrue(mapped.components.contains(
+            MappedRelationComponent(CoordinateComponent(0, 0), CoordinateComponent(0, 0))))
+        CAssert.assertTrue(mapped.components.contains(
+            MappedRelationComponent(CoordinateComponent(0, 1), CoordinateComponent.fromIndex(30))))
     }
 
     private fun potionNormalTest2() {
