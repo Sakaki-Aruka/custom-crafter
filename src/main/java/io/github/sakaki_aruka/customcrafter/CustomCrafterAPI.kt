@@ -35,6 +35,14 @@ object CustomCrafterAPI {
      */
     var USE_MULTIPLE_RESULT_CANDIDATE_FEATURE = false
 
+    /**
+     * Use 'auto crafting' feature or not.
+     * - true: Players can use auto crafting feature.
+     * - false: The system does not provide auto crafting feature to players. (default)
+     * @since 5.0.10
+     */
+    var USE_AUTO_CRAFTING_FEATURE = false
+
     internal var BASE_BLOCK_SIDE: Int = 3
     const val CRAFTING_TABLE_MAKE_BUTTON_SLOT: Int = 35
     const val CRAFTING_TABLE_RESULT_SLOT: Int = 44
