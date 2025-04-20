@@ -2,6 +2,7 @@ package io.github.sakaki_aruka.customcrafter
 
 import io.github.sakaki_aruka.customcrafter.api.event.RegisterCustomRecipeEvent
 import io.github.sakaki_aruka.customcrafter.api.event.UnregisterCustomRecipeEvent
+import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.AutoCraftingIdentifier
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.internal.listener.InventoryClickListener
 import io.github.sakaki_aruka.customcrafter.internal.listener.InventoryCloseListener
@@ -13,6 +14,9 @@ import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
+import org.bukkit.block.Block
+import org.bukkit.entity.Player
+import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
@@ -29,11 +33,20 @@ object CustomCrafterAPI {
 
     /**
      * use 'multiple result candidate' feature or not.
-     * true: if the system gets some result candidates, shows all candidates to a player.
-     * false: provides only a first matched item. (no prompt)
+     * - true: if the system gets some result candidates, shows all candidates to a player.
+     * - false: provides only a first matched item. (no prompt)
      * @since 5.0.8
      */
     var USE_MULTIPLE_RESULT_CANDIDATE_FEATURE = false
+
+    /**
+     * Use 'auto crafting' feature or not.
+     *
+     * Default is false.
+     * @since 5.0.10
+     */
+    var USE_AUTO_CRAFTING_FEATURE = false
+
 
     internal var BASE_BLOCK_SIDE: Int = 3
     const val CRAFTING_TABLE_MAKE_BUTTON_SLOT: Int = 35
@@ -69,6 +82,68 @@ object CustomCrafterAPI {
      */
     internal var ALL_CANDIDATE_NO_DISPLAYABLE_ITEM_LORE_SUPPLIER: (String) -> List<Component>? = { recipeName ->
         listOf(MiniMessage.miniMessage().deserialize("<white>Recipe Name: $recipeName"))
+    }
+
+    /**
+     * A lambda expression used to pick only one [AutoCraftingIdentifier] when auto-crafting provides more than 2 recipes.
+     * ```
+     * // A default implementation
+     * AUTO_CRAFTING_PICKUP_RESOLVER = { list ->
+     *   list.firstOrNull()
+     * }
+     * ```
+     * @since 5.0.10
+     */
+    var AUTO_CRAFTING_PICKUP_RESOLVER: (List<AutoCraftingIdentifier>) -> AutoCraftingIdentifier? = { list ->
+        list.firstOrNull()
+    }
+
+    /**
+     * A lambda expression that provides the set of recipes used as the source when the Auto Crafting feature searches for a recipe matching the recorded recipe ID.
+     * ```kotlin
+     * // A default implementation
+     * AUTO_CRAFTING_SOURCE_RECIPES_PROVIDER: (Block) -> List<AutoCraftingIdentifier> = { _ ->
+     *     CustomCrafterAPI.getRecipes().filterIsInstance<AutoCraftingIdentifier>()
+     * }
+     * ```
+     * @since 5.0.10
+     */
+    var AUTO_CRAFTING_SOURCE_RECIPES_PROVIDER: (Block) -> List<AutoCraftingIdentifier> = { _ ->
+        this.getRecipes().filterIsInstance<AutoCraftingIdentifier>()
+    }
+
+    /**
+     * ```kotlin
+     * // A default implementation
+     * AUTO_CRAFTING_SETTING_PAGE_SUGGESTION: (Block, Player) -> List<AutoCraftingIdentifier> = { _, _ ->
+     *     CustomCrafterAPI.getRecipes().filterIsInstance<AutoCraftingIdentifier>()
+     * }
+     * ```
+     * @since 5.0.10
+     */
+    var AUTO_CRAFTING_SETTING_PAGE_SUGGESTION: (Block, Player) -> List<AutoCraftingIdentifier> = { _, _ ->
+        this.getRecipes().filterIsInstance<AutoCraftingIdentifier>()
+    }
+
+    private var AUTO_CRAFTING_BASE_BLOCK: Material = Material.GOLD_BLOCK
+    /**
+     * Get auto crafting base block type.
+     * @return[Material] A base block of auto crafting.
+     * @since 5.0.10
+     */
+    fun getAutoCraftingBaseBlock(): Material = AUTO_CRAFTING_BASE_BLOCK
+
+    /**
+     * Set auto crafting base block with given material.
+     *
+     * If a given material is not a block type, throws [IllegalArgumentException].
+     * @param[type] Auto crafting base block type
+     * @throws[IllegalArgumentException] When specified not block type
+     * @since 5.0.10
+     */
+    fun setAutoCraftingBaseBlock(type: Material) {
+        if (!type.isBlock) throw IllegalArgumentException("'type' must meet 'Material#isBlock'.")
+        AUTO_CRAFTING_BASE_BLOCK = type
     }
 
     /**

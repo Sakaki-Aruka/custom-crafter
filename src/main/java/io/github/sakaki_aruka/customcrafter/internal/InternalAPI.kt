@@ -168,4 +168,17 @@ internal object InternalAPI {
          */
         return gui
     }
+
+
+    /**
+     * AutoCraftable blocks.
+     * @since 5.0.10
+     */
+    val AUTO_CRAFTING_BLOCKS: Set<Material> = setOf(Material.BARREL)
+
+    /**
+     * AutoCrafting base blocks
+     * @since 5.0.10
+     */
+    const val AUTO_CRAFTING_BASE_BLOCK_SIDE = 3
 }
