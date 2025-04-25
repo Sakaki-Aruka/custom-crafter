@@ -1,16 +1,17 @@
 package io.github.sakaki_aruka.customcrafter.internal.listener
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
-import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
-import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlock
+import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterGUI
+import io.github.sakaki_aruka.customcrafter.internal.gui.PageOpenTrigger
 import org.bukkit.Material
 import org.bukkit.block.Block
-import org.bukkit.event.Event
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.inventory.Inventory
+import kotlin.reflect.full.superclasses
 
 /**
  * @suppress
@@ -19,14 +20,25 @@ object PlayerInteractListener: Listener {
     @EventHandler
     fun PlayerInteractEvent.onInteract() {
 
+        // debug
+        val instance: CustomCrafterGUI = CustomCrafterGUI.PAGES.entries
+            .filter { (_, clazz) -> clazz.superclasses.contains(PageOpenTrigger::class) }
+            .firstNotNullOfOrNull { (_, clazz) ->
+                (clazz as PageOpenTrigger).predicate(this)
+            } ?: return
+
+        val inv: Inventory = (instance as PageOpenTrigger).getFirstPage(this) ?: return
+        player.openInventory(inv)
+
         if (action == Action.RIGHT_CLICK_BLOCK
             && clickedBlock?.type == Material.CRAFTING_TABLE) {
             playerCrafting(this)
-        } else if (action == Action.RIGHT_CLICK_BLOCK
-            && clickedBlock?.type in InternalAPI.AUTO_CRAFTING_BLOCKS
-            && useInteractedBlock() == Event.Result.ALLOW) {
-            autoCrafting(this)
         }
+//        else if (action == Action.RIGHT_CLICK_BLOCK
+//            && clickedBlock?.type in InternalAPI.AUTO_CRAFTING_BLOCKS
+//            && useInteractedBlock() == Event.Result.ALLOW) {
+//            autoCrafting(this)
+//        }
     }
 
     private fun playerCrafting(

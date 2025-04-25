@@ -29,6 +29,8 @@ public final class CustomCrafter extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(InventoryCloseListener.INSTANCE, instance);
         Bukkit.getPluginManager().registerEvents(PlayerInteractListener.INSTANCE, instance);
 
+        // TODO: write to register GUI id (CustomCrafterGUI.PAGES)
+
         InternalAPI.INSTANCE.runTests();
     }
 

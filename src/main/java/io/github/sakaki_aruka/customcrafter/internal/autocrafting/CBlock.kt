@@ -4,12 +4,10 @@ import io.github.sakaki_aruka.customcrafter.CustomCrafter
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.AutoCraftingIdentifier
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
+import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import org.bukkit.Bukkit
 import org.bukkit.block.Block
-import org.bukkit.inventory.Inventory
-import org.bukkit.inventory.ItemStack
 import org.bukkit.metadata.FixedMetadataValue
 import org.bukkit.metadata.MetadataValue
 
@@ -22,16 +20,11 @@ import org.bukkit.metadata.MetadataValue
  */
 @Serializable
 internal data class CBlock(
-    val recipes: Set<String>,
-    val ignoreSlots: Set<Int>
+    val recipes: MutableSet<String>,
+    val ignoreSlots: MutableSet<Int> = Converter.getAvailableCraftingSlotIndices().toMutableSet()
 ) {
     companion object {
         private const val KEY = "custom_crafter_auto_crafting_key"
-
-        // TODO: impl here
-//        private fun getGUISignature(): ItemStack {
-//            //
-//        }
 
         /**
          * @since 5.0.10
@@ -43,13 +36,6 @@ internal data class CBlock(
             val json: String = data.firstOrNull()?.asString() ?: return null
             return Json.decodeFromString(json)
         }
-
-        // TODO: impl here
-//        fun getCleanGUI(): Inventory {
-//            val gui: Inventory = Bukkit.createInventory(null, 54)
-//            val (nk, type, time) = CustomCrafterAPI.genCCKey()
-//
-//        }
     }
 
     fun getCRecipes(

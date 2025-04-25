@@ -1,5 +1,7 @@
 package io.github.sakaki_aruka.customcrafter.api.interfaces.recipe
 
+import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemStack
 import java.util.UUID
 
 /**
@@ -9,4 +11,6 @@ import java.util.UUID
  */
 interface AutoCraftingIdentifier: CRecipe {
     val autoCraftID: UUID
+
+    fun getAutoCraftDisplayItem(player: Player): ItemStack
 }

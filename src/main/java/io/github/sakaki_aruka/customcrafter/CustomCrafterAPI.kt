@@ -53,7 +53,7 @@ object CustomCrafterAPI {
     const val CRAFTING_TABLE_RESULT_SLOT: Int = 44
     internal const val ALL_CANDIDATE_PREVIOUS_SLOT: Int = 45
     internal const val ALL_CANDIDATE_SIGNATURE_SLOT: Int = 49
-    internal const val ALL_CANDIDATE_NEXT_SLOT: Int = 54
+    internal const val ALL_CANDIDATE_NEXT_SLOT: Int = 53
     const val CRAFTING_TABLE_TOTAL_SIZE: Int = 54
 
     internal val ALL_CANDIDATE_CURRENT_PAGE_NK = NamespacedKey(
