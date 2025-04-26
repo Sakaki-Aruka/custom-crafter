@@ -1,7 +1,7 @@
 package io.github.sakaki_aruka.customcrafter.internal.gui.autocraft
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
-import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.AutoCraftingIdentifier
+import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.AutoCraftRecipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
@@ -70,7 +70,7 @@ object AutoCraft : NoPlayerListener{
                 pseudoInventory.setItem(index, item)
             }
         val sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes()
-            .filterIsInstance<AutoCraftingIdentifier>()
+            .filterIsInstance<AutoCraftRecipe>()
             .filter { r -> r.autoCraftID.toString() in cBlock.recipes }
 
         val result: Search.SearchResult = Search.search(

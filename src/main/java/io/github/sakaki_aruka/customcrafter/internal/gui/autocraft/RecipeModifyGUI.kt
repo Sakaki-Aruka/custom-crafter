@@ -1,15 +1,13 @@
 package io.github.sakaki_aruka.customcrafter.internal.gui.autocraft
 
-import io.github.sakaki_aruka.customcrafter.CustomCrafter
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
-import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.AutoCraftingIdentifier
+import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.AutoCraftRecipe
 import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlock
 import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterGUI
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
-import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -89,7 +87,7 @@ internal data class RecipeModifyGUI(
                         )
                     } ?: return
 
-                val recipe: AutoCraftingIdentifier = recipePages[currentPage]
+                val recipe: AutoCraftRecipe = recipePages[currentPage]
                     ?.get(event.rawSlot)
                     ?.let { recipeID ->
                         CustomCrafterAPI.AUTO_CRAFTING_SETTING_PAGE_SUGGESTION(block, player)

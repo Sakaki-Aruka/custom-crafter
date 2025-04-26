@@ -9,7 +9,7 @@ import java.util.UUID
  *
  * @since 5.0.10
  */
-interface AutoCraftingIdentifier: CRecipe {
+interface AutoCraftRecipe: CRecipe {
     val autoCraftID: UUID
 
     fun getAutoCraftDisplayItem(player: Player): ItemStack

@@ -2,12 +2,10 @@ package io.github.sakaki_aruka.customcrafter
 
 import io.github.sakaki_aruka.customcrafter.api.event.RegisterCustomRecipeEvent
 import io.github.sakaki_aruka.customcrafter.api.event.UnregisterCustomRecipeEvent
-import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.AutoCraftingIdentifier
+import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.AutoCraftRecipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
-import io.github.sakaki_aruka.customcrafter.internal.listener.InventoryClickListener
 import io.github.sakaki_aruka.customcrafter.internal.listener.InventoryCloseListener
-import io.github.sakaki_aruka.customcrafter.internal.listener.PlayerInteractListener
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.search.Search
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter
@@ -18,7 +16,6 @@ import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
-import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.Recipe
@@ -88,7 +85,7 @@ object CustomCrafterAPI {
     }
 
     /**
-     * A lambda expression used to pick only one [AutoCraftingIdentifier] when auto-crafting provides more than 2 recipes.
+     * A lambda expression used to pick only one [AutoCraftRecipe] when auto-crafting provides more than 2 recipes.
      * ```
      * // A default implementation
      * AUTO_CRAFTING_PICKUP_RESOLVER = { list ->
@@ -97,7 +94,7 @@ object CustomCrafterAPI {
      * ```
      * @since 5.0.10
      */
-    var AUTO_CRAFTING_PICKUP_RESOLVER: (List<AutoCraftingIdentifier>) -> AutoCraftingIdentifier? = { list ->
+    var AUTO_CRAFTING_PICKUP_RESOLVER: (List<AutoCraftRecipe>) -> AutoCraftRecipe? = { list ->
         list.firstOrNull()
     }
 
@@ -111,8 +108,8 @@ object CustomCrafterAPI {
      * ```
      * @since 5.0.10
      */
-    var AUTO_CRAFTING_SOURCE_RECIPES_PROVIDER: (Block) -> List<AutoCraftingIdentifier> = { _ ->
-        this.getRecipes().filterIsInstance<AutoCraftingIdentifier>()
+    var AUTO_CRAFTING_SOURCE_RECIPES_PROVIDER: (Block) -> List<AutoCraftRecipe> = { _ ->
+        this.getRecipes().filterIsInstance<AutoCraftRecipe>()
     }
 
     /**
@@ -124,8 +121,8 @@ object CustomCrafterAPI {
      * ```
      * @since 5.0.10
      */
-    var AUTO_CRAFTING_SETTING_PAGE_SUGGESTION: (Block, Player) -> List<AutoCraftingIdentifier> = { _, _ ->
-        this.getRecipes().filterIsInstance<AutoCraftingIdentifier>()
+    var AUTO_CRAFTING_SETTING_PAGE_SUGGESTION: (Block, Player) -> List<AutoCraftRecipe> = { _, _ ->
+        this.getRecipes().filterIsInstance<AutoCraftRecipe>()
     }
 
     /**

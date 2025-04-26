@@ -1,7 +1,7 @@
 package io.github.sakaki_aruka.customcrafter.internal.gui.autocraft
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
-import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.AutoCraftingIdentifier
+import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.AutoCraftRecipe
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
@@ -153,7 +153,7 @@ internal data class SlotsModifyGUI(
             }
 
             contextComponentSlot -> {
-                val autoCraftRecipes: Set<AutoCraftingIdentifier> = getAvailableRecipeWithGivenSlots(
+                val autoCraftRecipes: Set<AutoCraftRecipe> = getAvailableRecipeWithGivenSlots(
                     targetBlock = block,
                     availableSlots = Converter.getAvailableCraftingSlotIndices() - cBlock.ignoreSlots
                 )
@@ -204,7 +204,7 @@ internal data class SlotsModifyGUI(
     private fun getAvailableRecipeWithGivenSlots(
         targetBlock: Block,
         availableSlots: Set<Int>
-    ): Set<AutoCraftingIdentifier> {
+    ): Set<AutoCraftRecipe> {
         return CustomCrafterAPI.AUTO_CRAFTING_SOURCE_RECIPES_PROVIDER(targetBlock)
             .filter { i ->
                 if (i.type == CRecipeType.NORMAL) {
