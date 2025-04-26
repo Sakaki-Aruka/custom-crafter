@@ -11,37 +11,83 @@ import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
 import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlock
 import io.github.sakaki_aruka.customcrafter.internal.listener.NoPlayerListener
+import org.bukkit.Location
+import org.bukkit.World
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.block.Container
+import org.bukkit.block.Crafter
 import org.bukkit.event.Event
 import org.bukkit.event.block.BlockRedstoneEvent
+import org.bukkit.event.inventory.InventoryMoveItemEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.Recipe
 import java.util.UUID
 import kotlin.math.max
 
-object AutoCraft : NoPlayerListener{
+object AutoCraft {
 
     private val PSEUDO_UUID: UUID = UUID.fromString("00000000-0000-0000-0000-000000000000")
 
-    override fun <T : Event> predicate(event: T): Boolean? {
-        if (event !is BlockRedstoneEvent) return false
-        else if (event.block.type !in InternalAPI.AUTO_CRAFTING_BLOCKS) return false
-        return true
+    object AutoCraftRedstoneSignalReceiver: NoPlayerListener {
+        override fun <T : Event> func(event: T) {
+            if (event !is BlockRedstoneEvent) return
+
+            val cBlock: CBlock = CBlock.fromBlock(event.block) ?: return
+            if (event.oldCurrent > 0 && event.newCurrent == 0) {
+                turnOff(event.block, cBlock)
+            }
+            else if (event.oldCurrent == 0 && event.newCurrent > 0) {
+                turnOn(event.block, cBlock)
+            }
+        }
+
+        override fun <T : Event> predicate(event: T): Boolean? {
+            return event is BlockRedstoneEvent
+                    && event.block.type in InternalAPI.AUTO_CRAFTING_BLOCKS
+                    && baseBlockCheck(event.block)
+        }
     }
 
-    override fun <T : Event> func(event: T) {
-        if (event !is BlockRedstoneEvent) return
+    object AutoCraftItemInputSignalReceiver: NoPlayerListener {
+        override fun <T : Event> func(event: T) {
+            if (event !is InventoryMoveItemEvent) return
 
-        val cBlock: CBlock = CBlock.fromBlock(event.block) ?: return
-        if (event.oldCurrent > 0 && event.newCurrent == 0) {
-            turnOff(event.block, cBlock)
+            val block: Block = (event.destination as Crafter).block
+            val cBlock: CBlock = CBlock.fromBlock(block) ?: return
+
+            event.isCancelled = true
+
+            if (cBlock.containedItems.size >= 36) {
+                // drop items to crafter's location.
+                block.world.dropItem(block.getRelative(BlockFace.DOWN, 1).location, event.item)
+                return
+            }
+
+            cBlock.containedItems.add(event.item.serializeAsBytes())
+            cBlock.write(block)
         }
-        else if (event.oldCurrent == 0 && event.newCurrent > 0) {
-            turnOn(event.block, cBlock)
+
+        override fun <T : Event> predicate(event: T): Boolean? {
+            return event is InventoryMoveItemEvent
+                    && event.destination.holder is Crafter
+                    && baseBlockCheck((event.destination.holder as Crafter).block)
         }
+    }
+
+    private fun baseBlockCheck(crafter: Block): Boolean {
+        val crafterLoc: Location = crafter.location
+        val crafterWorld: World = crafter.world
+        val underCenter = Location(crafterWorld, crafterLoc.x, crafterLoc.y - 1, crafterLoc.z)
+        if (crafterWorld.getBlockAt(underCenter).type != CustomCrafterAPI.getAutoCraftingBaseBlock()) return false
+        for (dz in (-1..1)) {
+            for (dx in (-1..1)) {
+                val loc = Location(crafterWorld, underCenter.x + dx, underCenter.y, underCenter.z + dz)
+                if (crafterWorld.getBlockAt(loc).type != CustomCrafterAPI.getAutoCraftingBaseBlock()) return false
+            }
+        }
+        return true
     }
 
     private fun turnOff(

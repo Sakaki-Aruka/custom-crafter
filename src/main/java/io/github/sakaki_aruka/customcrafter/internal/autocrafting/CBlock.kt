@@ -21,12 +21,16 @@ import org.bukkit.metadata.MetadataValue
 @Serializable
 internal data class CBlock(
     val recipes: MutableSet<String>,
-    val ignoreSlots: MutableSet<Int> = Converter.getAvailableCraftingSlotIndices().toMutableSet()
+    val ignoreSlots: MutableSet<Int> = Converter.getAvailableCraftingSlotIndices().toMutableSet(),
+    val containedItems: MutableList<ByteArray> = mutableListOf()
 ) {
     companion object {
         private const val KEY = "custom_crafter_auto_crafting_key"
 
         /**
+         * Get a CBlock instance from a block.
+         * @param[block] A block instance.
+         * @return[CBlock] A CBlock instance what was written loaded data from the given block. If the given block has not CBlock data, returns null.
          * @since 5.0.10
          */
         fun fromBlock(block: Block): CBlock? {
