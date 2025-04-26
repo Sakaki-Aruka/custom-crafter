@@ -1,4 +1,4 @@
-package io.github.sakaki_aruka.customcrafter.internal.gui.autocraft
+package io.github.sakaki_aruka.customcrafter.internal.autocrafting
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.AutoCraftRecipe
@@ -9,7 +9,6 @@ import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateCompone
 import io.github.sakaki_aruka.customcrafter.api.search.Search
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
-import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlock
 import io.github.sakaki_aruka.customcrafter.internal.listener.NoPlayerListener
 import org.bukkit.Location
 import org.bukkit.World
@@ -165,7 +164,7 @@ object AutoCraft {
             isMultipleDisplayCall = false
         )
 
-        val view: CraftView = CraftView.fromInventory(gui)!!
+        val view: CraftView = CraftView.Companion.fromInventory(gui)!!
             .getDecrementedCraftView(true, pair)
 
         block.world.let { w ->
@@ -185,12 +184,12 @@ object AutoCraft {
         val result: ItemStack = recipe.result.apply { amount *= minAmount }
         block.world.dropItem(block.getRelative(BlockFace.DOWN, 1).location, result)
 
-        val minCoordinate: CoordinateComponent = CoordinateComponent.fromIndex(
+        val minCoordinate: CoordinateComponent = CoordinateComponent.Companion.fromIndex(
             index = Converter.getAvailableCraftingSlotComponents()
                 .filter { c -> gui.getItem(c.toIndex()) != null && gui.getItem(c.toIndex())?.isEmpty == false }
                 .minOf { c -> c.toIndex() }
         )
-        CoordinateComponent.squareFill(3, minCoordinate.x, minCoordinate.y)
+        CoordinateComponent.Companion.squareFill(3, minCoordinate.x, minCoordinate.y)
             .forEach { c ->
                 gui.getItem(c.toIndex())?.let { item ->
                     item.asQuantity(max(0, item.amount - minAmount))
