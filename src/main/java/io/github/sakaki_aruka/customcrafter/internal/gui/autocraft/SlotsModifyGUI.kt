@@ -40,6 +40,7 @@ internal data class SlotsModifyGUI(
             if (event.action != Action.RIGHT_CLICK_BLOCK || event.useInteractedBlock() != Event.Result.ALLOW) return null
             val clicked: Block = event.clickedBlock
                 ?.takeIf { b -> b.type in InternalAPI.AUTO_CRAFTING_BLOCKS }
+                ?.takeIf { b -> CBlock.fromBlock(b) == null }
                 ?: return null
             val half: Int = InternalAPI.AUTO_CRAFTING_BASE_BLOCK_SIDE / 2
             val xzRange: IntRange = (-1 * half..half)
@@ -80,7 +81,6 @@ internal data class SlotsModifyGUI(
         if (event !is PlayerInteractEvent) return null
         val inventory: Inventory = Bukkit.createInventory(null, 54, Component.text("Auto Craft (Slot)"))
 
-        // debug TODO: impl here
         val block: Block = getBlock() ?: return null
         val cBlock: CBlock = CBlock.fromBlock(block) ?: return null
 
