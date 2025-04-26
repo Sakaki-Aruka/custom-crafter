@@ -11,9 +11,6 @@ import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
 import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlock
 import io.github.sakaki_aruka.customcrafter.internal.listener.NoPlayerListener
-import org.bukkit.Bukkit
-import org.bukkit.Location
-import org.bukkit.World
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.block.Container
@@ -23,6 +20,7 @@ import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.Recipe
 import java.util.UUID
+import kotlin.math.max
 
 object AutoCraft : NoPlayerListener{
 
@@ -135,25 +133,29 @@ object AutoCraft : NoPlayerListener{
         gui: Inventory,
         block: Block
     ) {
-        val itemArray: Array<ItemStack> = Array(9) { ItemStack.empty() }
-        val firstItemSlot: CoordinateComponent = Converter.getAvailableCraftingSlotIndices()
-            .filter { slot -> gui.getItem(slot) != null && gui.getItem(slot)?.isEmpty == false }
-            .min()
-            .let { c -> CoordinateComponent.fromIndex(c) }
-        CoordinateComponent.squareFill(3, firstItemSlot.x, firstItemSlot.y)
-            .sortedBy { c -> c.toIndex() }
-            .withIndex()
-            .forEach { (index, slot) ->
-                itemArray[index] = gui.getItem(slot.toIndex()) ?: ItemStack.empty()
-            }
-
         val minAmount: Int = Converter.getAvailableCraftingSlotIndices()
             .mapNotNull { slot -> gui.getItem(slot) }
             .minOf { item -> item.amount }
         val result: ItemStack = recipe.result.apply { amount *= minAmount }
+        block.world.dropItem(block.getRelative(BlockFace.DOWN, 1).location, result)
+
+        val minCoordinate: CoordinateComponent = CoordinateComponent.fromIndex(
+            index = Converter.getAvailableCraftingSlotComponents()
+                .filter { c -> gui.getItem(c.toIndex()) != null && gui.getItem(c.toIndex())?.isEmpty == false }
+                .minOf { c -> c.toIndex() }
+        )
+        CoordinateComponent.squareFill(3, minCoordinate.x, minCoordinate.y)
+            .forEach { c ->
+                gui.getItem(c.toIndex())?.let { item ->
+                    item.asQuantity(max(0, item.amount - minAmount))
+                }
+            }
         block.world.let { w ->
-            w.dropItem(block.getRelative(BlockFace.DOWN, 1).location, result)
-            // TODO: impl decrement items amount from the gui and drop those.
+            Converter.getAvailableCraftingSlotIndices()
+                .filter { i ->  gui.getItem(i) != null && gui.getItem(i)?.isEmpty == false }
+                .forEach { slot ->
+                    w.dropItem(block.getRelative(BlockFace.DOWN, 1).location, gui.getItem(slot) ?: ItemStack.empty())
+                }
         }
     }
 }
