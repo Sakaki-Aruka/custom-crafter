@@ -274,7 +274,7 @@ object InventoryClickListener: Listener {
                                 player.world.dropItem(player.location, over)
                             }
                     }
-                    newCraftView = getDecrementedCraftView(input, shiftUsed = shiftUsed)
+                    newCraftView = input.getDecrementedCraftView(shiftUsed = shiftUsed)
                 } else {
                     val indexInCraftingSlots: Int = Converter.getAvailableCraftingSlotIndices()
                         .sorted()
@@ -317,7 +317,7 @@ object InventoryClickListener: Listener {
                         }
                     }
 
-                    newCraftView = getDecrementedCraftView(input, shiftUsed, cRecipe to mapped)
+                    newCraftView = input.getDecrementedCraftView(shiftUsed, cRecipe to mapped)
                 }
 
                 gui.getItem(CustomCrafterAPI.ALL_CANDIDATE_SIGNATURE_SLOT)?.let { s ->
@@ -441,59 +441,6 @@ object InventoryClickListener: Listener {
         player.openInventory(gui)
     }
 
-    /**
-     * decrement items from the provided CraftView
-     *
-     * if [forCustomSettings] is not null, this runs a process for CRecipe.
-     *
-     * only for Shift clicked
-     *
-     * @param[view] current CraftView
-     * @param[shiftUsed] a crafter used shift-click or not
-     * @param[forCustomSettings] a matched result info. (requires these when matched custom recipe)
-     * @suppress
-     * @since 5.0.8
-     */
-    private fun getDecrementedCraftView(
-        view: CraftView,
-        shiftUsed: Boolean = true,
-        forCustomSettings: Pair<CRecipe, MappedRelation>? = null
-    ): CraftView {
-        val minAmount: Int = view.materials.minOf { (_, i) -> i.amount }
-        return forCustomSettings?.let { (cRecipe, mapped) ->
-            val map: MutableMap<CoordinateComponent, ItemStack> = mutableMapOf()
-            mapped.components.forEach { component ->
-                val matter: CMatter = cRecipe.items[component.recipe]!!
-                val isMass: Boolean = matter.mass
-                val decrementAmount: Int =
-                    if (isMass) 1
-                    else if (shiftUsed) (minAmount / matter.amount) * matter.amount
-                    else matter.amount
-                val newAmount: Int = max(0, view.materials[component.input]!!.amount - decrementAmount)
-                map[component.input] =
-                    if (newAmount == 0) ItemStack.empty()
-                    else let {
-                        val newItem: ItemStack = view.materials[component.input]?.clone() ?: ItemStack.empty()
-                        newItem.amount = newAmount
-                        newItem
-                    }
-            }
-            CraftView(map, ItemStack.empty())
-        } ?: run {
-            val map: MutableMap<CoordinateComponent, ItemStack> = mutableMapOf()
-            view.materials.forEach { (c, item) ->
-                val newAmount: Int = max(0, item.amount - if (shiftUsed) minAmount else 1)
-                map[c] =
-                    if (newAmount == 0) ItemStack.empty()
-                    else let {
-                        val newItem: ItemStack = item.clone()
-                        newItem.amount = newAmount
-                        newItem
-                    }
-            }
-            CraftView(map, ItemStack.empty())
-        }
-    }
 
     private fun allCandidatesProcess(
         result: Search.SearchResult,

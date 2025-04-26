@@ -11,7 +11,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.Inventory
-import kotlin.reflect.full.superclasses
+import kotlin.reflect.full.allSuperclasses
 
 /**
  * @suppress
@@ -21,11 +21,12 @@ object PlayerInteractListener: Listener {
     fun PlayerInteractEvent.onInteract() {
 
         // debug
-        val instance: CustomCrafterGUI = CustomCrafterGUI.PAGES.entries
-            .filter { (_, clazz) -> clazz.superclasses.contains(PageOpenTrigger::class) }
-            .firstNotNullOfOrNull { (_, clazz) ->
-                (clazz as PageOpenTrigger).predicate(this)
-            } ?: return
+//        val instance: CustomCrafterGUI = CustomCrafterGUI.PAGES.entries
+//            .filter { (_, clazz) -> clazz.allSuperclasses.contains(PageOpenTrigger::class) }
+//            .firstNotNullOfOrNull { (_, clazz) ->
+//                (clazz as PageOpenTrigger).predicate(this)
+//            } ?: return
+        val instance: CustomCrafterGUI = PageOpenTrigger.getGUI(this) ?: return
 
         val inv: Inventory = (instance as PageOpenTrigger).getFirstPage(this) ?: return
         player.openInventory(inv)

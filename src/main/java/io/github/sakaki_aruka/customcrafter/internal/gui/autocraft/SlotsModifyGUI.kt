@@ -8,6 +8,7 @@ import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
 import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlock
 import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterGUI
 import io.github.sakaki_aruka.customcrafter.internal.gui.PageOpenTrigger
+import io.github.sakaki_aruka.customcrafter.internal.gui.PredicateProvider
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import net.kyori.adventure.text.Component
@@ -33,7 +34,35 @@ internal data class SlotsModifyGUI(
     override val id: String = CustomCrafterGUI.getID(SlotsModifyGUI::class).toString(),
     override val contextComponentSlot: Int = 45,
 ): CustomCrafterGUI.UnPageableGUI, PageOpenTrigger {
-    companion object {
+    companion object: PredicateProvider<CustomCrafterGUI> {
+        override fun <T: Event> predicate(event: T): CustomCrafterGUI? {
+            if (event !is PlayerInteractEvent) return null
+            if (event.action != Action.RIGHT_CLICK_BLOCK || event.useInteractedBlock() != Event.Result.ALLOW) return null
+            val clicked: Block = event.clickedBlock
+                ?.takeIf { b -> b.type in InternalAPI.AUTO_CRAFTING_BLOCKS }
+                ?: return null
+            val half: Int = InternalAPI.AUTO_CRAFTING_BASE_BLOCK_SIDE / 2
+            val xzRange: IntRange = (-1 * half..half)
+            val types: Set<Material> = setOf(CustomCrafterAPI.getAutoCraftingBaseBlock())
+
+            for (dy: Int in -1..1) {
+                for (dx: Int in xzRange) {
+                    for (dz: Int in xzRange) {
+                        if (dx == 0 && dz == 0) continue
+                        if (clicked.world.getBlockAt(clicked.x + dx, clicked.y + dy, clicked.z + dz).type !in types) {
+                            return null
+                        }
+                    }
+                }
+            }
+            return SlotsModifyGUI(
+                clicked.world.uid.toString(),
+                clicked.x,
+                clicked.y,
+                clicked.z
+            )
+        }
+
         val PLACEABLE_SLOT = ItemStack(Material.LIME_STAINED_GLASS_PANE).apply {
             itemMeta = itemMeta.apply {
                 displayName(Component.text("Item Place: OK"))
@@ -45,34 +74,6 @@ internal data class SlotsModifyGUI(
                 displayName(Component.text("Item Place: NG"))
             }
         }
-    }
-
-    override fun <T : Event> predicate(event: T): CustomCrafterGUI? {
-        if (event !is PlayerInteractEvent) return null
-        if (event.action != Action.RIGHT_CLICK_BLOCK || event.useInteractedBlock() != Event.Result.ALLOW) return null
-        val clicked: Block = event.clickedBlock
-            ?.takeIf { b -> b.type in InternalAPI.AUTO_CRAFTING_BLOCKS }
-            ?: return null
-        val half: Int = InternalAPI.AUTO_CRAFTING_BASE_BLOCK_SIDE / 2
-        val xzRange: IntRange = (-1 * half..half)
-        val types: Set<Material> = setOf(CustomCrafterAPI.getAutoCraftingBaseBlock())
-
-        for (dy: Int in -1..1) {
-            for (dx: Int in xzRange) {
-                for (dz: Int in xzRange) {
-                    if (dx == 0 && dz == 0) continue
-                    if (clicked.world.getBlockAt(clicked.x + dx, clicked.y + dy, clicked.z + dz).type !in types) {
-                        return null
-                    }
-                }
-            }
-        }
-        return SlotsModifyGUI(
-            clicked.world.uid.toString(),
-            clicked.x,
-            clicked.y,
-            clicked.z
-        )
     }
 
     override fun <T : Event> getFirstPage(event: T): Inventory? {

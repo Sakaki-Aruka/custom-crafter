@@ -2,6 +2,7 @@ package io.github.sakaki_aruka.customcrafter;
 
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe;
 import io.github.sakaki_aruka.customcrafter.internal.InternalAPI;
+import io.github.sakaki_aruka.customcrafter.internal.listener.BlockRedstoneListener;
 import io.github.sakaki_aruka.customcrafter.internal.listener.InventoryClickListener;
 import io.github.sakaki_aruka.customcrafter.internal.listener.InventoryCloseListener;
 import io.github.sakaki_aruka.customcrafter.internal.listener.PlayerInteractListener;
@@ -28,6 +29,7 @@ public final class CustomCrafter extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(InventoryClickListener.INSTANCE, instance);
         Bukkit.getPluginManager().registerEvents(InventoryCloseListener.INSTANCE, instance);
         Bukkit.getPluginManager().registerEvents(PlayerInteractListener.INSTANCE, instance);
+        Bukkit.getPluginManager().registerEvents(BlockRedstoneListener.INSTANCE, instance);
 
         // TODO: write to register GUI id (CustomCrafterGUI.PAGES)
 

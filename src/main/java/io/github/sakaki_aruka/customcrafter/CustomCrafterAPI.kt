@@ -4,10 +4,12 @@ import io.github.sakaki_aruka.customcrafter.api.event.RegisterCustomRecipeEvent
 import io.github.sakaki_aruka.customcrafter.api.event.UnregisterCustomRecipeEvent
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.AutoCraftingIdentifier
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
+import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.internal.listener.InventoryClickListener
 import io.github.sakaki_aruka.customcrafter.internal.listener.InventoryCloseListener
 import io.github.sakaki_aruka.customcrafter.internal.listener.PlayerInteractListener
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
+import io.github.sakaki_aruka.customcrafter.api.search.Search
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
@@ -19,6 +21,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.Recipe
 import org.bukkit.persistence.PersistentDataType
 
 object CustomCrafterAPI {
@@ -124,6 +127,26 @@ object CustomCrafterAPI {
     var AUTO_CRAFTING_SETTING_PAGE_SUGGESTION: (Block, Player) -> List<AutoCraftingIdentifier> = { _, _ ->
         this.getRecipes().filterIsInstance<AutoCraftingIdentifier>()
     }
+
+    /**
+     *
+     * ```kotlin
+     * // A Default implementation
+     * AUTO_CRAFTING_RESULT_PICKUP_RESOLVER: (List<CRecipe>, Search.SearchResult, Block) -> Pair<CRecipe?, Recipe?> = { _, result, _ ->
+     *     result.customs().firstOrNull() to result.vanilla()
+     * }
+     * ```
+     * @since 5.0.10
+     */
+    var AUTO_CRAFTING_RESULT_PICKUP_RESOLVER: (List<CRecipe>, Search.SearchResult, Block) -> Pair<Pair<CRecipe, MappedRelation>?, Recipe?> = { _, result, _ ->
+        result.customs().firstOrNull() to result.vanilla()
+    }
+
+    /**
+     * Default `true`.
+     * @since 5.0.10
+     */
+    var AUTO_CRAFTING_RESULT_PICKUP_RESOLVER_PRIORITIZE_CUSTOM: Boolean = true
 
     private var AUTO_CRAFTING_BASE_BLOCK: Material = Material.GOLD_BLOCK
     /**
