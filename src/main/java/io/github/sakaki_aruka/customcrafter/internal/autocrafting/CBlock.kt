@@ -7,9 +7,11 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import org.bukkit.Material
+import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
-import org.bukkit.metadata.FixedMetadataValue
-import org.bukkit.metadata.MetadataValue
+import org.bukkit.block.Crafter
+import org.bukkit.persistence.PersistentDataType
 
 /**
  * A block class for Auto Crafting feature.
@@ -25,7 +27,7 @@ internal data class CBlock(
     val containedItems: MutableList<ByteArray> = mutableListOf()
 ) {
     companion object {
-        private const val KEY = "custom_crafter_auto_crafting_key"
+        private val KEY = NamespacedKey(CustomCrafter.getInstance(), "custom_crafter_auto_crafting_key")
 
         /**
          * Get a CBlock instance from a block.
@@ -34,10 +36,9 @@ internal data class CBlock(
          * @since 5.0.10
          */
         fun fromBlock(block: Block): CBlock? {
-            if (!block.hasMetadata(KEY)) return null
-
-            val data: List<MetadataValue> = block.getMetadata(KEY)
-            val json: String = data.firstOrNull()?.asString() ?: return null
+            if (block.type != Material.CRAFTER) return null
+            val crafter: Crafter = block.state as Crafter
+            val json: String = crafter.persistentDataContainer.get(KEY, PersistentDataType.STRING) ?: return null
             return Json.decodeFromString(json)
         }
     }
@@ -53,23 +54,13 @@ internal data class CBlock(
         return list
     }
 
-    fun write(
-        block: Block,
-        debugMode: Boolean = false
-    ): Boolean {
-        val cBlock: CBlock? = fromBlock(block)
-        if (cBlock != null
-            && (cBlock.recipes.isNotEmpty() || cBlock.ignoreSlots.isNotEmpty())) {
-            if (debugMode) {
-                CustomCrafter.getInstance().logger.warning("The block what you want to write, already has any CBlock data.")
-                CustomCrafter.getInstance().logger.warning("Block: $block")
-            }
-            return false
+    fun write(block: Block): Boolean {
+        if (block.type != Material.CRAFTER) {
+            throw IllegalArgumentException("'block' type must be 'Material.CRAFTER'.")
         }
-        block.removeMetadata(KEY, CustomCrafter.getInstance()) // delete empty data
-        val metadata = FixedMetadataValue(CustomCrafter.getInstance(), Json.encodeToString(this))
-        block.setMetadata(KEY, metadata)
-
+        val crafter: Crafter = block.state as Crafter
+        crafter.persistentDataContainer.set(KEY, PersistentDataType.STRING, Json.encodeToString(this))
+        crafter.update(true)
         return fromBlock(block)?.let { c -> c == this } ?: false
     }
 }

@@ -174,7 +174,7 @@ internal object InternalAPI {
      * AutoCraftable blocks.
      * @since 5.0.10
      */
-    val AUTO_CRAFTING_BLOCKS: Set<Material> = setOf(Material.BARREL)
+    val AUTO_CRAFTING_BLOCKS: Set<Material> = setOf(Material.CRAFTER)
 
     /**
      * AutoCrafting base blocks
