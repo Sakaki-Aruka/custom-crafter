@@ -75,7 +75,7 @@ object AutoCraft {
         }
     }
 
-    private fun baseBlockCheck(crafter: Block): Boolean {
+    internal fun baseBlockCheck(crafter: Block): Boolean {
         val crafterLoc: Location = crafter.location
         val crafterWorld: World = crafter.world
         val underCenter = Location(crafterWorld, crafterLoc.x, crafterLoc.y - 1, crafterLoc.z)
