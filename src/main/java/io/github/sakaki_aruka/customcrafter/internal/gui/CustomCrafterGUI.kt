@@ -2,29 +2,24 @@ package io.github.sakaki_aruka.customcrafter.internal.gui
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafter
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.jsonObject
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
-import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 import java.util.UUID
 import kotlin.reflect.KClass
-import kotlin.reflect.full.createInstance
 
 internal sealed interface CustomCrafterGUI {
     val id: String
     val contextComponentSlot: Int
 
     fun write(contextItem: ItemStack): ItemStack?
-    fun from(contextItem: ItemStack): CustomCrafterGUI?
-    fun eventReaction(
-        event: InventoryClickEvent,
-        ui: CustomCrafterGUI,
-        inventory: Inventory
-    )
     fun getDefaultContextComponent(): ItemStack {
         val item = ItemStack(Material.CRAFTING_TABLE)
         item.editMeta { meta ->
@@ -50,34 +45,51 @@ internal sealed interface CustomCrafterGUI {
             }
         }
 
-        val PAGES: MutableMap<UUID, KClass<out CustomCrafterGUI>> = mutableMapOf()
+        val PAGES: MutableMap<KClass<out CustomCrafterGUI>, UUID> = mutableMapOf()
+        val DESERIALIZERS: MutableSet<GuiDeserializer> = mutableSetOf()
 
-        fun getGUI(inventory: Inventory): CustomCrafterGUI? {
-            val contextItem: ItemStack = inventory.firstOrNull { i ->
-                i.itemMeta.persistentDataContainer.has(
-                    CONTEXT_KEY,
-                    PersistentDataType.STRING
-                )
-            } ?: return null
-
-            val id: UUID = contextItem.itemMeta.persistentDataContainer.get(
-                CONTEXT_KEY,
-                PersistentDataType.STRING
-            )
-                ?.let { s -> UUID.fromString(s) }
-                ?: return null
-
-            return PAGES[id]?.createInstance()?.from(contextItem)
+        fun getIdOrRegister(
+            clazz: KClass<out CustomCrafterGUI>
+        ): UUID {
+            return PAGES.getOrPut(clazz) { UUID.randomUUID() }
         }
+    }
 
+    interface GuiDeserializer {
+        fun from(contextItem: ItemStack): CustomCrafterGUI?
+        fun id(): UUID
 
-        fun getID(clazz: KClass<out CustomCrafterGUI>): UUID {
-            return PAGES.entries.firstOrNull { (_, c) ->
-                c == clazz
-            }?.key ?: let {
-                val id: UUID = UUID.randomUUID()
-                PAGES[id] = clazz // register
-                id
+        companion object {
+            fun getGUI(inventory: Inventory): CustomCrafterGUI? {
+                val keyItems: List<ItemStack> = inventory.contents
+                    .filterNotNull()
+                    .filter { i -> !i.isEmpty }
+                    .filter { i ->
+                        i.itemMeta.persistentDataContainer.has(
+                            CONTEXT_KEY,
+                            PersistentDataType.STRING
+                        )
+                    }
+
+                if (keyItems.isEmpty()) return null
+
+                return keyItems.firstNotNullOfOrNull { item ->
+                    val element: JsonElement = Json.parseToJsonElement(item.itemMeta.persistentDataContainer.get(
+                        CONTEXT_KEY,
+                        PersistentDataType.STRING
+                    )!!)
+
+                    //debug
+                    println("json element = $element")
+                    println("uuid = ${element.jsonObject["id"]!!.toString().replace("\"", "")}[last]")
+
+                    val id: UUID = UUID.fromString(element.jsonObject["id"]!!.toString().replace("\"", ""))
+
+                    DESERIALIZERS
+                        .filter { d -> d.id() == id }
+                        .filter { d -> d.from(item) != null }
+                        .firstNotNullOfOrNull { d -> d.from(item) }
+                }
             }
         }
     }

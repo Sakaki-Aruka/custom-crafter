@@ -36,7 +36,7 @@
                         <phase>compile</phase>
                         <configuration>
                             <sourceDirs>
-                                <sourceDir>src/main/kotlin</sourceDir>
+                                <sourceDir>src/main/java</sourceDir>
                             </sourceDirs>
                         </configuration>
                     </execution>
@@ -47,7 +47,7 @@
                         </goals>
                         <configuration>
                             <sourceDirs>
-                                <sourceDir>src/main/kotlin</sourceDir>
+                                <sourceDir>src/main/java</sourceDir>
                             </sourceDirs>
                         </configuration>
                     </execution>
@@ -138,8 +138,11 @@
                                     <pattern>kotlinx</pattern>
                                     <shadedPattern>io.github.sakaki_aruka.shaded.kotlinx</shadedPattern>
                                 </relocation>
+                                <relocation>
+                                    <pattern>kotlin.reflect</pattern>
+                                    <shadedPattern>io.github.sakaki_aruka.shaded.kotlin.reflect</shadedPattern>
+                                </relocation>
                             </relocations>
-                            <minimizeJar>true</minimizeJar>
                         </configuration>
                     </execution>
                 </executions>
@@ -172,6 +175,12 @@
             <version>${kotlin.version}</version>
             <scope>compile</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-reflect</artifactId>
+            <version>${kotlin.version}</version>
+        </dependency>
         <!-- /Kotlin -->
 
         <dependency>
@@ -192,12 +201,6 @@
             <artifactId>annotations</artifactId>
             <version>24.1.0</version>
             <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-reflect</artifactId>
-            <version>${kotlin.version}</version>
         </dependency>
     </dependencies>
 </project>

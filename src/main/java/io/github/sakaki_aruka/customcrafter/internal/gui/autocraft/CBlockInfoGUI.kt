@@ -8,8 +8,12 @@ import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlock
 import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterGUI
 import io.github.sakaki_aruka.customcrafter.internal.gui.PageOpenTrigger
 import io.github.sakaki_aruka.customcrafter.internal.gui.PredicateProvider
+import io.github.sakaki_aruka.customcrafter.internal.gui.ReactionProvider
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.put
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
@@ -26,6 +30,7 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
+import java.util.*
 
 /**
  * When a player clicks a data-written block, this will be displayed.
@@ -37,10 +42,11 @@ internal data class CBlockInfoGUI(
     val targetBlockX: Int,
     val targetBlockY: Int,
     val targetBlockZ: Int,
-    override val id: String = CustomCrafterGUI.getID(CBlockInfoGUI::class).toString(),
-    override val contextComponentSlot: Int = 45
-): CustomCrafterGUI.UnPageableGUI, PageOpenTrigger {
-    companion object: PredicateProvider<CustomCrafterGUI> {
+    val customCrafterInternalGuiAutoCraftCBlockInfoGui: String? = null,
+    override val id: String = CustomCrafterGUI.getIdOrRegister(CBlockInfoGUI::class).toString(),
+    override val contextComponentSlot: Int = 8
+): CustomCrafterGUI.UnPageableGUI, PageOpenTrigger, ReactionProvider {
+    companion object: PredicateProvider<CustomCrafterGUI>, CustomCrafterGUI.GuiDeserializer {
         override fun <T : Event> predicate(event: T): CustomCrafterGUI? {
             if (event !is PlayerInteractEvent) return null
             if (event.action != Action.RIGHT_CLICK_BLOCK || event.useInteractedBlock() != Event.Result.ALLOW) return null
@@ -52,27 +58,35 @@ internal data class CBlockInfoGUI(
             if (!AutoCraft.baseBlockCheck(clicked)) return null
             return CBlockInfoGUI(clicked.world.uid.toString(), clicked.x, clicked.y, clicked.z)
         }
+
+        override fun from(contextItem: ItemStack): CustomCrafterGUI? {
+            val json: String = contextItem.itemMeta.persistentDataContainer.get(
+                CustomCrafterGUI.CONTEXT_KEY,
+                PersistentDataType.STRING
+            ) ?: return null
+            return Json.decodeFromString<CBlockInfoGUI>(json)
+        }
+
+        override fun id(): UUID = CustomCrafterGUI.getIdOrRegister(CBlockInfoGUI::class)
     }
 
     override fun write(contextItem: ItemStack): ItemStack? {
         val cloned: ItemStack = contextItem.clone()
-        val json: String = Json.encodeToString(this)
+        val json: String = Json.encodeToString<CBlockInfoGUI>(this)
         cloned.editMeta { meta ->
             meta.persistentDataContainer.set(
                 CustomCrafterGUI.CONTEXT_KEY,
                 PersistentDataType.STRING,
-                json
+                buildJsonObject {
+                    Json.parseToJsonElement(json).jsonObject
+                        .forEach { (key, value) ->
+                            put(key, value)
+                        }
+                    put("id", CustomCrafterGUI.getIdOrRegister(CBlockInfoGUI::class).toString())
+                }.toString()
             )
         }
         return cloned
-    }
-
-    override fun from(contextItem: ItemStack): CustomCrafterGUI? {
-        val json: String = contextItem.itemMeta.persistentDataContainer.get(
-            CustomCrafterGUI.CONTEXT_KEY,
-            PersistentDataType.STRING
-        ) ?: return null
-        return Json.decodeFromString(json)
     }
 
     override fun eventReaction(
@@ -87,7 +101,7 @@ internal data class CBlockInfoGUI(
             53 -> {
                 // clear all data and open SlotModifyGUI
                 val crafter: Crafter = getBlock()?.let { b -> b.state as? Crafter } ?: return
-                val emptyCBlock = CBlock(mutableSetOf(), mutableSetOf(), mutableListOf())
+                val emptyCBlock = CBlock(recipes = mutableSetOf())
                 emptyCBlock.write(crafter.block)
                 val gui: Inventory = SlotsModifyGUI(
                     crafter.block.world.uid.toString(),

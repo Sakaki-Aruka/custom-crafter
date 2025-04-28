@@ -12,6 +12,8 @@ import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateCompone
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import io.github.sakaki_aruka.customcrafter.api.search.Search
 import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
+import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterGUI
+import io.github.sakaki_aruka.customcrafter.internal.gui.ReactionProvider
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
@@ -34,6 +36,12 @@ import kotlin.math.min
 object InventoryClickListener: Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     fun InventoryClickEvent.onClick() {
+
+        //debug
+        println("click selected class = ${CustomCrafterGUI.GuiDeserializer.getGUI(inventory)}")
+        val gui: CustomCrafterGUI = CustomCrafterGUI.GuiDeserializer.getGUI(inventory) ?: return
+        (gui as? ReactionProvider)?.eventReaction(this, gui, inventory)
+
         val player: Player = Bukkit.getPlayer(whoClicked.uniqueId) ?: return
         val topInv: Inventory = player.openInventory.topInventory
         val bottomInv: Inventory = player.openInventory.bottomInventory

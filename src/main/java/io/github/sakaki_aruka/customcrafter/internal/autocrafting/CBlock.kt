@@ -59,8 +59,9 @@ internal data class CBlock(
             throw IllegalArgumentException("'block' type must be 'Material.CRAFTER'.")
         }
         val crafter: Crafter = block.state as Crafter
-        crafter.persistentDataContainer.set(KEY, PersistentDataType.STRING, Json.encodeToString(this))
-        crafter.update(true)
+        crafter.apply {
+            persistentDataContainer.set(KEY, PersistentDataType.STRING, Json.encodeToString(this@CBlock))
+        }.update(true)
         return fromBlock(block)?.let { c -> c == this } ?: false
     }
 }

@@ -5,16 +5,20 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.AutoCraftRecip
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
+import io.github.sakaki_aruka.customcrafter.internal.autocrafting.AutoCraft
 import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlock
 import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterGUI
 import io.github.sakaki_aruka.customcrafter.internal.gui.PageOpenTrigger
 import io.github.sakaki_aruka.customcrafter.internal.gui.PredicateProvider
+import io.github.sakaki_aruka.customcrafter.internal.gui.ReactionProvider
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.put
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.Material
-import org.bukkit.World
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
@@ -24,6 +28,7 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
+import java.util.*
 
 @Serializable
 internal data class SlotsModifyGUI(
@@ -31,10 +36,11 @@ internal data class SlotsModifyGUI(
     val targetBlockX: Int,
     val targetBlockY: Int,
     val targetBlockZ: Int,
-    override val id: String = CustomCrafterGUI.getID(SlotsModifyGUI::class).toString(),
-    override val contextComponentSlot: Int = 45,
-): CustomCrafterGUI.UnPageableGUI, PageOpenTrigger {
-    companion object: PredicateProvider<CustomCrafterGUI> {
+    val customCrafterInternalGuiAutoCraftSlotsModifyGui: String? = null,
+    override val id: String = CustomCrafterGUI.getIdOrRegister(SlotsModifyGUI::class).toString(),
+    override val contextComponentSlot: Int = 8,
+): CustomCrafterGUI.UnPageableGUI, PageOpenTrigger, ReactionProvider {
+    companion object: PredicateProvider<CustomCrafterGUI>, CustomCrafterGUI.GuiDeserializer {
         override fun <T: Event> predicate(event: T): CustomCrafterGUI? {
             if (event !is PlayerInteractEvent) return null
             if (event.action != Action.RIGHT_CLICK_BLOCK || event.useInteractedBlock() != Event.Result.ALLOW) return null
@@ -42,20 +48,7 @@ internal data class SlotsModifyGUI(
                 ?.takeIf { b -> b.type in InternalAPI.AUTO_CRAFTING_BLOCKS }
                 ?.takeIf { b -> CBlock.fromBlock(b) == null }
                 ?: return null
-            val half: Int = InternalAPI.AUTO_CRAFTING_BASE_BLOCK_SIDE / 2
-            val xzRange: IntRange = (-1 * half..half)
-            val types: Set<Material> = setOf(CustomCrafterAPI.getAutoCraftingBaseBlock())
-
-            for (dy: Int in -1..1) {
-                for (dx: Int in xzRange) {
-                    for (dz: Int in xzRange) {
-                        if (dx == 0 && dz == 0) continue
-                        if (clicked.world.getBlockAt(clicked.x + dx, clicked.y + dy, clicked.z + dz).type !in types) {
-                            return null
-                        }
-                    }
-                }
-            }
+            if (!AutoCraft.baseBlockCheck(clicked)) return null
             return SlotsModifyGUI(
                 clicked.world.uid.toString(),
                 clicked.x,
@@ -63,6 +56,16 @@ internal data class SlotsModifyGUI(
                 clicked.z
             )
         }
+
+        override fun from(contextItem: ItemStack): CustomCrafterGUI? {
+            val json: String = contextItem.itemMeta.persistentDataContainer.get(
+                CustomCrafterGUI.CONTEXT_KEY,
+                PersistentDataType.STRING
+            ) ?: return null
+            return Json.decodeFromString<SlotsModifyGUI>(json)
+        }
+
+        override fun id(): UUID = CustomCrafterGUI.getIdOrRegister(SlotsModifyGUI::class)
 
         val PLACEABLE_SLOT = ItemStack(Material.LIME_STAINED_GLASS_PANE).apply {
             itemMeta = itemMeta.apply {
@@ -77,13 +80,17 @@ internal data class SlotsModifyGUI(
         }
     }
 
+    override fun getDefaultContextComponent(): ItemStack {
+        val base: ItemStack = super.getDefaultContextComponent()
+        base.editMeta { meta ->
+            meta.displayName(Component.text("Select Recipes"))
+        }
+        return base
+    }
+
     override fun <T : Event> getFirstPage(event: T): Inventory? {
         if (event !is PlayerInteractEvent) return null
         val inventory: Inventory = Bukkit.createInventory(null, 54, Component.text("Auto Craft (Slot)"))
-
-        val block: Block = getBlock() ?: return null
-        val cBlock: CBlock = CBlock.fromBlock(block) ?: return null
-
         (0..<54).forEach { i ->
             inventory.setItem(i, CustomCrafterGUI.UN_CLICKABLE_SLOT)
         }
@@ -92,8 +99,8 @@ internal data class SlotsModifyGUI(
             inventory.setItem(i, PLACEABLE_SLOT)
         }
 
-        cBlock.ignoreSlots.forEach { i ->
-            inventory.setItem(i, UN_PLACEABLE_SLOT)
+        Converter.getAvailableCraftingSlotIndices().forEach { slot ->
+            inventory.setItem(slot, UN_PLACEABLE_SLOT)
         }
 
         inventory.setItem(contextComponentSlot, getDefaultContextComponent())
@@ -103,23 +110,22 @@ internal data class SlotsModifyGUI(
 
     override fun write(contextItem: ItemStack): ItemStack? {
         val cloned: ItemStack = contextItem.clone()
-        val json: String = Json.encodeToString(this)
+        val json: String = Json.encodeToString<SlotsModifyGUI>(this)
+
         cloned.editMeta { meta ->
             meta.persistentDataContainer.set(
                 CustomCrafterGUI.CONTEXT_KEY,
                 PersistentDataType.STRING,
-                json
+                buildJsonObject {
+                    Json.parseToJsonElement(json).jsonObject
+                        .forEach { (key, value) ->
+                            put(key, value)
+                        }
+                    put("id", CustomCrafterGUI.getIdOrRegister(SlotsModifyGUI::class).toString())
+                }.toString()
             )
         }
         return cloned
-    }
-
-    override fun from(contextItem: ItemStack): CustomCrafterGUI? {
-        val json: String = contextItem.itemMeta.persistentDataContainer.get(
-            CustomCrafterGUI.CONTEXT_KEY,
-            PersistentDataType.STRING
-        ) ?: return null
-        return Json.decodeFromString(json)
     }
 
     override fun eventReaction(
@@ -134,7 +140,7 @@ internal data class SlotsModifyGUI(
             .firstOrNull { w -> w.uid.toString() == this.worldID }
             ?.getBlockAt(targetBlockX, targetBlockY, targetBlockZ)
             ?: return
-        val cBlock: CBlock = CBlock.fromBlock(block) ?: return
+        val cBlock:CBlock = CBlock.fromBlock(block) ?: CBlock(recipes = mutableSetOf())
 
         event.isCancelled = true
 
@@ -153,6 +159,9 @@ internal data class SlotsModifyGUI(
             }
 
             contextComponentSlot -> {
+
+                cBlock.write(block)
+
                 val autoCraftRecipes: Set<AutoCraftRecipe> = getAvailableRecipeWithGivenSlots(
                     targetBlock = block,
                     availableSlots = Converter.getAvailableCraftingSlotIndices() - cBlock.ignoreSlots
@@ -214,16 +223,5 @@ internal data class SlotsModifyGUI(
                     i.items.size == availableSlots.size
                 }
             }.toSet()
-    }
-
-    private fun getBlock(): Block? {
-        val world: World = Bukkit.getWorlds()
-            .firstOrNull { w -> w.uid.toString() == this.worldID }
-            ?: return null
-        return world.getBlockAt(
-            this.targetBlockX,
-            this.targetBlockY,
-            this.targetBlockZ
-        )
     }
 }

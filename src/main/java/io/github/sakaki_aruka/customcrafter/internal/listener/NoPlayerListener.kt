@@ -5,7 +5,7 @@ import org.bukkit.event.Event
 
 interface NoPlayerListener: PredicateProvider<Boolean> {
     companion object {
-        private val LISTENERS: MutableSet<NoPlayerListener> = mutableSetOf()
+        val LISTENERS: MutableSet<NoPlayerListener> = mutableSetOf()
 
         fun <T: Event> runMatchFunc(event: T) {
             LISTENERS.firstOrNull { listener ->

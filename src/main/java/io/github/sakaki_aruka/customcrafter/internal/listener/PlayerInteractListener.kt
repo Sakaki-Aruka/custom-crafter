@@ -1,17 +1,17 @@
 package io.github.sakaki_aruka.customcrafter.internal.listener
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
-import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
 import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterGUI
 import io.github.sakaki_aruka.customcrafter.internal.gui.PageOpenTrigger
+import io.github.sakaki_aruka.customcrafter.internal.gui.autocraft.SlotsModifyGUI
 import org.bukkit.Material
 import org.bukkit.block.Block
+import org.bukkit.event.Event
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.Inventory
-import kotlin.reflect.full.allSuperclasses
 
 /**
  * @suppress
@@ -20,25 +20,19 @@ object PlayerInteractListener: Listener {
     @EventHandler
     fun PlayerInteractEvent.onInteract() {
 
-        // debug
-//        val instance: CustomCrafterGUI = CustomCrafterGUI.PAGES.entries
-//            .filter { (_, clazz) -> clazz.allSuperclasses.contains(PageOpenTrigger::class) }
-//            .firstNotNullOfOrNull { (_, clazz) ->
-//                (clazz as PageOpenTrigger).predicate(this)
-//            } ?: return
-        val instance: CustomCrafterGUI = PageOpenTrigger.getGUI(this) ?: return
-
-        val inv: Inventory = (instance as PageOpenTrigger).getFirstPage(this) ?: return
+        val inv: Inventory = PageOpenTrigger.getGUI(this)
+            ?.takeIf { gui -> gui is PageOpenTrigger }
+            ?.let { gui -> (gui as PageOpenTrigger).getFirstPage(this) }
+            ?: return
+        isCancelled = true
         player.openInventory(inv)
 
-        if (action == Action.RIGHT_CLICK_BLOCK
-            && clickedBlock?.type == Material.CRAFTING_TABLE) {
-            playerCrafting(this)
-        }
-//        else if (action == Action.RIGHT_CLICK_BLOCK
-//            && clickedBlock?.type in InternalAPI.AUTO_CRAFTING_BLOCKS
-//            && useInteractedBlock() == Event.Result.ALLOW) {
-//            autoCrafting(this)
+//        val inv: Inventory = (instance as PageOpenTrigger).getFirstPage(this) ?: return
+//        player.openInventory(inv)
+
+//        if (action == Action.RIGHT_CLICK_BLOCK
+//            && clickedBlock?.type == Material.CRAFTING_TABLE) {
+//            playerCrafting(this)
 //        }
     }
 
@@ -66,33 +60,6 @@ object PlayerInteractListener: Listener {
 
         event.isCancelled = true
         event.player.openInventory(CustomCrafterAPI.getCraftingGUI(dropItemsOnClose = true))
-    }
-
-    private fun autoCrafting(
-        event: PlayerInteractEvent
-    ) {
-        val clicked: Block = event.clickedBlock!!
-        if (!baseBlockCheck(
-            size = InternalAPI.AUTO_CRAFTING_BASE_BLOCK_SIDE,
-            types = setOf(CustomCrafterAPI.getAutoCraftingBaseBlock()),
-            block = clicked,
-            ignoreCenter = true
-        )) return
-
-//        val cBlock: CBlock = CBlock.fromBlock(clicked)
-//            ?.let { b ->
-//                b.takeIf { block ->
-//                    block.recipes.isNotEmpty()
-//                }
-//            } ?: return
-//
-//        val recipe: CRecipe = cBlock.getRecipes(CustomCrafterAPI.AUTO_CRAFTING_SOURCE_RECIPES_PROVIDER(event))
-//            .let { recipes ->
-//                if (recipes.size == 1) recipes.first()
-//                else CustomCrafterAPI.AUTO_CRAFTING_PICKUP_RESOLVER(recipes) ?: return
-//            }
-//
-
     }
 
     private fun baseBlockCheck(

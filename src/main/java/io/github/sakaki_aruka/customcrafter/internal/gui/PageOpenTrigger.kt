@@ -2,7 +2,6 @@ package io.github.sakaki_aruka.customcrafter.internal.gui
 
 import org.bukkit.event.Event
 import org.bukkit.inventory.Inventory
-import kotlin.reflect.full.companionObjectInstance
 
 /**
  *
@@ -14,15 +13,8 @@ internal interface PageOpenTrigger {
     companion object {
         fun <T: Event> getGUI(event: T): CustomCrafterGUI? {
             return PredicateProvider.PROVIDERS
-                .asSequence()
-                .filter { c ->
-                    c.companionObjectInstance != null
-                            || c.objectInstance != null
-                }
-                .mapNotNull { c -> c.companionObjectInstance ?: c.objectInstance }
-                .filterIsInstance<PredicateProvider<CustomCrafterGUI>>()
-                .map { i -> i.predicate(event) }
-                .firstOrNull()
+                .filterIsInstance<PredicateProvider<out CustomCrafterGUI>>()
+                .firstNotNullOfOrNull { i -> i.predicate(event) }
         }
     }
 }

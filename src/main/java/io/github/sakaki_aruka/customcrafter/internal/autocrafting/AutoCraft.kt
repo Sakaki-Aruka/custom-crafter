@@ -11,6 +11,7 @@ import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
 import io.github.sakaki_aruka.customcrafter.internal.listener.NoPlayerListener
 import org.bukkit.Location
+import org.bukkit.Material
 import org.bukkit.World
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
@@ -79,9 +80,10 @@ object AutoCraft {
         val crafterLoc: Location = crafter.location
         val crafterWorld: World = crafter.world
         val underCenter = Location(crafterWorld, crafterLoc.x, crafterLoc.y - 1, crafterLoc.z)
-        if (crafterWorld.getBlockAt(underCenter).type != CustomCrafterAPI.getAutoCraftingBaseBlock()) return false
+        if (crafterWorld.getBlockAt(underCenter).type != Material.AIR) return false
         for (dz in (-1..1)) {
             for (dx in (-1..1)) {
+                if (dx == 0 && dz == 0) continue
                 val loc = Location(crafterWorld, underCenter.x + dx, underCenter.y, underCenter.z + dz)
                 if (crafterWorld.getBlockAt(loc).type != CustomCrafterAPI.getAutoCraftingBaseBlock()) return false
             }
@@ -98,7 +100,6 @@ object AutoCraft {
         block: Block,
         cBlock: CBlock
     ) {
-        // TODO impl
         if (!block.chunk.isLoaded) return
         else if (cBlock.recipes.isEmpty()) return
 

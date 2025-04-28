@@ -4,8 +4,14 @@ import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.AutoCraftRecipe
 import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlock
 import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterGUI
+import io.github.sakaki_aruka.customcrafter.internal.gui.ReactionProvider
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.buildJsonObject
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.put
+import kotlinx.serialization.modules.SerializersModule
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.block.Block
@@ -14,6 +20,7 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
+import java.util.*
 
 @Serializable
 internal data class RecipeModifyGUI(
@@ -22,13 +29,27 @@ internal data class RecipeModifyGUI(
     val targetBlockY: Int,
     val targetBlockZ: Int,
     val recipePages: Map<Int, Map<Int, String>>, // Map<PageNum, Map<SlotNum, AutoCraftingIdentifier's ID>
+    val customCrafterInternalGuiAutoCraftRecipeModifyGui: String? = null,
+    override val id: String = CustomCrafterGUI.getIdOrRegister(RecipeModifyGUI::class).toString(),
     override val pages: Map<Int, Map<Int, ByteArray>>,
-    override val id: String = CustomCrafterGUI.getID(RecipeModifyGUI::class).toString(),
     override val previousPageButtonSlot: Int = 45,
     override val nextPageButtonSlot: Int = 53,
     override var currentPage: Int = 0,
     override val contextComponentSlot: Int = 49
-): CustomCrafterGUI.PageableGUI {
+): CustomCrafterGUI.PageableGUI, ReactionProvider {
+
+    companion object: CustomCrafterGUI.GuiDeserializer {
+        override fun from(contextItem: ItemStack): CustomCrafterGUI? {
+            val json: String = contextItem.itemMeta.persistentDataContainer.get(
+                CustomCrafterGUI.CONTEXT_KEY,
+                PersistentDataType.STRING
+            ) ?: return null
+            return Json.decodeFromString<RecipeModifyGUI>(json)
+        }
+
+        override fun id(): UUID = CustomCrafterGUI.getIdOrRegister(RecipeModifyGUI::class)
+    }
+
     override fun getConstantItems(): Map<Int, ItemStack> {
         return (45..50).map { i ->
             i to CustomCrafterGUI.UN_CLICKABLE_SLOT
@@ -42,18 +63,16 @@ internal data class RecipeModifyGUI(
             meta.persistentDataContainer.set(
                 CustomCrafterGUI.CONTEXT_KEY,
                 PersistentDataType.STRING,
-                json
+                buildJsonObject {
+                    Json.parseToJsonElement(json).jsonObject
+                        .forEach { (key, value) ->
+                            put(key, value)
+                        }
+                    put("id", CustomCrafterGUI.getIdOrRegister(RecipeModifyGUI::class).toString())
+                }.toString()
             )
         }
         return cloned
-    }
-
-    override fun from(contextItem: ItemStack): CustomCrafterGUI? {
-        val json: String = contextItem.itemMeta.persistentDataContainer.get(
-            CustomCrafterGUI.CONTEXT_KEY,
-            PersistentDataType.STRING
-        ) ?: return null
-        return Json.decodeFromString(json)
     }
 
     override fun eventReaction(
