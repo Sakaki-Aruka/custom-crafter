@@ -12,6 +12,7 @@ import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import io.github.sakaki_aruka.customcrafter.api.search.Search
 import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
 import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterGUI
+import io.github.sakaki_aruka.customcrafter.internal.gui.OldWarnGUI
 import io.github.sakaki_aruka.customcrafter.internal.gui.ReactionProvider
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -38,12 +39,19 @@ object InventoryClickListener: Listener {
 
         //debug
         // TODO: write PlayerInventoryReaction process
-        if (clickedInventory == null) return
+        val clicked: Inventory = clickedInventory ?: return
         val top: Inventory = whoClicked.openInventory.topInventory
-        println("clicked = ${if (top == clickedInventory) "top" else "bottom"}")
+        val bottom: Inventory = whoClicked.openInventory.bottomInventory
+
+        if (isOld(top) || isOld(bottom)) {
+            whoClicked.openInventory(OldWarnGUI.getPage())
+            return
+        }
+
+        println("clicked = ${if (top == clicked) "top" else "bottom"}")
         println("click selected class (top Inventory) = ${CustomCrafterGUI.GuiDeserializer.getGUI(top)}")
         val gui: CustomCrafterGUI = CustomCrafterGUI.GuiDeserializer.getGUI(top) ?: return
-        (gui as? ReactionProvider)?.eventReaction(this, gui, clickedInventory!!, isTopInventory = clickedInventory!! == top)
+        (gui as? ReactionProvider)?.eventReaction(this, gui, clicked, isTopInventory = clicked == top)
 
 //        val player: Player = Bukkit.getPlayer(whoClicked.uniqueId) ?: return
 //        val topInv: Inventory = player.openInventory.topInventory
@@ -77,6 +85,16 @@ object InventoryClickListener: Listener {
 //                }
 //            }
 //        }
+    }
+
+    private fun isOld(gui: Inventory): Boolean {
+        val (key, type, _) = CustomCrafterAPI.genCCKey()
+        val time: Long = gui.contents
+            .filterNotNull()
+            .firstOrNull { item -> item.itemMeta.persistentDataContainer.has(key, type) }
+            ?.let { i -> i.itemMeta.persistentDataContainer.get(key, type) }
+            ?: return false
+        return time < CustomCrafter.INITIALIZED
     }
 
     private fun crafting(
