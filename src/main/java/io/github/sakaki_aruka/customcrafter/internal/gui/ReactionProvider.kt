@@ -7,6 +7,7 @@ internal interface ReactionProvider {
     fun eventReaction(
         event: InventoryClickEvent,
         ui: CustomCrafterGUI,
-        inventory: Inventory
+        inventory: Inventory,
+        isTopInventory: Boolean = true
     )
 }

@@ -78,15 +78,17 @@ internal data class RecipeModifyGUI(
     override fun eventReaction(
         event: InventoryClickEvent,
         ui: CustomCrafterGUI,
-        inventory: Inventory
+        inventory: Inventory,
+        isTopInventory: Boolean
     ) {
+        event.isCancelled = true
+
         if (ui !is RecipeModifyGUI
             || event.currentItem == null
             || event.currentItem?.isEmpty == true
-            ) return
+            || !isTopInventory
+        ) return
         val player: Player = event.whoClicked as? Player ?: return
-
-        event.isCancelled = true
 
         when (event.rawSlot) {
             previousPageButtonSlot -> {

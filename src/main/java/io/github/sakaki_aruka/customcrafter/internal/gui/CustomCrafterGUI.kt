@@ -79,10 +79,6 @@ internal sealed interface CustomCrafterGUI {
                         PersistentDataType.STRING
                     )!!)
 
-                    //debug
-                    println("json element = $element")
-                    println("uuid = ${element.jsonObject["id"]!!.toString().replace("\"", "")}[last]")
-
                     val id: UUID = UUID.fromString(element.jsonObject["id"]!!.toString().replace("\"", ""))
 
                     DESERIALIZERS

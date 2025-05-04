@@ -92,11 +92,15 @@ internal data class CBlockInfoGUI(
     override fun eventReaction(
         event: InventoryClickEvent,
         ui: CustomCrafterGUI,
-        inventory: Inventory
+        inventory: Inventory,
+        isTopInventory: Boolean
     ) {
         if (ui !is CBlockInfoGUI) return
 
         event.isCancelled = true
+
+        if (!isTopInventory) return
+
         when (event.rawSlot) {
             53 -> {
                 // clear all data and open SlotModifyGUI

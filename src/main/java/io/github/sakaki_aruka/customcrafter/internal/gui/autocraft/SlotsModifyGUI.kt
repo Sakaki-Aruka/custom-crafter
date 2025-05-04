@@ -131,9 +131,13 @@ internal data class SlotsModifyGUI(
     override fun eventReaction(
         event: InventoryClickEvent,
         ui: CustomCrafterGUI,
-        inventory: Inventory
+        inventory: Inventory,
+        isTopInventory: Boolean
     ) {
         if (ui !is SlotsModifyGUI) return
+
+        event.isCancelled = true
+
         val availableSlots: Set<Int> = Converter.getAvailableCraftingSlotIndices()
         val player: Player = event.whoClicked as? Player ?: return
         val block: Block = Bukkit.getWorlds()
@@ -141,8 +145,7 @@ internal data class SlotsModifyGUI(
             ?.getBlockAt(targetBlockX, targetBlockY, targetBlockZ)
             ?: return
         val cBlock:CBlock = CBlock.fromBlock(block) ?: CBlock(recipes = mutableSetOf())
-
-        event.isCancelled = true
+        if (!isTopInventory) return
 
         when (event.rawSlot) {
             in availableSlots -> {

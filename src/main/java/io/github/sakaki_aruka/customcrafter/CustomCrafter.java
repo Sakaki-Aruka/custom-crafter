@@ -8,6 +8,7 @@ import io.github.sakaki_aruka.customcrafter.internal.gui.PredicateProvider;
 import io.github.sakaki_aruka.customcrafter.internal.gui.autocraft.CBlockInfoGUI;
 import io.github.sakaki_aruka.customcrafter.internal.gui.autocraft.RecipeModifyGUI;
 import io.github.sakaki_aruka.customcrafter.internal.gui.autocraft.SlotsModifyGUI;
+import io.github.sakaki_aruka.customcrafter.internal.gui.crafting.CraftingGUI;
 import io.github.sakaki_aruka.customcrafter.internal.listener.BlockRedstoneListener;
 import io.github.sakaki_aruka.customcrafter.internal.listener.InventoryClickListener;
 import io.github.sakaki_aruka.customcrafter.internal.listener.InventoryCloseListener;
@@ -44,14 +45,17 @@ public final class CustomCrafter extends JavaPlugin {
         CustomCrafterGUI.Companion.getPAGES().put(JvmClassMappingKt.getKotlinClass(SlotsModifyGUI.class), UUID.randomUUID());
         CustomCrafterGUI.Companion.getPAGES().put(JvmClassMappingKt.getKotlinClass(CBlockInfoGUI.class), UUID.randomUUID());
         CustomCrafterGUI.Companion.getPAGES().put(JvmClassMappingKt.getKotlinClass(RecipeModifyGUI.class), UUID.randomUUID());
+        CustomCrafterGUI.Companion.getPAGES().put(JvmClassMappingKt.getKotlinClass(CBlockInfoGUI.class), UUID.randomUUID());
 
-        // TODO
+        // TODO: register CustomCrafterGUI.GuiDeserializer
         CustomCrafterGUI.Companion.getDESERIALIZERS().add(CBlockInfoGUI.Companion);
         CustomCrafterGUI.Companion.getDESERIALIZERS().add(SlotsModifyGUI.Companion);
+        CustomCrafterGUI.Companion.getDESERIALIZERS().add(CraftingGUI.Companion);
 
         // TODO: register PredicateProvider<T: out CustomCrafterGUI>::class to PredicateProvider.PROVIDERS
         PredicateProvider.Companion.getPROVIDERS().add(CBlockInfoGUI.Companion);
         PredicateProvider.Companion.getPROVIDERS().add(SlotsModifyGUI.Companion);
+        PredicateProvider.Companion.getPROVIDERS().add(CraftingGUI.Companion);
 
         // TODO: register NoPlayerListener (NoPlayerListener.LISTENERS)
         NoPlayerListener.Companion.getLISTENERS().add(AutoCraft.AutoCraftRedstoneSignalReceiver.INSTANCE);

@@ -4,7 +4,6 @@ import io.github.sakaki_aruka.customcrafter.CustomCrafter
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.event.CreateCustomItemEvent
 import io.github.sakaki_aruka.customcrafter.api.event.PreCreateCustomItemEvent
-import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
@@ -38,9 +37,17 @@ object InventoryClickListener: Listener {
     fun InventoryClickEvent.onClick() {
 
         //debug
-        println("click selected class = ${CustomCrafterGUI.GuiDeserializer.getGUI(inventory)}")
-        val gui: CustomCrafterGUI = CustomCrafterGUI.GuiDeserializer.getGUI(inventory) ?: return
-        (gui as? ReactionProvider)?.eventReaction(this, gui, inventory)
+        // TODO: write PlayerInventoryReaction process
+        val top: Inventory = whoClicked.openInventory.topInventory
+        val bottom: Inventory = whoClicked.openInventory.bottomInventory
+        println("click selected class (top Inventory) = ${CustomCrafterGUI.GuiDeserializer.getGUI(top)}")
+        val gui: CustomCrafterGUI = CustomCrafterGUI.GuiDeserializer.getGUI(top) ?: run {
+            println("click selected class (bottom Inventory) = ${CustomCrafterGUI.GuiDeserializer.getGUI(bottom)}")
+            val g: CustomCrafterGUI = CustomCrafterGUI.GuiDeserializer.getGUI(bottom) ?: return
+            (g as? ReactionProvider)?.eventReaction(this, g, bottom, isTopInventory = false)
+            return
+        }
+        (gui as? ReactionProvider)?.eventReaction(this, gui, top)
 
         val player: Player = Bukkit.getPlayer(whoClicked.uniqueId) ?: return
         val topInv: Inventory = player.openInventory.topInventory
