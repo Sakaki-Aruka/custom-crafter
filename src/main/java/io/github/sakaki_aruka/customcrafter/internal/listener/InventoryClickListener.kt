@@ -38,49 +38,45 @@ object InventoryClickListener: Listener {
 
         //debug
         // TODO: write PlayerInventoryReaction process
+        if (clickedInventory == null) return
         val top: Inventory = whoClicked.openInventory.topInventory
-        val bottom: Inventory = whoClicked.openInventory.bottomInventory
+        println("clicked = ${if (top == clickedInventory) "top" else "bottom"}")
         println("click selected class (top Inventory) = ${CustomCrafterGUI.GuiDeserializer.getGUI(top)}")
-        val gui: CustomCrafterGUI = CustomCrafterGUI.GuiDeserializer.getGUI(top) ?: run {
-            println("click selected class (bottom Inventory) = ${CustomCrafterGUI.GuiDeserializer.getGUI(bottom)}")
-            val g: CustomCrafterGUI = CustomCrafterGUI.GuiDeserializer.getGUI(bottom) ?: return
-            (g as? ReactionProvider)?.eventReaction(this, g, bottom, isTopInventory = false)
-            return
-        }
-        (gui as? ReactionProvider)?.eventReaction(this, gui, top)
+        val gui: CustomCrafterGUI = CustomCrafterGUI.GuiDeserializer.getGUI(top) ?: return
+        (gui as? ReactionProvider)?.eventReaction(this, gui, clickedInventory!!, isTopInventory = clickedInventory!! == top)
 
-        val player: Player = Bukkit.getPlayer(whoClicked.uniqueId) ?: return
-        val topInv: Inventory = player.openInventory.topInventory
-        val bottomInv: Inventory = player.openInventory.bottomInventory
-        val clicked: Inventory = this.clickedInventory ?: return
-
-        if (CustomCrafterAPI.isCustomCrafterGUI(clicked)) {
-            // crafting clicked
-            crafting(player, clicked, this)
-        } else if (CustomCrafterAPI.isAllCandidatesPageGUI(clicked)) {
-            // all clicked
-            allCandidatesClickedProcess(player, clicked, this)
-        } else {
-            if (clicked is PlayerInventory && clicked == bottomInv) {
-                if (CustomCrafterAPI.isCustomCrafterGUI(topInv)) {
-                    // move materials to crafting gui (only allow 'collect' or 'place')
-                    if (click !in setOf(
-                            ClickType.LEFT,
-                            ClickType.SHIFT_LEFT,
-                            ClickType.RIGHT,
-                            ClickType.DOUBLE_CLICK)
-                        ) {
-                        isCancelled = true
-                    }
-                } else if (CustomCrafterAPI.isAllCandidatesPageGUI(topInv)) {
-                    // to swap? (ignore all)
-                    this.isCancelled = true
-                } else {
-                    // not CustomCrafter's event
-                    return
-                }
-            }
-        }
+//        val player: Player = Bukkit.getPlayer(whoClicked.uniqueId) ?: return
+//        val topInv: Inventory = player.openInventory.topInventory
+//        val bottomInv: Inventory = player.openInventory.bottomInventory
+//        val clicked: Inventory = this.clickedInventory ?: return
+//
+//        if (CustomCrafterAPI.isCustomCrafterGUI(clicked)) {
+//            // crafting clicked
+//            crafting(player, clicked, this)
+//        } else if (CustomCrafterAPI.isAllCandidatesPageGUI(clicked)) {
+//            // all clicked
+//            allCandidatesClickedProcess(player, clicked, this)
+//        } else {
+//            if (clicked is PlayerInventory && clicked == bottomInv) {
+//                if (CustomCrafterAPI.isCustomCrafterGUI(topInv)) {
+//                    // move materials to crafting gui (only allow 'collect' or 'place')
+//                    if (click !in setOf(
+//                            ClickType.LEFT,
+//                            ClickType.SHIFT_LEFT,
+//                            ClickType.RIGHT,
+//                            ClickType.DOUBLE_CLICK)
+//                        ) {
+//                        isCancelled = true
+//                    }
+//                } else if (CustomCrafterAPI.isAllCandidatesPageGUI(topInv)) {
+//                    // to swap? (ignore all)
+//                    this.isCancelled = true
+//                } else {
+//                    // not CustomCrafter's event
+//                    return
+//                }
+//            }
+//        }
     }
 
     private fun crafting(

@@ -48,7 +48,7 @@ internal data class CraftingGUI(
             if (event !is PlayerInteractEvent) return null
             else if (event.clickedBlock == null) return null
             else if (event.action != Action.RIGHT_CLICK_BLOCK) return null
-            else if (event.clickedBlock!!.type == Material.CRAFTING_TABLE) return null
+            else if (event.clickedBlock!!.type != Material.CRAFTING_TABLE) return null
 
             val underCenterLoc: Location = event.clickedBlock!!.location.apply { y -= 1 }
             val underCenter: Block = underCenterLoc.block
@@ -159,6 +159,7 @@ internal data class CraftingGUI(
             }
         } else {
             // player's inventory
+            event.isCancelled = false
             return
         }
     }
