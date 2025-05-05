@@ -46,7 +46,6 @@ public final class CustomCrafter extends JavaPlugin {
         CustomCrafterGUI.Companion.getPAGES().put(JvmClassMappingKt.getKotlinClass(SlotsModifyGUI.class), UUID.randomUUID());
         CustomCrafterGUI.Companion.getPAGES().put(JvmClassMappingKt.getKotlinClass(CBlockInfoGUI.class), UUID.randomUUID());
         CustomCrafterGUI.Companion.getPAGES().put(JvmClassMappingKt.getKotlinClass(RecipeModifyGUI.class), UUID.randomUUID());
-        CustomCrafterGUI.Companion.getPAGES().put(JvmClassMappingKt.getKotlinClass(CBlockInfoGUI.class), UUID.randomUUID());
         CustomCrafterGUI.Companion.getPAGES().put(JvmClassMappingKt.getKotlinClass(OldWarnGUI.class), UUID.randomUUID());
 
         // TODO: register CustomCrafterGUI.GuiDeserializer
