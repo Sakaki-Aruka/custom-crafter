@@ -131,7 +131,7 @@ interface CRecipe {
         isCraftGUI: Boolean,
         shift: Boolean
     ): Int? {
-        if (shift) return 1
+        if (!shift) return 1
         return items.entries
             .filter { (c, _) -> c in Converter.getAvailableCraftingSlotComponents() }
             .filter { (c, _) -> map[c] != null }

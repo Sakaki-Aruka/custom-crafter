@@ -9,10 +9,12 @@ import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.search.Search
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter
+import io.github.sakaki_aruka.customcrafter.impl.util.InventoryUtil.giveItems
 import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterGUI
 import io.github.sakaki_aruka.customcrafter.internal.gui.PageOpenTrigger
 import io.github.sakaki_aruka.customcrafter.internal.gui.PredicateProvider
 import io.github.sakaki_aruka.customcrafter.internal.gui.ReactionProvider
+import io.github.sakaki_aruka.customcrafter.internal.gui.allcandidate.AllCandidateGUI
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
@@ -141,6 +143,34 @@ internal data class CraftingGUI(
 
                     if (CustomCrafterAPI.USE_MULTIPLE_RESULT_CANDIDATE_FEATURE && result.size() > 1) {
                         // all-candidate page process
+                        val baseList: MutableList<ItemStack> = mutableListOf()
+                        if (result.vanilla() != null) {
+                            baseList.add(result.vanilla()!!.result)
+                        }
+
+                        result.customs().forEach { (recipe: CRecipe, relation: MappedRelation) ->
+                            val displayItem: ItemStack = recipe.getResults(
+                                crafterID = player.uniqueId,
+                                relate = relation,
+                                mapped = view.materials,
+                                shiftClicked = event.isShiftClick,
+                                calledTimes = recipe.getMinAmount(view.materials, false, shift = event.isShiftClick) ?: 1,
+                                isMultipleDisplayCall = false
+                            ).firstOrNull() ?: CustomCrafterAPI.ALL_CANDIDATE_NO_DISPLAYABLE_ITEM
+                            baseList.add(displayItem)
+                        }
+
+                        val pages: MutableMap<Int, Map<Int, ByteArray>> = mutableMapOf()
+                        baseList.chunked(45)
+                            .withIndex()
+                            .forEach { (page: Int, items: List<ItemStack>) ->
+                                pages[page] =
+                                    items.withIndex().associate { (slot: Int, item: ItemStack) ->
+                                        slot to item.serializeAsBytes()
+                                    }
+                            }
+                        val allCandidateGUI = AllCandidateGUI(result.toJson(), view.toJson(), pages)
+                        allCandidateGUI.firstPage()?.let { first: Inventory -> player.openInventory(first) }
                     } else {
                         // normal crafting process
                         normalCrafting(result, inventory, mass, player)
@@ -206,11 +236,8 @@ internal data class CraftingGUI(
             Converter.getAvailableCraftingSlotIndices()
                 .filter { s -> gui.getItem(s)?.takeIf { item -> item.type != Material.AIR } != null }
                 .forEach { s -> decrement(gui, s, amount) }
-            val item: ItemStack = result.vanilla()!!.result.asQuantity(amount)
-
-            player.inventory.addItem(item).forEach { (_, over) ->
-                player.world.dropItem(player.location, over)
-            }
+            val item: ItemStack = result.vanilla()!!.result.apply { this.amount *= amount }
+            player.giveItems(items = arrayOf(item))
         }
     }
 

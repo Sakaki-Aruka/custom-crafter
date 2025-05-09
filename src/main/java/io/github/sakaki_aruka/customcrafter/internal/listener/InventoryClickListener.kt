@@ -25,7 +25,6 @@ import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.PlayerInventory
 import org.bukkit.persistence.PersistentDataType
 import kotlin.math.max
 import kotlin.math.min
@@ -43,15 +42,17 @@ object InventoryClickListener: Listener {
         val top: Inventory = whoClicked.openInventory.topInventory
         val bottom: Inventory = whoClicked.openInventory.bottomInventory
 
+        //debug
+        println("clicked = ${if (top == clicked) "top" else "bottom"}")
+        println("click selected class (top Inventory) = ${CustomCrafterGUI.GuiDeserializer.getGUI(top)}")
+
+        val gui: CustomCrafterGUI = CustomCrafterGUI.GuiDeserializer.getGUI(top) ?: return
         if (isOld(top) || isOld(bottom)) {
             whoClicked.openInventory(OldWarnGUI.getPage())
             return
+        } else {
+            (gui as? ReactionProvider)?.eventReaction(this, gui, clicked, isTopInventory = clicked == top)
         }
-
-        println("clicked = ${if (top == clicked) "top" else "bottom"}")
-        println("click selected class (top Inventory) = ${CustomCrafterGUI.GuiDeserializer.getGUI(top)}")
-        val gui: CustomCrafterGUI = CustomCrafterGUI.GuiDeserializer.getGUI(top) ?: return
-        (gui as? ReactionProvider)?.eventReaction(this, gui, clicked, isTopInventory = clicked == top)
 
 //        val player: Player = Bukkit.getPlayer(whoClicked.uniqueId) ?: return
 //        val topInv: Inventory = player.openInventory.topInventory
