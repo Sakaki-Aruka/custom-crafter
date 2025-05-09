@@ -47,6 +47,7 @@ object AutoCraft {
             return event is BlockRedstoneEvent
                     && event.block.type in InternalAPI.AUTO_CRAFTING_BLOCKS
                     && baseBlockCheck(event.block)
+                    && CustomCrafterAPI.USE_AUTO_CRAFTING_FEATURE
         }
     }
 
@@ -73,6 +74,7 @@ object AutoCraft {
             return event is InventoryMoveItemEvent
                     && event.destination.holder is Crafter
                     && baseBlockCheck((event.destination.holder as Crafter).block)
+                    && CustomCrafterAPI.USE_AUTO_CRAFTING_FEATURE
         }
     }
 
