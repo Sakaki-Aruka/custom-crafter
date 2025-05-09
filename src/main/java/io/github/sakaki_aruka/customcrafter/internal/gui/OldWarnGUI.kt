@@ -1,6 +1,5 @@
 package io.github.sakaki_aruka.customcrafter.internal.gui
 
-import io.github.sakaki_aruka.customcrafter.internal.gui.crafting.CraftingGUI
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.buildJsonObject
