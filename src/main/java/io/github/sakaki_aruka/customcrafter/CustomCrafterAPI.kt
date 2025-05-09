@@ -2,12 +2,12 @@ package io.github.sakaki_aruka.customcrafter
 
 import io.github.sakaki_aruka.customcrafter.api.event.RegisterCustomRecipeEvent
 import io.github.sakaki_aruka.customcrafter.api.event.UnregisterCustomRecipeEvent
-import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.AutoCraftingIdentifier
+import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.AutoCraftRecipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
-import io.github.sakaki_aruka.customcrafter.internal.listener.InventoryClickListener
+import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.internal.listener.InventoryCloseListener
-import io.github.sakaki_aruka.customcrafter.internal.listener.PlayerInteractListener
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
+import io.github.sakaki_aruka.customcrafter.api.search.Search
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
@@ -16,9 +16,9 @@ import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
-import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.Recipe
 import org.bukkit.persistence.PersistentDataType
 
 object CustomCrafterAPI {
@@ -53,7 +53,7 @@ object CustomCrafterAPI {
     const val CRAFTING_TABLE_RESULT_SLOT: Int = 44
     internal const val ALL_CANDIDATE_PREVIOUS_SLOT: Int = 45
     internal const val ALL_CANDIDATE_SIGNATURE_SLOT: Int = 49
-    internal const val ALL_CANDIDATE_NEXT_SLOT: Int = 54
+    internal const val ALL_CANDIDATE_NEXT_SLOT: Int = 53
     const val CRAFTING_TABLE_TOTAL_SIZE: Int = 54
 
     internal val ALL_CANDIDATE_CURRENT_PAGE_NK = NamespacedKey(
@@ -85,7 +85,7 @@ object CustomCrafterAPI {
     }
 
     /**
-     * A lambda expression used to pick only one [AutoCraftingIdentifier] when auto-crafting provides more than 2 recipes.
+     * A lambda expression used to pick only one [AutoCraftRecipe] when auto-crafting provides more than 2 recipes.
      * ```
      * // A default implementation
      * AUTO_CRAFTING_PICKUP_RESOLVER = { list ->
@@ -94,7 +94,7 @@ object CustomCrafterAPI {
      * ```
      * @since 5.0.10
      */
-    var AUTO_CRAFTING_PICKUP_RESOLVER: (List<AutoCraftingIdentifier>) -> AutoCraftingIdentifier? = { list ->
+    var AUTO_CRAFTING_PICKUP_RESOLVER: (List<AutoCraftRecipe>) -> AutoCraftRecipe? = { list ->
         list.firstOrNull()
     }
 
@@ -108,8 +108,8 @@ object CustomCrafterAPI {
      * ```
      * @since 5.0.10
      */
-    var AUTO_CRAFTING_SOURCE_RECIPES_PROVIDER: (Block) -> List<AutoCraftingIdentifier> = { _ ->
-        this.getRecipes().filterIsInstance<AutoCraftingIdentifier>()
+    var AUTO_CRAFTING_SOURCE_RECIPES_PROVIDER: (Block) -> List<AutoCraftRecipe> = { _ ->
+        this.getRecipes().filterIsInstance<AutoCraftRecipe>()
     }
 
     /**
@@ -121,9 +121,29 @@ object CustomCrafterAPI {
      * ```
      * @since 5.0.10
      */
-    var AUTO_CRAFTING_SETTING_PAGE_SUGGESTION: (Block, Player) -> List<AutoCraftingIdentifier> = { _, _ ->
-        this.getRecipes().filterIsInstance<AutoCraftingIdentifier>()
+    var AUTO_CRAFTING_SETTING_PAGE_SUGGESTION: (Block, Player) -> List<AutoCraftRecipe> = { _, _ ->
+        this.getRecipes().filterIsInstance<AutoCraftRecipe>()
     }
+
+    /**
+     *
+     * ```kotlin
+     * // A Default implementation
+     * AUTO_CRAFTING_RESULT_PICKUP_RESOLVER: (List<CRecipe>, Search.SearchResult, Block) -> Pair<CRecipe?, Recipe?> = { _, result, _ ->
+     *     result.customs().firstOrNull() to result.vanilla()
+     * }
+     * ```
+     * @since 5.0.10
+     */
+    var AUTO_CRAFTING_RESULT_PICKUP_RESOLVER: (List<CRecipe>, Search.SearchResult, Block) -> Pair<Pair<CRecipe, MappedRelation>?, Recipe?> = { _, result, _ ->
+        result.customs().firstOrNull() to result.vanilla()
+    }
+
+    /**
+     * Default `true`.
+     * @since 5.0.10
+     */
+    var AUTO_CRAFTING_RESULT_PICKUP_RESOLVER_PRIORITIZE_CUSTOM: Boolean = true
 
     private var AUTO_CRAFTING_BASE_BLOCK: Material = Material.GOLD_BLOCK
     /**
