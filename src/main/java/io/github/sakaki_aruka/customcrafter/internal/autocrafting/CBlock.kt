@@ -49,7 +49,7 @@ internal data class CBlock(
         val list: MutableList<CRecipe> = mutableListOf()
         sourceRecipes
             .filter { r -> r is AutoCraftRecipe }
-            .filter { r -> (r as AutoCraftRecipe).autoCraftID.toString() in this.recipes }
+            .filter { r -> (r as AutoCraftRecipe).getCBlockTitle() in this.recipes }
             .forEach { r -> list.add(r) }
         return list
     }

@@ -10,12 +10,6 @@ import java.util.UUID
 /**
  * A result items supplier of [CRecipe].
  *
- * ```
- * // call example from Java
- * ResultSupplier supplier = new ResultSupplier((config) ->
- *     return List.of(ItemStack.STONE);
- * );
- *
  * // call example from Kotlin
  * val supplier = ResultSupplier { config ->
  *     if (config.crafterID == UUID.fromString("069a79f4-44e9-4726-a5be-fca90e38aaf5")) {
@@ -93,5 +87,11 @@ data class ResultSupplier (
                 } else listOf(item)
             }
         }
+
+        /**
+         * Empty ResultSupplier (for AutoCraft only recipes)
+         * @since 5.0.10
+         */
+        val EMPTY = ResultSupplier { _ -> emptyList() }
     }
 }

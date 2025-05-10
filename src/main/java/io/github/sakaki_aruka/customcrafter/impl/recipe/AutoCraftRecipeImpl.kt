@@ -11,7 +11,6 @@ import io.github.sakaki_aruka.customcrafter.api.objects.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.impl.recipe.CRecipeImpl.Companion.getDefaultFilters
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import java.time.ZonedDateTime
 import java.util.UUID
 
 /**
@@ -33,6 +32,7 @@ data class AutoCraftRecipeImpl(
     override val containers: List<CRecipeContainer>? = null,
     override val results: List<ResultSupplier>? = null,
     override val filters: Set<CRecipeFilter<CMatter>>? = getDefaultFilters(),
+    override val autoCraftResults: List<ResultSupplier>? = null,
 ): AutoCraftRecipe {
     override fun replaceItems(newItems: Map<CoordinateComponent, CMatter>): CRecipe {
         return AutoCraftRecipeImpl(

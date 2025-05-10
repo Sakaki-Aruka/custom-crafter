@@ -113,16 +113,16 @@ internal data class RecipeModifyGUI(
                     ?.let { recipeID ->
                         CustomCrafterAPI.AUTO_CRAFTING_SETTING_PAGE_SUGGESTION(block, player)
                             .firstOrNull { i ->
-                                i.autoCraftID.toString() == recipeID
+                                i.getCBlockTitle() == recipeID
                             }
                     } ?: return
 
                 val cBlock: CBlock = CBlock.fromBlock(block) ?: return
 
-                if (cBlock.recipes.contains(recipe.autoCraftID.toString())) {
-                    cBlock.recipes.remove(recipe.autoCraftID.toString())
+                if (cBlock.recipes.contains(recipe.getCBlockTitle())) {
+                    cBlock.recipes.remove(recipe.getCBlockTitle())
                 } else {
-                    cBlock.recipes.add(recipe.autoCraftID.toString())
+                    cBlock.recipes.add(recipe.getCBlockTitle())
                 }
                 cBlock.write(block)
             }

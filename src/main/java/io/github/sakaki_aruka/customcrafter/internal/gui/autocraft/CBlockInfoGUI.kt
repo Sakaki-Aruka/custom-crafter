@@ -142,7 +142,7 @@ internal data class CBlockInfoGUI(
         val names: List<Component> = cBlock.recipes
             .mapNotNull { id ->
                 CustomCrafterAPI.AUTO_CRAFTING_SOURCE_RECIPES_PROVIDER(block)
-                    .firstOrNull { recipe -> recipe.autoCraftID.toString() == id }
+                    .firstOrNull { recipe -> recipe.getCBlockTitle() == id }
                     ?.let { recipe ->
                         MiniMessage.miniMessage().deserialize("<white>${recipe.name}")
                     }

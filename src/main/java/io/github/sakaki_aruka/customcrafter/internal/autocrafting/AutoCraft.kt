@@ -119,7 +119,7 @@ object AutoCraft {
             }
         val sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes()
             .filterIsInstance<AutoCraftRecipe>()
-            .filter { r -> r.autoCraftID.toString() in cBlock.recipes }
+            .filter { r -> r.getCBlockTitle() in cBlock.recipes }
 
         val result: Search.SearchResult = Search.search(
             crafterID = PSEUDO_UUID,
