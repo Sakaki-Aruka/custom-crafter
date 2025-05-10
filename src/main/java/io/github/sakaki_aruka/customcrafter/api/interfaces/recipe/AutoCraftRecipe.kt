@@ -11,6 +11,5 @@ import java.util.UUID
  */
 interface AutoCraftRecipe: CRecipe {
     val autoCraftID: UUID
-
-    fun getAutoCraftDisplayItem(player: Player): ItemStack
+    val autoCraftDisplayItemProvider: (Player) -> ItemStack
 }

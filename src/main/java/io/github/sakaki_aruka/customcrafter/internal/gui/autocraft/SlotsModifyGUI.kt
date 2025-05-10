@@ -183,7 +183,7 @@ internal data class SlotsModifyGUI(
                         autoCraftRecipes
                             .withIndex()
                             .forEach { (slotIndex, recipe) ->
-                                map[slotIndex] = recipe.getAutoCraftDisplayItem(player).serializeAsBytes()
+                                map[slotIndex] = recipe.autoCraftDisplayItemProvider(player).serializeAsBytes()
                                 rMap[slotIndex] = recipe.autoCraftID.toString()
                             }
                         pages[pageIndex] = map
