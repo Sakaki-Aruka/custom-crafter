@@ -2,14 +2,17 @@ package io.github.sakaki_aruka.customcrafter.api.objects.result
 
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
+import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplierConfig
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
+import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 import java.util.UUID
 
 /**
  * A result items supplier of [CRecipe].
  *
+ * ```
  * // call example from Kotlin
  * val supplier = ResultSupplier { config ->
  *     if (config.crafterID == UUID.fromString("069a79f4-44e9-4726-a5be-fca90e38aaf5")) {
@@ -18,15 +21,12 @@ import java.util.UUID
  *     } else emptyList()
  * }
  * ```
- *
- * @param[func] function.
- * @return[ResultSupplier]
  */
 data class ResultSupplier (
-    val func: Function1<ResultSupplier.Config, List<ItemStack>>,
+    val func: Function1<ResultSupplierConfig, List<ItemStack>>,
 ) {
     operator fun invoke(
-        config: Config
+        config: ResultSupplierConfig
     ): List<ItemStack> = func(config)
 
     /**
@@ -39,19 +39,47 @@ data class ResultSupplier (
      * @param[mapped] a coordinate and input items mapping
      * @param[list] result items that are made by a [CRecipe]
      * @param[shiftClicked] shift clicked or not
-     * @param[calledTimes] calculated minimum amount with [CMatter].amount
+     * @param[calledTimes] calculated minimum amount with [CMatter.amount]
      * @param[isMultipleDisplayCall] `invoke` called from multiple result display item collector or not
+     *
+     * @see[ResultSupplierConfig]
+     * @see[AutoCraftConfig]
      * @since 5.0.8
      */
-    data class Config internal constructor(
+    data class NormalConfig internal constructor(
+        override val relation: MappedRelation,
+        override val mapped: Map<CoordinateComponent, ItemStack>,
+        override val shiftClicked: Boolean,
+        override val calledTimes: Int,
         val crafterID: UUID,
-        val relation: MappedRelation,
-        val mapped: Map<CoordinateComponent, ItemStack>,
         val list: MutableList<ItemStack>,
-        val shiftClicked: Boolean,
-        val calledTimes: Int,
         val isMultipleDisplayCall: Boolean
-    )
+      ): ResultSupplierConfig
+
+    /**
+     * A class of implements [ResultSupplierConfig].
+     *
+     * (This class's constructor is internal. You cannot call it from your project.)
+     *
+     * @param[relation] A coordinate mapping between a [CRecipe] and an input Inventory
+     * @param[mapped] A coordinate and input items mapping
+     * @param[shiftClicked] Shift clicked or not. The default is true on AutoCraft.
+     * @param[calledTimes] Calculated minimum amount with [CMatter.amount]
+     * @param[autoCrafterBlock] A block of called
+     * @param[list] Result items that are made by a [CRecipe]
+     *
+     * @see[ResultSupplierConfig]
+     * @see[NormalConfig]
+     * @since 5.0.10
+     */
+    data class AutoCraftConfig internal constructor(
+        override val relation: MappedRelation,
+        override val mapped: Map<CoordinateComponent, ItemStack>,
+        override val shiftClicked: Boolean = true,
+        override val calledTimes: Int,
+        val autoCrafterBlock: Block,
+        val list: MutableList<ItemStack>
+    ): ResultSupplierConfig
 
     companion object {
         /**
@@ -90,6 +118,9 @@ data class ResultSupplier (
 
         /**
          * Empty ResultSupplier (for AutoCraft only recipes)
+         * ```
+         * val EMPTY = ResultSupplier { _ -> emptyList() }
+         * ```
          * @since 5.0.10
          */
         val EMPTY = ResultSupplier { _ -> emptyList() }

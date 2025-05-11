@@ -107,13 +107,13 @@ interface CRecipe {
             val list: MutableList<ItemStack> = mutableListOf()
             suppliers.map { s ->
                 list.addAll(s.func.invoke(
-                    ResultSupplier.Config(
-                        crafterID,
+                    ResultSupplier.NormalConfig(
                         relate,
                         mapped,
-                        list,
                         shiftClicked,
                         calledTimes,
+                        crafterID,
+                        list,
                         isMultipleDisplayCall
                     )
                 ))
