@@ -17,16 +17,9 @@ import org.bukkit.inventory.Inventory
 object InventoryClickListener: Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     fun InventoryClickEvent.onClick() {
-
-        //debug
-        // TODO: write PlayerInventoryReaction process
         val clicked: Inventory = clickedInventory ?: return
         val top: Inventory = whoClicked.openInventory.topInventory
         val bottom: Inventory = whoClicked.openInventory.bottomInventory
-
-        //debug
-        println("clicked = ${if (top == clicked) "top" else "bottom"}")
-        println("click selected class (top Inventory) = ${CustomCrafterGUI.getGUI(top)}")
 
         val gui: CustomCrafterGUI = CustomCrafterGUI.getGUI(top) ?: return
         if (isOld(top) || isOld(bottom)) {
