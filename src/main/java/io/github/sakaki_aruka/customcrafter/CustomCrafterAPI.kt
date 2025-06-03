@@ -56,13 +56,6 @@ object CustomCrafterAPI {
     internal const val ALL_CANDIDATE_NEXT_SLOT: Int = 53
     const val CRAFTING_TABLE_TOTAL_SIZE: Int = 54
 
-    internal val ALL_CANDIDATE_CURRENT_PAGE_NK = NamespacedKey(
-        CustomCrafter.getInstance(), "all_candidate_current_page")
-    internal val ALL_CANDIDATE_RESULTS_NK = NamespacedKey(
-        CustomCrafter.getInstance(), "all_candidate_results")
-    internal val ALL_CANDIDATE_INPUT_NK = NamespacedKey(
-        CustomCrafter.getInstance(), "all_candidate_input")
-
     /**
      * An item that is used for an all-candidates-menu's not displayable items slot.
      *
