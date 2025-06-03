@@ -3,7 +3,7 @@ package io.github.sakaki_aruka.customcrafter.internal.listener
 import io.github.sakaki_aruka.customcrafter.internal.gui.PredicateProvider
 import org.bukkit.event.Event
 
-interface NoPlayerListener: PredicateProvider<Boolean> {
+internal interface NoPlayerListener: PredicateProvider<Boolean> {
     companion object {
         val LISTENERS: MutableSet<NoPlayerListener> = mutableSetOf()
 
