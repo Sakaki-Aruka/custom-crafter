@@ -23,7 +23,23 @@ interface AutoCraftRecipe: CRecipe {
         /**
          * Returns recipe-name what is loaded and matches id, type, slots.
          *
-         * If the given string is illegal
+         * If the given string is illegal, returns an empty string.
+         *
+         * ```
+         * // Title format
+         * <AutoCraftRecipe.autoCraftID>_<"AMORPHOUS" or "NORMAL">_<Item exist slot(s)>
+         *
+         * // Example-1
+         * // Valid UUID, Valid Type (AMORPHOUS), Item slot amount (what is the recipe requires on AMORPHOUS.)
+         * 79804475-89ab-4197-90c6-3638e0ddf202_AMORPHOUS_3
+         *
+         * // Example-2
+         * // Valid UUID, Valid Type (NORMAL), Item slots (what are required by the recipe on NORMAL.)
+         * // The last section ("0_1_2_3") means "This recipe requires items what are placed on slot index are 0, 1, 2, 3.".
+         * f4d66d26-0098-42fe-87ff-2ab8daa1711c_NORMAL_0_1_2_3
+         * ```
+         * @param[title] Title formatted string
+         * @return[String] Recipe(implements AutoCraftRecipe) name or empty string
          */
         fun getRecipeNameFromCBlockTitle(title: String): String {
             val result: MatchResult = titleRegex.find(title)
