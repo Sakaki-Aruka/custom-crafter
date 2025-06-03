@@ -9,6 +9,7 @@ import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
+import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
@@ -20,6 +21,7 @@ internal sealed interface CustomCrafterGUI {
     val contextComponentSlot: Int
 
     fun write(contextItem: ItemStack): ItemStack?
+    fun onClose(event: InventoryCloseEvent) {}
     fun getDefaultContextComponent(): ItemStack {
         val item = ItemStack(Material.CRAFTING_TABLE)
         item.editMeta { meta ->
@@ -53,41 +55,39 @@ internal sealed interface CustomCrafterGUI {
         ): UUID {
             return PAGES.getOrPut(clazz) { UUID.randomUUID() }
         }
+
+        fun getGUI(inventory: Inventory): CustomCrafterGUI? {
+            val keyItems: List<ItemStack> = inventory.contents
+                .filterNotNull()
+                .filter { i -> !i.isEmpty }
+                .filter { i ->
+                    i.itemMeta.persistentDataContainer.has(
+                        CONTEXT_KEY,
+                        PersistentDataType.STRING
+                    )
+                }
+
+            if (keyItems.isEmpty()) return null
+
+            return keyItems.firstNotNullOfOrNull { item ->
+                val element: JsonElement = Json.parseToJsonElement(item.itemMeta.persistentDataContainer.get(
+                    CONTEXT_KEY,
+                    PersistentDataType.STRING
+                )!!)
+
+                val id: UUID = UUID.fromString(element.jsonObject["id"]!!.toString().replace("\"", ""))
+
+                DESERIALIZERS
+                    .filter { d -> d.id() == id }
+                    .filter { d -> d.from(item) != null }
+                    .firstNotNullOfOrNull { d -> d.from(item) }
+            }
+        }
     }
 
     interface GuiDeserializer {
         fun from(contextItem: ItemStack): CustomCrafterGUI?
         fun id(): UUID
-
-        companion object {
-            fun getGUI(inventory: Inventory): CustomCrafterGUI? {
-                val keyItems: List<ItemStack> = inventory.contents
-                    .filterNotNull()
-                    .filter { i -> !i.isEmpty }
-                    .filter { i ->
-                        i.itemMeta.persistentDataContainer.has(
-                            CONTEXT_KEY,
-                            PersistentDataType.STRING
-                        )
-                    }
-
-                if (keyItems.isEmpty()) return null
-
-                return keyItems.firstNotNullOfOrNull { item ->
-                    val element: JsonElement = Json.parseToJsonElement(item.itemMeta.persistentDataContainer.get(
-                        CONTEXT_KEY,
-                        PersistentDataType.STRING
-                    )!!)
-
-                    val id: UUID = UUID.fromString(element.jsonObject["id"]!!.toString().replace("\"", ""))
-
-                    DESERIALIZERS
-                        .filter { d -> d.id() == id }
-                        .filter { d -> d.from(item) != null }
-                        .firstNotNullOfOrNull { d -> d.from(item) }
-                }
-            }
-        }
     }
 
     interface PageableGUI: CustomCrafterGUI {

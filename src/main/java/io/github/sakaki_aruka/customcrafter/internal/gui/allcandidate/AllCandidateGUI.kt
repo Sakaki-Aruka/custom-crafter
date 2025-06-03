@@ -7,6 +7,7 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.search.Search
+import io.github.sakaki_aruka.customcrafter.impl.util.InventoryUtil.giveItems
 import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterGUI
 import io.github.sakaki_aruka.customcrafter.internal.gui.ReactionProvider
 import kotlinx.serialization.Serializable
@@ -17,6 +18,7 @@ import kotlinx.serialization.json.put
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
+import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.Recipe
@@ -69,6 +71,14 @@ internal data class AllCandidateGUI(
             )
         }
         return cloned
+    }
+
+    override fun onClose(event: InventoryCloseEvent) {
+        val view: CraftView = CraftView.fromJson(this.craftViewJson)
+        (event.player as? Player)?.let { player ->
+            player.giveItems(saveLimit = true, *view.materials.values.toTypedArray())
+            player.giveItems(saveLimit = true, view.result)
+        }
     }
 
     override fun eventReaction(

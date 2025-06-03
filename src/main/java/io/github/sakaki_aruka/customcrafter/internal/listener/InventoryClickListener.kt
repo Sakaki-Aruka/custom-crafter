@@ -26,9 +26,9 @@ object InventoryClickListener: Listener {
 
         //debug
         println("clicked = ${if (top == clicked) "top" else "bottom"}")
-        println("click selected class (top Inventory) = ${CustomCrafterGUI.GuiDeserializer.getGUI(top)}")
+        println("click selected class (top Inventory) = ${CustomCrafterGUI.getGUI(top)}")
 
-        val gui: CustomCrafterGUI = CustomCrafterGUI.GuiDeserializer.getGUI(top) ?: return
+        val gui: CustomCrafterGUI = CustomCrafterGUI.getGUI(top) ?: return
         if (isOld(top) || isOld(bottom)) {
             whoClicked.openInventory(OldWarnGUI.getPage())
             return

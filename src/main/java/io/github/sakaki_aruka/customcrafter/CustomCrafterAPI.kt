@@ -296,9 +296,7 @@ object CustomCrafterAPI {
      * @param[dropItemsOnClose] drops materials or not when a player close this gui (default = false, since = 5.0.8)
      * @return[Inventory] custom crafter gui
      */
-    fun getCraftingGUI(
-        dropItemsOnClose: Boolean = false
-    ): Inventory {
+    fun getCraftingGUI(): Inventory {
         val gui: Inventory = Bukkit.createInventory(null, CRAFTING_TABLE_TOTAL_SIZE, Component.text("Custom Crafter"))
         (0..<54).forEach { slot -> gui.setItem(slot, blank) }
         Converter.getAvailableCraftingSlotComponents().forEach { c ->
@@ -306,7 +304,6 @@ object CustomCrafterAPI {
             gui.setItem(index, ItemStack.empty())
         }
         val makeButton: ItemStack = makeButton()
-        if (!dropItemsOnClose) InventoryCloseListener.setNoDropMarker(makeButton)
         gui.setItem(CRAFTING_TABLE_MAKE_BUTTON_SLOT, makeButton)
         gui.setItem(CRAFTING_TABLE_RESULT_SLOT, ItemStack.empty())
         return gui

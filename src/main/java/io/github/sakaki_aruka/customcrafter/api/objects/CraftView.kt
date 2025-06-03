@@ -86,10 +86,8 @@ data class CraftView internal constructor(
      * @see[CustomCrafterAPI.getCraftingGUI]
      * @return[Inventory] Custom Crafter's gui
      */
-    fun toCraftingGUI(
-        dropItemsOnClose: Boolean = false
-    ): Inventory {
-        val gui: Inventory = CustomCrafterAPI.getCraftingGUI(dropItemsOnClose = dropItemsOnClose)
+    fun toCraftingGUI(): Inventory {
+        val gui: Inventory = CustomCrafterAPI.getCraftingGUI()
         this.materials.entries.forEach { (c, item) ->
             gui.setItem(c.x + c.y * 9, item)
         }

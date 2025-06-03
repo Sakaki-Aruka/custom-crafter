@@ -29,6 +29,7 @@ import org.bukkit.event.Event
 import org.bukkit.event.block.Action
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
+import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
@@ -92,6 +93,13 @@ internal data class CraftingGUI(
             )
         }
         return cloned
+    }
+
+    override fun onClose(event: InventoryCloseEvent) {
+        val view: CraftView = CraftView.fromInventory(event.inventory) ?: return
+        val player: Player = event.player as? Player ?: return
+        player.giveItems(saveLimit = true, *view.materials.values.toTypedArray())
+        player.giveItems(saveLimit = true, view.result)
     }
 
     override fun <T : Event> getFirstPage(event: T): Inventory? {
