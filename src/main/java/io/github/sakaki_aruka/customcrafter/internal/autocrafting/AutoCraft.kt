@@ -15,7 +15,6 @@ import org.bukkit.Material
 import org.bukkit.World
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
-import org.bukkit.block.Container
 import org.bukkit.block.Crafter
 import org.bukkit.event.Event
 import org.bukkit.event.block.BlockRedstoneEvent
@@ -25,6 +24,7 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.Recipe
 import java.util.UUID
 import kotlin.math.max
+import kotlin.math.min
 
 object AutoCraft {
 
@@ -60,14 +60,53 @@ object AutoCraft {
 
             event.isCancelled = true
 
-            if (cBlock.containedItems.size >= 36) {
+            val (mergeResult: Boolean, list: List<ItemStack>) = tryItemMerge(cBlock, event.item)
+            if (!mergeResult) {
                 // drop items to crafter's location.
                 block.world.dropItem(block.getRelative(BlockFace.DOWN, 1).location, event.item)
                 return
             }
 
-            cBlock.containedItems.add(event.item.serializeAsBytes())
+            cBlock.containedItems.clear()
+            list.forEach { item ->
+                cBlock.containedItems.add(item.serializeAsBytes())
+            }
             cBlock.write(block)
+        }
+
+        /**
+         * Merges cBlock contained items and specified item.
+         *
+         * Returns a Pair (Boolean (merge result), List (new list what is the specified item added)) of a result to try merge.
+         *
+         * If addItem amount is over the cBlock contained items amount, returns (false, currentItems).
+         */
+        private fun tryItemMerge(
+            cBlock: CBlock,
+            addItem: ItemStack
+        ): Pair<Boolean, List<ItemStack>> {
+            val currentItems: List<ItemStack> = cBlock.containedItems
+                .map { itemBinary -> ItemStack.deserializeBytes(itemBinary) }
+            if (addItem.amount == 0 || currentItems.size > 36) return (false to currentItems)
+            var amount: Int = addItem.amount
+            val addAmounts: MutableList<Int> = mutableListOf()
+            for (item: ItemStack in currentItems) {
+                if (amount == 0) break
+                else if (!item.isSimilar(addItem) || item.amount == item.type.maxStackSize) {
+                    addAmounts.add(0)
+                    continue
+                }
+                val enableAddAmount: Int = min(item.type.maxStackSize - item.amount, amount)
+                amount -= enableAddAmount
+                addAmounts.add(enableAddAmount)
+            }
+
+            if (amount != 0) return (false to currentItems)
+
+            val newList: List<ItemStack> = currentItems.withIndex().map { (index, item) ->
+                item.clone().asQuantity(item.amount + addAmounts[index])
+            }
+            return (true to newList)
         }
 
         override fun <T : Event> predicate(event: T): Boolean? {
@@ -105,9 +144,8 @@ object AutoCraft {
         if (!block.chunk.isLoaded) return
         else if (cBlock.recipes.isEmpty()) return
 
-        val container: Container = block.state as? Container ?: return
-        val elements: List<ItemStack> = container.inventory
-            .filter { i -> !i.isEmpty }
+        val elements: List<ItemStack> = cBlock.containedItems
+            .map { itemBinary -> ItemStack.deserializeBytes(itemBinary) }
 
         if (36 - cBlock.ignoreSlots.size != elements.size) return
 
