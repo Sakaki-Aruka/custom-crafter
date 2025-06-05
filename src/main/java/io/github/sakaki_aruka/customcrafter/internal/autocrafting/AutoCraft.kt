@@ -205,7 +205,7 @@ object AutoCraft {
             isMultipleDisplayCall = false
         )
 
-        val view: CraftView = CraftView.Companion.fromInventory(gui)!!
+        val view: CraftView = CraftView.fromInventory(gui)!!
             .getDecrementedCraftView(true, pair)
 
         block.world.let { w ->
@@ -225,12 +225,12 @@ object AutoCraft {
         val result: ItemStack = recipe.result.apply { amount *= minAmount }
         block.world.dropItem(block.getRelative(BlockFace.DOWN, 1).location, result)
 
-        val minCoordinate: CoordinateComponent = CoordinateComponent.Companion.fromIndex(
+        val minCoordinate: CoordinateComponent = CoordinateComponent.fromIndex(
             index = Converter.getAvailableCraftingSlotComponents()
                 .filter { c -> gui.getItem(c.toIndex()) != null && gui.getItem(c.toIndex())?.isEmpty == false }
                 .minOf { c -> c.toIndex() }
         )
-        CoordinateComponent.Companion.squareFill(3, minCoordinate.x, minCoordinate.y)
+        CoordinateComponent.squareFill(3, minCoordinate.x, minCoordinate.y)
             .forEach { c ->
                 gui.getItem(c.toIndex())?.let { item ->
                     item.asQuantity(max(0, item.amount - minAmount))
