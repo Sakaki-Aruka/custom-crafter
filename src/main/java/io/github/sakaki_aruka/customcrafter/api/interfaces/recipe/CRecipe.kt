@@ -7,6 +7,7 @@ import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeContainer
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.objects.result.ResultSupplier
+import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import org.bukkit.inventory.ItemStack
 import java.util.UUID
 
@@ -106,18 +107,35 @@ interface CRecipe {
             val list: MutableList<ItemStack> = mutableListOf()
             suppliers.map { s ->
                 list.addAll(s.func.invoke(
-                    ResultSupplier.Config(
-                        crafterID,
+                    ResultSupplier.NormalConfig(
                         relate,
                         mapped,
-                        list,
                         shiftClicked,
                         calledTimes,
+                        crafterID,
+                        list,
                         isMultipleDisplayCall
                     )
                 ))
             }
             list
         } ?: mutableListOf()
+    }
+
+    /**
+     * Get min amount
+     * @since 5.0.10
+     */
+    fun getMinAmount(
+        map: Map<CoordinateComponent, ItemStack>,
+        isCraftGUI: Boolean,
+        shift: Boolean
+    ): Int? {
+        if (!shift) return 1
+        return items.entries
+            .filter { (c, _) -> c in Converter.getAvailableCraftingSlotComponents() }
+            .filter { (c, _) -> map[c] != null }
+            .filter { (_, matter) -> !matter.mass }
+            .minOfOrNull { (c, matter) -> map[c]!!.amount / matter.amount }
     }
 }

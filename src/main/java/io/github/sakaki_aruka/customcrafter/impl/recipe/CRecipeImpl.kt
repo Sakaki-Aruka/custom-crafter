@@ -17,6 +17,7 @@ import io.github.sakaki_aruka.customcrafter.api.objects.result.ResultSupplier
  *
  * @param[name] A name of this recipe.
  * @param[items] Elements of this recipe.
+ * @param[type] A type of this recipe. (Normal or Amorphous (=Shapeless))
  * @param[containers] Containers of this recipe. (default = null)
  * @param[results] A [ResultSupplier] list. (default = null)
  * @param[filters] A recipe filters. (default = [getDefaultFilters])

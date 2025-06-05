@@ -1,6 +1,8 @@
 package io.github.sakaki_aruka.customcrafter.api.objects
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
+import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
+import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import kotlinx.serialization.json.Json
@@ -8,6 +10,7 @@ import org.bukkit.Material
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import java.util.Base64
+import kotlin.math.max
 
 /**
  * A view of crafting gui.
@@ -83,10 +86,8 @@ data class CraftView internal constructor(
      * @see[CustomCrafterAPI.getCraftingGUI]
      * @return[Inventory] Custom Crafter's gui
      */
-    fun toCraftingGUI(
-        dropItemsOnClose: Boolean = false
-    ): Inventory {
-        val gui: Inventory = CustomCrafterAPI.getCraftingGUI(dropItemsOnClose = dropItemsOnClose)
+    fun toCraftingGUI(): Inventory {
+        val gui: Inventory = CustomCrafterAPI.getCraftingGUI()
         this.materials.entries.forEach { (c, item) ->
             gui.setItem(c.x + c.y * 9, item)
         }
@@ -114,5 +115,57 @@ data class CraftView internal constructor(
                 converted[Int.MAX_VALUE] = Base64.getEncoder().encodeToString(result.serializeAsBytes())
             }
         return Json.encodeToString(converted)
+    }
+
+    /**
+     * decrement items from the provided CraftView
+     *
+     * if [forCustomSettings] is not null, this runs a process for CRecipe.
+     *
+     * only for Shift clicked
+     *
+     * @param[view] current CraftView
+     * @param[shiftUsed] a crafter used shift-click or not
+     * @param[forCustomSettings] a matched result info. (requires these when matched custom recipe)
+     * @since 5.0.8
+     */
+    fun getDecrementedCraftView(
+        shiftUsed: Boolean = true,
+        forCustomSettings: Pair<CRecipe, MappedRelation>? = null
+    ): CraftView {
+        val minAmount: Int = this.materials.minOf { (_, i) -> i.amount }
+        return forCustomSettings?.let { (cRecipe, mapped) ->
+            val map: MutableMap<CoordinateComponent, ItemStack> = mutableMapOf()
+            mapped.components.forEach { component ->
+                val matter: CMatter = cRecipe.items[component.recipe]!!
+                val isMass: Boolean = matter.mass
+                val decrementAmount: Int =
+                    if (isMass) 1
+                    else if (shiftUsed) (minAmount / matter.amount) * matter.amount
+                    else matter.amount
+                val newAmount: Int = max(0, this.materials[component.input]!!.amount - decrementAmount)
+                map[component.input] =
+                    if (newAmount == 0) ItemStack.empty()
+                    else let {
+                        val newItem: ItemStack = this.materials[component.input]?.clone() ?: ItemStack.empty()
+                        newItem.amount = newAmount
+                        newItem
+                    }
+            }
+            CraftView(map, ItemStack.empty())
+        } ?: run {
+            val map: MutableMap<CoordinateComponent, ItemStack> = mutableMapOf()
+            this.materials.forEach { (c, item) ->
+                val newAmount: Int = max(0, item.amount - if (shiftUsed) minAmount else 1)
+                map[c] =
+                    if (newAmount == 0) ItemStack.empty()
+                    else let {
+                        val newItem: ItemStack = item.clone()
+                        newItem.amount = newAmount
+                        newItem
+                    }
+            }
+            CraftView(map, ItemStack.empty())
+        }
     }
 }

@@ -1,13 +1,10 @@
 package io.github.sakaki_aruka.customcrafter.internal.listener
 
-import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
-import org.bukkit.Material
-import org.bukkit.World
-import org.bukkit.block.Block
+import io.github.sakaki_aruka.customcrafter.internal.gui.PageOpenTrigger
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.event.block.Action
 import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.inventory.Inventory
 
 /**
  * @suppress
@@ -15,22 +12,12 @@ import org.bukkit.event.player.PlayerInteractEvent
 object PlayerInteractListener: Listener {
     @EventHandler
     fun PlayerInteractEvent.onInteract() {
-        if (action != Action.RIGHT_CLICK_BLOCK) return
-        val clicked: Block = clickedBlock.takeIf { clickedBlock?.type == Material.CRAFTING_TABLE } ?: return
 
-        val x: Int = clicked.x
-        val y: Int = clicked.y
-        val z: Int = clicked.z
-        val world: World = clicked.world
-        val halfSideSize: Int = CustomCrafterAPI.BASE_BLOCK_SIDE / 2
-        val range: IntRange = (-1 * halfSideSize..halfSideSize)
-        for (dx: Int in range) {
-            for (dz: Int in range) {
-                if (world.getBlockAt(x + dx, y - 1, z + dz).type != CustomCrafterAPI.BASE_BLOCK) return
-            }
-        }
-
+        val inv: Inventory = PageOpenTrigger.getGUI(this)
+            ?.takeIf { gui -> gui is PageOpenTrigger }
+            ?.let { gui -> (gui as PageOpenTrigger).getFirstPage(this) }
+            ?: return
         isCancelled = true
-        player.openInventory(CustomCrafterAPI.getCraftingGUI(dropItemsOnClose = true))
+        player.openInventory(inv)
     }
 }
