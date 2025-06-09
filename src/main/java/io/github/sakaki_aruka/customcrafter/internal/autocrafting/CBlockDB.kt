@@ -106,6 +106,54 @@ internal object CBlockDB {
         val item = blob("item").bindTo { it.item }
     }
 
+    fun initTables() {
+        db.useConnection { conn ->
+            val statement = conn.createStatement()
+
+            val cBlockTableCreateSQL = """
+                CREATE TABLE IF NOT EXISTS c_block (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    world_id TEXT NOT NULL ,
+                    x INTEGER NOT NULL,
+                    y INTEGER NOT NULL,
+                    z INTEGER NOT NULL,
+                    version TEXT NOT NULL
+                );
+            """.trimIndent()
+            statement.executeUpdate(cBlockTableCreateSQL)
+
+            val recipeTableCreateSQL = """
+                CREATE TABLE IF NOT EXISTS c_block_recipe (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    block_id INTEGER NOT NULL,
+                    name TEXT NOT NULL
+                );
+            """.trimIndent()
+            statement.executeUpdate(recipeTableCreateSQL)
+
+            val ignoreSlotsCreateSQL = """
+                CREATE TABLE IF NOT EXISTS c_block_ignore_slot (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    block_id INTEGER NOT NULL,
+                    slot INTEGER NOT NULL
+                );
+            """.trimIndent()
+            statement.executeUpdate(ignoreSlotsCreateSQL)
+
+            val itemTableCreateSQL = """
+                CREATE TABLE IF NOT EXISTS c_block_item (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    block_id INTEGER NOT NULL,
+                    slot INTEGER NOT NULL,
+                    item BLOB NOT NULL
+                );
+            """.trimIndent()
+            statement.executeUpdate(itemTableCreateSQL)
+
+            statement.close()
+        }
+    }
+
     fun create(block: Block): CBlock? {
         db.insert(CBlockTable) {
             set(it.worldID, block.world.uid.toString())
@@ -275,7 +323,16 @@ internal object CBlockDB {
         }
     }
 
-    fun clear(block: Block) {
+    fun reset(block: Block, cBlock: CBlock): List<ItemStack> {
+        cBlock.recipes.clear() // Init
+        cBlock.ignoreSlots.addAll(Converter.getAvailableCraftingSlotIndices()) // Init (All Ignore)
+        val result: List<ItemStack> = cBlock.containedItems.values.toList()
+        cBlock.containedItems.clear() // Init
+        cBlock.update(block, setOf(CBlockTableType.C_BLOCK))
+        return result
+    }
+
+    fun allDelete(block: Block) {
         val id: Int = getBlockID(block)!!
         db.delete(CBlockTable) { it.id eq id }
         db.delete(CBlockRecipeTable) { it.blockID eq id }

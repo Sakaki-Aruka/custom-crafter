@@ -30,7 +30,7 @@ internal data class CBlock(
 
         fun fromBlock(block: Block): CBlock? = CBlockDB.read(block)
         fun create(block: Block): CBlock? = CBlockDB.create(block)
-        fun clear(block: Block) = CBlockDB.clear(block)
+        fun clear(block: Block) = CBlockDB.allDelete(block)
     }
 
     fun getCRecipes(
@@ -51,6 +51,8 @@ internal data class CBlock(
     fun updateOrCreate(block: Block, types: Set<CBlockDB.CBlockTableType>) {
         CBlockDB.updateOrCreate(block, this, types)
     }
+
+    fun reset(block: Block): List<ItemStack> = CBlockDB.reset(block, this)
 
     fun write(block: Block): Boolean {
         if (block.type != Material.CRAFTER) {

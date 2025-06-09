@@ -66,6 +66,7 @@ public final class CustomCrafter extends JavaPlugin {
         NoPlayerListener.Companion.getLISTENERS().add(AutoCraft.AutoCraftItemInputSignalReceiver.INSTANCE);
 
         InternalAPI.INSTANCE.runTests();
+        InternalAPI.INSTANCE.setup();
     }
 
     @Override

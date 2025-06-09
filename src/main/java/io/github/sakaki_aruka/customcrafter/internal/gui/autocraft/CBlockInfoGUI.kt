@@ -2,9 +2,11 @@ package io.github.sakaki_aruka.customcrafter.internal.gui.autocraft
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter
+import io.github.sakaki_aruka.customcrafter.impl.util.InventoryUtil.giveItems
 import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
 import io.github.sakaki_aruka.customcrafter.internal.autocrafting.AutoCraft
 import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlock
+import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlockDB
 import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterGUI
 import io.github.sakaki_aruka.customcrafter.internal.gui.PageOpenTrigger
 import io.github.sakaki_aruka.customcrafter.internal.gui.PredicateProvider
@@ -105,9 +107,10 @@ internal data class CBlockInfoGUI(
             53 -> {
                 // clear all data and open SlotModifyGUI
                 val crafter: Crafter = getBlock()?.let { b -> b.state as? Crafter } ?: return
-                CBlock.clear(crafter.block)
-                //val emptyCBlock = CBlock.create(crafter.block) ?: return //CBlock(recipes = mutableSetOf())
-                //emptyCBlock.write(crafter.block)
+                val cBlock: CBlock = CBlock.fromBlock(crafter.block) ?: return
+
+                (event.whoClicked as Player).giveItems(true, *cBlock.reset(crafter.block).toTypedArray())
+
                 val gui: Inventory = SlotsModifyGUI(
                     crafter.block.world.uid.toString(),
                     crafter.block.x,
