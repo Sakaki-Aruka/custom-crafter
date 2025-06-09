@@ -3,6 +3,7 @@ package io.github.sakaki_aruka.customcrafter.internal.gui.autocraft
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.AutoCraftRecipe
 import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlock
+import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlockDB
 import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterGUI
 import io.github.sakaki_aruka.customcrafter.internal.gui.ReactionProvider
 import kotlinx.serialization.SerialName
@@ -124,7 +125,8 @@ internal data class RecipeModifyGUI(
                 } else {
                     cBlock.recipes.add(recipe.getCBlockTitle())
                 }
-                cBlock.write(block)
+                //cBlock.write(block)
+                cBlock.update(block, setOf(CBlockDB.CBlockTableType.C_BLOCK))
             }
         }
     }

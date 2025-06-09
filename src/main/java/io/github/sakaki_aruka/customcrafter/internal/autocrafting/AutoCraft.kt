@@ -60,53 +60,52 @@ object AutoCraft {
 
             event.isCancelled = true
 
-            val (mergeResult: Boolean, list: List<ItemStack>) = tryItemMerge(cBlock, event.item)
-            if (!mergeResult) {
-                // drop items to crafter's location.
+            val (map: Map<Int, ItemStack>?, remaining: ItemStack?) = tryItemMerge(cBlock, event.item)
+            if (map == null && remaining == null) {
                 block.world.dropItem(block.getRelative(BlockFace.DOWN, 1).location, event.item)
                 return
+            } else if (map != null && remaining != null) {
+                block.world.dropItem(block.getRelative(BlockFace.DOWN, 1).location, remaining)
             }
 
-            cBlock.containedItems.clear()
-            list.forEach { item ->
-                cBlock.containedItems.add(item.serializeAsBytes())
-            }
-            cBlock.write(block)
+            CBlockDB.updateOrCreate(
+                block,
+                cBlock.copy(containedItems = map!!.toMutableMap()),
+                setOf(CBlockDB.CBlockTableType.ITEM)
+            )
         }
 
+
         /**
-         * Merges cBlock contained items and specified item.
-         *
-         * Returns a Pair (Boolean (merge result), List (new list what is the specified item added)) of a result to try merge.
-         *
-         * If addItem amount is over the cBlock contained items amount, returns (false, currentItems).
+         * Returns
+         * - (null to null)
+         * - (Map<Int, ItemStack>, ItemStack>)
+         * - (Map<Int, ItemStack>, null)
          */
         private fun tryItemMerge(
             cBlock: CBlock,
             addItem: ItemStack
-        ): Pair<Boolean, List<ItemStack>> {
-            val currentItems: List<ItemStack> = cBlock.containedItems
-                .map { itemBinary -> ItemStack.deserializeBytes(itemBinary) }
-            if (addItem.amount == 0 || currentItems.size > 36) return (false to currentItems)
+        ): Pair<Map<Int, ItemStack>?, ItemStack?> {
+            if (addItem.amount == 0 || cBlock.containedItems.size > 36) return (null to null)
             var amount: Int = addItem.amount
-            val addAmounts: MutableList<Int> = mutableListOf()
-            for (item: ItemStack in currentItems) {
+            val addAmounts: MutableMap<Int, Int> = mutableMapOf() // (index, amount)
+            for ((slot: Int, item: ItemStack) in cBlock.containedItems.entries) {
                 if (amount == 0) break
-                else if (!item.isSimilar(addItem) || item.amount == item.type.maxStackSize) {
-                    addAmounts.add(0)
-                    continue
-                }
+                else if (!item.isSimilar(addItem) || item.amount == item.type.maxStackSize) continue
                 val enableAddAmount: Int = min(item.type.maxStackSize - item.amount, amount)
                 amount -= enableAddAmount
-                addAmounts.add(enableAddAmount)
+                addAmounts[slot] = enableAddAmount
             }
 
-            if (amount != 0) return (false to currentItems)
-
-            val newList: List<ItemStack> = currentItems.withIndex().map { (index, item) ->
-                item.clone().asQuantity(item.amount + addAmounts[index])
+            val modifiedItems: Map<Int, ItemStack> = cBlock.containedItems.entries.associate { (index, item) ->
+                if (index !in addAmounts.keys) index to item
+                else index to item.asQuantity(item.amount + addAmounts[index]!!)
             }
-            return (true to newList)
+            return if (amount != 0) {
+                modifiedItems to addItem.asQuantity(amount) // remaining contained
+            } else {
+                modifiedItems to null // all merged (success)
+            }
         }
 
         override fun <T : Event> predicate(event: T): Boolean? {
@@ -144,17 +143,12 @@ object AutoCraft {
         if (!block.chunk.isLoaded) return
         else if (cBlock.recipes.isEmpty()) return
 
-        val elements: List<ItemStack> = cBlock.containedItems
-            .map { itemBinary -> ItemStack.deserializeBytes(itemBinary) }
-
-        if (36 - cBlock.ignoreSlots.size != elements.size) return
+        if (36 - cBlock.ignoreSlots.size != cBlock.containedItems.values.filter { i -> !i.isEmpty }.size) return
 
         val pseudoInventory: Inventory = CustomCrafterAPI.getCraftingGUI()
-        Converter.getAvailableCraftingSlotIndices()
-            .zip(elements)
-            .forEach { (index, item) ->
-                pseudoInventory.setItem(index, item)
-            }
+        cBlock.containedItems.entries.forEach { (index, item) ->
+            pseudoInventory.setItem(index, item)
+        }
         val sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes()
             .filterIsInstance<AutoCraftRecipe>()
             .filter { r -> r.getCBlockTitle() in cBlock.recipes }
