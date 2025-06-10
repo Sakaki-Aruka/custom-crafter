@@ -7,6 +7,7 @@ import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
 import io.github.sakaki_aruka.customcrafter.internal.autocrafting.AutoCraft
 import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlock
+import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlockDB
 import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterGUI
 import io.github.sakaki_aruka.customcrafter.internal.gui.PageOpenTrigger
 import io.github.sakaki_aruka.customcrafter.internal.gui.PredicateProvider
@@ -144,7 +145,7 @@ internal data class SlotsModifyGUI(
             .firstOrNull { w -> w.uid.toString() == this.worldID }
             ?.getBlockAt(targetBlockX, targetBlockY, targetBlockZ)
             ?: return
-        val cBlock:CBlock = CBlock.fromBlock(block) ?: CBlock(recipes = mutableSetOf())
+        val cBlock:CBlock = CBlock.fromBlock(block) ?: CBlock.create(block) ?: return //CBlock(recipes = mutableSetOf())
         if (!isTopInventory) return
 
         when (event.rawSlot) {
@@ -158,12 +159,14 @@ internal data class SlotsModifyGUI(
                     cBlock.ignoreSlots.remove(event.rawSlot)
                     inventory.setItem(event.rawSlot, PLACEABLE_SLOT)
                 }
-                cBlock.write(block)
+                //cBlock.write(block)
+                cBlock.update(block, setOf(CBlockDB.CBlockTableType.C_BLOCK))
             }
 
             contextComponentSlot -> {
 
-                cBlock.write(block)
+                //cBlock.write(block)
+                cBlock.update(block, setOf(CBlockDB.CBlockTableType.C_BLOCK))
 
                 val autoCraftRecipes: Set<AutoCraftRecipe> = getAvailableRecipeWithGivenSlots(
                     targetBlock = block,

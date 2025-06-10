@@ -131,16 +131,24 @@
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <relocations>
                                 <relocation>
-                                    <pattern>kotlin</pattern>
-                                    <shadedPattern>io.github.sakaki_aruka.shaded.kotlin</shadedPattern>
+                                    <pattern>org.jetbrains.kotlin</pattern>
+                                    <shadedPattern>kotlin.shade.io.github.sakaki_aruka</shadedPattern>
                                 </relocation>
                                 <relocation>
-                                    <pattern>kotlinx</pattern>
-                                    <shadedPattern>io.github.sakaki_aruka.shaded.kotlinx</shadedPattern>
+                                    <pattern>org.jetbrains.kotlinx</pattern>
+                                    <shadedPattern>kotlinx.shaded.io.github.sakaki_aruka</shadedPattern>
                                 </relocation>
                                 <relocation>
-                                    <pattern>kotlin.reflect</pattern>
-                                    <shadedPattern>io.github.sakaki_aruka.shaded.kotlin.reflect</shadedPattern>
+                                    <pattern>org.xerial</pattern>
+                                    <shadedPattern>xerial.shaded.io.github.sakaki_aruka</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>com.zaxxer</pattern>
+                                    <shadedPattern>zaxxer.shaded.io.github.sakaki_aruka</shadedPattern>
+                                </relocation>
+                                <relocation>
+                                    <pattern>org.ktorm</pattern>
+                                    <shadedPattern>ktorm.shaded.io.github.sakaki_aruka</shadedPattern>
                                 </relocation>
                             </relocations>
                         </configuration>
@@ -187,6 +195,24 @@
             <groupId>org.jetbrains.kotlinx</groupId>
             <artifactId>kotlinx-serialization-json</artifactId>
             <version>${serialization.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.ktorm</groupId>
+            <artifactId>ktorm-core</artifactId>
+            <version>4.1.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.49.1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+            <version>6.3.0</version>
         </dependency>
 
         <dependency>

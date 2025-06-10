@@ -47,6 +47,17 @@ object CustomCrafterAPI {
      */
     var USE_AUTO_CRAFTING_FEATURE = false
 
+    /**
+     * AutoCrafting feature compatibilities.
+     *
+     * - KEY: Target version
+     * - VALUE: Versions what are compatible with the target version
+     * @since 5.0.10
+     */
+    val AUTO_CRAFTING_CONFIG_COMPATIBILITIES: Map<String, Set<String>> = mapOf(
+        "5.0.10" to setOf("5.0.10")
+    )
+
 
     internal var BASE_BLOCK_SIDE: Int = 3
     const val CRAFTING_TABLE_MAKE_BUTTON_SLOT: Int = 35
