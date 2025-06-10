@@ -5,6 +5,7 @@ import com.zaxxer.hikari.HikariDataSource
 import io.github.sakaki_aruka.customcrafter.CustomCrafter
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter
+import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
 import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 import org.ktorm.database.Database
@@ -342,6 +343,20 @@ internal object CBlockDB {
 
     fun read(block: Block): CBlock? {
         val id: Int = getBlockID(block) ?: return null
+
+        val version: String = db.from(CBlockTable)
+            .select(CBlockTable.version)
+            .where { CBlockTable.id eq id }
+            .mapNotNull { row -> row[CBlockTable.version] }
+            .firstOrNull() ?: return null
+
+        if (version !in CustomCrafterAPI.AUTO_CRAFTING_CONFIG_COMPATIBILITIES.keys) {
+            return null
+        } else if (version !in CustomCrafterAPI.AUTO_CRAFTING_CONFIG_COMPATIBILITIES[version]!!) {
+            InternalAPI.warn("This CBlock has not compatible with this CustomCrafter version. (target=${version}, current=${CustomCrafterAPI.API_VERSION} / WorldID=${block.world.name}, X=${block.location.blockX}, Y=${block.location.blockY}, Z=${block.location.blockZ} / c_block id (DB)=$id)")
+            return null
+        }
+
         val recipes: MutableSet<String> = db.from(CBlockRecipeTable)
             .select(CBlockRecipeTable.name)
             .where { CBlockRecipeTable.blockID eq id }

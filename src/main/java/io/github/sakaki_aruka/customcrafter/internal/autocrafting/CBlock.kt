@@ -1,17 +1,11 @@
 package io.github.sakaki_aruka.customcrafter.internal.autocrafting
 
-import io.github.sakaki_aruka.customcrafter.CustomCrafter
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.AutoCraftRecipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter
-import kotlinx.serialization.json.Json
-import org.bukkit.Material
-import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
-import org.bukkit.block.Crafter
 import org.bukkit.inventory.ItemStack
-import org.bukkit.persistence.PersistentDataType
 
 /**
  * A block class for Auto Crafting feature.
@@ -26,8 +20,6 @@ internal data class CBlock(
     val containedItems: MutableMap<Int, ItemStack> = mutableMapOf()
 ) {
     companion object {
-        private val KEY = NamespacedKey(CustomCrafter.getInstance(), "custom_crafter_auto_crafting_key")
-
         fun fromBlock(block: Block): CBlock? = CBlockDB.read(block)
         fun create(block: Block): CBlock? = CBlockDB.create(block)
         fun clear(block: Block) = CBlockDB.allDelete(block)
@@ -53,15 +45,4 @@ internal data class CBlock(
     }
 
     fun reset(block: Block): List<ItemStack> = CBlockDB.reset(block, this)
-
-    fun write(block: Block): Boolean {
-        if (block.type != Material.CRAFTER) {
-            throw IllegalArgumentException("'block' type must be 'Material.CRAFTER'.")
-        }
-        val crafter: Crafter = block.state as Crafter
-        crafter.apply {
-            persistentDataContainer.set(KEY, PersistentDataType.STRING, Json.encodeToString(this@CBlock))
-        }.update(true)
-        return fromBlock(block)?.let { c -> c == this } ?: false
-    }
 }
