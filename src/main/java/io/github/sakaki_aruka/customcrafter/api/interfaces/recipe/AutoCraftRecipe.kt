@@ -82,9 +82,19 @@ interface AutoCraftRecipe: CRecipe {
 
     /**
      * An identifier of this recipe.
+     *
+     * You do not change this value without changing [CRecipe.type] and [CRecipe.items] coordinates.
      */
     val autoCraftID: UUID
+
+    /**
+     * This lambda provides a displayed item to players when they set auto crafting recipes.
+     */
     val autoCraftDisplayItemProvider: (Player) -> ItemStack
+
+    /**
+     * [ResultSupplier]s to provide result items on auto crafting.
+     */
     val autoCraftResults: List<ResultSupplier>?
 
     /**
