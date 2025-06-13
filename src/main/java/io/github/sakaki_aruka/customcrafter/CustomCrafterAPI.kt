@@ -5,7 +5,6 @@ import io.github.sakaki_aruka.customcrafter.api.event.UnregisterCustomRecipeEven
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.AutoCraftRecipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
-import io.github.sakaki_aruka.customcrafter.internal.listener.InventoryCloseListener
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.search.Search
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter
@@ -22,12 +21,35 @@ import org.bukkit.inventory.Recipe
 import org.bukkit.persistence.PersistentDataType
 
 object CustomCrafterAPI {
+    /**
+     * Custom Crafter API version.
+     *
+     * This version is different with the plugin version string.
+     */
     const val API_VERSION: String = "0.1.9"
+
+    /**
+     * Custom Crafter API is stable or not.
+     */
     const val IS_STABLE: Boolean = false
+
+    /**
+     * Custom Crafter API is beta or not.
+     */
     const val IS_BETA: Boolean = true
 
+    /**
+     * Custom Crafter API author names
+     */
     val AUTHORS: Set<String> = setOf("Sakaki-Aruka")
 
+    /**
+     * If this true, the Custom Crafter API does not give result items to players.
+     *
+     * You have to set this to true if you want to give result items processing in your plugin.
+     *
+     * (Default Value is `false`)
+     */
     var RESULT_GIVE_CANCEL: Boolean = false
     internal var BASE_BLOCK: Material = Material.GOLD_BLOCK
 
