@@ -26,7 +26,7 @@ object CustomCrafterAPI {
      *
      * This version is different with the plugin version string.
      */
-    const val API_VERSION: String = "0.1.9"
+    const val API_VERSION: String = "0.1.10"
 
     /**
      * Custom Crafter API is stable or not.
@@ -77,7 +77,7 @@ object CustomCrafterAPI {
      * @since 5.0.10
      */
     val AUTO_CRAFTING_CONFIG_COMPATIBILITIES: Map<String, Set<String>> = mapOf(
-        "5.0.10" to setOf("5.0.10")
+        "0.1.10" to setOf("0.1.10")
     )
 
 
