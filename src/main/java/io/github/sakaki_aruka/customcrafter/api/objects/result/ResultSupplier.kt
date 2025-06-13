@@ -51,8 +51,8 @@ data class ResultSupplier (
         override val mapped: Map<CoordinateComponent, ItemStack>,
         override val shiftClicked: Boolean,
         override val calledTimes: Int,
+        override val list: MutableList<ItemStack>,
         val crafterID: UUID,
-        val list: MutableList<ItemStack>,
         val isMultipleDisplayCall: Boolean
       ): ResultSupplierConfig
 
@@ -77,8 +77,8 @@ data class ResultSupplier (
         override val mapped: Map<CoordinateComponent, ItemStack>,
         override val shiftClicked: Boolean = true,
         override val calledTimes: Int,
-        val autoCrafterBlock: Block,
-        val list: MutableList<ItemStack>
+        override val list: MutableList<ItemStack>,
+        val autoCrafterBlock: Block
     ): ResultSupplierConfig
 
     companion object {

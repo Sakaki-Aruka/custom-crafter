@@ -14,4 +14,5 @@ interface ResultSupplierConfig {
     val mapped: Map<CoordinateComponent, ItemStack>
     val shiftClicked: Boolean
     val calledTimes: Int
+    val list: MutableList<ItemStack>
 }
