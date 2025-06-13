@@ -1,7 +1,7 @@
 package io.github.sakaki_aruka.customcrafter.api.search
 
-import io.github.sakaki_aruka.customcrafter.api.`object`.recipe.CoordinateComponent
-import io.github.sakaki_aruka.customcrafter.api.processor.Converter
+import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
+import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.World
@@ -41,9 +41,10 @@ object VanillaSearch {
             dy = minCoordinate.y,
             safeTrim = false
         ).sortedBy { c -> c.toIndex() }
-            .forEach { c ->
+            .takeIf { arr -> arr.containsAll(mapped.keys) }
+            ?.forEach { c ->
                 list.add(mapped[c] ?: ItemStack.empty())
-            }
+            } ?: return null
         return list.toTypedArray()
     }
 }

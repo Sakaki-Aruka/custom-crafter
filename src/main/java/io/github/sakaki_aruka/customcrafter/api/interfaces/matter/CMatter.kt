@@ -1,8 +1,8 @@
 package io.github.sakaki_aruka.customcrafter.api.interfaces.matter
 
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
-import io.github.sakaki_aruka.customcrafter.api.`object`.matter.CMatterPredicate
-import io.github.sakaki_aruka.customcrafter.api.`object`.recipe.CoordinateComponent
+import io.github.sakaki_aruka.customcrafter.api.objects.matter.CMatterPredicate
+import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import java.util.UUID
