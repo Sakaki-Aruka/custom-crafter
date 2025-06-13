@@ -4,7 +4,7 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import org.bukkit.inventory.ItemStack
 
-import io.github.sakaki_aruka.customcrafter.impl.recipe.filter.EnchantFilter
+import io.github.sakaki_aruka.customcrafter.api.`object`.recipe.filter.EnchantFilter
 import org.bukkit.inventory.meta.ItemMeta
 
 /**

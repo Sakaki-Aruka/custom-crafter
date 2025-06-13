@@ -1,6 +1,6 @@
 package io.github.sakaki_aruka.customcrafter.api.interfaces.matter
 
-import io.github.sakaki_aruka.customcrafter.api.objects.matter.potion.CPotionComponent
+import io.github.sakaki_aruka.customcrafter.api.`object`.matter.potion.CPotionComponent
 
 /**
  * This interface's implementing types will be subject to checks regarding potion effects when used as materials.

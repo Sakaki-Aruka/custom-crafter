@@ -1,6 +1,6 @@
 package io.github.sakaki_aruka.customcrafter.api.event
 
-import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
+import io.github.sakaki_aruka.customcrafter.api.`object`.CraftView
 import io.github.sakaki_aruka.customcrafter.api.search.Search
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
