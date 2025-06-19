@@ -58,7 +58,7 @@ The latest provided version
    <dependency>
       <groupId>com.github.Sakaki-Aruka</groupId>
       <artifactId>custom-crafter</artifactId>
-      <version>5.0.9</version>
+      <version>5.0.10-1</version>
    </dependency>
 </dependencies>
 
@@ -82,7 +82,7 @@ dependencyResolutionManagement {
 (dependency)
 ```groovy
 dependencies {
-   implementation 'com.github.Sakaki-Aruka:custom-crafter:5.0.9'
+   implementation 'com.github.Sakaki-Aruka:custom-crafter:5.0.10-1'
 }
 ```
 
@@ -103,7 +103,7 @@ repositories {
 (dependency)
 ```
 dependencies {
-    implementation("com.github.Sakaki-Aruka:custom-crafter:5.0.9")
+    implementation("com.github.Sakaki-Aruka:custom-crafter:5.0.10-1")
 }
 ```
 
@@ -163,7 +163,7 @@ It allows you to retrieve various conditions during crafting and determine the f
 ```Kotlin
 // In Kotlin
 val supplier = ResultSupplier { config ->
-    // 'config' is ResultSupplier.Config. 
+    // 'config' is 'ResultSupplier.NormalConfig' or 'ResultSupplier.AutoCraftConfig'. 
     // This contains some useful values.
     
     // Write processes here.
