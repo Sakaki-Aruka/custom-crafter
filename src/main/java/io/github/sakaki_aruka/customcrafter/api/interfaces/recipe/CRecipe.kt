@@ -37,16 +37,24 @@ interface CRecipe {
      * @param[mapped] coordinates and input items relation.
      * @param[results] generated results by this recipe.
      */
-    fun runContainers(
+    fun runNormalContainers(
         crafterID: UUID,
         relate: MappedRelation,
         mapped: Map<CoordinateComponent, ItemStack>,
         results: MutableList<ItemStack>,
         isMultipleDisplayCall: Boolean
     ) {
-        containers?.forEach { container ->
-            container.run(crafterID, relate, mapped, results, isMultipleDisplayCall)
+        containers?.let { containers ->
+            containers.filter { c ->
+                c.predicate is CRecipeContainer.NormalPredicate
+                        && c.consumer is CRecipeContainer.NormalConsumer
+            }.filter { c ->
+                (c.predicate as CRecipeContainer.NormalPredicate)(crafterID, relate, mapped, results, isMultipleDisplayCall)
+            }.forEach { c ->
+                (c.consumer as CRecipeContainer.NormalConsumer)(crafterID, relate, mapped, results, isMultipleDisplayCall)
+            }
         }
+
     }
 
     /**

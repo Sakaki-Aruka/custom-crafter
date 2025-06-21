@@ -2,9 +2,12 @@ package io.github.sakaki_aruka.customcrafter.api.interfaces.recipe
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
+import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeContainer
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.objects.result.ResultSupplier
+import io.github.sakaki_aruka.customcrafter.api.search.Search
+import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlock
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -93,9 +96,14 @@ interface AutoCraftRecipe: CRecipe {
     val autoCraftDisplayItemProvider: (Player) -> ItemStack
 
     /**
-     * [ResultSupplier]s to provide result items on auto crafting.
+     * [ResultSupplier] to provide result items on auto crafting.
      */
     val autoCraftResults: List<ResultSupplier>?
+
+    /**
+     * [CRecipeContainer] what are run on auto crafting.
+     */
+    val autoCraftContainers: List<CRecipeContainer>?
 
     /**
      * Returns a string for CBlock data write.
@@ -139,7 +147,7 @@ interface AutoCraftRecipe: CRecipe {
      * @param[mapped] Input coordinates and input items relation.
      * @param[calledTimes] Called times ( = minimal input item's amount).
      * @return[MutableList] (MutableList<ItemStack>) Generated items list. If no item supplier applied, returns an empty list.
-     * @since 5.0.10
+     * @since 5.0.10-1
      */
     fun getAutoCraftResults(
         block: Block,
@@ -147,6 +155,36 @@ interface AutoCraftRecipe: CRecipe {
         mapped: Map<CoordinateComponent, ItemStack>,
         calledTimes: Int
     ): MutableList<ItemStack> {
-        return mutableListOf() // TODO impl
+        val list: MutableList<ItemStack> = mutableListOf()
+        autoCraftResults?.map { supplier ->
+            supplier.func(ResultSupplier.AutoCraftConfig(
+                relation = relate,
+                mapped = mapped,
+                calledTimes = calledTimes,
+                list = list,
+                autoCrafterBlock = block
+            ))
+        }?.forEach { itemList ->
+            list.addAll(itemList)
+        }
+        return list
+    }
+
+    fun runAutoCraftContainers(
+        block: Block,
+        relate: MappedRelation,
+        mapped: Map<CoordinateComponent, ItemStack>,
+        results: MutableList<ItemStack>
+    ) {
+        autoCraftContainers?.let { containers ->
+            containers.filter { c ->
+                c.predicate is CRecipeContainer.AutoCraftPredicate
+                        && c.consumer is CRecipeContainer.AutoCraftConsumer
+            }.filter { c->
+                (c.predicate as CRecipeContainer.AutoCraftPredicate)(block, relate, mapped, results)
+            }.forEach { c ->
+                (c.consumer as CRecipeContainer.AutoCraftConsumer)(block, relate, mapped, results)
+            }
+        }
     }
 }

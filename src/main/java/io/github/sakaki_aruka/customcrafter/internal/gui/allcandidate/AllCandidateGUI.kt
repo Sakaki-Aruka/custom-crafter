@@ -49,9 +49,9 @@ internal data class AllCandidateGUI(
     }
 
     override fun getConstantItems(): Map<Int, ItemStack> {
-        return (45..53).map { i ->
-            i to CustomCrafterGUI.UN_CLICKABLE_SLOT
-        }.toMap()
+        return (45..53).associateWith { i ->
+            CustomCrafterGUI.UN_CLICKABLE_SLOT
+        }
     }
 
     override fun write(contextItem: ItemStack): ItemStack? {
@@ -226,15 +226,13 @@ internal data class AllCandidateGUI(
             calledTimes = minAmount,
             isMultipleDisplayCall = true
         ).let { results ->
-            recipe.containers?.forEach { container ->
-                container.run(
-                    crafterID = player.uniqueId,
-                    relate = relate,
-                    mapped = view.materials,
-                    list = results,
-                    isMultipleDisplayCall = true
-                )
-            }
+            recipe.runNormalContainers(
+                crafterID = player.uniqueId,
+                relate = relate,
+                mapped = view.materials,
+                results = results,
+                isMultipleDisplayCall = true
+            )
         }
 
         return view.getDecrementedCraftView(shiftUsed = isShiftUsed)

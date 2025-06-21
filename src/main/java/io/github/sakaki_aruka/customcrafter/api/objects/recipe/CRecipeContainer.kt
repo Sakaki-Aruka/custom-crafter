@@ -2,6 +2,7 @@ package io.github.sakaki_aruka.customcrafter.api.objects.recipe
 
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
+import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 import java.util.UUID
 
@@ -13,8 +14,11 @@ import java.util.UUID
  * When crafting and a predicate is true, consumer runs.
  */
 data class CRecipeContainer(
-    val consumers: List<Pair<Predicate, Consumer>>
+    val predicate: Predicate,
+    val consumer: Consumer
 ) {
+    sealed interface Predicate
+    sealed interface Consumer
 
     /**
      * A predicate of [CRecipeContainer].
@@ -28,30 +32,25 @@ data class CRecipeContainer(
      * predicate return
      * - [Boolean]: a result of this predicate.
      *
-     * ```
-     * // Java
-     * CRecipeContainer.Predicate predicate = new CRecipeContainer.Predicate((crafterID, relate, mapped, list) ->
-     *   Bukkit.getPlayer(crafterID) != null
-     * );
-     *
+     * ```kotlin
      * // Kotlin
-     * val predicate = CRecipeContainer.Predicate = CRecipeContainer.Predicate { crafterID, relate, mapped, list ->
+     * val predicate = CRecipeContainer.NormalPredicate { crafterID, relate, mapped, list ->
      *   Bukkit.getPlayer(crafterID) != null
      * }
      * ```
      *
      * @param[func] a function what checks elements.
      */
-    data class Predicate(
-        val func: Function5<UUID, MappedRelation, Map<CoordinateComponent, ItemStack>, MutableList<ItemStack>, Boolean, Boolean>
-    ) {
+    data class NormalPredicate(
+        val func: (UUID, MappedRelation, Map<CoordinateComponent, ItemStack>, MutableList<ItemStack>, Boolean) -> Boolean
+    ): Predicate {
         operator fun invoke(
             crafterID: UUID,
             relate: MappedRelation,
             mapped: Map<CoordinateComponent, ItemStack>,
             list: MutableList<ItemStack>,
-            isMultipleDisplayCall: Boolean
-        ): Boolean = func(crafterID, relate, mapped, list, isMultipleDisplayCall)
+            isMutableDisplayCall: Boolean
+        ): Boolean = func(crafterID, relate, mapped, list, isMutableDisplayCall)
 
         companion object {
             /**
@@ -61,8 +60,24 @@ data class CRecipeContainer(
              * val True: Predicate = Predicate { _, _, _, _ -> true }
              * ```
              */
-            val True: Predicate = Predicate { _, _, _, _, _ -> true }
+            val True: NormalPredicate = NormalPredicate { _, _, _, _, _ -> true }
         }
+    }
+
+    /**
+     * @since 5.0.10-1
+     */
+    data class AutoCraftPredicate(
+        val func: (Block, MappedRelation, Map<CoordinateComponent, ItemStack>, MutableList<ItemStack>) -> Boolean
+    ): Predicate {
+
+
+        operator fun invoke(
+            block: Block,
+            relate: MappedRelation,
+            mapped: Map<CoordinateComponent, ItemStack>,
+            list: MutableList<ItemStack>
+        ): Boolean = func(block, relate, mapped, list)
     }
 
     /**
@@ -75,59 +90,38 @@ data class CRecipeContainer(
      * - isMultipleDisplayCall: called from multiple craft result candidate collector or not (since 5.0.10)
      * consumer return
      * - [Unit]: Unit likes void.
-     * ```
-     * // call example from Java
-     * Consumer consumer = new CRecipeContainer.Consumer((crafterID, relate, mapped, list) -> {
-     *   System.out.println("foo~~!!!");
-     *
-     *   // kotlin's "Unit" likes Java's "void".
-     *   return kotlin.Unit.INSTANCE
-     * });
-     *
+     * ```kotlin
      * // call example from Kotlin
-     * val consumer = CRecipeContainer.Consumer { crafterID, relate, mapped, list ->
+     * val consumer = CRecipeContainer.NormalConsumer { crafterID, relate, mapped, list ->
      *   println("foo~~~!!!")
      * }
      * ```
      *
      * @param[func] a function what consume input data
      */
-    data class Consumer(
-        val func: Function5<UUID, MappedRelation, Map<CoordinateComponent, ItemStack>, MutableList<ItemStack>, Boolean, Unit>
-    ) {
-        operator fun invoke(
-            crafterID: UUID,
-            relate: MappedRelation,
-            mapped: Map<CoordinateComponent, ItemStack>,
-            list: MutableList<ItemStack>,
-            isMultipleDisplayCall: Boolean
+    data class NormalConsumer(
+        val func: (UUID, MappedRelation, Map<CoordinateComponent, ItemStack>, MutableList<ItemStack>, Boolean) -> Unit
+    ): Consumer {
+
+
+        operator fun invoke(crafterID: UUID,
+                            relate: MappedRelation,
+                            mapped: Map<CoordinateComponent, ItemStack>,
+                            list: MutableList<ItemStack>,
+                            isMultipleDisplayCall: Boolean
         ): Unit = func(crafterID, relate, mapped, list, isMultipleDisplayCall)
     }
 
-    /**
-     * run all containers
-     * ```
-     *         consumers
-     *             .filter { (p, _) -> p.func.invoke(player, relate, mapped, list) }
-     *             .forEach { (_, c) -> c.func.invoke(player, relate, mapped, list) }
-     * ```
-     *
-     * @param[crafterID] a crafter's uuid
-     * @param[relate] a coordinate mapping between a [CRecipe] and an input Inventory
-     * @param[mapped] a coordinate and input items mapping
-     * @param[list] result items that are made by a [CRecipe]
-     * @param[isMultipleDisplayCall] called from multiple craft result candidate collector or not (since 5.0.10)
-     * @return[Unit] no return elements
-     */
-    fun run(
-        crafterID: UUID,
-        relate: MappedRelation,
-        mapped: Map<CoordinateComponent, ItemStack>,
-        list: MutableList<ItemStack>,
-        isMultipleDisplayCall: Boolean
-    ) {
-        consumers
-            .filter { (p, _) -> p.func.invoke(crafterID, relate, mapped, list, isMultipleDisplayCall) }
-            .forEach { (_, c) -> c.func.invoke(crafterID, relate, mapped, list, isMultipleDisplayCall) }
+    data class AutoCraftConsumer(
+        val func: (Block, MappedRelation, Map<CoordinateComponent, ItemStack>, MutableList<ItemStack>) -> Unit
+    ): Consumer {
+
+
+        operator fun invoke(
+            block: Block,
+            relate: MappedRelation,
+            mapped: Map<CoordinateComponent, ItemStack>,
+            list: MutableList<ItemStack>
+        ) = func(block, relate, mapped, list)
     }
 }

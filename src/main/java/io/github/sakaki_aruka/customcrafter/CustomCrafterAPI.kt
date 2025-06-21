@@ -161,8 +161,11 @@ object CustomCrafterAPI {
      * ```
      * @since 5.0.10
      */
-    var AUTO_CRAFTING_RESULT_PICKUP_RESOLVER: (List<CRecipe>, Search.SearchResult, Block) -> Pair<Pair<CRecipe, MappedRelation>?, Recipe?> = { _, result, _ ->
-        result.customs().firstOrNull() to result.vanilla()
+    var AUTO_CRAFTING_RESULT_PICKUP_RESOLVER: (List<CRecipe>, Search.SearchResult, Block)
+        -> Triple<AutoCraftRecipe?, MappedRelation?, Recipe?> = { _, result, _ ->
+            result.customs().firstOrNull { (recipe, _) -> recipe is AutoCraftRecipe }?.let { (recipe, relation) ->
+                Triple(recipe as AutoCraftRecipe, relation, result.vanilla())
+            } ?: Triple(null, null, result.vanilla())
     }
 
     /**
