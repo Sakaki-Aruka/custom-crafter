@@ -17,6 +17,8 @@ internal object APITest {
         tooOldTest()
         randomCoordinatesTest()
         allCandidateTest()
+
+        CAssert.assertTrue(false) // Fail test line
     }
 
     private fun randomCoordinatesTest() {
