@@ -1,9 +1,9 @@
 name: PaperMC Plugin Test
 
 on:
-  pull_request_target:
-    types:
-      - closed
+  push:
+    branches:
+      - actions-test
 
 jobs:
   build-and-test:
