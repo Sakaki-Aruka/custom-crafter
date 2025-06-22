@@ -65,6 +65,7 @@ object CAssert {
         }
 
         destination.writeLines(LOGS, Charset.defaultCharset(), StandardOpenOption.APPEND)
+        InternalAPI.info("[CAssert LogFlush] ${LOGS.size} lines flushed to '${destination.name}'.")
         LOGS.clear()
     }
 
