@@ -33,7 +33,7 @@ data class AutoCraftRecipeImpl(
     override val results: List<ResultSupplier>? = null,
     override val filters: Set<CRecipeFilter<CMatter>>? = getDefaultFilters(),
     override val autoCraftResults: List<ResultSupplier>? = null,
-    override val autoCraftContainers: List<CRecipeContainer>?
+    override val autoCraftContainers: List<CRecipeContainer>? = null
 ): AutoCraftRecipe {
     override fun replaceItems(newItems: Map<CoordinateComponent, CMatter>): CRecipe {
         return AutoCraftRecipeImpl(
