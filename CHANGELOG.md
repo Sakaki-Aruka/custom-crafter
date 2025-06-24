@@ -1,5 +1,18 @@
 # Changelog
 
+# 5.0.10-1
+## Code
+- [Fixed] CAssert log option arguments and a function
+- [Added] CRecipeContainer.(Normal / AutoCraft)(Consumer / Predicate)
+- [Changed] CRecipeContainer.Consumer / Predicate become marker interfaces
+- [Deleted] CraftingGUIAccessor
+## Document
+- [Improved] Rewrite GitHub Wiki pages what are parts of fixed (ResultSupplier, CRecipeContainer and more...)
+- [Added] GitHub Wiki pages what are added in 5.0.10*. (AutoCraftRecipe, ...)
+
+## CI/CD
+- [CI / Added] Test of Custom Crafter features on GitHub Actions
+
 # 5.0.10
 ## Feature
 - [Added] auto crafting
