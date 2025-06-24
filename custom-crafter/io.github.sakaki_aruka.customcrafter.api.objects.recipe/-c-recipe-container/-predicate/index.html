@@ -65,88 +65,11 @@
   <div class="breadcrumbs"><a href="../../../../index.html">custom-crafter</a><span class="delimiter">/</span><a href="../../index.html">io.github.sakaki_aruka.customcrafter.api.objects.recipe</a><span class="delimiter">/</span><a href="../index.html">CRecipeContainer</a><span class="delimiter">/</span><span class="current">Predicate</span></div>
   <div class="cover ">
     <h1 class="cover"><span><span>Predicate</span></span></h1>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="custom-crafter/JVM"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="index.html">Predicate</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>func<span class="token operator">: </span><span class="token punctuation">(</span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/UUID.html">UUID</a><span class="token punctuation">, </span><a href="../../../io.github.sakaki_aruka.customcrafter.api.objects/-mapped-relation/index.html">MappedRelation</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><a href="../../-coordinate-component/index.html">CoordinateComponent</a><span class="token punctuation">, </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-mutable-list/index.html">MutableList</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span></div><p class="paragraph">A predicate of <a href="../index.html">CRecipeContainer</a>.</p><p class="paragraph">predicate params</p><ul><li><p class="paragraph">crafterID(<a href="https://docs.oracle.com/javase/8/docs/api/java/util/UUID.html">UUID</a>): crafter's UUID.</p></li><li><p class="paragraph">relate(<a href="../../../io.github.sakaki_aruka.customcrafter.api.objects/-mapped-relation/index.html">MappedRelation</a>): coordinate relation with recipes and inputs</p></li><li><p class="paragraph">mapped(<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><<a href="../../-coordinate-component/index.html">CoordinateComponent</a>, <span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span>>): a mapping of input inventory</p></li><li><p class="paragraph">list(<a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-mutable-list/index.html">MutableList</a><<span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span>>): provided result items contained list. you can modify its components.</p></li><li><p class="paragraph">isMultipleDisplayCall: called from multiple craft result candidate collector or not (since 5.0.10) predicate return</p></li><li><p class="paragraph"><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a>: a result of this predicate.</p></li></ul><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">// Java<br>CRecipeContainer.Predicate predicate = new CRecipeContainer.Predicate((crafterID, relate, mapped, list) -&gt;<br>  Bukkit.getPlayer(crafterID) != null<br>);<br><br>// Kotlin<br>val predicate = CRecipeContainer.Predicate = CRecipeContainer.Predicate { crafterID, relate, mapped, list -&gt;<br>  Bukkit.getPlayer(crafterID) != null<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><h4 class="">Parameters</h4><div class="table"><div class="table-row" data-filterable-current="custom-crafter/JVM" data-filterable-set="custom-crafter/JVM"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>func</span></span></u></div></span></div><div><div class="title"><p class="paragraph">a function what checks elements.</p></div></div></div></div></div></div></div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="custom-crafter/JVM"><div class="symbol monospace"><span class="token keyword">sealed </span><span class="token keyword">interface </span><a href="index.html">Predicate</a></div><h4 class="">Inheritors</h4><div class="table"><div class="table-row" data-filterable-current="custom-crafter/JVM" data-filterable-set="custom-crafter/JVM"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-normal-predicate/index.html">NormalPredicate</a></div></span></div><div></div></div></div><div class="table-row" data-filterable-current="custom-crafter/JVM" data-filterable-set="custom-crafter/JVM"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-auto-craft-predicate/index.html">AutoCraftPredicate</a></div></span></div><div></div></div></div></div></div></div>
   </div>
   <div class="tabbedcontent">
-    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
-    <div class="tabs-section-body">
-      <div data-togglable="CONSTRUCTOR">
-        <h2 class="">Constructors</h2>
-        <div class="table"><a data-name="605128740%2FConstructors%2F-1417057397" anchor-label="Predicate" id="605128740%2FConstructors%2F-1417057397" data-filterable-set="custom-crafter/JVM"></a>
-          <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current="custom-crafter/JVM" data-filterable-set="custom-crafter/JVM">
-            <div class="main-subrow keyValue ">
-              <div class=""><span class="inline-flex">
-                  <div><a href="-predicate.html"><span><span>Predicate</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="605128740%2FConstructors%2F-1417057397"></span>
-                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                  </span></span></div>
-              <div>
-                <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="custom-crafter/JVM"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">func<span class="token operator">: </span><span class="token punctuation">(</span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/UUID.html">UUID</a><span class="token punctuation">, </span><a href="../../../io.github.sakaki_aruka.customcrafter.api.objects/-mapped-relation/index.html">MappedRelation</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><a href="../../-coordinate-component/index.html">CoordinateComponent</a><span class="token punctuation">, </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-mutable-list/index.html">MutableList</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span></div></div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div data-togglable="TYPE">
-        <h2 class="">Types</h2>
-        <div class="table"><a data-name="392550919%2FClasslikes%2F-1417057397" anchor-label="Companion" id="392550919%2FClasslikes%2F-1417057397" data-filterable-set="custom-crafter/JVM"></a>
-          <div class="table-row" data-filterable-current="custom-crafter/JVM" data-filterable-set="custom-crafter/JVM">
-            <div class="main-subrow keyValue ">
-              <div class=""><span class="inline-flex">
-                  <div><a href="-companion/index.html"><span><span>Companion</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="392550919%2FClasslikes%2F-1417057397"></span>
-                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                  </span></span></div>
-              <div>
-                <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="custom-crafter/JVM"><div class="symbol monospace"><span class="token keyword">object </span><a href="-companion/index.html">Companion</a></div></div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div data-togglable="PROPERTY">
-        <h2 class="">Properties</h2>
-        <div class="table"><a data-name="178498198%2FProperties%2F-1417057397" anchor-label="func" id="178498198%2FProperties%2F-1417057397" data-filterable-set="custom-crafter/JVM"></a>
-          <div class="table-row" data-filterable-current="custom-crafter/JVM" data-filterable-set="custom-crafter/JVM">
-            <div class="main-subrow keyValue ">
-              <div class=""><span class="inline-flex">
-                  <div><a href="func.html"><span><span>func</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="178498198%2FProperties%2F-1417057397"></span>
-                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                  </span></span></div>
-              <div>
-                <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="custom-crafter/JVM"><div class="symbol monospace"><span class="token keyword">val </span><a href="func.html">func</a><span class="token operator">: </span><span class="token punctuation">(</span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/UUID.html">UUID</a><span class="token punctuation">, </span><a href="../../../io.github.sakaki_aruka.customcrafter.api.objects/-mapped-relation/index.html">MappedRelation</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><a href="../../-coordinate-component/index.html">CoordinateComponent</a><span class="token punctuation">, </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-mutable-list/index.html">MutableList</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div data-togglable="FUNCTION">
-        <h2 class="">Functions</h2>
-        <div class="table"><a data-name="1788227928%2FFunctions%2F-1417057397" anchor-label="invoke" id="1788227928%2FFunctions%2F-1417057397" data-filterable-set="custom-crafter/JVM"></a>
-          <div class="table-row" data-filterable-current="custom-crafter/JVM" data-filterable-set="custom-crafter/JVM">
-            <div class="main-subrow keyValue ">
-              <div class=""><span class="inline-flex">
-                  <div><a href="invoke.html"><span><span>invoke</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1788227928%2FFunctions%2F-1417057397"></span>
-                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                  </span></span></div>
-              <div>
-                <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="custom-crafter/JVM"><div class="symbol monospace"><span class="token keyword">operator </span><span class="token keyword">fun </span><a href="invoke.html"><span class="token function">invoke</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">crafterID<span class="token operator">: </span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/UUID.html">UUID</a><span class="token punctuation">, </span></span><span class="parameter ">relate<span class="token operator">: </span><a href="../../../io.github.sakaki_aruka.customcrafter.api.objects/-mapped-relation/index.html">MappedRelation</a><span class="token punctuation">, </span></span><span class="parameter ">mapped<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><a href="../../-coordinate-component/index.html">CoordinateComponent</a><span class="token punctuation">, </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">list<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-mutable-list/index.html">MutableList</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">isMultipleDisplayCall<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <div class="tabs-section" tabs-section="tabs-section"></div>
+    <div class="tabs-section-body"></div>
   </div>
 </div>
       <div class="footer">
