@@ -161,46 +161,41 @@ object AutoCraft {
 
         if (result.size() == 0) return
 
-        val (pair: Pair<CRecipe, MappedRelation>?, vanilla: Recipe?) = CustomCrafterAPI.AUTO_CRAFTING_RESULT_PICKUP_RESOLVER(sourceRecipes, result, block)
+        val (autoCraftRecipe, relation, vanilla) = CustomCrafterAPI.AUTO_CRAFTING_RESULT_PICKUP_RESOLVER(sourceRecipes, result, block)
 
-        if (pair?.first != null && vanilla != null) {
+        if (autoCraftRecipe != null  && relation != null && vanilla != null) {
             if (CustomCrafterAPI.AUTO_CRAFTING_RESULT_PICKUP_RESOLVER_PRIORITIZE_CUSTOM) {
-                giveCustomResult(pair, pseudoInventory, block)
+                giveCustomResult(autoCraftRecipe, relation, pseudoInventory, block)
             } else giveVanillaResult(vanilla, pseudoInventory, block)
-        } else if (pair?.first != null) {
-            giveCustomResult(pair, pseudoInventory, block)
-        } else if (vanilla != null) {
+        }  else if (vanilla != null) {
             giveVanillaResult(vanilla, pseudoInventory, block)
         } else return
     }
 
     private fun giveCustomResult(
-        pair: Pair<CRecipe, MappedRelation>,
+        autoCraftRecipe: AutoCraftRecipe,
+        relation: MappedRelation,
         gui: Inventory,
         block: Block
     ) {
         val transformed: Map<CoordinateComponent, ItemStack> = Converter.standardInputMapping(gui)
             ?: return
-        val recipe: CRecipe = pair.first
-        val results: MutableList<ItemStack> = recipe.getResults(
-            crafterID = PSEUDO_UUID,
-            relate = pair.second,
+        val results: MutableList<ItemStack> = autoCraftRecipe.getAutoCraftResults(
+            block =  block,
+            relate = relation,
             mapped = transformed,
-            shiftClicked = true,
-            calledTimes = recipe.getMinAmount(transformed,  isCraftGUI = true, shift = true) ?: 1,
-            isMultipleDisplayCall = false
+            calledTimes = autoCraftRecipe.getMinAmount(transformed, isCraftGUI = false, shift = true) ?: 1
         )
 
-        recipe.runContainers(
-            crafterID = PSEUDO_UUID,
-            relate = pair.second,
+        autoCraftRecipe.runAutoCraftContainers(
+            block = block,
+            relate = relation,
             mapped = transformed,
-            results = results,
-            isMultipleDisplayCall = false
+            results = results
         )
 
         val view: CraftView = CraftView.fromInventory(gui)!!
-            .getDecrementedCraftView(true, pair)
+            .getDecrementedCraftView(true, autoCraftRecipe to relation)
 
         block.world.let { w ->
             setOf(*view.materials.values.toTypedArray(), *results.toTypedArray()).forEach { i ->

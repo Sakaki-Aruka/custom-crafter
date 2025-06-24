@@ -230,7 +230,7 @@ internal data class CraftingGUI(
             recipe.getResults(player.uniqueId, relate, mapped, mass, amount, isMultipleDisplayCall = false)
                 .takeIf { it.isNotEmpty() }
                 ?.let { itemList ->
-                    recipe.runContainers(player.uniqueId, relate, mapped, itemList, isMultipleDisplayCall = false)
+                    recipe.runNormalContainers(player.uniqueId, relate, mapped, itemList, isMultipleDisplayCall = false)
                     itemList.takeIf { it.isNotEmpty() }
                         ?.forEach { item ->
                             player.inventory.addItem(item).forEach { (_, over) ->
