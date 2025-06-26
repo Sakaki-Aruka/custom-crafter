@@ -139,10 +139,6 @@
                                     <shadedPattern>kotlinx.shaded.io.github.sakaki_aruka</shadedPattern>
                                 </relocation>
                                 <relocation>
-                                    <pattern>org.xerial</pattern>
-                                    <shadedPattern>xerial.shaded.io.github.sakaki_aruka</shadedPattern>
-                                </relocation>
-                                <relocation>
                                     <pattern>com.zaxxer</pattern>
                                     <shadedPattern>zaxxer.shaded.io.github.sakaki_aruka</shadedPattern>
                                 </relocation>
@@ -201,12 +197,6 @@
             <groupId>org.ktorm</groupId>
             <artifactId>ktorm-core</artifactId>
             <version>4.1.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.xerial</groupId>
-            <artifactId>sqlite-jdbc</artifactId>
-            <version>3.49.1.0</version>
         </dependency>
 
         <dependency>
