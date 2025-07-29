@@ -14,6 +14,7 @@ import org.bukkit.Material
 import org.bukkit.scheduler.BukkitRunnable
 import java.nio.file.Paths
 import java.sql.SQLException
+import kotlin.io.path.createDirectory
 
 /**
  * @suppress
@@ -63,6 +64,14 @@ internal object InternalAPI {
     fun setup() {
         if (CustomCrafterAPI.USE_AUTO_CRAFTING_FEATURE) {
             try {
+                Class.forName("org.sqlite.JDBC")
+                if (!CustomCrafter.getInstance().dataFolder.exists()) {
+                    CustomCrafter.getInstance().dataFolder.toPath().createDirectory()
+                    info("plugins data folder created.")
+                }
+                if (CustomCrafter.getInstance().dataFolder.resolve("auto-craft.db").createNewFile()) {
+                    info("[AutoCraft] auto-craft.db created.")
+                }
                 CBlockDB.initTables()
                 info("AutoCraft DB Initialize Success")
             } catch (e: SQLException) {
