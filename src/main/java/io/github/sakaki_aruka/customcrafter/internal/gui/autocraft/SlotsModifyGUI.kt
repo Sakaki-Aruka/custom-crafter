@@ -6,7 +6,6 @@ import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
 import io.github.sakaki_aruka.customcrafter.internal.autocrafting.AutoCraft
-import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlock
 import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlockDB
 import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterGUI
 import io.github.sakaki_aruka.customcrafter.internal.gui.PageOpenTrigger

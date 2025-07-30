@@ -24,7 +24,6 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.Recipe
 import java.util.UUID
 import kotlin.math.max
-import kotlin.math.min
 
 object AutoCraft {
 
@@ -33,8 +32,11 @@ object AutoCraft {
     object AutoCraftRedstoneSignalReceiver: NoPlayerListener {
         override fun <T : Event> func(event: T) {
             if (event !is BlockRedstoneEvent) return
+            else if (event.block.state !is Crafter) return
 
-            val cBlock: CBlock = CBlock.fromBlock(event.block) ?: return
+            val crafter: Crafter = event.block.state as? Crafter ?: return
+
+            val cBlock: CBlock = CBlock.of(crafter) ?: return
             if (event.oldCurrent > 0 && event.newCurrent == 0) {
                 turnOff(event.block, cBlock)
             }
@@ -54,60 +56,20 @@ object AutoCraft {
     object AutoCraftItemInputSignalReceiver: NoPlayerListener {
         override fun <T : Event> func(event: T) {
             if (event !is InventoryMoveItemEvent) return
+            else if (event.destination.holder == null) return
 
-            val block: Block = (event.destination as Crafter).block
-            val cBlock: CBlock = CBlock.fromBlock(block) ?: return
+            val crafter: Crafter = event.destination.holder!! as? Crafter ?: return
+            val cBlock: CBlock = CBlock.of(crafter) ?: return
 
             event.isCancelled = true
 
-            val (map: Map<Int, ItemStack>?, remaining: ItemStack?) = tryItemMerge(cBlock, event.item)
-            if (map == null && remaining == null) {
-                block.world.dropItem(block.getRelative(BlockFace.DOWN, 1).location, event.item)
-                return
-            } else if (map != null && remaining != null) {
-                block.world.dropItem(block.getRelative(BlockFace.DOWN, 1).location, remaining)
-            }
-
-            CBlockDB.updateOrCreate(
-                block,
-                cBlock.copy(containedItems = map!!.toMutableMap()),
-                setOf(CBlockDB.CBlockTableType.ITEM)
-            )
-        }
-
-
-        /**
-         * Returns
-         * - (null to null)
-         * - (Map<Int, ItemStack>, ItemStack>)
-         * - (Map<Int, ItemStack>, null)
-         */
-        private fun tryItemMerge(
-            cBlock: CBlock,
-            addItem: ItemStack
-        ): Pair<Map<Int, ItemStack>?, ItemStack?> {
-            if (addItem.amount == 0 || cBlock.containedItems.size > 36) return (null to null)
-            var amount: Int = addItem.amount
-            val addAmounts: MutableMap<Int, Int> = mutableMapOf() // (index, amount)
-            for ((slot: Int, item: ItemStack) in cBlock.containedItems.entries) {
-                if (amount == 0) break
-                else if (!item.isSimilar(addItem) || item.amount == item.type.maxStackSize) continue
-                val enableAddAmount: Int = min(item.type.maxStackSize - item.amount, amount)
-                amount -= enableAddAmount
-                addAmounts[slot] = enableAddAmount
-            }
-
-            val modifiedItems: Map<Int, ItemStack> = cBlock.containedItems.entries.associate { (index, item) ->
-                if (index !in addAmounts.keys) index to item
-                else index to item.asQuantity(item.amount + addAmounts[index]!!)
-            }
-            return if (amount != 0) {
-                modifiedItems to addItem.asQuantity(amount) // remaining contained
-            } else {
-                modifiedItems to null // all merged (success)
+            if (!cBlock.addItems(event.item)) {
+                crafter.block.world.dropItem(
+                    crafter.block.getRelative(BlockFace.DOWN, 1).location,
+                    event.item
+                )
             }
         }
-
         override fun <T : Event> predicate(event: T): Boolean? {
             return event is InventoryMoveItemEvent
                     && event.destination.holder is Crafter
@@ -141,12 +103,11 @@ object AutoCraft {
         cBlock: CBlock
     ) {
         if (!block.chunk.isLoaded) return
-        else if (cBlock.recipes.isEmpty()) return
-
-        if (36 - cBlock.ignoreSlots.size != cBlock.containedItems.values.filter { i -> !i.isEmpty }.size) return
+        else if (!CBlockDB.isLinked(block)) return
+        else if (cBlock.getContainedItems().none { i -> !i.isEmpty }) return
 
         val pseudoInventory: Inventory = CustomCrafterAPI.getCraftingGUI()
-        cBlock.containedItems.entries.forEach { (index, item) ->
+        cBlock.getContainedItems().zip(cBlock.slots).forEach { (item, index) ->
             pseudoInventory.setItem(index, item)
         }
         val sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes()

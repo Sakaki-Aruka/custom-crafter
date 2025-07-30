@@ -3,7 +3,6 @@ package io.github.sakaki_aruka.customcrafter.internal.listener
 import io.github.sakaki_aruka.customcrafter.CustomCrafter
 import io.github.sakaki_aruka.customcrafter.impl.util.InventoryUtil.giveItems
 import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
-import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlock
 import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlockDB
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener

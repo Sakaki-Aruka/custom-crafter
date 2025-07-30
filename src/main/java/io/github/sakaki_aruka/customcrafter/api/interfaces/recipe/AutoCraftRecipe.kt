@@ -7,7 +7,6 @@ import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.objects.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.api.search.Search
-import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlock
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
