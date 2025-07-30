@@ -3,11 +3,15 @@ package io.github.sakaki_aruka.customcrafter.internal.autocrafting
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.github.sakaki_aruka.customcrafter.CustomCrafter
+import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
+import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.AutoCraftRecipe
+import io.github.sakaki_aruka.customcrafter.impl.util.InventoryUtil
 import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
 import org.bukkit.block.Block
 import org.bukkit.block.Crafter
 import org.bukkit.inventory.ItemStack
 import org.ktorm.database.Database
+import org.ktorm.dsl.delete
 import org.ktorm.dsl.eq
 import org.ktorm.dsl.from
 import org.ktorm.dsl.insert
@@ -94,10 +98,14 @@ internal object CBlockDB {
             .firstOrNull()
     }
 
-    fun link(block: Block, items: Collection<ItemStack>): Boolean {
+    fun linkWithoutItems(block: Block, recipe: AutoCraftRecipe): CBlock? {
+        return link(block, recipe, emptyList())
+    }
+
+    fun link(block: Block, recipe: AutoCraftRecipe, items: Collection<ItemStack>): CBlock? {
         if (isLinked(block)) {
             InternalAPI.info("[CBlock] The specified block had already linked. (world=${block.world.name}, x=${block.location.blockX}, y=${block.location.blockY}, z=${block.location.blockZ})")
-            return false
+            return null
         }
 
         db.insert(CBlockItemsTable) {
@@ -107,11 +115,39 @@ internal object CBlockDB {
             set(it.z, block.location.blockZ)
             set(it.items, ItemStack.serializeItemsAsBytes(items))
         }
-        return true
+
+        val cBlock = CBlock(
+            version = CustomCrafterAPI.API_VERSION,
+            name = recipe.name,
+            type = recipe.type,
+            publisherName = recipe.publisherPluginName,
+            slots = recipe.getSlots(),
+            block = block
+        )
+
+        return cBlock
     }
 
     fun unlink(block: Block): Boolean {
-        // TODO: impl here
+        if (!isLinked(block)) {
+            return false
+        }
+
+        val linkId: Int = getLinkId(block) ?: return false
+
+        db.delete(CBlockItemsTable) {
+            it.id eq linkId
+        }
+
+        val crafter: Crafter = block.state as Crafter
+        crafter.persistentDataContainer.remove(InventoryUtil.fromKeyContainer(CBlock.VERSION))
+        crafter.persistentDataContainer.remove(InventoryUtil.fromKeyContainer(CBlock.TYPE))
+        crafter.persistentDataContainer.remove(InventoryUtil.fromKeyContainer(CBlock.SLOTS))
+        crafter.persistentDataContainer.remove(InventoryUtil.fromKeyContainer(CBlock.NAME))
+        crafter.persistentDataContainer.remove(InventoryUtil.fromKeyContainer(CBlock.PUBLISHER))
+        crafter.update()
+
+        return true
     }
 
     fun getContainedItems(block: Block): List<ItemStack> {

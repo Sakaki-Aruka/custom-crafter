@@ -26,7 +26,7 @@ object CustomCrafterAPI {
      *
      * This version is different with the plugin version string.
      */
-    const val API_VERSION: String = "0.1.10"
+    const val API_VERSION: String = "0.1.11"
 
     /**
      * Custom Crafter API is stable or not.

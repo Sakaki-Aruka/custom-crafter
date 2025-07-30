@@ -110,9 +110,7 @@ object AutoCraft {
         cBlock.getContainedItems().zip(cBlock.slots).forEach { (item, index) ->
             pseudoInventory.setItem(index, item)
         }
-        val sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes()
-            .filterIsInstance<AutoCraftRecipe>()
-            .filter { r -> r.getCBlockTitle() in cBlock.recipes }
+        val sourceRecipes: List<CRecipe> = listOf(cBlock.getRecipe() ?: return)
 
         val result: Search.SearchResult = Search.search(
             crafterID = PSEUDO_UUID,
