@@ -7,9 +7,6 @@ import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterGUI;
 import io.github.sakaki_aruka.customcrafter.internal.gui.OldWarnGUI;
 import io.github.sakaki_aruka.customcrafter.internal.gui.PredicateProvider;
 import io.github.sakaki_aruka.customcrafter.internal.gui.allcandidate.AllCandidateGUI;
-import io.github.sakaki_aruka.customcrafter.internal.gui.autocraft.CBlockInfoGUI;
-import io.github.sakaki_aruka.customcrafter.internal.gui.autocraft.RecipeModifyGUI;
-import io.github.sakaki_aruka.customcrafter.internal.gui.autocraft.SlotsModifyGUI;
 import io.github.sakaki_aruka.customcrafter.internal.gui.crafting.CraftingGUI;
 import io.github.sakaki_aruka.customcrafter.internal.listener.InventoryClickListener;
 import io.github.sakaki_aruka.customcrafter.internal.listener.InventoryCloseListener;
@@ -45,22 +42,15 @@ public final class CustomCrafter extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(PlayerBreakBlockListener.INSTANCE, instance);
 
         // TODO: register GUI class/object to CustomCrafterGUI.PAGES (ALL GUIs)
-        CustomCrafterGUI.Companion.getPAGES().put(JvmClassMappingKt.getKotlinClass(SlotsModifyGUI.class), UUID.randomUUID());
-        CustomCrafterGUI.Companion.getPAGES().put(JvmClassMappingKt.getKotlinClass(CBlockInfoGUI.class), UUID.randomUUID());
-        CustomCrafterGUI.Companion.getPAGES().put(JvmClassMappingKt.getKotlinClass(RecipeModifyGUI.class), UUID.randomUUID());
         CustomCrafterGUI.Companion.getPAGES().put(JvmClassMappingKt.getKotlinClass(OldWarnGUI.class), UUID.randomUUID());
         CustomCrafterGUI.Companion.getPAGES().put(JvmClassMappingKt.getKotlinClass(AllCandidateGUI.class), UUID.randomUUID());
 
         // TODO: register CustomCrafterGUI.GuiDeserializer
-        CustomCrafterGUI.Companion.getDESERIALIZERS().add(CBlockInfoGUI.Companion);
-        CustomCrafterGUI.Companion.getDESERIALIZERS().add(SlotsModifyGUI.Companion);
         CustomCrafterGUI.Companion.getDESERIALIZERS().add(CraftingGUI.Companion);
         CustomCrafterGUI.Companion.getDESERIALIZERS().add(OldWarnGUI.Companion);
         CustomCrafterGUI.Companion.getDESERIALIZERS().add(AllCandidateGUI.Companion);
 
         // TODO: register PredicateProvider<T: out CustomCrafterGUI>::class to PredicateProvider.PROVIDERS
-        PredicateProvider.Companion.getPROVIDERS().add(CBlockInfoGUI.Companion);
-        PredicateProvider.Companion.getPROVIDERS().add(SlotsModifyGUI.Companion);
         PredicateProvider.Companion.getPROVIDERS().add(CraftingGUI.Companion);
 
         // TODO: register NoPlayerListener (NoPlayerListener.LISTENERS)
