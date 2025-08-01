@@ -13,13 +13,13 @@ internal interface CustomCrafterUI {
     companion object {
         val DEFAULT_PAGE: Inventory = Bukkit.createInventory(null, 54)
 
-        val NEXT_BUTTON: ItemStack = ItemStack.of(Material.LIME_DYE).apply {
+        val NEXT_BUTTON: ItemStack = ItemStack.of(Material.ENDER_PEARL).apply {
             itemMeta = itemMeta.apply {
                 displayName("<b>NEXT".toComponent())
             }
         }
 
-        val PREVIOUS_BUTTON: ItemStack = ItemStack.of(Material.RED_DYE).apply {
+        val PREVIOUS_BUTTON: ItemStack = ItemStack.of(Material.ENDER_EYE).apply {
             itemMeta = itemMeta.apply {
                 displayName("<b>PREVIOUS".toComponent())
             }

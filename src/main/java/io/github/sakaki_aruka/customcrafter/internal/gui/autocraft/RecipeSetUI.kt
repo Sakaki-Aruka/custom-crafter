@@ -27,10 +27,9 @@ class RecipeSetUI(
     )
 
     init {
-        val autoRecipes: MutableList<AutoCraftRecipe> = CustomCrafterAPI.getRecipes()
+        val autoRecipes: List<AutoCraftRecipe> = CustomCrafterAPI.getRecipes()
             .filterIsInstance<AutoCraftRecipe>()
             .sortedBy { recipe -> recipe.name }
-            .toMutableList()
 
         val chunked: List<List<AutoCraftRecipe>> = autoRecipes.chunked(45)
         if (chunked.isNotEmpty()) {

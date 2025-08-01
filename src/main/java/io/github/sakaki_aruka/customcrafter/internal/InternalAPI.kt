@@ -62,6 +62,10 @@ internal object InternalAPI {
     }
 
     fun setup() {
+
+        //debug
+        CustomCrafterAPI.USE_AUTO_CRAFTING_FEATURE = true
+
         if (CustomCrafterAPI.USE_AUTO_CRAFTING_FEATURE) {
             try {
                 Class.forName("org.sqlite.JDBC")

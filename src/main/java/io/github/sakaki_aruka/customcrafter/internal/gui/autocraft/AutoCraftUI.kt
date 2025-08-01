@@ -19,10 +19,34 @@ import org.bukkit.persistence.PersistentDataType
 
 // Only for Check, Delete.
 // Not for CREATE, MODIFY.
-internal class AutoCraftUI: CustomCrafterUI.Static, InventoryHolder {
-    private lateinit var inventory: Inventory
-    private lateinit var block: Block
-    private lateinit var player: Player
+internal class AutoCraftUI(
+    private val block: Block,
+    private val player: Player,
+): CustomCrafterUI.Static, InventoryHolder {
+
+    private val inventory: Inventory = Bukkit.createInventory(
+        this,
+        9,
+        "<aqua><b><u>Auto Craft".toComponent()
+    )
+
+    init {
+        this.inventory.setItem(0, ItemStack.of(Material.SHEARS).apply {
+            itemMeta = itemMeta.apply {
+                displayName("Delete AutoCraft Settings".toComponent())
+            }
+        })
+
+        CBlock.of(block.state as Crafter)?.let { cBlock ->
+            this.inventory.setItem(
+                4,
+                cBlock.getRecipe()?.autoCraftDisplayItemProvider(player)
+                    ?: UNDEFINED
+            )
+        } ?: run {
+            this.inventory.setItem(4, UNDEFINED)
+        }
+    }
 
     companion object {
         val UNDEFINED: ItemStack = ItemStack.of(Material.BARRIER).apply {
@@ -64,6 +88,10 @@ internal class AutoCraftUI: CustomCrafterUI.Static, InventoryHolder {
 
                 val recipeSetUI: Inventory = RecipeSetUI(this.block, this.player).inventory
                 if (recipeSetUI.isEmpty) {
+
+                    //debug
+                    println("RecipeSetUI is empty")
+
                     return
                 }
 
@@ -73,23 +101,4 @@ internal class AutoCraftUI: CustomCrafterUI.Static, InventoryHolder {
     }
 
     override fun getInventory(): Inventory = inventory
-
-    fun of(player: Player, block: Block): Inventory {
-        this.player = player
-        this.block = block
-        this.inventory = Bukkit.createInventory(this, 9, "<aqua><b><u>Auto Craft".toComponent())
-        this.inventory.setItem(0, ItemStack.of(Material.SHEARS).apply {
-            itemMeta = itemMeta.apply {
-                displayName("Delete AutoCraft Settings".toComponent())
-            }
-        })
-
-        CBlock.of(block.state as Crafter)?.let { cBlock ->
-            this.inventory.setItem(4, cBlock.getRecipe()?.autoCraftDisplayItemProvider(player) ?: UNDEFINED)
-        } ?: run {
-            this.inventory.setItem(4, UNDEFINED)
-        }
-
-        return this.inventory
-    }
 }

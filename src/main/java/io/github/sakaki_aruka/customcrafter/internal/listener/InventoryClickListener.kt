@@ -3,6 +3,7 @@ package io.github.sakaki_aruka.customcrafter.internal.listener
 import io.github.sakaki_aruka.customcrafter.CustomCrafter
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterGUI
+import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterUI
 import io.github.sakaki_aruka.customcrafter.internal.gui.OldWarnGUI
 import io.github.sakaki_aruka.customcrafter.internal.gui.ReactionProvider
 import org.bukkit.event.EventHandler
@@ -18,6 +19,19 @@ object InventoryClickListener: Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     fun InventoryClickEvent.onClick() {
         val clicked: Inventory = clickedInventory ?: return
+
+        //debug
+        clicked.holder?.let { holder ->
+            (holder as? CustomCrafterUI)?.let { ui ->
+
+                //debug
+                println("Inventory Holder = ${holder::class.java.simpleName}")
+
+                ui.onClick(clicked, this)
+                return
+            }
+        }
+
         val top: Inventory = whoClicked.openInventory.topInventory
         val bottom: Inventory = whoClicked.openInventory.bottomInventory
 
