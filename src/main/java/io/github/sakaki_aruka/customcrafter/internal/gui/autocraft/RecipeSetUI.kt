@@ -15,11 +15,39 @@ import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
 
-class RecipeSetUI: CustomCrafterUI.Pageable, InventoryHolder {
+class RecipeSetUI(
+    private val block: Block,
+    private val player: Player
+): CustomCrafterUI.Pageable, InventoryHolder {
 
-    private lateinit var inventory: Inventory
-    private lateinit var block: Block
-    private lateinit var player: Player
+    private val inventory: Inventory = Bukkit.createInventory(
+        this,
+        54,
+        "<green><u><b>Auto Craft Recipe Set".toComponent()
+    )
+
+    init {
+        val autoRecipes: MutableList<AutoCraftRecipe> = CustomCrafterAPI.getRecipes()
+            .filterIsInstance<AutoCraftRecipe>()
+            .sortedBy { recipe -> recipe.name }
+            .toMutableList()
+
+        val chunked: List<List<AutoCraftRecipe>> = autoRecipes.chunked(45)
+        if (chunked.isNotEmpty()) {
+            for ((index: Int, recipe: AutoCraftRecipe) in chunked.first().withIndex()) {
+                this.inventory.setItem(
+                    index,
+                    recipe.autoCraftDisplayItemProvider(player).takeIf { i -> !i.isEmpty }
+                        ?: AutoCraftUI.UNDEFINED
+                )
+            }
+
+            if (autoRecipes.size > 45) {
+                this.inventory.setItem(NEXT, CustomCrafterUI.NEXT_BUTTON)
+            }
+        }
+    }
+
 
     var recipes: List<AutoCraftRecipe> = listOf()
 
@@ -109,21 +137,4 @@ class RecipeSetUI: CustomCrafterUI.Pageable, InventoryHolder {
     }
 
     override fun getInventory(): Inventory = this.inventory
-
-    fun of(player: Player, block: Block): Inventory? {
-        this.block = block
-        this.player = player
-        this.inventory = Bukkit.createInventory(this, 54, "<green><u><b>Auto Craft Recipe Set".toComponent())
-        val autoRecipes: MutableList<AutoCraftRecipe> = CustomCrafterAPI.getRecipes().filterIsInstance<AutoCraftRecipe>().toMutableList()
-        autoRecipes.sortedBy { recipe -> recipe.name }
-        for ((index, recipe) in autoRecipes.chunked(45).firstOrNull()?.withIndex() ?: return null) {
-            this.inventory.setItem(index, recipe.autoCraftDisplayItemProvider(player).takeIf { i -> !i.isEmpty } ?: AutoCraftUI.UNDEFINED)
-        }
-
-        if (autoRecipes.size > 45) {
-            this.inventory.setItem(NEXT, CustomCrafterUI.NEXT_BUTTON)
-        }
-
-        return this.inventory
-    }
 }

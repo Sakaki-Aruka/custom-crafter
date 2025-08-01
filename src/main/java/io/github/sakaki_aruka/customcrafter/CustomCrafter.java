@@ -11,7 +11,6 @@ import io.github.sakaki_aruka.customcrafter.internal.gui.crafting.CraftingGUI;
 import io.github.sakaki_aruka.customcrafter.internal.listener.InventoryClickListener;
 import io.github.sakaki_aruka.customcrafter.internal.listener.InventoryCloseListener;
 import io.github.sakaki_aruka.customcrafter.internal.listener.NoPlayerListener;
-import io.github.sakaki_aruka.customcrafter.internal.listener.PlayerBreakBlockListener;
 import io.github.sakaki_aruka.customcrafter.internal.listener.PlayerInteractListener;
 import kotlin.jvm.JvmClassMappingKt;
 import org.bukkit.Bukkit;
@@ -39,7 +38,6 @@ public final class CustomCrafter extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(InventoryCloseListener.INSTANCE, instance);
         Bukkit.getPluginManager().registerEvents(PlayerInteractListener.INSTANCE, instance);
         Bukkit.getPluginManager().registerEvents(NoPlayerListener.Companion, instance);
-        Bukkit.getPluginManager().registerEvents(PlayerBreakBlockListener.INSTANCE, instance);
 
         // TODO: register GUI class/object to CustomCrafterGUI.PAGES (ALL GUIs)
         CustomCrafterGUI.Companion.getPAGES().put(JvmClassMappingKt.getKotlinClass(OldWarnGUI.class), UUID.randomUUID());

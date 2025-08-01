@@ -62,7 +62,7 @@ internal class AutoCraftUI: CustomCrafterUI.Static, InventoryHolder {
                     return
                 }
 
-                val recipeSetUI: Inventory = RecipeSetUI().of(this.player, this.block) ?: return
+                val recipeSetUI: Inventory = RecipeSetUI(this.block, this.player).inventory
                 if (recipeSetUI.isEmpty) {
                     return
                 }

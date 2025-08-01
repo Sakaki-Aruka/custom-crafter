@@ -4,7 +4,6 @@ import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeContainer
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.objects.result.ResultSupplier
-import io.github.sakaki_aruka.customcrafter.internal.gui.autocraft.AutoCraftUI
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -39,10 +38,6 @@ interface AutoCraftRecipe: CRecipe {
      */
     val autoCraftContainers: List<CRecipeContainer>?
 
-    fun getSignedDisplayItem(player: Player): ItemStack {
-        val item: ItemStack = this.autoCraftDisplayItemProvider(player).takeIf { i -> i.isEmpty } ?: AutoCraftUI.UNDEFINED
-        //
-    }
 
     /**
      * Returns items what are made by [autoCraftResults].
