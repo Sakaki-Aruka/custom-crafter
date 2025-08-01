@@ -1,14 +1,29 @@
 package io.github.sakaki_aruka.customcrafter.internal.gui
 
+import io.github.sakaki_aruka.customcrafter.impl.util.Converter.toComponent
 import org.bukkit.Bukkit
+import org.bukkit.Material
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.inventory.Inventory
+import org.bukkit.inventory.ItemStack
 
-internal sealed interface CustomCrafterUI {
+internal interface CustomCrafterUI {
 
     companion object {
         val DEFAULT_PAGE: Inventory = Bukkit.createInventory(null, 54)
+
+        val NEXT_BUTTON: ItemStack = ItemStack.of(Material.LIME_DYE).apply {
+            itemMeta = itemMeta.apply {
+                displayName("<b>NEXT".toComponent())
+            }
+        }
+
+        val PREVIOUS_BUTTON: ItemStack = ItemStack.of(Material.RED_DYE).apply {
+            itemMeta = itemMeta.apply {
+                displayName("<b>PREVIOUS".toComponent())
+            }
+        }
     }
 
     enum class ClickableType {
@@ -17,16 +32,16 @@ internal sealed interface CustomCrafterUI {
         DYNAMIC_TOGGLED
     }
 
-    fun onClose(event: InventoryCloseEvent)
-    fun onClick(event: InventoryClickEvent)
+    fun onClose(event: InventoryCloseEvent) {}
+    fun onClick(clicked: Inventory, event: InventoryClickEvent)
 
     interface Pageable: CustomCrafterUI {
-        val currentPage: Int
+        var currentPage: Int
 
         fun flipPage()
-        fun canFlipPage()
+        fun canFlipPage(): Boolean
         fun flipBackPage()
-        fun canFlipBackPage()
+        fun canFlipBackPage(): Boolean
     }
 
     interface Static: CustomCrafterUI {

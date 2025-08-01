@@ -8,6 +8,7 @@ import io.github.sakaki_aruka.customcrafter.impl.util.InventoryUtil
 import io.github.sakaki_aruka.customcrafter.impl.util.InventoryUtil.hasAllKeys
 import io.github.sakaki_aruka.customcrafter.impl.util.KeyContainer
 import org.bukkit.block.Block
+import org.bukkit.block.BlockFace
 import org.bukkit.block.Crafter
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataContainer
@@ -50,7 +51,7 @@ internal class CBlock(
                 return null
             }
 
-            return CBlock(
+            val cBlock = CBlock(
                 version = container.get(InventoryUtil.fromKeyContainer(VERSION), VERSION.type)!!,
                 type = CRecipeType.of(container.get(InventoryUtil.fromKeyContainer(TYPE), TYPE.type)!!)!!,
                 name = container.get(InventoryUtil.fromKeyContainer(NAME), NAME.type)!!,
@@ -58,6 +59,9 @@ internal class CBlock(
                 slots = container.get(InventoryUtil.fromKeyContainer(SLOTS), SLOTS.type)!!.toList(),
                 block = crafter.block
             )
+
+            cBlock.writeToContainer()
+            return cBlock
         }
     }
 
@@ -67,8 +71,13 @@ internal class CBlock(
         return candidate.contains(v)
     }
 
-    fun isLinked(): Boolean {
-        return CBlockDB.isLinked(this.block)
+    fun updateRecipe(recipe: AutoCraftRecipe) {
+        this.getContainedItems().forEach { item ->
+            this.block.world.dropItem(this.block.getRelative(BlockFace.DOWN, 1).location, item)
+        }
+        CBlockDB.unlink(this.block)
+        CBlockDB.linkWithoutItems(this.block, recipe)
+        writeToContainer()
     }
 
     fun getContainedItems(): List<ItemStack> {

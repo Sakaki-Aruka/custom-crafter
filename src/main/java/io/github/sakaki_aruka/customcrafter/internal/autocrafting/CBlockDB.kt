@@ -150,6 +150,17 @@ internal object CBlockDB {
         return true
     }
 
+    fun clearContainedItems(block: Block) {
+        val linkId: Int = getLinkId(block) ?: run {
+            throw NotLinkedBlockException("[CBlock] The specified block is not linked. (world=${block.world.name}, x=${block.location.blockX}, y=${block.location.blockY}, z=${block.location.blockZ})")
+        }
+
+        db.update(CBlockItemsTable) {
+            set(CBlockItemsTable.items, ItemStack.serializeItemsAsBytes(listOf<ItemStack>()))
+            where { it.id eq linkId }
+        }
+    }
+
     fun getContainedItems(block: Block): List<ItemStack> {
         val linkId: Int = getLinkId(block) ?: run {
             throw NotLinkedBlockException("[CBlock] The specified block is not linked. (world=${block.world.name}, x=${block.location.blockX}, y=${block.location.blockY}, z=${block.location.blockZ})")
