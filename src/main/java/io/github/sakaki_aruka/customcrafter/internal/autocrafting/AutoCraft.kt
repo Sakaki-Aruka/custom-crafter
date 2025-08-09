@@ -9,6 +9,7 @@ import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateCompone
 import io.github.sakaki_aruka.customcrafter.api.search.Search
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
+import io.github.sakaki_aruka.customcrafter.internal.gui.crafting.CraftUI
 import io.github.sakaki_aruka.customcrafter.internal.listener.NoPlayerListener
 import org.bukkit.Location
 import org.bukkit.Material
@@ -107,7 +108,7 @@ object AutoCraft {
         else if (!CBlockDB.isLinked(block)) return
         else if (cBlock.getContainedItems().none { i -> !i.isEmpty }) return
 
-        val pseudoInventory: Inventory = CustomCrafterAPI.getCraftingGUI()
+        val pseudoInventory: Inventory = CraftUI().inventory
         cBlock.getContainedItems().zip(cBlock.slots).forEach { (item, index) ->
             pseudoInventory.setItem(index, item)
         }

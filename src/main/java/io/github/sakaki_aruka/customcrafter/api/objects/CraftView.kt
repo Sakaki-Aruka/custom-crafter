@@ -5,6 +5,7 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter
+import io.github.sakaki_aruka.customcrafter.internal.gui.crafting.CraftUI
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import kotlin.math.max
@@ -57,12 +58,10 @@ data class CraftView internal constructor(
     /**
      * converts a view to Custom Crafter's gui.
      *
-     * @param[dropItemsOnClose] CustomCrafterAPI#getCraftingGUI 'dropItemsOnClose' (default = false, since 5.0.8)
-     * @see[CustomCrafterAPI.getCraftingGUI]
      * @return[Inventory] Custom Crafter's gui
      */
     fun toCraftingGUI(): Inventory {
-        val gui: Inventory = CustomCrafterAPI.getCraftingGUI()
+        val gui: Inventory = CraftUI().inventory
         this.materials.entries.forEach { (c, item) ->
             gui.setItem(c.x + c.y * 9, item)
         }
@@ -77,7 +76,6 @@ data class CraftView internal constructor(
      *
      * only for Shift clicked
      *
-     * @param[view] current CraftView
      * @param[shiftUsed] a crafter used shift-click or not
      * @param[forCustomSettings] a matched result info. (requires these when matched custom recipe)
      * @since 5.0.8

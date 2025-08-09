@@ -4,6 +4,7 @@ import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.active_test.CAssert
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import io.github.sakaki_aruka.customcrafter.api.search.VanillaSearch
+import io.github.sakaki_aruka.customcrafter.internal.gui.crafting.CraftUI
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.inventory.Inventory
@@ -24,7 +25,7 @@ internal object VanillaSearchTest {
     }
 
     private fun vanillaSearchTest() {
-        val gui = CustomCrafterAPI.getCraftingGUI()
+        val gui = CraftUI().inventory
 
         // furnace recipe
         /*

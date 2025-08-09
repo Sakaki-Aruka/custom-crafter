@@ -2,7 +2,6 @@ package io.github.sakaki_aruka.customcrafter.impl.test
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.active_test.CAssert
-import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 
@@ -13,8 +12,6 @@ import org.bukkit.inventory.ItemStack
 internal object APITest {
     fun run() {
         baseBlockTest()
-        craftingGUITest()
-        tooOldTest()
         randomCoordinatesTest()
         allCandidateTest()
     }
@@ -42,30 +39,6 @@ internal object APITest {
         }
 
         CustomCrafterAPI.BASE_BLOCK_SIDE = base
-    }
-
-    private fun craftingGUITest() {
-        val gui = CustomCrafterAPI.getCraftingGUI()
-        CAssert.assertTrue(CustomCrafterAPI.isCustomCrafterGUI(gui))
-        CAssert.assertTrue(!CustomCrafterAPI.isGUITooOld(gui))
-        val dummy = Bukkit.createInventory(null, 54)
-        CAssert.assertTrue(!CustomCrafterAPI.isCustomCrafterGUI(dummy))
-        CAssert.assertThrow(IllegalArgumentException::class) {
-            CustomCrafterAPI.isGUITooOld(dummy)
-        }
-    }
-
-    private fun tooOldTest() {
-        val gui = CustomCrafterAPI.getCraftingGUI()
-        val (key, type, _) = CustomCrafterAPI.genCCKey()
-        val item = ItemStack(Material.ANVIL).apply {
-            itemMeta = itemMeta.apply {
-                persistentDataContainer.set(key, type, 0L)
-            }
-        }
-        gui.setItem(CustomCrafterAPI.CRAFTING_TABLE_MAKE_BUTTON_SLOT, item)
-
-        CAssert.assertTrue(CustomCrafterAPI.isGUITooOld(gui))
     }
 
     private fun allCandidateTest() {

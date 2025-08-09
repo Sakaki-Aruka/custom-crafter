@@ -7,18 +7,14 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.search.Search
-import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.bukkit.Material
-import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
-import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.Recipe
-import org.bukkit.persistence.PersistentDataType
 
 object CustomCrafterAPI {
     /**
@@ -85,9 +81,6 @@ object CustomCrafterAPI {
     internal var BASE_BLOCK_SIDE: Int = 3
     const val CRAFTING_TABLE_MAKE_BUTTON_SLOT: Int = 35
     const val CRAFTING_TABLE_RESULT_SLOT: Int = 44
-    internal const val ALL_CANDIDATE_PREVIOUS_SLOT: Int = 45
-    internal const val ALL_CANDIDATE_SIGNATURE_SLOT: Int = 49
-    internal const val ALL_CANDIDATE_NEXT_SLOT: Int = 53
     const val CRAFTING_TABLE_TOTAL_SIZE: Int = 54
 
     /**
@@ -267,113 +260,6 @@ object CustomCrafterAPI {
      * @return[Int] size
      */
     fun getBaseBlockSideSize(): Int = BASE_BLOCK_SIDE
-
-    /**
-     * provides elements of custom crafter's gui component
-     *
-     * returned Triple contained below elements.
-     * - first([NamespacedKey]): "custom_crafter:gui_created"
-     * - second([PersistentDataType.LONG]): a type of 'third'
-     * - third([Long]): epoch time when called this.
-     *
-     * @return[Triple]
-     */
-    fun genCCKey() = Triple(
-        NamespacedKey("custom_crafter", "gui_created"),
-        PersistentDataType.LONG,
-        System.currentTimeMillis()
-    )
-    private val blank = ItemStack(Material.BLACK_STAINED_GLASS_PANE).apply {
-        itemMeta = itemMeta.apply {
-            displayName(Component.empty())
-        }
-    }
-    private fun makeButton() = ItemStack(Material.ANVIL).apply {
-        itemMeta = itemMeta.apply {
-            displayName(Component.text("Making items"))
-            val key = genCCKey()
-            persistentDataContainer.set(key.first, key.second, key.third)
-        }
-    }
-
-    /**
-     * returns custom crafter gui
-     *
-     * @param[dropItemsOnClose] drops materials or not when a player close this gui (default = false, since = 5.0.8)
-     * @return[Inventory] custom crafter gui
-     */
-    fun getCraftingGUI(): Inventory {
-        val gui: Inventory = Bukkit.createInventory(null, CRAFTING_TABLE_TOTAL_SIZE, Component.text("Custom Crafter"))
-        (0..<54).forEach { slot -> gui.setItem(slot, blank) }
-        Converter.getAvailableCraftingSlotComponents().forEach { c ->
-            val index: Int = c.x + c.y * 9
-            gui.setItem(index, ItemStack.empty())
-        }
-        val makeButton: ItemStack = makeButton()
-        gui.setItem(CRAFTING_TABLE_MAKE_BUTTON_SLOT, makeButton)
-        gui.setItem(CRAFTING_TABLE_RESULT_SLOT, ItemStack.empty())
-        return gui
-    }
-
-    /**
-     * returns the provided inventory is custom crafter gui or not.
-     *
-     * @param[inventory] input inventory
-     * @return[Boolean] is custom crafter gui or not
-     */
-    fun isCustomCrafterGUI(inventory: Inventory): Boolean {
-        if (inventory.size != 54) return false
-        val makeButton: ItemStack = inventory.getItem(CRAFTING_TABLE_MAKE_BUTTON_SLOT)
-            ?.takeIf { it.type == makeButton().type }
-            ?: return false
-        val key = genCCKey()
-        return makeButton.itemMeta.persistentDataContainer.has(key.first, key.second)
-    }
-
-
-    internal val allCandidateSignatureNK = NamespacedKey(CustomCrafter.getInstance(), "all_candidate_signature")
-
-    /**
-     * returns the provided inventory is all-candidates-page gui or not.
-     *
-     * @param[inventory] input inventory
-     * @return[Boolean] is all-candidates-page gui or not
-     * @since 5.0.8
-     */
-    fun isAllCandidatesPageGUI(inventory: Inventory): Boolean {
-        if (inventory.size != 54) return false
-        val signature: ItemStack = inventory.getItem(ALL_CANDIDATE_SIGNATURE_SLOT) ?: return false
-        return signature.itemMeta.persistentDataContainer.getOrDefault(
-            allCandidateSignatureNK,
-            PersistentDataType.STRING,
-            "_" // default (if not found applied)
-        ) == ""
-    }
-
-    /**
-     * returns the provided inventory is OLDER than custom crafter reloaded or enabled or not.
-     *
-     * if you provide an inventory what is not a custom crafter gui, this throws an Exception.
-     *
-     * @param[inventory] provided inventory
-     * @throws[IllegalArgumentException] thrown when the provided is not custom crafter gui
-     * @throws[IllegalStateException] thrown when get an error on get gui created epoch time
-     * @return[Boolean] older or not
-     */
-    fun isGUITooOld(inventory: Inventory): Boolean {
-        if (!isCustomCrafterGUI(inventory)
-            && !isAllCandidatesPageGUI(inventory)) {
-            throw IllegalArgumentException("'inventory' must be a CustomCrafter's gui.")
-        }
-        val (key, type, _) = genCCKey()
-        val time: Long = inventory.contents
-            .filterNotNull()
-            .firstOrNull { item -> item.itemMeta.persistentDataContainer.has(key, type) }
-            ?.let { i -> i.itemMeta.persistentDataContainer.get(key, type) }
-            ?: throw IllegalStateException("'time' key contained item not found.")
-
-        return time < CustomCrafter.INITIALIZED
-    }
 
     /**
      * Get an item that is used for an all-candidates-menu's not displayable items slot.

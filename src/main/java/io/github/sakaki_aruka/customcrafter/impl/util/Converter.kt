@@ -45,7 +45,7 @@ object Converter {
      */
     fun standardInputMapping(inventory: Inventory, noAir: Boolean = true): Map<CoordinateComponent, ItemStack>? {
         // CoordinateComponent: zero origin (x, y both)
-        if (inventory.isEmpty || !CustomCrafterAPI.isCustomCrafterGUI(inventory)) return null
+        if (inventory.isEmpty) return null
         val result: MutableMap<CoordinateComponent, ItemStack> = mutableMapOf()
 
         for (coordinate in getAvailableCraftingSlotComponents()) {

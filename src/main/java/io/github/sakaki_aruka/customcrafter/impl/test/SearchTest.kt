@@ -18,6 +18,7 @@ import io.github.sakaki_aruka.customcrafter.api.search.Search
 import io.github.sakaki_aruka.customcrafter.impl.matter.enchant.CEnchantMatterImpl
 import io.github.sakaki_aruka.customcrafter.impl.matter.potion.CPotionMatterImpl
 import io.github.sakaki_aruka.customcrafter.impl.recipe.filter.EnchantFilter
+import io.github.sakaki_aruka.customcrafter.internal.gui.crafting.CraftUI
 import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemStack
@@ -71,7 +72,7 @@ internal object SearchTest {
             type = CRecipeType.NORMAL
         )
 
-        val gui = CustomCrafterAPI.getCraftingGUI()
+        val gui = CraftUI().inventory
         setOf(0, 1, 2, 9, 11, 18, 19, 20).forEach { i ->
             gui.setItem(i, ItemStack(Material.COBBLESTONE))
         }
@@ -105,7 +106,7 @@ internal object SearchTest {
         CAssert.assertTrue(resultOfUnnatural.customs().first().first == recipe)
         CAssert.assertTrue(resultOfUnnatural.customs().first().second.components.toSet().size == 8)
 
-        val invalidInput = CustomCrafterAPI.getCraftingGUI()
+        val invalidInput = CraftUI().inventory
         setOf(0, 1, 2, 9, 11, 18, 19).forEach { i ->
             invalidInput.setItem(i, ItemStack(Material.COBBLESTONE))
         }
@@ -149,7 +150,7 @@ internal object SearchTest {
 
         val testRecipes: MutableList<CRecipe> = mutableListOf(recipe)
 
-        val gui = CustomCrafterAPI.getCraftingGUI()
+        val gui = CraftUI().inventory
         setOf(0, 1, 45, 46).forEach { i ->
             gui.setItem(i, ItemStack(Material.STONE))
         }
@@ -198,7 +199,7 @@ internal object SearchTest {
             type = CRecipeType.AMORPHOUS
         )
 
-        val gui = CustomCrafterAPI.getCraftingGUI()
+        val gui = CraftUI().inventory
         gui.setItem(0, ItemStack(Material.SLIME_BALL, 10))
         gui.setItem(1, ItemStack(Material.LAVA_BUCKET))
         val testRecipes: MutableList<CRecipe> = mutableListOf(recipe)
@@ -222,7 +223,7 @@ internal object SearchTest {
     }
 
     private fun furnaceTest() {
-        val gui = CustomCrafterAPI.getCraftingGUI()
+        val gui = CraftUI().inventory
         setOf(0, 1, 2, 9, 11, 18, 19, 20).forEach { i ->
             gui.setItem(i, ItemStack(Material.COBBLESTONE))
         }
@@ -238,7 +239,7 @@ internal object SearchTest {
     }
 
     private fun batchFurnaceTest() {
-        val gui = CustomCrafterAPI.getCraftingGUI()
+        val gui = CraftUI().inventory
         setOf(0, 1, 2, 9, 11, 18, 19, 20).forEach { i ->
             gui.setItem(i, ItemStack(Material.COBBLESTONE, 10))
         }
@@ -255,7 +256,7 @@ internal object SearchTest {
     }
 
     private fun emptyTest() {
-        val gui = CustomCrafterAPI.getCraftingGUI()
+        val gui = CraftUI().inventory
         val result = Search.search(
             UUID.randomUUID(),
             CraftView.fromInventory(gui)!!,
@@ -296,7 +297,7 @@ internal object SearchTest {
         val input2 = ItemStack(Material.STONE)
         input2.editMeta { meta -> meta.addEnchant(Enchantment.EFFICIENCY, 1, false) }
 
-        val gui = CustomCrafterAPI.getCraftingGUI()
+        val gui = CraftUI().inventory
         gui.setItem(38, input1)
         gui.setItem(46, input2)
 
@@ -368,7 +369,7 @@ internal object SearchTest {
             (m as PotionMeta).addCustomEffect(PotionEffect(PotionEffectType.POISON, 1, 1), true)
         }
 
-        val gui = CustomCrafterAPI.getCraftingGUI()
+        val gui = CraftUI().inventory
         gui.setItem(0, input1)
         gui.setItem(30, input1)
 

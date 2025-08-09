@@ -52,8 +52,6 @@ class CraftUI(
         val makeButton: ItemStack = ItemStack(Material.ANVIL).apply {
             itemMeta = itemMeta.apply {
                 displayName(Component.text("Making items"))
-                val key = CustomCrafterAPI.genCCKey()
-                persistentDataContainer.set(key.first, key.second, key.third)
             }
         }
         this.inventory.setItem(CustomCrafterAPI.CRAFTING_TABLE_MAKE_BUTTON_SLOT, makeButton)
