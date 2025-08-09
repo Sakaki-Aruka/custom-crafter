@@ -77,7 +77,8 @@ object CustomCrafterAPI {
      * @since 5.0.10
      */
     val AUTO_CRAFTING_CONFIG_COMPATIBILITIES: Map<String, Set<String>> = mapOf(
-        "0.1.10" to setOf("0.1.10")
+        "0.1.10" to setOf("0.1.10"),
+        "0.1.11" to setOf("0.1.11")
     )
 
 
@@ -108,20 +109,6 @@ object CustomCrafterAPI {
      */
     internal var ALL_CANDIDATE_NO_DISPLAYABLE_ITEM_LORE_SUPPLIER: (String) -> List<Component>? = { recipeName ->
         listOf(MiniMessage.miniMessage().deserialize("<white>Recipe Name: $recipeName"))
-    }
-
-    /**
-     * A lambda expression used to pick only one [AutoCraftRecipe] when auto-crafting provides more than 2 recipes.
-     * ```
-     * // A default implementation
-     * AUTO_CRAFTING_PICKUP_RESOLVER = { list ->
-     *   list.firstOrNull()
-     * }
-     * ```
-     * @since 5.0.10
-     */
-    var AUTO_CRAFTING_PICKUP_RESOLVER: (List<AutoCraftRecipe>) -> AutoCraftRecipe? = { list ->
-        list.firstOrNull()
     }
 
 

@@ -27,8 +27,7 @@ class RecipeSetUI(
     )
 
     init {
-        val autoRecipes: List<AutoCraftRecipe> = CustomCrafterAPI.getRecipes()
-            .filterIsInstance<AutoCraftRecipe>()
+        val autoRecipes: List<AutoCraftRecipe> = CustomCrafterAPI.AUTO_CRAFTING_SETTING_PAGE_SUGGESTION(this.block, this.player)
             .sortedBy { recipe -> recipe.name }
 
         val chunked: List<List<AutoCraftRecipe>> = autoRecipes.chunked(45)

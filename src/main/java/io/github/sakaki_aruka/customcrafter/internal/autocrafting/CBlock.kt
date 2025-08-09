@@ -29,10 +29,6 @@ internal class CBlock(
         val NAME = KeyContainer("name", PersistentDataType.STRING)
         val PUBLISHER = KeyContainer("publisher", PersistentDataType.STRING)
         val SLOTS = KeyContainer("slots", PersistentDataType.INTEGER_ARRAY)
-        val SUPPORTED_VERSIONS_MAP: Map<String, Set<String>> = mapOf(
-            "0.1.10" to setOf("0.1.10"), // v5.0.10
-            "0.1.11" to setOf("0.1.11")  // v5.0.11
-        )
 
         val RECIPE_SEARCH_CACHE: MutableMap<Block, AutoCraftRecipe> = mutableMapOf()
         val RECIPE_SEARCH_CACHE_EXPIRE_UNIX_TIMES: MutableMap<Block, Long> = mutableMapOf()
@@ -66,7 +62,7 @@ internal class CBlock(
     }
 
     fun isSupportedVersion(v: String): Boolean {
-        val candidate: Set<String> = SUPPORTED_VERSIONS_MAP[CustomCrafterAPI.API_VERSION]
+        val candidate: Set<String> = CustomCrafterAPI.AUTO_CRAFTING_CONFIG_COMPATIBILITIES[CustomCrafterAPI.API_VERSION]
             ?: return false
         return candidate.contains(v)
     }
