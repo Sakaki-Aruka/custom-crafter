@@ -1,4 +1,4 @@
-package io.github.sakaki_aruka.customcrafter.impl.recipe.filter
+package io.github.sakaki_aruka.customcrafter.impl.recipe
 
 import io.github.sakaki_aruka.customcrafter.api.interfaces.filter.CRecipeFilter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
@@ -8,7 +8,6 @@ import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.objects.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
-import io.github.sakaki_aruka.customcrafter.impl.recipe.CRecipeImpl
 import org.bukkit.Material
 import org.bukkit.inventory.CraftingRecipe
 import org.bukkit.inventory.Recipe
@@ -46,7 +45,7 @@ data class CVanillaRecipe internal constructor(
                 recipe.key.namespace + recipe.key.key,
                 shapeToItems(recipe.shape, recipe.choiceMap),
                 CRecipeType.NORMAL,
-                results = listOf(ResultSupplier.timesSingle(recipe.result)),
+                results = listOf(ResultSupplier.Companion.timesSingle(recipe.result)),
                 original = recipe
             )
         }
@@ -63,7 +62,7 @@ data class CVanillaRecipe internal constructor(
                 recipe.key.namespace + recipe.key.key,
                 shapelessToItems(recipe.choiceList),
                 CRecipeType.AMORPHOUS,
-                results = listOf(ResultSupplier.timesSingle(recipe.result)),
+                results = listOf(ResultSupplier.Companion.timesSingle(recipe.result)),
                 original = recipe
             )
         }
@@ -76,7 +75,7 @@ data class CVanillaRecipe internal constructor(
                     candidates.firstOrNull()?.name ?: "vanilla matter default name",
                     candidates
                 )
-                result[CoordinateComponent.fromIndex(index)] = matter
+                result[CoordinateComponent.Companion.fromIndex(index)] = matter
             }
             return result
         }
@@ -93,7 +92,7 @@ data class CVanillaRecipe internal constructor(
                     candidates.firstOrNull()?.name ?: "vanilla matter default name",
                     candidates
                 )
-                result[CoordinateComponent.fromIndex(index)] = matter
+                result[CoordinateComponent.Companion.fromIndex(index)] = matter
             }
             return result
         }
