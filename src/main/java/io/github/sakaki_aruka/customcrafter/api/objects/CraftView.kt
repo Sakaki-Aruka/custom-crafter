@@ -5,11 +5,8 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter
-import kotlinx.serialization.json.Json
-import org.bukkit.Material
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
-import java.util.Base64
 import kotlin.math.max
 
 /**
@@ -55,28 +52,6 @@ data class CraftView internal constructor(
             val result: ItemStack = inventory.getItem(CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT) ?: ItemStack.empty()
             return CraftView(mapped, result)
         }
-
-        /**
-         * decodes a json string to CraftView
-         *
-         * @param[json] an input json string
-         * @return[CraftView] a deserialized CraftView
-         * @since 5.0.8
-         */
-        fun fromJson(json: String): CraftView {
-            val map: Map<Int, String> = Json.decodeFromString(json)
-            val deserialized: MutableMap<CoordinateComponent, ItemStack> = mutableMapOf()
-            map.forEach { (index, item) ->
-                val itemByteArray: ByteArray = Base64.getDecoder().decode(item)
-                deserialized[CoordinateComponent.fromIndex(index, followLimit = false)] = ItemStack.deserializeBytes(itemByteArray)
-            }
-            val result: ItemStack =
-                if (Int.MAX_VALUE in map.keys) {
-                    ItemStack.deserializeBytes(Base64.getDecoder().decode(map[Int.MAX_VALUE]))
-                }
-                else ItemStack.empty()
-            return CraftView(deserialized, result)
-        }
     }
 
     /**
@@ -93,28 +68,6 @@ data class CraftView internal constructor(
         }
         gui.setItem(CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT, this.result)
         return gui
-    }
-
-    /**
-     * converts a view to [ByteArray] (ByteArray equals byte[] in Java)
-     *
-     * @return[String] a serialized CraftView string
-     * @since 5.0.8
-     */
-    fun toJson(): String {
-        val converted: MutableMap<Int, String> = mutableMapOf()
-        for (index in (0..<54)) {
-            val item: ItemStack = this.materials[CoordinateComponent.fromIndex(index, followLimit = false)]
-                .takeIf { i -> i?.type != Material.AIR } ?: continue
-            converted[index] = Base64.getEncoder().encodeToString(item.serializeAsBytes())
-        }
-
-        this.result
-            .takeIf { i -> i.type != Material.AIR }
-            ?.let { result ->
-                converted[Int.MAX_VALUE] = Base64.getEncoder().encodeToString(result.serializeAsBytes())
-            }
-        return Json.encodeToString(converted)
     }
 
     /**

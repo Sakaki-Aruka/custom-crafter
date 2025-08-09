@@ -12,7 +12,6 @@ import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.impl.recipe.CVanillaRecipe
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter
-import kotlinx.serialization.json.Json
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.World
@@ -24,7 +23,6 @@ import org.bukkit.inventory.Recipe
 import java.util.UUID
 import kotlin.math.abs
 import kotlin.math.min
-import kotlin.reflect.KClass
 
 object Search {
 
@@ -54,22 +52,6 @@ object Search {
          *
          */
         fun customs() = this.customs
-
-        /**
-         * converts to a json string from specified SearchResult
-         *
-         * @return[String] serialized SearchResult string
-         * @since 5.0.8
-         */
-        fun toJson(): String {
-            val vanillaRecipeNamespacedKey: String = vanilla?.let { r -> (r as CraftingRecipe).key.toString() } ?: ""
-            val customsList: MutableList<Pair<String, MappedRelation>> = mutableListOf()
-            customs.forEach { (recipe, mapped) ->
-                val recipeString = "${recipe.name}-${recipe.items.hashCode()}-${recipe.type.name}"
-                customsList.add(recipeString to mapped)
-            }
-            return Json.encodeToString(vanillaRecipeNamespacedKey to customsList)
-        }
 
         /**
          * returns search result size that is sum of vanilla and customs.
@@ -105,35 +87,6 @@ object Search {
             }
             this.customs.forEach { (recipe, relation) -> result.add(recipe to relation) }
             return result
-        }
-
-        companion object {
-            /**
-             * converts to a SearchResult instance from a specified json string
-             *
-             * @param[json] A SearchResult json string
-             * @param[sourceRecipes] A list of source recipes. (default = CustomCrafterAPI.getRecipes() / since 5.0.10)
-             * @return[SearchResult] deserialized SearchResult instance
-             * @since 5.0.8
-             */
-            fun fromJson(
-                json: String,
-                sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes()
-            ): SearchResult {
-                val pair: Pair<String, List<Pair<String, MappedRelation>>> = Json.decodeFromString(json)
-                val vanilla: Recipe? = Bukkit.recipeIterator()
-                    .asSequence()
-                    .filter { r -> r is CraftingRecipe }
-                    .firstOrNull { r -> (r as CraftingRecipe).key.toString() == pair.first }
-                val list: List<Pair<String, MappedRelation>> = pair.second
-                val customs: List<Pair<CRecipe, MappedRelation>> = list.map { (cRecipe, mapped) ->
-                    val c: CRecipe = sourceRecipes.first { r ->
-                        "${r.name}-${r.items.hashCode()}-${r.type.name}" == cRecipe
-                    }
-                    c to mapped
-                }
-                return SearchResult(vanilla, customs)
-            }
         }
 
         // when call Search#search with natural: Boolean
