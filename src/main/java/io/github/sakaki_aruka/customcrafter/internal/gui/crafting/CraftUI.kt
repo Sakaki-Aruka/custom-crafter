@@ -118,7 +118,6 @@ class CraftUI(
                 if (CustomCrafterAPI.RESULT_GIVE_CANCEL) return
 
                 if (result.customs().isEmpty() && result.vanilla() == null) return
-                val mass: Boolean = event.click == ClickType.SHIFT_LEFT
 
                 if (CustomCrafterAPI.USE_MULTIPLE_RESULT_CANDIDATE_FEATURE) {
                     val allCandidateUI = AllCandidateUI(

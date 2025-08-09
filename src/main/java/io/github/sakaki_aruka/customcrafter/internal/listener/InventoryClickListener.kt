@@ -1,7 +1,5 @@
 package io.github.sakaki_aruka.customcrafter.internal.listener
 
-import io.github.sakaki_aruka.customcrafter.CustomCrafter
-import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterUI
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -29,15 +27,5 @@ object InventoryClickListener: Listener {
         if (clicked is PlayerInventory && top.holder != null && top.holder is CustomCrafterUI) {
             (top.holder as CustomCrafterUI).onPlayerInventoryClick(clicked, this)
         }
-    }
-
-    private fun isOld(gui: Inventory): Boolean {
-        val (key, type, _) = CustomCrafterAPI.genCCKey()
-        val time: Long = gui.contents
-            .filterNotNull()
-            .firstOrNull { item -> item.itemMeta.persistentDataContainer.has(key, type) }
-            ?.let { i -> i.itemMeta.persistentDataContainer.get(key, type) }
-            ?: return false
-        return time < CustomCrafter.INITIALIZED
     }
 }
