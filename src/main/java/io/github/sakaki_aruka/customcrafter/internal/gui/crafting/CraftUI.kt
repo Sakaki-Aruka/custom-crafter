@@ -65,8 +65,9 @@ class CraftUI(
             val clicked: Block = event.clickedBlock?.takeIf { b -> b.type == Material.CRAFTING_TABLE }
                 ?: return false
             val underCenter: Block = clicked.getRelative(0, -1, 0)
-            for (dx in (-1..1)) {
-                for (dz in (-1..1)) {
+            val half: Int = CustomCrafterAPI.BASE_BLOCK_SIDE / 2
+            for (dx in (-half..half)) {
+                for (dz in (-half..half)) {
                     if (underCenter.getRelative(dx, 0, dz).type != CustomCrafterAPI.BASE_BLOCK) {
                         return false
                     }

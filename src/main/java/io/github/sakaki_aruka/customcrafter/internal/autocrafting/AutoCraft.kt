@@ -83,8 +83,9 @@ object AutoCraft {
         val crafterWorld: World = crafter.world
         val underCenter = Location(crafterWorld, crafterLoc.x, crafterLoc.y - 1, crafterLoc.z)
         if (crafterWorld.getBlockAt(underCenter).type != Material.AIR) return false
-        for (dz in (-1..1)) {
-            for (dx in (-1..1)) {
+        val half: Int = InternalAPI.AUTO_CRAFTING_BASE_BLOCK_SIDE / 2
+        for (dz in (-half..half)) {
+            for (dx in (-half..half)) {
                 if (dx == 0 && dz == 0) continue
                 val loc = Location(crafterWorld, underCenter.x + dx, underCenter.y, underCenter.z + dz)
                 if (crafterWorld.getBlockAt(loc).type != CustomCrafterAPI.getAutoCraftingBaseBlock()) return false

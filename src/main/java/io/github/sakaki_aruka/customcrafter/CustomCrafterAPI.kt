@@ -124,19 +124,6 @@ object CustomCrafterAPI {
         list.firstOrNull()
     }
 
-    /**
-     * A lambda expression that provides the set of recipes used as the source when the Auto Crafting feature searches for a recipe matching the recorded recipe ID.
-     * ```kotlin
-     * // A default implementation
-     * AUTO_CRAFTING_SOURCE_RECIPES_PROVIDER: (Block) -> List<AutoCraftingIdentifier> = { _ ->
-     *     CustomCrafterAPI.getRecipes().filterIsInstance<AutoCraftingIdentifier>()
-     * }
-     * ```
-     * @since 5.0.10
-     */
-    var AUTO_CRAFTING_SOURCE_RECIPES_PROVIDER: (Block) -> List<AutoCraftRecipe> = { _ ->
-        this.getRecipes().filterIsInstance<AutoCraftRecipe>()
-    }
 
     /**
      * ```kotlin
@@ -155,9 +142,12 @@ object CustomCrafterAPI {
      *
      * ```kotlin
      * // A Default implementation
-     * AUTO_CRAFTING_RESULT_PICKUP_RESOLVER: (List<CRecipe>, Search.SearchResult, Block) -> Pair<CRecipe?, Recipe?> = { _, result, _ ->
-     *     result.customs().firstOrNull() to result.vanilla()
-     * }
+     *     var AUTO_CRAFTING_RESULT_PICKUP_RESOLVER: (List<CRecipe>, Search.SearchResult, Block)
+     *         -> Triple<AutoCraftRecipe?, MappedRelation?, Recipe?> = { _, result, _ ->
+     *             result.customs().firstOrNull { (recipe, _) -> recipe is AutoCraftRecipe }?.let { (recipe, relation) ->
+     *                 Triple(recipe as AutoCraftRecipe, relation, result.vanilla())
+     *             } ?: Triple(null, null, result.vanilla())
+     *     }
      * ```
      * @since 5.0.10
      */
