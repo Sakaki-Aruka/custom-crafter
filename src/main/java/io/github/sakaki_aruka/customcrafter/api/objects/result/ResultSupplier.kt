@@ -15,10 +15,13 @@ import java.util.UUID
  * ```
  * // call example from Kotlin
  * val supplier = ResultSupplier { config ->
- *     if (config.crafterID == UUID.fromString("069a79f4-44e9-4726-a5be-fca90e38aaf5")) {
+ *     if (config is NormalConfig
+ *         && (config as NormalConfig).crafterID == UUID.fromString("069a79f4-44e9-4726-a5be-fca90e38aaf5")) {
  *         // Only for Notch
  *         listOf(ItemStack(Material.ENCHANTED_GOLDEN_APPLE))
- *     } else emptyList()
+ *     } else {
+ *         emptyList()
+ *     }
  * }
  * ```
  */

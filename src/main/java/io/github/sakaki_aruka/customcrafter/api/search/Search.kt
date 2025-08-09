@@ -10,6 +10,7 @@ import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelationComponent
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
+import io.github.sakaki_aruka.customcrafter.impl.recipe.filter.CVanillaRecipe
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import kotlinx.serialization.json.Json
 import org.bukkit.Bukkit
@@ -87,6 +88,23 @@ object Search {
             val v: Int = if (this.vanilla != null) 1 else 0
             val c: Int = this.customs.size
             return v + c
+        }
+
+        /**
+         * returns all CRecipe and relation list. (If 'vanilla' is not null, a result list contains converted CRecipe.)
+         *
+         * (If an element converted from a vanilla recipe, it does not contain 'MappedRelation'.)
+         *
+         * @return[List] = List<Pair<CRecipe, MappedRelation?>>: Result
+         * @since 5.0.11
+         */
+        fun getMergedResults(): List<Pair<CRecipe, MappedRelation?>> {
+            val result: MutableList<Pair<CRecipe, MappedRelation?>> = mutableListOf()
+            this.vanilla?.let { v ->
+                CVanillaRecipe.fromVanilla(v as CraftingRecipe)?.let { r -> result.add(r to null) }
+            }
+            this.customs.forEach { (recipe, relation) -> result.add(recipe to relation) }
+            return result
         }
 
         companion object {

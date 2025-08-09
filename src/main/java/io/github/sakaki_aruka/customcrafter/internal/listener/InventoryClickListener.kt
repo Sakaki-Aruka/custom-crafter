@@ -11,6 +11,7 @@ import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.Inventory
+import org.bukkit.inventory.PlayerInventory
 
 /**
  * @suppress
@@ -20,27 +21,16 @@ object InventoryClickListener: Listener {
     fun InventoryClickEvent.onClick() {
         val clicked: Inventory = clickedInventory ?: return
 
-        //debug
         clicked.holder?.let { holder ->
             (holder as? CustomCrafterUI)?.let { ui ->
-
-                //debug
-                println("Inventory Holder = ${holder::class.java.simpleName}")
-
                 ui.onClick(clicked, this)
                 return
             }
         }
 
         val top: Inventory = whoClicked.openInventory.topInventory
-        val bottom: Inventory = whoClicked.openInventory.bottomInventory
-
-        val gui: CustomCrafterGUI = CustomCrafterGUI.getGUI(top) ?: return
-        if (isOld(top) || isOld(bottom)) {
-            whoClicked.openInventory(OldWarnGUI.getPage())
-            return
-        } else {
-            (gui as? ReactionProvider)?.eventReaction(this, gui, clicked, isTopInventory = clicked == top)
+        if (clicked is PlayerInventory && top is CustomCrafterUI) {
+            top.onPlayerInventoryClick(clicked, this)
         }
     }
 

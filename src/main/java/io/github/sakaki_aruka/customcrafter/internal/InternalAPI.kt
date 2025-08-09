@@ -3,6 +3,9 @@ package io.github.sakaki_aruka.customcrafter.internal
 import io.github.sakaki_aruka.customcrafter.CustomCrafter
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.active_test.CAssert
+import io.github.sakaki_aruka.customcrafter.api.objects.result.ResultSupplier
+import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
+import io.github.sakaki_aruka.customcrafter.impl.recipe.CRecipeImpl
 import io.github.sakaki_aruka.customcrafter.impl.test.APITest
 import io.github.sakaki_aruka.customcrafter.impl.test.ConverterTest
 import io.github.sakaki_aruka.customcrafter.impl.test.MultipleCandidateTest
@@ -11,6 +14,7 @@ import io.github.sakaki_aruka.customcrafter.impl.test.VanillaSearchTest
 import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlockDB
 import org.bukkit.Bukkit
 import org.bukkit.Material
+import org.bukkit.inventory.ItemStack
 import org.bukkit.scheduler.BukkitRunnable
 import java.nio.file.Paths
 import java.sql.SQLException
@@ -65,6 +69,13 @@ internal object InternalAPI {
 
         //debug
         CustomCrafterAPI.USE_AUTO_CRAFTING_FEATURE = true
+        CustomCrafterAPI.USE_MULTIPLE_RESULT_CANDIDATE_FEATURE = true
+        (0..<90).forEach { i ->
+            CustomCrafterAPI.registerRecipe(CRecipeImpl(
+                "recipe-${i}", listOf(CMatterImpl.single(Material.STONE)),
+                results = listOf(ResultSupplier.timesSingle(ItemStack.of(Material.COBBLESTONE)))
+            ))
+        }
 
         if (CustomCrafterAPI.USE_AUTO_CRAFTING_FEATURE) {
             try {
