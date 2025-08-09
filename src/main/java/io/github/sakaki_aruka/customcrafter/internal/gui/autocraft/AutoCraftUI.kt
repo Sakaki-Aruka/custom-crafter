@@ -88,10 +88,6 @@ internal class AutoCraftUI(
 
                 val recipeSetUI: Inventory = RecipeSetUI(this.block, this.player).inventory
                 if (recipeSetUI.isEmpty) {
-
-                    //debug
-                    println("RecipeSetUI is empty")
-
                     return
                 }
 

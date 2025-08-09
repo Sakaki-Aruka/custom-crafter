@@ -12,8 +12,11 @@ import io.github.sakaki_aruka.customcrafter.impl.test.MultipleCandidateTest
 import io.github.sakaki_aruka.customcrafter.impl.test.SearchTest
 import io.github.sakaki_aruka.customcrafter.impl.test.VanillaSearchTest
 import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlockDB
+import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterUI
 import org.bukkit.Bukkit
 import org.bukkit.Material
+import org.bukkit.event.inventory.InventoryCloseEvent
+import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
 import org.bukkit.scheduler.BukkitRunnable
 import java.nio.file.Paths
@@ -93,6 +96,18 @@ internal object InternalAPI {
                 warn("AutoCraft DB Initialize Error. The feature will turn off.")
                 warn(e.message ?: "? Error ?")
                 CustomCrafterAPI.USE_AUTO_CRAFTING_FEATURE = false
+            }
+        }
+    }
+
+    fun shutdown() {
+        for (player in Bukkit.getOnlinePlayers()) {
+            val holder: InventoryHolder = player.openInventory.topInventory.holder ?: continue
+            if (holder is CustomCrafterUI) {
+                holder.onClose(
+                    InventoryCloseEvent(player.openInventory)
+                )
+                player.closeInventory()
             }
         }
     }

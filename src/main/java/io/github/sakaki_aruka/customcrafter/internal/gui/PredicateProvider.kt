@@ -8,8 +8,4 @@ import org.bukkit.event.Event
  */
 interface PredicateProvider<U> {
     fun <T: Event> predicate(event: T): U?
-
-    companion object {
-        val PROVIDERS: MutableSet<PredicateProvider<*>> = mutableSetOf()
-    }
 }
