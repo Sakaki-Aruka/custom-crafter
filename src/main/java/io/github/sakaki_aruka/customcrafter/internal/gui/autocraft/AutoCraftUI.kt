@@ -59,6 +59,8 @@ internal class AutoCraftUI(
                 )
             }
         }
+
+        // TODO: impl InteractTriggered
     }
 
     override fun getClickableType(slot: Int): CustomCrafterUI.ClickableType {
