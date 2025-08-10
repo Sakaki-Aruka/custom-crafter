@@ -84,7 +84,9 @@ data class CraftView internal constructor(
         shiftUsed: Boolean = true,
         forCustomSettings: Pair<CRecipe, MappedRelation>? = null
     ): CraftView {
-        val minAmount: Int = this.materials.minOf { (_, i) -> i.amount }
+        val minAmount: Int = this.materials.values
+            .filter { item -> !item.isEmpty && item.type.isItem }
+            .minOf { item -> item.amount }
         return forCustomSettings?.let { (cRecipe, mapped) ->
             val map: MutableMap<CoordinateComponent, ItemStack> = mutableMapOf()
             mapped.components.forEach { component ->

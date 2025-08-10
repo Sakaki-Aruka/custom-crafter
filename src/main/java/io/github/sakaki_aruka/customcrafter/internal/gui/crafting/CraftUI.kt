@@ -18,7 +18,6 @@ import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
-import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.event.player.PlayerInteractEvent
@@ -118,7 +117,7 @@ class CraftUI(
 
                 if (result.customs().isEmpty() && result.vanilla() == null) return
 
-                if (CustomCrafterAPI.USE_MULTIPLE_RESULT_CANDIDATE_FEATURE) {
+                if (CustomCrafterAPI.USE_MULTIPLE_RESULT_CANDIDATE_FEATURE && result.size() > 1) {
                     val allCandidateUI = AllCandidateUI(
                         view = view,
                         player = player,

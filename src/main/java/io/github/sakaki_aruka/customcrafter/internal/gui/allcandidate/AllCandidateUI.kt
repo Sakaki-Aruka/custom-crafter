@@ -7,12 +7,14 @@ import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.search.Search
 import io.github.sakaki_aruka.customcrafter.impl.recipe.CVanillaRecipe
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter.toComponent
+import io.github.sakaki_aruka.customcrafter.impl.util.InventoryUtil.giveItems
 import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterUI
 import io.github.sakaki_aruka.customcrafter.internal.gui.crafting.CraftUI
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
+import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.inventory.CraftingRecipe
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
@@ -24,6 +26,7 @@ class AllCandidateUI(
     private val player: Player,
     private val result: Search.SearchResult,
     useShift: Boolean,
+    private var dropOnClose: Boolean = true
 ) : CustomCrafterUI.Pageable, InventoryHolder {
     private val inventory: Inventory = Bukkit.createInventory(
         this,
@@ -120,6 +123,13 @@ class AllCandidateUI(
         return this.currentPage > 0
     }
 
+    override fun onClose(event: InventoryCloseEvent) {
+        if (!this.dropOnClose) {
+            return
+        }
+        player.giveItems(saveLimit = true, *this.view.materials.values.toTypedArray(), this.view.result)
+    }
+
     override fun onClick(
         clicked: Inventory,
         event: InventoryClickEvent
@@ -198,6 +208,7 @@ class AllCandidateUI(
                     craftUI.inventory.setItem(c.toIndex(), item)
                 }
                 craftUI.inventory.setItem(CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT, this.view.result)
+                this.dropOnClose = false
                 player.openInventory(craftUI.inventory)
             }
         }
