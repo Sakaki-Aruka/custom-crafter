@@ -80,7 +80,7 @@ object CC {
             }
         ).then(Commands.literal("auto-crafting-base-block")
             .executes { ctx ->
-                ctx.msg("AUTO_CRAFTING_BASE_BLOCK: ${InternalAPI.AUTO_CRAFTING_BLOCKS.joinToString(", ")}")
+                ctx.msg("AUTO_CRAFTING_BASE_BLOCK: ${CustomCrafterAPI.getAutoCraftingBaseBlock()}")
                 return@executes SINGLE_SUCCESS
             }
         ).then(Commands.literal("use-multiple-result-candidates-feature")

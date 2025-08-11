@@ -1,7 +1,9 @@
 package io.github.sakaki_aruka.customcrafter.internal.gui.autocraft
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafter
+import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter.toComponent
+import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
 import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlock
 import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlockDB
 import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterUI
@@ -12,6 +14,7 @@ import org.bukkit.block.Block
 import org.bukkit.block.Crafter
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
+import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
@@ -48,7 +51,7 @@ internal class AutoCraftUI(
         }
     }
 
-    companion object {
+    companion object: CustomCrafterUI.InteractTriggered {
         val UNDEFINED: ItemStack = ItemStack.of(Material.BARRIER).apply {
             itemMeta = itemMeta.apply {
                 displayName("<red><b><u>RECIPE UNDEFINED".toComponent())
@@ -60,7 +63,34 @@ internal class AutoCraftUI(
             }
         }
 
-        // TODO: impl InteractTriggered
+        override fun isTrigger(event: PlayerInteractEvent): Boolean {
+            /*
+             * xxx
+             * x x
+             * xxx
+             * (in default)
+             */
+            val clicked: Block = event.clickedBlock?.takeIf { b ->
+                b.type == Material.CRAFTER
+            } ?: return false
+            val underCenter: Block = clicked.getRelative(0, -1, 0)
+            val half: Int = InternalAPI.AUTO_CRAFTING_BASE_BLOCK_SIDE / 2
+            for (dx in (-half..half)) {
+                for (dz in (-half..half)) {
+                    if (dx == 0 && dz == 0) {
+                        continue
+                    } else if (underCenter.getRelative(dx, 0, dz).type != CustomCrafterAPI.getAutoCraftingBaseBlock()) {
+                        return false
+                    }
+                }
+            }
+            return true
+        }
+
+        override fun open(event: PlayerInteractEvent) {
+            event.isCancelled = true
+            event.player.openInventory(AutoCraftUI(event.clickedBlock!!, event.player).inventory)
+        }
     }
 
     override fun getClickableType(slot: Int): CustomCrafterUI.ClickableType {
