@@ -64,7 +64,7 @@ object CustomCrafterAPI {
     fun setResultGiveCancel(v: Boolean) {
         if (RESULT_GIVE_CANCEL != v) {
             CustomCrafterAPIPropertiesChangeEvent(
-                propertyName = "RESULT_GIVE_CANCEL",
+                propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.RESULT_GIVE_CANCEL.name,
                 old = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(RESULT_GIVE_CANCEL),
                 new = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(v)
             ).callEvent()
@@ -99,7 +99,7 @@ object CustomCrafterAPI {
 
         if (type != BASE_BLOCK) {
             CustomCrafterAPIPropertiesChangeEvent(
-                propertyName = "BASE_BLOCK",
+                propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK.name,
                 old = CustomCrafterAPIPropertiesChangeEvent.Property<Material>(BASE_BLOCK),
                 new = CustomCrafterAPIPropertiesChangeEvent.Property<Material>(type)
             ).callEvent()
@@ -138,7 +138,7 @@ object CustomCrafterAPI {
     fun setUseMultipleResultCandidateFeature(v: Boolean) {
         if (v != USE_MULTIPLE_RESULT_CANDIDATE_FEATURE) {
             CustomCrafterAPIPropertiesChangeEvent(
-                propertyName = "USE_MULTIPLE_RESULT_CANDIDATE_FEATURE",
+                propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.USE_MULTIPLE_RESULT_CANDIDATE_FEATURE.name,
                 old = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(USE_MULTIPLE_RESULT_CANDIDATE_FEATURE),
                 new = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(v)
             ).callEvent()
@@ -171,7 +171,7 @@ object CustomCrafterAPI {
     fun setUseAutoCraftingFeature(v: Boolean) {
         if (v != USE_AUTO_CRAFTING_FEATURE) {
             CustomCrafterAPIPropertiesChangeEvent(
-                propertyName = "USE_AUTO_CRAFTING_FEATURE",
+                propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.USE_AUTO_CRAFTING_FEATURE.name,
                 old = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(USE_AUTO_CRAFTING_FEATURE),
                 new = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(v)
             ).callEvent()
@@ -209,7 +209,7 @@ object CustomCrafterAPI {
         if (size <= 0 || size % 2 != 1) return false
         if (size != BASE_BLOCK_SIDE) {
             CustomCrafterAPIPropertiesChangeEvent(
-                propertyName = "BASE_BLOCK_SIDE",
+                propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK_SIDE.name,
                 old = CustomCrafterAPIPropertiesChangeEvent.Property<Int>(BASE_BLOCK_SIDE),
                 new = CustomCrafterAPIPropertiesChangeEvent.Property<Int>(size)
             ).callEvent()
