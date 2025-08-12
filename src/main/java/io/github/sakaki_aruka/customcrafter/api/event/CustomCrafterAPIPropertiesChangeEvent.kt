@@ -9,6 +9,18 @@ import org.bukkit.event.HandlerList
  *
  * (External plugins cannot initialize this instance.)
  *
+ * ```Kotlin
+ * // Example Code (Kotlin)
+ * object PropertiesChangeListener: Listener {
+ *   fun <T> CustomCrafterAPIPropertiesChangeEvent<T>.onChange() {
+ *     if (this.propertyName == "BASE_BLOCK") {
+ *       CustomCrafterAPI.setBaseBlock(this.old.value as Material)
+ *       println("I rejected new setting... Hahaha!!!")
+ *     }
+ *   }
+ * }
+ * ```
+ *
  * @param[propertyName] Name of property
  * @param[old] An old value
  * @param[new] A new value
