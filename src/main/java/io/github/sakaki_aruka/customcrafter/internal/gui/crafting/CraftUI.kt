@@ -62,10 +62,10 @@ class CraftUI(
             val clicked: Block = event.clickedBlock?.takeIf { b -> b.type == Material.CRAFTING_TABLE }
                 ?: return false
             val underCenter: Block = clicked.getRelative(0, -1, 0)
-            val half: Int = CustomCrafterAPI.BASE_BLOCK_SIDE / 2
+            val half: Int = CustomCrafterAPI.getBaseBlockSideSize() / 2
             for (dx in (-half..half)) {
                 for (dz in (-half..half)) {
-                    if (underCenter.getRelative(dx, 0, dz).type != CustomCrafterAPI.BASE_BLOCK) {
+                    if (underCenter.getRelative(dx, 0, dz).type != CustomCrafterAPI.getBaseBlock()) {
                         return false
                     }
                 }
@@ -109,15 +109,15 @@ class CraftUI(
                 val result: Search.SearchResult = Search.search(
                     player.uniqueId,
                     this.inventory,
-                    natural = !CustomCrafterAPI.USE_MULTIPLE_RESULT_CANDIDATE_FEATURE
+                    natural = !CustomCrafterAPI.getUseMultipleResultCandidateFeature()
                 ) ?: return
 
                 CreateCustomItemEvent(player, view, result, event.click).callEvent()
-                if (CustomCrafterAPI.RESULT_GIVE_CANCEL) return
+                if (CustomCrafterAPI.getResultGiveCancel()) return
 
                 if (result.customs().isEmpty() && result.vanilla() == null) return
 
-                if (CustomCrafterAPI.USE_MULTIPLE_RESULT_CANDIDATE_FEATURE && result.size() > 1) {
+                if (CustomCrafterAPI.getUseMultipleResultCandidateFeature() && result.size() > 1) {
                     val allCandidateUI = AllCandidateUI(
                         view = view,
                         player = player,

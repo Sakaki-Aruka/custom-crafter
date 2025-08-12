@@ -1,13 +1,23 @@
 package io.github.sakaki_aruka.customcrafter.api.event
 
+import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
 
-class CustomCrafterAPIPropertiesChangeEvent<T>(
+/**
+ * Called when [CustomCrafterAPI] changeable properties changed. (Only changed. When an old value is same with new value, this won't be called this.)
+ *
+ * (External plugins cannot initialize this instance.)
+ *
+ * @param[propertyName] Name of property
+ * @param[old] An old value
+ * @param[new] A new value
+ * @since[5.0.11]
+ */
+class CustomCrafterAPIPropertiesChangeEvent<T> internal constructor(
     val propertyName: String,
     val old: Property<T>,
     val new: Property<T>,
-    val fromStandardCommand: Boolean
 ): Event() {
     class Property<T> internal constructor(
         val value: T

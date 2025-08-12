@@ -70,12 +70,12 @@ object CC {
             }
         ).then(Commands.literal("result-give-cancel")
             .executes { ctx ->
-                ctx.msg("RESULT_GIVE_CANCEL: ${CustomCrafterAPI.RESULT_GIVE_CANCEL}")
+                ctx.msg("RESULT_GIVE_CANCEL: ${CustomCrafterAPI.getResultGiveCancel()}")
                 return@executes SINGLE_SUCCESS
             }
         ).then(Commands.literal("base-block")
             .executes { ctx ->
-                ctx.msg("BASE_BLOCK: ${CustomCrafterAPI.BASE_BLOCK.name}")
+                ctx.msg("BASE_BLOCK: ${CustomCrafterAPI.getBaseBlock().name}")
                 return@executes SINGLE_SUCCESS
             }
         ).then(Commands.literal("auto-crafting-base-block")
@@ -85,17 +85,17 @@ object CC {
             }
         ).then(Commands.literal("use-multiple-result-candidates-feature")
             .executes { ctx ->
-                ctx.msg("USE_MULTIPLE_RESULT_CANDIDATES_FEATURE: ${CustomCrafterAPI.USE_MULTIPLE_RESULT_CANDIDATE_FEATURE}")
+                ctx.msg("USE_MULTIPLE_RESULT_CANDIDATES_FEATURE: ${CustomCrafterAPI.getUseMultipleResultCandidateFeature()}")
                 return@executes SINGLE_SUCCESS
             }
         ).then(Commands.literal("use-auto-crafting-feature")
             .executes { ctx ->
-                ctx.msg("USE_AUTO_CRAFTING_FEATURE: ${CustomCrafterAPI.USE_AUTO_CRAFTING_FEATURE}")
+                ctx.msg("USE_AUTO_CRAFTING_FEATURE: ${CustomCrafterAPI.getUseAutoCraftingFeature()}")
                 return@executes SINGLE_SUCCESS
             }
         ).then(Commands.literal("base-block-side")
             .executes { ctx ->
-                ctx.msg("BASE_BLOCK_SIDE: ${CustomCrafterAPI.BASE_BLOCK_SIDE}")
+                ctx.msg("BASE_BLOCK_SIDE: ${CustomCrafterAPI.getBaseBlockSideSize()}")
                 return@executes SINGLE_SUCCESS
             }
         ).then(Commands.literal("auto-crafting-base-block-side")
@@ -117,7 +117,7 @@ object CC {
             .then(Commands.argument("value", BoolArgumentType.bool())
                 .executes { ctx ->
                     val v: Boolean = ctx.getArgument("value", Boolean::class.java)
-                    CustomCrafterAPI.RESULT_GIVE_CANCEL = v
+                    CustomCrafterAPI.setResultGiveCancel(v)
                     ctx.msg("<green>result-give-cancel toggle successful. (${v})")
                     return@executes SINGLE_SUCCESS
                 }
@@ -139,7 +139,7 @@ object CC {
             .then(Commands.argument("value", BoolArgumentType.bool())
                 .executes { ctx ->
                     val v: Boolean = ctx.getArgument("value", Boolean::class.java)
-                    CustomCrafterAPI.USE_MULTIPLE_RESULT_CANDIDATE_FEATURE = v
+                    CustomCrafterAPI.setUseMultipleResultCandidateFeature(v)
                     ctx.msg("<green>use-multiple-result-candidate-feature toggle successful. (${v})")
                     return@executes SINGLE_SUCCESS
                 }
@@ -151,9 +151,9 @@ object CC {
                     if (v) {
                         object: BukkitRunnable() {
                             override fun run() {
-                                CustomCrafterAPI.USE_AUTO_CRAFTING_FEATURE = true
+                                CustomCrafterAPI.setUseAutoCraftingFeature(true)
                                 InternalAPI.setup()
-                                if (v != CustomCrafterAPI.USE_AUTO_CRAFTING_FEATURE) {
+                                if (v != CustomCrafterAPI.getUseAutoCraftingFeature()) {
                                     ctx.msg("<red>Failed to toggle use-auto-crafting-feature. See console logs.")
                                 } else {
                                     ctx.msg("<green>use-auto-crafting-feature toggle successful. (${v})")
@@ -161,7 +161,7 @@ object CC {
                             }
                         }.runTaskAsynchronously(CustomCrafter.getInstance())
                     } else {
-                        CustomCrafterAPI.USE_AUTO_CRAFTING_FEATURE = false
+                        CustomCrafterAPI.setUseAutoCraftingFeature(false)
                         ctx.msg("<green>use-auto-crafting-feature toggle successful. (${v})")
                     }
                     return@executes SINGLE_SUCCESS

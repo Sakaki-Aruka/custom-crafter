@@ -71,8 +71,8 @@ internal object InternalAPI {
     fun setup() {
 
         //debug
-        CustomCrafterAPI.USE_AUTO_CRAFTING_FEATURE = true
-        CustomCrafterAPI.USE_MULTIPLE_RESULT_CANDIDATE_FEATURE = true
+        CustomCrafterAPI.setUseAutoCraftingFeature(true)
+        CustomCrafterAPI.setUseMultipleResultCandidateFeature(true)
         (0..<90).forEach { i ->
             CustomCrafterAPI.registerRecipe(CRecipeImpl(
                 "recipe-${i}", listOf(CMatterImpl.single(Material.STONE)),
@@ -80,7 +80,7 @@ internal object InternalAPI {
             ))
         }
 
-        if (CustomCrafterAPI.USE_AUTO_CRAFTING_FEATURE) {
+        if (CustomCrafterAPI.getUseAutoCraftingFeature()) {
             try {
                 Class.forName("org.sqlite.JDBC")
                 if (!CustomCrafter.getInstance().dataFolder.exists()) {
@@ -95,7 +95,7 @@ internal object InternalAPI {
             } catch (e: SQLException) {
                 warn("AutoCraft DB Initialize Error. The feature will turn off.")
                 warn(e.message ?: "? Error ?")
-                CustomCrafterAPI.USE_AUTO_CRAFTING_FEATURE = false
+                CustomCrafterAPI.setUseAutoCraftingFeature(false)
             }
         }
     }

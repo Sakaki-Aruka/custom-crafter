@@ -38,7 +38,7 @@ internal object APITest {
             CustomCrafterAPI.setBaseBlock(Material.DIAMOND)
         }
 
-        CustomCrafterAPI.BASE_BLOCK_SIDE = base
+        CustomCrafterAPI.setBaseBlockSideSize(base)
     }
 
     private fun allCandidateTest() {

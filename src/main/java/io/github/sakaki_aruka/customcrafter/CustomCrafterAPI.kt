@@ -1,5 +1,6 @@
 package io.github.sakaki_aruka.customcrafter
 
+import io.github.sakaki_aruka.customcrafter.api.event.CustomCrafterAPIPropertiesChangeEvent
 import io.github.sakaki_aruka.customcrafter.api.event.RegisterCustomRecipeEvent
 import io.github.sakaki_aruka.customcrafter.api.event.UnregisterCustomRecipeEvent
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.AutoCraftRecipe
@@ -39,23 +40,102 @@ object CustomCrafterAPI {
      */
     val AUTHORS: Set<String> = setOf("Sakaki-Aruka")
 
+    private var RESULT_GIVE_CANCEL: Boolean = false
     /**
-     * If this true, the Custom Crafter API does not give result items to players.
+     * Returns a boolean value that means the Custom Crafter API give result items to players or not.
+     * @return[Boolean] Give or not
+     * @since 5.0.11
+     */
+    fun getResultGiveCancel(): Boolean = RESULT_GIVE_CANCEL
+
+    /**
+     * Set a boolean value that means the Custom Crafter API give result items to players or not.
      *
      * You have to set this to true if you want to give result items processing in your plugin.
      *
-     * (Default Value is `false`)
+     * Default = `false`
+     * @param[v] Give or not
+     * @since 5.0.11
      */
-    var RESULT_GIVE_CANCEL: Boolean = false
-    internal var BASE_BLOCK: Material = Material.GOLD_BLOCK
+    fun setResultGiveCancel(v: Boolean) {
+        if (RESULT_GIVE_CANCEL != v) {
+            CustomCrafterAPIPropertiesChangeEvent(
+                propertyName = "RESULT_GIVE_CANCEL",
+                old = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(RESULT_GIVE_CANCEL),
+                new = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(v)
+            ).callEvent()
+        }
+        RESULT_GIVE_CANCEL = v
+    }
+
+    private var BASE_BLOCK: Material = Material.GOLD_BLOCK
+    /**
+     * Get a base block type.
+     * @return[Material] base block type
+     * @since 5.0.9
+     */
+    fun getBaseBlock(): Material = BASE_BLOCK
+
+    /**
+     * Set base block with given material.
+     *
+     * If a given material is not a block type, throws [IllegalArgumentException].
+     * @param[type] base block type
+     * @throws[IllegalArgumentException] when specified not a block type
+     * @since 5.0.9
+     */
+    fun setBaseBlock(type: Material) {
+        if (!type.isBlock) {
+            throw IllegalArgumentException("'type' must meet 'Material#isBlock'.")
+        }
+
+        if (type != BASE_BLOCK) {
+            CustomCrafterAPIPropertiesChangeEvent(
+                propertyName = "BASE_BLOCK",
+                old = CustomCrafterAPIPropertiesChangeEvent.Property<Material>(BASE_BLOCK),
+                new = CustomCrafterAPIPropertiesChangeEvent.Property<Material>(type)
+            ).callEvent()
+        }
+        BASE_BLOCK = type
+    }
 
     /**
      * use 'multiple result candidate' feature or not.
      * - true: if the system gets some result candidates, shows all candidates to a player.
      * - false: provides only a first matched item. (no prompt)
+     * @suppress
      * @since 5.0.8
      */
-    var USE_MULTIPLE_RESULT_CANDIDATE_FEATURE = false
+    private var USE_MULTIPLE_RESULT_CANDIDATE_FEATURE = false
+
+    /**
+     * Returns a boolean value that means 'multiple result candidate' feature enabled or not.
+     *
+     * - `true`: If the system gets some result candidates, shows all candidates to a player.
+     * - `false`: The API provides only a first matched item. (no prompt)
+     * @return[Boolean] Enabled or not
+     * @since 5.0.11 (original 5.0.8)
+     */
+    fun getUseMultipleResultCandidateFeature(): Boolean = USE_MULTIPLE_RESULT_CANDIDATE_FEATURE
+
+    /**
+     * Set 'multiple result candidate' feature enables or not.
+     *
+     * - `true`: If the system gets some result candidates, shows all candidates to a player.
+     * - `false`: The API provides only a first matched item. (no prompt)
+     * @param[v] Multiple result candidate feature enable or not
+     * @since 5.0.11 (original 5.0.8)
+     */
+    fun setUseMultipleResultCandidateFeature(v: Boolean) {
+        if (v != USE_MULTIPLE_RESULT_CANDIDATE_FEATURE) {
+            CustomCrafterAPIPropertiesChangeEvent(
+                propertyName = "USE_MULTIPLE_RESULT_CANDIDATE_FEATURE",
+                old = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(USE_MULTIPLE_RESULT_CANDIDATE_FEATURE),
+                new = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(v)
+            ).callEvent()
+        }
+        USE_MULTIPLE_RESULT_CANDIDATE_FEATURE = v
+    }
 
     /**
      * Use 'auto crafting' feature or not.
@@ -63,7 +143,30 @@ object CustomCrafterAPI {
      * Default is false.
      * @since 5.0.10
      */
-    var USE_AUTO_CRAFTING_FEATURE = false
+    private var USE_AUTO_CRAFTING_FEATURE = false
+
+    /**
+     * Returns 'auto crafting' feature enabled or not.
+     * @return[Boolean]
+     * @since 5.0.11 (original 5.0.10)
+     */
+    fun getUseAutoCraftingFeature(): Boolean = USE_AUTO_CRAFTING_FEATURE
+
+    /**
+     * Sets 'auto crafting' feature enables or not.
+     * @param[v] Auto Crafting feature enables or not
+     * @since 5.0.11 (original 5.0.10)
+     */
+    fun setUseAutoCraftingFeature(v: Boolean) {
+        if (v != USE_AUTO_CRAFTING_FEATURE) {
+            CustomCrafterAPIPropertiesChangeEvent(
+                propertyName = "USE_AUTO_CRAFTING_FEATURE",
+                old = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(USE_AUTO_CRAFTING_FEATURE),
+                new = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(v)
+            ).callEvent()
+        }
+        USE_AUTO_CRAFTING_FEATURE = v
+    }
 
     /**
      * AutoCrafting feature compatibilities.
@@ -78,8 +181,37 @@ object CustomCrafterAPI {
     )
 
 
-    internal var BASE_BLOCK_SIDE: Int = 3
-    const val CRAFTING_TABLE_MAKE_BUTTON_SLOT: Int = 35
+    private var BASE_BLOCK_SIDE: Int = 3
+    /**
+     * set base block's side size.
+     *
+     * default size = 3.
+     *
+     * @param[size] this argument must be odd and more than zero.
+     * @return[Boolean] if successful to change, returns true else false.
+     */
+    fun setBaseBlockSideSize(size: Int): Boolean {
+        if (size <= 0 || size % 2 != 1) return false
+        if (size != BASE_BLOCK_SIDE) {
+            CustomCrafterAPIPropertiesChangeEvent(
+                propertyName = "BASE_BLOCK_SIDE",
+                old = CustomCrafterAPIPropertiesChangeEvent.Property<Int>(BASE_BLOCK_SIDE),
+                new = CustomCrafterAPIPropertiesChangeEvent.Property<Int>(size)
+            ).callEvent()
+        }
+        BASE_BLOCK_SIDE = size
+        return true
+    }
+
+    /**
+     * get base block's side size.
+     *
+     * @return[Int] size
+     */
+    fun getBaseBlockSideSize(): Int = BASE_BLOCK_SIDE
+
+
+    internal const val CRAFTING_TABLE_MAKE_BUTTON_SLOT: Int = 35
     const val CRAFTING_TABLE_RESULT_SLOT: Int = 44
     const val CRAFTING_TABLE_TOTAL_SIZE: Int = 54
 
@@ -90,6 +222,7 @@ object CustomCrafterAPI {
      *
      * To set, use [setAllCandidateNotDisplayableItem].
      *
+     * @suppress
      * @since 5.0.9
      */
     internal var ALL_CANDIDATE_NO_DISPLAYABLE_ITEM = defaultAllCandidateNotDisplayableItems()
@@ -166,26 +299,6 @@ object CustomCrafterAPI {
     }
 
     /**
-     * Get base block type.
-     * @return[Material] base block type
-     * @since 5.0.9
-     */
-    fun getBaseBlock(): Material = BASE_BLOCK
-
-    /**
-     * Set base block with given material.
-     *
-     * If a given material is not a block type, throws [IllegalArgumentException].
-     * @param[type] base block type
-     * @throws[IllegalArgumentException] when specified not block type
-     * @since 5.0.9
-     */
-    fun setBaseBlock(type: Material) {
-        if (!type.isBlock) throw IllegalArgumentException("'type' must meet 'Material#isBlock'.")
-        BASE_BLOCK = type
-    }
-
-    /**
      * returns an IMMUTABLE list what contains all registered recipes.
      *
      * NOTICE: it is immutable, so you cannot modify its components.
@@ -239,27 +352,6 @@ object CustomCrafterAPI {
         if (event.isCancelled) return false
         return CustomCrafter.RECIPES.remove(recipe)
     }
-
-    /**
-     * set base block's side size.
-     *
-     * default size = 3.
-     *
-     * @param[size] this argument must be odd and more than zero.
-     * @return[Boolean] if successful to change, returns true else false.
-     */
-    fun setBaseBlockSideSize(size: Int): Boolean {
-        if (size <= 0 || size % 2 != 1) return false
-        BASE_BLOCK_SIDE = size
-        return true
-    }
-
-    /**
-     * get base block's side size.
-     *
-     * @return[Int] size
-     */
-    fun getBaseBlockSideSize(): Int = BASE_BLOCK_SIDE
 
     /**
      * Get an item that is used for an all-candidates-menu's not displayable items slot.
