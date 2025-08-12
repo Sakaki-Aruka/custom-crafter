@@ -40,6 +40,10 @@ object CustomCrafterAPI {
      */
     val AUTHORS: Set<String> = setOf("Sakaki-Aruka")
 
+    /**
+     * @suppress
+     * @see[CustomCrafterAPIPropertiesChangeEvent.PropertyKey.RESULT_GIVE_CANCEL]
+     */
     private var RESULT_GIVE_CANCEL: Boolean = false
     /**
      * Returns a boolean value that means the Custom Crafter API give result items to players or not.
@@ -68,6 +72,10 @@ object CustomCrafterAPI {
         RESULT_GIVE_CANCEL = v
     }
 
+    /**
+     * @suppress
+     * @see[CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK]
+     */
     private var BASE_BLOCK: Material = Material.GOLD_BLOCK
     /**
      * Get a base block type.
@@ -105,6 +113,7 @@ object CustomCrafterAPI {
      * - false: provides only a first matched item. (no prompt)
      * @suppress
      * @since 5.0.8
+     * @see[CustomCrafterAPIPropertiesChangeEvent.PropertyKey.USE_MULTIPLE_RESULT_CANDIDATE_FEATURE]
      */
     private var USE_MULTIPLE_RESULT_CANDIDATE_FEATURE = false
 
@@ -142,6 +151,8 @@ object CustomCrafterAPI {
      *
      * Default is false.
      * @since 5.0.10
+     * @suppress
+     * @see[CustomCrafterAPIPropertiesChangeEvent.PropertyKey.USE_AUTO_CRAFTING_FEATURE]
      */
     private var USE_AUTO_CRAFTING_FEATURE = false
 
@@ -181,6 +192,10 @@ object CustomCrafterAPI {
     )
 
 
+    /**
+     * @suppress
+     * @see[CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK_SIDE]
+     */
     private var BASE_BLOCK_SIDE: Int = 3
     /**
      * set base block's side size.
