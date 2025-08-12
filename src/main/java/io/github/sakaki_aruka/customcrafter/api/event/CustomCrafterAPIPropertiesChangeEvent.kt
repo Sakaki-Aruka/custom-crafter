@@ -19,6 +19,15 @@ class CustomCrafterAPIPropertiesChangeEvent<T> internal constructor(
     val old: Property<T>,
     val new: Property<T>,
 ): Event() {
+
+    /**
+     * A value of [CustomCrafterAPI] property.
+     *
+     * `T` is a type of instance contains value.
+     *
+     * @param[value] Value
+     * @since 5.0.11
+     */
     class Property<T> internal constructor(
         val value: T
     )
