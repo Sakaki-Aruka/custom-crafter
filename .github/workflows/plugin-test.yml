@@ -13,6 +13,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Set up jq and curl
+        run: apt-get update && apt-get install -y jq curl
+
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
@@ -28,7 +31,28 @@ jobs:
 
       - name: Download PaperMC 1.21.3
         working-directory: ./server
-        run: wget https://api.papermc.io/v2/projects/paper/versions/1.21.3/builds/83/downloads/paper-1.21.3-83.jar -O paper.jar
+        run: |
+          PROJECT="paper"
+          MINECRAFT_VERSION="1.21.3"
+          USER_AGENT="GitHub-Actions-test/0.1 (aruka.works@gmail.com)"
+          
+          VERSION_CHECK=$(curl -s -H "User-Agent: $USER_AGENT" https://fill.papermc.io/v3/projects/${PROJECT}/versions/${MINECRAFT_VERSION}/builds)
+          
+          if echo "$VERSION_CHECK" | jq -e '.ok == false' > /dev/null 2>&1; then
+            ERROR_MSG=$(echo "$VERSION_CHECK" | jq -r '.message // "Unknown error"')
+            echo "Error: $ERROR_MSG"
+            exit 1
+          fi
+          
+          PAPERMC_URL=$(curl -s -H "User-Agent: $USER_AGENT" https://fill.papermc.io/v3/projects/${PROJECT}/versions/${MINECRAFT_VERSION}/builds | \
+          jq -r 'first(.[] | select(.channel == "STABLE") | .downloads."server:default".url) // "null"')
+          
+          if [ "$PAPERMC_URL" != "null" ]; then
+            curl -o paper.jar $PAPERMC_URL
+            echo "Download completed"
+          else
+            echo "No stable build for version $MINECRAFT_VERSION found :("
+          fi
 
       - name: Accept EULA
         working-directory: ./server
