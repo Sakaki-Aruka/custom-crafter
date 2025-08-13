@@ -4,6 +4,8 @@ import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeContainer
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.objects.result.ResultSupplier
+import io.github.sakaki_aruka.customcrafter.impl.util.Converter.toComponent
+import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -26,7 +28,7 @@ interface AutoCraftRecipe: CRecipe {
     /**
      * This lambda provides a displayed item to players when they set auto crafting recipes.
      */
-    val autoCraftDisplayItemProvider: (Player) -> ItemStack
+    val autoCraftDisplayItemProvider: (Player, Block) -> ItemStack
 
     /**
      * [ResultSupplier] to provide result items on auto crafting.
@@ -37,6 +39,27 @@ interface AutoCraftRecipe: CRecipe {
      * [CRecipeContainer] what are run on auto crafting.
      */
     val autoCraftContainers: List<CRecipeContainer>?
+
+    companion object {
+        /**
+         * Returns a default display item resolver.
+         *
+         * @return[(Player, Block) -> ItemStack] A default resolver
+         * @since 5.0.11
+         */
+        fun getDefaultDisplayItemProvider(recipeName: String): (Player, Block) -> ItemStack = { player, block ->
+            val item: ItemStack = ItemStack.of(Material.COMMAND_BLOCK)
+            item.editMeta { meta ->
+                meta.displayName("<b><white>Recipe: $recipeName".toComponent())
+                meta.lore(listOf(
+                    "<b><yellow>This item is not an actual result item.".toComponent()
+                ))
+            }
+            item
+        }
+    }
+
+
 
 
     /**

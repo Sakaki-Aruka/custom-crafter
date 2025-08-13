@@ -9,9 +9,9 @@ import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.objects.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.impl.recipe.CRecipeImpl.Companion.getDefaultFilters
+import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import java.util.UUID
 
 /**
  * A default [CRecipe] and [AutoCraftRecipe] implementation class.
@@ -19,16 +19,20 @@ import java.util.UUID
  * @param[name] A name of this recipe.
  * @param[items] Elements of this recipe.
  * @param[type] A type of this recipe. (Normal or Amorphous (=Shapeless))
- * @param[autoCraftID] An id of this recipe.
+ * @parma[publisherPluginName] Name of a publisher plugin
+ * @param[autoCraftDisplayItemProvider] Item provider for auto-craft display
  * @param[containers] Containers of this recipe. (default = null)
  * @param[results]
+ * @param[filters]
+ * @param[autoCraftResults]
+ * @param[autoCraftContainers]
  */
 data class AutoCraftRecipeImpl(
     override val name: String,
     override val items: Map<CoordinateComponent, CMatter>,
     override val type: CRecipeType,
-    override val autoCraftDisplayItemProvider: (Player) -> ItemStack,
     override val publisherPluginName: String,
+    override val autoCraftDisplayItemProvider: (Player, Block) -> ItemStack = AutoCraftRecipe.getDefaultDisplayItemProvider(name),
     override val containers: List<CRecipeContainer>? = null,
     override val results: List<ResultSupplier>? = null,
     override val filters: Set<CRecipeFilter<CMatter>>? = getDefaultFilters(),
@@ -40,8 +44,8 @@ data class AutoCraftRecipeImpl(
             this.name,
             newItems,
             this.type,
-            this.autoCraftDisplayItemProvider,
             this.publisherPluginName,
+            this.autoCraftDisplayItemProvider,
             this.containers,
             this.results,
             this.filters,
