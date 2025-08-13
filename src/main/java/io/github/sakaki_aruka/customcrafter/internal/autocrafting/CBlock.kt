@@ -85,16 +85,14 @@ internal class CBlock(
     }
 
     fun writeToContainer() {
-        if (this.block.state !is Crafter) {
-            throw IllegalStateException("[CBlock] The specified block can not convert to 'Crafter'.")
-        }
-        val container: PersistentDataContainer = (this.block.state as Crafter).persistentDataContainer
-        container.set(InventoryUtil.fromKeyContainer(VERSION), VERSION.type, this.version)
-        container.set(InventoryUtil.fromKeyContainer(NAME), NAME.type, this.name)
-        container.set(InventoryUtil.fromKeyContainer(TYPE), TYPE.type, this.type.type)
-        container.set(InventoryUtil.fromKeyContainer(PUBLISHER), PUBLISHER.type, this.publisherName)
-        container.set(InventoryUtil.fromKeyContainer(SLOTS), SLOTS.type, this.slots.toIntArray())
-        this.block.state.update()
+        val crafter: Crafter = this.block.state as? Crafter
+            ?: throw IllegalStateException("[CBlock] The specified block can not convert to 'Crafter'.")
+        crafter.persistentDataContainer.set(InventoryUtil.fromKeyContainer(VERSION), VERSION.type, this.version)
+        crafter.persistentDataContainer.set(InventoryUtil.fromKeyContainer(NAME), NAME.type, this.name)
+        crafter.persistentDataContainer.set(InventoryUtil.fromKeyContainer(TYPE), TYPE.type, this.type.type)
+        crafter.persistentDataContainer.set(InventoryUtil.fromKeyContainer(PUBLISHER), PUBLISHER.type, this.publisherName)
+        crafter.persistentDataContainer.set(InventoryUtil.fromKeyContainer(SLOTS), SLOTS.type, this.slots.toIntArray())
+        crafter.update()
     }
 
     fun getRecipe(): AutoCraftRecipe? {

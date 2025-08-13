@@ -40,10 +40,10 @@ internal class AutoCraftUI(
             }
         })
 
-        CBlock.of(block.state as Crafter)?.let { cBlock ->
+        CBlock.of(this.block.state as Crafter)?.let { cBlock ->
             this.inventory.setItem(
                 4,
-                cBlock.getRecipe()?.autoCraftDisplayItemProvider(player)
+                cBlock.getRecipe()?.autoCraftDisplayItemProvider(this.player, this.block)
                     ?: UNDEFINED
             )
         } ?: run {
@@ -72,6 +72,8 @@ internal class AutoCraftUI(
              */
             val clicked: Block = event.clickedBlock?.takeIf { b ->
                 b.type == Material.CRAFTER
+                        && event.action.isRightClick
+                        && (event.item == null || event.item!!.type != Material.HOPPER)
             } ?: return false
             val underCenter: Block = clicked.getRelative(0, -1, 0)
             val half: Int = InternalAPI.AUTO_CRAFTING_BASE_BLOCK_SIDE / 2

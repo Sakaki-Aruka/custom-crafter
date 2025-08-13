@@ -21,7 +21,7 @@ import org.ktorm.dsl.update
 import org.ktorm.dsl.where
 import org.ktorm.entity.Entity
 import org.ktorm.schema.Table
-import org.ktorm.schema.blob
+import org.ktorm.schema.bytes
 import org.ktorm.schema.int
 import org.ktorm.schema.text
 
@@ -61,7 +61,7 @@ internal object CBlockDB {
         val x = int("x").bindTo { it.x }
         val y = int("y").bindTo { it.y }
         val z = int("z").bindTo { it.z }
-        val items = blob("items").bindTo { it.items }
+        val items = bytes("items").bindTo { it.items }
     }
 
     fun initTables() {

@@ -3,12 +3,10 @@ package io.github.sakaki_aruka.customcrafter.internal.gui.autocraft
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.AutoCraftRecipe
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter.toComponent
-import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlock
 import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlockDB
 import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterUI
 import org.bukkit.Bukkit
 import org.bukkit.block.Block
-import org.bukkit.block.Crafter
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.Inventory
@@ -23,19 +21,37 @@ class RecipeSetUI(
     private val inventory: Inventory = Bukkit.createInventory(
         this,
         54,
-        "<green><u><b>Auto Craft Recipe Set".toComponent()
+        "<u><b>Auto Craft Recipe Set".toComponent()
     )
+
+    private val elements: Map<Int, Map<Int, Pair<ItemStack, AutoCraftRecipe>>>
 
     init {
         val autoRecipes: List<AutoCraftRecipe> = CustomCrafterAPI.AUTO_CRAFTING_SETTING_PAGE_SUGGESTION(this.block, this.player)
             .sortedBy { recipe -> recipe.name }
+
+        val e: List<Pair<ItemStack, AutoCraftRecipe>> = autoRecipes.map { recipe ->
+            Pair(
+                recipe.autoCraftDisplayItemProvider(this.player, this.block)
+                    .takeIf { i -> !i.isEmpty && i.type.isItem }
+                    ?: AutoCraftUI.UNDEFINED,
+                recipe
+            )
+        }
+
+        this.elements = e.chunked(45)
+            .withIndex()
+            .associate { (index, list) -> index to list }
+            .map { (index, list) ->
+                index to list.withIndex().associate { (i, l) -> i to l }
+            }.toMap()
 
         val chunked: List<List<AutoCraftRecipe>> = autoRecipes.chunked(45)
         if (chunked.isNotEmpty()) {
             for ((index: Int, recipe: AutoCraftRecipe) in chunked.first().withIndex()) {
                 this.inventory.setItem(
                     index,
-                    recipe.autoCraftDisplayItemProvider(player).takeIf { i -> !i.isEmpty }
+                    recipe.autoCraftDisplayItemProvider(this.player, this.block).takeIf { i -> !i.isEmpty }
                         ?: AutoCraftUI.UNDEFINED
                 )
             }
@@ -45,9 +61,6 @@ class RecipeSetUI(
             }
         }
     }
-
-
-    var recipes: List<AutoCraftRecipe> = listOf()
 
     companion object {
         const val NEXT = 53
@@ -59,16 +72,11 @@ class RecipeSetUI(
     override fun flipPage() {
         if (!canFlipPage()) return
         this.currentPage++
-        val chunked: List<List<AutoCraftRecipe>> = CustomCrafterAPI.getRecipes()
-            .filterIsInstance<AutoCraftRecipe>()
-            .sortedBy { recipe -> recipe.name }
-            .chunked(45)
-        this.recipes = chunked.getOrNull(this.currentPage) ?: return
+        val items: Map<Int, Pair<ItemStack, AutoCraftRecipe>> = this.elements[this.currentPage] ?: return
         (0..<this.inventory.size).forEach { index ->
             this.inventory.setItem(
                 index,
-                this.recipes.getOrNull(index)?.autoCraftDisplayItemProvider(this.player)
-                    ?: ItemStack.empty()
+                items[index]?.first ?: ItemStack.empty()
             )
         }
         this.inventory.setItem(PREVIOUS, CustomCrafterUI.PREVIOUS_BUTTON)
@@ -82,19 +90,17 @@ class RecipeSetUI(
             .filterIsInstance<AutoCraftRecipe>()
             .sortedBy { recipe -> recipe.name }
             .chunked(45)
-        return this.currentPage >= chunked.size - 1
+        return this.currentPage < chunked.size - 1
     }
 
     override fun flipBackPage() {
         if (!canFlipBackPage()) return
         this.currentPage--
-        val chunked: List<List<AutoCraftRecipe>> = CustomCrafterAPI.getRecipes().filterIsInstance<AutoCraftRecipe>().chunked(45)
-        this.recipes = chunked.getOrNull(this.currentPage) ?: return
+        val items: Map<Int, Pair<ItemStack, AutoCraftRecipe>> = this.elements[this.currentPage] ?: return
         (0..<this.inventory.size).forEach { index ->
             this.inventory.setItem(
                 index,
-                this.recipes.getOrNull(index)?.autoCraftDisplayItemProvider(this.player)
-                    ?: ItemStack.empty()
+                items[index]?.first ?: ItemStack.empty()
             )
         }
         if (canFlipBackPage()) {
@@ -122,14 +128,13 @@ class RecipeSetUI(
 
             // Normal Slots
             else -> {
-                val recipe: AutoCraftRecipe = this.recipes.getOrNull(event.rawSlot) ?: return
-                val cBlock: CBlock = CBlock.of(this.block.state as Crafter)
-                    ?: run {
-                        CBlockDB.linkWithoutItems(this.block, recipe)
-                            ?.writeToContainer()
-                        return
-                    }
-                cBlock.updateRecipe(recipe)
+                val pageItems: Map<Int, Pair<ItemStack, AutoCraftRecipe>> = this.elements[this.currentPage] ?: return
+                val recipe: AutoCraftRecipe = pageItems[event.rawSlot]?.second ?: return
+                CBlockDB.linkWithoutItems(this.block, recipe)?.let { c ->
+                    c.writeToContainer()
+                    this.player.sendMessage("<green>Set AutoCraft recipe successful. (Recipe = ${recipe.publisherPluginName}:${recipe.name})".toComponent())
+                }
+                this.player.openInventory(AutoCraftUI(this.block, this.player).inventory)
             }
         }
     }

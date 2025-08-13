@@ -3,8 +3,11 @@ package io.github.sakaki_aruka.customcrafter.internal
 import io.github.sakaki_aruka.customcrafter.CustomCrafter
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.active_test.CAssert
+import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
+import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.objects.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
+import io.github.sakaki_aruka.customcrafter.impl.recipe.AutoCraftRecipeImpl
 import io.github.sakaki_aruka.customcrafter.impl.recipe.CRecipeImpl
 import io.github.sakaki_aruka.customcrafter.impl.test.APITest
 import io.github.sakaki_aruka.customcrafter.impl.test.ConverterTest
@@ -13,6 +16,7 @@ import io.github.sakaki_aruka.customcrafter.impl.test.SearchTest
 import io.github.sakaki_aruka.customcrafter.impl.test.VanillaSearchTest
 import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlockDB
 import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterUI
+import net.kyori.adventure.text.BlockNBTComponent
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.event.inventory.InventoryCloseEvent
@@ -74,9 +78,12 @@ internal object InternalAPI {
         CustomCrafterAPI.setUseAutoCraftingFeature(true)
         CustomCrafterAPI.setUseMultipleResultCandidateFeature(true)
         (0..<90).forEach { i ->
-            CustomCrafterAPI.registerRecipe(CRecipeImpl(
-                "recipe-${i}", listOf(CMatterImpl.single(Material.STONE)),
-                results = listOf(ResultSupplier.timesSingle(ItemStack.of(Material.COBBLESTONE)))
+            CustomCrafterAPI.registerRecipe(AutoCraftRecipeImpl(
+                "recipe-${i}",
+                items = mapOf(CoordinateComponent(0, 0) to CMatterImpl.single(Material.STONE)),
+                results = listOf(ResultSupplier.timesSingle(ItemStack.of(Material.COBBLESTONE))),
+                publisherPluginName = CustomCrafter.getInstance().pluginMeta.name,
+                type = CRecipeType.NORMAL
             ))
         }
 

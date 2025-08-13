@@ -16,6 +16,11 @@ import org.bukkit.inventory.ItemStack
 /**
  * A default [CRecipe] and [AutoCraftRecipe] implementation class.
  *
+ * Suggested to get plugin name with the following code.
+ * ```Kotlin
+ * val publisherPluginName: String = <YOUR PLUGIN INSTANCE>.getPluginMeta.name
+ * ```
+ *
  * @param[name] A name of this recipe.
  * @param[items] Elements of this recipe.
  * @param[type] A type of this recipe. (Normal or Amorphous (=Shapeless))
