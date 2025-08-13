@@ -1,6 +1,5 @@
 package io.github.sakaki_aruka.customcrafter.internal.autocrafting
 
-import io.github.sakaki_aruka.customcrafter.CustomCrafter
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.AutoCraftRecipe
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
@@ -13,7 +12,6 @@ import org.bukkit.block.Crafter
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataContainer
 import org.bukkit.persistence.PersistentDataType
-import org.bukkit.scheduler.BukkitRunnable
 
 internal class CBlock(
     val version: String,
@@ -29,10 +27,6 @@ internal class CBlock(
         val NAME = KeyContainer("name", PersistentDataType.STRING)
         val PUBLISHER = KeyContainer("publisher", PersistentDataType.STRING)
         val SLOTS = KeyContainer("slots", PersistentDataType.INTEGER_ARRAY)
-
-        val RECIPE_SEARCH_CACHE: MutableMap<Block, AutoCraftRecipe> = mutableMapOf()
-        val RECIPE_SEARCH_CACHE_EXPIRE_UNIX_TIMES: MutableMap<Block, Long> = mutableMapOf()
-        const val RECIPE_SEARCH_CACHE_DELETE_INTERVAL_SECONDS = 600
 
         // Get
         fun of(crafter: Crafter): CBlock? {
@@ -100,11 +94,6 @@ internal class CBlock(
             return null
         }
 
-        if (RECIPE_SEARCH_CACHE.containsKey(this.block)) {
-            RECIPE_SEARCH_CACHE_EXPIRE_UNIX_TIMES[this.block] = System.currentTimeMillis() + RECIPE_SEARCH_CACHE_DELETE_INTERVAL_SECONDS * 1000
-            return RECIPE_SEARCH_CACHE[this.block]
-        }
-
         val recipe: AutoCraftRecipe = CustomCrafterAPI.getRecipes()
             .filterIsInstance<AutoCraftRecipe>()
             .filter { r -> r.publisherPluginName == this.publisherName }
@@ -112,20 +101,6 @@ internal class CBlock(
             .filter { r -> r.name == this.name }
             .firstOrNull { r -> r.items.size == this.slots.size }
             ?: return null
-
-        RECIPE_SEARCH_CACHE[this.block] = recipe
-
-        object: BukkitRunnable() {
-            override fun run() {
-                if (!RECIPE_SEARCH_CACHE.containsKey(this@CBlock.block)) {
-                    return
-                }
-                if (System.currentTimeMillis() >= RECIPE_SEARCH_CACHE_EXPIRE_UNIX_TIMES[this@CBlock.block]!!) {
-                    RECIPE_SEARCH_CACHE.remove(this@CBlock.block)
-                    RECIPE_SEARCH_CACHE_EXPIRE_UNIX_TIMES.remove(this@CBlock.block)
-                }
-            }
-        }.runTaskLaterAsynchronously(CustomCrafter.getInstance(), RECIPE_SEARCH_CACHE_DELETE_INTERVAL_SECONDS * 20L)
 
         return recipe
     }
