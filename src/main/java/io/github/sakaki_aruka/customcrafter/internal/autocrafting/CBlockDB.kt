@@ -147,6 +147,8 @@ internal object CBlockDB {
         crafter.persistentDataContainer.remove(InventoryUtil.fromKeyContainer(CBlock.PUBLISHER))
         crafter.update()
 
+        // drop contained items
+
         return true
     }
 

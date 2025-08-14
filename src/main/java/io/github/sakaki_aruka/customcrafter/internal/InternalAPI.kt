@@ -83,7 +83,8 @@ internal object InternalAPI {
                 items = mapOf(CoordinateComponent(0, 0) to CMatterImpl.single(Material.STONE)),
                 results = listOf(ResultSupplier.timesSingle(ItemStack.of(Material.COBBLESTONE))),
                 publisherPluginName = CustomCrafter.getInstance().pluginMeta.name,
-                type = CRecipeType.NORMAL
+                type = CRecipeType.NORMAL,
+                autoCraftResults = listOf(ResultSupplier.timesSingle(ItemStack.of(Material.END_STONE)))
             ))
         }
 
