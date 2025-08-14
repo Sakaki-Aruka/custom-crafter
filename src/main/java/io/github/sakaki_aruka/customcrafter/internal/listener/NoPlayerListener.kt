@@ -4,7 +4,6 @@ import io.github.sakaki_aruka.customcrafter.internal.gui.PredicateProvider
 import org.bukkit.event.Event
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.event.block.BlockRedstoneEvent
 import org.bukkit.event.inventory.InventoryMoveItemEvent
 
 internal interface NoPlayerListener: PredicateProvider<Boolean> {
@@ -17,10 +16,6 @@ internal interface NoPlayerListener: PredicateProvider<Boolean> {
             }?.func(event)
         }
 
-        @EventHandler
-        fun BlockRedstoneEvent.on() {
-            runMatchFunc(this)
-        }
 
         @EventHandler
         fun InventoryMoveItemEvent.on() {
