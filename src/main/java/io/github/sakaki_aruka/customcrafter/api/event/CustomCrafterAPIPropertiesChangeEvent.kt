@@ -59,12 +59,31 @@ class CustomCrafterAPIPropertiesChangeEvent<T> internal constructor(
     class Property<T> internal constructor(
         val value: T
     ) {
+        /**
+         * Returns `Property<T>` value in safety.
+         *
+         * If provided key mismatches with `T`, this returns `null`.
+         *
+         * @param[key] Key of a Property
+         * @return[S] Contained value
+         * @see[PropertyKey]
+         * @since 5.0.11
+         */
         @SuppressWarnings("unchecked")
         fun <S> getOrNull(key: PropertyKey<S>): S? {
             return value as? S
         }
     }
 
+    /**
+     * Key of `Property<T>`
+     *
+     * @param[name] Name of a Property
+     * @param[T] Type of a Property value
+     * @see[Property.getOrNull]
+     * @see[CustomCrafterAPIPropertiesChangeEvent]
+     * @since 5.0.11
+     */
     class PropertyKey<T> internal constructor(
         val name: String
     ) {
