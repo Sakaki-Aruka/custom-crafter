@@ -29,7 +29,8 @@ object InventoryMoveItemListener: Listener {
         val cBlock: CBlock = CBlock.of(crafter) ?: return
 
         if (!cBlock.addItems(this.item)) {
-            crafter.block.world.dropItem(cBlock.getDropLocation(), this.item)
+            this.isCancelled = true
+            return
         }
         this.item = ItemStack.empty()
     }
