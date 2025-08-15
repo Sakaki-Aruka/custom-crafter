@@ -68,10 +68,12 @@ object AutoCraftPowerOnListener: Listener {
 
         if (autoCraftRecipe != null  && relation != null) {
             if (CustomCrafterAPI.AUTO_CRAFTING_RESULT_PICKUP_RESOLVER_PRIORITIZE_CUSTOM) {
-                giveCustomResult(autoCraftRecipe, relation, pseudoInventory, block)
-            } else if (vanilla != null) giveVanillaResult(vanilla, pseudoInventory, block)
+                giveCustomResult(autoCraftRecipe, relation, pseudoInventory, cBlock)
+            } else if (vanilla != null) {
+                giveVanillaResult(vanilla, pseudoInventory, cBlock)
+            }
         }  else if (vanilla != null) {
-            giveVanillaResult(vanilla, pseudoInventory, block)
+            giveVanillaResult(vanilla, pseudoInventory, cBlock)
         } else return
     }
 
@@ -79,20 +81,20 @@ object AutoCraftPowerOnListener: Listener {
         autoCraftRecipe: AutoCraftRecipe,
         relation: MappedRelation,
         gui: Inventory,
-        block: Block
+        cBlock: CBlock
     ) {
         val transformed: Map<CoordinateComponent, ItemStack> = Converter.standardInputMapping(gui)
             ?: return
 
         val results: MutableList<ItemStack> = autoCraftRecipe.getAutoCraftResults(
-            block =  block,
+            block =  cBlock.block,
             relate = relation,
             mapped = transformed,
             calledTimes = autoCraftRecipe.getMinAmount(transformed, isCraftGUI = false, shift = true) ?: 1
         )
 
         autoCraftRecipe.runAutoCraftContainers(
-            block = block,
+            block = cBlock.block,
             relate = relation,
             mapped = transformed,
             results = results
@@ -101,33 +103,35 @@ object AutoCraftPowerOnListener: Listener {
         val view: CraftView = CraftView.fromInventory(gui)!!
             .getDecrementedCraftView(true, autoCraftRecipe to relation)
 
-        block.world.let { w ->
+        cBlock.block.world.let { w ->
             val dropLocation = Location(
-                block.world,
-                floor(block.location.x) + 0.5,
-                floor(block.location.y) - 0.5,
-                floor(block.location.z) + 0.5
+                w,
+                floor(cBlock.block.location.x) + 0.5,
+                floor(cBlock.block.location.y) - 0.5,
+                floor(cBlock.block.location.z) + 0.5
             )
             setOf(*view.materials.values.toTypedArray(), *results.toTypedArray()).forEach { i ->
                 w.dropItem(dropLocation, i)
             }
         }
+
+        cBlock.clearContainedItems()
     }
     private fun giveVanillaResult(
         recipe: Recipe,
         gui: Inventory,
-        block: Block
+        cBlock: CBlock
     ) {
         val minAmount: Int = Converter.getAvailableCraftingSlotIndices()
             .mapNotNull { slot -> gui.getItem(slot) }
             .minOf { item -> item.amount }
         val result: ItemStack = recipe.result.apply { amount *= minAmount }
-        block.world.dropItem(
+        cBlock.block.world.dropItem(
             Location(
-                block.world,
-                floor(block.location.x) + 0.5,
-                floor(block.location.y) - 0.5,
-                floor(block.location.z) + 0.5
+                cBlock.block.world,
+                floor(cBlock.block.location.x) + 0.5,
+                floor(cBlock.block.location.y) - 0.5,
+                floor(cBlock.block.location.z) + 0.5
             ),
             result
         )
@@ -143,12 +147,14 @@ object AutoCraftPowerOnListener: Listener {
                     item.asQuantity(max(0, item.amount - minAmount))
                 }
             }
-        block.world.let { w ->
+        cBlock.block.world.let { w ->
+            val dropLocation: Location = cBlock.getDropLocation()
             Converter.getAvailableCraftingSlotIndices()
                 .filter { i ->  gui.getItem(i) != null && gui.getItem(i)?.isEmpty == false }
                 .forEach { slot ->
-                    w.dropItem(block.getRelative(BlockFace.DOWN, 1).location, gui.getItem(slot) ?: ItemStack.empty())
+                    w.dropItem(dropLocation, gui.getItem(slot) ?: ItemStack.empty())
                 }
         }
+        cBlock.clearContainedItems()
     }
 }

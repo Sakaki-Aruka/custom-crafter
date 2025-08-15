@@ -77,6 +77,10 @@ internal class CBlock(
         writeToContainer()
     }
 
+    fun clearContainedItems() {
+        CBlockDB.clearContainedItems(this.block)
+    }
+
     fun getContainedItems(): List<ItemStack> {
         return CBlockDB.getContainedItems(this.block)
     }
