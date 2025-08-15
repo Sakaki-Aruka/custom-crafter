@@ -17,10 +17,10 @@ internal interface NoPlayerListener: PredicateProvider<Boolean> {
         }
 
 
-        @EventHandler
-        fun InventoryMoveItemEvent.on() {
-            runMatchFunc(this)
-        }
+//        @EventHandler
+//        fun InventoryMoveItemEvent.on() {
+//            runMatchFunc(this)
+//        }
     }
 
     fun <T: Event> func(event: T)

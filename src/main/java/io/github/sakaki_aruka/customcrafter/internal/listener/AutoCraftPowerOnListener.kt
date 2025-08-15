@@ -31,10 +31,6 @@ object AutoCraftPowerOnListener: Listener {
     @EventHandler
     fun AutoCraftPowerOnEvent.onPower() {
         val cBlock: CBlock = CBlock.of(this.crafter) ?: return
-        val crafterData = this.crafter.block.blockData as? org.bukkit.block.data.type.Crafter ?: return
-        if (crafterData.isTriggered) {
-            return
-        }
 
         turnOn(this.crafter.block, cBlock)
     }

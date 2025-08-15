@@ -9,7 +9,7 @@ import java.io.Serializable
 
 object InventoryUtil {
 
-    internal fun PersistentDataContainer.hasAllKeys(keys: Collection<KeyContainer<out Serializable, out Serializable>>): Boolean {
+    internal fun PersistentDataContainer.hasAllKeys(vararg keys: KeyContainer<out Serializable, out Serializable>): Boolean {
         for (key in keys) {
             if (!this.has(fromKeyContainer(key), key.type)) {
                 return false

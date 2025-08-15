@@ -2,12 +2,12 @@ package io.github.sakaki_aruka.customcrafter;
 
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe;
 import io.github.sakaki_aruka.customcrafter.internal.InternalAPI;
-import io.github.sakaki_aruka.customcrafter.internal.autocrafting.AutoCraft;
 import io.github.sakaki_aruka.customcrafter.internal.command.CC;
 import io.github.sakaki_aruka.customcrafter.internal.listener.AutoCraftPowerOnListener;
 import io.github.sakaki_aruka.customcrafter.internal.listener.BlockPhysicsListener;
 import io.github.sakaki_aruka.customcrafter.internal.listener.InventoryClickListener;
 import io.github.sakaki_aruka.customcrafter.internal.listener.InventoryCloseListener;
+import io.github.sakaki_aruka.customcrafter.internal.listener.InventoryMoveItemListener;
 import io.github.sakaki_aruka.customcrafter.internal.listener.NoPlayerListener;
 import io.github.sakaki_aruka.customcrafter.internal.listener.PlayerInteractListener;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
@@ -38,9 +38,7 @@ public final class CustomCrafter extends JavaPlugin {
 
         Bukkit.getPluginManager().registerEvents(AutoCraftPowerOnListener.INSTANCE, this);
         Bukkit.getPluginManager().registerEvents(BlockPhysicsListener.INSTANCE, this);
-
-        // TODO: register NoPlayerListener (NoPlayerListener.LISTENERS)
-        NoPlayerListener.Companion.getLISTENERS().add(AutoCraft.AutoCraftItemInputSignalReceiver.INSTANCE);
+        Bukkit.getPluginManager().registerEvents(InventoryMoveItemListener.INSTANCE, this);
 
         InternalAPI.INSTANCE.runTests();
         InternalAPI.INSTANCE.setup();
