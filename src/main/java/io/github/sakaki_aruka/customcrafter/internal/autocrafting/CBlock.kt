@@ -92,6 +92,12 @@ internal class CBlock(
     fun writeToContainer() {
         val crafter: Crafter = this.block.state as? Crafter
             ?: throw IllegalStateException("[CBlock] The specified block can not convert to 'Crafter'.")
+
+        (0..<9).forEach { index ->
+            crafter.setSlotDisabled(index, false)
+        }
+        crafter.update()
+
         crafter.persistentDataContainer.set(InventoryUtil.fromKeyContainer(VERSION), VERSION.type, this.version)
         crafter.persistentDataContainer.set(InventoryUtil.fromKeyContainer(NAME), NAME.type, this.name)
         crafter.persistentDataContainer.set(InventoryUtil.fromKeyContainer(TYPE), TYPE.type, this.type.type)

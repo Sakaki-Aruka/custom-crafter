@@ -28,6 +28,11 @@ object InventoryMoveItemListener: Listener {
 
         val cBlock: CBlock = CBlock.of(crafter) ?: return
 
+        (0..<9).forEach { index ->
+            crafter.setSlotDisabled(index, false)
+        }
+        crafter.update()
+
         if (!cBlock.addItems(this.item)) {
             this.isCancelled = true
             return
