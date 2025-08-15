@@ -7,6 +7,7 @@ import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.AutoCraftRecipe
 import io.github.sakaki_aruka.customcrafter.impl.util.InventoryUtil
 import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
+import org.bukkit.Location
 import org.bukkit.block.Block
 import org.bukkit.block.Crafter
 import org.bukkit.inventory.ItemStack
@@ -135,6 +136,15 @@ internal object CBlockDB {
 
         val linkId: Int = getLinkId(block) ?: return false
 
+        (block.state as? Crafter)?.let { crafter ->
+            CBlock.of(crafter)?.let { cBlock ->
+                val dropLocation: Location = cBlock.getDropLocation()
+                cBlock.getContainedItems().forEach { item ->
+                    block.world.dropItem(dropLocation, item)
+                }
+            }
+        }
+
         db.delete(CBlockItemsTable) {
             it.id eq linkId
         }
@@ -146,8 +156,6 @@ internal object CBlockDB {
         crafter.persistentDataContainer.remove(InventoryUtil.fromKeyContainer(CBlock.NAME))
         crafter.persistentDataContainer.remove(InventoryUtil.fromKeyContainer(CBlock.PUBLISHER))
         crafter.update()
-
-        // drop contained items
 
         return true
     }

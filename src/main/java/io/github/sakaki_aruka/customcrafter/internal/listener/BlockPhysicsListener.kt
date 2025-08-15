@@ -30,9 +30,6 @@ object BlockPhysicsListener: Listener {
         val crafterBlock: org.bukkit.block.Crafter = this.block.state as? org.bukkit.block.Crafter ?: return
         val crafterType: org.bukkit.block.data.type.Crafter = this.block.blockData as? org.bukkit.block.data.type.Crafter ?: return
 
-        //debug
-        println("isTriggered (block.Crafter)=${crafterBlock.isTriggered} / isTriggered (type.Crafter)=${(block.blockData as org.bukkit.block.data.type.Crafter).isTriggered} / isBlockDataChange=${this.changedBlockData is org.bukkit.block.data.type.Crafter} / Power=${crafterBlock.block.blockPower} / Time=${System.currentTimeMillis()}")
-
         STATE_CACHE[this.block.location]?.let { state ->
             if (crafterType.isTriggered
                 && state.updatedUnixEpochMill <= System.currentTimeMillis()
