@@ -46,7 +46,7 @@ class CustomCrafterAPIPropertiesChangeEvent<T> internal constructor(
     val propertyName: String,
     val old: Property<T>,
     val new: Property<T>,
-): Event() {
+): Event(true) {
 
     /**
      * A value of [CustomCrafterAPI] property.

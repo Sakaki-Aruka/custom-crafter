@@ -3,12 +3,6 @@ package io.github.sakaki_aruka.customcrafter.internal
 import io.github.sakaki_aruka.customcrafter.CustomCrafter
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.active_test.CAssert
-import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
-import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
-import io.github.sakaki_aruka.customcrafter.api.objects.result.ResultSupplier
-import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
-import io.github.sakaki_aruka.customcrafter.impl.recipe.AutoCraftRecipeImpl
-import io.github.sakaki_aruka.customcrafter.impl.recipe.CRecipeImpl
 import io.github.sakaki_aruka.customcrafter.impl.test.APITest
 import io.github.sakaki_aruka.customcrafter.impl.test.ConverterTest
 import io.github.sakaki_aruka.customcrafter.impl.test.MultipleCandidateTest
@@ -16,12 +10,10 @@ import io.github.sakaki_aruka.customcrafter.impl.test.SearchTest
 import io.github.sakaki_aruka.customcrafter.impl.test.VanillaSearchTest
 import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlockDB
 import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterUI
-import net.kyori.adventure.text.BlockNBTComponent
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.inventory.InventoryHolder
-import org.bukkit.inventory.ItemStack
 import org.bukkit.scheduler.BukkitRunnable
 import java.nio.file.Paths
 import java.sql.SQLException
