@@ -6,7 +6,6 @@ import io.github.sakaki_aruka.customcrafter.internal.autocrafting.AutoCraft;
 import io.github.sakaki_aruka.customcrafter.internal.command.CC;
 import io.github.sakaki_aruka.customcrafter.internal.listener.AutoCraftPowerOnListener;
 import io.github.sakaki_aruka.customcrafter.internal.listener.BlockPhysicsListener;
-import io.github.sakaki_aruka.customcrafter.internal.listener.BlockRedstoneListener;
 import io.github.sakaki_aruka.customcrafter.internal.listener.InventoryClickListener;
 import io.github.sakaki_aruka.customcrafter.internal.listener.InventoryCloseListener;
 import io.github.sakaki_aruka.customcrafter.internal.listener.NoPlayerListener;
@@ -38,11 +37,9 @@ public final class CustomCrafter extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(NoPlayerListener.Companion, instance);
 
         Bukkit.getPluginManager().registerEvents(AutoCraftPowerOnListener.INSTANCE, this);
-        Bukkit.getPluginManager().registerEvents(BlockRedstoneListener.INSTANCE, this);
         Bukkit.getPluginManager().registerEvents(BlockPhysicsListener.INSTANCE, this);
 
         // TODO: register NoPlayerListener (NoPlayerListener.LISTENERS)
-//        NoPlayerListener.Companion.getLISTENERS().add(AutoCraft.AutoCraftRedstoneSignalReceiver.INSTANCE);
         NoPlayerListener.Companion.getLISTENERS().add(AutoCraft.AutoCraftItemInputSignalReceiver.INSTANCE);
 
         InternalAPI.INSTANCE.runTests();
