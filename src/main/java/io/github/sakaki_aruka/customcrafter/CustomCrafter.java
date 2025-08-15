@@ -4,6 +4,7 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe;
 import io.github.sakaki_aruka.customcrafter.internal.InternalAPI;
 import io.github.sakaki_aruka.customcrafter.internal.command.CC;
 import io.github.sakaki_aruka.customcrafter.internal.listener.AutoCraftPowerOnListener;
+import io.github.sakaki_aruka.customcrafter.internal.listener.BlockBreakEventListener;
 import io.github.sakaki_aruka.customcrafter.internal.listener.BlockPhysicsListener;
 import io.github.sakaki_aruka.customcrafter.internal.listener.InventoryClickListener;
 import io.github.sakaki_aruka.customcrafter.internal.listener.InventoryCloseListener;
@@ -39,6 +40,7 @@ public final class CustomCrafter extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(AutoCraftPowerOnListener.INSTANCE, this);
         Bukkit.getPluginManager().registerEvents(BlockPhysicsListener.INSTANCE, this);
         Bukkit.getPluginManager().registerEvents(InventoryMoveItemListener.INSTANCE, this);
+        Bukkit.getPluginManager().registerEvents(BlockBreakEventListener.INSTANCE, this);
 
         InternalAPI.INSTANCE.runTests();
         InternalAPI.INSTANCE.setup();
