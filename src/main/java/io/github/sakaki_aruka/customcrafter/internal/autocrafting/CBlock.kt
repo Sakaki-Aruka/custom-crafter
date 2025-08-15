@@ -6,12 +6,14 @@ import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.impl.util.InventoryUtil
 import io.github.sakaki_aruka.customcrafter.impl.util.InventoryUtil.hasAllKeys
 import io.github.sakaki_aruka.customcrafter.impl.util.KeyContainer
+import org.bukkit.Location
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.block.Crafter
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataContainer
 import org.bukkit.persistence.PersistentDataType
+import kotlin.math.floor
 
 internal class CBlock(
     val version: String,
@@ -28,6 +30,11 @@ internal class CBlock(
         val PUBLISHER = KeyContainer("publisher", PersistentDataType.STRING)
         val SLOTS = KeyContainer("slots", PersistentDataType.INTEGER_ARRAY)
 
+
+        fun hasEssentialKeys(crafter: Crafter): Boolean {
+            return crafter.persistentDataContainer.hasAllKeys(VERSION, TYPE, NAME, PUBLISHER, SLOTS)
+        }
+
         // Get
         fun of(crafter: Crafter): CBlock? {
             if (!CBlockDB.isLinked(crafter.block)) {
@@ -35,7 +42,7 @@ internal class CBlock(
             }
 
             val container: PersistentDataContainer = crafter.persistentDataContainer
-            if (!container.hasAllKeys(listOf(VERSION, TYPE, NAME, PUBLISHER, SLOTS))) {
+            if (!container.hasAllKeys(VERSION, TYPE, NAME, PUBLISHER, SLOTS)) {
                 return null
             } else if (CRecipeType.of(container.get(InventoryUtil.fromKeyContainer(TYPE), TYPE.type)!!) == null) {
                 return null
@@ -103,5 +110,14 @@ internal class CBlock(
             ?: return null
 
         return recipe
+    }
+
+    fun getDropLocation(): Location {
+        return Location(
+            this.block.world,
+            floor(this.block.location.x) + 0.5,
+            floor(this.block.location.y) - 0.5,
+            floor(this.block.location.z) + 0.5
+        )
     }
 }
