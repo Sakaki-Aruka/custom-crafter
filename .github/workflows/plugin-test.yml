@@ -28,7 +28,7 @@ jobs:
 
       - name: Download PaperMC 1.21.3
         working-directory: ./server
-        run: wget https://api.papermc.io/v2/projects/paper/versions/1.21.3/builds/83/downloads/paper-1.21.3-83.jar -O paper.jar
+        run: wget https://fill-data.papermc.io/v1/objects/87e973e1d338e869e7fdbc4b8fadc1579d7bb0246a0e0cf6e5700ace6c8bc17e/paper-1.21.3-83.jar -O paper.jar
 
       - name: Accept EULA
         working-directory: ./server

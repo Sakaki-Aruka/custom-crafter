@@ -131,4 +131,13 @@ interface CRecipe {
             .filter { (_, matter) -> !matter.mass }
             .minOfOrNull { (c, matter) -> map[c]!!.amount / matter.amount }
     }
+
+    fun getSlots(): List<Int> {
+        return if (this.type == CRecipeType.NORMAL) {
+            items.keys.map { c -> c.toIndex() }.sorted()
+        } else {
+            // Amorphous
+            (0..<this.items.size).sorted()
+        }
+    }
 }

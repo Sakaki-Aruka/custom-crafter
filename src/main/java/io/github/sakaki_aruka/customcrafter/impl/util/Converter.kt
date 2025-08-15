@@ -2,6 +2,8 @@ package io.github.sakaki_aruka.customcrafter.impl.util
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
+import net.kyori.adventure.text.Component
+import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Material
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
@@ -43,7 +45,7 @@ object Converter {
      */
     fun standardInputMapping(inventory: Inventory, noAir: Boolean = true): Map<CoordinateComponent, ItemStack>? {
         // CoordinateComponent: zero origin (x, y both)
-        if (inventory.isEmpty || !CustomCrafterAPI.isCustomCrafterGUI(inventory)) return null
+        if (inventory.isEmpty) return null
         val result: MutableMap<CoordinateComponent, ItemStack> = mutableMapOf()
 
         for (coordinate in getAvailableCraftingSlotComponents()) {
@@ -53,5 +55,15 @@ object Converter {
         }
         return result
     }
-    
+
+    /**
+     * Kotlin string extension. String to Component (net.kyori.adventure)
+     *
+     * Usage
+     * ```kotlin
+     * val component = "<aqua>This is a kyori component!".toComponent()
+     * ```
+     */
+    fun String.toComponent(): Component = MiniMessage.miniMessage().deserialize(this)
+
 }

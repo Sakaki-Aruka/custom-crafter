@@ -1,5 +1,20 @@
 # Changelog
 
+# 5.0.11
+## Features
+- [Added] an automatic crafting function.
+- [Added] a command to get and change some of the properties of the CustomCrafterAPI (/cc).
+- [Fixed] an issue with the multi-candidate display function.
+## Code
+- [Changed] some variables of the CustomCrafterAPI to be accessible via getters and setters.
+
+- [Changed] the properties of AutoCraftRecipe.
+
+- [Added] an event that is fired when some of the variables of the CustomCrafterAPI are changed (CustomCrafterAPIPropertiesChangeEvent).
+
+## CI/CD
+- [Fixed] Updated to support changes in the PaperMC Download API.
+
 # 5.0.10-1
 ## Code
 - [Fixed] CAssert log option arguments and a function

@@ -3,3 +3,11 @@ version: '${project.version}'
 main: io.github.sakaki_aruka.customcrafter.CustomCrafter
 api-version: 1.19
 authors: [ SakakiAruka ]
+
+commands:
+  cc:
+    permission: cc.command
+
+permissions:
+  cc.command:
+    default: op

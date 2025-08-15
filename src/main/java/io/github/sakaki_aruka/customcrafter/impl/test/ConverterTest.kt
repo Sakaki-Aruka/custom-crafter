@@ -4,6 +4,7 @@ import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.active_test.CAssert
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter
+import io.github.sakaki_aruka.customcrafter.internal.gui.crafting.CraftUI
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.inventory.Inventory
@@ -77,10 +78,10 @@ internal object ConverterTest {
     private fun inputMappingTest() {
         val empty = Bukkit.createInventory(null, 54)
         CAssert.assertTrue(Converter.standardInputMapping(empty) == null)
-        val gui = CustomCrafterAPI.getCraftingGUI()
+        val gui = CraftUI().inventory
         CAssert.assertTrue(Converter.standardInputMapping(gui, noAir = false)?.values?.all { it.type == Material.AIR } ?: true)
 
-        val stones: Inventory = CustomCrafterAPI.getCraftingGUI()
+        val stones: Inventory = CraftUI().inventory
         Converter.getAvailableCraftingSlotIndices().forEach { index ->
             stones.setItem(index, ItemStack(Material.STONE))
         }
