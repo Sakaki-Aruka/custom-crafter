@@ -42,10 +42,6 @@ object AutoCraftPowerOnListener: Listener {
         else if (!CBlockDB.isLinked(block)) return
         else if (cBlock.getContainedItems().any { i -> i.isEmpty }) return
 
-        //debug
-        println("Turn on!!!")
-        println("Items=${cBlock.getContainedItems()}")
-
         val pseudoInventory: Inventory = CraftUI().inventory
         cBlock.getContainedItems().zip(cBlock.slots).forEach { (item, index) ->
             pseudoInventory.setItem(index, item)
@@ -56,10 +52,6 @@ object AutoCraftPowerOnListener: Listener {
             inventory = pseudoInventory,
             sourceRecipes = sourceRecipes
         ) ?: return
-
-        //debug
-        println("Result=${result}")
-        println("Custom=${result.customs()}")
 
         if (result.size() == 0) return
 
