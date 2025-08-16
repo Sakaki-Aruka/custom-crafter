@@ -8,6 +8,7 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.search.Search
+import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
@@ -177,6 +178,7 @@ object CustomCrafterAPI {
             ).callEvent()
         }
         USE_AUTO_CRAFTING_FEATURE = v
+        InternalAPI.setup()
     }
 
     /**
@@ -206,7 +208,7 @@ object CustomCrafterAPI {
      * @return[Boolean] if successful to change, returns true else false.
      */
     fun setBaseBlockSideSize(size: Int): Boolean {
-        if (size <= 0 || size % 2 != 1) return false
+        if (size < 3 || size % 2 != 1) return false
         if (size != BASE_BLOCK_SIDE) {
             CustomCrafterAPIPropertiesChangeEvent(
                 propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK_SIDE.name,
