@@ -58,7 +58,7 @@ The latest provided version
    <dependency>
       <groupId>com.github.Sakaki-Aruka</groupId>
       <artifactId>custom-crafter</artifactId>
-      <version>5.0.10-1</version>
+      <version>5.0.11</version>
    </dependency>
 </dependencies>
 
@@ -82,7 +82,7 @@ dependencyResolutionManagement {
 (dependency)
 ```groovy
 dependencies {
-   implementation 'com.github.Sakaki-Aruka:custom-crafter:5.0.10-1'
+   implementation 'com.github.Sakaki-Aruka:custom-crafter:5.0.11'
 }
 ```
 
@@ -103,7 +103,7 @@ repositories {
 (dependency)
 ```
 dependencies {
-    implementation("com.github.Sakaki-Aruka:custom-crafter:5.0.10-1")
+    implementation("com.github.Sakaki-Aruka:custom-crafter:5.0.11")
 }
 ```
 
