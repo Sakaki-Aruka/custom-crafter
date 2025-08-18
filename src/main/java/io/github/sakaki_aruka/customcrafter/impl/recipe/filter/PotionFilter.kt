@@ -22,9 +22,15 @@ object PotionFilter: CRecipeFilter<CPotionMatter> {
         matter: CPotionMatter
     ): Pair<CRecipeFilter.ResultType ,Boolean> {
         val meta: PotionMeta = item.itemMeta as PotionMeta
-        val effects: MutableList<PotionEffect> = meta.customEffects
+        val effects: MutableList<PotionEffect> = meta.customEffects.toMutableList()
         meta.basePotionType?.let {
             effects.addAll(it.potionEffects)
+        }
+
+        if (matter.potionComponents.isEmpty()) {
+            return CRecipeFilter.ResultType.NOT_REQUIRED to true
+        } else if (effects.isEmpty()) {
+            return CRecipeFilter.ResultType.FAILED to false
         }
 
         return CRecipeFilter.ResultType.SUCCESS to matter.potionComponents.all { c ->
