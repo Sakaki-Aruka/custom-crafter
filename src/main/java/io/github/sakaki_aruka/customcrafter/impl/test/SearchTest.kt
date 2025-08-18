@@ -28,8 +28,6 @@ import org.bukkit.inventory.meta.EnchantmentStorageMeta
 import org.bukkit.inventory.meta.PotionMeta
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
-import org.bukkit.potion.PotionType
-import org.ktorm.dsl.CASE
 import java.util.UUID
 
 /**
