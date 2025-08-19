@@ -21,7 +21,9 @@ object EnchantStorageFilter: CRecipeFilter<CEnchantmentStoreMatter> {
         matter: CEnchantmentStoreMatter
     ): Pair<CRecipeFilter.ResultType, Boolean> {
         val stored: Map<Enchantment, Int> = (item.itemMeta as EnchantmentStorageMeta).storedEnchants
-        if (matter.storedEnchantComponents.isNotEmpty() && stored.isEmpty()) {
+        if (matter.storedEnchantComponents.isEmpty()) {
+            return CRecipeFilter.ResultType.NOT_REQUIRED to true
+        } else if (stored.isEmpty()) {
             return CRecipeFilter.ResultType.FAILED to false
         }
 
