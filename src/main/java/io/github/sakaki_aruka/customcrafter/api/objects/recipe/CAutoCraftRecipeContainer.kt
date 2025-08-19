@@ -1,45 +1,46 @@
 package io.github.sakaki_aruka.customcrafter.api.objects.recipe
 
-import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
+import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
-import java.util.UUID
 
 /**
- * Containers for [CRecipe].
- *
- * each container has a predicate and a consumer.
- *
- * When crafting and a predicate is true, consumer runs.
+ * A recipe container for [io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.AutoCraftRecipe]
+ * @param[predicate] Predicate of this container
+ * @param[consumer] The body of this container and is executed only when predicate returns true
+ * @since 5.0.12
  */
-data class CRecipeContainer(
+class CAutoCraftRecipeContainer(
     val predicate: (Context) -> Boolean,
     val consumer: (Context) -> Unit
 ) {
 
     companion object {
         /**
+         * A predicate always returns true
          * ```kotlin
          * val AlwaysTrue: (Context) -> Boolean = { _ -> true }
          * ```
+         *
          * @since 5.0.12
          */
         val AlwaysTrue: (Context) -> Boolean = { _ -> true }
 
         /**
+         * Empty container
          * ```kotlin
          * val None: (Context) -> Unit = { _ -> }
          * ```
+         *
          * @since 5.0.12
          */
         val None: (Context) -> Unit = { _ -> }
     }
 
     class Context internal constructor(
-        val userID: UUID,
-        val relate: MappedRelation,
+        val block: Block,
+        val relation: MappedRelation,
         val mapped: Map<CoordinateComponent, ItemStack>,
         val results: MutableList<ItemStack>,
-        val isAllCandidateDisplayCall: Boolean
     )
 }

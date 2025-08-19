@@ -45,13 +45,13 @@ interface CRecipe {
         isMultipleDisplayCall: Boolean
     ) {
         containers?.let { containers ->
-            containers.filter { c ->
-                c.predicate is CRecipeContainer.NormalPredicate
-                        && c.consumer is CRecipeContainer.NormalConsumer
-            }.filter { c ->
-                (c.predicate as CRecipeContainer.NormalPredicate)(crafterID, relate, mapped, results, isMultipleDisplayCall)
-            }.forEach { c ->
-                (c.consumer as CRecipeContainer.NormalConsumer)(crafterID, relate, mapped, results, isMultipleDisplayCall)
+            containers.filter { container ->
+                container.predicate(
+                    CRecipeContainer.Context(crafterID, relate, mapped, results, isMultipleDisplayCall)
+            ) }.forEach { container ->
+                container.consumer(
+                    CRecipeContainer.Context(crafterID, relate, mapped, results, isMultipleDisplayCall)
+                )
             }
         }
 

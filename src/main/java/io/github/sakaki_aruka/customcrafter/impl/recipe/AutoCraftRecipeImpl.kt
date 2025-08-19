@@ -4,6 +4,7 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.filter.CRecipeFilter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.AutoCraftRecipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
+import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CAutoCraftRecipeContainer
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeContainer
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
@@ -42,7 +43,7 @@ data class AutoCraftRecipeImpl(
     override val results: List<ResultSupplier>? = null,
     override val filters: Set<CRecipeFilter<CMatter>>? = getDefaultFilters(),
     override val autoCraftResults: List<ResultSupplier>? = null,
-    override val autoCraftContainers: List<CRecipeContainer>? = null
+    override val autoCraftContainers: List<CAutoCraftRecipeContainer>? = null
 ): AutoCraftRecipe {
     override fun replaceItems(newItems: Map<CoordinateComponent, CMatter>): CRecipe {
         return AutoCraftRecipeImpl(
