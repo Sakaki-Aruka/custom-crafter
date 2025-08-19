@@ -331,31 +331,53 @@ internal object SearchTest {
     }
 
     private fun enchantTest2() {
-        val emptyEnchant = CEnchantMatterImpl(
-            name = "empty",
-            candidate = setOf(Material.STONE),
-            enchantComponents = emptySet()
-        )
+        val noEnchantInput = ItemStack.of(Material.STONE)
+        val onlyEnchantInput = ItemStack.of(Material.STONE).apply {
+            itemMeta = itemMeta.apply {
+                addEnchant(Enchantment.EFFICIENCY, 100, true)
+            }
+        }
+        val strictEnchantInput = ItemStack.of(Material.STONE).apply {
+            itemMeta = itemMeta.apply {
+                addEnchant(Enchantment.EFFICIENCY, 1, true)
+            }
+        }
 
-        val noEnchantInput1 = ItemStack.of(Material.STONE)
-        //noEnchantInput1.editMeta { meta -> meta.addEnchant(Enchantment.EFFICIENCY, 5, false) }
-        val (resultType1, _) = EnchantFilter.normal(noEnchantInput1, emptyEnchant)
-
-        CAssert.assertTrue(resultType1 == CRecipeFilter.ResultType.NOT_REQUIRED)
-
-        val hasEnchant1 = CEnchantMatterImpl(
+        val noEnchantMatter = CEnchantMatterImpl(
             name = "",
             candidate = setOf(Material.STONE),
-            enchantComponents = setOf(CEnchantComponent(1, Enchantment.EFFICIENCY, EnchantStrict.ONLY_ENCHANT))
+            enchantComponents = setOf()
         )
-        val (resultType2, _) = EnchantFilter.normal(noEnchantInput1, hasEnchant1)
-        CAssert.assertTrue(resultType2 == CRecipeFilter.ResultType.FAILED)
+        val onlyEnchantMatter = CEnchantMatterImpl(
+            name = "",
+            candidate = setOf(Material.STONE),
+            enchantComponents = setOf(CEnchantComponent(150, Enchantment.EFFICIENCY, EnchantStrict.ONLY_ENCHANT))
+        )
+        val strictEnchantMatter = CEnchantMatterImpl(
+            name = "",
+            candidate = setOf(Material.STONE),
+            enchantComponents = setOf(CEnchantComponent(1, Enchantment.EFFICIENCY, EnchantStrict.STRICT))
+        )
 
-        val hasEnchantInput1 = ItemStack.of(Material.STONE)
-        hasEnchantInput1.editMeta { meta -> meta.addEnchant(Enchantment.EFFICIENCY, 1, true) }
+        CAssert.assertTrue(EnchantFilter.normal(noEnchantInput, noEnchantMatter).first == CRecipeFilter.ResultType.NOT_REQUIRED)
+        CAssert.assertTrue(EnchantFilter.normal(noEnchantInput, onlyEnchantMatter).first == CRecipeFilter.ResultType.FAILED)
+        CAssert.assertTrue(EnchantFilter.normal(noEnchantInput, strictEnchantMatter).first == CRecipeFilter.ResultType.FAILED)
 
-        val (resultType3, _) = EnchantFilter.normal(hasEnchantInput1, hasEnchant1)
-        CAssert.assertTrue(resultType3 == CRecipeFilter.ResultType.SUCCESS)
+        CAssert.assertTrue(EnchantFilter.normal(onlyEnchantInput, noEnchantMatter).first == CRecipeFilter.ResultType.NOT_REQUIRED)
+        val (type1, result1) = EnchantFilter.normal(onlyEnchantInput, onlyEnchantMatter)
+        CAssert.assertTrue(type1 == CRecipeFilter.ResultType.SUCCESS)
+        CAssert.assertTrue(result1)
+        val (type2, result2) = EnchantFilter.normal(onlyEnchantInput, strictEnchantMatter)
+        CAssert.assertTrue(type2 == CRecipeFilter.ResultType.SUCCESS)
+        CAssert.assertTrue(!result2)
+
+        CAssert.assertTrue(EnchantFilter.normal(strictEnchantInput, noEnchantMatter).first == CRecipeFilter.ResultType.NOT_REQUIRED)
+        val (type3, result3) = EnchantFilter.normal(strictEnchantInput, onlyEnchantMatter)
+        CAssert.assertTrue(type3 == CRecipeFilter.ResultType.SUCCESS)
+        CAssert.assertTrue(result3)
+        val (type4, result4) = EnchantFilter.normal(strictEnchantInput, strictEnchantMatter)
+        CAssert.assertTrue(type4 == CRecipeFilter.ResultType.SUCCESS)
+        CAssert.assertTrue(result4)
     }
 
     private fun enchantStoreTest1() {
