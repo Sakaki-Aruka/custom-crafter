@@ -35,9 +35,18 @@ data class CRecipeContainer(
         val None: (Context) -> Unit = { _ -> }
     }
 
+    /**
+     * Context of CRecipeContainer
+     * @param[userID] Crafter's ID
+     * @param[relation] Relation of input and recipe
+     * @param[mapped] Input items map
+     * @param[results] Results of crafting
+     * @param[isAllCandidateDisplayCall] Called from AllCandidateDisplay feature or not
+     * @since 5.0.12
+     */
     class Context internal constructor(
         val userID: UUID,
-        val relate: MappedRelation,
+        val relation: MappedRelation,
         val mapped: Map<CoordinateComponent, ItemStack>,
         val results: MutableList<ItemStack>,
         val isAllCandidateDisplayCall: Boolean

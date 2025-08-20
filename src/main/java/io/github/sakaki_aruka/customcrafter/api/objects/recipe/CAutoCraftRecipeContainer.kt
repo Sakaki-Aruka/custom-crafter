@@ -37,6 +37,14 @@ class CAutoCraftRecipeContainer(
         val None: (Context) -> Unit = { _ -> }
     }
 
+    /**
+     * Context of **AutoCraft**RecipeContainer
+     * @param[block] Crafter Block
+     * @param[relation] Relation of input and recipe
+     * @param[mapped] Input items map
+     * @param[results] Results of crafting
+     * @since 5.0.12
+     */
     class Context internal constructor(
         val block: Block,
         val relation: MappedRelation,
