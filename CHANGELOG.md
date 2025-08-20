@@ -1,5 +1,10 @@
 # Changelog
 
+# 5.0.12
+## Code
+- [Changed] `(Normal / AutoCraft)(Predicate / Consumer)` to `CRecipeContainer` and `CAutoCraftRecipeContainer`
+- [Changed] `CustomCrafterAPIPropertiesChangeEvent` has come to accept async calls.
+
 # 5.0.11
 ## Features
 - [Added] an automatic crafting function.
