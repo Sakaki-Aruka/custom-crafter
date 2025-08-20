@@ -1,6 +1,7 @@
 package io.github.sakaki_aruka.customcrafter.api.interfaces.recipe
 
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
+import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CAutoCraftRecipeContainer
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeContainer
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.objects.result.ResultSupplier
@@ -38,7 +39,7 @@ interface AutoCraftRecipe: CRecipe {
     /**
      * [CRecipeContainer] what are run on auto crafting.
      */
-    val autoCraftContainers: List<CRecipeContainer>?
+    val autoCraftContainers: List<CAutoCraftRecipeContainer>?
 
     companion object {
         /**
@@ -99,14 +100,9 @@ interface AutoCraftRecipe: CRecipe {
         results: MutableList<ItemStack>
     ) {
         autoCraftContainers?.let { containers ->
-            containers.filter { c ->
-                c.predicate is CRecipeContainer.AutoCraftPredicate
-                        && c.consumer is CRecipeContainer.AutoCraftConsumer
-            }.filter { c->
-                (c.predicate as CRecipeContainer.AutoCraftPredicate)(block, relate, mapped, results)
-            }.forEach { c ->
-                (c.consumer as CRecipeContainer.AutoCraftConsumer)(block, relate, mapped, results)
-            }
+            val context = CAutoCraftRecipeContainer.Context(block, relate, mapped, results)
+            containers.filter { container -> container.predicate(context) }
+                .forEach { container -> container.consumer(context) }
         }
     }
 }

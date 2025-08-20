@@ -24,7 +24,7 @@ object CustomCrafterAPI {
      *
      * This version is different with the plugin version string.
      */
-    const val API_VERSION: String = "0.1.11"
+    const val API_VERSION: String = "0.1.12"
 
     /**
      * Custom Crafter API is stable or not.
@@ -60,14 +60,16 @@ object CustomCrafterAPI {
      *
      * Default = `false`
      * @param[v] Give or not
+     * @param[calledAsync] Called from async processing or not. (Default = false)
      * @since 5.0.11
      */
-    fun setResultGiveCancel(v: Boolean) {
+    fun setResultGiveCancel(v: Boolean, calledAsync: Boolean = false) {
         if (RESULT_GIVE_CANCEL != v) {
             CustomCrafterAPIPropertiesChangeEvent(
                 propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.RESULT_GIVE_CANCEL.name,
                 old = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(RESULT_GIVE_CANCEL),
-                new = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(v)
+                new = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(v),
+                isAsync = calledAsync
             ).callEvent()
         }
         RESULT_GIVE_CANCEL = v
@@ -90,11 +92,12 @@ object CustomCrafterAPI {
      *
      * If a given material is not a block type, throws [IllegalArgumentException].
      * @param[type] base block type
+     * @param[calledAsync] Called from async processing or not. (Default = false)
      * @throws[IllegalArgumentException] when specified not a block type
      * @since 5.0.9
      */
-    fun setBaseBlock(type: Material) {
-        if (!type.isBlock) {
+    fun setBaseBlock(type: Material, calledAsync: Boolean = false) {
+        if (!type.isBlock || type.isAir) {
             throw IllegalArgumentException("'type' must meet 'Material#isBlock'.")
         }
 
@@ -102,7 +105,8 @@ object CustomCrafterAPI {
             CustomCrafterAPIPropertiesChangeEvent(
                 propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK.name,
                 old = CustomCrafterAPIPropertiesChangeEvent.Property<Material>(BASE_BLOCK),
-                new = CustomCrafterAPIPropertiesChangeEvent.Property<Material>(type)
+                new = CustomCrafterAPIPropertiesChangeEvent.Property<Material>(type),
+                isAsync = calledAsync
             ).callEvent()
         }
         BASE_BLOCK = type
@@ -134,14 +138,16 @@ object CustomCrafterAPI {
      * - `true`: If the system gets some result candidates, shows all candidates to a player.
      * - `false`: The API provides only a first matched item. (no prompt)
      * @param[v] Multiple result candidate feature enable or not
+     * @param[calledAsync] Called from async processing or not. (Default = false)
      * @since 5.0.11 (original 5.0.8)
      */
-    fun setUseMultipleResultCandidateFeature(v: Boolean) {
+    fun setUseMultipleResultCandidateFeature(v: Boolean, calledAsync: Boolean = false) {
         if (v != USE_MULTIPLE_RESULT_CANDIDATE_FEATURE) {
             CustomCrafterAPIPropertiesChangeEvent(
                 propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.USE_MULTIPLE_RESULT_CANDIDATE_FEATURE.name,
                 old = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(USE_MULTIPLE_RESULT_CANDIDATE_FEATURE),
-                new = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(v)
+                new = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(v),
+                isAsync = calledAsync
             ).callEvent()
         }
         USE_MULTIPLE_RESULT_CANDIDATE_FEATURE = v
@@ -167,14 +173,16 @@ object CustomCrafterAPI {
     /**
      * Sets 'auto crafting' feature enables or not.
      * @param[v] Auto Crafting feature enables or not
+     * @param[calledAsync] Called from async processing or not. (Default = false)
      * @since 5.0.11 (original 5.0.10)
      */
-    fun setUseAutoCraftingFeature(v: Boolean) {
+    fun setUseAutoCraftingFeature(v: Boolean, calledAsync: Boolean = false) {
         if (v != USE_AUTO_CRAFTING_FEATURE) {
             CustomCrafterAPIPropertiesChangeEvent(
                 propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.USE_AUTO_CRAFTING_FEATURE.name,
                 old = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(USE_AUTO_CRAFTING_FEATURE),
-                new = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(v)
+                new = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(v),
+                isAsync = calledAsync
             ).callEvent()
         }
         USE_AUTO_CRAFTING_FEATURE = v
@@ -190,7 +198,8 @@ object CustomCrafterAPI {
      */
     val AUTO_CRAFTING_CONFIG_COMPATIBILITIES: Map<String, Set<String>> = mapOf(
         "0.1.10" to setOf("0.1.10"),
-        "0.1.11" to setOf("0.1.11")
+        "0.1.11" to setOf("0.1.11"),
+        "0.1.12" to setOf("0.1.11", "0.1.12")
     )
 
 
@@ -205,15 +214,17 @@ object CustomCrafterAPI {
      * default size = 3.
      *
      * @param[size] this argument must be odd and more than zero.
+     * @param[calledAsync] Called from async processing or not. (Default = false)
      * @return[Boolean] if successful to change, returns true else false.
      */
-    fun setBaseBlockSideSize(size: Int): Boolean {
+    fun setBaseBlockSideSize(size: Int, calledAsync: Boolean = false): Boolean {
         if (size < 3 || size % 2 != 1) return false
         if (size != BASE_BLOCK_SIDE) {
             CustomCrafterAPIPropertiesChangeEvent(
                 propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK_SIDE.name,
                 old = CustomCrafterAPIPropertiesChangeEvent.Property<Int>(BASE_BLOCK_SIDE),
-                new = CustomCrafterAPIPropertiesChangeEvent.Property<Int>(size)
+                new = CustomCrafterAPIPropertiesChangeEvent.Property<Int>(size),
+                isAsync = calledAsync
             ).callEvent()
         }
         BASE_BLOCK_SIDE = size

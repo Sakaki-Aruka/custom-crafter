@@ -18,7 +18,7 @@ Paper
 - v4.3: `1.21.3`
 - v4.2: `1.20.1 - 1.20.4`
 
-Tested in Paper 1.21.3, 1.20.4.
+Tested in Paper 1.21.3 .
 
 **WARNING: custom crafter does not support to run on Spigot servers.**
 
@@ -58,7 +58,7 @@ The latest provided version
    <dependency>
       <groupId>com.github.Sakaki-Aruka</groupId>
       <artifactId>custom-crafter</artifactId>
-      <version>5.0.11</version>
+      <version>5.0.12</version>
    </dependency>
 </dependencies>
 
@@ -82,7 +82,7 @@ dependencyResolutionManagement {
 (dependency)
 ```groovy
 dependencies {
-   implementation 'com.github.Sakaki-Aruka:custom-crafter:5.0.11'
+   implementation 'com.github.Sakaki-Aruka:custom-crafter:5.0.12'
 }
 ```
 
@@ -103,7 +103,7 @@ repositories {
 (dependency)
 ```
 dependencies {
-    implementation("com.github.Sakaki-Aruka:custom-crafter:5.0.11")
+    implementation("com.github.Sakaki-Aruka:custom-crafter:5.0.12")
 }
 ```
 
