@@ -117,7 +117,7 @@ object CC {
             .then(Commands.argument("value", BoolArgumentType.bool())
                 .executes { ctx ->
                     val v: Boolean = ctx.getArgument("value", Boolean::class.java)
-                    CustomCrafterAPI.setResultGiveCancel(v)
+                    CustomCrafterAPI.setResultGiveCancel(v, calledAsync = true)
                     ctx.msg("<green>result-give-cancel toggle successful. (${v})")
                     return@executes SINGLE_SUCCESS
                 }
@@ -127,7 +127,7 @@ object CC {
                 .executes { ctx ->
                     val material: Material = ctx.getArgument("block", ItemStack::class.java).type
                     try {
-                        CustomCrafterAPI.setBaseBlock(material)
+                        CustomCrafterAPI.setBaseBlock(material, calledAsync = true)
                         ctx.msg("<green>base-block change successful. (${material.name})")
                     } catch (_: Exception) {
                         ctx.msg("<red>Failed to set base-block. 'block' must be a block.")
@@ -139,7 +139,7 @@ object CC {
             .then(Commands.argument("value", BoolArgumentType.bool())
                 .executes { ctx ->
                     val v: Boolean = ctx.getArgument("value", Boolean::class.java)
-                    CustomCrafterAPI.setUseMultipleResultCandidateFeature(v)
+                    CustomCrafterAPI.setUseMultipleResultCandidateFeature(v, calledAsync = true)
                     ctx.msg("<green>use-multiple-result-candidate-feature toggle successful. (${v})")
                     return@executes SINGLE_SUCCESS
                 }
@@ -151,7 +151,7 @@ object CC {
                     if (v) {
                         object: BukkitRunnable() {
                             override fun run() {
-                                CustomCrafterAPI.setUseAutoCraftingFeature(true)
+                                CustomCrafterAPI.setUseAutoCraftingFeature(true, calledAsync = true)
                                 InternalAPI.setup()
                                 if (v != CustomCrafterAPI.getUseAutoCraftingFeature()) {
                                     ctx.msg("<red>Failed to toggle use-auto-crafting-feature. See console logs.")
@@ -161,7 +161,7 @@ object CC {
                             }
                         }.runTaskAsynchronously(CustomCrafter.getInstance())
                     } else {
-                        CustomCrafterAPI.setUseAutoCraftingFeature(false)
+                        CustomCrafterAPI.setUseAutoCraftingFeature(false, calledAsync = true)
                         ctx.msg("<green>use-auto-crafting-feature toggle successful. (${v})")
                     }
                     return@executes SINGLE_SUCCESS
@@ -171,7 +171,7 @@ object CC {
             .then(Commands.argument("size", IntegerArgumentType.integer(3))
                 .executes { ctx ->
                     val size: Int = ctx.getArgument("size", Int::class.java)
-                    if (CustomCrafterAPI.setBaseBlockSideSize(size)) {
+                    if (CustomCrafterAPI.setBaseBlockSideSize(size, calledAsync = true)) {
                         ctx.msg("<green>base-block-side change successful. (${size}")
                     } else {
                         ctx.msg("<red>Failed to change base-block-side.")
