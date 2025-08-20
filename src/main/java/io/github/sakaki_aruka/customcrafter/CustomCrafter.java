@@ -43,7 +43,7 @@ public final class CustomCrafter extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(BlockBreakEventListener.INSTANCE, this);
 
         InternalAPI.INSTANCE.runTests();
-        InternalAPI.INSTANCE.setup();
+        InternalAPI.INSTANCE.setup(false);
 
         this.getLifecycleManager().registerEventHandler(
                 LifecycleEvents.COMMANDS,

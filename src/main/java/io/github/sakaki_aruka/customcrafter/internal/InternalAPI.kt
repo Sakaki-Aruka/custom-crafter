@@ -65,8 +65,7 @@ internal object InternalAPI {
         }
     }
 
-    fun setup() {
-
+    fun setup(async: Boolean) {
         if (CustomCrafterAPI.getUseAutoCraftingFeature()) {
             try {
                 Class.forName("org.sqlite.JDBC")
@@ -82,12 +81,7 @@ internal object InternalAPI {
             } catch (e: SQLException) {
                 warn("AutoCraft DB Initialize Error. The feature will turn off.")
                 warn(e.message ?: "? Error ?")
-                CustomCrafterAPI.setUseAutoCraftingFeature(false)
-                CustomCrafterAPIPropertiesChangeEvent(
-                    propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.USE_AUTO_CRAFTING_FEATURE.name,
-                    old = CustomCrafterAPIPropertiesChangeEvent.Property(true),
-                    new = CustomCrafterAPIPropertiesChangeEvent.Property(false)
-                ).callEvent()
+                CustomCrafterAPI.setUseAutoCraftingFeature(false, calledAsync = async)
             }
         }
     }

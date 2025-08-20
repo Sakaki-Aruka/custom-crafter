@@ -186,7 +186,9 @@ object CustomCrafterAPI {
             ).callEvent()
         }
         USE_AUTO_CRAFTING_FEATURE = v
-        InternalAPI.setup()
+        if (v) {
+            InternalAPI.setup(calledAsync)
+        }
     }
 
     /**
