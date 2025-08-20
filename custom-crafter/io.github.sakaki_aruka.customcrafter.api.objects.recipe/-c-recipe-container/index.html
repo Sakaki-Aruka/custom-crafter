@@ -65,24 +65,24 @@
   <div class="breadcrumbs"><a href="../../../index.html">custom-crafter</a><span class="delimiter">/</span><a href="../index.html">io.github.sakaki_aruka.customcrafter.api.objects.recipe</a><span class="delimiter">/</span><span class="current">CRecipeContainer</span></div>
   <div class="cover ">
     <h1 class="cover"><span>CRecipe</span><wbr></wbr><span><span>Container</span></span></h1>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="custom-crafter/JVM"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="index.html">CRecipeContainer</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>predicate<span class="token operator">: </span><a href="-predicate/index.html">CRecipeContainer.Predicate</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>consumer<span class="token operator">: </span><a href="-consumer/index.html">CRecipeContainer.Consumer</a></span></span><span class="token punctuation">)</span></div><p class="paragraph">Containers for <a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.recipe/-c-recipe/index.html">CRecipe</a>.</p><p class="paragraph">each container has a predicate and a consumer.</p><p class="paragraph">When crafting and a predicate is true, consumer runs.</p></div></div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="custom-crafter/JVM"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="index.html">CRecipeContainer</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>predicate<span class="token operator">: </span><span class="token punctuation">(</span><a href="-context/index.html">CRecipeContainer.Context</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>consumer<span class="token operator">: </span><span class="token punctuation">(</span><a href="-context/index.html">CRecipeContainer.Context</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div><p class="paragraph">Containers for <a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.recipe/-c-recipe/index.html">CRecipe</a>.</p><p class="paragraph">each container has a predicate and a consumer.</p><p class="paragraph">When crafting and a predicate is true, consumer runs.</p></div></div>
   </div>
   <div class="tabbedcontent">
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
     <div class="tabs-section-body">
       <div data-togglable="CONSTRUCTOR">
         <h2 class="">Constructors</h2>
-        <div class="table"><a data-name="949944695%2FConstructors%2F-1417057397" anchor-label="CRecipeContainer" id="949944695%2FConstructors%2F-1417057397" data-filterable-set="custom-crafter/JVM"></a>
+        <div class="table"><a data-name="8554432%2FConstructors%2F-1417057397" anchor-label="CRecipeContainer" id="8554432%2FConstructors%2F-1417057397" data-filterable-set="custom-crafter/JVM"></a>
           <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current="custom-crafter/JVM" data-filterable-set="custom-crafter/JVM">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-c-recipe-container.html"><span>CRecipe</span><wbr></wbr><span><span>Container</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="949944695%2FConstructors%2F-1417057397"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="8554432%2FConstructors%2F-1417057397"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="custom-crafter/JVM"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">predicate<span class="token operator">: </span><a href="-predicate/index.html">CRecipeContainer.Predicate</a><span class="token punctuation">, </span></span><span class="parameter ">consumer<span class="token operator">: </span><a href="-consumer/index.html">CRecipeContainer.Consumer</a></span></span><span class="token punctuation">)</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="custom-crafter/JVM"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">predicate<span class="token operator">: </span><span class="token punctuation">(</span><a href="-context/index.html">CRecipeContainer.Context</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span></span><span class="parameter ">consumer<span class="token operator">: </span><span class="token punctuation">(</span><a href="-context/index.html">CRecipeContainer.Context</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span></div></div></div>
                 </div>
               </div>
             </div>
@@ -91,92 +91,32 @@
       </div>
       <div data-togglable="TYPE">
         <h2 class="">Types</h2>
-        <div class="table"><a data-name="-688054347%2FClasslikes%2F-1417057397" anchor-label="AutoCraftConsumer" id="-688054347%2FClasslikes%2F-1417057397" data-filterable-set="custom-crafter/JVM"></a>
+        <div class="table"><a data-name="1307308048%2FClasslikes%2F-1417057397" anchor-label="Companion" id="1307308048%2FClasslikes%2F-1417057397" data-filterable-set="custom-crafter/JVM"></a>
           <div class="table-row" data-filterable-current="custom-crafter/JVM" data-filterable-set="custom-crafter/JVM">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-auto-craft-consumer/index.html"><span>Auto</span><wbr></wbr><span>Craft</span><wbr></wbr><span><span>Consumer</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-688054347%2FClasslikes%2F-1417057397"></span>
+                  <div><a href="-companion/index.html"><span><span>Companion</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1307308048%2FClasslikes%2F-1417057397"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="custom-crafter/JVM"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="-auto-craft-consumer/index.html">AutoCraftConsumer</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>func<span class="token operator">: </span><span class="token punctuation">(</span><span data-unresolved-link="org.bukkit.block/Block///PointingToDeclaration/">Block</span><span class="token punctuation">, </span><a href="../../io.github.sakaki_aruka.customcrafter.api.objects/-mapped-relation/index.html">MappedRelation</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><a href="../-coordinate-component/index.html">CoordinateComponent</a><span class="token punctuation">, </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-mutable-list/index.html">MutableList</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token operator">&gt;</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span> : <a href="-consumer/index.html">CRecipeContainer.Consumer</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="custom-crafter/JVM"><div class="symbol monospace"><span class="token keyword">object </span><a href="-companion/index.html">Companion</a></div></div></div>
                 </div>
               </div>
             </div>
           </div>
-<a data-name="-2065448224%2FClasslikes%2F-1417057397" anchor-label="AutoCraftPredicate" id="-2065448224%2FClasslikes%2F-1417057397" data-filterable-set="custom-crafter/JVM"></a>
+<a data-name="-2146719347%2FClasslikes%2F-1417057397" anchor-label="Context" id="-2146719347%2FClasslikes%2F-1417057397" data-filterable-set="custom-crafter/JVM"></a>
           <div class="table-row" data-filterable-current="custom-crafter/JVM" data-filterable-set="custom-crafter/JVM">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-auto-craft-predicate/index.html"><span>Auto</span><wbr></wbr><span>Craft</span><wbr></wbr><span><span>Predicate</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2065448224%2FClasslikes%2F-1417057397"></span>
+                  <div><a href="-context/index.html"><span><span>Context</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2146719347%2FClasslikes%2F-1417057397"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="custom-crafter/JVM"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="-auto-craft-predicate/index.html">AutoCraftPredicate</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>func<span class="token operator">: </span><span class="token punctuation">(</span><span data-unresolved-link="org.bukkit.block/Block///PointingToDeclaration/">Block</span><span class="token punctuation">, </span><a href="../../io.github.sakaki_aruka.customcrafter.api.objects/-mapped-relation/index.html">MappedRelation</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><a href="../-coordinate-component/index.html">CoordinateComponent</a><span class="token punctuation">, </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-mutable-list/index.html">MutableList</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token operator">&gt;</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span> : <a href="-predicate/index.html">CRecipeContainer.Predicate</a></div></div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-<a data-name="1515242032%2FClasslikes%2F-1417057397" anchor-label="Consumer" id="1515242032%2FClasslikes%2F-1417057397" data-filterable-set="custom-crafter/JVM"></a>
-          <div class="table-row" data-filterable-current="custom-crafter/JVM" data-filterable-set="custom-crafter/JVM">
-            <div class="main-subrow keyValue ">
-              <div class=""><span class="inline-flex">
-                  <div><a href="-consumer/index.html"><span><span>Consumer</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1515242032%2FClasslikes%2F-1417057397"></span>
-                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                  </span></span></div>
-              <div>
-                <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="custom-crafter/JVM"><div class="symbol monospace"><span class="token keyword">sealed </span><span class="token keyword">interface </span><a href="-consumer/index.html">Consumer</a></div></div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-<a data-name="-1464925623%2FClasslikes%2F-1417057397" anchor-label="NormalConsumer" id="-1464925623%2FClasslikes%2F-1417057397" data-filterable-set="custom-crafter/JVM"></a>
-          <div class="table-row" data-filterable-current="custom-crafter/JVM" data-filterable-set="custom-crafter/JVM">
-            <div class="main-subrow keyValue ">
-              <div class=""><span class="inline-flex">
-                  <div><a href="-normal-consumer/index.html"><span>Normal</span><wbr></wbr><span><span>Consumer</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1464925623%2FClasslikes%2F-1417057397"></span>
-                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                  </span></span></div>
-              <div>
-                <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="custom-crafter/JVM"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="-normal-consumer/index.html">NormalConsumer</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>func<span class="token operator">: </span><span class="token punctuation">(</span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/UUID.html">UUID</a><span class="token punctuation">, </span><a href="../../io.github.sakaki_aruka.customcrafter.api.objects/-mapped-relation/index.html">MappedRelation</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><a href="../-coordinate-component/index.html">CoordinateComponent</a><span class="token punctuation">, </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-mutable-list/index.html">MutableList</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></span></span><span class="token punctuation">)</span> : <a href="-consumer/index.html">CRecipeContainer.Consumer</a></div><div class="brief "><p class="paragraph">A processor of <a href="index.html">CRecipeContainer</a>. consumer prams</p></div></div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-<a data-name="-378654004%2FClasslikes%2F-1417057397" anchor-label="NormalPredicate" id="-378654004%2FClasslikes%2F-1417057397" data-filterable-set="custom-crafter/JVM"></a>
-          <div class="table-row" data-filterable-current="custom-crafter/JVM" data-filterable-set="custom-crafter/JVM">
-            <div class="main-subrow keyValue ">
-              <div class=""><span class="inline-flex">
-                  <div><a href="-normal-predicate/index.html"><span>Normal</span><wbr></wbr><span><span>Predicate</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-378654004%2FClasslikes%2F-1417057397"></span>
-                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                  </span></span></div>
-              <div>
-                <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="custom-crafter/JVM"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="-normal-predicate/index.html">NormalPredicate</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>func<span class="token operator">: </span><span class="token punctuation">(</span><a href="https://docs.oracle.com/javase/8/docs/api/java/util/UUID.html">UUID</a><span class="token punctuation">, </span><a href="../../io.github.sakaki_aruka.customcrafter.api.objects/-mapped-relation/index.html">MappedRelation</a><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><a href="../-coordinate-component/index.html">CoordinateComponent</a><span class="token punctuation">, </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-mutable-list/index.html">MutableList</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token operator">&gt;</span><span class="token punctuation">, </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></span></span><span class="token punctuation">)</span> : <a href="-predicate/index.html">CRecipeContainer.Predicate</a></div><div class="brief "><p class="paragraph">A predicate of <a href="index.html">CRecipeContainer</a>.</p></div></div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-<a data-name="1812230085%2FClasslikes%2F-1417057397" anchor-label="Predicate" id="1812230085%2FClasslikes%2F-1417057397" data-filterable-set="custom-crafter/JVM"></a>
-          <div class="table-row" data-filterable-current="custom-crafter/JVM" data-filterable-set="custom-crafter/JVM">
-            <div class="main-subrow keyValue ">
-              <div class=""><span class="inline-flex">
-                  <div><a href="-predicate/index.html"><span><span>Predicate</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1812230085%2FClasslikes%2F-1417057397"></span>
-                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                  </span></span></div>
-              <div>
-                <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="custom-crafter/JVM"><div class="symbol monospace"><span class="token keyword">sealed </span><span class="token keyword">interface </span><a href="-predicate/index.html">Predicate</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="custom-crafter/JVM"><div class="symbol monospace"><span class="token keyword">class </span><a href="-context/index.html">Context</a></div><div class="brief "><p class="paragraph">Context of CRecipeContainer</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -195,7 +135,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="custom-crafter/JVM"><div class="symbol monospace"><span class="token keyword">val </span><a href="consumer.html">consumer</a><span class="token operator">: </span><a href="-consumer/index.html">CRecipeContainer.Consumer</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="custom-crafter/JVM"><div class="symbol monospace"><span class="token keyword">val </span><a href="consumer.html">consumer</a><span class="token operator">: </span><span class="token punctuation">(</span><a href="-context/index.html">CRecipeContainer.Context</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-unit/index.html">Unit</a></div></div></div>
                 </div>
               </div>
             </div>
@@ -210,7 +150,7 @@
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="custom-crafter/JVM"><div class="symbol monospace"><span class="token keyword">val </span><a href="predicate.html">predicate</a><span class="token operator">: </span><a href="-predicate/index.html">CRecipeContainer.Predicate</a></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="custom-crafter/JVM"><div class="symbol monospace"><span class="token keyword">val </span><a href="predicate.html">predicate</a><span class="token operator">: </span><span class="token punctuation">(</span><a href="-context/index.html">CRecipeContainer.Context</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div></div></div>
                 </div>
               </div>
             </div>
