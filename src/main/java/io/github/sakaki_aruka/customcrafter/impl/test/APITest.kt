@@ -28,17 +28,18 @@ internal object APITest {
 
     private fun baseBlockTest() {
         val base: Int = CustomCrafterAPI.getBaseBlockSideSize()
-        CAssert.assertTrue(!CustomCrafterAPI.setBaseBlockSideSize(-1))
-        CAssert.assertTrue(!CustomCrafterAPI.setBaseBlockSideSize(0))
-        CAssert.assertTrue(CustomCrafterAPI.setBaseBlockSideSize(5))
-        CustomCrafterAPI.setBaseBlockSideSize(3)
+        CAssert.assertTrue(!CustomCrafterAPI.setBaseBlockSideSize(-1, calledAsync = true))
+        CAssert.assertTrue(!CustomCrafterAPI.setBaseBlockSideSize(0, calledAsync = true))
+        CAssert.assertTrue(CustomCrafterAPI.setBaseBlockSideSize(5, calledAsync = true))
+        CustomCrafterAPI.setBaseBlockSideSize(3, calledAsync = true)
         CAssert.assertTrue(CustomCrafterAPI.getBaseBlockSideSize() == 3)
 
         CAssert.assertThrow(IllegalArgumentException::class) {
-            CustomCrafterAPI.setBaseBlock(Material.DIAMOND)
+            CustomCrafterAPI.setBaseBlock(Material.DIAMOND, calledAsync = true)
         }
 
-        CustomCrafterAPI.setBaseBlockSideSize(base)
+        CustomCrafterAPI.setBaseBlockSideSize(base, calledAsync = true)
+        CAssert.assertTrue(CustomCrafterAPI.getBaseBlockSideSize() == base)
     }
 
     private fun allCandidateTest() {

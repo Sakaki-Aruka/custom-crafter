@@ -152,7 +152,6 @@ object CC {
                         object: BukkitRunnable() {
                             override fun run() {
                                 CustomCrafterAPI.setUseAutoCraftingFeature(true, calledAsync = true)
-                                InternalAPI.setup()
                                 if (v != CustomCrafterAPI.getUseAutoCraftingFeature()) {
                                     ctx.msg("<red>Failed to toggle use-auto-crafting-feature. See console logs.")
                                 } else {
