@@ -6,7 +6,7 @@
 
     <groupId>io.github.sakaki_aruka</groupId>
     <artifactId>custom-crafter</artifactId>
-    <version>5.0.12</version>
+    <version>5.0.13</version>
     <packaging>jar</packaging>
 
     <name>Custom Crafter</name>
@@ -198,7 +198,7 @@
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.21.3-R0.1-SNAPSHOT</version>
+            <version>1.21.4-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
 
