@@ -109,9 +109,9 @@ data class CoordinateComponent(
             val result: MutableSet<CoordinateComponent> = mutableSetOf()
             (dy..<size + dy).forEach { y ->
                 (dx..<size + dx).forEach { x ->
-                    if (y == 0 || y == size - 1 + dy) {
+                    if (y == dy || y == size - 1 + dy) {
                         result.add(CoordinateComponent(x, y))
-                    } else if (x == 0 || x == size - 1 + dx) {
+                    } else if (x == dx || x == size - 1 + dx) {
                         result.add(CoordinateComponent(x, y))
                     }
                 }

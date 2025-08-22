@@ -150,18 +150,18 @@ class CraftUI(
         if (result.customs().isNotEmpty()) {
             val (recipe: CRecipe, relate: MappedRelation) = result.customs().firstOrNull() ?: return
             if (getMinAmountWithoutMass(relate, recipe, mapped) <= 0) {
-                result
+                return
             }
 
             var amount = 1
             recipe.items.forEach { (c, m) ->
-                val inputCoordinate = relate.components.find { component -> component.recipe == c }
+                val inputCoordinate = relate.components.find { rel -> rel.recipe == c }
                     ?.input
                     ?: return
                 val min: Int = getMinAmountWithoutMass(relate, recipe, mapped)
                 amount = if (m.mass) 1 else (m.amount * (if (shiftUsed) min else 1))
 
-                val slot: Int = inputCoordinate.x + inputCoordinate.y * 9
+                val slot: Int = inputCoordinate.toIndex()
                 decrement(this.inventory, slot, amount)
             }
 
@@ -190,8 +190,12 @@ class CraftUI(
         slot: Int,
         amount: Int
     ) {
-        gui.getItem(slot)?.let { item ->
-            item.amount = max(item.amount - amount, 0)
+        val item: ItemStack = gui.getItem(slot) ?: return
+        val qty: Int = max(item.amount - amount, 0)
+        if (qty == 0) {
+            gui.setItem(slot, ItemStack.empty())
+        } else {
+            gui.setItem(slot, item.asQuantity(qty))
         }
     }
 
@@ -202,7 +206,7 @@ class CraftUI(
     ): Int {
         return relation.components
             .filter { c -> Converter.getAvailableCraftingSlotComponents().contains(c.input) }
-            .filter { c -> mapped[c.input] != null && mapped[c.input]!!.type != Material.AIR }
+            .filter { c -> mapped[c.input] != null && mapped[c.input]!!.type.isItem }
             .filter { c -> !recipe.items[c.recipe]!!.mass }
             .minOf { (r, i) -> mapped[i]!!.amount / recipe.items[r]!!.amount }
     }
