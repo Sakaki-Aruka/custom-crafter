@@ -348,7 +348,7 @@ object CustomCrafterAPI {
      * @since 5.0.10
      */
     fun setAutoCraftingBaseBlock(type: Material) {
-        if (!type.isBlock) throw IllegalArgumentException("'type' must meet 'Material#isBlock'.")
+        if (!type.isBlock || type.isAir) throw IllegalArgumentException("'type' must meet 'Material#isBlock'.")
         AUTO_CRAFTING_BASE_BLOCK = type
     }
 
