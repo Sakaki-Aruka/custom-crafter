@@ -207,6 +207,20 @@ object CustomCrafterAPI {
 
     /**
      * Checks full-compatibility
+     *
+     * ```kotlin
+     * // Check Example in your plugin
+     * @Override
+     * fun onEnable() {
+     *     if (!CustomCrafterAPI.hasFullCompatibility("0.1.13")) {
+     *         println("This plugin has not full-compatibility with loaded CustomCrafter.")
+     *         println("Loaded Version: ${CustomCrafterAPI.API_VERSION}")
+     *         Bukkit.pluginManager.disablePlugin(this)
+     *         return
+     *     }
+     * }
+     * ```
+     *
      * @param[version] CustomCrafter version string that is used by your plugin.
      * @since 5.0.13
      */
