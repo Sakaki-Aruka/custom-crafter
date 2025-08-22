@@ -205,6 +205,15 @@ object CustomCrafterAPI {
         "0.1.13" to setOf("0.1.11", "0.1.12", "0.1.13")
     )
 
+    /**
+     * Checks full-compatibility
+     * @param[version] CustomCrafter version string that is used by your plugin.
+     * @since 5.0.13
+     */
+    fun hasFullCompatibility(version: String): Boolean {
+        return version in setOf("0.1.13")
+    }
+
 
     /**
      * @suppress
