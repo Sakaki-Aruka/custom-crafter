@@ -60,6 +60,11 @@ internal object CraftUITest {
 
     @AfterEach
     fun tearDown() {
+        val recipes = CustomCrafterAPI.getRecipes()
+        recipes.forEach { recipe ->
+            CustomCrafterAPI.unregisterRecipe(recipe)
+        }
+
         MockBukkit.unmock()
     }
 
@@ -161,10 +166,5 @@ internal object CraftUITest {
         assertTrue(placedItems.all { item -> item != null && item.isSimilar(ItemStack(Material.OBSIDIAN)) })
 
         player.openInventory.close()
-    }
-
-    @Test
-    fun onClickCraftCustomItemWithMultipleCandidatesTest() {
-        //
     }
 }
