@@ -30,10 +30,17 @@ internal object CBlockDB {
 
     class NotLinkedBlockException(message: String): Exception(message)
 
-    private val DB_URL = "jdbc:sqlite:${CustomCrafter.getInstance().dataPath.resolve("auto-craft.db").toUri()}"
+    private var USE_IN_MEMORY_DATABASE: Boolean = false
+    private fun getDatabaseURL(): String {
+        return if (USE_IN_MEMORY_DATABASE) {
+            "jdbc:sqlite::memory:"
+        } else {
+            "jdbc:sqlite:${CustomCrafter.getInstance().dataPath.resolve("auto-craft.db").toUri()}"
+        }
+    }
     private val SOURCE: HikariDataSource by lazy {
         val config = HikariConfig().apply {
-            jdbcUrl = DB_URL
+            jdbcUrl = getDatabaseURL()
             driverClassName = "org.sqlite.JDBC"
             minimumIdle = 5
             maximumPoolSize = 20
@@ -65,7 +72,8 @@ internal object CBlockDB {
         val items = bytes("items").bindTo { it.items }
     }
 
-    fun initTables() {
+    fun initTables(useInMemoryDatabase: Boolean = false) {
+        USE_IN_MEMORY_DATABASE = useInMemoryDatabase
         db.useConnection { conn ->
             val statement = conn.createStatement()
 

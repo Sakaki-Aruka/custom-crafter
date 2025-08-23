@@ -187,7 +187,7 @@ object CustomCrafterAPI {
         }
         USE_AUTO_CRAFTING_FEATURE = v
         if (v) {
-            InternalAPI.setup(calledAsync)
+            InternalAPI.setupAutoCraftDatabase(calledAsync)
         }
     }
 

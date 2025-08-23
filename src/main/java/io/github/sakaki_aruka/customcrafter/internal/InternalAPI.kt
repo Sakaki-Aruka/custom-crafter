@@ -3,7 +3,6 @@ package io.github.sakaki_aruka.customcrafter.internal
 import io.github.sakaki_aruka.customcrafter.CustomCrafter
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.active_test.CAssert
-import io.github.sakaki_aruka.customcrafter.api.event.CustomCrafterAPIPropertiesChangeEvent
 import io.github.sakaki_aruka.customcrafter.impl.test.APITest
 import io.github.sakaki_aruka.customcrafter.impl.test.ConverterTest
 import io.github.sakaki_aruka.customcrafter.impl.test.MultipleCandidateTest
@@ -65,7 +64,7 @@ internal object InternalAPI {
         }
     }
 
-    fun setup(async: Boolean) {
+    fun setupAutoCraftDatabase(async: Boolean) {
         if (CustomCrafterAPI.getUseAutoCraftingFeature()) {
             try {
                 Class.forName("org.sqlite.JDBC")
