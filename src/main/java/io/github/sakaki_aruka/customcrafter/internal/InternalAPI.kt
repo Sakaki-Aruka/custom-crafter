@@ -3,7 +3,6 @@ package io.github.sakaki_aruka.customcrafter.internal
 import io.github.sakaki_aruka.customcrafter.CustomCrafter
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.active_test.CAssert
-import io.github.sakaki_aruka.customcrafter.impl.test.ConverterTest
 import io.github.sakaki_aruka.customcrafter.impl.test.SearchTest
 import io.github.sakaki_aruka.customcrafter.impl.test.VanillaSearchTest
 import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlockDB
@@ -42,7 +41,6 @@ internal object InternalAPI {
             object: BukkitRunnable() {
                 override fun run() {
                     val startAt = System.currentTimeMillis()
-                    ConverterTest.run()
 
                     VanillaSearchTest.run()
 

@@ -1,7 +1,5 @@
-package io.github.sakaki_aruka.customcrafter.impl.test
+package online.aruka.customcrafter.api.util
 
-import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
-import io.github.sakaki_aruka.customcrafter.api.active_test.CAssert
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import io.github.sakaki_aruka.customcrafter.internal.gui.crafting.CraftUI
@@ -9,17 +7,28 @@ import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
+import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
+import org.mockbukkit.mockbukkit.MockBukkit
+import org.mockbukkit.mockbukkit.ServerMock
+import kotlin.test.assertTrue
 
-/**
- * @suppress
- */
 internal object ConverterTest {
-    fun run() {
-        slotTest()
-        inputMappingTest()
+    private lateinit var server: ServerMock
+
+    @BeforeEach
+    fun setup() {
+        server = MockBukkit.mock()
     }
 
-    private fun slotTest() {
+    @AfterEach
+    fun tearDown() {
+        MockBukkit.unmock()
+    }
+
+    @Test
+    fun availableSlotComponentsTest() {
         val list: List<CoordinateComponent> = Converter.getAvailableCraftingSlotComponents()
         val components: List<CoordinateComponent> = listOf(
             CoordinateComponent(0, 0),
@@ -57,35 +66,43 @@ internal object ConverterTest {
             CoordinateComponent(2, 5),
             CoordinateComponent(3, 5),
             CoordinateComponent(4, 5),
-            CoordinateComponent(5, 5),
-            )
-        CAssert.assertTrue(list == components)
+            CoordinateComponent(5, 5)
+        )
 
-        val intList: Set<Int> = (0..54).filter { it % 9 < 6 }.take(36).toSet()
-        val slots: Set<Int> = Converter.getAvailableCraftingSlotIndices()
-        CAssert.assertTrue(slots.size == intList.size)
-        CAssert.assertTrue(slots.containsAll(intList))
+        assertTrue(list == components)
 
-        val componentList = Converter.getAvailableCraftingSlotComponents()
-        val mappedIndices = componentList.map { it.x + it.y*9 }
-        val indices = Converter.getAvailableCraftingSlotIndices()
-
-        CAssert.assertTrue(mappedIndices.size == indices.size)
-        CAssert.assertTrue(indices.containsAll(mappedIndices))
 
     }
 
-    private fun inputMappingTest() {
-        val empty = Bukkit.createInventory(null, 54)
-        CAssert.assertTrue(Converter.standardInputMapping(empty) == null)
-        val gui = CraftUI().inventory
-        CAssert.assertTrue(Converter.standardInputMapping(gui, noAir = false)?.values?.all { it.type == Material.AIR } ?: true)
+    @Test
+    fun availableCraftingSlotIndicesTest() {
+        val intList: Set<Int> = (0..<54).filter { i -> i % 9 < 6 }.take(36).toSet()
+        val slots: Set<Int> = Converter.getAvailableCraftingSlotIndices()
+        assertTrue(slots.size == intList.size)
+        assertTrue(slots.containsAll(intList))
+
+        val componentList = Converter.getAvailableCraftingSlotComponents()
+        val mappedIndices = componentList.map { c -> c.x + c.y * 9 }
+        assertTrue(slots.size == mappedIndices.size)
+        assertTrue(slots.containsAll(mappedIndices))
+    }
+
+    @Test
+    fun inputMappingTest() {
+        val emptyInventory = Bukkit.createInventory(null, 54)
+        assertTrue(Converter.standardInputMapping(emptyInventory) == null)
 
         val stones: Inventory = CraftUI().inventory
         Converter.getAvailableCraftingSlotIndices().forEach { index ->
             stones.setItem(index, ItemStack(Material.STONE))
         }
-        val mapping: Map<CoordinateComponent, ItemStack> = Converter.standardInputMapping(stones)!!
+
+        val mapping = Converter.standardInputMapping(stones)
+        assertTrue(mapping != null)
+        assertTrue(mapping.size == 36)
+        assertTrue(mapping.values.toSet().size == 1)
+        assertTrue(mapping.values.first().isSimilar(ItemStack(Material.STONE)))
+
         val components: Set<CoordinateComponent> = setOf(
             CoordinateComponent(0, 0),
             CoordinateComponent(1, 0),
@@ -124,9 +141,7 @@ internal object ConverterTest {
             CoordinateComponent(4, 5),
             CoordinateComponent(5, 5),
         )
-        CAssert.assertTrue(mapping.keys == components)
-        CAssert.assertTrue(mapping.values.size == 36)
-        CAssert.assertTrue(mapping.values.toSet().size == 1)
-        CAssert.assertTrue(mapping.values.toSet().first().isSimilar(ItemStack(Material.STONE)))
+
+        assertTrue(mapping.keys == components)
     }
 }
