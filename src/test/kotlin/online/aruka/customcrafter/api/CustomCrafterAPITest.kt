@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.assertThrows
 import org.mockbukkit.mockbukkit.MockBukkit
 import org.mockbukkit.mockbukkit.ServerMock
-import org.mockbukkit.mockbukkit.inventory.ItemStackMock
 import org.mockbukkit.mockbukkit.world.WorldMock
 import java.lang.IllegalArgumentException
 
@@ -45,6 +44,9 @@ internal object CustomCrafterAPITest {
 
         CustomCrafterAPI.setBaseBlockSideSize(5)
         assertTrue(CustomCrafterAPI.getBaseBlockSideSize() == 5)
+
+        CustomCrafterAPI.setBaseBlockSideSizeDefault()
+        assertTrue(CustomCrafterAPI.getBaseBlockSideSize() == 3)
     }
 
     @Test
@@ -59,6 +61,9 @@ internal object CustomCrafterAPITest {
 
         CustomCrafterAPI.setBaseBlock(Material.DIAMOND_BLOCK)
         assertTrue(CustomCrafterAPI.getBaseBlock() == Material.DIAMOND_BLOCK)
+
+        CustomCrafterAPI.setBaseBlockDefault()
+        assertTrue(CustomCrafterAPI.getBaseBlock() == Material.GOLD_BLOCK)
     }
 
     @Test
@@ -73,6 +78,9 @@ internal object CustomCrafterAPITest {
 
         CustomCrafterAPI.setAutoCraftingBaseBlock(Material.DIAMOND_BLOCK)
         assertTrue(CustomCrafterAPI.getAutoCraftingBaseBlock() == Material.DIAMOND_BLOCK)
+
+        CustomCrafterAPI.setAutoCraftingBaseBlockDefault()
+        assertTrue(CustomCrafterAPI.getAutoCraftingBaseBlock() == Material.GOLD_BLOCK)
     }
 
     // MockBukkit error
