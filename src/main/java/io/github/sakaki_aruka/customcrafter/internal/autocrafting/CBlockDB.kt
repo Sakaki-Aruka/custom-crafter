@@ -194,8 +194,8 @@ internal object CBlockDB {
     }
 
     fun addItems(block: Block, vararg items: ItemStack): Boolean {
-        val linkId: Int = getLinkId(block) ?: run {
-            throw NotLinkedBlockException("[CBlock] The specified block is not linked. (world=${block.world.name}, x=${block.location.blockX}, y=${block.location.blockY}, z=${block.location.blockZ})")
+        if (!isLinked(block)) {
+            return false
         }
 
         if (block.state !is Crafter) {
@@ -203,9 +203,17 @@ internal object CBlockDB {
         }
 
         val cBlock: CBlock = CBlock.of(block.state as Crafter) ?: return false
-        val containedItems: List<ItemStack> = getContainedItems(block)
+        return addItems(cBlock, *items)
+    }
 
-        if (cBlock.slots.size < containedItems.size + items.size) {
+    fun addItems(cBlock: CBlock, vararg items: ItemStack): Boolean {
+        val block: Block = cBlock.block
+        val linkId: Int = getLinkId(block) ?: run {
+            throw NotLinkedBlockException("[CBlock] The specified block is not linked. (world=${block.world.name}, x=${block.location.blockX}, y=${block.location.blockY}, z=${block.location.blockZ})")
+        }
+        val containedItems: List<ItemStack> = getContainedItems(block = cBlock.block)
+
+        if (cBlock.slots.size < (containedItems.size + items.size)) {
             return false
         }
 

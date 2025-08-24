@@ -62,10 +62,10 @@ internal class CBlock(
         }
     }
 
-    fun isSupportedVersion(v: String): Boolean {
+    fun isSupportedVersion(): Boolean {
         val candidate: Set<String> = CustomCrafterAPI.AUTO_CRAFTING_CONFIG_COMPATIBILITIES[CustomCrafterAPI.API_VERSION]
             ?: return false
-        return candidate.contains(v)
+        return candidate.contains(this.version)
     }
 
     fun updateRecipe(recipe: AutoCraftRecipe) {
@@ -107,7 +107,7 @@ internal class CBlock(
     }
 
     fun getRecipe(): AutoCraftRecipe? {
-        if (!isSupportedVersion(this.version)) {
+        if (!isSupportedVersion()) {
             return null
         }
 
