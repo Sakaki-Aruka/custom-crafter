@@ -82,7 +82,7 @@ object CAssert {
      */
     fun assertTrue(
         result: Boolean,
-        logStoreInternal: Boolean = InternalAPI.IS_GITHUB_ACTIONS
+        logStoreInternal: Boolean = false
     ) {
         StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE)
             .walk { stream ->
@@ -127,7 +127,7 @@ object CAssert {
      */
     fun assertThrow(
         exception: KClass<out Exception>,
-        logStoreInternal: Boolean = InternalAPI.IS_GITHUB_ACTIONS,
+        logStoreInternal: Boolean = false,
         e: () -> Unit
     ) {
 

@@ -21,7 +21,6 @@ import java.util.List;
 public final class CustomCrafter extends JavaPlugin {
 
     private static CustomCrafter instance;
-    public static long INITIALIZED;
 
     static List<CRecipe> RECIPES = new ArrayList<>();
 
@@ -29,8 +28,6 @@ public final class CustomCrafter extends JavaPlugin {
     public void onEnable() {
         // Plugin startup logic
         instance = this;
-
-        INITIALIZED = System.currentTimeMillis();
 
         Bukkit.getPluginManager().registerEvents(InventoryClickListener.INSTANCE, instance);
         Bukkit.getPluginManager().registerEvents(InventoryCloseListener.INSTANCE, instance);
@@ -42,7 +39,6 @@ public final class CustomCrafter extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(InventoryMoveItemListener.INSTANCE, this);
         Bukkit.getPluginManager().registerEvents(BlockBreakEventListener.INSTANCE, this);
 
-        InternalAPI.INSTANCE.runTests();
         InternalAPI.INSTANCE.setupAutoCraftDatabase(false);
 
         this.getLifecycleManager().registerEventHandler(

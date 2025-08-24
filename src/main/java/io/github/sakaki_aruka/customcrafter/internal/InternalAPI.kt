@@ -2,17 +2,12 @@ package io.github.sakaki_aruka.customcrafter.internal
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafter
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
-import io.github.sakaki_aruka.customcrafter.api.active_test.CAssert
-import io.github.sakaki_aruka.customcrafter.impl.test.SearchTest
-import io.github.sakaki_aruka.customcrafter.impl.test.VanillaSearchTest
 import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlockDB
 import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterUI
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.inventory.InventoryHolder
-import org.bukkit.scheduler.BukkitRunnable
-import java.nio.file.Paths
 import java.sql.SQLException
 import kotlin.io.path.createDirectory
 
@@ -20,44 +15,6 @@ import kotlin.io.path.createDirectory
  * @suppress
  */
 internal object InternalAPI {
-
-    internal var IS_GITHUB_ACTIONS = false
-    internal var GITHUB_ACTIONS_RESULT_LOG_PATH = Paths.get("plugin-test-results.txt")
-
-    /**
-     * @since 5.0.10
-     */
-    fun runTests() {
-
-        IS_GITHUB_ACTIONS = try {
-            System.getenv("PLATFORM")?.let { s -> s.lowercase() == "github-actions" } ?: false
-        } catch (e: Exception) {
-            warn(e.message ?: "GET ENV ERROR")
-            false
-        }
-
-        if (IS_GITHUB_ACTIONS) {
-            // run tests
-            object: BukkitRunnable() {
-                override fun run() {
-                    val startAt = System.currentTimeMillis()
-
-                    VanillaSearchTest.run()
-
-                    try {
-                        SearchTest.run()
-                    } catch (e: Exception){
-                        e.printStackTrace()
-                    }
-                    val endAt = System.currentTimeMillis()
-                    info("tested in ${endAt - startAt} ms")
-                    CAssert.flushStoredLog(GITHUB_ACTIONS_RESULT_LOG_PATH, overrideIfExist = true)
-                    Bukkit.shutdown()
-                }
-            }.runTaskAsynchronously(CustomCrafter.getInstance())
-        }
-    }
-
     fun setupAutoCraftDatabase(async: Boolean) {
         if (CustomCrafterAPI.getUseAutoCraftingFeature()) {
             try {
