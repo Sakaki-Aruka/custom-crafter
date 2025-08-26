@@ -105,7 +105,9 @@ object InventoryUtil {
         player: Player
     ) {
         player.inventory.addItem(item).forEach { (_, over) ->
-            player.world.dropItem(player.location, over)
+            if (!over.isEmpty) {
+                player.world.dropItem(player.location, over)
+            }
         }
     }
 }

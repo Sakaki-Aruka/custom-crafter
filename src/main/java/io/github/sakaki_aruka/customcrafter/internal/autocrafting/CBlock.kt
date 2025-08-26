@@ -70,7 +70,9 @@ internal class CBlock(
 
     fun updateRecipe(recipe: AutoCraftRecipe) {
         this.getContainedItems().forEach { item ->
-            this.block.world.dropItem(this.block.getRelative(BlockFace.DOWN, 1).location, item)
+            if (!item.isEmpty) {
+                this.block.world.dropItem(this.block.getRelative(BlockFace.DOWN, 1).location, item)
+            }
         }
         CBlockDB.unlink(this.block)
         CBlockDB.linkWithoutItems(this.block, recipe)

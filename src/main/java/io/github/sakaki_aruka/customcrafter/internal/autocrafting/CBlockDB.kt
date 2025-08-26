@@ -148,7 +148,9 @@ internal object CBlockDB {
             CBlock.of(crafter)?.let { cBlock ->
                 val dropLocation: Location = cBlock.getDropLocation()
                 cBlock.getContainedItems().forEach { item ->
-                    block.world.dropItem(dropLocation, item)
+                    if (!item.isEmpty) {
+                        block.world.dropItem(dropLocation, item)
+                    }
                 }
             }
         }

@@ -213,9 +213,11 @@ internal class AllCandidateUI(
                 }
 
                 results.forEach { item ->
-                    player.location.world.dropItem(player.location, item)
+                    if (!item.isEmpty) {
+                        player.location.world.dropItem(player.location, item)
+                    }
                 }
-                if (!this.view.result.isSimilar(ItemStack.empty())) {
+                if (!this.view.result.isEmpty) {
                     player.location.world.dropItem(player.location, this.view.result)
                     this.view = CraftView(this.view.materials, ItemStack.empty())
                 }
