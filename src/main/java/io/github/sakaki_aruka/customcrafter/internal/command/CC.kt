@@ -15,7 +15,7 @@ import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.bukkit.scheduler.BukkitRunnable
 
-object CC {
+internal object CC {
     /*
      * Custom Crafter Command (CC Command)
      *

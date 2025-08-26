@@ -13,7 +13,7 @@ import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
 
-class RecipeSetUI(
+internal class RecipeSetUI(
     private val block: Block,
     private val player: Player
 ): CustomCrafterUI.Pageable, InventoryHolder {

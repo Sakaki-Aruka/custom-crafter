@@ -27,7 +27,7 @@ import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
 import kotlin.math.max
 
-class CraftUI(
+internal class CraftUI(
     var dopItemsOnClose: Boolean = true
 ): CustomCrafterUI, InventoryHolder {
 
