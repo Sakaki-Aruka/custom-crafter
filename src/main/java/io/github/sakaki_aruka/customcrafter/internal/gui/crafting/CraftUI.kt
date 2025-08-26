@@ -18,6 +18,7 @@ import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
+import org.bukkit.event.inventory.InventoryAction
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.event.player.PlayerInteractEvent
@@ -99,6 +100,19 @@ class CraftUI(
         val player: Player = event.whoClicked as? Player ?: return
         event.isCancelled = true
         when (event.rawSlot) {
+            CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT -> {
+                if (event.action in setOf(
+                        InventoryAction.PLACE_ONE,
+                        InventoryAction.PLACE_ALL,
+                        InventoryAction.PLACE_SOME,
+                        InventoryAction.PLACE_FROM_BUNDLE
+                )) {
+                    return
+                }
+                event.isCancelled = false
+                return
+            }
+
             CustomCrafterAPI.CRAFTING_TABLE_MAKE_BUTTON_SLOT -> {
                 val view: CraftView = CraftView.fromInventory(inventory) ?: return
                 if (view.materials.values.none { i -> !i.isEmpty }) return
