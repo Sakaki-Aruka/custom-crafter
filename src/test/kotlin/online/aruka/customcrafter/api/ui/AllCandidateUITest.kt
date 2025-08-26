@@ -293,5 +293,11 @@ object AllCandidateUITest {
         allCandidateUI.onClick(allCandidateUI.inventory, clickEvent)
 
         assertTrue(player.openInventory.topInventory.holder is CraftUI)
+
+        val backedCraftUI = player.openInventory.topInventory.holder as CraftUI
+        assertTrue(CoordinateComponent.square(3).all { c ->
+            backedCraftUI.inventory.getItem(c.toIndex()) != null
+                    && backedCraftUI.inventory.getItem(c.toIndex())!!.isSimilar(ItemStack(Material.STONE))
+        })
     }
 }
