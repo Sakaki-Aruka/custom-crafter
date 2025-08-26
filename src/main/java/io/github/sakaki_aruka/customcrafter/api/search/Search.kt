@@ -485,7 +485,7 @@ object Search {
         val temporaryMapped: MutableMap<CoordinateComponent, ItemStack> = mutableMapOf()
         Converter.getAvailableCraftingSlotComponents().filter { i ->
             val item: ItemStack? = temporaryInventory.getItem(i.toIndex())
-            item != null && item.type != Material.AIR
+            item != null && !item.isEmpty
         }.forEach { c ->
             temporaryMapped[c] = temporaryInventory.getItem(c.toIndex())!!
         }

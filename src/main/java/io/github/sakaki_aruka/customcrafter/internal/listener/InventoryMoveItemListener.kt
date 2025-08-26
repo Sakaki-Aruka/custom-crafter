@@ -44,7 +44,7 @@ object InventoryMoveItemListener: Listener {
         val crafterLoc: Location = crafter.location
         val crafterWorld: World = crafter.world
         val underCenter = Location(crafterWorld, crafterLoc.x, crafterLoc.y - 1, crafterLoc.z)
-        if (crafterWorld.getBlockAt(underCenter).type != Material.AIR) return false
+        if (!crafterWorld.getBlockAt(underCenter).type.isEmpty) return false
         val half: Int = InternalAPI.AUTO_CRAFTING_BASE_BLOCK_SIDE / 2
         for (dz in (-half..half)) {
             for (dx in (-half..half)) {

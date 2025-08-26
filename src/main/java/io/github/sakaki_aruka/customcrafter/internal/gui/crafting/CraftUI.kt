@@ -192,7 +192,7 @@ class CraftUI(
             val min: Int = mapped.values.minOf { i -> i.amount }
             val amount: Int = if (shiftUsed) min else 1
             Converter.getAvailableCraftingSlotIndices()
-                .filter { s -> this.inventory.getItem(s)?.takeIf { item -> item.type != Material.AIR } != null }
+                .filter { s -> this.inventory.getItem(s)?.takeIf { item -> !item.type.isEmpty } != null }
                 .forEach { s -> decrement(this.inventory, s, amount) }
             val item: ItemStack = result.vanilla()!!.result.apply { this.amount *= amount }
             player.giveItems(items = arrayOf(item))
