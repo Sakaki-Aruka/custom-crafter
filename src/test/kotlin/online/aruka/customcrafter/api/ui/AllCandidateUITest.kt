@@ -254,4 +254,44 @@ object AllCandidateUITest {
         assertTrue(allCandidateUI.currentPage == 0)
         assertTrue(firstPageDisplayedItems.size == 45)
     }
+
+    @Test
+    fun backToCraftUITest() {
+        val player: Player = server.getPlayer(0)
+        val craftUI = CraftUI()
+        CoordinateComponent.square(3).forEach { c ->
+            craftUI.inventory.setItem(c.toIndex(), ItemStack(Material.STONE))
+        }
+        val view = CraftView.fromInventory(craftUI.inventory)!!
+        val result = Search.search(
+            crafterID = UUID.randomUUID(),
+            view = view
+        )
+
+        assertTrue(result != null)
+        assertTrue(result.size() == 50)
+
+        val allCandidateUI = AllCandidateUI(
+            view = view,
+            player = player,
+            result = result,
+            useShift = false
+        )
+
+        player.openInventory(allCandidateUI.inventory)
+        assertTrue(allCandidateUI.currentPage == 0)
+        assertTrue(allCandidateUI.inventory.getItem(AllCandidateUI.BACK_TO_CRAFT) != null)
+        assertTrue(allCandidateUI.inventory.getItem(AllCandidateUI.BACK_TO_CRAFT)!!.isSimilar(AllCandidateUI.BACK_TO_CRAFT_BUTTON))
+
+        val clickEvent = InventoryClickEvent(
+            player.openInventory,
+            InventoryType.SlotType.CONTAINER,
+            AllCandidateUI.BACK_TO_CRAFT,
+            ClickType.SHIFT_RIGHT,
+            InventoryAction.NOTHING
+        )
+        allCandidateUI.onClick(allCandidateUI.inventory, clickEvent)
+
+        assertTrue(player.openInventory.topInventory.holder is CraftUI)
+    }
 }
