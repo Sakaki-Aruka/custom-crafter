@@ -19,6 +19,7 @@ import org.bukkit.event.Listener
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.Recipe
+import org.jetbrains.annotations.TestOnly
 import java.util.UUID
 import kotlin.math.floor
 import kotlin.math.max
@@ -32,6 +33,13 @@ object AutoCraftPowerOnListener: Listener {
         val cBlock: CBlock = CBlock.of(this.crafter) ?: return
 
         turnOn(this.crafter.block, cBlock)
+    }
+
+    @TestOnly
+    internal fun turnOn(
+        cBlock: CBlock
+    ) {
+        this.turnOn(cBlock.block, cBlock)
     }
 
     private fun turnOn(
@@ -101,9 +109,11 @@ object AutoCraftPowerOnListener: Listener {
                 floor(cBlock.block.location.y) - 0.5,
                 floor(cBlock.block.location.z) + 0.5
             )
-            setOf(*view.materials.values.toTypedArray(), *results.toTypedArray()).forEach { i ->
-                w.dropItem(dropLocation, i)
-            }
+            setOf(*view.materials.values.toTypedArray(), *results.toTypedArray())
+                .filter { item -> !item.isEmpty && item.type.isItem }
+                .forEach { i ->
+                    w.dropItem(dropLocation, i)
+                }
         }
 
         cBlock.clearContainedItems()
