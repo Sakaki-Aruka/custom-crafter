@@ -1,8 +1,6 @@
 package io.github.sakaki_aruka.customcrafter.internal.gui.autocraft
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
-import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.AutoCraftRecipe
-import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter.toComponent
 import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
 import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlock
@@ -18,7 +16,6 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
-import org.jetbrains.annotations.ApiStatus
 
 // Only for Check, Delete.
 // Not for CREATE, MODIFY.
@@ -47,27 +44,6 @@ internal class AutoCraftUI(
                 ?: UNDEFINED
         )
     }
-
-//    init {
-//        this.inventory.setItem(0, ItemStack.of(Material.SHEARS).apply {
-//            itemMeta = itemMeta.apply {
-//                displayName("Delete AutoCraft Settings".toComponent())
-//            }
-//        })
-//
-//        val recipe: AutoCraftRecipe? =
-//            if (cBlock != null) {
-//                cBlock.getRecipe()
-//            } else if (this.block.state is Crafter) {
-//                CBlock.of(this.block.state as Crafter)?.getRecipe()
-//            } else null
-//
-//        this.inventory.setItem(
-//            4,
-//            recipe?.autoCraftDisplayItemProvider(this.player, this.block)
-//                ?: UNDEFINED
-//        )
-//    }
 
     companion object: CustomCrafterUI.InteractTriggered {
         val UNDEFINED: ItemStack = ItemStack.of(Material.BARRIER).apply {
