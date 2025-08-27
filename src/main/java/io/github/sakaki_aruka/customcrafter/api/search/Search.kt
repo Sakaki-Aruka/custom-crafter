@@ -334,7 +334,7 @@ object Search {
         recipe.items.forEach { (c, matter) ->
             recipe.filters?.forEach { filter ->
                 val (type, list) = checkAmorphousCoordinates(mapped, matter, c, filter)
-                if (type != AmorphousFilterCandidate.Type.NOT_REQUIRED) {
+                if (type != AmorphousFilterCandidate.Type.NOT_ENOUGH) {
                     filterResults.add(type to list)
                 }
             }
