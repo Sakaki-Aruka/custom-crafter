@@ -62,6 +62,7 @@ internal class RecipeSetUI(
     companion object {
         const val NEXT = 53
         const val PREVIOUS = 45
+        const val BACK_TO_AUTO_CRAFT = 49
     }
 
     override fun flipPage() {
@@ -110,12 +111,18 @@ internal class RecipeSetUI(
     ) {
         event.isCancelled = true
         when (event.rawSlot) {
-            in PREVIOUS + 1..<NEXT -> {
-                return
-            }
 
             PREVIOUS -> if (canFlipBackPage()) flipBackPage()
             NEXT -> if (canFlipPage()) flipPage()
+            BACK_TO_AUTO_CRAFT -> {
+                AutoCraftUI.of(this.block, this.player)?.let { ui ->
+                    this.player.openInventory(ui.inventory)
+                }
+            }
+
+            in PREVIOUS + 1..<NEXT -> {
+                return
+            }
 
             // Normal Slots
             else -> {

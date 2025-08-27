@@ -5,6 +5,7 @@ import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
 import io.github.sakaki_aruka.customcrafter.impl.recipe.AutoCraftRecipeImpl
+import io.github.sakaki_aruka.customcrafter.internal.gui.autocraft.AutoCraftUI
 import io.github.sakaki_aruka.customcrafter.internal.gui.autocraft.RecipeSetUI
 import org.bukkit.Material
 import org.bukkit.block.Block
@@ -163,4 +164,24 @@ object RecipeSetUITest {
         assertFalse(ui.canFlipBackPage())
         assertTrue(ui.inventory.contents.count { i -> i?.type == Material.COMMAND_BLOCK } == 45)
     }
+
+    // Future test (MockBukkit implements Crafter (org.bukkit.block))
+//    @Test
+//    fun playerBackToAutoCraftTest() {
+//        val block: Block = server.worlds.first().getBlockAt(0, 64, 0)
+//        val player: Player = server.getPlayer(0)
+//        val ui = RecipeSetUI(block, player)
+//        player.openInventory(ui.inventory)
+//
+//        val clickEvent = InventoryClickEvent(
+//            player.openInventory,
+//            InventoryType.SlotType.CONTAINER,
+//            RecipeSetUI.BACK_TO_AUTO_CRAFT,
+//            ClickType.SHIFT_RIGHT,
+//            InventoryAction.NOTHING
+//        )
+//        ui.onClick(ui.inventory, clickEvent)
+//
+//        assertTrue(player.openInventory.topInventory.holder is AutoCraftUI)
+//    }
 }
