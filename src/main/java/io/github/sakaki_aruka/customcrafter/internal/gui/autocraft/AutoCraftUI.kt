@@ -18,15 +18,16 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
+import org.jetbrains.annotations.ApiStatus
 
 // Only for Check, Delete.
 // Not for CREATE, MODIFY.
 internal class AutoCraftUI(
-    private val block: Block,
-    private val player: Player,
-    cBlock: CBlock? = null
+    cBlock: CBlock,
+    private val player: Player
 ): CustomCrafterUI.Static, InventoryHolder {
 
+    private val block: Block = cBlock.block
     private val inventory: Inventory = Bukkit.createInventory(
         this,
         9,
@@ -40,19 +41,33 @@ internal class AutoCraftUI(
             }
         })
 
-        val recipe: AutoCraftRecipe? =
-            if (cBlock != null) {
-                cBlock.getRecipe()
-            } else if (this.block.state is Crafter) {
-                CBlock.of(this.block.state as Crafter)?.getRecipe()
-            } else null
-
         this.inventory.setItem(
             4,
-            recipe?.autoCraftDisplayItemProvider(this.player, this.block)
+            cBlock.getRecipe()?.autoCraftDisplayItemProvider(this.player, this.block)
                 ?: UNDEFINED
         )
     }
+
+//    init {
+//        this.inventory.setItem(0, ItemStack.of(Material.SHEARS).apply {
+//            itemMeta = itemMeta.apply {
+//                displayName("Delete AutoCraft Settings".toComponent())
+//            }
+//        })
+//
+//        val recipe: AutoCraftRecipe? =
+//            if (cBlock != null) {
+//                cBlock.getRecipe()
+//            } else if (this.block.state is Crafter) {
+//                CBlock.of(this.block.state as Crafter)?.getRecipe()
+//            } else null
+//
+//        this.inventory.setItem(
+//            4,
+//            recipe?.autoCraftDisplayItemProvider(this.player, this.block)
+//                ?: UNDEFINED
+//        )
+//    }
 
     companion object: CustomCrafterUI.InteractTriggered {
         val UNDEFINED: ItemStack = ItemStack.of(Material.BARRIER).apply {
@@ -90,7 +105,20 @@ internal class AutoCraftUI(
 
         override fun open(event: PlayerInteractEvent) {
             event.isCancelled = true
-            event.player.openInventory(AutoCraftUI(event.clickedBlock!!, event.player).inventory)
+            of(event.clickedBlock!!, event.player)?.let { ui ->
+                event.player.openInventory(ui.inventory)
+            }
+        }
+
+        fun of(block: Block, player: Player): AutoCraftUI? {
+            if (block.type != Material.CRAFTER || block.state !is Crafter) {
+                return null
+            } else if (!CBlockDB.isLinked(block)) {
+                return null
+            }
+
+            val cBlock: CBlock = CBlock.of(block.state as Crafter) ?: return null
+            return AutoCraftUI(cBlock, player)
         }
     }
 

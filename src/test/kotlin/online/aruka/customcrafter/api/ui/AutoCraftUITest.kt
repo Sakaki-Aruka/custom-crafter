@@ -129,7 +129,7 @@ internal object AutoCraftUITest {
             slots = recipe.items.keys.map { c -> c.toIndex() }.sorted(),
             block = block
         )
-        val autoCraftUI = AutoCraftUI(block = block, player = player, cBlock = cBlock)
+        val autoCraftUI = AutoCraftUI(cBlock = cBlock, player = player)
 
         player.openInventory(autoCraftUI.inventory)
         assertTrue(player.openInventory.topInventory.holder is AutoCraftUI)

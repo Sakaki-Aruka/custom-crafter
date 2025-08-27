@@ -376,8 +376,8 @@ object CustomCrafterAPI {
     /**
      * ```kotlin
      * // A default implementation
-     * AUTO_CRAFTING_SETTING_PAGE_SUGGESTION: (Block, Player) -> List<AutoCraftingIdentifier> = { _, _ ->
-     *     CustomCrafterAPI.getRecipes().filterIsInstance<AutoCraftingIdentifier>()
+     * AUTO_CRAFTING_SETTING_PAGE_SUGGESTION: (Block, Player) -> List<AutoCraftRecipe> = { _, _ ->
+     *     CustomCrafterAPI.getRecipes().filterIsInstance<AutoCraftRecipe>()
      * }
      * ```
      * @since 5.0.10
