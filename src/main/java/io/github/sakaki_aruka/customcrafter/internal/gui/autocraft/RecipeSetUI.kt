@@ -115,9 +115,7 @@ internal class RecipeSetUI(
             PREVIOUS -> if (canFlipBackPage()) flipBackPage()
             NEXT -> if (canFlipPage()) flipPage()
             BACK_TO_AUTO_CRAFT -> {
-                AutoCraftUI.of(this.block, this.player)?.let { ui ->
-                    this.player.openInventory(ui.inventory)
-                }
+                this.player.openInventory(AutoCraftUI.of(this.block, this.player).inventory)
             }
 
             in PREVIOUS + 1..<NEXT -> {
@@ -132,9 +130,7 @@ internal class RecipeSetUI(
                     c.writeToContainer()
                     this.player.sendMessage("<green>Set AutoCraft recipe successful. (Recipe = ${recipe.publisherPluginName}:${recipe.name})".toComponent())
                 }
-                AutoCraftUI.of(this.block, this.player)?.let { ui ->
-                    this.player.openInventory(ui.inventory)
-                }
+                this.player.openInventory(AutoCraftUI.of(this.block, this.player).inventory)
             }
         }
     }

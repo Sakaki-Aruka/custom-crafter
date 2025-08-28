@@ -1,22 +1,18 @@
 package online.aruka.customcrafter.api.ui
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
+import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.AutoCraftRecipe
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
 import io.github.sakaki_aruka.customcrafter.impl.recipe.AutoCraftRecipeImpl
 import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlock
-import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlockDB
 import io.github.sakaki_aruka.customcrafter.internal.gui.autocraft.AutoCraftUI
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.entity.Player
 import org.bukkit.event.block.Action
-import org.bukkit.event.inventory.ClickType
-import org.bukkit.event.inventory.InventoryAction
-import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.event.inventory.InventoryType
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import org.junit.jupiter.api.AfterEach
@@ -129,9 +125,89 @@ internal object AutoCraftUITest {
             slots = recipe.items.keys.map { c -> c.toIndex() }.sorted(),
             block = block
         )
-        val autoCraftUI = AutoCraftUI(cBlock = cBlock, player = player)
+        val autoCraftUI = AutoCraftUI.of(cBlock = cBlock, player = player)
 
         player.openInventory(autoCraftUI.inventory)
         assertTrue(player.openInventory.topInventory.holder is AutoCraftUI)
     }
+
+    @Test
+    fun linkedSetSlotDefaultDisplayItemTest() {
+        val player: Player = server.getPlayer(0)
+        val block: Block = server.worlds.first().getBlockAt(0, 64, 0)
+
+        val matter = CMatterImpl.single(Material.STONE)
+        val items = CoordinateComponent.square(3).associateWith { c -> matter }
+        val recipe = AutoCraftRecipeImpl(
+            name = "",
+            items = items,
+            type = CRecipeType.NORMAL,
+            publisherPluginName = "Custom_Crafter"
+        )
+        val cBlock = CBlock(
+            version = CustomCrafterAPI.API_VERSION,
+            type = recipe.type,
+            name = recipe.name,
+            publisherName = recipe.publisherPluginName,
+            slots = recipe.items.keys.map { c -> c.toIndex() }.sorted(),
+            block = block
+        )
+        val autoCraftUI = AutoCraftUI.of(cBlock = cBlock, player = player)
+
+        player.openInventory(autoCraftUI.inventory)
+        assertTrue(player.openInventory.topInventory.holder is AutoCraftUI)
+
+        val setSlotItem = autoCraftUI.inventory.getItem(AutoCraftUI.SET)
+        assertTrue(setSlotItem != null)
+        assertTrue(setSlotItem.isSimilar(AutoCraftRecipe.getDefaultDisplayItemProvider(recipe.name)(player, block)))
+    }
+
+    @Test
+    fun linkedSetSlotNotFoundDisplayItemTest() {
+        val player: Player = server.getPlayer(0)
+        val block: Block = server.worlds.first().getBlockAt(0, 64, 0)
+
+        val matter = CMatterImpl.single(Material.STONE)
+        val items = CoordinateComponent.square(3).associateWith { c -> matter }
+        val recipe = AutoCraftRecipeImpl(
+            name = "",
+            items = items,
+            type = CRecipeType.NORMAL,
+            publisherPluginName = "Custom_Crafter"
+        )
+        val cBlock = CBlock(
+            version = "0.0.0", // <- Diff with the Default
+            type = recipe.type,
+            name = recipe.name,
+            publisherName = recipe.publisherPluginName,
+            slots = recipe.items.keys.map { c -> c.toIndex() }.sorted(),
+            block = block
+        )
+        val autoCraftUI = AutoCraftUI.of(cBlock = cBlock, player = player)
+
+        player.openInventory(autoCraftUI.inventory)
+        assertTrue(player.openInventory.topInventory.holder is AutoCraftUI)
+
+        val setSlotItem = autoCraftUI.inventory.getItem(AutoCraftUI.SET)
+        assertTrue(setSlotItem != null)
+        assertTrue(setSlotItem.isSimilar(AutoCraftUI.NOT_FOUND))
+    }
+
+    // MockBukkit error at 1.21.4
+    // Future fix
+//    @Test
+//    fun unlinkedSetSlotTest() {
+//        val player: Player = server.getPlayer(0)
+//        val block: Block = server.worlds.first().getBlockAt(0, 64, 0)
+//        val ui = AutoCraftUI.of(block, player)
+//
+//        player.openInventory(ui.inventory)
+//        assertTrue(player.openInventory.topInventory.holder is AutoCraftUI)
+//
+//        val setSlotItem = ui.inventory.getItem(AutoCraftUI.SET)
+//        assertTrue(setSlotItem != null)
+//        assertTrue(setSlotItem.isSimilar(AutoCraftUI.UNDEFINED))
+//    }
+
+
 }
