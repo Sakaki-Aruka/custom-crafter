@@ -13,6 +13,7 @@ import org.bukkit.block.Crafter
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataContainer
 import org.bukkit.persistence.PersistentDataType
+import java.util.Collections
 import kotlin.math.floor
 
 internal class CBlock(
@@ -30,6 +31,8 @@ internal class CBlock(
         val PUBLISHER = KeyContainer("publisher", PersistentDataType.STRING)
         val SLOTS = KeyContainer("slots", PersistentDataType.INTEGER_ARRAY)
 
+        private val CONTAINED_ITEMS_MODIFY_CACHE: MutableMap<Location, Array<ItemStack>> // Map<Loc, Array<(static capacity) Item>>
+            = Collections.synchronizedMap(mutableMapOf())
 
         fun hasEssentialKeys(crafter: Crafter): Boolean {
             return crafter.persistentDataContainer.hasAllKeys(VERSION, TYPE, NAME, PUBLISHER, SLOTS)
@@ -60,6 +63,66 @@ internal class CBlock(
             cBlock.writeToContainer()
             return cBlock
         }
+    }
+
+    fun isPlayerModifyMode(): Boolean {
+        return synchronized(CONTAINED_ITEMS_MODIFY_CACHE) {
+            CONTAINED_ITEMS_MODIFY_CACHE.keys.contains(this.block.location)
+        }
+    }
+
+    fun setToCache(index: Int, item: ItemStack): Boolean {
+        if (index < 0) {
+            throw IllegalArgumentException("'index' must be a positive number.")
+        }
+        val items: Array<ItemStack> = getCacheItems()?.toTypedArray() ?: run {
+            throw IllegalStateException("Could not get already registered cache items. (Block=${this.block.location})")
+        }
+        if (index >= items.size) {
+            throw IllegalArgumentException("'index' must be lesser than contained items capacity. (index=${index}, capacity=${items.size})")
+        }
+        synchronized(CONTAINED_ITEMS_MODIFY_CACHE) {
+            CONTAINED_ITEMS_MODIFY_CACHE[this.block.location]?.set(index, item)
+        }
+        return true
+    }
+
+    fun removeCache(index: Int) {
+        if (index < 0) return
+        val items: Array<ItemStack> = getCacheItems()?.toTypedArray() ?: return
+        if (index >= items.size) return
+        synchronized(CONTAINED_ITEMS_MODIFY_CACHE) {
+            CONTAINED_ITEMS_MODIFY_CACHE[this.block.location]?.set(index, ItemStack.empty())
+        }
+    }
+
+    private fun createCache(array: Array<ItemStack>): Boolean {
+        return synchronized(CONTAINED_ITEMS_MODIFY_CACHE) {
+            CONTAINED_ITEMS_MODIFY_CACHE.put(this.block.location, array) == null
+        }
+    }
+
+    fun getCacheItems(): List<ItemStack>? {
+        val copiedEntry: Array<ItemStack> = synchronized(CONTAINED_ITEMS_MODIFY_CACHE) {
+            CONTAINED_ITEMS_MODIFY_CACHE[this.block.location]
+        } ?: return null
+
+        return copiedEntry.toList()
+    }
+
+    fun enterPlayerModifyMode(): Boolean {
+        if (isPlayerModifyMode()) return false
+        val containedItems: List<ItemStack> = getContainedItems().takeIf { items ->
+            items.isNotEmpty()
+        } ?: List(this.slots.size) { ItemStack.empty() }
+        return createCache(containedItems.toTypedArray())
+    }
+
+    fun exitPlayerModifyMode() {
+        if (!isPlayerModifyMode()) return
+        val containedItems: List<ItemStack> = getCacheItems() ?: return
+        this.clearContainedItems()
+        this.addItems(*containedItems.toTypedArray())
     }
 
     fun isSupportedVersion(): Boolean {

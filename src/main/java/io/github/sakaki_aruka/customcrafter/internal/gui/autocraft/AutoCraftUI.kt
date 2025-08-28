@@ -167,7 +167,16 @@ internal class AutoCraftUI private constructor(
             }
 
             CONTAINED_ITEMS -> {
-                //
+                val setSlotItem: ItemStack = this.inventory.getItem(SET) ?: return
+                if (setSlotItem.isSimilar(NOT_FOUND)) {
+                    return
+                } else if (setSlotItem.isSimilar(UNDEFINED)) {
+                    return
+                } else if (!CBlockDB.isLinked(this.block)) {
+                    return
+                }
+
+
             }
         }
     }
