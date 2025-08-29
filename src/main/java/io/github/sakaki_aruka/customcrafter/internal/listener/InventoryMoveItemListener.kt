@@ -33,11 +33,6 @@ object InventoryMoveItemListener: Listener {
         }
         crafter.update()
 
-        if (cBlock.isPlayerModifyMode()) {
-            this.isCancelled = true
-            return
-        }
-
         if (!cBlock.addItems(this.item)) {
             this.isCancelled = true
             return

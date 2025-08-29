@@ -39,9 +39,6 @@ object AutoCraftPowerOnListener: Listener {
     internal fun turnOn(
         cBlock: CBlock
     ) {
-        if (cBlock.isPlayerModifyMode()) {
-            return
-        }
         this.turnOn(cBlock.block, cBlock)
     }
 

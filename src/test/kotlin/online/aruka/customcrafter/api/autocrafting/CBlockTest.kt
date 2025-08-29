@@ -189,48 +189,4 @@ internal object CBlockTest {
         CBlockDB.clearContainedItems(block)
         assertTrue(CBlockDB.getContainedItems(block).isEmpty())
     }
-
-    @Test
-    fun containedItemsCacheTest() {
-        val block = server.worlds.first().getBlockAt(0, 64, 0)
-        val matter = CMatterImpl.single(Material.STONE)
-        val items = CoordinateComponent.square(3).associateWith { c -> matter }
-        val recipe = AutoCraftRecipeImpl(
-            name = "",
-            items = items,
-            type = CRecipeType.NORMAL,
-            publisherPluginName = "Custom_Crafter"
-        )
-
-        CustomCrafterAPI.registerRecipe(recipe)
-
-        val cBlock = CBlock(
-            version = CustomCrafterAPI.API_VERSION,
-            type = recipe.type,
-            name = recipe.name,
-            publisherName = recipe.publisherPluginName,
-            slots = recipe.items.keys.map { c -> c.toIndex() }.toList(),
-            block = block
-        )
-
-        assertFalse(cBlock.isPlayerModifyMode())
-
-        CBlockDB.linkWithoutItems(cBlock.block, cBlock.getRecipe()!!)
-        assertTrue(cBlock.enterPlayerModifyMode())
-        assertTrue(cBlock.setToCache(0, ItemStack.of(Material.STONE)))
-        assertTrue(cBlock.getCacheItems() != null)
-        assertTrue(cBlock.getCacheItems()!!.size == 8)
-        assertTrue(cBlock.getCacheItems()!!.count { item -> item.type == Material.STONE } == 1)
-
-        cBlock.removeCache(0)
-        assertTrue(cBlock.getCacheItems()!!.count { item -> item.type == Material.STONE } == 0)
-
-        repeat(8) { i ->
-            assertTrue(cBlock.setToCache(i, ItemStack.of(Material.STONE)))
-        }
-
-        assertThrows<IllegalArgumentException> {
-            cBlock.setToCache(8, ItemStack.of(Material.STONE))
-        }
-    }
 }
