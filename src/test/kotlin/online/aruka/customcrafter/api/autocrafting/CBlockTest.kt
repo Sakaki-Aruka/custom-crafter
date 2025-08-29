@@ -55,6 +55,14 @@ internal object CBlockTest {
 
     @AfterEach
     fun tearDown() {
+        val recipes = CustomCrafterAPI.getRecipes()
+        recipes.forEach { r -> CustomCrafterAPI.unregisterRecipe(r) }
+        try {
+            CBlockDB.unlink(server.worlds.first().getBlockAt(0, 64, 0))
+        } catch (_: Exception) {
+            //
+        }
+
         MockBukkit.unmock()
     }
 
