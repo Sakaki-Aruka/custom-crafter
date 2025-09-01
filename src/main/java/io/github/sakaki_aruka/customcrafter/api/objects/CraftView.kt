@@ -6,6 +6,8 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import io.github.sakaki_aruka.customcrafter.internal.gui.crafting.CraftUI
+import org.bukkit.Location
+import org.bukkit.World
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import kotlin.math.max
@@ -120,5 +122,30 @@ data class CraftView internal constructor(
             }
             CraftView(map, ItemStack.empty())
         }
+    }
+
+    /**
+     * Drops all contained items.
+     * @param[world] dropped world
+     * @param[location] dropped location
+     * @since 5.0.13
+     */
+    fun drop(world: World, location: Location) {
+        this.materials.values.filter { item -> !item.isEmpty }
+            .forEach { item -> world.dropItem(location, item) }
+
+        this.result.takeIf { item -> !item.isEmpty }?.let { item ->
+            world.dropItem(location, item)
+        }
+    }
+
+    internal fun reduceMaterials(
+        amount: Int,
+        coordinates: Set<CoordinateComponent> = this.materials.keys
+    ) {
+        this.materials.filter { (c, _) -> c in coordinates }
+            .forEach { (_, item) ->
+                item.amount = max(0, item.amount - amount)
+            }
     }
 }

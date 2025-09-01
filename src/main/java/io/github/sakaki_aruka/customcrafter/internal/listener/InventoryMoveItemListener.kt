@@ -3,6 +3,7 @@ package io.github.sakaki_aruka.customcrafter.internal.listener
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
 import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlock
+import io.github.sakaki_aruka.customcrafter.internal.gui.autocraft.ContainedItemsUI
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.World
@@ -32,6 +33,12 @@ object InventoryMoveItemListener: Listener {
             crafter.setSlotDisabled(index, false)
         }
         crafter.update()
+
+        if (cBlock.isItemModifyCacheModeEnabled()) {
+            val ui = ContainedItemsUI.of(cBlock, createNewIfNotExist = false) ?: return
+            ui.merge(this.item).takeUnless { i -> i.isEmpty }?.let { i -> this.item = i }
+            return
+        }
 
         if (!cBlock.addItems(this.item)) {
             this.isCancelled = true

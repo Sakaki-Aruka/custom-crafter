@@ -6,6 +6,7 @@ import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.impl.util.InventoryUtil
 import io.github.sakaki_aruka.customcrafter.impl.util.InventoryUtil.hasAllKeys
 import io.github.sakaki_aruka.customcrafter.impl.util.KeyContainer
+import io.github.sakaki_aruka.customcrafter.internal.gui.autocraft.ContainedItemsUI
 import org.bukkit.Location
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
@@ -130,5 +131,9 @@ internal class CBlock(
             floor(this.block.location.y) - 0.5,
             floor(this.block.location.z) + 0.5
         )
+    }
+
+    fun isItemModifyCacheModeEnabled(): Boolean {
+        return ContainedItemsUI.contains(this.block.location)
     }
 }

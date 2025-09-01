@@ -4,6 +4,7 @@ import io.github.sakaki_aruka.customcrafter.CustomCrafter
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlockDB
 import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterUI
+import io.github.sakaki_aruka.customcrafter.internal.gui.autocraft.ContainedItemsUI
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.event.inventory.InventoryCloseEvent
@@ -46,6 +47,7 @@ internal object InternalAPI {
                 player.closeInventory()
             }
         }
+        ContainedItemsUI.clear()
     }
 
     fun warn(str: String) = CustomCrafter.getInstance().logger.warning(str)
