@@ -16,13 +16,14 @@ import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public final class CustomCrafter extends JavaPlugin {
 
     private static CustomCrafter instance;
 
-    static List<CRecipe> RECIPES = new ArrayList<>();
+    static List<CRecipe> RECIPES = Collections.synchronizedList(new ArrayList<>());
 
     @Override
     public void onEnable() {

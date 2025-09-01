@@ -465,7 +465,11 @@ object CustomCrafterAPI {
      *
      * @return[List]<[CRecipe]> recipes list
      */
-    fun getRecipes(): List<CRecipe> = CustomCrafter.RECIPES.toList()
+    fun getRecipes(): List<CRecipe> {
+        return synchronized(CustomCrafter.RECIPES) {
+            CustomCrafter.RECIPES.toList()
+        }
+    }
 
     /**
      * returns random generated coordinates.
@@ -494,7 +498,9 @@ object CustomCrafterAPI {
      */
     fun registerRecipe(recipe: CRecipe): Boolean {
         if (!RegisterCustomRecipeEvent(recipe).callEvent()) return false
-        return CustomCrafter.RECIPES.add(recipe)
+        return synchronized(CustomCrafter.RECIPES) {
+            CustomCrafter.RECIPES.add(recipe)
+        }
     }
 
     /**
@@ -510,7 +516,9 @@ object CustomCrafterAPI {
         val event = UnregisterCustomRecipeEvent(recipe)
         Bukkit.getPluginManager().callEvent(event)
         if (event.isCancelled) return false
-        return CustomCrafter.RECIPES.remove(recipe)
+        return synchronized(CustomCrafter.RECIPES) {
+            CustomCrafter.RECIPES.remove(recipe)
+        }
     }
 
     /**
