@@ -9,6 +9,8 @@ import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlock
 import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlockDB
 import io.github.sakaki_aruka.customcrafter.internal.gui.autocraft.ContainedItemsUI
 import org.bukkit.Material
+import org.bukkit.entity.Player
+import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.inventory.ItemStack
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -172,5 +174,61 @@ object ContainedItemsUITest {
         val over = ui.merge(ItemStack.of(Material.STONE, 9))
         assertFalse(over.isEmpty)
         assertTrue(over.amount == 1)
+    }
+
+    @Test
+    fun detectContainedItemTest() {
+        val block = server.worlds.first().getBlockAt(0, 64, 0)
+        val matter = CMatterImpl.single(Material.STONE)
+        val items = CoordinateComponent.square(3).associateWith { c -> matter }
+        val recipe = AutoCraftRecipeImpl(
+            name = "",
+            items = items,
+            type = CRecipeType.NORMAL,
+            publisherPluginName = "Custom_Crafter"
+        )
+        val cBlock = CBlock(
+            version = CustomCrafterAPI.API_VERSION,
+            type = recipe.type,
+            name = recipe.name,
+            publisherName = recipe.publisherPluginName,
+            slots = recipe.items.keys.map { c -> c.toIndex() }.toList(),
+            block = block
+        )
+        CustomCrafterAPI.registerRecipe(recipe)
+
+        val ui = ContainedItemsUI.of(cBlock)
+        assertTrue(ui != null)
+        assertTrue(ContainedItemsUI.contains(block.location))
+    }
+
+    @Test
+    fun deleteCacheOnPlayerCloseInventory() {
+        val block = server.worlds.first().getBlockAt(0, 64, 0)
+        val matter = CMatterImpl.single(Material.STONE)
+        val items = CoordinateComponent.square(3).associateWith { c -> matter }
+        val recipe = AutoCraftRecipeImpl(
+            name = "",
+            items = items,
+            type = CRecipeType.NORMAL,
+            publisherPluginName = "Custom_Crafter"
+        )
+        val cBlock = CBlock(
+            version = CustomCrafterAPI.API_VERSION,
+            type = recipe.type,
+            name = recipe.name,
+            publisherName = recipe.publisherPluginName,
+            slots = recipe.items.keys.map { c -> c.toIndex() }.toList(),
+            block = block
+        )
+        CustomCrafterAPI.registerRecipe(recipe)
+
+        val ui = ContainedItemsUI.of(cBlock)
+        assertTrue(ui != null)
+        val player: Player = server.getPlayer(0)
+        player.openInventory(ContainedItemsUI.of(cBlock)!!.inventory)
+        val closeEvent = InventoryCloseEvent(player.openInventory)
+        ui.onClose(closeEvent)
+        assertFalse(ContainedItemsUI.contains(block.location))
     }
 }
