@@ -7,22 +7,18 @@ import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.search.Search
-import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlock
 import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlockDB
 import io.github.sakaki_aruka.customcrafter.internal.event.AutoCraftPowerOnEvent
-import io.github.sakaki_aruka.customcrafter.internal.gui.crafting.CraftUI
+import io.github.sakaki_aruka.customcrafter.internal.gui.autocraft.ContainedItemsUI
 import org.bukkit.Location
-import org.bukkit.block.Block
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
-import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.Recipe
 import org.jetbrains.annotations.TestOnly
 import java.util.UUID
 import kotlin.math.floor
-import kotlin.math.max
 
 object AutoCraftPowerOnListener: Listener {
 
@@ -32,58 +28,88 @@ object AutoCraftPowerOnListener: Listener {
     fun AutoCraftPowerOnEvent.onPower() {
         val cBlock: CBlock = CBlock.of(this.crafter) ?: return
 
-        turnOn(this.crafter.block, cBlock)
+        if (cBlock.isItemModifyCacheModeEnabled()) {
+            turnOnInCacheMode(cBlock)
+        } else {
+            turnOnNormal(cBlock)
+        }
     }
 
     @TestOnly
     internal fun turnOn(
         cBlock: CBlock
     ) {
-        this.turnOn(cBlock.block, cBlock)
+        turnOnNormal(cBlock)
+    }
+
+    private fun turnOnInCacheMode(cBlock: CBlock) {
+        if (!cBlock.block.chunk.isLoaded) return
+        else if (!CBlockDB.isLinked(cBlock.block)) return
+
+        val containedUI = ContainedItemsUI.of(cBlock, createNewIfNotExist = false) ?: return
+        val view: CraftView = CraftView.fromInventory(containedUI.inventory) ?: return
+        containedUI.placeableSlots.forEach { slot -> containedUI.inventory.setItem(slot, ItemStack.empty()) }
+        val sourceRecipe: List<CRecipe> = listOf(cBlock.getRecipe() ?: return)
+
+        turnOn(cBlock, sourceRecipe, view)
+    }
+
+    private fun turnOnNormal(cBlock: CBlock) {
+        if (!cBlock.block.chunk.isLoaded) return
+        else if (!CBlockDB.isLinked(cBlock.block)) return
+
+        val view = CraftView(
+            materials = cBlock.getContainedItems().zip(cBlock.slots)
+                .associate { (item, slot) -> CoordinateComponent.fromIndex(slot) to item },
+            result = ItemStack.empty()
+        )
+        val sourceRecipes: List<CRecipe> = listOf(cBlock.getRecipe() ?: return)
+
+        turnOn(cBlock, sourceRecipes, view)
     }
 
     private fun turnOn(
-        block: Block,
-        cBlock: CBlock
+        cBlock: CBlock,
+        sourceRecipes: List<CRecipe>,
+        view: CraftView,
     ) {
-        if (!block.chunk.isLoaded) return
-        else if (!CBlockDB.isLinked(block)) return
-        else if (cBlock.getContainedItems().any { i -> i.isEmpty }) return
-
-        val pseudoInventory: Inventory = CraftUI().inventory
-        cBlock.getContainedItems().zip(cBlock.slots).forEach { (item, index) ->
-            pseudoInventory.setItem(index, item)
-        }
-        val sourceRecipes: List<CRecipe> = listOf(cBlock.getRecipe() ?: return)
         val result: Search.SearchResult = Search.search(
             crafterID = PSEUDO_UUID,
-            inventory = pseudoInventory,
+            view = view,
             sourceRecipes = sourceRecipes
-        ) ?: return
+        ) ?: run {
+            // No match -> drop all contained items
+            view.drop(cBlock.block.world, cBlock.getDropLocation())
+            return
+        }
 
-        if (result.size() == 0) return
+        if (result.size() == 0) {
+            view.drop(cBlock.block.world, cBlock.getDropLocation())
+            return
+        }
 
-        val (autoCraftRecipe, relation, vanilla) = CustomCrafterAPI.AUTO_CRAFTING_RESULT_PICKUP_RESOLVER(sourceRecipes, result, block)
+        val (autoCraftRecipe, relation, vanilla) = CustomCrafterAPI.AUTO_CRAFTING_RESULT_PICKUP_RESOLVER(sourceRecipes, result, cBlock.block)
 
         if (autoCraftRecipe != null  && relation != null) {
             if (CustomCrafterAPI.AUTO_CRAFTING_RESULT_PICKUP_RESOLVER_PRIORITIZE_CUSTOM) {
-                giveCustomResult(autoCraftRecipe, relation, pseudoInventory, cBlock)
+                giveCustomResult(autoCraftRecipe, relation, view, cBlock)
             } else if (vanilla != null) {
-                giveVanillaResult(vanilla, pseudoInventory, cBlock)
+                giveVanillaResult(vanilla, view, cBlock)
             }
         }  else if (vanilla != null) {
-            giveVanillaResult(vanilla, pseudoInventory, cBlock)
-        } else return
+            giveVanillaResult(vanilla, view, cBlock)
+        } else {
+            view.drop(cBlock.block.world, cBlock.getDropLocation())
+        }
     }
 
     private fun giveCustomResult(
         autoCraftRecipe: AutoCraftRecipe,
         relation: MappedRelation,
-        gui: Inventory,
+        view: CraftView,
         cBlock: CBlock
     ) {
-        val transformed: Map<CoordinateComponent, ItemStack> = Converter.standardInputMapping(gui)
-            ?: return
+        val transformed: Map<CoordinateComponent, ItemStack> = view.materials.filter { (_, item) -> !item.isEmpty }
 
         val results: MutableList<ItemStack> = autoCraftRecipe.getAutoCraftResults(
             block =  cBlock.block,
@@ -99,8 +125,10 @@ object AutoCraftPowerOnListener: Listener {
             results = results
         )
 
-        val view: CraftView = CraftView.fromInventory(gui)!!
-            .getDecrementedCraftView(true, autoCraftRecipe to relation)
+        val decrementedView: CraftView = view.getDecrementedCraftView(
+            shiftUsed = true,
+            forCustomSettings = autoCraftRecipe to relation
+        )
 
         cBlock.block.world.let { w ->
             val dropLocation = Location(
@@ -109,7 +137,7 @@ object AutoCraftPowerOnListener: Listener {
                 floor(cBlock.block.location.y) - 0.5,
                 floor(cBlock.block.location.z) + 0.5
             )
-            setOf(*view.materials.values.toTypedArray(), *results.toTypedArray())
+            setOf(*decrementedView.materials.values.toTypedArray(), *results.toTypedArray())
                 .filter { item -> !item.isEmpty && item.type.isItem }
                 .forEach { i ->
                     w.dropItem(dropLocation, i)
@@ -120,41 +148,31 @@ object AutoCraftPowerOnListener: Listener {
     }
     private fun giveVanillaResult(
         recipe: Recipe,
-        gui: Inventory,
+        view: CraftView,
         cBlock: CBlock
     ) {
-        val minAmount: Int = Converter.getAvailableCraftingSlotIndices()
-            .mapNotNull { slot -> gui.getItem(slot) }
-            .minOf { item -> item.amount }
+        val minAmount: Int = view.materials.values
+            .filter { i -> !i.isEmpty }
+            .minOf { i -> i.amount }
         val result: ItemStack = recipe.result.apply { amount *= minAmount }
         cBlock.block.world.dropItem(
-            Location(
-                cBlock.block.world,
-                floor(cBlock.block.location.x) + 0.5,
-                floor(cBlock.block.location.y) - 0.5,
-                floor(cBlock.block.location.z) + 0.5
-            ),
+            cBlock.getDropLocation(),
             result
         )
 
-        val minCoordinate: CoordinateComponent = CoordinateComponent.fromIndex(
-            index = Converter.getAvailableCraftingSlotComponents()
-                .filter { c -> gui.getItem(c.toIndex()) != null && gui.getItem(c.toIndex())?.isEmpty == false }
-                .minOf { c -> c.toIndex() }
+        val minCoordinate: CoordinateComponent =
+            view.materials.entries.filter { (_, item) -> !item.isEmpty }.minByOrNull { (c, _) -> c.toIndex() }?.key ?: return
+
+        view.reduceMaterials(
+            amount = minAmount,
+            coordinates = CoordinateComponent.squareFill(3, minCoordinate.x, minCoordinate.y)
         )
-        CoordinateComponent.squareFill(3, minCoordinate.x, minCoordinate.y)
-            .forEach { c ->
-                gui.getItem(c.toIndex())?.let { item ->
-                    item.asQuantity(max(0, item.amount - minAmount))
-                }
-            }
-        cBlock.block.world.let { w ->
+
+        cBlock.block.world.let { world ->
             val dropLocation: Location = cBlock.getDropLocation()
-            Converter.getAvailableCraftingSlotIndices()
-                .filter { i ->  gui.getItem(i) != null && gui.getItem(i)?.isEmpty == false }
-                .forEach { slot ->
-                    w.dropItem(dropLocation, gui.getItem(slot) ?: ItemStack.empty())
-                }
+            view.materials.values
+                .filter { item -> !item.isEmpty }
+                .forEach { item -> world.dropItem(dropLocation, item) }
         }
         cBlock.clearContainedItems()
     }
