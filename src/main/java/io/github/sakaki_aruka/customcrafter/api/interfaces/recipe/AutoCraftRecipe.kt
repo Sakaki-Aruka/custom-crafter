@@ -4,6 +4,7 @@ import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CAutoCraftRecipeContainer
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeContainer
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
+import io.github.sakaki_aruka.customcrafter.api.objects.result.AutoCraftResultSupplier
 import io.github.sakaki_aruka.customcrafter.api.objects.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter.toComponent
 import org.bukkit.Material
@@ -34,7 +35,7 @@ interface AutoCraftRecipe: CRecipe {
     /**
      * [ResultSupplier] to provide result items on auto crafting.
      */
-    val autoCraftResults: List<ResultSupplier>?
+    val autoCraftResults: List<AutoCraftResultSupplier>?
 
     /**
      * [CRecipeContainer] what are run on auto crafting.
@@ -80,7 +81,7 @@ interface AutoCraftRecipe: CRecipe {
     ): MutableList<ItemStack> {
         val list: MutableList<ItemStack> = mutableListOf()
         autoCraftResults?.map { supplier ->
-            supplier.func(ResultSupplier.AutoCraftConfig(
+            supplier.f(AutoCraftResultSupplier.Config(
                 relation = relate,
                 mapped = mapped,
                 calledTimes = calledTimes,
