@@ -65,24 +65,24 @@
   <div class="breadcrumbs"><a href="../../../index.html">custom-crafter</a><span class="delimiter">/</span><a href="../index.html">io.github.sakaki_aruka.customcrafter.api.objects.result</a><span class="delimiter">/</span><span class="current">ResultSupplier</span></div>
   <div class="cover ">
     <h1 class="cover"><span>Result</span><wbr></wbr><span><span>Supplier</span></span></h1>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="custom-crafter/JVM"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="index.html">ResultSupplier</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>func<span class="token operator">: </span><span class="token punctuation">(</span><a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.result/-result-supplier-config/index.html">ResultSupplierConfig</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><p class="paragraph">A result items supplier of <a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.recipe/-c-recipe/index.html">CRecipe</a>.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">// call example from Kotlin<br>val supplier = ResultSupplier { config -&gt;<br>    if (config is NormalConfig<br>        &amp;&amp; (config as NormalConfig).crafterID == UUID.fromString(&quot;069a79f4-44e9-4726-a5be-fca90e38aaf5&quot;)) {<br>        // Only for Notch<br>        listOf(ItemStack(Material.ENCHANTED_GOLDEN_APPLE))<br>    } else {<br>        emptyList()<br>    }<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="custom-crafter/JVM"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="index.html">ResultSupplier</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>f<span class="token operator">: </span><span class="token punctuation">(</span><a href="-config/index.html">ResultSupplier.Config</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><p class="paragraph">A result items supplier of <a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.recipe/-c-recipe/index.html">CRecipe</a>.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">// call example from Kotlin<br>val supplier = ResultSupplier { config -&gt;<br>    if (config is NormalConfig<br>        &amp;&amp; (config as NormalConfig).crafterID == UUID.fromString(&quot;069a79f4-44e9-4726-a5be-fca90e38aaf5&quot;)) {<br>        // Only for Notch<br>        listOf(ItemStack(Material.ENCHANTED_GOLDEN_APPLE))<br>    } else {<br>        emptyList()<br>    }<br>}</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div></div></div>
   </div>
   <div class="tabbedcontent">
     <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
     <div class="tabs-section-body">
       <div data-togglable="CONSTRUCTOR">
         <h2 class="">Constructors</h2>
-        <div class="table"><a data-name="-974604899%2FConstructors%2F-1417057397" anchor-label="ResultSupplier" id="-974604899%2FConstructors%2F-1417057397" data-filterable-set="custom-crafter/JVM"></a>
+        <div class="table"><a data-name="-105215867%2FConstructors%2F-1417057397" anchor-label="ResultSupplier" id="-105215867%2FConstructors%2F-1417057397" data-filterable-set="custom-crafter/JVM"></a>
           <div class="table-row" data-togglable="CONSTRUCTOR" data-filterable-current="custom-crafter/JVM" data-filterable-set="custom-crafter/JVM">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="-result-supplier.html"><span>Result</span><wbr></wbr><span><span>Supplier</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-974604899%2FConstructors%2F-1417057397"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-105215867%2FConstructors%2F-1417057397"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="custom-crafter/JVM"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">func<span class="token operator">: </span><span class="token punctuation">(</span><a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.result/-result-supplier-config/index.html">ResultSupplierConfig</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="custom-crafter/JVM"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">f<span class="token operator">: </span><span class="token punctuation">(</span><a href="-config/index.html">ResultSupplier.Config</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
                 </div>
               </div>
             </div>
@@ -91,22 +91,7 @@
       </div>
       <div data-togglable="TYPE">
         <h2 class="">Types</h2>
-        <div class="table"><a data-name="1811392511%2FClasslikes%2F-1417057397" anchor-label="AutoCraftConfig" id="1811392511%2FClasslikes%2F-1417057397" data-filterable-set="custom-crafter/JVM"></a>
-          <div class="table-row" data-filterable-current="custom-crafter/JVM" data-filterable-set="custom-crafter/JVM">
-            <div class="main-subrow keyValue ">
-              <div class=""><span class="inline-flex">
-                  <div><a href="-auto-craft-config/index.html"><span>Auto</span><wbr></wbr><span>Craft</span><wbr></wbr><span><span>Config</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1811392511%2FClasslikes%2F-1417057397"></span>
-                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                  </span></span></div>
-              <div>
-                <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="custom-crafter/JVM"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="-auto-craft-config/index.html">AutoCraftConfig</a> : <a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.result/-result-supplier-config/index.html">ResultSupplierConfig</a></div><div class="brief "><p class="paragraph">A class of implements <a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.result/-result-supplier-config/index.html">ResultSupplierConfig</a>.</p></div></div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-<a data-name="702540838%2FClasslikes%2F-1417057397" anchor-label="Companion" id="702540838%2FClasslikes%2F-1417057397" data-filterable-set="custom-crafter/JVM"></a>
+        <div class="table"><a data-name="702540838%2FClasslikes%2F-1417057397" anchor-label="Companion" id="702540838%2FClasslikes%2F-1417057397" data-filterable-set="custom-crafter/JVM"></a>
           <div class="table-row" data-filterable-current="custom-crafter/JVM" data-filterable-set="custom-crafter/JVM">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
@@ -121,17 +106,17 @@
               </div>
             </div>
           </div>
-<a data-name="-1440903129%2FClasslikes%2F-1417057397" anchor-label="NormalConfig" id="-1440903129%2FClasslikes%2F-1417057397" data-filterable-set="custom-crafter/JVM"></a>
+<a data-name="-1555757746%2FClasslikes%2F-1417057397" anchor-label="Config" id="-1555757746%2FClasslikes%2F-1417057397" data-filterable-set="custom-crafter/JVM"></a>
           <div class="table-row" data-filterable-current="custom-crafter/JVM" data-filterable-set="custom-crafter/JVM">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="-normal-config/index.html"><span>Normal</span><wbr></wbr><span><span>Config</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1440903129%2FClasslikes%2F-1417057397"></span>
+                  <div><a href="-config/index.html"><span><span>Config</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1555757746%2FClasslikes%2F-1417057397"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="custom-crafter/JVM"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="-normal-config/index.html">NormalConfig</a> : <a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.result/-result-supplier-config/index.html">ResultSupplierConfig</a></div><div class="brief "><p class="paragraph">ResultSupplier's arguments</p></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="custom-crafter/JVM"><div class="symbol monospace"><span class="token keyword">data </span><span class="token keyword">class </span><a href="-config/index.html">Config</a> : <a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.result/-result-supplier-config/index.html">ResultSupplierConfig</a></div><div class="brief "><p class="paragraph">ResultSupplier's arguments</p></div></div></div>
                 </div>
               </div>
             </div>
@@ -140,17 +125,17 @@
       </div>
       <div data-togglable="PROPERTY">
         <h2 class="">Properties</h2>
-        <div class="table"><a data-name="1189118231%2FProperties%2F-1417057397" anchor-label="func" id="1189118231%2FProperties%2F-1417057397" data-filterable-set="custom-crafter/JVM"></a>
+        <div class="table"><a data-name="-978552007%2FProperties%2F-1417057397" anchor-label="f" id="-978552007%2FProperties%2F-1417057397" data-filterable-set="custom-crafter/JVM"></a>
           <div class="table-row" data-filterable-current="custom-crafter/JVM" data-filterable-set="custom-crafter/JVM">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
-                  <div><a href="func.html"><span><span>func</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1189118231%2FProperties%2F-1417057397"></span>
+                  <div><a href="f.html"><span><span>f</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-978552007%2FProperties%2F-1417057397"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="custom-crafter/JVM"><div class="symbol monospace"><span class="token keyword">val </span><a href="func.html">func</a><span class="token operator">: </span><span class="token punctuation">(</span><a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.result/-result-supplier-config/index.html">ResultSupplierConfig</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token operator">&gt;</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="custom-crafter/JVM"><div class="symbol monospace"><span class="token keyword">val </span><a href="f.html">f</a><span class="token operator">: </span><span class="token punctuation">(</span><a href="-config/index.html">ResultSupplier.Config</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token operator">&gt;</span></div></div></div>
                 </div>
               </div>
             </div>
@@ -159,17 +144,17 @@
       </div>
       <div data-togglable="FUNCTION">
         <h2 class="">Functions</h2>
-        <div class="table"><a data-name="-398099645%2FFunctions%2F-1417057397" anchor-label="invoke" id="-398099645%2FFunctions%2F-1417057397" data-filterable-set="custom-crafter/JVM"></a>
+        <div class="table"><a data-name="432792283%2FFunctions%2F-1417057397" anchor-label="invoke" id="432792283%2FFunctions%2F-1417057397" data-filterable-set="custom-crafter/JVM"></a>
           <div class="table-row" data-filterable-current="custom-crafter/JVM" data-filterable-set="custom-crafter/JVM">
             <div class="main-subrow keyValue ">
               <div class=""><span class="inline-flex">
                   <div><a href="invoke.html"><span><span>invoke</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-398099645%2FFunctions%2F-1417057397"></span>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="432792283%2FFunctions%2F-1417057397"></span>
                     <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
                   </span></span></div>
               <div>
                 <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="custom-crafter/JVM"><div class="symbol monospace"><span class="token keyword">operator </span><span class="token keyword">fun </span><a href="invoke.html"><span class="token function">invoke</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">config<span class="token operator">: </span><a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.result/-result-supplier-config/index.html">ResultSupplierConfig</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token operator">&gt;</span></div></div></div>
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="custom-crafter/JVM"><div class="symbol monospace"><span class="token keyword">operator </span><span class="token keyword">fun </span><a href="invoke.html"><span class="token function">invoke</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">config<span class="token operator">: </span><a href="-config/index.html">ResultSupplier.Config</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token operator">&gt;</span></div></div></div>
                 </div>
               </div>
             </div>
