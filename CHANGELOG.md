@@ -1,5 +1,20 @@
 # Changelog
 
+# 5.0.13
+This plugin changed to depend PaperAPI version from 1.21.3 to 1.21.4.
+## Feature
+- [Added] `cc get registered-recipe-names` command added. (Shows all registered recipe names.) 
+## Code
+- [Added] Added to set CustomCrafterAPI properties to default value commands.
+- [Added] `CustomCrafterAPIPropertiesChangeEvent.PropertyKey#AUTO_CRAFTING_BASE_BLOCK` added.
+- [Changed] `ResultSupplier` divided to `ResultSupplier` and `AutoCraftResultSupplier`.
+  - [Changed] `ResultSupplier#func` renamed to `ResultSupplier#f`
+  - [Changed] `AutoCraftRecipe#autoCraftResults` type changed. 
+  - [Changed] `AutoCraftRecipeImpl#autoCraftResults` type changed.
+  - [Changed] `ResultSupplier.NormalConfig` changed to `ResultSupplier.Config`
+  - [Changed] `ResultSupplier.AutoCraftConfig` changed to `AutoCraftResultSupplier.Config`
+
+
 # 5.0.12
 ## Code
 - [Changed] `(Normal / AutoCraft)(Predicate / Consumer)` to `CRecipeContainer` and `CAutoCraftRecipeContainer`
