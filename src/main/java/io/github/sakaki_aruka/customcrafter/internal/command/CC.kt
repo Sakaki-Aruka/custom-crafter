@@ -6,6 +6,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import io.github.sakaki_aruka.customcrafter.CustomCrafter
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
+import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.AutoCraftRecipe
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter.toComponent
 import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
 import io.papermc.paper.command.brigadier.CommandSourceStack
@@ -15,7 +16,7 @@ import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.bukkit.scheduler.BukkitRunnable
 
-object CC {
+internal object CC {
     /*
      * Custom Crafter Command (CC Command)
      *
@@ -32,6 +33,7 @@ object CC {
      *   - USE_AUTO_CRAFTING_FEATURE
      *   - BASE_BLOCK_SIDE
      *   - AUTO_CRAFTING_BASE_BLOCK_SIDE (Internal API)
+     *   - (5.0.13) REGISTERED_RECIPE_NAMES
      *
      * - Set Part
      *   - RESULT_GIVE_CANCEL
@@ -101,6 +103,22 @@ object CC {
         ).then(Commands.literal("auto-crafting-base-block-side")
             .executes { ctx ->
                 ctx.msg("AUTO_CRAFTING_BASE_BLOCK_SIDE: ${InternalAPI.AUTO_CRAFTING_BASE_BLOCK_SIDE}")
+                return@executes SINGLE_SUCCESS
+            }
+        ).then(Commands.literal("registered-recipe-names")
+            .executes { ctx ->
+                val builder = StringBuilder()
+                val names: String = CustomCrafterAPI.getRecipes()
+                    .sortedBy { recipe -> recipe.name }
+                    .joinToString(System.lineSeparator()) { recipe ->
+                        builder.clear()
+                        if (recipe is AutoCraftRecipe) {
+                            builder.append("<b>(AutoCraft)</b> ")
+                        }
+                        builder.append(recipe.name)
+                        builder.toString()
+                    }
+                ctx.msg(names)
                 return@executes SINGLE_SUCCESS
             }
         )

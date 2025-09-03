@@ -99,8 +99,8 @@ interface CRecipe {
         return results?.let { suppliers ->
             val list: MutableList<ItemStack> = mutableListOf()
             suppliers.map { s ->
-                list.addAll(s.func.invoke(
-                    ResultSupplier.NormalConfig(
+                list.addAll(s.f(
+                    ResultSupplier.Config(
                         relate,
                         mapped,
                         shiftClicked,

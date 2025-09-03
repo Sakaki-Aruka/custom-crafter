@@ -334,7 +334,7 @@ object Search {
         recipe.items.forEach { (c, matter) ->
             recipe.filters?.forEach { filter ->
                 val (type, list) = checkAmorphousCoordinates(mapped, matter, c, filter)
-                if (type != AmorphousFilterCandidate.Type.NOT_REQUIRED) {
+                if (type != AmorphousFilterCandidate.Type.NOT_ENOUGH) {
                     filterResults.add(type to list)
                 }
             }
@@ -485,7 +485,7 @@ object Search {
         val temporaryMapped: MutableMap<CoordinateComponent, ItemStack> = mutableMapOf()
         Converter.getAvailableCraftingSlotComponents().filter { i ->
             val item: ItemStack? = temporaryInventory.getItem(i.toIndex())
-            item != null && item.type != Material.AIR
+            item != null && !item.isEmpty
         }.forEach { c ->
             temporaryMapped[c] = temporaryInventory.getItem(c.toIndex())!!
         }

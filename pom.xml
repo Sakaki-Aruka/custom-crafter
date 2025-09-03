@@ -6,7 +6,7 @@
 
     <groupId>io.github.sakaki_aruka</groupId>
     <artifactId>custom-crafter</artifactId>
-    <version>5.0.12</version>
+    <version>5.0.13</version>
     <packaging>jar</packaging>
 
     <name>Custom Crafter</name>
@@ -175,12 +175,6 @@
             <version>${kotlin.version}</version>
             <scope>compile</scope>
         </dependency>
-
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-reflect</artifactId>
-            <version>${kotlin.version}</version>
-        </dependency>
         <!-- /Kotlin -->
 
         <dependency>
@@ -198,7 +192,7 @@
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-            <version>1.21.3-R0.1-SNAPSHOT</version>
+            <version>1.21.4-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
 
@@ -212,7 +206,7 @@
         <dependency>
             <groupId>org.mockbukkit.mockbukkit</groupId>
             <artifactId>mockbukkit-v1.21</artifactId>
-            <version>4.24.2</version>
+            <version>4.45.0</version>
             <scope>test</scope>
         </dependency>
 
@@ -226,6 +220,13 @@
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-test-junit5</artifactId>
             <version>${kotlin.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.50.3.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

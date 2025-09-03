@@ -6,6 +6,7 @@ import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.impl.util.InventoryUtil
 import io.github.sakaki_aruka.customcrafter.impl.util.InventoryUtil.hasAllKeys
 import io.github.sakaki_aruka.customcrafter.impl.util.KeyContainer
+import io.github.sakaki_aruka.customcrafter.internal.gui.autocraft.ContainedItemsUI
 import org.bukkit.Location
 import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
@@ -29,7 +30,6 @@ internal class CBlock(
         val NAME = KeyContainer("name", PersistentDataType.STRING)
         val PUBLISHER = KeyContainer("publisher", PersistentDataType.STRING)
         val SLOTS = KeyContainer("slots", PersistentDataType.INTEGER_ARRAY)
-
 
         fun hasEssentialKeys(crafter: Crafter): Boolean {
             return crafter.persistentDataContainer.hasAllKeys(VERSION, TYPE, NAME, PUBLISHER, SLOTS)
@@ -62,15 +62,17 @@ internal class CBlock(
         }
     }
 
-    fun isSupportedVersion(v: String): Boolean {
+    fun isSupportedVersion(): Boolean {
         val candidate: Set<String> = CustomCrafterAPI.AUTO_CRAFTING_CONFIG_COMPATIBILITIES[CustomCrafterAPI.API_VERSION]
             ?: return false
-        return candidate.contains(v)
+        return candidate.contains(this.version)
     }
 
     fun updateRecipe(recipe: AutoCraftRecipe) {
         this.getContainedItems().forEach { item ->
-            this.block.world.dropItem(this.block.getRelative(BlockFace.DOWN, 1).location, item)
+            if (!item.isEmpty) {
+                this.block.world.dropItem(this.block.getRelative(BlockFace.DOWN, 1).location, item)
+            }
         }
         CBlockDB.unlink(this.block)
         CBlockDB.linkWithoutItems(this.block, recipe)
@@ -107,7 +109,7 @@ internal class CBlock(
     }
 
     fun getRecipe(): AutoCraftRecipe? {
-        if (!isSupportedVersion(this.version)) {
+        if (!isSupportedVersion()) {
             return null
         }
 
@@ -129,5 +131,9 @@ internal class CBlock(
             floor(this.block.location.y) - 0.5,
             floor(this.block.location.z) + 0.5
         )
+    }
+
+    fun isItemModifyCacheModeEnabled(): Boolean {
+        return ContainedItemsUI.contains(this.block.location)
     }
 }

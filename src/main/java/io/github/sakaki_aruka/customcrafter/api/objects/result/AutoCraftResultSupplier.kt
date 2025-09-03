@@ -5,57 +5,54 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplierConfig
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
+import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
-import java.util.UUID
 
 /**
- * A result items supplier of [CRecipe].
+ * A result items supplier of [io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.AutoCraftRecipe]
  *
- * ```
- * // call example from Kotlin
- * val supplier = ResultSupplier { config ->
- *     if (config is NormalConfig
- *         && (config as NormalConfig).crafterID == UUID.fromString("069a79f4-44e9-4726-a5be-fca90e38aaf5")) {
- *         // Only for Notch
+ * ```kotlin
+ * // call example for Kotlin
+ * val supplier = AutoCraftResultSupplier { config ->
+ *     if (config.autoCrafterBlock.world.name == "Eden") {
  *         listOf(ItemStack(Material.ENCHANTED_GOLDEN_APPLE))
  *     } else {
  *         emptyList()
  *     }
  * }
  * ```
+ * @since 5.0.13
  */
-data class ResultSupplier (
-    val f: (Config) -> List<ItemStack>,
+data class AutoCraftResultSupplier(
+    val f: (Config) -> List<ItemStack>
 ) {
     operator fun invoke(
         config: Config
     ): List<ItemStack> = f(config)
 
     /**
-     * ResultSupplier's arguments
+     * A class of implements [ResultSupplierConfig].
      *
      * (This class's constructor is internal. You cannot call it from your project.)
      *
-     * @param[crafterID] a crafter's uuid.
-     * @param[relation] a coordinate mapping between a [CRecipe] and an input Inventory
-     * @param[mapped] a coordinate and input items mapping
-     * @param[list] result items that are made by a [CRecipe]
-     * @param[shiftClicked] shift clicked or not
-     * @param[calledTimes] calculated minimum amount with [CMatter.amount]
-     * @param[isMultipleDisplayCall] `invoke` called from multiple result display item collector or not
+     * @param[relation] A coordinate mapping between a [CRecipe] and an input Inventory
+     * @param[mapped] A coordinate and input items mapping
+     * @param[shiftClicked] Shift clicked or not. The default is true on AutoCraft.
+     * @param[calledTimes] Calculated minimum amount with [CMatter.amount]
+     * @param[autoCrafterBlock] A block of called
+     * @param[list] Result items that are made by a [CRecipe]
      *
      * @see[ResultSupplierConfig]
-     * @since 5.0.8
+     * @since 5.0.13
      */
     data class Config internal constructor(
         override val relation: MappedRelation,
         override val mapped: Map<CoordinateComponent, ItemStack>,
-        override val shiftClicked: Boolean,
+        override val shiftClicked: Boolean = true,
         override val calledTimes: Int,
         override val list: MutableList<ItemStack>,
-        val crafterID: UUID,
-        val isMultipleDisplayCall: Boolean
-      ): ResultSupplierConfig
+        val autoCrafterBlock: Block
+    ): ResultSupplierConfig
 
     companion object {
         /**
@@ -63,13 +60,13 @@ data class ResultSupplier (
          * If you want to consider shift click, use [timesSingle] instead of this.
          *
          * ```
-         * return ResultSupplier { _ -> listOf(item) }
+         * return AutoCraftResultSupplier { _ -> listOf(item) }
          * ```
          *
          * @param[item] a supplied item
          */
-        fun single(item: ItemStack): ResultSupplier {
-            return ResultSupplier { _ -> listOf(item) }
+        fun single(item: ItemStack): AutoCraftResultSupplier {
+            return AutoCraftResultSupplier { _ -> listOf(item) }
         }
 
         /**
@@ -82,23 +79,12 @@ data class ResultSupplier (
          *
          * @param[item] a supplied item
          */
-        fun timesSingle(item: ItemStack): ResultSupplier {
-            return ResultSupplier { config ->
+        fun timesSingle(item: ItemStack): AutoCraftResultSupplier {
+            return AutoCraftResultSupplier { config ->
                 if (config.shiftClicked) {
-                    val modified = ItemStack(item)
-                    modified.amount *= config.calledTimes
-                    listOf(modified)
+                    listOf(item.clone().asQuantity(item.amount * config.calledTimes))
                 } else listOf(item)
             }
         }
-
-        /**
-         * Empty ResultSupplier (for AutoCraft only recipes)
-         * ```
-         * val EMPTY = ResultSupplier { _ -> emptyList() }
-         * ```
-         * @since 5.0.10
-         */
-        val EMPTY = ResultSupplier { _ -> emptyList() }
     }
 }

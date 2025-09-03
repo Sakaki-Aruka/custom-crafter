@@ -50,7 +50,7 @@ object Converter {
 
         for (coordinate in getAvailableCraftingSlotComponents()) {
             val index: Int = coordinate.x + coordinate.y * 9
-            val item: ItemStack = inventory.getItem(index)?.takeIf { if (noAir) it.type != Material.AIR else true } ?: continue
+            val item: ItemStack = inventory.getItem(index)?.takeIf { if (noAir) !it.isEmpty else true } ?: continue
             result[coordinate] = item
         }
         return result

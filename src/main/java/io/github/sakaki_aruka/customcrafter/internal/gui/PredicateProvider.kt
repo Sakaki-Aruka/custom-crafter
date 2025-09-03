@@ -6,6 +6,6 @@ import org.bukkit.event.Event
  * A class that implements PageOpenTrigger must implement this in whose companion object.
  * @since 5.0.10
  */
-interface PredicateProvider<U> {
+internal interface PredicateProvider<U> {
     fun <T: Event> predicate(event: T): U?
 }

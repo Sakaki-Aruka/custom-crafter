@@ -17,6 +17,7 @@ import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.Recipe
+import org.jetbrains.annotations.TestOnly
 
 object CustomCrafterAPI {
     /**
@@ -24,7 +25,7 @@ object CustomCrafterAPI {
      *
      * This version is different with the plugin version string.
      */
-    const val API_VERSION: String = "0.1.12"
+    const val API_VERSION: String = "0.1.13"
 
     /**
      * Custom Crafter API is stable or not.
@@ -46,6 +47,7 @@ object CustomCrafterAPI {
      * @see[CustomCrafterAPIPropertiesChangeEvent.PropertyKey.RESULT_GIVE_CANCEL]
      */
     private var RESULT_GIVE_CANCEL: Boolean = false
+
     /**
      * Returns a boolean value that means the Custom Crafter API give result items to players or not.
      * @return[Boolean] Give or not
@@ -54,7 +56,7 @@ object CustomCrafterAPI {
     fun getResultGiveCancel(): Boolean = RESULT_GIVE_CANCEL
 
     /**
-     * Set a boolean value that means the Custom Crafter API give result items to players or not.
+     * Sets a boolean value that means the Custom Crafter API give result items to players or not.
      *
      * You have to set this to true if you want to give result items processing in your plugin.
      *
@@ -76,19 +78,35 @@ object CustomCrafterAPI {
     }
 
     /**
+     * Sets `ResultGiveCancel` to false (default value).
+     * @since 5.0.13
+     */
+    fun setResultGiveCancelDefault(calledAsync: Boolean = false) {
+        if (RESULT_GIVE_CANCEL) {
+            CustomCrafterAPIPropertiesChangeEvent(
+                propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.RESULT_GIVE_CANCEL.name,
+                old = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(RESULT_GIVE_CANCEL),
+                new = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(false),
+                isAsync = calledAsync
+            ).callEvent()
+        }
+        RESULT_GIVE_CANCEL = false
+    }
+
+    /**
      * @suppress
      * @see[CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK]
      */
     private var BASE_BLOCK: Material = Material.GOLD_BLOCK
     /**
-     * Get a base block type.
+     * Gets a base block type.
      * @return[Material] base block type
      * @since 5.0.9
      */
     fun getBaseBlock(): Material = BASE_BLOCK
 
     /**
-     * Set base block with given material.
+     * Sets base block with given material.
      *
      * If a given material is not a block type, throws [IllegalArgumentException].
      * @param[type] base block type
@@ -113,6 +131,22 @@ object CustomCrafterAPI {
     }
 
     /**
+     * Sets `BaseBlock` to `Material.GOLD_BLOCK` (default value).
+     * @since 5.0.13
+     */
+    fun setBaseBlockDefault(calledAsync: Boolean = false) {
+        if (BASE_BLOCK != Material.GOLD_BLOCK) {
+            CustomCrafterAPIPropertiesChangeEvent(
+                propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK.name,
+                old = CustomCrafterAPIPropertiesChangeEvent.Property<Material>(BASE_BLOCK),
+                new = CustomCrafterAPIPropertiesChangeEvent.Property<Material>(Material.GOLD_BLOCK),
+                isAsync = calledAsync
+            ).callEvent()
+        }
+        BASE_BLOCK = Material.GOLD_BLOCK
+    }
+
+    /**
      * use 'multiple result candidate' feature or not.
      * - true: if the system gets some result candidates, shows all candidates to a player.
      * - false: provides only a first matched item. (no prompt)
@@ -133,7 +167,7 @@ object CustomCrafterAPI {
     fun getUseMultipleResultCandidateFeature(): Boolean = USE_MULTIPLE_RESULT_CANDIDATE_FEATURE
 
     /**
-     * Set 'multiple result candidate' feature enables or not.
+     * Sets 'multiple result candidate' feature enables or not.
      *
      * - `true`: If the system gets some result candidates, shows all candidates to a player.
      * - `false`: The API provides only a first matched item. (no prompt)
@@ -151,6 +185,22 @@ object CustomCrafterAPI {
             ).callEvent()
         }
         USE_MULTIPLE_RESULT_CANDIDATE_FEATURE = v
+    }
+
+    /**
+     * Sets `useMultipleResultCandidateFeature` to false (default value).
+     * @since 5.0.13
+     */
+    fun setUseMultipleResultCandidateFeatureDefault(calledAsync: Boolean = false) {
+        if (USE_MULTIPLE_RESULT_CANDIDATE_FEATURE) {
+            CustomCrafterAPIPropertiesChangeEvent(
+                propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.USE_MULTIPLE_RESULT_CANDIDATE_FEATURE.name,
+                old = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(USE_MULTIPLE_RESULT_CANDIDATE_FEATURE),
+                new = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(false),
+                isAsync = calledAsync
+            ).callEvent()
+        }
+        USE_MULTIPLE_RESULT_CANDIDATE_FEATURE = false
     }
 
     /**
@@ -187,8 +237,29 @@ object CustomCrafterAPI {
         }
         USE_AUTO_CRAFTING_FEATURE = v
         if (v) {
-            InternalAPI.setup(calledAsync)
+            InternalAPI.setupAutoCraftDatabase(calledAsync)
         }
+    }
+
+    @TestOnly
+    internal fun setUseAutoCraftingFeature(v: Boolean) {
+        USE_AUTO_CRAFTING_FEATURE = v
+    }
+
+    /**
+     * Sets `useAutoCraftingFeature` to false (default value).
+     * @since 5.0.13
+     */
+    fun setUseAutoCraftingFeatureDefault(calledAsync: Boolean = false) {
+        if (USE_AUTO_CRAFTING_FEATURE) {
+            CustomCrafterAPIPropertiesChangeEvent(
+                propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.USE_AUTO_CRAFTING_FEATURE.name,
+                old = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(USE_AUTO_CRAFTING_FEATURE),
+                new = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(false),
+                isAsync = calledAsync
+            ).callEvent()
+        }
+        USE_AUTO_CRAFTING_FEATURE = false
     }
 
     /**
@@ -201,8 +272,32 @@ object CustomCrafterAPI {
     val AUTO_CRAFTING_CONFIG_COMPATIBILITIES: Map<String, Set<String>> = mapOf(
         "0.1.10" to setOf("0.1.10"),
         "0.1.11" to setOf("0.1.11"),
-        "0.1.12" to setOf("0.1.11", "0.1.12")
+        "0.1.12" to setOf("0.1.11", "0.1.12"),
+        "0.1.13" to setOf("0.1.11", "0.1.12", "0.1.13")
     )
+
+    /**
+     * Checks full-compatibility
+     *
+     * ```kotlin
+     * // Check Example in your plugin
+     * @Override
+     * fun onEnable() {
+     *     if (!CustomCrafterAPI.hasFullCompatibility("0.1.13")) {
+     *         println("This plugin has not full-compatibility with loaded CustomCrafter.")
+     *         println("Loaded Version: ${CustomCrafterAPI.API_VERSION}")
+     *         Bukkit.pluginManager.disablePlugin(this)
+     *         return
+     *     }
+     * }
+     * ```
+     *
+     * @param[version] CustomCrafter version string that is used by your plugin.
+     * @since 5.0.13
+     */
+    fun hasFullCompatibility(version: String): Boolean {
+        return version in setOf("0.1.13")
+    }
 
 
     /**
@@ -240,6 +335,22 @@ object CustomCrafterAPI {
      */
     fun getBaseBlockSideSize(): Int = BASE_BLOCK_SIDE
 
+    /**
+     * Sets base block's side size to 3 (default value).
+     * @since 5.0.13
+     */
+    fun setBaseBlockSideSizeDefault(calledAsync: Boolean = false) {
+        if (BASE_BLOCK_SIDE != 3) {
+            CustomCrafterAPIPropertiesChangeEvent(
+                propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK_SIDE.name,
+                old = CustomCrafterAPIPropertiesChangeEvent.Property<Int>(BASE_BLOCK_SIDE),
+                new = CustomCrafterAPIPropertiesChangeEvent.Property<Int>(3),
+                isAsync = calledAsync
+            ).callEvent()
+        }
+        BASE_BLOCK_SIDE = 3
+    }
+
 
     internal const val CRAFTING_TABLE_MAKE_BUTTON_SLOT: Int = 35
     const val CRAFTING_TABLE_RESULT_SLOT: Int = 44
@@ -271,8 +382,8 @@ object CustomCrafterAPI {
     /**
      * ```kotlin
      * // A default implementation
-     * AUTO_CRAFTING_SETTING_PAGE_SUGGESTION: (Block, Player) -> List<AutoCraftingIdentifier> = { _, _ ->
-     *     CustomCrafterAPI.getRecipes().filterIsInstance<AutoCraftingIdentifier>()
+     * AUTO_CRAFTING_SETTING_PAGE_SUGGESTION: (Block, Player) -> List<AutoCraftRecipe> = { _, _ ->
+     *     CustomCrafterAPI.getRecipes().filterIsInstance<AutoCraftRecipe>()
      * }
      * ```
      * @since 5.0.10
@@ -320,12 +431,37 @@ object CustomCrafterAPI {
      *
      * If a given material is not a block type, throws [IllegalArgumentException].
      * @param[type] Auto crafting base block type
+     * @param[calledAsync] Called from async processing or not. (Default = false)
      * @throws[IllegalArgumentException] When specified not block type
      * @since 5.0.10
      */
-    fun setAutoCraftingBaseBlock(type: Material) {
-        if (!type.isBlock) throw IllegalArgumentException("'type' must meet 'Material#isBlock'.")
+    fun setAutoCraftingBaseBlock(type: Material, calledAsync: Boolean = false) {
+        if (!type.isBlock || type.isAir) throw IllegalArgumentException("'type' must meet 'Material#isBlock'.")
+        if (type != AUTO_CRAFTING_BASE_BLOCK) {
+            CustomCrafterAPIPropertiesChangeEvent(
+                propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.AUTO_CRAFTING_BASE_BLOCK.name,
+                old = CustomCrafterAPIPropertiesChangeEvent.Property<Material>(AUTO_CRAFTING_BASE_BLOCK),
+                new = CustomCrafterAPIPropertiesChangeEvent.Property<Material>(type),
+                isAsync = calledAsync
+            ).callEvent()
+        }
         AUTO_CRAFTING_BASE_BLOCK = type
+    }
+
+    /**
+     * Sets AutoCraftingBaseBlock to `Material.GOLD_BLOCK` (default value).
+     * @since 5.0.13
+     */
+    fun setAutoCraftingBaseBlockDefault(calledAsync: Boolean = false) {
+        if (AUTO_CRAFTING_BASE_BLOCK != Material.GOLD_BLOCK) {
+            CustomCrafterAPIPropertiesChangeEvent(
+                propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.AUTO_CRAFTING_BASE_BLOCK.name,
+                old = CustomCrafterAPIPropertiesChangeEvent.Property<Material>(AUTO_CRAFTING_BASE_BLOCK),
+                new = CustomCrafterAPIPropertiesChangeEvent.Property<Material>(Material.GOLD_BLOCK),
+                isAsync = calledAsync
+            ).callEvent()
+        }
+        AUTO_CRAFTING_BASE_BLOCK = Material.GOLD_BLOCK
     }
 
     /**
@@ -335,7 +471,11 @@ object CustomCrafterAPI {
      *
      * @return[List]<[CRecipe]> recipes list
      */
-    fun getRecipes(): List<CRecipe> = CustomCrafter.RECIPES.toList()
+    fun getRecipes(): List<CRecipe> {
+        return synchronized(CustomCrafter.RECIPES) {
+            CustomCrafter.RECIPES.toList()
+        }
+    }
 
     /**
      * returns random generated coordinates.
@@ -364,7 +504,9 @@ object CustomCrafterAPI {
      */
     fun registerRecipe(recipe: CRecipe): Boolean {
         if (!RegisterCustomRecipeEvent(recipe).callEvent()) return false
-        return CustomCrafter.RECIPES.add(recipe)
+        return synchronized(CustomCrafter.RECIPES) {
+            CustomCrafter.RECIPES.add(recipe)
+        }
     }
 
     /**
@@ -380,7 +522,9 @@ object CustomCrafterAPI {
         val event = UnregisterCustomRecipeEvent(recipe)
         Bukkit.getPluginManager().callEvent(event)
         if (event.isCancelled) return false
-        return CustomCrafter.RECIPES.remove(recipe)
+        return synchronized(CustomCrafter.RECIPES) {
+            CustomCrafter.RECIPES.remove(recipe)
+        }
     }
 
     /**

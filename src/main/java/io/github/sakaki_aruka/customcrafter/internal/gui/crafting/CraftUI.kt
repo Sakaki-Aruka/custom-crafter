@@ -16,17 +16,21 @@ import io.github.sakaki_aruka.customcrafter.internal.gui.allcandidate.AllCandida
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.Material
+import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
+import org.bukkit.event.inventory.InventoryAction
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
+import org.bukkit.persistence.PersistentDataType
+import java.util.UUID
 import kotlin.math.max
 
-class CraftUI(
+internal class CraftUI(
     var dopItemsOnClose: Boolean = true
 ): CustomCrafterUI, InventoryHolder {
 
@@ -41,6 +45,12 @@ class CraftUI(
             this.inventory.setItem(slot, ItemStack(Material.BLACK_STAINED_GLASS_PANE).apply {
                 itemMeta = itemMeta.apply {
                     displayName(Component.empty())
+                    // An additional datum to prevent accidental menu operation
+                    persistentDataContainer.set(
+                        NamespacedKey("custom_crafter", UUID.randomUUID().toString()),
+                        PersistentDataType.STRING,
+                        UUID.randomUUID().toString()
+                    )
                 }
             })
         }
@@ -99,6 +109,19 @@ class CraftUI(
         val player: Player = event.whoClicked as? Player ?: return
         event.isCancelled = true
         when (event.rawSlot) {
+            CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT -> {
+                if (event.action in setOf(
+                        InventoryAction.PLACE_ONE,
+                        InventoryAction.PLACE_ALL,
+                        InventoryAction.PLACE_SOME,
+                        InventoryAction.PLACE_FROM_BUNDLE
+                )) {
+                    return
+                }
+                event.isCancelled = false
+                return
+            }
+
             CustomCrafterAPI.CRAFTING_TABLE_MAKE_BUTTON_SLOT -> {
                 val view: CraftView = CraftView.fromInventory(inventory) ?: return
                 if (view.materials.values.none { i -> !i.isEmpty }) return
@@ -150,18 +173,18 @@ class CraftUI(
         if (result.customs().isNotEmpty()) {
             val (recipe: CRecipe, relate: MappedRelation) = result.customs().firstOrNull() ?: return
             if (getMinAmountWithoutMass(relate, recipe, mapped) <= 0) {
-                result
+                return
             }
 
             var amount = 1
             recipe.items.forEach { (c, m) ->
-                val inputCoordinate = relate.components.find { component -> component.recipe == c }
+                val inputCoordinate = relate.components.find { rel -> rel.recipe == c }
                     ?.input
                     ?: return
                 val min: Int = getMinAmountWithoutMass(relate, recipe, mapped)
                 amount = if (m.mass) 1 else (m.amount * (if (shiftUsed) min else 1))
 
-                val slot: Int = inputCoordinate.x + inputCoordinate.y * 9
+                val slot: Int = inputCoordinate.toIndex()
                 decrement(this.inventory, slot, amount)
             }
 
@@ -178,7 +201,7 @@ class CraftUI(
             val min: Int = mapped.values.minOf { i -> i.amount }
             val amount: Int = if (shiftUsed) min else 1
             Converter.getAvailableCraftingSlotIndices()
-                .filter { s -> this.inventory.getItem(s)?.takeIf { item -> item.type != Material.AIR } != null }
+                .filter { s -> this.inventory.getItem(s)?.takeIf { item -> !item.type.isEmpty } != null }
                 .forEach { s -> decrement(this.inventory, s, amount) }
             val item: ItemStack = result.vanilla()!!.result.apply { this.amount *= amount }
             player.giveItems(items = arrayOf(item))
@@ -190,8 +213,12 @@ class CraftUI(
         slot: Int,
         amount: Int
     ) {
-        gui.getItem(slot)?.let { item ->
-            item.amount = max(item.amount - amount, 0)
+        val item: ItemStack = gui.getItem(slot) ?: return
+        val qty: Int = max(item.amount - amount, 0)
+        if (qty == 0) {
+            gui.setItem(slot, ItemStack.empty())
+        } else {
+            gui.setItem(slot, item.asQuantity(qty))
         }
     }
 
@@ -202,7 +229,7 @@ class CraftUI(
     ): Int {
         return relation.components
             .filter { c -> Converter.getAvailableCraftingSlotComponents().contains(c.input) }
-            .filter { c -> mapped[c.input] != null && mapped[c.input]!!.type != Material.AIR }
+            .filter { c -> mapped[c.input] != null && mapped[c.input]!!.type.isItem }
             .filter { c -> !recipe.items[c.recipe]!!.mass }
             .minOf { (r, i) -> mapped[i]!!.amount / recipe.items[r]!!.amount }
     }

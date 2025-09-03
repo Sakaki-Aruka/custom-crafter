@@ -20,7 +20,7 @@ import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
 
-class AllCandidateUI(
+internal class AllCandidateUI(
     override var currentPage: Int = 0,
     private var view: CraftView,
     private val player: Player,
@@ -74,11 +74,20 @@ class AllCandidateUI(
         if (this.result.size() > 45) {
             this.inventory.setItem(NEXT, CustomCrafterUI.NEXT_BUTTON)
         }
+
+        this.inventory.setItem(BACK_TO_CRAFT, BACK_TO_CRAFT_BUTTON)
     }
 
     companion object {
         const val NEXT = 53
         const val PREVIOUS = 45
+        const val BACK_TO_CRAFT = 49
+
+        val BACK_TO_CRAFT_BUTTON = ItemStack.of(Material.CRAFTING_TABLE).apply {
+            itemMeta = itemMeta.apply {
+                displayName("<b>BACK TO CRAFT".toComponent())
+            }
+        }
     }
 
     override fun flipPage() {
@@ -96,6 +105,7 @@ class AllCandidateUI(
         if (canFlipPage()) {
             this.inventory.setItem(NEXT, CustomCrafterUI.NEXT_BUTTON)
         }
+        this.inventory.setItem(BACK_TO_CRAFT, BACK_TO_CRAFT_BUTTON)
     }
 
     override fun canFlipPage(): Boolean {
@@ -117,6 +127,7 @@ class AllCandidateUI(
             this.inventory.setItem(PREVIOUS, CustomCrafterUI.PREVIOUS_BUTTON)
         }
         this.inventory.setItem(NEXT, CustomCrafterUI.NEXT_BUTTON)
+        this.inventory.setItem(BACK_TO_CRAFT, BACK_TO_CRAFT_BUTTON)
     }
 
     override fun canFlipBackPage(): Boolean {
@@ -136,9 +147,6 @@ class AllCandidateUI(
     ) {
         event.isCancelled = true
         when (event.rawSlot) {
-            in PREVIOUS + 1..<NEXT -> {
-                return
-            }
 
             PREVIOUS -> if (canFlipBackPage()) {
                 flipBackPage()
@@ -146,6 +154,20 @@ class AllCandidateUI(
 
             NEXT -> if (canFlipPage()) {
                 flipPage()
+            }
+
+            BACK_TO_CRAFT -> {
+                val craftUI = CraftUI()
+                this.view.materials.entries.forEach { (c, item) ->
+                    craftUI.inventory.setItem(c.toIndex(), item)
+                }
+                this.dropOnClose = false
+                this.player.openInventory(craftUI.inventory)
+                return
+            }
+
+            in PREVIOUS + 1..<NEXT -> {
+                return
             }
 
             else -> {
@@ -163,7 +185,7 @@ class AllCandidateUI(
                     val minAmount: Int =
                         if (event.isShiftClick) {
                             this.view.materials.values
-                                .filter { item -> item.type != Material.AIR && item.type.isItem }
+                                .filter { item -> !item.type.isEmpty && item.type.isItem }
                                 .minOf { item -> item.amount }
                         } else 1
                     listOf(recipe.original.result.asQuantity(minAmount))
@@ -191,9 +213,11 @@ class AllCandidateUI(
                 }
 
                 results.forEach { item ->
-                    player.location.world.dropItem(player.location, item)
+                    if (!item.isEmpty) {
+                        player.location.world.dropItem(player.location, item)
+                    }
                 }
-                if (!this.view.result.isSimilar(ItemStack.empty())) {
+                if (!this.view.result.isEmpty) {
                     player.location.world.dropItem(player.location, this.view.result)
                     this.view = CraftView(this.view.materials, ItemStack.empty())
                 }

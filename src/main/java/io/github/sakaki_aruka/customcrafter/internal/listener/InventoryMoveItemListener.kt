@@ -3,6 +3,7 @@ package io.github.sakaki_aruka.customcrafter.internal.listener
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
 import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlock
+import io.github.sakaki_aruka.customcrafter.internal.gui.autocraft.ContainedItemsUI
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.World
@@ -33,6 +34,16 @@ object InventoryMoveItemListener: Listener {
         }
         crafter.update()
 
+        if (cBlock.isItemModifyCacheModeEnabled()) {
+            val ui = ContainedItemsUI.of(cBlock, createNewIfNotExist = false) ?: return
+            val remaining: ItemStack = ui.merge(this.item)
+            if (remaining.amount == this.item.amount && remaining.isSimilar(this.item)) {
+                // not merged
+                this.isCancelled = true
+                return
+            }
+        }
+
         if (!cBlock.addItems(this.item)) {
             this.isCancelled = true
             return
@@ -44,7 +55,7 @@ object InventoryMoveItemListener: Listener {
         val crafterLoc: Location = crafter.location
         val crafterWorld: World = crafter.world
         val underCenter = Location(crafterWorld, crafterLoc.x, crafterLoc.y - 1, crafterLoc.z)
-        if (crafterWorld.getBlockAt(underCenter).type != Material.AIR) return false
+        if (!crafterWorld.getBlockAt(underCenter).type.isEmpty) return false
         val half: Int = InternalAPI.AUTO_CRAFTING_BASE_BLOCK_SIDE / 2
         for (dz in (-half..half)) {
             for (dx in (-half..half)) {

@@ -131,6 +131,23 @@ dependencies {
 
 # Code Example
 
+## Version check
+Example code to check if the CustomCrafterAPI version your plugin depends on is fully compatible with the version deployed on your server.
+ 
+````kotlin
+class YourPlugin: JavaPlugin() {
+    const val DEPEND_CCAPI_VERSION = "0.1.13"
+    
+    @Override
+    fun onEnable() {
+        if (!CustomCrafterAPI.hasFullCompatibility(DEPEND_CCAPI_VERSION)) { 
+            Bukkit.pluginManager.disablePlugin(this)
+            return
+        }
+    }
+}
+````
+
 ## Recipe
 ### Make Materials
 When creating a custom recipe, you need to specify the arrangement of materials (instances of an implementation class of [CMatterImpl](https://sakaki-aruka.github.io/custom-crafter/custom-crafter/io.github.sakaki_aruka.customcrafter.api.object.matter/-c-matter-impl/index.html) or  [CMatter](https://sakaki-aruka.github.io/custom-crafter/custom-crafter/io.github.sakaki_aruka.customcrafter.api.interfaces.matter/-c-matter/index.html) ) along with their coordinates.  
