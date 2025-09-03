@@ -163,18 +163,10 @@ internal class AutoCraftUI private constructor(
 
             SET -> {
 
-                //debug
-                println("event.currentItem=${event.currentItem}")
-                println("similar undefined=${event.currentItem?.isSimilar(UNDEFINED)}")
-
                 val item: ItemStack = event.currentItem ?: return
                 if (!item.isSimilar(UNDEFINED) || item.type.isEmpty) {
                     return
                 }
-
-                //debug
-                println("RecipeSetUI=${RecipeSetUI(this.block, this.player)}")
-                println("Inv.isEmpty=${RecipeSetUI(this.block, this.player).inventory.isEmpty}")
 
                 val recipeSetUI: Inventory = RecipeSetUI(this.block, this.player).inventory
                 if (recipeSetUI.isEmpty) {
@@ -185,21 +177,22 @@ internal class AutoCraftUI private constructor(
             }
 
             CONTAINED_ITEMS -> {
-                val setSlotItem: ItemStack = this.inventory.getItem(SET) ?: return
-                if (setSlotItem.isSimilar(NOT_FOUND)) {
-                    return
-                } else if (setSlotItem.isSimilar(UNDEFINED)) {
-                    return
-                } else if (!CBlockDB.isLinked(this.block)) {
-                    return
-                }
-
-                if (event.currentItem?.let{ item -> !item.isSimilar(CONTAINED_ITEM) } ?: true) {
-                    return
-                }
-                val cBlock: CBlock = CBlock.of(this.block.state as? Crafter ?: return) ?: return
-                val ui = ContainedItemsUI.of(cBlock) ?: return
-                this.player.openInventory(ui.inventory)
+                // for v5.0.14
+//                val setSlotItem: ItemStack = this.inventory.getItem(SET) ?: return
+//                if (setSlotItem.isSimilar(NOT_FOUND)) {
+//                    return
+//                } else if (setSlotItem.isSimilar(UNDEFINED)) {
+//                    return
+//                } else if (!CBlockDB.isLinked(this.block)) {
+//                    return
+//                }
+//
+//                if (event.currentItem?.let{ item -> !item.isSimilar(CONTAINED_ITEM) } ?: true) {
+//                    return
+//                }
+//                val cBlock: CBlock = CBlock.of(this.block.state as? Crafter ?: return) ?: return
+//                val ui = ContainedItemsUI.of(cBlock) ?: return
+//                this.player.openInventory(ui.inventory)
             }
         }
     }
