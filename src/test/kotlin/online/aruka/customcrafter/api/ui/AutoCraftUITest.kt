@@ -7,6 +7,7 @@ import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateCompone
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
 import io.github.sakaki_aruka.customcrafter.impl.recipe.AutoCraftRecipeImpl
 import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlock
+import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlockDB
 import io.github.sakaki_aruka.customcrafter.internal.gui.autocraft.AutoCraftUI
 import org.bukkit.Material
 import org.bukkit.block.Block
@@ -85,11 +86,30 @@ internal object AutoCraftUITest {
             BlockFace.UP
         )
 
+        CBlockDB.initTables(useInMemoryDatabase = true)
+        CustomCrafterAPI.setUseAutoCraftingFeature(true)
+
         assertTrue(AutoCraftUI.isTrigger(event))
     }
 
     @Test
-    fun triggerFailTest() {
+    fun triggerFailWithAPIPropertyTest() {
+        val player: Player = server.getPlayer(0)
+        val block: Block = server.worlds.first().getBlockAt(0, 64, 0)
+
+        val event = PlayerInteractEvent(
+            player,
+            Action.RIGHT_CLICK_BLOCK,
+            null,
+            block,
+            BlockFace.UP
+        )
+
+        assertFalse(AutoCraftUI.isTrigger(event))
+    }
+
+    @Test
+    fun triggerFailWithHopperInMainHandTest() {
         val player: Player = server.getPlayer(0)
         val block: Block = server.worlds.first().getBlockAt(0, 64, 0)
 

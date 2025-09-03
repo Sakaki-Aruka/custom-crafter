@@ -102,6 +102,9 @@ internal class AutoCraftUI private constructor(
         }
 
         override fun isTrigger(event: PlayerInteractEvent): Boolean {
+            if (!CustomCrafterAPI.getUseAutoCraftingFeature()) {
+                return false
+            }
             /*
              * xxx
              * x x
@@ -129,7 +132,7 @@ internal class AutoCraftUI private constructor(
 
         override fun open(event: PlayerInteractEvent) {
             event.isCancelled = true
-            event.player.openInventory(AutoCraftUI(event.clickedBlock!!, event.player).inventory)
+            event.player.openInventory(of(event.clickedBlock!!, event.player).inventory)
         }
     }
 

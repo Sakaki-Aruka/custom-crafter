@@ -17,6 +17,7 @@ import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.Recipe
+import org.jetbrains.annotations.TestOnly
 
 object CustomCrafterAPI {
     /**
@@ -238,6 +239,11 @@ object CustomCrafterAPI {
         if (v) {
             InternalAPI.setupAutoCraftDatabase(calledAsync)
         }
+    }
+
+    @TestOnly
+    internal fun setUseAutoCraftingFeature(v: Boolean) {
+        USE_AUTO_CRAFTING_FEATURE = v
     }
 
     /**
