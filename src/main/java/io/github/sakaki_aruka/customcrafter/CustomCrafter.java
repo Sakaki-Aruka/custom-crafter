@@ -40,8 +40,6 @@ public final class CustomCrafter extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(InventoryMoveItemListener.INSTANCE, this);
         Bukkit.getPluginManager().registerEvents(BlockBreakEventListener.INSTANCE, this);
 
-        InternalAPI.INSTANCE.setupAutoCraftDatabase(false);
-
         this.getLifecycleManager().registerEventHandler(
                 LifecycleEvents.COMMANDS,
                 commands -> {

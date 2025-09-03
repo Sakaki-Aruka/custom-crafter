@@ -10,13 +10,16 @@ import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
+import org.bukkit.NamespacedKey
 import org.bukkit.event.inventory.InventoryAction
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
+import org.bukkit.persistence.PersistentDataType
 import java.util.Collections
+import java.util.UUID
 import kotlin.math.min
 
 internal class ContainedItemsUI private constructor(
@@ -39,6 +42,12 @@ internal class ContainedItemsUI private constructor(
         val BLANK: ItemStack = ItemStack.of(Material.BLACK_STAINED_GLASS_PANE).apply {
             itemMeta = itemMeta.apply {
                 displayName(Component.empty())
+                // An additional datum to prevent accidental menu operation
+                persistentDataContainer.set(
+                    NamespacedKey("custom_crafter", UUID.randomUUID().toString()),
+                    PersistentDataType.STRING,
+                    UUID.randomUUID().toString()
+                )
             }
         }
         private val INV_CACHE: MutableMap<Location, ContainedItemsUI> = Collections.synchronizedMap<Location, ContainedItemsUI>(mutableMapOf())
@@ -94,7 +103,7 @@ internal class ContainedItemsUI private constructor(
     ) {
         if (event.isCancelled) {
             return
-        } else if (event.rawSlot !in Converter.getAvailableCraftingSlotIndices()) {
+        } else if (event.rawSlot !in this.placeableSlots) {
             event.isCancelled = true
             return
         }

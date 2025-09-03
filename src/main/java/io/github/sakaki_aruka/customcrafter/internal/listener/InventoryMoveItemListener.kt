@@ -36,8 +36,12 @@ object InventoryMoveItemListener: Listener {
 
         if (cBlock.isItemModifyCacheModeEnabled()) {
             val ui = ContainedItemsUI.of(cBlock, createNewIfNotExist = false) ?: return
-            ui.merge(this.item).takeUnless { i -> i.isEmpty }?.let { i -> this.item = i }
-            return
+            val remaining: ItemStack = ui.merge(this.item)
+            if (remaining.amount == this.item.amount && remaining.isSimilar(this.item)) {
+                // not merged
+                this.isCancelled = true
+                return
+            }
         }
 
         if (!cBlock.addItems(this.item)) {

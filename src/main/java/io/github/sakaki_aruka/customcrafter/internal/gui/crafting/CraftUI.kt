@@ -16,6 +16,7 @@ import io.github.sakaki_aruka.customcrafter.internal.gui.allcandidate.AllCandida
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.Material
+import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryAction
@@ -25,6 +26,8 @@ import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
+import org.bukkit.persistence.PersistentDataType
+import java.util.UUID
 import kotlin.math.max
 
 internal class CraftUI(
@@ -42,6 +45,12 @@ internal class CraftUI(
             this.inventory.setItem(slot, ItemStack(Material.BLACK_STAINED_GLASS_PANE).apply {
                 itemMeta = itemMeta.apply {
                     displayName(Component.empty())
+                    // An additional datum to prevent accidental menu operation
+                    persistentDataContainer.set(
+                        NamespacedKey("custom_crafter", UUID.randomUUID().toString()),
+                        PersistentDataType.STRING,
+                        UUID.randomUUID().toString()
+                    )
                 }
             })
         }

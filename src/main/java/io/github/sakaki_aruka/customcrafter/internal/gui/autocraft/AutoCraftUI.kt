@@ -87,16 +87,22 @@ internal class AutoCraftUI private constructor(
 
         fun of(block: Block, player: Player): AutoCraftUI {
             val ui = AutoCraftUI(block, player)
-            ui.inventory.setItem(
-                SET,
-                CBlock.of(block.state as Crafter)?.let { cBlock ->
-                    cBlock.getRecipe()?.let { recipe ->
-                        recipe.autoCraftDisplayItemProvider(player, cBlock.block)
-                            .takeIf { item -> !item.isEmpty && item.type.isItem }
-                            ?: AutoCraftRecipe.getDefaultDisplayItemProvider(recipe.name)(player, cBlock.block)
-                    } ?: NOT_FOUND
-                } ?: UNDEFINED
-            )
+            val cBlock: CBlock? = CBlock.of(block.state as Crafter)
+            val setSlotItem: ItemStack = cBlock?.let { c ->
+                c.getRecipe()?.let { recipe ->
+                    recipe.autoCraftDisplayItemProvider(player, c.block)
+                        .takeIf { item -> !item.isEmpty && item.type.isItem }
+                        ?: AutoCraftRecipe.getDefaultDisplayItemProvider(recipe.name)(player, c.block)
+                } ?: NOT_FOUND
+            } ?: UNDEFINED
+            ui.inventory.setItem(SET, setSlotItem)
+            val containedSlotItem: ItemStack =
+                if (!setSlotItem.isSimilar(NOT_FOUND) && !setSlotItem.isSimilar(UNDEFINED)) {
+                    CONTAINED_ITEM
+                } else {
+                    ItemStack.empty()
+                }
+            ui.inventory.setItem(CONTAINED_ITEMS, containedSlotItem)
 
             return ui
         }
@@ -156,10 +162,19 @@ internal class AutoCraftUI private constructor(
             }
 
             SET -> {
+
+                //debug
+                println("event.currentItem=${event.currentItem}")
+                println("similar undefined=${event.currentItem?.isSimilar(UNDEFINED)}")
+
                 val item: ItemStack = event.currentItem ?: return
                 if (!item.isSimilar(UNDEFINED) || item.type.isEmpty) {
                     return
                 }
+
+                //debug
+                println("RecipeSetUI=${RecipeSetUI(this.block, this.player)}")
+                println("Inv.isEmpty=${RecipeSetUI(this.block, this.player).inventory.isEmpty}")
 
                 val recipeSetUI: Inventory = RecipeSetUI(this.block, this.player).inventory
                 if (recipeSetUI.isEmpty) {
@@ -179,7 +194,12 @@ internal class AutoCraftUI private constructor(
                     return
                 }
 
-
+                if (event.currentItem?.let{ item -> !item.isSimilar(CONTAINED_ITEM) } ?: true) {
+                    return
+                }
+                val cBlock: CBlock = CBlock.of(this.block.state as? Crafter ?: return) ?: return
+                val ui = ContainedItemsUI.of(cBlock) ?: return
+                this.player.openInventory(ui.inventory)
             }
         }
     }
