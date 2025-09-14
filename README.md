@@ -180,7 +180,7 @@ It allows you to retrieve various conditions during crafting and determine the f
 ```Kotlin
 // In Kotlin
 val supplier = ResultSupplier { config ->
-    // 'config' is 'ResultSupplier.NormalConfig' or 'ResultSupplier.AutoCraftConfig'. 
+    // 'config' is 'ResultSupplier.Config' or 'AutoCraftResultSupplier.Config'. 
     // This contains some useful values.
     
     // Write processes here.
