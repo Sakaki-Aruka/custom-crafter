@@ -94,6 +94,7 @@ class CustomCrafterAPIPropertiesChangeEvent<T> internal constructor(
             val AUTO_CRAFTING_BASE_BLOCK = PropertyKey<Material>("AUTO_CRAFTING_BASE_BLOCK")
             val USE_MULTIPLE_RESULT_CANDIDATE_FEATURE = PropertyKey<Boolean>("USE_MULTIPLE_CANDIDATE_FEATURE")
             val USE_AUTO_CRAFTING_FEATURE = PropertyKey<Boolean>("USE_AUTO_CRAFTING_FEATURE")
+            val USE_CUSTOM_CRAFT_UI = PropertyKey<Boolean>("USE_CUSTOM_CRAFT_UI")
             val BASE_BLOCK_SIDE = PropertyKey<Int>("BASE_BLOCK_SIDE")
         }
     }
