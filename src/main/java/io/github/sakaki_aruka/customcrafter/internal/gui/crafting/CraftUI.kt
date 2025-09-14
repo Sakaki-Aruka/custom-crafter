@@ -69,6 +69,9 @@ internal class CraftUI(
 
     companion object: CustomCrafterUI.InteractTriggered {
         override fun isTrigger(event: PlayerInteractEvent): Boolean {
+            if (!CustomCrafterAPI.getUseCustomCraftUI()) {
+                return false
+            }
             val clicked: Block = event.clickedBlock?.takeIf { b -> b.type == Material.CRAFTING_TABLE }
                 ?: return false
             val underCenter: Block = clicked.getRelative(0, -1, 0)

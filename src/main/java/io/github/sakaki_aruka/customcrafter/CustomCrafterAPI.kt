@@ -25,7 +25,7 @@ object CustomCrafterAPI {
      *
      * This version is different with the plugin version string.
      */
-    const val API_VERSION: String = "0.1.13"
+    const val API_VERSION: String = "0.1.13-1"
 
     /**
      * Custom Crafter API is stable or not.
@@ -203,6 +203,50 @@ object CustomCrafterAPI {
         USE_MULTIPLE_RESULT_CANDIDATE_FEATURE = false
     }
 
+    private var USE_CUSTOM_CRAFT_UI = true
+    /**
+     * Returns a boolean value that means 'Custom Craft UI open' enabled or not.
+     * @return[Boolean] Enabled or not
+     * @since 5.0.13-1
+     */
+    fun getUseCustomCraftUI(): Boolean = USE_CUSTOM_CRAFT_UI
+
+    /**
+     * Sets 'Custom Craft UI open' enables or not.
+     *
+     * @param[v] Enable or not
+     * @param[calledAsync] Called from async processing or not. (Default = false)
+     * @since 5.0.13-1
+     */
+    fun setUseCustomCraftUI(v: Boolean, calledAsync: Boolean = false) {
+        if (v != USE_CUSTOM_CRAFT_UI) {
+            CustomCrafterAPIPropertiesChangeEvent(
+                propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.USE_CUSTOM_CRAFT_UI.name,
+                old = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(USE_CUSTOM_CRAFT_UI),
+                new = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(v),
+                isAsync = calledAsync
+            ).callEvent()
+        }
+        USE_CUSTOM_CRAFT_UI = v
+    }
+
+    /**
+     * Sets 'Custom Craft UI open' enable.
+     * @param[calledAsync] Called from async processing or not. (Default = false)
+     * @since 5.0.13-1
+     */
+    fun setUseCustomCraftUIDefault(calledAsync: Boolean = false) {
+        if (!USE_CUSTOM_CRAFT_UI) {
+            CustomCrafterAPIPropertiesChangeEvent(
+                propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.USE_CUSTOM_CRAFT_UI.name,
+                old = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(USE_CUSTOM_CRAFT_UI),
+                new = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(true),
+                isAsync = calledAsync
+            ).callEvent()
+        }
+        USE_CUSTOM_CRAFT_UI = true
+    }
+
     /**
      * Use 'auto crafting' feature or not.
      *
@@ -273,7 +317,8 @@ object CustomCrafterAPI {
         "0.1.10" to setOf("0.1.10"),
         "0.1.11" to setOf("0.1.11"),
         "0.1.12" to setOf("0.1.11", "0.1.12"),
-        "0.1.13" to setOf("0.1.11", "0.1.12", "0.1.13")
+        "0.1.13" to setOf("0.1.11", "0.1.12", "0.1.13", "0.1.13-1"),
+        "0.1.13-1" to setOf("0.1.11", "0.1.12", "0.1.13", "0.1.13-1")
     )
 
     /**
@@ -296,7 +341,7 @@ object CustomCrafterAPI {
      * @since 5.0.13
      */
     fun hasFullCompatibility(version: String): Boolean {
-        return version in setOf("0.1.13")
+        return version in setOf("0.1.13", "0.1.13-1")
     }
 
 

@@ -1,5 +1,10 @@
 # Changelog
 
+# 5.0.13-1
+This version contains one change.
+## Code
+- [Added] Can control 'Custom Craft UI open ' enable or not.
+
 # 5.0.13
 This plugin changed to depend PaperAPI version from 1.21.3 to 1.21.4.
 ## Feature
