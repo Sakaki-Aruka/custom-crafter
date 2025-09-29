@@ -164,7 +164,7 @@ internal class AutoCraftUI private constructor(
             SET -> {
 
                 val item: ItemStack = event.currentItem ?: return
-                if (!item.isSimilar(UNDEFINED) || item.type.isEmpty) {
+                if (!item.isSimilar(UNDEFINED) || item.type.isAir) {
                     return
                 }
 

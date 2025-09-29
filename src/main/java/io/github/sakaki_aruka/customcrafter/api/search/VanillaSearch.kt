@@ -32,7 +32,7 @@ object VanillaSearch {
     ): Array<ItemStack>? {
         if (mapped.isEmpty()) return null
         val minCoordinate: CoordinateComponent = mapped
-            .filter { (_, item) -> !item.type.isEmpty }
+            .filter { (_, item) -> !item.type.isAir }
             .keys.minBy { i -> i.toIndex() }
         val list: MutableList<ItemStack> = mutableListOf()
         CoordinateComponent.squareFill(

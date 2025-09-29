@@ -185,7 +185,7 @@ internal class AllCandidateUI(
                     val minAmount: Int =
                         if (event.isShiftClick) {
                             this.view.materials.values
-                                .filter { item -> !item.type.isEmpty && item.type.isItem }
+                                .filter { item -> !item.type.isAir && item.type.isItem }
                                 .minOf { item -> item.amount }
                         } else 1
                     listOf(recipe.original.result.asQuantity(minAmount))
