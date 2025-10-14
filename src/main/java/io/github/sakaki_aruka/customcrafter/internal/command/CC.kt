@@ -6,7 +6,6 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import io.github.sakaki_aruka.customcrafter.CustomCrafter
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
-import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.AutoCraftRecipe
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter.toComponent
 import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
 import io.papermc.paper.command.brigadier.CommandSourceStack
@@ -80,29 +79,14 @@ internal object CC {
                 ctx.msg("BASE_BLOCK: ${CustomCrafterAPI.getBaseBlock().name}")
                 return@executes SINGLE_SUCCESS
             }
-        ).then(Commands.literal("auto-crafting-base-block")
-            .executes { ctx ->
-                ctx.msg("AUTO_CRAFTING_BASE_BLOCK: ${CustomCrafterAPI.getAutoCraftingBaseBlock()}")
-                return@executes SINGLE_SUCCESS
-            }
         ).then(Commands.literal("use-multiple-result-candidates-feature")
             .executes { ctx ->
                 ctx.msg("USE_MULTIPLE_RESULT_CANDIDATES_FEATURE: ${CustomCrafterAPI.getUseMultipleResultCandidateFeature()}")
                 return@executes SINGLE_SUCCESS
             }
-        ).then(Commands.literal("use-auto-crafting-feature")
-            .executes { ctx ->
-                ctx.msg("USE_AUTO_CRAFTING_FEATURE: ${CustomCrafterAPI.getUseAutoCraftingFeature()}")
-                return@executes SINGLE_SUCCESS
-            }
         ).then(Commands.literal("base-block-side")
             .executes { ctx ->
                 ctx.msg("BASE_BLOCK_SIDE: ${CustomCrafterAPI.getBaseBlockSideSize()}")
-                return@executes SINGLE_SUCCESS
-            }
-        ).then(Commands.literal("auto-crafting-base-block-side")
-            .executes { ctx ->
-                ctx.msg("AUTO_CRAFTING_BASE_BLOCK_SIDE: ${InternalAPI.AUTO_CRAFTING_BASE_BLOCK_SIDE}")
                 return@executes SINGLE_SUCCESS
             }
         ).then(Commands.literal("registered-recipe-names")
@@ -112,9 +96,6 @@ internal object CC {
                     .sortedBy { recipe -> recipe.name }
                     .joinToString(System.lineSeparator()) { recipe ->
                         builder.clear()
-                        if (recipe is AutoCraftRecipe) {
-                            builder.append("<b>(AutoCraft)</b> ")
-                        }
                         builder.append(recipe.name)
                         builder.toString()
                     }
@@ -159,28 +140,6 @@ internal object CC {
                     val v: Boolean = ctx.getArgument("value", Boolean::class.java)
                     CustomCrafterAPI.setUseMultipleResultCandidateFeature(v)
                     ctx.msg("<green>use-multiple-result-candidate-feature toggle successful. (${v})")
-                    return@executes SINGLE_SUCCESS
-                }
-            )
-        ).then(Commands.literal("use-auto-crafting-feature")
-            .then(Commands.argument("value", BoolArgumentType.bool())
-                .executes { ctx ->
-                    val v: Boolean = ctx.getArgument("value", Boolean::class.java)
-                    if (v) {
-                        object: BukkitRunnable() {
-                            override fun run() {
-                                CustomCrafterAPI.setUseAutoCraftingFeature(true, calledAsync = true)
-                                if (v != CustomCrafterAPI.getUseAutoCraftingFeature()) {
-                                    ctx.msg("<red>Failed to toggle use-auto-crafting-feature. See console logs.")
-                                } else {
-                                    ctx.msg("<green>use-auto-crafting-feature toggle successful. (${v})")
-                                }
-                            }
-                        }.runTaskAsynchronously(CustomCrafter.getInstance())
-                    } else {
-                        CustomCrafterAPI.setUseAutoCraftingFeature(false)
-                        ctx.msg("<green>use-auto-crafting-feature toggle successful. (${v})")
-                    }
                     return@executes SINGLE_SUCCESS
                 }
             )

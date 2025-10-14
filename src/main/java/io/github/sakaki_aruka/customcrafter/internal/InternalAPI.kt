@@ -1,41 +1,15 @@
 package io.github.sakaki_aruka.customcrafter.internal
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafter
-import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
-import io.github.sakaki_aruka.customcrafter.internal.autocrafting.CBlockDB
 import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterUI
-import io.github.sakaki_aruka.customcrafter.internal.gui.autocraft.ContainedItemsUI
 import org.bukkit.Bukkit
-import org.bukkit.Material
 import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.inventory.InventoryHolder
-import java.sql.SQLException
-import kotlin.io.path.createDirectory
 
 /**
  * @suppress
  */
 internal object InternalAPI {
-    fun setupAutoCraftDatabase(async: Boolean) {
-        if (CustomCrafterAPI.getUseAutoCraftingFeature()) {
-            try {
-                Class.forName("org.sqlite.JDBC")
-                if (!CustomCrafter.getInstance().dataFolder.exists()) {
-                    CustomCrafter.getInstance().dataFolder.toPath().createDirectory()
-                    info("plugins data folder created.")
-                }
-                if (CustomCrafter.getInstance().dataFolder.resolve("auto-craft.db").createNewFile()) {
-                    info("[AutoCraft] auto-craft.db created.")
-                }
-                CBlockDB.initTables()
-                info("AutoCraft DB Initialize Success")
-            } catch (e: SQLException) {
-                warn("AutoCraft DB Initialize Error. The feature will turn off.")
-                warn(e.message ?: "? Error ?")
-                CustomCrafterAPI.setUseAutoCraftingFeature(false, calledAsync = async)
-            }
-        }
-    }
 
     fun shutdown() {
         for (player in Bukkit.getOnlinePlayers()) {
@@ -47,21 +21,8 @@ internal object InternalAPI {
                 player.closeInventory()
             }
         }
-        ContainedItemsUI.clear()
     }
 
     fun warn(str: String) = CustomCrafter.getInstance().logger.warning(str)
     fun info(str: String) = CustomCrafter.getInstance().logger.info(str)
-
-    /**
-     * AutoCraftable blocks.
-     * @since 5.0.10
-     */
-    val AUTO_CRAFTING_BLOCKS: Set<Material> = setOf(Material.CRAFTER)
-
-    /**
-     * AutoCrafting base blocks
-     * @since 5.0.10
-     */
-    const val AUTO_CRAFTING_BASE_BLOCK_SIDE = 3
 }

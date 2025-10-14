@@ -66,23 +66,6 @@ internal object CustomCrafterAPITest {
         assertTrue(CustomCrafterAPI.getBaseBlock() == Material.GOLD_BLOCK)
     }
 
-    @Test
-    fun autoCraftBaseBlockTypeTest() {
-        assertThrows<IllegalArgumentException> {
-            CustomCrafterAPI.setAutoCraftingBaseBlock(Material.AIR)
-        }
-
-        assertThrows<kotlin.IllegalArgumentException> {
-            CustomCrafterAPI.setAutoCraftingBaseBlock(Material.GOLD_INGOT)
-        }
-
-        CustomCrafterAPI.setAutoCraftingBaseBlock(Material.DIAMOND_BLOCK)
-        assertTrue(CustomCrafterAPI.getAutoCraftingBaseBlock() == Material.DIAMOND_BLOCK)
-
-        CustomCrafterAPI.setAutoCraftingBaseBlockDefault()
-        assertTrue(CustomCrafterAPI.getAutoCraftingBaseBlock() == Material.GOLD_BLOCK)
-    }
-
     // MockBukkit error
 //    @Test
 //    fun allCandidateTest() {

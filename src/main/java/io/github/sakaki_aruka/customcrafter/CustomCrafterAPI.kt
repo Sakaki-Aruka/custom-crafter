@@ -3,7 +3,6 @@ package io.github.sakaki_aruka.customcrafter
 import io.github.sakaki_aruka.customcrafter.api.event.CustomCrafterAPIPropertiesChangeEvent
 import io.github.sakaki_aruka.customcrafter.api.event.RegisterCustomRecipeEvent
 import io.github.sakaki_aruka.customcrafter.api.event.UnregisterCustomRecipeEvent
-import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.AutoCraftRecipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
@@ -248,80 +247,6 @@ object CustomCrafterAPI {
     }
 
     /**
-     * Use 'auto crafting' feature or not.
-     *
-     * Default is false.
-     * @since 5.0.10
-     * @suppress
-     * @see[CustomCrafterAPIPropertiesChangeEvent.PropertyKey.USE_AUTO_CRAFTING_FEATURE]
-     */
-    private var USE_AUTO_CRAFTING_FEATURE = false
-
-    /**
-     * Returns 'auto crafting' feature enabled or not.
-     * @return[Boolean]
-     * @since 5.0.11 (original 5.0.10)
-     */
-    fun getUseAutoCraftingFeature(): Boolean = USE_AUTO_CRAFTING_FEATURE
-
-    /**
-     * Sets 'auto crafting' feature enables or not.
-     * @param[v] Auto Crafting feature enables or not
-     * @param[calledAsync] Called from async processing or not. (Default = false)
-     * @since 5.0.11 (original 5.0.10)
-     */
-    fun setUseAutoCraftingFeature(v: Boolean, calledAsync: Boolean = false) {
-        if (v != USE_AUTO_CRAFTING_FEATURE) {
-            CustomCrafterAPIPropertiesChangeEvent(
-                propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.USE_AUTO_CRAFTING_FEATURE.name,
-                old = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(USE_AUTO_CRAFTING_FEATURE),
-                new = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(v),
-                isAsync = calledAsync
-            ).callEvent()
-        }
-        USE_AUTO_CRAFTING_FEATURE = v
-        if (v) {
-            InternalAPI.setupAutoCraftDatabase(calledAsync)
-        }
-    }
-
-    @TestOnly
-    internal fun setUseAutoCraftingFeature(v: Boolean) {
-        USE_AUTO_CRAFTING_FEATURE = v
-    }
-
-    /**
-     * Sets `useAutoCraftingFeature` to false (default value).
-     * @since 5.0.13
-     */
-    fun setUseAutoCraftingFeatureDefault(calledAsync: Boolean = false) {
-        if (USE_AUTO_CRAFTING_FEATURE) {
-            CustomCrafterAPIPropertiesChangeEvent(
-                propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.USE_AUTO_CRAFTING_FEATURE.name,
-                old = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(USE_AUTO_CRAFTING_FEATURE),
-                new = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(false),
-                isAsync = calledAsync
-            ).callEvent()
-        }
-        USE_AUTO_CRAFTING_FEATURE = false
-    }
-
-    /**
-     * AutoCrafting feature compatibilities.
-     *
-     * - KEY: Target version
-     * - VALUE: Versions what are compatible with the target version
-     * @since 5.0.10
-     */
-    val AUTO_CRAFTING_CONFIG_COMPATIBILITIES: Map<String, Set<String>> = mapOf(
-        "0.1.10" to setOf("0.1.10"),
-        "0.1.11" to setOf("0.1.11"),
-        "0.1.12" to setOf("0.1.11", "0.1.12"),
-        "0.1.13" to setOf("0.1.11", "0.1.12", "0.1.13", "0.1.13-1"),
-        "0.1.13-1" to setOf("0.1.11", "0.1.12", "0.1.13", "0.1.13-1")
-    )
-
-    /**
      * Checks full-compatibility
      *
      * ```kotlin
@@ -423,91 +348,6 @@ object CustomCrafterAPI {
         listOf(MiniMessage.miniMessage().deserialize("<white>Recipe Name: $recipeName"))
     }
 
-
-    /**
-     * ```kotlin
-     * // A default implementation
-     * AUTO_CRAFTING_SETTING_PAGE_SUGGESTION: (Block, Player) -> List<AutoCraftRecipe> = { _, _ ->
-     *     CustomCrafterAPI.getRecipes().filterIsInstance<AutoCraftRecipe>()
-     * }
-     * ```
-     * @since 5.0.10
-     */
-    var AUTO_CRAFTING_SETTING_PAGE_SUGGESTION: (Block, Player) -> List<AutoCraftRecipe> = { _, _ ->
-        this.getRecipes().filterIsInstance<AutoCraftRecipe>()
-    }
-
-    /**
-     *
-     * ```kotlin
-     * // A Default implementation
-     *     var AUTO_CRAFTING_RESULT_PICKUP_RESOLVER: (List<CRecipe>, Search.SearchResult, Block)
-     *         -> Triple<AutoCraftRecipe?, MappedRelation?, Recipe?> = { _, result, _ ->
-     *             result.customs().firstOrNull { (recipe, _) -> recipe is AutoCraftRecipe }?.let { (recipe, relation) ->
-     *                 Triple(recipe as AutoCraftRecipe, relation, result.vanilla())
-     *             } ?: Triple(null, null, result.vanilla())
-     *     }
-     * ```
-     * @since 5.0.10
-     */
-    var AUTO_CRAFTING_RESULT_PICKUP_RESOLVER: (List<CRecipe>, Search.SearchResult, Block)
-        -> Triple<AutoCraftRecipe?, MappedRelation?, Recipe?> = { _, result, _ ->
-            result.customs().firstOrNull { (recipe, _) -> recipe is AutoCraftRecipe }?.let { (recipe, relation) ->
-                Triple(recipe as AutoCraftRecipe, relation, result.vanilla())
-            } ?: Triple(null, null, result.vanilla())
-    }
-
-    /**
-     * Default `true`.
-     * @since 5.0.10
-     */
-    var AUTO_CRAFTING_RESULT_PICKUP_RESOLVER_PRIORITIZE_CUSTOM: Boolean = true
-
-    private var AUTO_CRAFTING_BASE_BLOCK: Material = Material.GOLD_BLOCK
-    /**
-     * Get auto crafting base block type.
-     * @return[Material] A base block of auto crafting.
-     * @since 5.0.10
-     */
-    fun getAutoCraftingBaseBlock(): Material = AUTO_CRAFTING_BASE_BLOCK
-
-    /**
-     * Set auto crafting base block with given material.
-     *
-     * If a given material is not a block type, throws [IllegalArgumentException].
-     * @param[type] Auto crafting base block type
-     * @param[calledAsync] Called from async processing or not. (Default = false)
-     * @throws[IllegalArgumentException] When specified not block type
-     * @since 5.0.10
-     */
-    fun setAutoCraftingBaseBlock(type: Material, calledAsync: Boolean = false) {
-        if (!type.isBlock || type.isAir) throw IllegalArgumentException("'type' must meet 'Material#isBlock'.")
-        if (type != AUTO_CRAFTING_BASE_BLOCK) {
-            CustomCrafterAPIPropertiesChangeEvent(
-                propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.AUTO_CRAFTING_BASE_BLOCK.name,
-                old = CustomCrafterAPIPropertiesChangeEvent.Property<Material>(AUTO_CRAFTING_BASE_BLOCK),
-                new = CustomCrafterAPIPropertiesChangeEvent.Property<Material>(type),
-                isAsync = calledAsync
-            ).callEvent()
-        }
-        AUTO_CRAFTING_BASE_BLOCK = type
-    }
-
-    /**
-     * Sets AutoCraftingBaseBlock to `Material.GOLD_BLOCK` (default value).
-     * @since 5.0.13
-     */
-    fun setAutoCraftingBaseBlockDefault(calledAsync: Boolean = false) {
-        if (AUTO_CRAFTING_BASE_BLOCK != Material.GOLD_BLOCK) {
-            CustomCrafterAPIPropertiesChangeEvent(
-                propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.AUTO_CRAFTING_BASE_BLOCK.name,
-                old = CustomCrafterAPIPropertiesChangeEvent.Property<Material>(AUTO_CRAFTING_BASE_BLOCK),
-                new = CustomCrafterAPIPropertiesChangeEvent.Property<Material>(Material.GOLD_BLOCK),
-                isAsync = calledAsync
-            ).callEvent()
-        }
-        AUTO_CRAFTING_BASE_BLOCK = Material.GOLD_BLOCK
-    }
 
     /**
      * returns an IMMUTABLE list what contains all registered recipes.
