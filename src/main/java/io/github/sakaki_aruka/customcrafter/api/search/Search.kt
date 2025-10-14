@@ -347,7 +347,7 @@ object Search {
                 } else if (!result) {
                     //return null
                     //debug
-                    println("check result failed, slot=$slot")
+                    println("check result failed, recipe=$k, input=$slot")
                     continue
                 }
 
@@ -399,7 +399,8 @@ object Search {
         //debug
         println("rel=$relationComponents")
 
-        // TODO: container check write here
+        // TODO: amount check write here
+        // TODO: CMatter predicate check write here
         return MappedRelation(relationComponents)
     }
 
