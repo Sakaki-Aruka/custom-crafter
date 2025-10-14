@@ -5,7 +5,6 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.filter.CRecipeFilter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
-import io.github.sakaki_aruka.customcrafter.api.objects.AmorphousFilterCandidate
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelationComponent
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
@@ -13,16 +12,16 @@ import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateCompone
 import io.github.sakaki_aruka.customcrafter.impl.recipe.CVanillaRecipe
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import org.bukkit.Bukkit
-import org.bukkit.Material
 import org.bukkit.World
 import org.bukkit.entity.Player
 import org.bukkit.inventory.CraftingRecipe
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.Recipe
+import org.chocosolver.solver.Model
+import org.chocosolver.solver.variables.IntVar
 import java.util.UUID
 import kotlin.math.abs
-import kotlin.math.min
 
 object Search {
 
@@ -253,73 +252,60 @@ object Search {
         } catch (_: Exception) { null }
     }
 
-    private fun candidateAmorphous(
-        mapped: Map<CoordinateComponent, ItemStack>,
+
+    private fun getAmorphousCandidateCheckResult(
+        input: Map<CoordinateComponent, ItemStack>,
         recipe: CRecipe
-    ): Pair<AmorphousFilterCandidate.Type, List<AmorphousFilterCandidate>> {
-        val recipes: List<CoordinateComponent> = recipe.items.keys.toList()
-        val inputs: List<CoordinateComponent> = mapped.keys.toList()
-
-        if (recipes.size > inputs.size) return Pair(AmorphousFilterCandidate.Type.NOT_ENOUGH, emptyList())
-        else if (recipes.isEmpty()) return Pair(AmorphousFilterCandidate.Type.NOT_REQUIRED, emptyList())
-
-        val map: MutableMap<Int, List<Int>> = mutableMapOf()
-        for (index: Int in recipes.indices) {
-            val candidates: Set<Material> = recipe.items[recipes[index]]!!.candidate
-            val matched: List<Int> = inputs
-                .withIndex()
-                .filter { (_, component) ->
-                    val inType: Material = mapped[component]!!.type
-                    candidates.contains(inType)
-                }
-                .map { (index, _) -> index }
-            map[index] = matched
-        }
-
-        val result: MutableList<AmorphousFilterCandidate> = mutableListOf()
-        for (slice in map.entries) {
-            val R: CoordinateComponent = recipes[slice.key]
-            val list: List<CoordinateComponent> = inputs
-                .withIndex()
-                .filter { slice.value.contains(it.index) }
-                .map { it.value }
-            if (list.isEmpty()) {
-                return Pair(AmorphousFilterCandidate.Type.NOT_ENOUGH, emptyList())
+    ): Map<Int, Set<Triple<Int, Boolean, Boolean>>> {
+        // Key=RecipeSlot, Value=<InputSlot, Checked, CheckResult>
+        val result: MutableMap<Int, MutableSet<Triple<Int, Boolean, Boolean>>> = mutableMapOf()
+        // map init
+        for (x in 0..5) {
+            for (y in 0..5) {
+                val i = x + y*9
+                result[i] = mutableSetOf(Triple(-1, false, false))
             }
-            result.add(AmorphousFilterCandidate(R, list))
         }
 
-        val type =
-            if (result.isEmpty()) AmorphousFilterCandidate.Type.NOT_ENOUGH
-            else AmorphousFilterCandidate.Type.SUCCESSFUL
-
-        return Pair(type, result)
+        for ((r, matter) in recipe.items) {
+            for ((i, item) in input.entries) {
+                if (matter.candidate.contains(item.type)) {
+                    result[r.toIndex()]!!.add(Triple(i.toIndex(), true, true))
+                } else {
+                    result[r.toIndex()]!!.add(Triple(i.toIndex(), true, false))
+                }
+            }
+        }
+        return result
     }
 
-    private fun checkAmorphousCoordinates(
-        mapped: Map<CoordinateComponent, ItemStack>,
-        matter: CMatter,
-        matterCoordinate: CoordinateComponent,
-        filter: CRecipeFilter<CMatter>
-    ): Pair<AmorphousFilterCandidate.Type, List<AmorphousFilterCandidate>> {
-        val coordinateList: MutableSet<CoordinateComponent> = mutableSetOf()
-        for ((c, item) in mapped) {
-            applyNormalFilters(item, matter, filter)
-                ?.let { (type, result) ->
-                    when (type) {
-                        CRecipeFilter.ResultType.SUCCESS -> {
-                            if (result) coordinateList.add(c)
-                            //else return AmorphousFilterCandidate.Type.NOT_ENOUGH to emptyList()
-                        }
-                        CRecipeFilter.ResultType.FAILED -> return AmorphousFilterCandidate.Type.NOT_ENOUGH to emptyList()
-                        CRecipeFilter.ResultType.NOT_REQUIRED -> return AmorphousFilterCandidate.Type.NOT_REQUIRED to emptyList()
-                    }
-                } ?: return AmorphousFilterCandidate.Type.NOT_REQUIRED to emptyList()
+    private inline fun <reified T: CMatter> getAmorphousFilterCheckResult(
+        input: Map<CoordinateComponent, ItemStack>,
+        recipe: CRecipe,
+        filter: CRecipeFilter<T>
+    ): Map<Int, Set<Triple<Int, Boolean, Boolean>>> {
+        // Key=RecipeSlot, Value=<InputSlot, Checked, CheckResult>
+        val result: MutableMap<Int, MutableSet<Triple<Int, Boolean, Boolean>>> = mutableMapOf()
+        // map init
+        for (x in 0..5) {
+            for (y in 0..5) {
+                val i = x + y*9
+                result[i] = mutableSetOf(Triple(-1, false, false))
+            }
         }
 
-        return if (coordinateList.isEmpty()) {
-            AmorphousFilterCandidate.Type.NOT_ENOUGH to emptyList()//NOT_REQUIRED to emptyList()
-        } else AmorphousFilterCandidate.Type.SUCCESSFUL to listOf(AmorphousFilterCandidate(matterCoordinate, coordinateList.toList()))
+        for ((r, matter) in recipe.items.filter { (_, m)  -> m is T }) {
+            for ((i, item) in input.entries) {
+                val (type: CRecipeFilter.ResultType, checkResult: Boolean) = applyNormalFilters(item, matter, filter) ?: continue
+                val filterResult: Boolean = when (type) {
+                    CRecipeFilter.ResultType.NOT_REQUIRED -> true
+                    CRecipeFilter.ResultType.FAILED -> false
+                    CRecipeFilter.ResultType.SUCCESS -> checkResult
+                }
+                result[r.toIndex()]!!.add(Triple(i.toIndex(), true, filterResult))
+            }
+        }
+        return result
     }
 
     private fun amorphous(
@@ -327,170 +313,96 @@ object Search {
         recipe: CRecipe,
         crafterID: UUID
     ): MappedRelation? {
-        val filterResults: MutableList<Pair<AmorphousFilterCandidate.Type, List<AmorphousFilterCandidate>>> = mutableListOf(
-            candidateAmorphous(mapped, recipe)
-        )
 
-        recipe.items.forEach { (c, matter) ->
-            recipe.filters?.forEach { filter ->
-                val (type, list) = checkAmorphousCoordinates(mapped, matter, c, filter)
-                if (type != AmorphousFilterCandidate.Type.NOT_ENOUGH) {
-                    filterResults.add(type to list)
-                }
+        // MapKey=RecipeSlot, MapValue=<InputSlot, Checked, CheckResult>
+        val results: MutableMap<Int, MutableList<Triple<Int, Boolean, Boolean>>> = mutableMapOf()
+
+        for ((k, v) in getAmorphousCandidateCheckResult(mapped, recipe)) {
+            if (!results.containsKey(k)) {
+                results[k] = v.toMutableList()
+            } else {
+                results[k]!!.addAll(v)
             }
         }
-
-        if (filterResults.any { (type, _) -> type == AmorphousFilterCandidate.Type.NOT_ENOUGH }) return null//return false
-
-        val targets: Set<CoordinateComponent> = filterResults
-            .map { (_, list) -> list.map { afc -> afc.coordinate } }
-            .flatten()
-            .toSet()
-
-        val limits: MutableMap<CoordinateComponent, Int> = mutableMapOf()
-        filterResults
-            .filter { (type, _) -> type == AmorphousFilterCandidate.Type.SUCCESSFUL }
-            .map { (_, list) -> list }
-            .flatten()
-            .forEach { afc ->
-                limits[afc.coordinate] = min(limits.getOrDefault(afc.coordinate, Int.MAX_VALUE), afc.list.size)
-            }
-
-        val filters: MutableSet<AmorphousFilterCandidate> = mutableSetOf()
-        for (coordinate: CoordinateComponent in targets) {
-            val uniqueCandidate: MutableSet<CoordinateComponent> = mutableSetOf()
-            filterResults
-                .filter { (type, _) -> type == AmorphousFilterCandidate.Type.SUCCESSFUL }
-                .map { (_, list) -> list }
-                .flatten()
-                .filter { e -> e.coordinate == coordinate }
-                .forEach { candidate ->
-                    uniqueCandidate.addAll(candidate.list)
-                }
-            filters.add(AmorphousFilterCandidate(coordinate, uniqueCandidate.toList()))
-        }
-
-        val confirmed: MutableMap<CoordinateComponent, CoordinateComponent> = mutableMapOf()
-        val removeMarked: MutableSet<CoordinateComponent> = mutableSetOf()
-        filters.filter { f -> f.list.size == 1 }
-            .forEach { f ->
-                confirmed[f.coordinate] = f.list.first()
-                removeMarked.add(f.coordinate)
-            }
-        removeMarked.forEach { r -> filters.removeIf { f -> f.coordinate == r } }
-
-        // CSP solver here
-        //confirmed.putAll(csp(filters).takeIf { it.isNotEmpty() } ?: return null)//return false)
-        // type =List<MappedRelation>?
-        return solveCSP(filters, mapped, recipe, crafterID)
-            .firstOrNull()
-            ?.let { r ->
-                val components: MutableSet<MappedRelationComponent> = mutableSetOf()
-                confirmed.forEach { (recipe, input) ->
-                    components.add(MappedRelationComponent(recipe, input))
-                }
-                r.components.forEach { c -> components.add(c) }
-                MappedRelation(components)
-            }
-        //return recipe.items.size == confirmed.size
-    }
-
-    private fun solveCSP(
-        candidates: Set<AmorphousFilterCandidate>,
-        mapped: Map<CoordinateComponent, ItemStack>,
-        cRecipe: CRecipe,
-        crafterID: UUID,
-        getFull: Boolean = false
-    ): List<MappedRelation> {
-        val solutions = mutableListOf<Map<CoordinateComponent, CoordinateComponent>>()
-        val currentSolution = mutableMapOf<CoordinateComponent, CoordinateComponent>()
-
-        fun backtrack(index: Int, candidateList: List<AmorphousFilterCandidate>) {
-            if (index == candidateList.size) {
-                // 全ての候補を割り当てた
-                solutions.add(currentSolution.toMap())
-                return
-            }
-
-            val current = candidateList[index]
-            for (value in current.list) {
-                // 現在の解に値が既に使われていないかチェック
-                if (!currentSolution.values.contains(value)) {
-                    currentSolution[current.coordinate] = value
-
-                    // 次の候補に進む
-                    backtrack(index + 1, candidateList)
-
-                    // 戻り操作
-                    currentSolution.remove(current.coordinate)
-                }
-            }
-        }
-
-        backtrack(0, candidates.toList())
-
-        if (getFull) {
-            return solutions.filter { solution ->
-                val mappedRelation: MappedRelation = mapToMappedRelation(solution)
-                val (temporaryRecipe, temporaryInventory) = replaced(mapped, cRecipe, mappedRelation)
-                val temporaryMapped: Map<CoordinateComponent, ItemStack> = temporaryMapped(temporaryInventory)
-                normal(temporaryMapped, temporaryRecipe, crafterID, fromAmorphous = true)
-            }.map { s -> mapToMappedRelation(s) }
-        } else {
-            val candidate: Map<CoordinateComponent, CoordinateComponent>? =
-                solutions
-                    .asSequence()
-                    .take(1)
-                    .firstOrNull { solution ->
-                        val mappedRelation: MappedRelation = mapToMappedRelation(solution)
-                        val (temporaryRecipe, temporaryInventory) = replaced(mapped, cRecipe, mappedRelation)
-                        val temporaryMapped: Map<CoordinateComponent, ItemStack> = temporaryMapped(temporaryInventory)
-                        normal(temporaryMapped, temporaryRecipe, crafterID, fromAmorphous = true)
+        if (!recipe.filters.isNullOrEmpty()) {
+            for (filter in recipe.filters!!) {
+                for ((k, v) in getAmorphousFilterCheckResult(mapped, recipe, filter)) {
+                    if (!results.containsKey(k)) {
+                        results[k] = v.toMutableList()
+                    } else {
+                        results[k]!!.addAll(v)
                     }
-
-            return candidate?.let { listOf(mapToMappedRelation(it)) } ?: emptyList()
+                }
+            }
         }
-    }
 
-    private fun mapToMappedRelation(
-        map: Map<CoordinateComponent, CoordinateComponent>
-    ): MappedRelation {
-        return MappedRelation(
-            map.entries
-                .map { pair -> MappedRelationComponent(pair.key, pair.value) }
-                .toSet()
-        )
-    }
+        ///debug
+        println("results=$results")
 
-    private fun replaced(
-        mapped: Map<CoordinateComponent, ItemStack>,
-        cRecipe: CRecipe,
-        mappedRelation: MappedRelation
-    ): Pair<CRecipe, Inventory> {
-        val newItems: MutableMap<CoordinateComponent, CMatter> = mutableMapOf()
-        val temporaryInventory: Inventory = Bukkit.createInventory(null, 54)
-        mappedRelation.components.forEach { component ->
-            val matter: CMatter = cRecipe.items[component.recipe]!!
-            newItems[component.input] = matter
-            val c: CoordinateComponent = component.input
-            val index: Int = c.x + c.y * 9
-            temporaryInventory.setItem(index, mapped[c])
+        val merged: MutableMap<Int, MutableSet<Int>> = mutableMapOf()
+        for ((k, set) in results) {
+            for ((slot, checked, result) in set) {
+                if (!checked) {
+                    continue
+                } else if (!result) {
+                    //return null
+                    //debug
+                    println("check result failed, slot=$slot")
+                    continue
+                }
+
+                if (!merged.containsKey(k)) {
+                    merged[k] = mutableSetOf(slot)
+                } else {
+                    merged[k]!!.add(slot)
+                }
+            }
         }
-        return cRecipe.replaceItems(newItems) to temporaryInventory
+
+        //debug
+        for ((k, v) in merged) {
+            println("k=$k, v=$v")
+        }
+
+        val model = Model("ExactCoverProblem")
+        val assignmentVars: MutableMap<Int, IntVar> = mutableMapOf()
+        for ((key, possible) in merged) {
+            if (possible.isEmpty()) {
+                //return null
+                continue
+            }
+            val domainValues = possible.toIntArray()
+            assignmentVars[key] = model.intVar("Key_$key", domainValues)
+        }
+        val variablesList = assignmentVars.values.toList()
+        if (variablesList.isNotEmpty()) {
+            model.allDifferent(*variablesList.toTypedArray()).post()
+        }
+
+        val relationComponents: MutableSet<MappedRelationComponent> = mutableSetOf()
+        if (model.solver.solve()) {
+            // results found
+            for ((k, v) in assignmentVars) {
+                // Key=Recipe, Value=Input
+                relationComponents.add(
+                    MappedRelationComponent(
+                        recipe = CoordinateComponent.fromIndex(k),
+                        input = CoordinateComponent.fromIndex(v.value)
+                    )
+                )
+            }
+        } else {
+            // not found
+            return null
+        }
+
+        //debug
+        println("rel=$relationComponents")
+
+        // TODO: container check write here
+        return MappedRelation(relationComponents)
     }
 
-    private fun temporaryMapped(
-        temporaryInventory: Inventory
-    ): MutableMap<CoordinateComponent, ItemStack> {
-        val temporaryMapped: MutableMap<CoordinateComponent, ItemStack> = mutableMapOf()
-        Converter.getAvailableCraftingSlotComponents().filter { i ->
-            val item: ItemStack? = temporaryInventory.getItem(i.toIndex())
-            item != null && !item.isEmpty
-        }.forEach { c ->
-            temporaryMapped[c] = temporaryInventory.getItem(c.toIndex())!!
-        }
-        return temporaryMapped
-    }
 
     private fun allCandidateContains(mapped: Map<CoordinateComponent, ItemStack>, recipe: CRecipe): Boolean {
         val inputCoordinateSorted: List<CoordinateComponent> = coordinateSort(mapped.keys)
