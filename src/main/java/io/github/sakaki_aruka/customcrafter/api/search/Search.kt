@@ -308,6 +308,59 @@ object Search {
         return result
     }
 
+    private fun getAmorphousMatterPredicatesCheckResult(
+        input: Map<CoordinateComponent, ItemStack>,
+        recipe: CRecipe,
+        crafterID: UUID
+    ): Map<Int, Set<Triple<Int, Boolean, Boolean>>> {
+        // Key=RecipeSlot, Value=<InputSlot, Checked, CheckResult>
+        val result: MutableMap<Int, MutableSet<Triple<Int, Boolean, Boolean>>> = mutableMapOf()
+        // map init
+        for (x in 0..5) {
+            for (y in 0..5) {
+                val i = x + y*9
+                result[i] = mutableSetOf(Triple(-1, false, false))
+            }
+        }
+
+        for ((r, matter) in recipe.items) {
+            for ((i, item) in input.entries) {
+                if (matter.hasPredicates()) {
+                    result[r.toIndex()]!!.add(Triple(i.toIndex(), true, matter.predicatesResult(item, input, recipe, crafterID)))
+                }
+            }
+        }
+        return result
+    }
+
+    private fun getAmorphousAmountCheckResult(
+        input: Map<CoordinateComponent, ItemStack>,
+        recipe: CRecipe
+    ): Map<Int, Set<Triple<Int, Boolean, Boolean>>> {
+        // Key=RecipeSlot, Value=<InputSlot, Checked, CheckResult>
+        val result: MutableMap<Int, MutableSet<Triple<Int, Boolean, Boolean>>> = mutableMapOf()
+        // map init
+        for (x in 0..5) {
+            for (y in 0..5) {
+                val i = x + y*9
+                result[i] = mutableSetOf(Triple(-1, false, false))
+            }
+        }
+
+        for ((r, matter) in recipe.items) {
+            for ((i, item) in input.entries) {
+                val amountResult: Boolean =
+                    if (matter.mass) {
+                        item.amount > 0
+                    } else {
+                        item.amount >= matter.amount
+                    }
+                result[r.toIndex()]!!.add(Triple(i.toIndex(), true, amountResult))
+            }
+        }
+        return result
+    }
+
     private fun amorphous(
         mapped: Map<CoordinateComponent, ItemStack>,
         recipe: CRecipe,
@@ -336,8 +389,21 @@ object Search {
             }
         }
 
-        ///debug
-        println("results=$results")
+        for ((k, v) in getAmorphousMatterPredicatesCheckResult(mapped, recipe, crafterID)) {
+            if (!results.containsKey(k)) {
+                results[k] = v.toMutableList()
+            } else {
+                results[k]!!.addAll(v)
+            }
+        }
+
+        for ((k, v) in getAmorphousAmountCheckResult(mapped, recipe)) {
+            if (!results.containsKey(k)) {
+                results[k] = v.toMutableList()
+            } else {
+                results[k]!!.addAll(v)
+            }
+        }
 
         val merged: MutableMap<Int, MutableSet<Int>> = mutableMapOf()
         for ((k, set) in results) {
@@ -346,8 +412,6 @@ object Search {
                     continue
                 } else if (!result) {
                     //return null
-                    //debug
-                    println("check result failed, recipe=$k, input=$slot")
                     continue
                 }
 
@@ -357,11 +421,6 @@ object Search {
                     merged[k]!!.add(slot)
                 }
             }
-        }
-
-        //debug
-        for ((k, v) in merged) {
-            println("k=$k, v=$v")
         }
 
         val model = Model("ExactCoverProblem")
@@ -396,12 +455,11 @@ object Search {
             return null
         }
 
-        //debug
-        println("rel=$relationComponents")
-
-        // TODO: amount check write here
-        // TODO: CMatter predicate check write here
-        return MappedRelation(relationComponents)
+        return if (relationComponents.isEmpty()) {
+            null
+        } else {
+            MappedRelation(relationComponents)
+        }
     }
 
 
