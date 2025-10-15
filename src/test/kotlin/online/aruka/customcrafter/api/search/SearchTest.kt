@@ -4,7 +4,6 @@ import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.interfaces.filter.CRecipeFilter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
-import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelationComponent
 import io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant.CEnchantComponent
 import io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant.EnchantStrict
 import io.github.sakaki_aruka.customcrafter.api.objects.matter.potion.CPotionComponent
@@ -231,15 +230,20 @@ internal object SearchTest {
         assertTrue(result.vanilla() == null)
 
         val (_, mapped) = result.customs().first()
-        assertTrue(mapped.components.contains(MappedRelationComponent(
-            recipe = CoordinateComponent(0, 2),
-            input = CoordinateComponent.fromIndex(38)
-        )))
-
-        assertTrue(mapped.components.contains(MappedRelationComponent(
-            recipe = CoordinateComponent(0, 3),
-            input = CoordinateComponent.fromIndex(46)
-        )))
+        val recipeSet: MutableSet<CoordinateComponent> = mutableSetOf(
+            CoordinateComponent(0, 2),
+            CoordinateComponent(0, 3)
+        )
+        val inputSet: MutableSet<CoordinateComponent> = mutableSetOf(
+            CoordinateComponent.fromIndex(38),
+            CoordinateComponent.fromIndex(46)
+        )
+        for (c in mapped.components) {
+            recipeSet.remove(c.recipe)
+            inputSet.remove(c.input)
+        }
+        assertTrue(recipeSet.isEmpty())
+        assertTrue(inputSet.isEmpty())
     }
     
     @Test
@@ -398,10 +402,20 @@ internal object SearchTest {
         val (returnedRecipe, mapped) = result.customs().first()
         assertTrue(returnedRecipe == recipe)
         assertTrue(mapped.components.size == 2)
-        assertTrue(mapped.components.contains(
-            MappedRelationComponent(CoordinateComponent(0, 0), CoordinateComponent(0, 0))))
-        assertTrue(mapped.components.contains(
-            MappedRelationComponent(CoordinateComponent(0, 1), CoordinateComponent.fromIndex(30))))
+        val recipeSet: MutableSet<CoordinateComponent> = mutableSetOf(
+            CoordinateComponent(0, 0),
+            CoordinateComponent(0, 1)
+        )
+        val inputSet: MutableSet<CoordinateComponent> = mutableSetOf(
+            CoordinateComponent(0, 0),
+            CoordinateComponent.fromIndex(30)
+        )
+        for (c in mapped.components) {
+            recipeSet.remove(c.recipe)
+            inputSet.remove(c.input)
+        }
+        assertTrue(recipeSet.isEmpty())
+        assertTrue(inputSet.isEmpty())
     }
     
     @Test
