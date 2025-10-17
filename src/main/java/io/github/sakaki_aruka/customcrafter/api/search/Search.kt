@@ -405,22 +405,34 @@ object Search {
             }
         }
 
+        //debug
+        for ((k, v) in results.toSortedMap()) {
+            println("k=$k, v=$v")
+        }
+
         val merged: MutableMap<Int, MutableSet<Int>> = mutableMapOf()
         for ((k, set) in results) {
+            val candidates: MutableSet<Int> = mutableSetOf()
+            val ignored: MutableSet<Int> = mutableSetOf()
             for ((slot, checked, result) in set) {
-                if (!checked) {
+                if (slot in ignored) {
+                    continue
+                } else if (!checked) {
                     continue
                 } else if (!result) {
-                    //return null
+                    candidates.remove(slot)
+                    ignored.add(slot)
                     continue
                 }
 
-                if (!merged.containsKey(k)) {
-                    merged[k] = mutableSetOf(slot)
-                } else {
-                    merged[k]!!.add(slot)
-                }
+                candidates.add(slot)
             }
+            merged[k] = candidates
+        }
+
+        //debug
+        for ((k, v) in merged.toSortedMap()) {
+            println("(merged) k=$k, v=${v.sorted()}")
         }
 
         val model = Model("ExactCoverProblem")
