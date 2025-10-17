@@ -4,6 +4,7 @@ import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.interfaces.filter.CRecipeFilter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
+import io.github.sakaki_aruka.customcrafter.api.objects.matter.CMatterPredicate
 import io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant.CEnchantComponent
 import io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant.EnchantStrict
 import io.github.sakaki_aruka.customcrafter.api.objects.matter.potion.CPotionComponent
@@ -172,6 +173,256 @@ internal object SearchTest {
         assertTrue(result != null)
         assertTrue(result.size() == 1)
         assertTrue(result.customs().size == 1)
+    }
+
+    @Test
+    fun detectUnmatchMaterialCandidateInAmorphousRecipe() {
+        // Recipe: requires 9 stones
+        // Input : provides 8 stones and 1 cobblestone
+        // -> Fail to mapping
+
+        val stone = CMatterImpl.single(Material.STONE)
+        // ###
+        // # #
+        // ###
+        // # = STONE
+        val recipe = CRecipeImpl(name = "", items = List(9) { stone })
+
+        val ui = CraftUI()
+        for (c in CoordinateComponent.square(3)) {
+            ui.inventory.setItem(c.toIndex(), ItemStack.of(Material.STONE))
+        }
+        // *##
+        // # #
+        // ###
+        // * = COBBLESTONE, # = STONE
+        ui.inventory.setItem(0, ItemStack.of(Material.COBBLESTONE))
+
+        val result = Search.search(
+            crafterID = UUID.randomUUID(),
+            view = CraftView.fromInventory(ui.inventory)!!,
+            sourceRecipes = listOf(recipe)
+        )
+
+        assertTrue(result != null)
+        assertTrue(result.size() == 0)
+    }
+
+    @Test
+    fun detectUnmatchEnchantCandidateInAmorphousRecipe() {
+        // Recipe: requires 3 enchanted (efficiency, lv 5, strict) stones
+        // Input : provides 3 enchanted (efficiency, lv 5 x2, lv4 x1) stones
+        // -> Fail to mapping
+        val matter = CEnchantMatterImpl(
+            name = "lv5EfficiencyStone",
+            candidate = setOf(Material.STONE),
+            enchantComponents = setOf(
+                CEnchantComponent(5, Enchantment.EFFICIENCY, EnchantStrict.STRICT)
+            )
+        )
+        val recipe = CRecipeImpl(
+            name = "",
+            items = mapOf(
+                CoordinateComponent(0, 0) to matter,
+                CoordinateComponent(0, 1) to matter,
+                CoordinateComponent(0, 2) to matter
+            ),
+            type = CRecipeType.AMORPHOUS
+        )
+
+        val lv5Stone = ItemStack.of(Material.STONE)
+        lv5Stone.editMeta { meta ->
+            meta.addEnchant(Enchantment.EFFICIENCY, 5, true)
+        }
+        val lv4Stone = ItemStack.of(Material.STONE)
+        lv4Stone.editMeta { meta ->
+            meta.addEnchant(Enchantment.EFFICIENCY, 4, true)
+        }
+
+        val ui = CraftUI()
+        ui.inventory.setItem(0, lv5Stone)
+        ui.inventory.setItem(1, lv5Stone)
+        ui.inventory.setItem(2, lv4Stone)
+
+        val result = Search.search(
+            crafterID = UUID.randomUUID(),
+            view = CraftView.fromInventory(ui.inventory)!!,
+            sourceRecipes = listOf(recipe)
+        )
+
+        assertTrue(result != null)
+        assertTrue(result.size() == 0)
+    }
+
+    @Test
+    fun detectUnmatchEnchantStorageCandidateInAmorphousRecipe() {
+        // Recipe: requires 3 enchanted books (efficiency, lv5, strict)
+        // Input : provides 3 enchanted books (efficiency, lv5x2, lv4x1)
+        // -> Fail to mapping
+        val matter = CEnchantmentStoreMatterImpl(
+            name = "book",
+            candidate = setOf(Material.ENCHANTED_BOOK),
+            storedEnchantComponents = setOf(
+                CEnchantComponent(5, Enchantment.EFFICIENCY, EnchantStrict.STRICT)
+            )
+        )
+        val recipe = CRecipeImpl(
+            name = "",
+            items = mapOf(
+                CoordinateComponent(0, 0) to matter,
+                CoordinateComponent(0, 1) to matter,
+                CoordinateComponent(0, 2) to matter
+            ),
+            type = CRecipeType.AMORPHOUS
+        )
+
+        val lv5 = ItemStack.of(Material.ENCHANTED_BOOK)
+        lv5.editMeta { meta ->
+            (meta as EnchantmentStorageMeta).addStoredEnchant(Enchantment.EFFICIENCY, 5, true)
+        }
+        val lv4 = ItemStack.of(Material.ENCHANTED_BOOK)
+        lv4.editMeta { meta ->
+            (meta as EnchantmentStorageMeta).addStoredEnchant(Enchantment.EFFICIENCY, 4, true)
+        }
+
+        val ui = CraftUI()
+        ui.inventory.setItem(0, lv5)
+        ui.inventory.setItem(1, lv5)
+        ui.inventory.setItem(2, lv4)
+
+        val result = Search.search(
+            crafterID = UUID.randomUUID(),
+            view = CraftView.fromInventory(ui.inventory)!!,
+            sourceRecipes = listOf(recipe)
+        )
+
+        assertTrue(result != null)
+        assertTrue(result.size() == 0)
+    }
+
+    @Test
+    fun detectUnmatchPotionCandidateInAmorphousRecipe() {
+        // Recipe: requires 3 potions (luck, lv5, strict)
+        // Input : provides 3 potions (luck, lv5x2, lv4x1)
+        // -> Fail to mapping
+        val matter = CPotionMatterImpl(
+            name = "potion",
+            candidate = setOf(Material.POTION),
+            potionComponents = setOf(
+                CPotionComponent(
+                    PotionEffect(PotionEffectType.LUCK, 1, 5),
+                    CPotionComponent.PotionStrict.STRICT
+                )
+            )
+        )
+        val recipe = CRecipeImpl(
+            name = "",
+            items = mapOf(
+                CoordinateComponent(0, 0) to matter,
+                CoordinateComponent(0, 1) to matter,
+                CoordinateComponent(0, 2) to matter
+            ),
+            type = CRecipeType.AMORPHOUS
+        )
+
+        val lv5 = ItemStack.of(Material.POTION)
+        lv5.editMeta { meta ->
+            (meta as PotionMeta).addCustomEffect(PotionEffect(PotionEffectType.LUCK, 1, 5), true)
+        }
+        val lv4 = ItemStack.of(Material.POTION)
+        lv4.editMeta { meta ->
+            (meta as PotionMeta).addCustomEffect(PotionEffect(PotionEffectType.LUCK, 1, 4), true)
+        }
+
+        val ui = CraftUI()
+        ui.inventory.setItem(0, lv5)
+        ui.inventory.setItem(1, lv5)
+        ui.inventory.setItem(2, lv4)
+
+        val result = Search.search(
+            crafterID = UUID.randomUUID(),
+            view = CraftView.fromInventory(ui.inventory)!!,
+            sourceRecipes = listOf(recipe)
+        )
+
+        assertTrue(result != null)
+        assertTrue(result.size() == 0)
+    }
+
+    @Test
+    fun detectUnmatchMatterPredicateInAmorphousRecipe() {
+        // Recipe: requires to craft by Notch
+        // Action: craft by empty UUID user
+        // -> Fail to mapping
+        val NotchID = UUID.fromString("069a79f4-44e9-4726-a5be-fca90e38aaf5")
+        val emptyID = UUID.fromString("00000000-0000-0000-0000-000000000000")
+        val matter = CMatterImpl(
+            name = "",
+            candidate = setOf(Material.GRAVEL),
+            predicates = setOf(CMatterPredicate {_, _, _, id -> id == NotchID})
+        )
+        val recipe = CRecipeImpl(
+            name = "",
+            items = mapOf(
+                CoordinateComponent(0, 0) to matter,
+                CoordinateComponent(1, 0) to matter,
+                CoordinateComponent(0, 1) to matter,
+                CoordinateComponent(1, 1) to matter
+            ),
+            type = CRecipeType.AMORPHOUS
+        )
+
+        val gravel = ItemStack.of(Material.GRAVEL)
+        val ui = CraftUI()
+        ui.inventory.setItem(0, gravel)
+        ui.inventory.setItem(1, gravel)
+        ui.inventory.setItem(9, gravel)
+        ui.inventory.setItem(10, gravel)
+
+        val result = Search.search(
+            crafterID = emptyID,
+            view = CraftView.fromInventory(ui.inventory)!!,
+            sourceRecipes = listOf(recipe)
+        )
+
+        assertTrue(result != null)
+        assertTrue(result.size() == 0)
+    }
+
+    @Test
+    fun detectUnmatchMatterAmountInAmorphousRecipe() {
+        // Recipe: requires 3 stones (amount = 2)
+        // Input : provides 3 stones (amount = 1)
+        // -> Fail to mapping
+        val matter = CMatterImpl(
+            name = "",
+            candidate = setOf(Material.STONE),
+            amount = 2
+        )
+        val recipe = CRecipeImpl(
+            name = "",
+            items = mapOf(
+                CoordinateComponent(0, 0) to matter,
+                CoordinateComponent(0, 1) to matter,
+                CoordinateComponent(0, 2) to matter
+            ),
+            type = CRecipeType.AMORPHOUS
+        )
+
+        val stone = ItemStack.of(Material.STONE, 1)
+        val ui = CraftUI()
+        ui.inventory.setItem(0, stone)
+        ui.inventory.setItem(1, stone)
+        ui.inventory.setItem(2, stone)
+
+        val result = Search.search(
+            crafterID = UUID.randomUUID(),
+            view = CraftView.fromInventory(ui.inventory)!!,
+            sourceRecipes = listOf(recipe)
+        )
+
+        assertTrue(result != null)
+        assertTrue(result.size() == 0)
     }
 
     @Test
@@ -397,7 +648,7 @@ internal object SearchTest {
         )
 
         assertTrue(result != null)
-        assertTrue(result!!.vanilla() == null)
+        assertTrue(result.vanilla() == null)
         assertTrue(result.customs().size == 1)
         val (returnedRecipe, mapped) = result.customs().first()
         assertTrue(returnedRecipe == recipe)
