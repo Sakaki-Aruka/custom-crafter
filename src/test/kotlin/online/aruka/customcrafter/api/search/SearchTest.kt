@@ -3,7 +3,6 @@ package online.aruka.customcrafter.api.search
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.interfaces.filter.CRecipeFilter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
-import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
 import io.github.sakaki_aruka.customcrafter.api.objects.matter.CMatterPredicate
 import io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant.CEnchantComponent
 import io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant.EnchantStrict
@@ -64,7 +63,7 @@ internal object SearchTest {
          */
 
         val matter = CMatterImpl.single(Material.STONE)
-        val items = CoordinateComponent.square(3).associateWith { c -> matter }
+        val items = CoordinateComponent.square(3).associateWith { _ -> matter }
         val recipe = CRecipeImpl(
             name = "",
             items = items,
@@ -78,14 +77,13 @@ internal object SearchTest {
 
         val result = Search.search(
             crafterID = UUID.randomUUID(),
-            view = CraftView.fromInventory(ui.inventory)!!,
+            view = ui.toView(),
             sourceRecipes = listOf(recipe)
         )
 
-        assertTrue(result != null)
-        assertTrue(result.size() == 1)
-        assertTrue(result.customs().size == 1)
-        assertTrue(result.vanilla() == null)
+        assertEquals(result.size(), 1)
+        assertEquals(result.customs().size, 1)
+        assertEquals(result.vanilla(), null)
 
         ui.inventory.clear()
         CoordinateComponent.square(3).forEach { c ->
@@ -94,29 +92,27 @@ internal object SearchTest {
 
         val result2 = Search.search(
             crafterID = UUID.randomUUID(),
-            view = CraftView.fromInventory(ui.inventory)!!,
+            view = ui.toView(),
             sourceRecipes = listOf(recipe)
         )
 
-        assertTrue(result2 != null)
-        assertTrue(result2.size() == 0)
+        assertEquals(result2.size(), 0)
     }
 
     @Test
     fun vanillaTest1() {
-        val ui = CraftUI().inventory
-        ui.setItem(0, ItemStack(Material.STONE))
+        val ui = CraftUI()
+        ui.inventory.setItem(0, ItemStack(Material.STONE))
 
         val result = Search.search(
             crafterID = UUID.randomUUID(),
-            view = CraftView.fromInventory(ui)!!
+            view = ui.toView()
         )
 
-        assertTrue(result != null)
-        assertTrue(result.size() == 1)
+        assertEquals(result.size(), 1)
         assertTrue(result.customs().isEmpty())
         assertTrue(result.vanilla() != null)
-        assertTrue(result.vanilla()!!.result.type == Material.STONE_BUTTON)
+        assertEquals(result.vanilla()!!.result.type, Material.STONE_BUTTON)
     }
 
     @Test
@@ -124,7 +120,7 @@ internal object SearchTest {
         val matter = CMatterImpl.single(Material.STONE)
         val recipe = CRecipeImpl(
             name = "",
-            items = CustomCrafterAPI.getRandomNCoordinates(4).associateWith { c -> matter },
+            items = CustomCrafterAPI.getRandomNCoordinates(4).associateWith { _ -> matter },
             type = CRecipeType.AMORPHOUS
         )
         val ui = CraftUI()
@@ -134,11 +130,10 @@ internal object SearchTest {
 
         val result = Search.search(
             crafterID = UUID.randomUUID(),
-            view = CraftView.fromInventory(ui.inventory)!!,
+            view = ui.toView(),
             sourceRecipes = listOf(recipe)
         )
 
-        assertTrue(result != null)
         assertEquals(result.size(), 1)
         assertEquals(result.customs().size, 1)
         assertEquals(result.vanilla(), null)
@@ -166,13 +161,12 @@ internal object SearchTest {
 
         val result = Search.search(
             crafterID = UUID.randomUUID(),
-            view = CraftView.fromInventory(ui.inventory)!!,
+            view = ui.toView(),
             sourceRecipes = listOf(recipe)
         )
 
-        assertTrue(result != null)
-        assertTrue(result.size() == 1)
-        assertTrue(result.customs().size == 1)
+        assertEquals(result.size(), 1)
+        assertEquals(result.customs().size, 1)
     }
 
     @Test
@@ -200,12 +194,11 @@ internal object SearchTest {
 
         val result = Search.search(
             crafterID = UUID.randomUUID(),
-            view = CraftView.fromInventory(ui.inventory)!!,
+            view = ui.toView(),
             sourceRecipes = listOf(recipe)
         )
 
-        assertTrue(result != null)
-        assertTrue(result.size() == 0)
+        assertEquals(result.size(), 0)
     }
 
     @Test
@@ -246,12 +239,11 @@ internal object SearchTest {
 
         val result = Search.search(
             crafterID = UUID.randomUUID(),
-            view = CraftView.fromInventory(ui.inventory)!!,
+            view = ui.toView(),
             sourceRecipes = listOf(recipe)
         )
 
-        assertTrue(result != null)
-        assertTrue(result.size() == 0)
+        assertEquals(result.size(), 0)
     }
 
     @Test
@@ -292,12 +284,11 @@ internal object SearchTest {
 
         val result = Search.search(
             crafterID = UUID.randomUUID(),
-            view = CraftView.fromInventory(ui.inventory)!!,
+            view = ui.toView(),
             sourceRecipes = listOf(recipe)
         )
 
-        assertTrue(result != null)
-        assertTrue(result.size() == 0)
+        assertEquals(result.size(), 0)
     }
 
     @Test
@@ -341,12 +332,11 @@ internal object SearchTest {
 
         val result = Search.search(
             crafterID = UUID.randomUUID(),
-            view = CraftView.fromInventory(ui.inventory)!!,
+            view = ui.toView(),
             sourceRecipes = listOf(recipe)
         )
 
-        assertTrue(result != null)
-        assertTrue(result.size() == 0)
+        assertEquals(result.size(), 0)
     }
 
     @Test
@@ -381,12 +371,11 @@ internal object SearchTest {
 
         val result = Search.search(
             crafterID = emptyID,
-            view = CraftView.fromInventory(ui.inventory)!!,
+            view = ui.toView(),
             sourceRecipes = listOf(recipe)
         )
 
-        assertTrue(result != null)
-        assertTrue(result.size() == 0)
+        assertEquals(result.size(), 0)
     }
 
     @Test
@@ -417,12 +406,11 @@ internal object SearchTest {
 
         val result = Search.search(
             crafterID = UUID.randomUUID(),
-            view = CraftView.fromInventory(ui.inventory)!!,
+            view = ui.toView(),
             sourceRecipes = listOf(recipe)
         )
 
-        assertTrue(result != null)
-        assertTrue(result.size() == 0)
+        assertEquals(result.size(), 0)
     }
 
     @Test
@@ -472,13 +460,12 @@ internal object SearchTest {
 
         val result = Search.search(
             crafterID = UUID.randomUUID(),
-            view = CraftView.fromInventory(ui.inventory)!!,
+            view = ui.toView(),
             sourceRecipes = listOf(recipe)
         )
 
-        assertTrue(result != null)
-        assertTrue(result.size() == 1)
-        assertTrue(result.vanilla() == null)
+        assertEquals(result.size(), 1)
+        assertEquals(result.vanilla(), null)
 
         val (_, mapped) = result.customs().first()
         val recipeSet: MutableSet<CoordinateComponent> = mutableSetOf(
@@ -527,24 +514,30 @@ internal object SearchTest {
             enchantComponents = setOf(CEnchantComponent(1, Enchantment.EFFICIENCY, EnchantStrict.STRICT))
         )
 
-        assertTrue(EnchantFilter.normal(noEnchantInput, noEnchantMatter).first == CRecipeFilter.ResultType.NOT_REQUIRED)
-        assertTrue(EnchantFilter.normal(noEnchantInput, onlyEnchantMatter).first == CRecipeFilter.ResultType.FAILED)
-        assertTrue(EnchantFilter.normal(noEnchantInput, strictEnchantMatter).first == CRecipeFilter.ResultType.FAILED)
+        assertEquals(EnchantFilter.normal(noEnchantInput, noEnchantMatter).first, CRecipeFilter.ResultType.NOT_REQUIRED)
+        assertEquals(EnchantFilter.normal(noEnchantInput, onlyEnchantMatter).first, CRecipeFilter.ResultType.FAILED)
+        assertEquals(EnchantFilter.normal(noEnchantInput, strictEnchantMatter).first, CRecipeFilter.ResultType.FAILED)
 
-        assertTrue(EnchantFilter.normal(onlyEnchantInput, noEnchantMatter).first == CRecipeFilter.ResultType.NOT_REQUIRED)
+        assertEquals(
+            EnchantFilter.normal(onlyEnchantInput, noEnchantMatter).first,
+            CRecipeFilter.ResultType.NOT_REQUIRED
+        )
         val (type1, result1) = EnchantFilter.normal(onlyEnchantInput, onlyEnchantMatter)
-        assertTrue(type1 == CRecipeFilter.ResultType.SUCCESS)
+        assertEquals(type1, CRecipeFilter.ResultType.SUCCESS)
         assertTrue(result1)
         val (type2, result2) = EnchantFilter.normal(onlyEnchantInput, strictEnchantMatter)
-        assertTrue(type2 == CRecipeFilter.ResultType.SUCCESS)
+        assertEquals(type2, CRecipeFilter.ResultType.SUCCESS)
         assertTrue(!result2)
 
-        assertTrue(EnchantFilter.normal(strictEnchantInput, noEnchantMatter).first == CRecipeFilter.ResultType.NOT_REQUIRED)
+        assertEquals(
+            EnchantFilter.normal(strictEnchantInput, noEnchantMatter).first,
+            CRecipeFilter.ResultType.NOT_REQUIRED
+        )
         val (type3, result3) = EnchantFilter.normal(strictEnchantInput, onlyEnchantMatter)
-        assertTrue(type3 == CRecipeFilter.ResultType.SUCCESS)
+        assertEquals(type3, CRecipeFilter.ResultType.SUCCESS)
         assertTrue(result3)
         val (type4, result4) = EnchantFilter.normal(strictEnchantInput, strictEnchantMatter)
-        assertTrue(type4 == CRecipeFilter.ResultType.SUCCESS)
+        assertEquals(type4, CRecipeFilter.ResultType.SUCCESS)
         assertTrue(result4)
     }
     
@@ -582,24 +575,36 @@ internal object SearchTest {
                 level = 1, enchantment = Enchantment.EFFICIENCY, strict = EnchantStrict.STRICT))
         )
 
-        assertTrue(EnchantStorageFilter.normal(noEnchantInput, noEnchantMatter).first == CRecipeFilter.ResultType.NOT_REQUIRED)
-        assertTrue(EnchantStorageFilter.normal(noEnchantInput, onlyEnchantMatter).first == CRecipeFilter.ResultType.FAILED)
-        assertTrue(EnchantStorageFilter.normal(noEnchantInput, strictMatter).first == CRecipeFilter.ResultType.FAILED)
+        assertEquals(
+            EnchantStorageFilter.normal(noEnchantInput, noEnchantMatter).first,
+            CRecipeFilter.ResultType.NOT_REQUIRED
+        )
+        assertEquals(
+            EnchantStorageFilter.normal(noEnchantInput, onlyEnchantMatter).first,
+            CRecipeFilter.ResultType.FAILED
+        )
+        assertEquals(EnchantStorageFilter.normal(noEnchantInput, strictMatter).first, CRecipeFilter.ResultType.FAILED)
 
-        assertTrue(EnchantStorageFilter.normal(onlyEnchantInput, noEnchantMatter).first == CRecipeFilter.ResultType.NOT_REQUIRED)
+        assertEquals(
+            EnchantStorageFilter.normal(onlyEnchantInput, noEnchantMatter).first,
+            CRecipeFilter.ResultType.NOT_REQUIRED
+        )
         val (strictType1, strictResult1) = EnchantStorageFilter.normal(onlyEnchantInput, onlyEnchantMatter)
-        assertTrue(strictType1 == CRecipeFilter.ResultType.SUCCESS)
+        assertEquals(strictType1, CRecipeFilter.ResultType.SUCCESS)
         assertTrue(strictResult1)
         val (strictType2, strictResult2) = EnchantStorageFilter.normal(onlyEnchantInput, strictMatter)
-        assertTrue(strictType2 == CRecipeFilter.ResultType.SUCCESS)
+        assertEquals(strictType2, CRecipeFilter.ResultType.SUCCESS)
         assertTrue(!strictResult2)
 
-        assertTrue(EnchantStorageFilter.normal(strictInput, noEnchantMatter).first == CRecipeFilter.ResultType.NOT_REQUIRED)
+        assertEquals(
+            EnchantStorageFilter.normal(strictInput, noEnchantMatter).first,
+            CRecipeFilter.ResultType.NOT_REQUIRED
+        )
         val (strictType3, strictResult3) = EnchantStorageFilter.normal(strictInput, onlyEnchantMatter)
-        assertTrue(strictType3 == CRecipeFilter.ResultType.SUCCESS)
+        assertEquals(strictType3, CRecipeFilter.ResultType.SUCCESS)
         assertTrue(strictResult3)
         val (strictType4, strictResult4) = EnchantStorageFilter.normal(strictInput, strictMatter)
-        assertTrue(strictType4 == CRecipeFilter.ResultType.SUCCESS)
+        assertEquals(strictType4, CRecipeFilter.ResultType.SUCCESS)
         assertTrue(strictResult4)
     }
     
@@ -637,22 +642,21 @@ internal object SearchTest {
             (m as PotionMeta).addCustomEffect(PotionEffect(PotionEffectType.POISON, 1, 1), true)
         }
 
-        val gui = CraftUI().inventory
-        gui.setItem(0, input1)
-        gui.setItem(30, input1)
+        val gui = CraftUI()
+        gui.inventory.setItem(0, input1)
+        gui.inventory.setItem(30, input1)
 
         val result = Search.search(
             UUID.randomUUID(),
-            CraftView.fromInventory(gui)!!,
+            gui.toView(),
             sourceRecipes = listOf(recipe)
         )
 
-        assertTrue(result != null)
-        assertTrue(result.vanilla() == null)
-        assertTrue(result.customs().size == 1)
+        assertEquals(result.vanilla(), null)
+        assertEquals(result.customs().size, 1)
         val (returnedRecipe, mapped) = result.customs().first()
-        assertTrue(returnedRecipe == recipe)
-        assertTrue(mapped.components.size == 2)
+        assertEquals(returnedRecipe, recipe)
+        assertEquals(mapped.components.size, 2)
         val recipeSet: MutableSet<CoordinateComponent> = mutableSetOf(
             CoordinateComponent(0, 0),
             CoordinateComponent(0, 1)
@@ -719,24 +723,36 @@ internal object SearchTest {
             )
         )
 
-        assertTrue(PotionFilter.normal(noEffectPotionInput, noEffectMatter).first == CRecipeFilter.ResultType.NOT_REQUIRED)
-        assertTrue(PotionFilter.normal(noEffectPotionInput, onlyEffectMatter).first == CRecipeFilter.ResultType.FAILED)
-        assertTrue(PotionFilter.normal(noEffectPotionInput, strictEffectMatter).first == CRecipeFilter.ResultType.FAILED)
+        assertEquals(
+            PotionFilter.normal(noEffectPotionInput, noEffectMatter).first,
+            CRecipeFilter.ResultType.NOT_REQUIRED
+        )
+        assertEquals(PotionFilter.normal(noEffectPotionInput, onlyEffectMatter).first, CRecipeFilter.ResultType.FAILED)
+        assertEquals(
+            PotionFilter.normal(noEffectPotionInput, strictEffectMatter).first,
+            CRecipeFilter.ResultType.FAILED
+        )
 
-        assertTrue(PotionFilter.normal(onlyEffectPotionInput, noEffectMatter).first == CRecipeFilter.ResultType.NOT_REQUIRED)
+        assertEquals(
+            PotionFilter.normal(onlyEffectPotionInput, noEffectMatter).first,
+            CRecipeFilter.ResultType.NOT_REQUIRED
+        )
         val (type1, result1) = PotionFilter.normal(onlyEffectPotionInput, onlyEffectMatter)
-        assertTrue(type1 == CRecipeFilter.ResultType.SUCCESS)
+        assertEquals(type1, CRecipeFilter.ResultType.SUCCESS)
         assertTrue(result1)
         val (type2, result2) = PotionFilter.normal(onlyEffectPotionInput, strictEffectMatter)
-        assertTrue(type2 == CRecipeFilter.ResultType.SUCCESS)
+        assertEquals(type2, CRecipeFilter.ResultType.SUCCESS)
         assertTrue(!result2)
 
-        assertTrue(PotionFilter.normal(strictPotionInput, noEffectMatter).first == CRecipeFilter.ResultType.NOT_REQUIRED)
+        assertEquals(
+            PotionFilter.normal(strictPotionInput, noEffectMatter).first,
+            CRecipeFilter.ResultType.NOT_REQUIRED
+        )
         val (type3, result3) = PotionFilter.normal(strictPotionInput, onlyEffectMatter)
-        assertTrue(type3 == CRecipeFilter.ResultType.SUCCESS)
+        assertEquals(type3, CRecipeFilter.ResultType.SUCCESS)
         assertTrue(result3)
         val (type4, result4) = PotionFilter.normal(strictPotionInput, strictEffectMatter)
-        assertTrue(type4 == CRecipeFilter.ResultType.SUCCESS)
+        assertEquals(type4, CRecipeFilter.ResultType.SUCCESS)
         assertTrue(result4)
     }
 }
