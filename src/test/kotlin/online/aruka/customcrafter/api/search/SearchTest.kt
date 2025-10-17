@@ -180,7 +180,7 @@ internal object SearchTest {
         // # #
         // ###
         // # = STONE
-        val recipe = CRecipeImpl(name = "", items = List(9) { stone })
+        val recipe = CRecipeImpl.amorphous("", List(9) {stone})
 
         val ui = CraftUI()
         for (c in CoordinateComponent.square(3)) {
