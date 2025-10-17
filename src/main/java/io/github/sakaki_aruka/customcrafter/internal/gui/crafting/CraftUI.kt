@@ -134,9 +134,9 @@ internal class CraftUI(
 
                 val result: Search.SearchResult = Search.search(
                     player.uniqueId,
-                    this.inventory,
+                    view,
                     natural = !CustomCrafterAPI.getUseMultipleResultCandidateFeature()
-                ) ?: return
+                )
 
                 CreateCustomItemEvent(player, view, result, event.click).callEvent()
                 if (CustomCrafterAPI.getResultGiveCancel()) return
@@ -238,4 +238,20 @@ internal class CraftUI(
     }
 
     override fun getInventory(): Inventory = this.inventory
+
+    fun toView(
+        paddingAir: Boolean = false
+    ): CraftView {
+        val materials: MutableMap<CoordinateComponent, ItemStack> = mutableMapOf()
+        for (slot in Converter.getAvailableCraftingSlotIndices()) {
+            val c: CoordinateComponent = CoordinateComponent.fromIndex(slot)
+            val item: ItemStack = this.inventory.getItem(slot)
+                ?: if (paddingAir) ItemStack.empty() else continue
+            materials[c] = item
+        }
+
+        val result: ItemStack = this.inventory.getItem(CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT)
+            ?: ItemStack.empty()
+        return CraftView(materials, result)
+    }
 }
