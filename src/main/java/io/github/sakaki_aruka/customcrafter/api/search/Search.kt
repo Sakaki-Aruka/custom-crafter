@@ -10,12 +10,10 @@ import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelationComponent
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.impl.recipe.CVanillaRecipe
-import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import org.bukkit.Bukkit
 import org.bukkit.World
 import org.bukkit.entity.Player
 import org.bukkit.inventory.CraftingRecipe
-import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.Recipe
 import org.chocosolver.solver.Model
@@ -101,6 +99,40 @@ object Search {
     // one: Boolean
 
     /**
+     * 6x6 crafting items.
+     *
+     * zero origin & do not skip empty slots (do padding = use ItemStack#empty())
+     *
+     *  A search-result is not guaranteed what is not empty.
+     *
+     * @param[player] A craft-request sender.
+     * @param[items] Materials of crafting. this size must equal 36(6*6).
+     * @param[natural] Force to search vanilla recipes or not.(true=not, false=force). The default is true.
+     * @param[onlyFirst] get only first matched custom recipe and mapped. (default = false)
+     * @param[sourceRecipes] A list of searched recipes. (default = CustomCrafterAPI.getRecipes() / since 5.0.10)
+     * @return[SearchResult?] A result of a request. If you send one that contains invalid params, returns null.
+     */
+    fun search(
+        player: Player,
+        items: Array<ItemStack>,
+        natural: Boolean = true,
+        onlyFirst: Boolean = false,
+        sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes()
+    ): SearchResult? {
+        if (items.size != 36) return null
+        val materials: MutableMap<CoordinateComponent, ItemStack> = mutableMapOf()
+        for (y: Int in (0..<6)) {
+            for (x: Int in (0..<6)) {
+                val index: Int = x + y * 9
+                materials[CoordinateComponent(x, y)] = items[index]
+            }
+        }
+
+        val view = CraftView(materials, ItemStack.empty())
+        return search(player.uniqueId, view, natural, onlyFirst, sourceRecipes)
+    }
+
+    /**
      * search main method.
      *
      * this is more recommended than [search] (use List<ItemStack>).
@@ -118,78 +150,33 @@ object Search {
         natural: Boolean = true,
         onlyFirst: Boolean = false,
         sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes()
-    ): SearchResult? {
-        val gui: Inventory = view.toCraftingGUI()
-        return search(crafterID, gui, natural, onlyFirst, sourceRecipes)
-    }
+    ): SearchResult {
+        val mapped: Map<CoordinateComponent, ItemStack> = view.materials
 
-    /**
-     * 6x6 crafting items.
-     *
-     * zero origin & do not skip empty slots (do padding = use ItemStack#empty())
-     *
-     *  A search-result is not guaranteed what is not empty.
-     *
-     * @param[player] A craft-request sender.
-     * @param[items] Materials of crafting. this size must equal 36(6*6).
-     * @param[natural] Force to search vanilla recipes or not.(true=not, false=force). The default is true.
-     * @param[onlyFirst] get only first matched custom recipe and mapped. (default = false)
-     * @param[sourceRecipes] A list of searched recipes. (default = CustomCrafterAPI.getRecipes() / since 5.0.10)
-     * @return[SearchResult?] A result of a request. If you send one that contains invalid params, returns null.
-     */
-    fun search(
-        player: Player,
-        items: List<ItemStack>,
-        natural: Boolean = true,
-        onlyFirst: Boolean = false,
-        sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes()
-    ): SearchResult? {
-        if (items.size != 36) return null
-        val inventory: Inventory = Bukkit.createInventory(null, 54)
-        val chunkedInput: List<List<ItemStack>> = items.chunked(6)
-        for (y: Int in (0..<6)) {
-            for (x: Int in (0..<6)) {
-                val index: Int = x + y * 9
-                inventory.setItem(index, chunkedInput[y][x])
+        val customs: MutableList<Pair<CRecipe, MappedRelation>> = mutableListOf()
+        for (recipe in sourceRecipes.filter { r -> r.items.size == mapped.size }) {
+            when (recipe.type) {
+                CRecipeType.NORMAL -> {
+                    if (!normal(mapped, recipe, crafterID)) {
+                        continue
+                    }
+                    val components: Set<MappedRelationComponent> = recipe.items.entries.zip(mapped.entries)
+                        .map { (recipeEntry, inputEntry) -> MappedRelationComponent(recipeEntry.key, inputEntry.key) }
+                        .toSet()
+                    customs.add(recipe to MappedRelation(components))
+                }
+
+                CRecipeType.AMORPHOUS -> {
+                    amorphous(mapped, recipe, crafterID)?.let { relation ->
+                        customs.add(recipe to relation)
+                    }
+                }
+            }
+
+            if (onlyFirst && customs.isNotEmpty()) {
+                break
             }
         }
-
-        return search(player.uniqueId, inventory, natural, onlyFirst, sourceRecipes)
-    }
-
-    internal fun search(
-        crafterID: UUID,
-        inventory: Inventory,
-        natural: Boolean = true,
-        onlyFirst: Boolean = false,
-        sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes()
-    ): SearchResult? {
-        val mapped: Map<CoordinateComponent, ItemStack> = Converter.standardInputMapping(inventory)
-            .takeIf { it?.isNotEmpty() == true } ?: return null
-
-        val customs: List<Pair<CRecipe, MappedRelation>> = sourceRecipes
-            .filter { it.items.size == mapped.size }
-            .map { recipe ->
-                val relation: MappedRelation? =
-                    when (recipe.type) {
-                        CRecipeType.NORMAL -> {
-                            if (normal(mapped, recipe, crafterID)) {
-                                val components: Set<MappedRelationComponent> =
-                                    recipe.items.keys.zip(mapped.keys)
-                                        .map { MappedRelationComponent(it.first, it.second) }
-                                        .toSet()
-                                if (onlyFirst) return SearchResult(null, listOf(recipe to MappedRelation(components)))
-                                MappedRelation(components)
-                            } else {
-                                null
-                            }
-                        }
-                        CRecipeType.AMORPHOUS -> amorphous(mapped, recipe, crafterID)
-                    }
-                Pair(recipe, relation)
-            }
-            .filter { p -> p.second != null }
-            .map { Pair(it.first, it.second as MappedRelation) }
 
         val vanilla: Recipe? =
             if (natural && customs.isNotEmpty()) null
@@ -197,7 +184,7 @@ object Search {
                 val world: World = Bukkit.getPlayer(crafterID)
                     ?.world
                     ?: Bukkit.getWorlds().first()
-                VanillaSearch.search(world, inventory)
+                VanillaSearch.search(world, view)
             }
 
         return SearchResult(vanilla, customs)

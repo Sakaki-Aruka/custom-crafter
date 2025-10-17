@@ -1,11 +1,9 @@
 package io.github.sakaki_aruka.customcrafter.api.search
 
+import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
-import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import org.bukkit.Bukkit
-import org.bukkit.Material
 import org.bukkit.World
-import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.Recipe
 
@@ -15,15 +13,32 @@ object VanillaSearch {
      * but, there is no recipe to find with provided inputs, returns null.
      *
      * @param[world] a crafter exists world
-     * @param[inventory] an input inventory
+     * @param[view] an input view
      * @return[Recipe] a found recipe
      */
     fun search(
         world: World,
-        inventory: Inventory
+        view: CraftView
     ): Recipe? {
-        val mapped: Map<CoordinateComponent, ItemStack> = Converter.standardInputMapping(inventory) ?: return null
-        val nineArray: Array<ItemStack> = getNineItemStackArray(mapped) ?: return null
+        val nineArray: Array<ItemStack> = getNineItemStackArray(view.materials) ?: return null
+        return Bukkit.getCraftingRecipe(nineArray, world)
+    }
+
+    /**
+     * If a recipe found with provided input, returns that.
+     * But, there is no recipe to find with provided inputs, returns null.
+     *
+     * @param[world] crafter exists world
+     * @param[mapped] input items
+     * @return[Recipe] a found recipe
+     * @since v5.0.14
+     */
+    fun search(
+        world: World,
+        mapped: Map<CoordinateComponent, ItemStack>
+    ): Recipe? {
+        val nineArray: Array<ItemStack> = getNineItemStackArray(mapped)
+            ?: return null
         return Bukkit.getCraftingRecipe(nineArray, world)
     }
 
