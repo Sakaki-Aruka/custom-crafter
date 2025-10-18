@@ -245,7 +245,7 @@ object Search {
         recipe: CRecipe
     ): Map<Int, Set<Triple<Int, Boolean, Boolean>>> {
         // Key=RecipeSlot, Value=<InputSlot, Checked, CheckResult>
-        val result: MutableMap<Int, MutableSet<Triple<Int, Boolean, Boolean>>> = mutableMapOf()
+        val result: MutableMap<Int, Set<Triple<Int, Boolean, Boolean>>> = mutableMapOf()
         // map init
         for (x in 0..5) {
             for (y in 0..5) {
@@ -255,13 +255,15 @@ object Search {
         }
 
         for ((r, matter) in recipe.items) {
+            val set: MutableSet<Triple<Int, Boolean, Boolean>> = mutableSetOf()
             for ((i, item) in input.entries) {
                 if (matter.candidate.contains(item.type)) {
-                    result[r.toIndex()]!!.add(Triple(i.toIndex(), true, true))
+                    set.add(Triple(i.toIndex(), true, true))
                 } else {
-                    result[r.toIndex()]!!.add(Triple(i.toIndex(), true, false))
+                    set.add(Triple(i.toIndex(), true, false))
                 }
             }
+            result[r.toIndex()] = set.toSet()
         }
         return result
     }
@@ -272,7 +274,7 @@ object Search {
         filter: CRecipeFilter<T>
     ): Map<Int, Set<Triple<Int, Boolean, Boolean>>> {
         // Key=RecipeSlot, Value=<InputSlot, Checked, CheckResult>
-        val result: MutableMap<Int, MutableSet<Triple<Int, Boolean, Boolean>>> = mutableMapOf()
+        val result: MutableMap<Int, Set<Triple<Int, Boolean, Boolean>>> = mutableMapOf()
         // map init
         for (x in 0..5) {
             for (y in 0..5) {
@@ -282,6 +284,7 @@ object Search {
         }
 
         for ((r, matter) in recipe.items.filter { (_, m)  -> m is T }) {
+            val set: MutableSet<Triple<Int, Boolean, Boolean>> = mutableSetOf()
             for ((i, item) in input.entries) {
                 val (type: CRecipeFilter.ResultType, checkResult: Boolean) = applyNormalFilters(item, matter, filter) ?: continue
                 val filterResult: Boolean = when (type) {
@@ -289,8 +292,9 @@ object Search {
                     CRecipeFilter.ResultType.FAILED -> false
                     CRecipeFilter.ResultType.SUCCESS -> checkResult
                 }
-                result[r.toIndex()]!!.add(Triple(i.toIndex(), true, filterResult))
+                set.add(Triple(i.toIndex(), true, filterResult))
             }
+            result[r.toIndex()] = set.toSet()
         }
         return result
     }
@@ -301,7 +305,7 @@ object Search {
         crafterID: UUID
     ): Map<Int, Set<Triple<Int, Boolean, Boolean>>> {
         // Key=RecipeSlot, Value=<InputSlot, Checked, CheckResult>
-        val result: MutableMap<Int, MutableSet<Triple<Int, Boolean, Boolean>>> = mutableMapOf()
+        val result: MutableMap<Int, Set<Triple<Int, Boolean, Boolean>>> = mutableMapOf()
         // map init
         for (x in 0..5) {
             for (y in 0..5) {
@@ -311,11 +315,13 @@ object Search {
         }
 
         for ((r, matter) in recipe.items) {
+            val set: MutableSet<Triple<Int, Boolean, Boolean>> = mutableSetOf()
             for ((i, item) in input.entries) {
                 if (matter.hasPredicates()) {
-                    result[r.toIndex()]!!.add(Triple(i.toIndex(), true, matter.predicatesResult(item, input, recipe, crafterID)))
+                    set.add(Triple(i.toIndex(), true, matter.predicatesResult(item, input, recipe, crafterID)))
                 }
             }
+            result[r.toIndex()] = set.toSet()
         }
         return result
     }
@@ -325,7 +331,7 @@ object Search {
         recipe: CRecipe
     ): Map<Int, Set<Triple<Int, Boolean, Boolean>>> {
         // Key=RecipeSlot, Value=<InputSlot, Checked, CheckResult>
-        val result: MutableMap<Int, MutableSet<Triple<Int, Boolean, Boolean>>> = mutableMapOf()
+        val result: MutableMap<Int, Set<Triple<Int, Boolean, Boolean>>> = mutableMapOf()
         // map init
         for (x in 0..5) {
             for (y in 0..5) {
@@ -335,6 +341,7 @@ object Search {
         }
 
         for ((r, matter) in recipe.items) {
+            val set: MutableSet<Triple<Int, Boolean, Boolean>> = mutableSetOf()
             for ((i, item) in input.entries) {
                 val amountResult: Boolean =
                     if (matter.mass) {
@@ -342,8 +349,9 @@ object Search {
                     } else {
                         item.amount >= matter.amount
                     }
-                result[r.toIndex()]!!.add(Triple(i.toIndex(), true, amountResult))
+                set.add(Triple(i.toIndex(), true, amountResult))
             }
+            result[r.toIndex()] = set.toSet()
         }
         return result
     }
@@ -357,40 +365,24 @@ object Search {
         // MapKey=RecipeSlot, MapValue=<InputSlot, Checked, CheckResult>
         val results: MutableMap<Int, MutableList<Triple<Int, Boolean, Boolean>>> = mutableMapOf()
 
-        for ((k, v) in getAmorphousCandidateCheckResult(mapped, recipe)) {
-            if (!results.containsKey(k)) {
-                results[k] = v.toMutableList()
-            } else {
-                results[k]!!.addAll(v)
-            }
-        }
-        if (!recipe.filters.isNullOrEmpty()) {
-            for (filter in recipe.filters!!) {
-                for ((k, v) in getAmorphousFilterCheckResult(mapped, recipe, filter)) {
-                    if (!results.containsKey(k)) {
-                        results[k] = v.toMutableList()
-                    } else {
-                        results[k]!!.addAll(v)
-                    }
+        fun addResults(resultMap: Map<Int, Set<Triple<Int, Boolean, Boolean>>>) {
+            for ((k, v) in resultMap) {
+                if (!results.containsKey(k)) {
+                    results[k] = v.toMutableList()
+                } else {
+                    results[k]!!.addAll(v)
                 }
             }
         }
 
-        for ((k, v) in getAmorphousMatterPredicatesCheckResult(mapped, recipe, crafterID)) {
-            if (!results.containsKey(k)) {
-                results[k] = v.toMutableList()
-            } else {
-                results[k]!!.addAll(v)
+        addResults(getAmorphousCandidateCheckResult(mapped, recipe))
+        if (!recipe.filters.isNullOrEmpty()) {
+            for (filter in recipe.filters!!) {
+                addResults(getAmorphousFilterCheckResult(mapped, recipe, filter))
             }
         }
-
-        for ((k, v) in getAmorphousAmountCheckResult(mapped, recipe)) {
-            if (!results.containsKey(k)) {
-                results[k] = v.toMutableList()
-            } else {
-                results[k]!!.addAll(v)
-            }
-        }
+        addResults(getAmorphousMatterPredicatesCheckResult(mapped, recipe, crafterID))
+        addResults(getAmorphousAmountCheckResult(mapped, recipe))
 
         //debug
         for ((k, v) in results.toSortedMap()) {
