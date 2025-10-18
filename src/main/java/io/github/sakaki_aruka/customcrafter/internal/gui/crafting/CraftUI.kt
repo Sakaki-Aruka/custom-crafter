@@ -31,7 +31,7 @@ import java.util.UUID
 import kotlin.math.max
 
 internal class CraftUI(
-    var dopItemsOnClose: Boolean = true
+    var dropItemsOnClose: Boolean = true
 ): CustomCrafterUI, InventoryHolder {
 
     private val inventory: Inventory = Bukkit.createInventory(
@@ -97,7 +97,7 @@ internal class CraftUI(
     }
 
     override fun onClose(event: InventoryCloseEvent) {
-        if (!this.dopItemsOnClose) {
+        if (!this.dropItemsOnClose) {
             return
         }
         val view: CraftView = CraftView.fromInventory(event.inventory) ?: return
@@ -151,7 +151,7 @@ internal class CraftUI(
                         useShift = event.isShiftClick
                     )
                     if (!allCandidateUI.inventory.isEmpty) {
-                        this.dopItemsOnClose = false
+                        this.dropItemsOnClose = false
                         player.openInventory(allCandidateUI.inventory)
                     }
                 } else {
