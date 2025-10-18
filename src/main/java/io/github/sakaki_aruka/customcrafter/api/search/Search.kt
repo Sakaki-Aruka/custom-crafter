@@ -384,11 +384,6 @@ object Search {
         addResults(getAmorphousMatterPredicatesCheckResult(mapped, recipe, crafterID))
         addResults(getAmorphousAmountCheckResult(mapped, recipe))
 
-        //debug
-        for ((k, v) in results.toSortedMap()) {
-            println("k=$k, v=$v")
-        }
-
         val merged: MutableMap<Int, MutableSet<Int>> = mutableMapOf()
         for ((k, set) in results) {
             val candidates: MutableSet<Int> = mutableSetOf()
@@ -407,11 +402,6 @@ object Search {
                 candidates.add(slot)
             }
             merged[k] = candidates
-        }
-
-        //debug
-        for ((k, v) in merged.toSortedMap()) {
-            println("(merged) k=$k, v=${v.sorted()}")
         }
 
         val model = Model("ExactCoverProblem")
