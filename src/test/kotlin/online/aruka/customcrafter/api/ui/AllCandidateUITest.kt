@@ -83,7 +83,7 @@ object AllCandidateUITest {
             view = view
         )
 
-        assertEquals(result.size(), 50)
+        assertEquals(50, result.size())
 
         val allCandidateUI = AllCandidateUI(
             view = view,
@@ -93,23 +93,23 @@ object AllCandidateUITest {
         )
 
         assertTrue(allCandidateUI.canFlipPage())
-        assertEquals(allCandidateUI.currentPage, 0)
+        assertEquals(0, allCandidateUI.currentPage)
 
         val firstPageDisplayedItems = (0..<45).mapNotNull { i ->
             allCandidateUI.inventory.getItem(i)
         }.filter { item -> !item.isEmpty }
-        assertEquals(firstPageDisplayedItems.size, 45)
+        assertEquals(45, firstPageDisplayedItems.size)
 
         // 50 recipes -> 2 pages (index=[0, 1])
         // set last page
         allCandidateUI.flipPage()
-        assertEquals(allCandidateUI.currentPage, 1)
+        assertEquals(1, allCandidateUI.currentPage)
         assertFalse(allCandidateUI.canFlipPage())
 
         val secondPageDisplayedItems = (0..<45).mapNotNull { i ->
             allCandidateUI.inventory.getItem(i)
         }.filter { item -> !item.isEmpty }
-        assertEquals(secondPageDisplayedItems.size, 5)
+        assertEquals(5, secondPageDisplayedItems.size)
     }
 
     @Test
@@ -126,7 +126,7 @@ object AllCandidateUITest {
             view = view
         )
 
-        assertEquals(result.size(), 50)
+        assertEquals(50, result.size())
 
         val allCandidateUI = AllCandidateUI(
             view = view,
@@ -136,12 +136,12 @@ object AllCandidateUITest {
         )
 
         assertTrue(allCandidateUI.canFlipPage())
-        assertEquals(allCandidateUI.currentPage, 0)
+        assertEquals(0, allCandidateUI.currentPage)
 
         val firstPageDisplayedItems = (0..<45).mapNotNull { i ->
             allCandidateUI.inventory.getItem(i)
         }.filter { item -> !item.isEmpty }
-        assertEquals(firstPageDisplayedItems.size, 45)
+        assertEquals(45, firstPageDisplayedItems.size)
 
         player.openInventory(allCandidateUI.inventory)
 
@@ -158,8 +158,8 @@ object AllCandidateUITest {
         val secondPageDisplayedItems = (0..<45).mapNotNull { i ->
             allCandidateUI.inventory.getItem(i)
         }.filter { item -> !item.isEmpty }
-        assertEquals(allCandidateUI.currentPage, 1)
-        assertEquals(secondPageDisplayedItems.size, 5)
+        assertEquals(1, allCandidateUI.currentPage)
+        assertEquals(5, secondPageDisplayedItems.size)
     }
 
     @Test
@@ -176,7 +176,7 @@ object AllCandidateUITest {
             view = view
         )
 
-        assertEquals(result.size(), 50)
+        assertEquals(50, result.size())
 
         val allCandidateUI = AllCandidateUI(
             view = view,
@@ -185,7 +185,7 @@ object AllCandidateUITest {
             useShift = false
         )
 
-        assertEquals(allCandidateUI.currentPage, 0)
+        assertEquals(0, allCandidateUI.currentPage)
         assertFalse(allCandidateUI.canFlipBackPage())
 
         allCandidateUI.flipPage()
@@ -193,17 +193,17 @@ object AllCandidateUITest {
         val secondPageDisplayedItems = (0..<45).mapNotNull { i ->
             allCandidateUI.inventory.getItem(i)
         }.filter { item -> !item.isEmpty }
-        assertEquals(secondPageDisplayedItems.size, 5)
+        assertEquals(5, secondPageDisplayedItems.size)
 
         assertTrue(allCandidateUI.canFlipBackPage())
 
         allCandidateUI.flipBackPage()
-        assertEquals(allCandidateUI.currentPage, 0)
+        assertEquals(0, allCandidateUI.currentPage)
 
         val firstPageDisplayedItems = (0..<45).mapNotNull { i ->
             allCandidateUI.inventory.getItem(i)
         }.filter { item -> !item.isEmpty }
-        assertEquals(firstPageDisplayedItems.size, 45)
+        assertEquals(45, firstPageDisplayedItems.size)
     }
 
     @Test
@@ -220,7 +220,7 @@ object AllCandidateUITest {
             view = view
         )
 
-        assertEquals(result.size(), 50)
+        assertEquals(50, result.size())
 
         val allCandidateUI = AllCandidateUI(
             view = view,
@@ -230,7 +230,7 @@ object AllCandidateUITest {
         )
 
         player.openInventory(allCandidateUI.inventory)
-        assertEquals(allCandidateUI.currentPage, 0)
+        assertEquals(0, allCandidateUI.currentPage)
 
         allCandidateUI.flipPage()
 
@@ -247,8 +247,8 @@ object AllCandidateUITest {
         val firstPageDisplayedItems = (0..<45).mapNotNull { i ->
             allCandidateUI.inventory.getItem(i)
         }.filter { item -> !item.isEmpty }
-        assertEquals(allCandidateUI.currentPage, 0)
-        assertEquals(firstPageDisplayedItems.size, 45)
+        assertEquals(0, allCandidateUI.currentPage)
+        assertEquals(45, firstPageDisplayedItems.size)
     }
 
     @Test
@@ -264,7 +264,7 @@ object AllCandidateUITest {
             view = view
         )
 
-        assertEquals(result.size(), 50)
+        assertEquals(50, result.size())
 
         val allCandidateUI = AllCandidateUI(
             view = view,
@@ -274,7 +274,7 @@ object AllCandidateUITest {
         )
 
         player.openInventory(allCandidateUI.inventory)
-        assertEquals(allCandidateUI.currentPage, 0)
+        assertEquals(0, allCandidateUI.currentPage)
         assertTrue(allCandidateUI.inventory.getItem(AllCandidateUI.BACK_TO_CRAFT) != null)
         assertTrue(allCandidateUI.inventory.getItem(AllCandidateUI.BACK_TO_CRAFT)!!.isSimilar(AllCandidateUI.BACK_TO_CRAFT_BUTTON))
 
