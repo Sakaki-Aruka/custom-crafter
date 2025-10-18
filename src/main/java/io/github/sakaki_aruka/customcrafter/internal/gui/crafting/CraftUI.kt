@@ -240,13 +240,14 @@ internal class CraftUI(
     override fun getInventory(): Inventory = this.inventory
 
     fun toView(
-        paddingAir: Boolean = false
+        noAir: Boolean = true
     ): CraftView {
         val materials: MutableMap<CoordinateComponent, ItemStack> = mutableMapOf()
         for (slot in Converter.getAvailableCraftingSlotIndices()) {
             val c: CoordinateComponent = CoordinateComponent.fromIndex(slot)
             val item: ItemStack = this.inventory.getItem(slot)
-                ?: if (paddingAir) ItemStack.empty() else continue
+                ?.takeIf { item -> !item.isEmpty }
+                ?: if (noAir) continue else ItemStack.empty()
             materials[c] = item
         }
 
