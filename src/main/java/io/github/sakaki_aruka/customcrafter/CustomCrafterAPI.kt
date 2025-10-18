@@ -4,19 +4,12 @@ import io.github.sakaki_aruka.customcrafter.api.event.CustomCrafterAPIProperties
 import io.github.sakaki_aruka.customcrafter.api.event.RegisterCustomRecipeEvent
 import io.github.sakaki_aruka.customcrafter.api.event.UnregisterCustomRecipeEvent
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
-import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
-import io.github.sakaki_aruka.customcrafter.api.search.Search
-import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.bukkit.Material
-import org.bukkit.block.Block
-import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.Recipe
-import org.jetbrains.annotations.TestOnly
 
 object CustomCrafterAPI {
     /**
