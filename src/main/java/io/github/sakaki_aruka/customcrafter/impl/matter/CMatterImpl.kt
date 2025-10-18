@@ -39,12 +39,60 @@ data class CMatterImpl(
          *
          * its name is [material]'s name. `material.name`.
          *
+         * ```kotlin
+         * // below 2 matters are same
+         * val matter = CMatterImpl.single(Material.STONE)
+         *
+         * val matter = CMatterImpl(
+         *     name = "STONE",
+         *     candidate = setOf(Material.STONE),
+         *     amount = 1,
+         *     mass = false,
+         *     predicates = null
+         * )
+         * ```
+         *
          * @param[material] a candidate of this matter.
          */
-        fun single(material: Material): CMatter {
+        fun single(material: Material): CMatterImpl {
+            if (material.isAir || !material.isItem) {
+                throw IllegalArgumentException("'material' must be 'Material#isItem' and '!Material#isAir'.")
+            }
             return CMatterImpl(
                 name = material.name,
                 candidate = setOf(material)
+            )
+        }
+
+        /**
+         * Returns multi candidate [CMatterImpl].
+         *
+         * ```kotlin
+         * // below 2 matters are same
+         * val matter = CMatterImpl.multi(Material.STONE, Material.COBBLESTONE)
+         *
+         * val matter = CMatterImpl(
+         *     name = "STONE-COBBLESTONE",
+         *     candidate = setOf(Material.STONE, Material.COBBLESTONE),
+         *     amount = 1,
+         *     mass = false,
+         *     predicates = null
+         * )
+         * ```
+         *
+         * @param[materials] Candidate materials
+         * @return[CMatterImpl] Built matter
+         * @throws[IllegalArgumentException] Throws when [materials] is empty and contains invalid material
+         */
+        fun multi(vararg materials: Material): CMatter {
+            if (materials.isEmpty() || (materials.size == 1 && materials.first().isAir)) {
+                throw IllegalArgumentException("'materials' must contain correct material type.")
+            } else if (materials.any { m -> m.isAir || !m.isItem }) {
+                throw IllegalArgumentException("'materials' only allowed to contain 'Material#isItem' types.")
+            }
+            return CMatterImpl(
+                name = materials.joinToString("-") { m -> m.name },
+                candidate = materials.toSet()
             )
         }
     }

@@ -381,6 +381,9 @@ object CustomCrafterAPI {
      * @param[recipe] a recipe what you want to register.
      */
     fun registerRecipe(recipe: CRecipe): Boolean {
+        if (recipe.items.values.any { matter -> matter.candidate.any { c -> c.isAir || !c.isItem } }) {
+            throw IllegalArgumentException("'material' must be 'Material#isItem' and '!Material#isAir'.")
+        }
         if (!RegisterCustomRecipeEvent(recipe).callEvent()) return false
         return synchronized(CustomCrafter.RECIPES) {
             CustomCrafter.RECIPES.add(recipe)
