@@ -24,7 +24,7 @@ object CustomCrafterAPI {
      *
      * This version is different with the plugin version string.
      */
-    const val API_VERSION: String = "0.1.13-1"
+    const val API_VERSION: String = "0.1.14"
 
     /**
      * Custom Crafter API is stable or not.
@@ -266,7 +266,7 @@ object CustomCrafterAPI {
      * @since 5.0.13
      */
     fun hasFullCompatibility(version: String): Boolean {
-        return version in setOf("0.1.13", "0.1.13-1")
+        return version in setOf("0.1.14")
     }
 
 
