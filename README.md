@@ -13,11 +13,17 @@ custom crafter is a plugin for PaperMC servers that provides custom recipes.
 ---
 
 # Support versions
-Paper
-- v5.0.13 -: `1.21.4 -`
-- v5.0.0 - v5.0.11: `1.21.3 - `
-- v4.3: `1.21.3`
-- v4.2: `1.20.1 - 1.20.4`
+Paper  
+
+| Custom Crafter Version | Paper Version   |
+|------------------------|-----------------|
+| 5.0.14 (latest)        | 1.21.4 ~        |
+| 5.0.13, 5.0.13-1       | 1.21.4 ~        |
+| 5.0.0 ~ 5.0.11         | 1.21.3          |
+| 4.3 (legacy)           | 1.21.3          |
+| 4.2 (legacy)           | 1.20.1 ~ 1.20.4 |
+
+(v5.0.12 did not release.)  
 
 **WARNING: custom crafter does not support to run on Spigot servers.**
 
@@ -57,7 +63,7 @@ The latest provided version
    <dependency>
       <groupId>com.github.Sakaki-Aruka</groupId>
       <artifactId>custom-crafter</artifactId>
-      <version>5.0.13-1</version>
+      <version>5.0.14</version>
       <scope>provided</scope>
    </dependency>
 </dependencies>
@@ -82,7 +88,7 @@ dependencyResolutionManagement {
 (dependency)
 ```groovy
 dependencies {
-   compileOnly 'com.github.Sakaki-Aruka:custom-crafter:5.0.13-1'
+   compileOnly 'com.github.Sakaki-Aruka:custom-crafter:5.0.14'
 }
 ```
 
@@ -103,7 +109,7 @@ repositories {
 (dependency)
 ```
 dependencies {
-    compileOnly("com.github.Sakaki-Aruka:custom-crafter:5.0.13-1")
+    compileOnly("com.github.Sakaki-Aruka:custom-crafter:5.0.14")
 }
 ```
 
