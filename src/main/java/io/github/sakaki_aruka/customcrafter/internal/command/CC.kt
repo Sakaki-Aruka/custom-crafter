@@ -4,16 +4,13 @@ import com.mojang.brigadier.arguments.BoolArgumentType
 import com.mojang.brigadier.arguments.IntegerArgumentType
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
-import io.github.sakaki_aruka.customcrafter.CustomCrafter
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter.toComponent
-import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
-import org.bukkit.scheduler.BukkitRunnable
 
 internal object CC {
     /*
@@ -27,18 +24,14 @@ internal object CC {
      *   - AUTHORS
      *   - RESULT_GIVE_CANCEL
      *   - BASE_BLOCK
-     *   - AUTO_CRAFTING_BASE_BLOCK
      *   - USE_MULTIPLE_RESULT_CANDIDATE_FEATURE
-     *   - USE_AUTO_CRAFTING_FEATURE
      *   - BASE_BLOCK_SIDE
-     *   - AUTO_CRAFTING_BASE_BLOCK_SIDE (Internal API)
      *   - (5.0.13) REGISTERED_RECIPE_NAMES
      *
      * - Set Part
      *   - RESULT_GIVE_CANCEL
      *   - BASE_BLOCK
      *   - USE_MULTIPLE_RESULT_CANDIDATE_FEATURE
-     *   - USE_AUTO_CRAFTING_FEATURE
      *   - BASE_BLOCK_SIDE
      */
 
@@ -108,7 +101,6 @@ internal object CC {
     //     *   - RESULT_GIVE_CANCEL
     //     *   - BASE_BLOCK
     //     *   - USE_MULTIPLE_RESULT_CANDIDATE_FEATURE
-    //     *   - USE_AUTO_CRAFTING_FEATURE
     //     *   - BASE_BLOCK_SIDE
 
     private val Set: LiteralArgumentBuilder<CommandSourceStack> = Commands.literal("set")
