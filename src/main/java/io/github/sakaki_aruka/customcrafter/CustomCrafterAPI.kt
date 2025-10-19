@@ -380,7 +380,7 @@ object CustomCrafterAPI {
      * in normally, a result of `RECIPES.add(recipe)`.
      *
      * @param[recipe] a recipe what you want to register.
-     * @throws[IllegalArgumentException] Calls when the specified recipe is invalid
+     * @throws[IllegalStateException] Calls when the specified recipe is invalid
      */
     fun registerRecipe(recipe: CRecipe): Boolean {
         CRecipe.isValidCRecipe(recipe).exceptionOrNull()?.let { t -> throw t }
