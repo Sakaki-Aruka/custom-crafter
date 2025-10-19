@@ -85,15 +85,14 @@ data class CMatterImpl(
          * @throws[IllegalArgumentException] Throws when [materials] is empty and contains invalid material
          */
         fun multi(vararg materials: Material): CMatter {
-            if (materials.isEmpty() || (materials.size == 1 && materials.first().isAir)) {
-                throw IllegalArgumentException("'materials' must contain correct material type.")
-            } else if (materials.any { m -> m.isAir || !m.isItem }) {
-                throw IllegalArgumentException("'materials' only allowed to contain 'Material#isItem' types.")
-            }
-            return CMatterImpl(
+            val matter = CMatterImpl(
                 name = materials.joinToString("-") { m -> m.name },
                 candidate = materials.toSet()
             )
+
+            val checkResult: Result<Unit> = CMatter.isValidCMatter(matter)
+            checkResult.exceptionOrNull()?.let { t -> throw t }
+            return matter
         }
     }
 }

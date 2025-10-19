@@ -1,12 +1,16 @@
 # Changelog
 
 # 5.0.14
-Delete auto-crafting feature and internal changes.    
+Delete auto-crafting feature, internal changes.  
+
 ## Feature
 - [Deleted] Auto-Crafting feature deleted.
 ## Code
 - [Added] `CRecipeImpl` amorphous recipe init wrapper
 - [Added] `VanillaSearch` new search function signature
+- [Added] To `CustomCrafterAPI#registerRecipe`, recipe validation
+- [Added] `CMatter` check function. `CMatter#isValidCMatter`
+- [Added] `CRecipe` check function. `CRecipe#isValidCRecipe`
 - [Changed] `Search#search` signatures
   - `items: List<ItemStack>` type changed to `Array<ItemStack>`
   - `inventory: Inventory` changed to `view: CraftView`

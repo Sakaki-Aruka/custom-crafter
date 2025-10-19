@@ -64,6 +64,7 @@ data class CRecipeImpl(
          * This calls the constructor with arguments and [CRecipeType.AMORPHOUS].
          * @return[CRecipeImpl] an amorphous recipe
          * @throws[IllegalArgumentException] Throws if [items] size is out of the range (1 ~ 36).
+         * @throws[IllegalStateException] Throws if built recipe is invalid.
          * @since v5.0.14
          */
         fun amorphous(
@@ -80,7 +81,7 @@ data class CRecipeImpl(
                 CustomCrafterAPI.getRandomNCoordinates(items.size)
                     .zip(items)
                     .associate { (c, m) -> c to m }
-            return CRecipeImpl(
+            val recipe = CRecipeImpl(
                 name = name,
                 items = map,
                 type = CRecipeType.AMORPHOUS,
@@ -88,6 +89,8 @@ data class CRecipeImpl(
                 results = results,
                 filters = filters
             )
+            CRecipe.isValidCRecipe(recipe).exceptionOrNull()?.let { t -> throw t }
+            return recipe
         }
     }
 }

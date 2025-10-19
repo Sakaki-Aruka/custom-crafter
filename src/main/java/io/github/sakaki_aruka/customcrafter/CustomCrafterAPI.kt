@@ -3,6 +3,7 @@ package io.github.sakaki_aruka.customcrafter
 import io.github.sakaki_aruka.customcrafter.api.event.CustomCrafterAPIPropertiesChangeEvent
 import io.github.sakaki_aruka.customcrafter.api.event.RegisterCustomRecipeEvent
 import io.github.sakaki_aruka.customcrafter.api.event.UnregisterCustomRecipeEvent
+import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import net.kyori.adventure.text.Component
@@ -379,11 +380,10 @@ object CustomCrafterAPI {
      * in normally, a result of `RECIPES.add(recipe)`.
      *
      * @param[recipe] a recipe what you want to register.
+     * @throws[IllegalArgumentException] Calls when the specified recipe is invalid
      */
     fun registerRecipe(recipe: CRecipe): Boolean {
-        if (recipe.items.values.any { matter -> matter.candidate.any { c -> c.isAir || !c.isItem } }) {
-            throw IllegalArgumentException("'material' must be 'Material#isItem' and '!Material#isAir'.")
-        }
+        CRecipe.isValidCRecipe(recipe).exceptionOrNull()?.let { t -> throw t }
         if (!RegisterCustomRecipeEvent(recipe).callEvent()) return false
         return synchronized(CustomCrafter.RECIPES) {
             CustomCrafter.RECIPES.add(recipe)
