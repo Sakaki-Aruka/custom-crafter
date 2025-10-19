@@ -2,7 +2,7 @@
 <html class="no-js">
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
-    <title>Companion</title>
+    <title>multi</title>
     <link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg">
     <script>var pathToRoot = "../../../../";</script>
     <script>document.documentElement.classList.replace("no-js","js");</script>
@@ -61,36 +61,12 @@
                 <div class="sidebar--inner" id="sideMenu"></div>
             </div>
             <div id="main">
-<div class="main-content" data-page-type="classlike" id="content" pageIds="custom-crafter::io.github.sakaki_aruka.customcrafter.api.interfaces.recipe/AutoCraftRecipe.Companion///PointingToDeclaration//-1417057397">
-  <div class="breadcrumbs"><a href="../../../../index.html">custom-crafter</a><span class="delimiter">/</span><a href="../../index.html">io.github.sakaki_aruka.customcrafter.api.interfaces.recipe</a><span class="delimiter">/</span><a href="../index.html">AutoCraftRecipe</a><span class="delimiter">/</span><span class="current">Companion</span></div>
+<div class="main-content" data-page-type="member" id="content" pageIds="custom-crafter::io.github.sakaki_aruka.customcrafter.impl.matter/CMatterImpl.Companion/multi/#kotlin.Array[org.bukkit.Material]/PointingToDeclaration//-1417057397">
+  <div class="breadcrumbs"><a href="../../../../index.html">custom-crafter</a><span class="delimiter">/</span><a href="../../index.html">io.github.sakaki_aruka.customcrafter.impl.matter</a><span class="delimiter">/</span><a href="../index.html">CMatterImpl</a><span class="delimiter">/</span><a href="index.html">Companion</a><span class="delimiter">/</span><span class="current">multi</span></div>
   <div class="cover ">
-    <h1 class="cover"><span><span>Companion</span></span></h1>
-    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="custom-crafter/JVM"><div class="symbol monospace"><span class="token keyword">object </span><a href="index.html">Companion</a></div></div></div>
+    <h1 class="cover"><span><span>multi</span></span></h1>
   </div>
-  <div class="tabbedcontent">
-    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
-    <div class="tabs-section-body">
-      <div data-togglable="FUNCTION">
-        <h2 class="">Functions</h2>
-        <div class="table"><a data-name="326080207%2FFunctions%2F-1417057397" anchor-label="getDefaultDisplayItemProvider" id="326080207%2FFunctions%2F-1417057397" data-filterable-set="custom-crafter/JVM"></a>
-          <div class="table-row" data-filterable-current="custom-crafter/JVM" data-filterable-set="custom-crafter/JVM">
-            <div class="main-subrow keyValue ">
-              <div class=""><span class="inline-flex">
-                  <div><a href="get-default-display-item-provider.html"><span>get</span><wbr></wbr><span>Default</span><wbr></wbr><span>Display</span><wbr></wbr><span>Item</span><wbr></wbr><span><span>Provider</span></span></a></div>
-<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="326080207%2FFunctions%2F-1417057397"></span>
-                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
-                  </span></span></div>
-              <div>
-                <div class="title">
-                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="custom-crafter/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="get-default-display-item-provider.html"><span class="token function">getDefaultDisplayItemProvider</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">recipeName<span class="token operator">: </span><a href="https://kotlinlang.org/api/latest/jvm/stdlib/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><span class="token punctuation">(</span><span data-unresolved-link="org.bukkit.entity/Player///PointingToDeclaration/">Player</span><span class="token punctuation">, </span><span data-unresolved-link="org.bukkit.block/Block///PointingToDeclaration/">Block</span><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span></div><div class="brief "><p class="paragraph">Returns a default display item resolver.</p></div></div></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="custom-crafter/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="multi.html"><span class="token function">multi</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">vararg </span>materials<span class="token operator">: </span><span data-unresolved-link="org.bukkit/Material///PointingToDeclaration/">Material</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="../../../io.github.sakaki_aruka.customcrafter.api.interfaces.matter/-c-matter/index.html">CMatter</a></div><p class="paragraph">Returns multi candidate <a href="../index.html">CMatterImpl</a>.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">// below 2 matters are same<br>val matter = CMatterImpl.multi(Material.STONE, Material.COBBLESTONE)<br><br>val matter = CMatterImpl(<br>    name = &quot;STONE-COBBLESTONE&quot;,<br>    candidate = setOf(Material.STONE, Material.COBBLESTONE),<br>    amount = 1,<br>    mass = false,<br>    predicates = null<br>)</code></pre><span class="top-right-position"><span class="copy-icon"></span><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div></span></div><span class="kdoc-tag"><h4 class="">Return</h4><p class="paragraph"><a href="../index.html">CMatterImpl</a> Built matter</p></span><h4 class="">Parameters</h4><div class="table"><div class="table-row" data-filterable-current="custom-crafter/JVM" data-filterable-set="custom-crafter/JVM"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>materials</span></span></u></div></span></div><div><div class="title"><p class="paragraph">Candidate materials</p></div></div></div></div></div><h4 class="">Throws</h4><div class="table"><div class="table-row" data-filterable-current="custom-crafter/JVM" data-filterable-set="custom-crafter/JVM"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="https://docs.oracle.com/javase/8/docs/api/java/lang/IllegalStateException.html"><span>Illegal</span><wbr></wbr><span>State</span><wbr></wbr><span><span>Exception</span></span></a></div></span></div><div><div class="title"><p class="paragraph">Throws when <a href="multi.html">materials</a> is empty and contains invalid material</p></div></div></div></div></div></div></div>
 </div>
       <div class="footer">
         <span class="go-to-top-icon"><a href="#content" id="go-to-top-link"></a></span><span>© 2025 Copyright</span><span
