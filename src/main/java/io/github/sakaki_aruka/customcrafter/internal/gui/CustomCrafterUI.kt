@@ -1,7 +1,6 @@
 package io.github.sakaki_aruka.customcrafter.internal.gui
 
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter.toComponent
-import io.github.sakaki_aruka.customcrafter.internal.gui.autocraft.AutoCraftUI
 import io.github.sakaki_aruka.customcrafter.internal.gui.crafting.CraftUI
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -57,8 +56,7 @@ internal interface CustomCrafterUI {
     interface InteractTriggered {
         companion object {
             val PAGES: Set<InteractTriggered> = setOf(
-                CraftUI,
-                AutoCraftUI
+                CraftUI
             )
         }
         fun isTrigger(event: PlayerInteractEvent): Boolean

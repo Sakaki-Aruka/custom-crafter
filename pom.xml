@@ -6,7 +6,7 @@
 
     <groupId>io.github.sakaki_aruka</groupId>
     <artifactId>custom-crafter</artifactId>
-    <version>5.0.13-1</version>
+    <version>5.0.14</version>
     <packaging>jar</packaging>
 
     <name>Custom Crafter</name>
@@ -122,14 +122,6 @@
                                     <pattern>org.jetbrains.kotlin</pattern>
                                     <shadedPattern>kotlin.shade.io.github.sakaki_aruka</shadedPattern>
                                 </relocation>
-                                <relocation>
-                                    <pattern>com.zaxxer</pattern>
-                                    <shadedPattern>zaxxer.shaded.io.github.sakaki_aruka</shadedPattern>
-                                </relocation>
-                                <relocation>
-                                    <pattern>org.ktorm</pattern>
-                                    <shadedPattern>ktorm.shaded.io.github.sakaki_aruka</shadedPattern>
-                                </relocation>
                             </relocations>
                         </configuration>
                     </execution>
@@ -178,22 +170,16 @@
         <!-- /Kotlin -->
 
         <dependency>
-            <groupId>org.ktorm</groupId>
-            <artifactId>ktorm-core</artifactId>
-            <version>4.1.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
-            <version>6.3.0</version>
-        </dependency>
-
-        <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
             <version>1.21.4-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.choco-solver</groupId>
+            <artifactId>choco-solver</artifactId>
+            <version>5.0.0-beta.1</version>
         </dependency>
 
         <dependency>
@@ -220,13 +206,6 @@
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-test-junit5</artifactId>
             <version>${kotlin.version}</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.xerial</groupId>
-            <artifactId>sqlite-jdbc</artifactId>
-            <version>3.50.3.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

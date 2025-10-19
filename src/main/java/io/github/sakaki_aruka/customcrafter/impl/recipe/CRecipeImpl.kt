@@ -31,38 +31,6 @@ data class CRecipeImpl(
     override val filters: Set<CRecipeFilter<CMatter>>? = getDefaultFilters()
 ): CRecipe {
     /**
-     * This constructor provides only a recipe that is CRecipeType#ARMOPHOUS. (= shapeless recipe.)
-     *
-     * So, [type] is automatically specified.
-     *
-     * Other parameters are same with default the default constructor,
-     * but [items] type is changed to `List<CMatter>` from `Map<CoordinateComponent, CMatter>`
-     *
-     * @param[name] A name of this recipe.
-     * @param[items] Elements of this recipe.
-     * @param[containers] Containers of this recipe. (default = null)
-     * @param[results] A [ResultSupplier] list. (default = null)
-     * @param[filters] A recipe filters. (default = [getDefaultFilters])
-     * @since 5.0.9
-     */
-    constructor(
-        name: String,
-        items: List<CMatter>,
-        containers: List<CRecipeContainer>? = null,
-        results: List<ResultSupplier>? = null,
-        filters: Set<CRecipeFilter<CMatter>>? = getDefaultFilters()
-    ): this(
-        name = name,
-        items = CustomCrafterAPI.getRandomNCoordinates(items.size)
-            .zip(items)
-            .toMap(),
-        containers = containers,
-        results = results,
-        filters = filters,
-        type = CRecipeType.AMORPHOUS
-    )
-
-    /**
      * @see[CRecipe.replaceItems]
      */
     override fun replaceItems(newItems: Map<CoordinateComponent, CMatter>): CRecipeImpl {
@@ -88,6 +56,41 @@ data class CRecipeImpl(
                 EnchantStorageFilter,
                 PotionFilter
             )
+        }
+
+        /**
+         * Amorphous recipe build wrapper.
+         *
+         * This calls the constructor with arguments and [CRecipeType.AMORPHOUS].
+         * @return[CRecipeImpl] an amorphous recipe
+         * @throws[IllegalArgumentException] Throws if [items] size is out of the range (1 ~ 36).
+         * @throws[IllegalStateException] Throws if built recipe is invalid.
+         * @since v5.0.14
+         */
+        fun amorphous(
+            name: String,
+            items: List<CMatter>,
+            containers: List<CRecipeContainer>? = null,
+            results: List<ResultSupplier>? = null,
+            filters: Set<CRecipeFilter<CMatter>>? = getDefaultFilters()
+        ): CRecipeImpl {
+            if (items.isEmpty() || items.size > 36) {
+                throw IllegalArgumentException("'items' size must be in range of 1 to 36.")
+            }
+            val map: Map<CoordinateComponent, CMatter> =
+                CustomCrafterAPI.getRandomNCoordinates(items.size)
+                    .zip(items)
+                    .associate { (c, m) -> c to m }
+            val recipe = CRecipeImpl(
+                name = name,
+                items = map,
+                type = CRecipeType.AMORPHOUS,
+                containers = containers,
+                results = results,
+                filters = filters
+            )
+            CRecipe.isValidCRecipe(recipe).exceptionOrNull()?.let { t -> throw t }
+            return recipe
         }
     }
 }

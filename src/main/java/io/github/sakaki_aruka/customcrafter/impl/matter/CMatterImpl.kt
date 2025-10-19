@@ -39,13 +39,60 @@ data class CMatterImpl(
          *
          * its name is [material]'s name. `material.name`.
          *
+         * ```kotlin
+         * // below 2 matters are same
+         * val matter = CMatterImpl.single(Material.STONE)
+         *
+         * val matter = CMatterImpl(
+         *     name = "STONE",
+         *     candidate = setOf(Material.STONE),
+         *     amount = 1,
+         *     mass = false,
+         *     predicates = null
+         * )
+         * ```
+         *
          * @param[material] a candidate of this matter.
          */
-        fun single(material: Material): CMatter {
+        fun single(material: Material): CMatterImpl {
+            if (material.isAir || !material.isItem) {
+                throw IllegalArgumentException("'material' must be 'Material#isItem' and '!Material#isAir'.")
+            }
             return CMatterImpl(
                 name = material.name,
                 candidate = setOf(material)
             )
+        }
+
+        /**
+         * Returns multi candidate [CMatterImpl].
+         *
+         * ```kotlin
+         * // below 2 matters are same
+         * val matter = CMatterImpl.multi(Material.STONE, Material.COBBLESTONE)
+         *
+         * val matter = CMatterImpl(
+         *     name = "STONE-COBBLESTONE",
+         *     candidate = setOf(Material.STONE, Material.COBBLESTONE),
+         *     amount = 1,
+         *     mass = false,
+         *     predicates = null
+         * )
+         * ```
+         *
+         * @param[materials] Candidate materials
+         * @return[CMatterImpl] Built matter
+         * @throws[IllegalStateException] Throws when [materials] is empty and contains invalid material
+         */
+        fun multi(vararg materials: Material): CMatter {
+            val matter = CMatterImpl(
+                name = materials.joinToString("-") { m -> m.name },
+                candidate = materials.toSet()
+            )
+
+            val checkResult: Result<Unit> = CMatter.isValidCMatter(matter)
+            checkResult.exceptionOrNull()?.let { t -> throw t }
+            return matter
         }
     }
 }

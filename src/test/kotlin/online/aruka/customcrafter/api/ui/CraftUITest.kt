@@ -1,10 +1,8 @@
 package online.aruka.customcrafter.api.ui
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
-import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
-import io.github.sakaki_aruka.customcrafter.api.search.Search
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
 import io.github.sakaki_aruka.customcrafter.impl.recipe.CRecipeImpl
 import io.github.sakaki_aruka.customcrafter.internal.gui.crafting.CraftUI
@@ -47,7 +45,7 @@ internal object CraftUITest {
         }
 
         val matter = CMatterImpl.single(Material.STONE)
-        val items = CoordinateComponent.square(3).associateWith { c -> matter }
+        val items = CoordinateComponent.square(3).associateWith { _ -> matter }
         val recipe = CRecipeImpl(
             name = "",
             items = items,

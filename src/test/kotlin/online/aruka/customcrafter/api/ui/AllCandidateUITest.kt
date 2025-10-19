@@ -1,7 +1,6 @@
 package online.aruka.customcrafter.api.ui
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
-import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.search.Search
@@ -23,6 +22,7 @@ import org.mockbukkit.mockbukkit.MockBukkit
 import org.mockbukkit.mockbukkit.ServerMock
 import org.mockbukkit.mockbukkit.world.WorldMock
 import java.util.UUID
+import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -48,7 +48,7 @@ object AllCandidateUITest {
         }
 
         val matter = CMatterImpl.single(Material.STONE)
-        val items = CoordinateComponent.square(3).associateWith { c -> matter }
+        val items = CoordinateComponent.square(3).associateWith { _ -> matter }
         val recipe = CRecipeImpl(
             name = "",
             items = items,
@@ -77,14 +77,13 @@ object AllCandidateUITest {
             craftUI.inventory.setItem(c.toIndex(), ItemStack(Material.STONE))
         }
 
-        val view = CraftView.fromInventory(craftUI.inventory)!!
+        val view = craftUI.toView()
         val result = Search.search(
             crafterID = UUID.randomUUID(),
             view = view
         )
 
-        assertTrue(result != null)
-        assertTrue(result.size() == 50)
+        assertEquals(50, result.size())
 
         val allCandidateUI = AllCandidateUI(
             view = view,
@@ -94,23 +93,23 @@ object AllCandidateUITest {
         )
 
         assertTrue(allCandidateUI.canFlipPage())
-        assertTrue(allCandidateUI.currentPage == 0)
+        assertEquals(0, allCandidateUI.currentPage)
 
         val firstPageDisplayedItems = (0..<45).mapNotNull { i ->
             allCandidateUI.inventory.getItem(i)
         }.filter { item -> !item.isEmpty }
-        assertTrue(firstPageDisplayedItems.size == 45)
+        assertEquals(45, firstPageDisplayedItems.size)
 
         // 50 recipes -> 2 pages (index=[0, 1])
         // set last page
         allCandidateUI.flipPage()
-        assertTrue(allCandidateUI.currentPage == 1)
+        assertEquals(1, allCandidateUI.currentPage)
         assertFalse(allCandidateUI.canFlipPage())
 
         val secondPageDisplayedItems = (0..<45).mapNotNull { i ->
             allCandidateUI.inventory.getItem(i)
         }.filter { item -> !item.isEmpty }
-        assertTrue(secondPageDisplayedItems.size == 5)
+        assertEquals(5, secondPageDisplayedItems.size)
     }
 
     @Test
@@ -121,14 +120,13 @@ object AllCandidateUITest {
             craftUI.inventory.setItem(c.toIndex(), ItemStack(Material.STONE))
         }
 
-        val view = CraftView.fromInventory(craftUI.inventory)!!
+        val view = craftUI.toView()
         val result = Search.search(
             crafterID = UUID.randomUUID(),
             view = view
         )
 
-        assertTrue(result != null)
-        assertTrue(result.size() == 50)
+        assertEquals(50, result.size())
 
         val allCandidateUI = AllCandidateUI(
             view = view,
@@ -138,12 +136,12 @@ object AllCandidateUITest {
         )
 
         assertTrue(allCandidateUI.canFlipPage())
-        assertTrue(allCandidateUI.currentPage == 0)
+        assertEquals(0, allCandidateUI.currentPage)
 
         val firstPageDisplayedItems = (0..<45).mapNotNull { i ->
             allCandidateUI.inventory.getItem(i)
         }.filter { item -> !item.isEmpty }
-        assertTrue(firstPageDisplayedItems.size == 45)
+        assertEquals(45, firstPageDisplayedItems.size)
 
         player.openInventory(allCandidateUI.inventory)
 
@@ -160,8 +158,8 @@ object AllCandidateUITest {
         val secondPageDisplayedItems = (0..<45).mapNotNull { i ->
             allCandidateUI.inventory.getItem(i)
         }.filter { item -> !item.isEmpty }
-        assertTrue(allCandidateUI.currentPage == 1)
-        assertTrue(secondPageDisplayedItems.size == 5)
+        assertEquals(1, allCandidateUI.currentPage)
+        assertEquals(5, secondPageDisplayedItems.size)
     }
 
     @Test
@@ -172,14 +170,13 @@ object AllCandidateUITest {
             craftUI.inventory.setItem(c.toIndex(), ItemStack(Material.STONE))
         }
 
-        val view = CraftView.fromInventory(craftUI.inventory)!!
+        val view = craftUI.toView()
         val result = Search.search(
             crafterID = UUID.randomUUID(),
             view = view
         )
 
-        assertTrue(result != null)
-        assertTrue(result.size() == 50)
+        assertEquals(50, result.size())
 
         val allCandidateUI = AllCandidateUI(
             view = view,
@@ -188,7 +185,7 @@ object AllCandidateUITest {
             useShift = false
         )
 
-        assertTrue(allCandidateUI.currentPage == 0)
+        assertEquals(0, allCandidateUI.currentPage)
         assertFalse(allCandidateUI.canFlipBackPage())
 
         allCandidateUI.flipPage()
@@ -196,17 +193,17 @@ object AllCandidateUITest {
         val secondPageDisplayedItems = (0..<45).mapNotNull { i ->
             allCandidateUI.inventory.getItem(i)
         }.filter { item -> !item.isEmpty }
-        assertTrue(secondPageDisplayedItems.size == 5)
+        assertEquals(5, secondPageDisplayedItems.size)
 
         assertTrue(allCandidateUI.canFlipBackPage())
 
         allCandidateUI.flipBackPage()
-        assertTrue(allCandidateUI.currentPage == 0)
+        assertEquals(0, allCandidateUI.currentPage)
 
         val firstPageDisplayedItems = (0..<45).mapNotNull { i ->
             allCandidateUI.inventory.getItem(i)
         }.filter { item -> !item.isEmpty }
-        assertTrue(firstPageDisplayedItems.size == 45)
+        assertEquals(45, firstPageDisplayedItems.size)
     }
 
     @Test
@@ -217,14 +214,13 @@ object AllCandidateUITest {
             craftUI.inventory.setItem(c.toIndex(), ItemStack(Material.STONE))
         }
 
-        val view = CraftView.fromInventory(craftUI.inventory)!!
+        val view = craftUI.toView()
         val result = Search.search(
             crafterID = UUID.randomUUID(),
             view = view
         )
 
-        assertTrue(result != null)
-        assertTrue(result.size() == 50)
+        assertEquals(50, result.size())
 
         val allCandidateUI = AllCandidateUI(
             view = view,
@@ -234,7 +230,7 @@ object AllCandidateUITest {
         )
 
         player.openInventory(allCandidateUI.inventory)
-        assertTrue(allCandidateUI.currentPage == 0)
+        assertEquals(0, allCandidateUI.currentPage)
 
         allCandidateUI.flipPage()
 
@@ -251,8 +247,8 @@ object AllCandidateUITest {
         val firstPageDisplayedItems = (0..<45).mapNotNull { i ->
             allCandidateUI.inventory.getItem(i)
         }.filter { item -> !item.isEmpty }
-        assertTrue(allCandidateUI.currentPage == 0)
-        assertTrue(firstPageDisplayedItems.size == 45)
+        assertEquals(0, allCandidateUI.currentPage)
+        assertEquals(45, firstPageDisplayedItems.size)
     }
 
     @Test
@@ -262,14 +258,13 @@ object AllCandidateUITest {
         CoordinateComponent.square(3).forEach { c ->
             craftUI.inventory.setItem(c.toIndex(), ItemStack(Material.STONE))
         }
-        val view = CraftView.fromInventory(craftUI.inventory)!!
+        val view = craftUI.toView()
         val result = Search.search(
             crafterID = UUID.randomUUID(),
             view = view
         )
 
-        assertTrue(result != null)
-        assertTrue(result.size() == 50)
+        assertEquals(50, result.size())
 
         val allCandidateUI = AllCandidateUI(
             view = view,
@@ -279,7 +274,7 @@ object AllCandidateUITest {
         )
 
         player.openInventory(allCandidateUI.inventory)
-        assertTrue(allCandidateUI.currentPage == 0)
+        assertEquals(0, allCandidateUI.currentPage)
         assertTrue(allCandidateUI.inventory.getItem(AllCandidateUI.BACK_TO_CRAFT) != null)
         assertTrue(allCandidateUI.inventory.getItem(AllCandidateUI.BACK_TO_CRAFT)!!.isSimilar(AllCandidateUI.BACK_TO_CRAFT_BUTTON))
 

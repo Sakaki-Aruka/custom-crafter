@@ -19,6 +19,27 @@ interface CMatter {
     val mass: Boolean
     val predicates: Set<CMatterPredicate>?
 
+    companion object {
+        /**
+         * Returns a specified [CMatter] is valid or not.
+         * ```kotlin
+         * val matter: CMatter = ~~~
+         * CMatter.isValidCMatter(matter).exceptionOrNull()?.let { throw it }
+         * ```
+         * @return[Result] Result of check
+         * @since v5.0.14
+         */
+        fun isValidCMatter(matter: CMatter): Result<Unit> {
+            return if (matter.candidate.isEmpty()) {
+                Result.failure(IllegalStateException("'candidate' must contain correct materials at least one."))
+            } else if (matter.candidate.any { m -> m.isAir || !m.isItem }) {
+                Result.failure(IllegalStateException("'candidate' not allowed to contain materials that are 'Material#isAir' or '!Material#isItem'."))
+            } else if (matter.amount < 1) {
+                Result.failure(IllegalStateException("'amount' must be 1 or more."))
+            } else Result.success(Unit)
+        }
+    }
+
     /**
      * returns this CMatter has some predicates or not.
      *

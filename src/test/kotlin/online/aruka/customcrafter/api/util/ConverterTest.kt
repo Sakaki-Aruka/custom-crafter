@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.mockbukkit.mockbukkit.MockBukkit
 import org.mockbukkit.mockbukkit.ServerMock
+import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 internal object ConverterTest {
@@ -69,7 +70,7 @@ internal object ConverterTest {
             CoordinateComponent(5, 5)
         )
 
-        assertTrue(list == components)
+        assertEquals(components, list)
 
 
     }
@@ -78,19 +79,19 @@ internal object ConverterTest {
     fun availableCraftingSlotIndicesTest() {
         val intList: Set<Int> = (0..<54).filter { i -> i % 9 < 6 }.take(36).toSet()
         val slots: Set<Int> = Converter.getAvailableCraftingSlotIndices()
-        assertTrue(slots.size == intList.size)
+        assertEquals(intList.size, slots.size)
         assertTrue(slots.containsAll(intList))
 
         val componentList = Converter.getAvailableCraftingSlotComponents()
         val mappedIndices = componentList.map { c -> c.x + c.y * 9 }
-        assertTrue(slots.size == mappedIndices.size)
+        assertEquals(mappedIndices.size, slots.size)
         assertTrue(slots.containsAll(mappedIndices))
     }
 
     @Test
     fun inputMappingTest() {
         val emptyInventory = Bukkit.createInventory(null, 54)
-        assertTrue(Converter.standardInputMapping(emptyInventory) == null)
+        assertEquals(null, Converter.standardInputMapping(emptyInventory))
 
         val stones: Inventory = CraftUI().inventory
         Converter.getAvailableCraftingSlotIndices().forEach { index ->
@@ -99,8 +100,8 @@ internal object ConverterTest {
 
         val mapping = Converter.standardInputMapping(stones)
         assertTrue(mapping != null)
-        assertTrue(mapping.size == 36)
-        assertTrue(mapping.values.toSet().size == 1)
+        assertEquals(36, mapping.size)
+        assertEquals(1, mapping.values.toSet().size)
         assertTrue(mapping.values.first().isSimilar(ItemStack(Material.STONE)))
 
         val components: Set<CoordinateComponent> = setOf(
@@ -142,6 +143,6 @@ internal object ConverterTest {
             CoordinateComponent(5, 5),
         )
 
-        assertTrue(mapping.keys == components)
+        assertEquals(components, mapping.keys)
     }
 }

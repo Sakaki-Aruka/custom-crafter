@@ -28,21 +28,21 @@ data class CraftView internal constructor(
          * converting an [Inventory] to [CraftView].
          * ```
          * // an example from Java.
-         * Inventory gui = CustomCrafterAPI.getCraftingGUI();
+         * Inventory gui = ~~~;
          * CraftView view = CraftView.fromInventory(gui, true);
          *
          * // an example from Kotlin
-         * val gui = CustomCrafterAPI.getCraftingGUI()
+         * val gui = ~~~
          * val view = CraftView.fromInventory(gui)
          * ```
          *
          * @param[inventory] convert target
-         * @param[paddingAir] padding empty slots with [ItemStack.empty] or not. default value is true. (default value can only use from Kotlin.)
+         * @param[paddingAir] padding empty slots with [ItemStack.empty] or not. default value is false. (default value can only use from Kotlin.)
          * @return[CraftView?] A result of converting. If a provided inventory is not custom crafter's gui, returns Null.
          */
         fun fromInventory(
             inventory: Inventory,
-            paddingAir: Boolean = true
+            paddingAir: Boolean = false
         ): CraftView? {
             val mapped: MutableMap<CoordinateComponent, ItemStack> = Converter.standardInputMapping(inventory)?.toMutableMap() ?: return null
             if (paddingAir) {
