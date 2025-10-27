@@ -3,7 +3,6 @@ package io.github.sakaki_aruka.customcrafter
 import io.github.sakaki_aruka.customcrafter.api.event.CustomCrafterAPIPropertiesChangeEvent
 import io.github.sakaki_aruka.customcrafter.api.event.RegisterCustomRecipeEvent
 import io.github.sakaki_aruka.customcrafter.api.event.UnregisterCustomRecipeEvent
-import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import net.kyori.adventure.text.Component
@@ -18,7 +17,7 @@ object CustomCrafterAPI {
      *
      * This version is different with the plugin version string.
      */
-    const val API_VERSION: String = "0.1.14"
+    const val API_VERSION: String = "5.0.15"
 
     /**
      * Custom Crafter API is stable or not.
@@ -247,7 +246,7 @@ object CustomCrafterAPI {
      * // Check Example in your plugin
      * @Override
      * fun onEnable() {
-     *     if (!CustomCrafterAPI.hasFullCompatibility("0.1.13")) {
+     *     if (!CustomCrafterAPI.hasFullCompatibility("5.0.15")) {
      *         println("This plugin has not full-compatibility with loaded CustomCrafter.")
      *         println("Loaded Version: ${CustomCrafterAPI.API_VERSION}")
      *         Bukkit.pluginManager.disablePlugin(this)
@@ -260,7 +259,7 @@ object CustomCrafterAPI {
      * @since 5.0.13
      */
     fun hasFullCompatibility(version: String): Boolean {
-        return version in setOf("0.1.14")
+        return version in setOf("5.0.15")
     }
 
 
