@@ -1,7 +1,7 @@
 name: Custom_Crafter
 version: '${project.version}'
 main: io.github.sakaki_aruka.customcrafter.CustomCrafter
-api-version: 1.19
+api-version: "1.21.4"
 authors: [ SakakiAruka ]
 
 commands:

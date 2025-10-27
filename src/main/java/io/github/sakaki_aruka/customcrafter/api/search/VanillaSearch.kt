@@ -31,7 +31,7 @@ object VanillaSearch {
      * @param[world] crafter exists world
      * @param[mapped] input items
      * @return[Recipe] a found recipe
-     * @since v5.0.14
+     * @since 5.0.14
      */
     fun search(
         world: World,

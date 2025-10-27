@@ -65,7 +65,7 @@ data class CRecipeImpl(
          * @return[CRecipeImpl] an amorphous recipe
          * @throws[IllegalArgumentException] Throws if [items] size is out of the range (1 ~ 36).
          * @throws[IllegalStateException] Throws if built recipe is invalid.
-         * @since v5.0.14
+         * @since 5.0.14
          */
         fun amorphous(
             name: String,

@@ -17,8 +17,10 @@ Paper
 
 | Custom Crafter Version | Paper Version   |
 |------------------------|-----------------|
-| 5.0.14 (latest)        | 1.21.4 ~        |
-| 5.0.13, 5.0.13-1       | 1.21.4 ~        |
+| 5.0.15 (latest)        | 1.21.4 ~        |
+| 5.0.14                 | 1.21.4 ~        |
+| 5.0.13-1               | 1.21.4 ~        |
+| 5.0.13                 | 1.21.4 ~        |
 | 5.0.0 ~ 5.0.11         | 1.21.3          |
 | 4.3 (legacy)           | 1.21.3          |
 | 4.2 (legacy)           | 1.20.1 ~ 1.20.4 |
@@ -63,7 +65,7 @@ The latest provided version
    <dependency>
       <groupId>com.github.Sakaki-Aruka</groupId>
       <artifactId>custom-crafter</artifactId>
-      <version>5.0.14</version>
+      <version>5.0.15</version>
       <scope>provided</scope>
    </dependency>
 </dependencies>
@@ -88,7 +90,7 @@ dependencyResolutionManagement {
 (dependency)
 ```groovy
 dependencies {
-   compileOnly 'com.github.Sakaki-Aruka:custom-crafter:5.0.14'
+   compileOnly 'com.github.Sakaki-Aruka:custom-crafter:5.0.15'
 }
 ```
 
@@ -109,7 +111,7 @@ repositories {
 (dependency)
 ```
 dependencies {
-    compileOnly("com.github.Sakaki-Aruka:custom-crafter:5.0.14")
+    compileOnly("com.github.Sakaki-Aruka:custom-crafter:5.0.15")
 }
 ```
 
@@ -141,7 +143,7 @@ Example code to check if the CustomCrafterAPI version your plugin depends on is 
  
 ````kotlin
 class YourPlugin: JavaPlugin() {
-    const val DEPEND_CCAPI_VERSION = "0.1.13"
+    const val DEPEND_CCAPI_VERSION = "5.0.15"
     
     @Override
     fun onEnable() {
@@ -170,7 +172,7 @@ val matter: CMatter = CMatterImpl(
 
 ```Kotlin
 // In Kotlin
-val matter: CMatter = CMatterImpl.single(Material.STONE)
+val matter: CMatter = CMatterImpl.multi(Material.STONE, Material.COBBLESTONE)
 ```
 This is a common example of creating a Matter that acts as a material when either "Stone" or "Cobblestone" is placed.  
 If only one item type is needed in the `candidate` field and other parameters use default values (which makes it almost identical to vanilla Minecraft recipes), you can use the following shorthand:

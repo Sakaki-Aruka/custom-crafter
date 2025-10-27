@@ -1,5 +1,14 @@
 # Changelog
 
+# 5.0.15
+CMatter, CRecipe changes.
+
+## Code
+- [Changed] `CustomCrafterAPI#API_VERSION` format has been `5.x.x` from `0.x.x`. (became Plugin Version == API Version)
+- [Changed] `CMatter#isValidCMatter` changed to `CMatter#isValidMatter` and to be customizable impl.
+- [Changed] `CRecipe#isValidCRecipe` changed to `CRecipe#isValidRecipe` and to be customizable impl.
+- [Changed] `CMatterPredicate#predicate` has been using `CMatterPredicate.Context`.
+
 # 5.0.14
 Delete auto-crafting feature, internal changes.  
 
