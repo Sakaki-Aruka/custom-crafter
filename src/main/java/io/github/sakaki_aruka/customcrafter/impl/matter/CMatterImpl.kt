@@ -84,7 +84,7 @@ data class CMatterImpl(
          * @return[CMatterImpl] Built matter
          * @throws[IllegalStateException] Throws when [materials] is empty and contains invalid material
          */
-        fun multi(vararg materials: Material): CMatter {
+        fun multi(vararg materials: Material): CMatterImpl {
             val matter = CMatterImpl(
                 name = materials.joinToString("-") { m -> m.name },
                 candidate = materials.toSet()
