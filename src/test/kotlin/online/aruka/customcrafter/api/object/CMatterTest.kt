@@ -5,6 +5,7 @@ import org.bukkit.Material
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertNull
 import org.mockbukkit.mockbukkit.MockBukkit
 import org.mockbukkit.mockbukkit.ServerMock
 import org.mockbukkit.mockbukkit.world.WorldMock
@@ -64,5 +65,16 @@ object CMatterTest {
         )
         assertTrue(minus.isValidMatter().isFailure)
         assertTrue(minus.isValidMatter().exceptionOrNull() is IllegalStateException)
+    }
+
+    @Test
+    fun validCMatterTest() {
+        val valid = CMatterImpl(
+            name = "",
+            candidate = setOf(Material.STONE),
+            amount = 1
+        )
+        assertTrue(valid.isValidMatter().isSuccess)
+        assertNull(valid.isValidMatter().exceptionOrNull())
     }
 }
