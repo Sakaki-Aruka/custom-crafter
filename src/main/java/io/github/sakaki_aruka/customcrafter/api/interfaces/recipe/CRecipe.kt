@@ -22,30 +22,34 @@ interface CRecipe {
     val filters: Set<CRecipeFilter<CMatter>>?
     val type: CRecipeType
 
-    companion object {
-        /**
-         * Returns a specified [CRecipe] is valid or not.
-         * ```kotlin
-         * val recipe: CRecipe = ~~~
-         * CRecipe.isValidCRecipe(recipe).exceptionOrNull()?.let { throw it }
-         * ```
-         * @return[Result] Result of check
-         * @since v5.0.14
-         */
-        fun isValidCRecipe(recipe: CRecipe): Result<Unit> {
-            return if (recipe.items.isEmpty() || recipe.items.size > 36) {
-                Result.failure(IllegalStateException("'items' must contain 1 to 36 valid CMatters."))
-            } else if (recipe.items.values.any { matter -> CMatter.isValidCMatter(matter).isFailure }) {
-                val builder = StringBuilder()
-                for ((c, matter) in recipe.items.entries) {
-                    val t: Throwable = CMatter.isValidCMatter(matter).exceptionOrNull()
-                        ?: continue
-                    builder.append("[items] x: ${c.x}, y: ${c.y}, ${t.message} ${System.lineSeparator()}")
-                }
-                Result.failure(IllegalStateException(builder.toString()))
-            } else {
-                Result.success(Unit)
+    /**
+     * Returns this [CRecipe] is a valid or not.
+     *
+     * CRecipe's default implementation checks below conditions.
+     * - [CRecipe.items] size (in range 1 to 36 ?)
+     * - contained [CMatter] are all valid (Do all [CRecipe.items] elements pass [CMatter.isValidMatter]?)
+     *
+     * ```kotlin
+     * // (Usage)
+     * val recipe: CRecipe = ~~~
+     * recipe.isValidRecipe().exceptionOrNull()?.let{ throw it }
+     * ```
+     * @return[Result] Result of check
+     * @since 5.0.15
+     */
+    fun isValidRecipe(): Result<Unit> {
+        return if (this.items.isEmpty() || this.items.size > 36) {
+            Result.failure(IllegalStateException("'items' must contain 1 to 36 valid CMatters."))
+        } else if (this.items.values.any { matter -> matter.isValidMatter().isFailure }) {
+            val builder = StringBuilder()
+            for ((c, matter) in this.items.entries) {
+                val t: Throwable = matter.isValidMatter().exceptionOrNull()
+                    ?: continue
+                builder.append("[items] x: ${c.x}, y: ${c.y}, ${t.message} ${System.lineSeparator()}")
             }
+            Result.failure(IllegalStateException(builder.toString()))
+        } else {
+            Result.success(Unit)
         }
     }
 

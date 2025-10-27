@@ -89,7 +89,7 @@ data class CRecipeImpl(
                 results = results,
                 filters = filters
             )
-            CRecipe.isValidCRecipe(recipe).exceptionOrNull()?.let { t -> throw t }
+            recipe.isValidRecipe().exceptionOrNull()?.let { t -> throw t }
             return recipe
         }
     }

@@ -90,7 +90,7 @@ data class CMatterImpl(
                 candidate = materials.toSet()
             )
 
-            val checkResult: Result<Unit> = CMatter.isValidCMatter(matter)
+            val checkResult: Result<Unit> = matter.isValidMatter()
             checkResult.exceptionOrNull()?.let { t -> throw t }
             return matter
         }

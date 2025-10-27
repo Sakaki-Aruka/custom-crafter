@@ -383,7 +383,7 @@ object CustomCrafterAPI {
      * @throws[IllegalStateException] Calls when the specified recipe is invalid
      */
     fun registerRecipe(recipe: CRecipe): Boolean {
-        CRecipe.isValidCRecipe(recipe).exceptionOrNull()?.let { t -> throw t }
+        recipe.isValidRecipe().exceptionOrNull()?.let { t -> throw t }
         if (!RegisterCustomRecipeEvent(recipe).callEvent()) return false
         return synchronized(CustomCrafter.RECIPES) {
             CustomCrafter.RECIPES.add(recipe)
