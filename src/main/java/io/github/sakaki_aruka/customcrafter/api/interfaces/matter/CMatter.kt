@@ -66,7 +66,9 @@ interface CMatter {
         recipe: CRecipe,
         crafterID: UUID
     ): Boolean {
-        return predicates?.all { p -> p.predicate(self, mapped, recipe, crafterID) } ?: true
+        return predicates?.all { p -> p.predicate(CMatterPredicate.Context(
+            self, mapped, recipe, crafterID
+        )) } ?: true
     }
 
     /**
