@@ -19,6 +19,40 @@ import org.bukkit.inventory.meta.ItemMeta
  */
 interface CRecipeFilter<out T: CMatter> {
 
+    companion object {
+        /**
+         * This means 'check did not require' .
+         *
+         * Equals `Pair(ResultType.NOT_REQUIRED, true)` .
+         * @since 5.0.15
+         */
+        val CHECK_NOT_REQUIRED = ResultType.NOT_REQUIRED to true
+
+        /**
+         * This means 'failed to predicate checks' .
+         *
+         * Equals `Pair(ResultType.FAILED, false)` .
+         * @since 5.0.15
+         */
+        val CHECK_FAILED = ResultType.FAILED to false
+
+        /**
+         * This means `all checks successful` .
+         *
+         * Equals `Pair(ResultType.SUCCESS, true)`
+         * @since 5.0.15
+         */
+        val CHECKED_ALL_PASS = ResultType.SUCCESS to true
+
+        /**
+         * This means 'did all checks, but some checks failed' .
+         *
+         * Equals `Pair(ResultType.SUCCESS, false)`
+         * @since 5.0.15
+         */
+        val CHECKED_NOT_PASS = ResultType.SUCCESS to false
+    }
+
     /**
      * SUCCESS not means success to input matter check passed.
      * that only means success to pass any checks before final one.
@@ -42,7 +76,7 @@ interface CRecipeFilter<out T: CMatter> {
      * ```
      * // in EnchantStorageFilter
      * override fun metaTypeCheck(meta: ItemMeta): Boolean {
-     *   return meta is EnchantmentStorageMeta
+     *     return meta is EnchantmentStorageMeta
      * }
      * ```
      *
@@ -53,7 +87,7 @@ interface CRecipeFilter<out T: CMatter> {
      * // in EnchantFilter
      * // cause you can get enchantments from ItemStack, so items has not to provide ItemMeta.
      * override fun metaTypeCheck(meta: ItemMeta): Boolean {
-     *   return true
+     *     return true
      * }
      * ```
      *
@@ -74,5 +108,5 @@ interface CRecipeFilter<out T: CMatter> {
      * @param[matter] one of a recipe
      * @return[Pair] type of checks and [item] conforms [matter] or not
      */
-    fun normal(item: ItemStack, matter: @UnsafeVariance T): Pair<ResultType, Boolean>
+    fun itemMatterCheck(item: ItemStack, matter: @UnsafeVariance T): Pair<ResultType, Boolean>
 }

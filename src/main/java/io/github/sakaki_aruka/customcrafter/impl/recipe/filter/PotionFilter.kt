@@ -17,7 +17,7 @@ object PotionFilter: CRecipeFilter<CPotionMatter> {
         return meta is PotionMeta
     }
 
-    override fun normal(
+    override fun itemMatterCheck(
         item: ItemStack,
         matter: CPotionMatter
     ): Pair<CRecipeFilter.ResultType ,Boolean> {
@@ -28,9 +28,9 @@ object PotionFilter: CRecipeFilter<CPotionMatter> {
         }
 
         if (matter.potionComponents.isEmpty()) {
-            return CRecipeFilter.ResultType.NOT_REQUIRED to true
+            return CRecipeFilter.CHECK_NOT_REQUIRED
         } else if (effects.isEmpty()) {
-            return CRecipeFilter.ResultType.FAILED to false
+            return CRecipeFilter.CHECK_FAILED
         }
 
         return CRecipeFilter.ResultType.SUCCESS to matter.potionComponents.all { c ->

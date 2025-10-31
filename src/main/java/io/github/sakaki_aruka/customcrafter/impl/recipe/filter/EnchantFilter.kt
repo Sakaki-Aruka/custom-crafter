@@ -15,15 +15,15 @@ import org.bukkit.inventory.meta.ItemMeta
 object EnchantFilter: CRecipeFilter<CEnchantMatter> {
     override fun metaTypeCheck(meta: ItemMeta): Boolean = true
 
-    override fun normal(
+    override fun itemMatterCheck(
         item: ItemStack,
         matter: CEnchantMatter
     ): Pair<CRecipeFilter.ResultType, Boolean> {
         val itemEnchants: Map<Enchantment, Int> = item.enchantments
         if (matter.enchantComponents.isEmpty()) {
-            return CRecipeFilter.ResultType.NOT_REQUIRED to true
+            return CRecipeFilter.CHECK_NOT_REQUIRED
         } else if (itemEnchants.isEmpty()) {
-            return CRecipeFilter.ResultType.FAILED to false
+            return CRecipeFilter.CHECK_FAILED
         }
         return CRecipeFilter.ResultType.SUCCESS to matter.enchantComponents.all { base(itemEnchants, it) }
     }

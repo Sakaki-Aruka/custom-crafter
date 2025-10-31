@@ -235,7 +235,7 @@ object Search {
         filter: CRecipeFilter<T>
     ): Pair<CRecipeFilter.ResultType, Boolean>? {
         return try {
-            filter.normal(item, matter as T)
+            filter.itemMatterCheck(item, matter as T)
         } catch (_: Exception) { null }
     }
 

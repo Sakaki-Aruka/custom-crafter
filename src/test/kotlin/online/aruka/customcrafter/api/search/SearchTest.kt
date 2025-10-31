@@ -516,36 +516,36 @@ internal object SearchTest {
 
         assertEquals(
             CRecipeFilter.ResultType.NOT_REQUIRED,
-            EnchantFilter.normal(noEnchantInput, noEnchantMatter).first
+            EnchantFilter.itemMatterCheck(noEnchantInput, noEnchantMatter).first
         )
         assertEquals(
             CRecipeFilter.ResultType.FAILED,
-            EnchantFilter.normal(noEnchantInput, onlyEnchantMatter).first
+            EnchantFilter.itemMatterCheck(noEnchantInput, onlyEnchantMatter).first
         )
         assertEquals(
             CRecipeFilter.ResultType.FAILED,
-            EnchantFilter.normal(noEnchantInput, strictEnchantMatter).first
+            EnchantFilter.itemMatterCheck(noEnchantInput, strictEnchantMatter).first
         )
 
         assertEquals(
             CRecipeFilter.ResultType.NOT_REQUIRED,
-            EnchantFilter.normal(onlyEnchantInput, noEnchantMatter).first
+            EnchantFilter.itemMatterCheck(onlyEnchantInput, noEnchantMatter).first
         )
-        val (type1, result1) = EnchantFilter.normal(onlyEnchantInput, onlyEnchantMatter)
+        val (type1, result1) = EnchantFilter.itemMatterCheck(onlyEnchantInput, onlyEnchantMatter)
         assertEquals(CRecipeFilter.ResultType.SUCCESS, type1)
         assertTrue(result1)
-        val (type2, result2) = EnchantFilter.normal(onlyEnchantInput, strictEnchantMatter)
+        val (type2, result2) = EnchantFilter.itemMatterCheck(onlyEnchantInput, strictEnchantMatter)
         assertEquals(CRecipeFilter.ResultType.SUCCESS, type2)
         assertTrue(!result2)
 
         assertEquals(
             CRecipeFilter.ResultType.NOT_REQUIRED,
-            EnchantFilter.normal(strictEnchantInput, noEnchantMatter).first
+            EnchantFilter.itemMatterCheck(strictEnchantInput, noEnchantMatter).first
         )
-        val (type3, result3) = EnchantFilter.normal(strictEnchantInput, onlyEnchantMatter)
+        val (type3, result3) = EnchantFilter.itemMatterCheck(strictEnchantInput, onlyEnchantMatter)
         assertEquals(CRecipeFilter.ResultType.SUCCESS, type3)
         assertTrue(result3)
-        val (type4, result4) = EnchantFilter.normal(strictEnchantInput, strictEnchantMatter)
+        val (type4, result4) = EnchantFilter.itemMatterCheck(strictEnchantInput, strictEnchantMatter)
         assertEquals(CRecipeFilter.ResultType.SUCCESS, type4)
         assertTrue(result4)
     }
@@ -586,36 +586,36 @@ internal object SearchTest {
 
         assertEquals(
             CRecipeFilter.ResultType.NOT_REQUIRED,
-            EnchantStorageFilter.normal(noEnchantInput, noEnchantMatter).first
+            EnchantStorageFilter.itemMatterCheck(noEnchantInput, noEnchantMatter).first
         )
         assertEquals(
             CRecipeFilter.ResultType.FAILED,
-            EnchantStorageFilter.normal(noEnchantInput, onlyEnchantMatter).first
+            EnchantStorageFilter.itemMatterCheck(noEnchantInput, onlyEnchantMatter).first
         )
         assertEquals(
             CRecipeFilter.ResultType.FAILED,
-            EnchantStorageFilter.normal(noEnchantInput, strictMatter).first
+            EnchantStorageFilter.itemMatterCheck(noEnchantInput, strictMatter).first
         )
 
         assertEquals(
             CRecipeFilter.ResultType.NOT_REQUIRED,
-            EnchantStorageFilter.normal(onlyEnchantInput, noEnchantMatter).first
+            EnchantStorageFilter.itemMatterCheck(onlyEnchantInput, noEnchantMatter).first
         )
-        val (strictType1, strictResult1) = EnchantStorageFilter.normal(onlyEnchantInput, onlyEnchantMatter)
+        val (strictType1, strictResult1) = EnchantStorageFilter.itemMatterCheck(onlyEnchantInput, onlyEnchantMatter)
         assertEquals(CRecipeFilter.ResultType.SUCCESS, strictType1)
         assertTrue(strictResult1)
-        val (strictType2, strictResult2) = EnchantStorageFilter.normal(onlyEnchantInput, strictMatter)
+        val (strictType2, strictResult2) = EnchantStorageFilter.itemMatterCheck(onlyEnchantInput, strictMatter)
         assertEquals(CRecipeFilter.ResultType.SUCCESS, strictType2)
         assertTrue(!strictResult2)
 
         assertEquals(
             CRecipeFilter.ResultType.NOT_REQUIRED,
-            EnchantStorageFilter.normal(strictInput, noEnchantMatter).first
+            EnchantStorageFilter.itemMatterCheck(strictInput, noEnchantMatter).first
         )
-        val (strictType3, strictResult3) = EnchantStorageFilter.normal(strictInput, onlyEnchantMatter)
+        val (strictType3, strictResult3) = EnchantStorageFilter.itemMatterCheck(strictInput, onlyEnchantMatter)
         assertEquals(CRecipeFilter.ResultType.SUCCESS, strictType3)
         assertTrue(strictResult3)
-        val (strictType4, strictResult4) = EnchantStorageFilter.normal(strictInput, strictMatter)
+        val (strictType4, strictResult4) = EnchantStorageFilter.itemMatterCheck(strictInput, strictMatter)
         assertEquals(CRecipeFilter.ResultType.SUCCESS, strictType4)
         assertTrue(strictResult4)
     }
@@ -737,36 +737,36 @@ internal object SearchTest {
 
         assertEquals(
             CRecipeFilter.ResultType.NOT_REQUIRED,
-            PotionFilter.normal(noEffectPotionInput, noEffectMatter).first
+            PotionFilter.itemMatterCheck(noEffectPotionInput, noEffectMatter).first
         )
         assertEquals(
             CRecipeFilter.ResultType.FAILED,
-            PotionFilter.normal(noEffectPotionInput, onlyEffectMatter).first
+            PotionFilter.itemMatterCheck(noEffectPotionInput, onlyEffectMatter).first
         )
         assertEquals(
             CRecipeFilter.ResultType.FAILED,
-            PotionFilter.normal(noEffectPotionInput, strictEffectMatter).first
+            PotionFilter.itemMatterCheck(noEffectPotionInput, strictEffectMatter).first
         )
 
         assertEquals(
             CRecipeFilter.ResultType.NOT_REQUIRED,
-            PotionFilter.normal(onlyEffectPotionInput, noEffectMatter).first
+            PotionFilter.itemMatterCheck(onlyEffectPotionInput, noEffectMatter).first
         )
-        val (type1, result1) = PotionFilter.normal(onlyEffectPotionInput, onlyEffectMatter)
+        val (type1, result1) = PotionFilter.itemMatterCheck(onlyEffectPotionInput, onlyEffectMatter)
         assertEquals(CRecipeFilter.ResultType.SUCCESS, type1)
         assertTrue(result1)
-        val (type2, result2) = PotionFilter.normal(onlyEffectPotionInput, strictEffectMatter)
+        val (type2, result2) = PotionFilter.itemMatterCheck(onlyEffectPotionInput, strictEffectMatter)
         assertEquals(CRecipeFilter.ResultType.SUCCESS, type2)
         assertTrue(!result2)
 
         assertEquals(
             CRecipeFilter.ResultType.NOT_REQUIRED,
-            PotionFilter.normal(strictPotionInput, noEffectMatter).first
+            PotionFilter.itemMatterCheck(strictPotionInput, noEffectMatter).first
         )
-        val (type3, result3) = PotionFilter.normal(strictPotionInput, onlyEffectMatter)
+        val (type3, result3) = PotionFilter.itemMatterCheck(strictPotionInput, onlyEffectMatter)
         assertEquals(CRecipeFilter.ResultType.SUCCESS, type3)
         assertTrue(result3)
-        val (type4, result4) = PotionFilter.normal(strictPotionInput, strictEffectMatter)
+        val (type4, result4) = PotionFilter.itemMatterCheck(strictPotionInput, strictEffectMatter)
         assertEquals(CRecipeFilter.ResultType.SUCCESS, type4)
         assertTrue(result4)
     }

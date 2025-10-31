@@ -16,15 +16,15 @@ object EnchantStorageFilter: CRecipeFilter<CEnchantmentStoreMatter> {
         return meta is EnchantmentStorageMeta
     }
 
-    override fun normal(
+    override fun itemMatterCheck(
         item: ItemStack,
         matter: CEnchantmentStoreMatter
     ): Pair<CRecipeFilter.ResultType, Boolean> {
         val stored: Map<Enchantment, Int> = (item.itemMeta as EnchantmentStorageMeta).storedEnchants
         if (matter.storedEnchantComponents.isEmpty()) {
-            return CRecipeFilter.ResultType.NOT_REQUIRED to true
+            return CRecipeFilter.CHECK_NOT_REQUIRED
         } else if (stored.isEmpty()) {
-            return CRecipeFilter.ResultType.FAILED to false
+            return CRecipeFilter.CHECK_FAILED
         }
 
         return CRecipeFilter.ResultType.SUCCESS to matter.storedEnchantComponents.all { EnchantFilter.base(stored, it) }
