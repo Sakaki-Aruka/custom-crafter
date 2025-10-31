@@ -77,9 +77,9 @@
                         </directory>
                     </sourceDirectories>
                     <suppressedFiles>
-                        <file>src/main/kotlin/io/github/sakaki_aruka/customcrafter/internal</file>
-                        <file>src/main/kotlin/io/github/sakaki_aruka/customcrafter/CustomCrafter.java</file>
-                        <file>src/main/kotlin/io/github/sakaki_aruka/customcrafter/impl/recipe/CVanillaRecipe.kt</file>
+                        <file>src/main/java/io/github/sakaki_aruka/customcrafter/internal</file>
+                        <file>src/main/java/io/github/sakaki_aruka/customcrafter/CustomCrafter.java</file>
+                        <file>src/main/java/io/github/sakaki_aruka/customcrafter/impl/recipe/CVanillaRecipe.kt</file>
                     </suppressedFiles>
                     <includes>
                         <include>Module.md</include>

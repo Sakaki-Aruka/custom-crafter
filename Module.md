@@ -19,8 +19,11 @@ This product includes software developed by the IMT Atlantique.
 # Package io.github.sakaki_aruka.customcrafter
 CustomCrafterAPI is here.
 
+# Package io.github.sakaki_aruka.customcrafter.api.event
+Custom_Crafter custom events
+
 # Package io.github.sakaki_aruka.customcrafter.api.search
-Search functions here.
+Search functions
 
 # Package io.github.sakaki_aruka.customcrafter.impl.matter
 Default CMatter implementations
