@@ -5,9 +5,6 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerInteractEvent
 
-/**
- * @suppress
- */
 object PlayerInteractListener: Listener {
     @EventHandler
     fun PlayerInteractEvent.onInteract() {

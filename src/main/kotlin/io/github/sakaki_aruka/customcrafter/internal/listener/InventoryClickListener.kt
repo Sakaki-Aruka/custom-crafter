@@ -8,9 +8,6 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.PlayerInventory
 
-/**
- * @suppress
- */
 object InventoryClickListener: Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     fun InventoryClickEvent.onClick() {

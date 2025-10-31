@@ -6,9 +6,6 @@ import org.bukkit.Bukkit
 import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.inventory.InventoryHolder
 
-/**
- * @suppress
- */
 internal object InternalAPI {
 
     fun shutdown() {
