@@ -79,7 +79,7 @@ class CustomCrafterAPIPropertiesChangeEvent<T> internal constructor(
          * @see[PropertyKey]
          * @since 5.0.11
          */
-        @SuppressWarnings("unchecked")
+        @Suppress("UNCHECKED_CAST")
         fun <S> getOrNull(key: PropertyKey<S>): S? {
             return value as? S
         }
