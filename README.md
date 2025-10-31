@@ -15,7 +15,7 @@ custom crafter is a plugin for PaperMC servers that provides custom recipes.
 # Support versions
 Paper  
 
-| Custom Crafter Version | Paper Version   |
+| Custom_Crafter Version | Paper Version   |
 |------------------------|-----------------|
 | 5.0.15 (latest)        | 1.21.4 ~        |
 | 5.0.14                 | 1.21.4 ~        |
@@ -119,7 +119,7 @@ dependencies {
 
 ---
 
-# Getting Started
+# Get Started with Custom_Crafter
 0. Make a plugin
    1. create plugin that uses custom-crafter API
 
