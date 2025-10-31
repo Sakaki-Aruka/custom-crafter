@@ -14,8 +14,6 @@ import org.bukkit.inventory.ItemStack
 object CustomCrafterAPI {
     /**
      * Custom Crafter API version.
-     *
-     * This version is different with the plugin version string.
      */
     const val API_VERSION: String = "5.0.15"
 
