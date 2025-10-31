@@ -23,7 +23,7 @@ data class CPotionMatterImpl(
     override val amount: Int = 1,
     override val mass: Boolean = false,
     override val predicates: Set<CMatterPredicate>? = null,
-): CMatter, CPotionMatter {
+): CPotionMatter {
     override fun asOne(): CPotionMatterImpl {
         return CPotionMatterImpl(
             name = name,

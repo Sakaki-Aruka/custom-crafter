@@ -24,7 +24,7 @@ data class CEnchantMatterImpl(
     override val mass: Boolean = false,
     override val predicates: Set<CMatterPredicate>? = null
 
-): CMatter, CEnchantMatter {
+): CEnchantMatter {
     override fun asOne(): CEnchantMatterImpl {
         return CEnchantMatterImpl(
             name = name,
