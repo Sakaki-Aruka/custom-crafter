@@ -61,8 +61,8 @@ object CustomCrafterAPI {
         if (RESULT_GIVE_CANCEL != v) {
             CustomCrafterAPIPropertiesChangeEvent(
                 propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.RESULT_GIVE_CANCEL.name,
-                old = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(RESULT_GIVE_CANCEL),
-                new = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(v),
+                oldValue = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(RESULT_GIVE_CANCEL),
+                newValue = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(v),
                 isAsync = calledAsync
             ).callEvent()
         }
@@ -77,8 +77,8 @@ object CustomCrafterAPI {
         if (RESULT_GIVE_CANCEL) {
             CustomCrafterAPIPropertiesChangeEvent(
                 propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.RESULT_GIVE_CANCEL.name,
-                old = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(RESULT_GIVE_CANCEL),
-                new = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(false),
+                oldValue = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(RESULT_GIVE_CANCEL),
+                newValue = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(false),
                 isAsync = calledAsync
             ).callEvent()
         }
@@ -114,8 +114,8 @@ object CustomCrafterAPI {
         if (type != BASE_BLOCK) {
             CustomCrafterAPIPropertiesChangeEvent(
                 propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK.name,
-                old = CustomCrafterAPIPropertiesChangeEvent.Property<Material>(BASE_BLOCK),
-                new = CustomCrafterAPIPropertiesChangeEvent.Property<Material>(type),
+                oldValue = CustomCrafterAPIPropertiesChangeEvent.Property<Material>(BASE_BLOCK),
+                newValue = CustomCrafterAPIPropertiesChangeEvent.Property<Material>(type),
                 isAsync = calledAsync
             ).callEvent()
         }
@@ -130,8 +130,8 @@ object CustomCrafterAPI {
         if (BASE_BLOCK != Material.GOLD_BLOCK) {
             CustomCrafterAPIPropertiesChangeEvent(
                 propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK.name,
-                old = CustomCrafterAPIPropertiesChangeEvent.Property<Material>(BASE_BLOCK),
-                new = CustomCrafterAPIPropertiesChangeEvent.Property<Material>(Material.GOLD_BLOCK),
+                oldValue = CustomCrafterAPIPropertiesChangeEvent.Property<Material>(BASE_BLOCK),
+                newValue = CustomCrafterAPIPropertiesChangeEvent.Property<Material>(Material.GOLD_BLOCK),
                 isAsync = calledAsync
             ).callEvent()
         }
@@ -171,8 +171,8 @@ object CustomCrafterAPI {
         if (v != USE_MULTIPLE_RESULT_CANDIDATE_FEATURE) {
             CustomCrafterAPIPropertiesChangeEvent(
                 propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.USE_MULTIPLE_RESULT_CANDIDATE_FEATURE.name,
-                old = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(USE_MULTIPLE_RESULT_CANDIDATE_FEATURE),
-                new = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(v),
+                oldValue = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(USE_MULTIPLE_RESULT_CANDIDATE_FEATURE),
+                newValue = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(v),
                 isAsync = calledAsync
             ).callEvent()
         }
@@ -187,8 +187,8 @@ object CustomCrafterAPI {
         if (USE_MULTIPLE_RESULT_CANDIDATE_FEATURE) {
             CustomCrafterAPIPropertiesChangeEvent(
                 propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.USE_MULTIPLE_RESULT_CANDIDATE_FEATURE.name,
-                old = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(USE_MULTIPLE_RESULT_CANDIDATE_FEATURE),
-                new = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(false),
+                oldValue = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(USE_MULTIPLE_RESULT_CANDIDATE_FEATURE),
+                newValue = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(false),
                 isAsync = calledAsync
             ).callEvent()
         }
@@ -214,8 +214,8 @@ object CustomCrafterAPI {
         if (v != USE_CUSTOM_CRAFT_UI) {
             CustomCrafterAPIPropertiesChangeEvent(
                 propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.USE_CUSTOM_CRAFT_UI.name,
-                old = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(USE_CUSTOM_CRAFT_UI),
-                new = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(v),
+                oldValue = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(USE_CUSTOM_CRAFT_UI),
+                newValue = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(v),
                 isAsync = calledAsync
             ).callEvent()
         }
@@ -231,8 +231,8 @@ object CustomCrafterAPI {
         if (!USE_CUSTOM_CRAFT_UI) {
             CustomCrafterAPIPropertiesChangeEvent(
                 propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.USE_CUSTOM_CRAFT_UI.name,
-                old = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(USE_CUSTOM_CRAFT_UI),
-                new = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(true),
+                oldValue = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(USE_CUSTOM_CRAFT_UI),
+                newValue = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(true),
                 isAsync = calledAsync
             ).callEvent()
         }
@@ -282,8 +282,8 @@ object CustomCrafterAPI {
         if (size != BASE_BLOCK_SIDE) {
             CustomCrafterAPIPropertiesChangeEvent(
                 propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK_SIDE.name,
-                old = CustomCrafterAPIPropertiesChangeEvent.Property<Int>(BASE_BLOCK_SIDE),
-                new = CustomCrafterAPIPropertiesChangeEvent.Property<Int>(size),
+                oldValue = CustomCrafterAPIPropertiesChangeEvent.Property<Int>(BASE_BLOCK_SIDE),
+                newValue = CustomCrafterAPIPropertiesChangeEvent.Property<Int>(size),
                 isAsync = calledAsync
             ).callEvent()
         }
@@ -306,8 +306,8 @@ object CustomCrafterAPI {
         if (BASE_BLOCK_SIDE != 3) {
             CustomCrafterAPIPropertiesChangeEvent(
                 propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK_SIDE.name,
-                old = CustomCrafterAPIPropertiesChangeEvent.Property<Int>(BASE_BLOCK_SIDE),
-                new = CustomCrafterAPIPropertiesChangeEvent.Property<Int>(3),
+                oldValue = CustomCrafterAPIPropertiesChangeEvent.Property<Int>(BASE_BLOCK_SIDE),
+                newValue = CustomCrafterAPIPropertiesChangeEvent.Property<Int>(3),
                 isAsync = calledAsync
             ).callEvent()
         }

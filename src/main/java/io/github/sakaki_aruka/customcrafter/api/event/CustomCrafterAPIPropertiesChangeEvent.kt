@@ -6,46 +6,55 @@ import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
 
 /**
- * Called when [CustomCrafterAPI] changeable properties changed. (Only changed. When an old value is same with new value, this won't be called this.)
+ * Called when [CustomCrafterAPI] changeable properties changed.
+ *
+ * Only changed. When an old value is same with new value, this won't be called this.
  *
  * (External plugins cannot initialize this instance.)
  *
  * ```Kotlin
  * // Example Code (Safe / Kotlin)
  * object PropertiesChangeListener: Listener {
- *   fun <T> CustomCrafterAPIPropertiesChangeEvent<T>.onChange() {
- *     val baseKey = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK
- *     if (this.propertyName != baseKey.name) {
- *       return
+ *     @EventHandler
+ *     fun <T> CustomCrafterAPIPropertiesChangeEvent<T>.onChange() {
+ *         val baseKey = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK
+ *         if (this.propertyName != baseKey.name) {
+ *             return
+ *         }
+ *         val baseTypeOld: Material = this.oldValue.getOrNull(baseKey) ?: return
+ *         CustomCrafterAPI.setBaseBlock(baseTypeOld)
+ *         println("I rejected new setting... Hahaha!!!")
  *     }
- *     val baseTypeOld: Material = this.old.getOrNull(baseKey) ?: return
- *     CustomCrafterAPI.setBaseBlock(baseTypeOld)
- *     println("I rejected new setting... Hahaha!!!")
- *   }
  * }
  * ```
- * ```Kotlin
- * // Example Code (Danger / Kotlin)
- * object PropertiesChangeListener: Listener {
- *   fun <T> CustomCrafterAPIPropertiesChangeEvent<T>.onChange() {
- *     if (this.propertyName != "BASE_BLOCK") {
- *       return
+ * ```Java
+ * // Example Code (Safe / Java)
+ * public class PropertiesChangeListener implements Listener {
+ *     @EventHandler
+ *     public void <T> onChange(CustomCrafterAPIPropertiesChangeEvent<T> event) {
+ *         String baseKey = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.Companion.BASE_BLOCK;
+ *         if (!event.getPropertyName().equals(baseKey.getName())) {
+ *             return;
+ *         }
+ *         Material baseTypeOld = event.getOldValue().getOrNull(baseKey);
+ *         if (baseTypeOld == null) {
+ *             return;
+ *         }
+ *         CustomCrafterAPI.INSTANCE.setBaseBlock(baseTypeOld);
+ *         System.out.println("I rejected new setting... Hahaha!!!");
  *     }
- *     CustomCrafterAPI.setBaseBlock(this.old.value as Material)
- *     println("I rejected new setting... Hahaha!!!")
- *   }
  * }
  * ```
  *
  * @param[propertyName] Name of property
- * @param[old] An old value
- * @param[new] A new value
+ * @param[oldValue] An old value
+ * @param[newValue] A new value
  * @since[5.0.11]
  */
 class CustomCrafterAPIPropertiesChangeEvent<T> internal constructor(
     val propertyName: String,
-    val old: Property<T>,
-    val new: Property<T>,
+    val oldValue: Property<T>,
+    val newValue: Property<T>,
     isAsync: Boolean = false
 ): Event(isAsync) {
 
