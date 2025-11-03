@@ -1,0 +1,8 @@
+[versions]
+kotlin = "2.1.0"
+shadowJar = "9.2.2"
+
+[libraries]
+kotlinStdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin"}
+paperApi = { group = "io.papermc.paper", name = "paper-api", version = "1.21.4-R0.1-SNAPSHOT"}
+kotlinTestJunit5 = { group = "org.jetbrains.kotlin", name = "kotlin-test-junit5", version.ref = "kotlin"}
