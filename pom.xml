@@ -41,7 +41,7 @@
                         <configuration>
                             <sourceDirs>
                                 <sourceDir>src/main/java</sourceDir>
-                                <sourceDir>src/main/java</sourceDir>
+                                <sourceDir>src/main/kotlin</sourceDir>
                             </sourceDirs>
                         </configuration>
                     </execution>
