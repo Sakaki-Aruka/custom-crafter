@@ -7,7 +7,12 @@
     <groupId>io.github.sakaki_aruka</groupId>
     <artifactId>custom-crafter</artifactId>
     <version>5.0.15</version>
-    <packaging>jar</packaging>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>api</module>
+        <module>demo</module>
+    </modules>
 
     <name>Custom Crafter</name>
 
@@ -53,38 +58,6 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.jetbrains.dokka</groupId>
-                <artifactId>dokka-maven-plugin</artifactId>
-                <version>2.1.0</version>
-                <executions>
-                    <execution>
-                        <phase>pre-site</phase>
-                        <goals>
-                            <goal>dokka</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <moduleName>Custom_Crafter ${version}</moduleName>
-                    <outputDir>
-                        ${project.basedir}/docs
-                    </outputDir>
-                    <sourceDirectories>
-                        <directory>
-                            ${project.basedir}/src/main
-                        </directory>
-                    </sourceDirectories>
-                    <suppressedFiles>
-                        <file>src/main/java/io/github/sakaki_aruka/customcrafter/internal</file>
-                        <file>src/main/java/io/github/sakaki_aruka/customcrafter/CustomCrafter.java</file>
-                        <file>src/main/java/io/github/sakaki_aruka/customcrafter/impl/recipe/CVanillaRecipe.kt</file>
-                    </suppressedFiles>
-                    <includes>
-                        <include>Module.md</include>
-                    </includes>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -134,11 +107,12 @@
                             <createDependencyReducedPom>false</createDependencyReducedPom>
                             <relocations>
                                 <relocation>
+<!-- TODO: org.jetbrains.kotlin -> kotlin, choco-solver -> chocosolver -->
                                     <pattern>org.jetbrains.kotlin</pattern>
                                     <shadedPattern>kotlin.shade.online.aruka</shadedPattern>
                                 </relocation>
                                 <relocation>
-                                    <pattern>org.choco-solver</pattern>
+                                    <pattern>org.chocosolver</pattern>
                                     <shadedPattern>choco-solver.shade.online.aruka</shadedPattern>
                                 </relocation>
                             </relocations>
@@ -193,39 +167,6 @@
             <artifactId>paper-api</artifactId>
             <version>1.21.4-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.choco-solver</groupId>
-            <artifactId>choco-solver</artifactId>
-            <version>5.0.0-beta.1</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.jetbrains</groupId>
-            <artifactId>annotations</artifactId>
-            <version>24.1.0</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.mockbukkit.mockbukkit</groupId>
-            <artifactId>mockbukkit-v1.21</artifactId>
-            <version>4.45.0</version>
-            <scope>test</scope>
-        </dependency>
-
-
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-test-junit5</artifactId>
-            <version>${kotlin.version}</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>
