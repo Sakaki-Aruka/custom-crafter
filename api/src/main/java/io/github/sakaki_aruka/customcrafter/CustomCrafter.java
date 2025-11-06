@@ -38,6 +38,10 @@ public final class CustomCrafter extends JavaPlugin {
         );
     }
 
+    public CustomCrafterAPI getAPI() {
+        return CustomCrafterAPI.INSTANCE;
+    }
+
     @Override
     public void onDisable() {
         InternalAPI.INSTANCE.shutdown();
