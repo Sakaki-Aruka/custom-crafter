@@ -83,6 +83,19 @@ object CustomCrafterAPI {
         RESULT_GIVE_CANCEL = false
     }
 
+
+    private val AVAILABLE_BASE_BLOCKS = Material.entries
+        .filter { material -> material.isBlock && !material.isAir }
+        .toSet()
+    /**
+     * Returns an available base block set.
+     * @return[Set] `Set<Material>`
+     * @see 5.0.15
+     */
+    fun getAvailableBaseBlocks(): Set<Material> {
+        return AVAILABLE_BASE_BLOCKS
+    }
+
     /**
      * @suppress
      * @see[CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK]
@@ -105,7 +118,7 @@ object CustomCrafterAPI {
      * @since 5.0.9
      */
     fun setBaseBlock(type: Material, calledAsync: Boolean = false) {
-        if (!type.isBlock || type.isAir) {
+        if (type !in AVAILABLE_BASE_BLOCKS) {
             throw IllegalArgumentException("'type' must meet 'Material#isBlock'.")
         }
 
