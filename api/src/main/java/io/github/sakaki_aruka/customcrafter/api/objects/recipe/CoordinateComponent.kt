@@ -27,7 +27,7 @@ data class CoordinateComponent(
 
     companion object {
 
-        private fun inRange(vararg c: Int): Boolean = c.all { (0..<6).contains(it) }
+        private fun inRange(limitExcluded: Int, vararg c: Int): Boolean = c.all { (0..<limitExcluded).contains(it) }
 
         /**
          * returns [CoordinateComponent] from the given index.
@@ -42,7 +42,7 @@ data class CoordinateComponent(
          */
         fun fromIndex(index: Int, followLimit: Boolean = true): CoordinateComponent {
             val c = CoordinateComponent(index % 9, index / 9)
-            if (followLimit && !inRange(c.x, c.y)) {
+            if (followLimit && !inRange(9, c.x, c.y)) {
                 throw IllegalArgumentException("'index' must be in range of 0-35 when you set 'followLimit' is true.")
             }
             return c
@@ -76,7 +76,7 @@ data class CoordinateComponent(
             (dy..<size + dy).forEach { y ->
                 (dx..<size + dx).forEach { x ->
                     if (safeTrim) {
-                        if (inRange(x, y)) result.add(CoordinateComponent(x, y))
+                        if (inRange(6, x, y)) result.add(CoordinateComponent(x, y))
                     } else {
                         result.add(CoordinateComponent(x, y))
                     }
