@@ -2,13 +2,18 @@ package online.aruka.demo.recipe
 
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
+import io.github.sakaki_aruka.customcrafter.api.objects.matter.CMatterPredicate
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.objects.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
 import io.github.sakaki_aruka.customcrafter.impl.recipe.CRecipeImpl
+import io.github.sakaki_aruka.customcrafter.impl.util.Converter.toComponent
+import online.aruka.demo.Demo
 import org.bukkit.Material
+import org.bukkit.NamespacedKey
 import org.bukkit.inventory.ItemStack
+import org.bukkit.persistence.PersistentDataType
 
 object ShapedRecipeProvider {
     fun enchantedGoldenApple(): CRecipe {
@@ -108,6 +113,61 @@ object ShapedRecipeProvider {
 
         return CRecipeImpl(
             name = "bulk water bottles (more) recipe",
+            items = items,
+            results = listOf(supplier),
+            type = CRecipeType.NORMAL
+        )
+    }
+
+    fun infinityIronBlock(): CRecipe {
+        val ironBlock: CMatter = CMatterImpl(
+            name = "iron block",
+            candidate = setOf(Material.IRON_BLOCK),
+            predicates = setOf(CMatterPredicate { ctx ->
+                val key = NamespacedKey(Demo.plugin, "infinity_iron_block_count")
+                !ctx.input.itemMeta.persistentDataContainer.has(key, PersistentDataType.LONG)
+            })
+        )
+        val obsidian: CMatter = CMatterImpl(
+            name = "obsidian",
+            candidate = setOf(Material.OBSIDIAN),
+            mass = true
+        )
+
+        val supplier = ResultSupplier { ctx ->
+            val totalIronBlockAmount: Int = ctx.mapped.values.filter { v -> v.type == Material.IRON_BLOCK }
+                .sumOf { i -> i.amount }
+            val core: ItemStack = ItemStack.of(Material.IRON_BLOCK)
+            core.editMeta { meta ->
+                meta.persistentDataContainer.set(
+                    NamespacedKey(Demo.plugin, "infinity_iron_block_count"),
+                    PersistentDataType.INTEGER,
+                    totalIronBlockAmount
+                )
+                meta.displayName("Infinity Iron Block".toComponent())
+                meta.lore(listOf("<green>Contained Iron Block:</green> $totalIronBlockAmount".toComponent()))
+            }
+            listOf(core)
+        }
+
+        /*
+         * # -> iron block
+         * + -> obsidian
+         *
+         * ###
+         * #+#
+         * ###
+         *
+         * returns (min amount)x iron block
+         */
+        val items: MutableMap<CoordinateComponent, CMatter> = mutableMapOf()
+        CoordinateComponent.square(3).forEach { c ->
+            items[c] = ironBlock
+        }
+        items[CoordinateComponent(1, 1)] = obsidian
+
+        return CRecipeImpl(
+            name = "infinity iron block core",
             items = items,
             results = listOf(supplier),
             type = CRecipeType.NORMAL

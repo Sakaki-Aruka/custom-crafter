@@ -26,9 +26,13 @@ class Demo : JavaPlugin() {
         CustomCrafterAPI.registerRecipe(ShapedRecipeProvider.enchantedGoldenApple())
         CustomCrafterAPI.registerRecipe(ShapedRecipeProvider.wateredBottles())
         CustomCrafterAPI.registerRecipe(ShapedRecipeProvider.moreWateredBottles())
+        CustomCrafterAPI.registerRecipe(ShapedRecipeProvider.infinityIronBlock())
 
         // register shapeless recipes
         CustomCrafterAPI.registerRecipe(ShapelessRecipeProvider.glowBerry())
+        CustomCrafterAPI.registerRecipe(ShapelessRecipeProvider.infinityIronBlock())
+        CustomCrafterAPI.registerRecipe(ShapelessRecipeProvider.infinityIronBlockExtract())
+        CustomCrafterAPI.registerRecipe(ShapelessRecipeProvider.extractPotion())
     }
 
     override fun onDisable() {
