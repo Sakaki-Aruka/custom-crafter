@@ -13,19 +13,14 @@ custom crafter is a plugin for PaperMC servers that provides custom recipes.
 ---
 
 # Support versions
-Paper  
+## PaperMC / PaperMC-fork  
 
-| Custom_Crafter Version | Paper Version   |
-|------------------------|-----------------|
-| 5.0.15 (latest)        | 1.21.4 ~        |
-| 5.0.14                 | 1.21.4 ~        |
-| 5.0.13-1               | 1.21.4 ~        |
-| 5.0.13                 | 1.21.4 ~        |
-| 5.0.0 ~ 5.0.11         | 1.21.3          |
-| 4.3 (legacy)           | 1.21.3          |
-| 4.2 (legacy)           | 1.20.1 ~ 1.20.4 |
-
-(v5.0.12 did not release.)  
+| Custom_Crafter Version   | Paper Version   |
+|--------------------------|-----------------|
+| 5.0.13 ~ 5.0.15 (latest) | 1.21.4 ~        |
+| 5.0.0 ~ 5.0.11           | 1.21.3          |
+| 4.3 (legacy)             | 1.21.3          |
+| 4.2 (legacy)             | 1.20.1 ~ 1.20.4 |
 
 **WARNING: custom crafter does not support to run on Spigot servers.**
 
@@ -38,12 +33,17 @@ You can make custom recipes in your plugin and register those.
 
 ## Documents
 [KDoc](https://sakaki-aruka.github.io/custom-crafter/) / [Wiki (on GitHub)](https://github.com/Sakaki-Aruka/custom-crafter/wiki/Intro)  
-You can build a document what type of JavaDoc with `mvn dokka:javadoc` on the project root.
+
+You can build document from Maven commands.
+- KDoc Style: `mvn -pl api dokka:dokka`
+- JavaDoc Style: `mvn -pl api dokka:javadoc`
 
 ## Dependency Information
 
-**Note: the version name must be a real version string or `master-SNAPSHOT`.**
-
+Must use below scopes.
+- Maven: `provided`
+- Gradle: `compileOnly`  
+  
 The latest provided version  
 [![](https://jitpack.io/v/Sakaki-Aruka/custom-crafter.svg)](https://jitpack.io/#Sakaki-Aruka/custom-crafter)
 
@@ -120,14 +120,11 @@ dependencies {
 ---
 
 # Get Started with Custom_Crafter
-0. Make a plugin
-   1. create plugin that uses custom-crafter API
-
 1. Install
-   1. [Download from here.(GitHub release page)](https://github.com/Sakaki-Aruka/custom-crafter/releases/latest)
-   2. Place the downloaded file to plugins directory.
-   3. Reboot or reload your server.
-
+   1. [Download CustomCrafterAPI (GitHub release page)](https://github.com/Sakaki-Aruka/custom-crafter/releases/latest)
+   1. [Download MCKotlin-Paper plugin (GitHub release page)](https://github.com/4drian3d/MCKotlin/releases) if you did not. (Choose your server version)
+   1. Place the downloaded file to plugins directory.
+   1. Reboot or reload your server.
 
 2. Place base block  
    custom crafter does not work only a work bench block.  
@@ -137,6 +134,10 @@ dependencies {
 ---
 
 # Code Example
+
+CustomCrafterAPI has some code examples.  
+- Below examples
+- Demo plugin in `demo` module
 
 ## Version check
 Example code to check if the CustomCrafterAPI version your plugin depends on is fully compatible with the version deployed on your server.
