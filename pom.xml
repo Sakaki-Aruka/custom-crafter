@@ -46,6 +46,9 @@
                                 <sourceDir>src/main/java</sourceDir>
                                 <sourceDir>src/main/kotlin</sourceDir>
                             </sourceDirs>
+                            <args>
+                                <arg>-Xconsistent-data-class-copy-visibility</arg>
+                            </args>
                         </configuration>
                     </execution>
                     <execution>
@@ -134,7 +137,7 @@
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib</artifactId>
             <version>${kotlin.version}</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
         <!-- /Kotlin -->
 

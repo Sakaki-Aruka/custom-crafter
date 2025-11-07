@@ -48,7 +48,45 @@ object ShapedRecipeProvider {
             val list: MutableList<ItemStack> = mutableListOf()
             list.add(ItemStack.of(Material.POTION, ctx.calledTimes * 4))
             list.add(ItemStack.of(Material.BUCKET, ctx.calledTimes))
-            return@ResultSupplier emptyList()
+            return@ResultSupplier list
+        }
+
+        /*
+         * # -> glass bottle
+         * + -> water bucket
+         *
+         *  #  (x:1, y:0)
+         * #+# (x:0, y:1), (x:1, y:1), (x:2, y:1)
+         *
+         * returns 4x water bottle, 1x empty bucket
+         */
+        val items: MutableMap<CoordinateComponent, CMatter> = mutableMapOf()
+        items[CoordinateComponent(1, 0)] = emptyBottle
+        items[CoordinateComponent(0, 1)] = emptyBottle
+        items[CoordinateComponent(1, 1)] = waterBucket
+        items[CoordinateComponent(2, 1)] = emptyBottle
+
+        return CRecipeImpl(
+            name = "bulk water bottles recipe",
+            items = items,
+            results = listOf(supplier),
+            type = CRecipeType.NORMAL
+        )
+    }
+
+    fun moreWateredBottles(): CRecipe {
+        val emptyBottle: CMatter = CMatterImpl.single(Material.GLASS_BOTTLE)
+        val waterBucket: CMatter = CMatterImpl(
+            name = "water bucket (mass)",
+            candidate = setOf(Material.WATER_BUCKET),
+            mass = true
+        )
+
+        val supplier = ResultSupplier { ctx ->
+            listOf(
+                ItemStack.of(Material.POTION, ctx.calledTimes * 4),
+                ItemStack.of(Material.BUCKET)
+            )
         }
 
         /*
@@ -59,7 +97,7 @@ object ShapedRecipeProvider {
          * #+# (x:0, y:1), (x:1, y:1), (x:2, y:1)
          *  #  (x:1, y:2)
          *
-         * returns 4x water bottle, 1x empty bucket
+         * returns (min amount * 4)x water bottle, 1x empty bucket
          */
         val items: MutableMap<CoordinateComponent, CMatter> = mutableMapOf()
         items[CoordinateComponent(1, 0)] = emptyBottle
@@ -69,7 +107,7 @@ object ShapedRecipeProvider {
         items[CoordinateComponent(1, 2)] = emptyBottle
 
         return CRecipeImpl(
-            name = "bulk water bottles recipe",
+            name = "bulk water bottles (more) recipe",
             items = items,
             results = listOf(supplier),
             type = CRecipeType.NORMAL

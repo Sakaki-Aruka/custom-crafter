@@ -10,7 +10,7 @@ import org.bukkit.inventory.ItemStack
 
 object ShapelessRecipeProvider {
     fun glowBerry(): CRecipe {
-        val glowstone: CMatter = CMatterImpl.single(Material.GLOWSTONE)
+        val glowstone: CMatter = CMatterImpl.single(Material.GLOWSTONE_DUST)
         val berry: CMatter = CMatterImpl.single(Material.SWEET_BERRIES)
         /*
          * # -> glowstone

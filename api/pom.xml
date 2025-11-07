@@ -80,10 +80,6 @@
 
                             <relocations>
                                 <relocation>
-                                    <pattern>kotlin</pattern>
-                                    <shadedPattern>io.github.sakaki_aruka.customcrafter.shaded.kotlin</shadedPattern>
-                                </relocation>
-                                <relocation>
                                     <pattern>org.chocosolver</pattern>
                                     <shadedPattern>io.github.sakaki_aruka.customcrafter.shaded.org.chocosolver</shadedPattern>
                                 </relocation>

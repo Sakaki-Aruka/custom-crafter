@@ -1,6 +1,5 @@
 package online.aruka.demo
 
-import io.github.sakaki_aruka.customcrafter.CustomCrafter
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import online.aruka.demo.listener.CustomItemRegisteredListener
 import online.aruka.demo.recipe.ShapedRecipeProvider
@@ -12,30 +11,24 @@ class Demo : JavaPlugin() {
 
     companion object {
         lateinit var plugin: JavaPlugin
-        lateinit var API: CustomCrafterAPI
     }
 
     override fun onEnable() {
         // Plugin startup logic
         plugin = this
-        API = (Bukkit.getPluginManager().getPlugin("Custom_Crafter") as? CustomCrafter)
-            ?.api
-            ?: run {
-                Bukkit.getPluginManager().disablePlugin(this)
-                return
-            }
 
-        this.logger.info("Custom Crafter API found: ${API.API_VERSION}")
+        this.logger.info("Custom Crafter API found: ${CustomCrafterAPI.API_VERSION}")
 
         // register listeners to Bukkit api
         Bukkit.getPluginManager().registerEvents(CustomItemRegisteredListener, this)
 
         // register shaped recipes
-        API.registerRecipe(ShapedRecipeProvider.enchantedGoldenApple())
-        API.registerRecipe(ShapedRecipeProvider.wateredBottles())
+        CustomCrafterAPI.registerRecipe(ShapedRecipeProvider.enchantedGoldenApple())
+        CustomCrafterAPI.registerRecipe(ShapedRecipeProvider.wateredBottles())
+        CustomCrafterAPI.registerRecipe(ShapedRecipeProvider.moreWateredBottles())
 
         // register shapeless recipes
-        API.registerRecipe(ShapelessRecipeProvider.glowBerry())
+        CustomCrafterAPI.registerRecipe(ShapelessRecipeProvider.glowBerry())
     }
 
     override fun onDisable() {
