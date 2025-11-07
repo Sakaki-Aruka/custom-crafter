@@ -35,6 +35,37 @@ data class CMatterImpl(
 
     companion object {
         /**
+         * Returns [CMatterImpl] build from specified materials.
+         *
+         * ```kotlin
+         * // below 2 matters are same
+         * val matter = CMatterImpl.of(Material.STONE, Material.COBBLESTONE)
+         *
+         * val matter = CMatterImpl(
+         *     name = "STONE-COBBLESTONE",
+         *     candidate = setOf(Material.STONE, Material.COBBLESTONE),
+         *     amount = 1,
+         *     mass = false,
+         *     predicates = null
+         * )
+         * ```
+         *
+         * @param[materials] Candidate materials
+         * @return[CMatterImpl] Built matter
+         * @throws[IllegalStateException] Throws when [materials] is empty and contains invalid material
+         */
+        fun of(vararg materials: Material): CMatterImpl {
+            val matter = CMatterImpl(
+                name = materials.joinToString("-") { m -> m.name },
+                candidate = materials.toSet()
+            )
+
+            val checkResult: Result<Unit> = matter.isValidMatter()
+            checkResult.exceptionOrNull()?.let { t -> throw t }
+            return matter
+        }
+
+        /**
          * returns single candidate [CMatterImpl].
          *
          * its name is [material]'s name. `material.name`.
@@ -54,15 +85,7 @@ data class CMatterImpl(
          *
          * @param[material] a candidate of this matter.
          */
-        fun single(material: Material): CMatterImpl {
-            if (material.isAir || !material.isItem) {
-                throw IllegalArgumentException("'material' must be 'Material#isItem' and '!Material#isAir'.")
-            }
-            return CMatterImpl(
-                name = material.name,
-                candidate = setOf(material)
-            )
-        }
+        fun single(material: Material): CMatterImpl = of(material)
 
         /**
          * Returns multi candidate [CMatterImpl].
@@ -84,15 +107,6 @@ data class CMatterImpl(
          * @return[CMatterImpl] Built matter
          * @throws[IllegalStateException] Throws when [materials] is empty and contains invalid material
          */
-        fun multi(vararg materials: Material): CMatterImpl {
-            val matter = CMatterImpl(
-                name = materials.joinToString("-") { m -> m.name },
-                candidate = materials.toSet()
-            )
-
-            val checkResult: Result<Unit> = matter.isValidMatter()
-            checkResult.exceptionOrNull()?.let { t -> throw t }
-            return matter
-        }
+        fun multi(vararg materials: Material): CMatterImpl = of(*materials)
     }
 }

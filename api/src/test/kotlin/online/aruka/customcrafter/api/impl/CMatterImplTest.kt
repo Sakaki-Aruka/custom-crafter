@@ -28,12 +28,12 @@ object CMatterImplTest {
 
     @Test
     fun detectAirOnSingleTest() {
-        assertThrows<IllegalArgumentException> { CMatterImpl.single(Material.AIR) }
+        assertThrows<IllegalStateException> { CMatterImpl.single(Material.AIR) }
     }
 
     @Test
     fun detectNotItemOnSingleTest() {
-        assertThrows<IllegalArgumentException> { CMatterImpl.single(Material.WATER) }
+        assertThrows<IllegalStateException> { CMatterImpl.single(Material.WATER) }
     }
 
     @Test
