@@ -69,12 +69,4 @@ interface CMatter {
             self, mapped, recipe, crafterID
         )) } ?: true
     }
-
-    /**
-     * returns a matter what is applied `amount = 1`.
-     *
-     * @return[CMatter] applied `amount = 1`
-     */
-    fun asOne(): CMatter
-
 }

@@ -20,19 +20,6 @@ data class CMatterImpl(
     override val mass: Boolean = false,
     override val predicates: Set<CMatterPredicate>? = null,
 ): CMatter {
-    /**
-     * @see[CMatter.asOne]
-     */
-    override fun asOne(): CMatterImpl {
-        return CMatterImpl(
-            this.name,
-            this.candidate,
-            amount = 1,
-            this.mass,
-            this.predicates,
-        )
-    }
-
     companion object {
         /**
          * Returns [CMatterImpl] build from specified materials.

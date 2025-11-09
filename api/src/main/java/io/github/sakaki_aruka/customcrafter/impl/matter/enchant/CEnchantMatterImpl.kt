@@ -23,16 +23,4 @@ data class CEnchantMatterImpl(
     override val amount: Int = 1,
     override val mass: Boolean = false,
     override val predicates: Set<CMatterPredicateImpl>? = null
-
-): CEnchantMatter {
-    override fun asOne(): CEnchantMatterImpl {
-        return CEnchantMatterImpl(
-            name = name,
-            candidate = candidate,
-            amount = 1,
-            mass = mass,
-            predicates = predicates,
-            enchantComponents = enchantComponents
-        )
-    }
-}
+): CEnchantMatter

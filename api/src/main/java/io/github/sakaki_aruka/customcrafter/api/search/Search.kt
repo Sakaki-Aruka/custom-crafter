@@ -208,13 +208,11 @@ object Search {
 
         for ((i, m) in inputSorted.zip(recipeSorted)) {
             if (!m.mass && m.amount != 1 && i.amount < m.amount) return false
-            val inOne: ItemStack = i.asOne()
-            val recipeOne: CMatter = m.asOne()
 
-            if (!recipeOne.predicatesResult(inOne, mapped, recipe, crafterID)) return false
+            if (!m.predicatesResult(i, mapped, recipe, crafterID)) return false
             recipe.filters?.let { set ->
                 for (filter in set) {
-                    val (type, result) = applyNormalFilters(inOne, recipeOne, filter) ?: continue
+                    val (type, result) = applyNormalFilters(i ,m, filter) ?: continue
                     return when (type) {
                         CRecipeFilter.ResultType.NOT_REQUIRED -> continue
                         CRecipeFilter.ResultType.FAILED -> false

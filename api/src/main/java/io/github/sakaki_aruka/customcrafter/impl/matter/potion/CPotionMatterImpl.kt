@@ -23,15 +23,4 @@ data class CPotionMatterImpl(
     override val amount: Int = 1,
     override val mass: Boolean = false,
     override val predicates: Set<CMatterPredicateImpl>? = null,
-): CPotionMatter {
-    override fun asOne(): CPotionMatterImpl {
-        return CPotionMatterImpl(
-            name = name,
-            candidate = candidate,
-            amount = 1,
-            mass = mass,
-            predicates = predicates,
-            potionComponents = potionComponents
-        )
-    }
-}
+): CPotionMatter
