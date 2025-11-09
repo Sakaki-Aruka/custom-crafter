@@ -19,14 +19,6 @@ interface CMatter {
     val mass: Boolean
     val predicates: Set<CMatterPredicate>?
 
-    companion object {
-        /**
-         * Returns an available materials set
-         * @since 5.0.15
-         */
-        val AVAILABLE_MATERIALS: Set<Material> = Material.entries.filter { m -> m.isItem && !m.isAir }.toSet()
-    }
-
     /**
      * Returns this [CMatter] is a valid or not.
      *
