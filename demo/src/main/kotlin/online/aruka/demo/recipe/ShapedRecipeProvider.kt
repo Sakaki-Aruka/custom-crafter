@@ -2,7 +2,7 @@ package online.aruka.demo.recipe
 
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
-import io.github.sakaki_aruka.customcrafter.api.objects.matter.CMatterPredicate
+import io.github.sakaki_aruka.customcrafter.api.objects.matter.CMatterPredicateImpl
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.objects.result.ResultSupplier
@@ -123,7 +123,7 @@ object ShapedRecipeProvider {
         val ironBlock: CMatter = CMatterImpl(
             name = "iron block",
             candidate = setOf(Material.IRON_BLOCK),
-            predicates = setOf(CMatterPredicate { ctx ->
+            predicates = setOf(CMatterPredicateImpl { ctx ->
                 val key = NamespacedKey(Demo.plugin, "infinity_iron_block_count")
                 !ctx.input.itemMeta.persistentDataContainer.has(key, PersistentDataType.LONG)
             })

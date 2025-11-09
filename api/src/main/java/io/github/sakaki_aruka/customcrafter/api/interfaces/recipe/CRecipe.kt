@@ -3,7 +3,7 @@ package io.github.sakaki_aruka.customcrafter.api.interfaces.recipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.filter.CRecipeFilter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
-import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeContainer
+import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeContainerImpl
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.objects.result.ResultSupplier
@@ -17,7 +17,7 @@ import java.util.UUID
 interface CRecipe {
     val name: String
     val items: Map<CoordinateComponent, CMatter>
-    val containers: List<CRecipeContainer>?
+    val containers: List<CRecipeContainerImpl>?
     val results: List<ResultSupplier>?
     val filters: Set<CRecipeFilter<CMatter>>?
     val type: CRecipeType

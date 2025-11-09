@@ -1,7 +1,6 @@
 package io.github.sakaki_aruka.customcrafter.api.interfaces.matter
 
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
-import io.github.sakaki_aruka.customcrafter.api.objects.matter.CMatterPredicate
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
@@ -51,9 +50,9 @@ interface CMatter {
     /**
      * returns this CMatter has some predicates or not.
      *
-     * @return[Boolean] `predicates != null && predicates!!.isNotEmpty()`
+     * @return[Boolean] == `!predicates.isNullOrEmpty()`
      */
-    fun hasPredicates(): Boolean = predicates != null && predicates!!.isNotEmpty()
+    fun hasPredicates(): Boolean = !predicates.isNullOrEmpty()
 
     /**
      * returns a merged result of all predicates run.

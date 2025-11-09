@@ -3,7 +3,7 @@ package io.github.sakaki_aruka.customcrafter.impl.recipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.filter.CRecipeFilter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
-import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeContainer
+import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeContainerImpl
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.objects.result.ResultSupplier
@@ -19,7 +19,7 @@ data class CVanillaRecipe internal constructor(
     override val name: String,
     override val items: Map<CoordinateComponent, CMatter>,
     override val type: CRecipeType,
-    override val containers: List<CRecipeContainer>? = null,
+    override val containers: List<CRecipeContainerImpl>? = null,
     override val results: List<ResultSupplier>? = null,
     override val filters: Set<CRecipeFilter<CMatter>>? = CRecipeImpl.getDefaultFilters(),
     val original: Recipe

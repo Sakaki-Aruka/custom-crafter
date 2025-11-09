@@ -4,7 +4,7 @@ import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.interfaces.filter.CRecipeFilter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
-import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeContainer
+import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeContainerImpl
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.impl.recipe.filter.EnchantFilter
@@ -26,7 +26,7 @@ data class CRecipeImpl(
     override val name: String,
     override val items: Map<CoordinateComponent, CMatter>,
     override val type: CRecipeType,
-    override val containers: List<CRecipeContainer>? = null,
+    override val containers: List<CRecipeContainerImpl>? = null,
     override val results: List<ResultSupplier>? = null,
     override val filters: Set<CRecipeFilter<CMatter>>? = getDefaultFilters()
 ): CRecipe {
@@ -70,7 +70,7 @@ data class CRecipeImpl(
         fun amorphous(
             name: String,
             items: List<CMatter>,
-            containers: List<CRecipeContainer>? = null,
+            containers: List<CRecipeContainerImpl>? = null,
             results: List<ResultSupplier>? = null,
             filters: Set<CRecipeFilter<CMatter>>? = getDefaultFilters()
         ): CRecipeImpl {

@@ -2,7 +2,7 @@ package io.github.sakaki_aruka.customcrafter.impl.matter.potion
 
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CPotionMatter
-import io.github.sakaki_aruka.customcrafter.api.objects.matter.CMatterPredicate
+import io.github.sakaki_aruka.customcrafter.api.objects.matter.CMatterPredicateImpl
 import io.github.sakaki_aruka.customcrafter.api.objects.matter.potion.CPotionComponent
 import org.bukkit.Material
 
@@ -22,7 +22,7 @@ data class CPotionMatterImpl(
     override val potionComponents: Set<CPotionComponent>,
     override val amount: Int = 1,
     override val mass: Boolean = false,
-    override val predicates: Set<CMatterPredicate>? = null,
+    override val predicates: Set<CMatterPredicateImpl>? = null,
 ): CPotionMatter {
     override fun asOne(): CPotionMatterImpl {
         return CPotionMatterImpl(
