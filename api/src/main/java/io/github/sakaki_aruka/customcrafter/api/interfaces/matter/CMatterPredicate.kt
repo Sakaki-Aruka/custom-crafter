@@ -20,6 +20,8 @@ interface CMatterPredicate {
     /**
      * CMatterPredicate context
      *
+     * @param[coordinate] Inspection point on a recipe mapping
+     * @param[matter] Inspector
      * @param[input] Inspection target
      * @param[mapped] User input items mapping
      * @param[recipe] A CRecipe what contains a CMatterPredicate who receives this
@@ -27,6 +29,8 @@ interface CMatterPredicate {
      * @see[CMatterPredicate]
      */
     data class Context internal constructor(
+        val coordinate: CoordinateComponent,
+        val matter: CMatter,
         val input: ItemStack,
         val mapped: Map<CoordinateComponent, ItemStack>,
         val recipe: CRecipe,

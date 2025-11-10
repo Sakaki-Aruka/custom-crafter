@@ -3,6 +3,7 @@ package io.github.sakaki_aruka.customcrafter.api.search
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.interfaces.filter.CRecipeFilter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
+import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatterPredicate
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
@@ -10,6 +11,8 @@ import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelationComponent
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.impl.recipe.CVanillaRecipe
+import io.github.sakaki_aruka.customcrafter.impl.util.Converter
+import io.github.sakaki_aruka.customcrafter.internal.command.CC
 import org.bukkit.Bukkit
 import org.bukkit.World
 import org.bukkit.entity.Player
@@ -154,7 +157,8 @@ object Search {
         val mapped: Map<CoordinateComponent, ItemStack> = view.materials
 
         val customs: MutableList<Pair<CRecipe, MappedRelation>> = mutableListOf()
-        for (recipe in sourceRecipes.filter { r -> r.items.size == mapped.size }) {
+        /*r.items.size == mapped.size*/
+        for (recipe in sourceRecipes.filter { r -> mapped.size in r.requiresInputItemAmountMin()..r.requiresInputItemAmountMax() }) {
             when (recipe.type) {
                 CRecipeType.NORMAL -> {
                     if (!normal(mapped, recipe, crafterID)) {
@@ -190,40 +194,64 @@ object Search {
         return SearchResult(vanilla, customs)
     }
 
+    private fun allCandidateContains(
+        mapped: Map<CoordinateComponent, ItemStack>,
+        recipe: CRecipe
+    ): Boolean {
+        // base point: recipe
+        val recipeMinCoordinate: CoordinateComponent = recipe.items.keys.minBy { it.toIndex() }
+        val inputMinCoordinate: CoordinateComponent = mapped.keys.minBy { it.toIndex() }
+        val dx: Int = recipeMinCoordinate.x - inputMinCoordinate.x
+        val dy: Int = recipeMinCoordinate.y - inputMinCoordinate.y
+        val inputCoordinates: List<CoordinateComponent> = recipe.items.keys.map { c -> CoordinateComponent(c.x - dx, c.y - dy) }
+        val mustEmptyCoordinates: List<CoordinateComponent> = Converter.getAvailableCraftingSlotComponents() - inputCoordinates.toSet()
+
+        val itemPlaceCheck: Boolean = recipe.items.entries.all { (c, matter) ->
+            val itemCoordinate = CoordinateComponent(c.x - dx, c.y - dy)
+            (mapped[itemCoordinate] ?: ItemStack.empty()).type in matter.candidate
+        }
+
+        val itemEmptyCheck: Boolean = mustEmptyCoordinates.all { c ->
+            mapped[c]?.let { it.type.isAir } ?: true
+        }
+        return itemPlaceCheck && itemEmptyCheck
+    }
+
     private fun normal(
         mapped: Map<CoordinateComponent, ItemStack>,
         recipe: CRecipe,
         crafterID: UUID,
-        fromAmorphous: Boolean = false
     ): Boolean {
-        val basic: Boolean =
-            if (fromAmorphous) allCandidateContains(mapped, recipe)
-            else {
-                sameShape(mapped.keys, recipe)
-                        && allCandidateContains(mapped, recipe)
-            }
+        val basic: Boolean = allCandidateContains(mapped, recipe)
 
-        val inputSorted: List<ItemStack> = coordinateSort(mapped)
-        val recipeSorted: List<CMatter> = coordinateSort(recipe.items)
-
-        for ((i, m) in inputSorted.zip(recipeSorted)) {
-            if (!m.mass && m.amount != 1 && i.amount < m.amount) return false
-
-            if (!m.predicatesResult(i, mapped, recipe, crafterID)) return false
-            recipe.filters?.let { set ->
-                for (filter in set) {
-                    val (type, result) = applyNormalFilters(i ,m, filter) ?: continue
-                    return when (type) {
-                        CRecipeFilter.ResultType.NOT_REQUIRED -> continue
-                        CRecipeFilter.ResultType.FAILED -> false
-                        CRecipeFilter.ResultType.SUCCESS -> {
-                            if (result) continue
-                            else false
-                        }
-                    }
+        for ((c, matter) in recipe.items.entries.sortedBy { (c, _) -> c.toIndex() }) {
+            val input: ItemStack = mapped[c] ?: ItemStack.empty()
+            if (!input.type.isAir) {
+                if (!matter.mass && input.amount < matter.amount) {
+                    return false
+                } else if (matter.mass && input.amount < 1) {
+                    return false
                 }
             }
+
+            val ctx = CMatterPredicate.Context(c, matter, input, mapped, recipe, crafterID)
+            if (!matter.predicatesResult(ctx)) {
+                return false
+            }
+
+            recipe.filters?.let { filters ->
+                for (filter in filters) {
+                    val (type, result) = applyNormalFilters(input, matter, filter)
+                        ?: continue
+                    when (type) {
+                        CRecipeFilter.ResultType.NOT_REQUIRED -> continue
+                        CRecipeFilter.ResultType.FAILED -> return false
+                        CRecipeFilter.ResultType.SUCCESS -> if (!result) return false
+                    }
+                }
+            } ?: continue
         }
+
         return basic
     }
 
@@ -316,7 +344,8 @@ object Search {
             val set: MutableSet<Triple<Int, Boolean, Boolean>> = mutableSetOf()
             for ((i, item) in input.entries) {
                 if (matter.hasPredicates()) {
-                    set.add(Triple(i.toIndex(), true, matter.predicatesResult(item, input, recipe, crafterID)))
+                    val ctx = CMatterPredicate.Context(r, matter, item, input, recipe, crafterID)
+                    set.add(Triple(i.toIndex(), true, matter.predicatesResult(ctx)))
                 }
             }
             result[r.toIndex()] = set.toSet()
@@ -439,47 +468,5 @@ object Search {
         } else {
             MappedRelation(relationComponents)
         }
-    }
-
-
-    private fun allCandidateContains(mapped: Map<CoordinateComponent, ItemStack>, recipe: CRecipe): Boolean {
-        val inputCoordinateSorted: List<CoordinateComponent> = coordinateSort(mapped.keys)
-        val recipeCoordinateSorted: List<CoordinateComponent> = coordinateSort(recipe.items.keys)
-        for ((ic, rc) in inputCoordinateSorted.zip(recipeCoordinateSorted)) {
-            if (!recipe.items[rc]!!.candidate.contains(mapped[ic]!!.type)) return false
-        }
-        return true
-    }
-
-    private fun sameShape(mapped: Set<CoordinateComponent>, recipe: CRecipe): Boolean {
-        if (recipe.type == CRecipeType.AMORPHOUS || mapped.size != recipe.items.size) return false
-        val r: List<CoordinateComponent> = coordinateSort(recipe.items.keys)
-        val i: List<CoordinateComponent> = coordinateSort(mapped)
-        val set: MutableSet<Pair<Int, Int>> = mutableSetOf()
-        for ((inputCoordinate, recipeCoordinate) in i.zip(r)) {
-            set.add(Pair(abs(inputCoordinate.x - recipeCoordinate.x), abs(inputCoordinate.y - recipeCoordinate.y)))
-        }
-        return set.size == 1
-    }
-
-    private fun <T> coordinateSort(coordinates: Map<CoordinateComponent, T>): List<T> {
-        val result: MutableList<T> = mutableListOf()
-        for (c in coordinateSort(coordinates.keys)) {
-            coordinates[c]?.let { result.add(it) }
-        }
-        return result
-    }
-
-    private fun coordinateSort(coordinates: Collection<CoordinateComponent>): List<CoordinateComponent> {
-        val result: MutableList<CoordinateComponent> = mutableListOf()
-        coordinates.groupBy { it.y }
-            .let {
-                for (y in it.keys.sorted()) {
-                    it[y]?.let { list -> list.sortedBy { c -> c.x }
-                        .forEach { c -> result.add(c) }
-                    }
-                }
-            }
-        return result
     }
 }

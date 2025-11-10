@@ -17,7 +17,7 @@ import java.util.UUID
 interface CRecipe {
     val name: String
     val items: Map<CoordinateComponent, CMatter>
-    val containers: List<CRecipeContainerImpl>?
+    val containers: List<CRecipeContainer>?
     val results: List<ResultSupplier>?
     val filters: Set<CRecipeFilter<CMatter>>?
     val type: CRecipeType
@@ -60,6 +60,26 @@ interface CRecipe {
      * @return[CRecipe] created new recipe.
      */
     fun replaceItems(newItems: Map<CoordinateComponent, CMatter>): CRecipe
+
+    /**
+     * Minimal requires input items amount
+     *
+     * Default implementation exists
+     *
+     * @return[Int] Minimal requires input items amount
+     * @since 5.0.15
+     */
+    fun requiresInputItemAmountMin(): Int = this.items.size
+
+    /**
+     * Maximum requires input items amount. Inclusive
+     *
+     * Default implementation exists
+     *
+     * @return[Int] Maximum requires input items amount
+     * @since 5.0.15
+     */
+    fun requiresInputItemAmountMax(): Int = this.items.size
 
     /**
      * runs all [containers] if it is not null.

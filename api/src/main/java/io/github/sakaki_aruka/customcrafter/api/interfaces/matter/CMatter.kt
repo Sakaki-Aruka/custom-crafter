@@ -1,10 +1,7 @@
 package io.github.sakaki_aruka.customcrafter.api.interfaces.matter
 
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
-import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import org.bukkit.Material
-import org.bukkit.inventory.ItemStack
-import java.util.UUID
 
 /**
  * This interface's implementing types can be used as materials for [CRecipe].
@@ -55,18 +52,19 @@ interface CMatter {
     fun hasPredicates(): Boolean = !predicates.isNullOrEmpty()
 
     /**
-     * returns a merged result of all predicates run.
+     * Returns a merged result of all predicates run.
      *
+     * ```Kotlin
+     * // Default implementation on `CMatter#predicateResult`
+     * fun predicateResult(ctx: CMatterPredicate.Context): Boolean {
+     *     return predicates?.all { p -> p.predicate(ctx) } ?: true
+     * }
+     * ```
+     *
+     * @param[ctx] Context of CMatterPredicate execution
      * @return[Boolean] all or nothing.
      */
-    fun predicatesResult(
-        self: ItemStack,
-        mapped: Map<CoordinateComponent, ItemStack>,
-        recipe: CRecipe,
-        crafterID: UUID
-    ): Boolean {
-        return predicates?.all { p -> p.predicate(CMatterPredicate.Context(
-            self, mapped, recipe, crafterID
-        )) } ?: true
+    fun predicatesResult(ctx: CMatterPredicate.Context): Boolean {
+        return predicates?.all { p -> p.predicate(ctx) } ?: true
     }
 }
