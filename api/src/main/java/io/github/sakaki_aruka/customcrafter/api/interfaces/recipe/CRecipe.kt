@@ -2,11 +2,11 @@ package io.github.sakaki_aruka.customcrafter.api.interfaces.recipe
 
 import io.github.sakaki_aruka.customcrafter.api.interfaces.filter.CRecipeFilter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
+import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeContainerImpl
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
-import io.github.sakaki_aruka.customcrafter.api.objects.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import org.bukkit.inventory.ItemStack
 import java.util.UUID
@@ -152,7 +152,7 @@ interface CRecipe {
             val list: MutableList<ItemStack> = mutableListOf()
             suppliers.map { s ->
                 list.addAll(s.f(
-                    ResultSupplier.Config(
+                    ResultSupplier.Context(
                         relate,
                         mapped,
                         shiftClicked,

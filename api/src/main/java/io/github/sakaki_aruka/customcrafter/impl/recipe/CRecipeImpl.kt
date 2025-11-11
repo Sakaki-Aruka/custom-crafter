@@ -10,7 +10,7 @@ import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateCompone
 import io.github.sakaki_aruka.customcrafter.impl.recipe.filter.EnchantFilter
 import io.github.sakaki_aruka.customcrafter.impl.recipe.filter.EnchantStorageFilter
 import io.github.sakaki_aruka.customcrafter.impl.recipe.filter.PotionFilter
-import io.github.sakaki_aruka.customcrafter.api.objects.result.ResultSupplier
+import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
 
 /**
  * A default [CRecipe] implementation class.

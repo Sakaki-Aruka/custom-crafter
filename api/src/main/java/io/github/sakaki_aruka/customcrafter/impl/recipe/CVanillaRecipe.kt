@@ -6,8 +6,9 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeContainerImpl
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
-import io.github.sakaki_aruka.customcrafter.api.objects.result.ResultSupplier
+import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
+import io.github.sakaki_aruka.customcrafter.impl.result.ResultSupplierImpl
 import org.bukkit.Material
 import org.bukkit.inventory.CraftingRecipe
 import org.bukkit.inventory.Recipe
@@ -45,7 +46,7 @@ data class CVanillaRecipe internal constructor(
                 recipe.key.namespace + recipe.key.key,
                 shapeToItems(recipe.shape, recipe.choiceMap),
                 CRecipeType.NORMAL,
-                results = listOf(ResultSupplier.Companion.timesSingle(recipe.result)),
+                results = listOf(ResultSupplierImpl.timesSingle(recipe.result)),
                 original = recipe
             )
         }
@@ -62,7 +63,7 @@ data class CVanillaRecipe internal constructor(
                 recipe.key.namespace + recipe.key.key,
                 shapelessToItems(recipe.choiceList),
                 CRecipeType.AMORPHOUS,
-                results = listOf(ResultSupplier.Companion.timesSingle(recipe.result)),
+                results = listOf(ResultSupplierImpl.timesSingle(recipe.result)),
                 original = recipe
             )
         }
