@@ -194,47 +194,31 @@ object Search {
         return SearchResult(vanilla, customs)
     }
 
-    private fun allCandidateContains(
-        mapped: Map<CoordinateComponent, ItemStack>,
-        recipe: CRecipe
-    ): Boolean {
-        // base point: recipe
-        val recipeMinCoordinate: CoordinateComponent = recipe.items.keys.minBy { it.toIndex() }
-        val inputMinCoordinate: CoordinateComponent = mapped.keys.minBy { it.toIndex() }
-        val dx: Int = recipeMinCoordinate.x - inputMinCoordinate.x
-        val dy: Int = recipeMinCoordinate.y - inputMinCoordinate.y
-        val inputCoordinates: List<CoordinateComponent> = recipe.items.keys.map { c -> CoordinateComponent(c.x - dx, c.y - dy) }
-        val mustEmptyCoordinates: List<CoordinateComponent> = Converter.getAvailableCraftingSlotComponents() - inputCoordinates.toSet()
-
-        val itemPlaceCheck: Boolean = recipe.items.entries.all { (c, matter) ->
-            val itemCoordinate = CoordinateComponent(c.x - dx, c.y - dy)
-            (mapped[itemCoordinate] ?: ItemStack.empty()).type in matter.candidate
-        }
-
-        val itemEmptyCheck: Boolean = mustEmptyCoordinates.all { c ->
-            mapped[c]?.let { it.type.isAir } ?: true
-        }
-        return itemPlaceCheck && itemEmptyCheck
-    }
-
     private fun normal(
         mapped: Map<CoordinateComponent, ItemStack>,
         recipe: CRecipe,
         crafterID: UUID,
     ): Boolean {
-        val basic: Boolean = allCandidateContains(mapped, recipe)
-
-        for ((c, matter) in recipe.items.entries.sortedBy { (c, _) -> c.toIndex() }) {
-            val input: ItemStack = mapped[c] ?: ItemStack.empty()
-            if (!input.type.isAir) {
-                if (!matter.mass && input.amount < matter.amount) {
-                    return false
-                } else if (matter.mass && input.amount < 1) {
-                    return false
-                }
+        val sortedRecipeCoordinates: List<CoordinateComponent> = recipe.items.keys.sortedBy { it.toIndex() }
+        val sortedInputCoordinates: List<CoordinateComponent> = mapped.keys.sortedBy { it.toIndex() }
+        val diffs: MutableSet<Pair<Int, Int>> = mutableSetOf()
+        for ((recipeCoordinate, inputCoordinate) in sortedRecipeCoordinates.zip(sortedInputCoordinates)) {
+            diffs.add(recipeCoordinate.x - inputCoordinate.x to recipeCoordinate.y - inputCoordinate.y)
+            if (diffs.size > 1) {
+                return false
             }
 
-            val ctx = CMatterPredicate.Context(c, matter, input, mapped, recipe, crafterID)
+            val matter: CMatter = recipe.items.getValue(recipeCoordinate)
+            val input: ItemStack = mapped[inputCoordinate] ?: ItemStack.empty()
+            if (input.type !in matter.candidate) {
+                return false
+            } else if (matter.mass && input.amount < 1) {
+                return false
+            } else if (!matter.mass && input.amount < matter.amount) {
+                return false
+            }
+
+            val ctx = CMatterPredicate.Context(recipeCoordinate, matter, input, mapped, recipe, crafterID)
             if (!matter.predicatesResult(ctx)) {
                 return false
             }
@@ -251,8 +235,7 @@ object Search {
                 }
             } ?: continue
         }
-
-        return basic
+        return true
     }
 
     private inline fun <reified T : CMatter> applyNormalFilters(
