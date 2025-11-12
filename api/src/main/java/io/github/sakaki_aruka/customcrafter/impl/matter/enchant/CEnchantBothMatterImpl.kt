@@ -3,7 +3,7 @@ package io.github.sakaki_aruka.customcrafter.impl.matter.enchant
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CEnchantMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CEnchantmentStoreMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
-import io.github.sakaki_aruka.customcrafter.api.objects.matter.CMatterPredicateImpl
+import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterPredicateImpl
 import io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant.CEnchantComponent
 import org.bukkit.Material
 

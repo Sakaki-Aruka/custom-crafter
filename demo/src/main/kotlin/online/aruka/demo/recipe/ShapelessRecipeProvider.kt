@@ -2,8 +2,8 @@ package online.aruka.demo.recipe
 
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
-import io.github.sakaki_aruka.customcrafter.api.objects.matter.CMatterPredicateImpl
-import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeContainerImpl
+import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterPredicateImpl
+import io.github.sakaki_aruka.customcrafter.impl.recipe.CRecipeContainerImpl
 import io.github.sakaki_aruka.customcrafter.api.objects.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
 import io.github.sakaki_aruka.customcrafter.impl.recipe.CRecipeImpl

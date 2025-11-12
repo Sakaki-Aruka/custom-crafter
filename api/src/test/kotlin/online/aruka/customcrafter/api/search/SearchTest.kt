@@ -3,7 +3,7 @@ package online.aruka.customcrafter.api.search
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.interfaces.filter.CRecipeFilter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
-import io.github.sakaki_aruka.customcrafter.api.objects.matter.CMatterPredicateImpl
+import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterPredicateImpl
 import io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant.CEnchantComponent
 import io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant.EnchantStrict
 import io.github.sakaki_aruka.customcrafter.api.objects.matter.potion.CPotionComponent
