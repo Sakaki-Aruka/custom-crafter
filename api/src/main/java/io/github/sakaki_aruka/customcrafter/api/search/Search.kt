@@ -212,10 +212,14 @@ object Search {
             val input: ItemStack = mapped[inputCoordinate] ?: ItemStack.empty()
             if (input.type !in matter.candidate) {
                 return false
-            } else if (matter.mass && input.amount < 1) {
-                return false
-            } else if (!matter.mass && input.amount < matter.amount) {
-                return false
+            }
+
+            if (!input.type.isAir) {
+                if (matter.mass && input.amount < 1) {
+                    return false
+                } else if (!matter.mass && input.amount < matter.amount) {
+                    return false
+                }
             }
 
             val ctx = CMatterPredicate.Context(recipeCoordinate, matter, input, mapped, recipe, crafterID)
