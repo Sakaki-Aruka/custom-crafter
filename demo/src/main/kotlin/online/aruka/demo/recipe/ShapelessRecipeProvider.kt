@@ -4,9 +4,9 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterPredicateImpl
 import io.github.sakaki_aruka.customcrafter.impl.recipe.CRecipeContainerImpl
-import io.github.sakaki_aruka.customcrafter.api.objects.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
 import io.github.sakaki_aruka.customcrafter.impl.recipe.CRecipeImpl
+import io.github.sakaki_aruka.customcrafter.impl.result.ResultSupplierImpl
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter.toComponent
 import online.aruka.demo.Demo
 import org.bukkit.Bukkit
@@ -32,7 +32,7 @@ object ShapelessRecipeProvider {
             name = "glow berry recipe",
             items = listOf(glowstone, berry),
             results = listOf(
-                ResultSupplier.timesSingle(ItemStack.of(Material.GLOW_BERRIES))
+                ResultSupplierImpl.timesSingle(ItemStack.of(Material.GLOW_BERRIES))
             )
         )
     }
@@ -79,7 +79,7 @@ object ShapelessRecipeProvider {
             ),
             mass = true
         )
-        val supplier = ResultSupplier { ctx ->
+        val supplier = ResultSupplierImpl { ctx ->
             var count = 0
             ctx.mapped.values.forEach { v ->
                 v.itemMeta.persistentDataContainer.get(
@@ -119,7 +119,7 @@ object ShapelessRecipeProvider {
                 )
             })
         )
-        val supplier = ResultSupplier { ctx ->
+        val supplier = ResultSupplierImpl { ctx ->
             val amount: Int = ctx.mapped.values.first().itemMeta.persistentDataContainer.getOrDefault(
                 NamespacedKey(Demo.plugin, "infinity_iron_block_count"),
                 PersistentDataType.INTEGER,
@@ -154,7 +154,7 @@ object ShapelessRecipeProvider {
                 }
             }
         )
-        val supplier = ResultSupplier.timesSingle(ItemStack.of(Material.GLASS_BOTTLE))
+        val supplier = ResultSupplierImpl.timesSingle(ItemStack.of(Material.GLASS_BOTTLE))
         return CRecipeImpl.amorphous(
             name = "potion effect extractor recipe",
             items = listOf(potion),
