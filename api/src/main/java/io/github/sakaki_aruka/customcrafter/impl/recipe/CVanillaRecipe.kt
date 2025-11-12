@@ -3,11 +3,11 @@ package io.github.sakaki_aruka.customcrafter.impl.recipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.filter.CRecipeFilter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
-import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeContainer
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
-import io.github.sakaki_aruka.customcrafter.api.objects.result.ResultSupplier
+import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
+import io.github.sakaki_aruka.customcrafter.impl.result.ResultSupplierImpl
 import org.bukkit.Material
 import org.bukkit.inventory.CraftingRecipe
 import org.bukkit.inventory.Recipe
@@ -19,7 +19,7 @@ data class CVanillaRecipe internal constructor(
     override val name: String,
     override val items: Map<CoordinateComponent, CMatter>,
     override val type: CRecipeType,
-    override val containers: List<CRecipeContainer>? = null,
+    override val containers: List<CRecipeContainerImpl>? = null,
     override val results: List<ResultSupplier>? = null,
     override val filters: Set<CRecipeFilter<CMatter>>? = CRecipeImpl.getDefaultFilters(),
     val original: Recipe
@@ -45,7 +45,7 @@ data class CVanillaRecipe internal constructor(
                 recipe.key.namespace + recipe.key.key,
                 shapeToItems(recipe.shape, recipe.choiceMap),
                 CRecipeType.NORMAL,
-                results = listOf(ResultSupplier.Companion.timesSingle(recipe.result)),
+                results = listOf(ResultSupplierImpl.timesSingle(recipe.result)),
                 original = recipe
             )
         }
@@ -62,7 +62,7 @@ data class CVanillaRecipe internal constructor(
                 recipe.key.namespace + recipe.key.key,
                 shapelessToItems(recipe.choiceList),
                 CRecipeType.AMORPHOUS,
-                results = listOf(ResultSupplier.Companion.timesSingle(recipe.result)),
+                results = listOf(ResultSupplierImpl.timesSingle(recipe.result)),
                 original = recipe
             )
         }

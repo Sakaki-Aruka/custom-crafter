@@ -2,8 +2,8 @@ package online.aruka.demo.recipe
 
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
-import io.github.sakaki_aruka.customcrafter.api.objects.matter.CMatterPredicate
-import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeContainer
+import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterPredicateImpl
+import io.github.sakaki_aruka.customcrafter.impl.recipe.CRecipeContainerImpl
 import io.github.sakaki_aruka.customcrafter.api.objects.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
 import io.github.sakaki_aruka.customcrafter.impl.recipe.CRecipeImpl
@@ -41,7 +41,7 @@ object ShapelessRecipeProvider {
         val normalIronBlock: CMatter = CMatterImpl(
             name = "normal iron block",
             candidate = setOf(Material.IRON_BLOCK),
-            predicates = setOf(CMatterPredicate { ctx ->
+            predicates = setOf(CMatterPredicateImpl { ctx ->
                 !ctx.input.itemMeta.persistentDataContainer.has(
                     NamespacedKey(Demo.plugin, "infinity_iron_block_count"),
                     PersistentDataType.INTEGER
@@ -52,14 +52,14 @@ object ShapelessRecipeProvider {
             name = "infinity iron block",
             candidate = setOf(Material.IRON_BLOCK),
             predicates = setOf(
-                CMatterPredicate { ctx ->
+                CMatterPredicateImpl { ctx ->
                     // CMatterPredicate, container value check
                     ctx.input.itemMeta.persistentDataContainer.has(
                         NamespacedKey(Demo.plugin, "infinity_iron_block_count"),
                         PersistentDataType.INTEGER)
                 },
 
-                CMatterPredicate { ctx ->
+                CMatterPredicateImpl { ctx ->
                     // CMatterPredicate, amount check
                     var count = 0
                     ctx.mapped.values.forEach { v ->
@@ -112,7 +112,7 @@ object ShapelessRecipeProvider {
         val infinityIronBlock: CMatter = CMatterImpl(
             name = "infinity iron block",
             candidate = setOf(Material.IRON_BLOCK),
-            predicates = setOf(CMatterPredicate { ctx ->
+            predicates = setOf(CMatterPredicateImpl { ctx ->
                 ctx.input.itemMeta.persistentDataContainer.has(
                     NamespacedKey(Demo.plugin, "infinity_iron_block_count"),
                     PersistentDataType.INTEGER
@@ -140,10 +140,10 @@ object ShapelessRecipeProvider {
 
     fun extractPotion(): CRecipe {
         val potion: CMatter = CMatterImpl.of(Material.POTION, Material.SPLASH_POTION, Material.LINGERING_POTION)
-        val container = CRecipeContainer(
+        val container = CRecipeContainerImpl(
             predicate = { ctx -> ctx.mapped.values.first().itemMeta is PotionMeta },
             consumer = { ctx ->
-                val potionMeta: PotionMeta = ctx.mapped.values.first().itemMeta as? PotionMeta ?: return@CRecipeContainer
+                val potionMeta: PotionMeta = ctx.mapped.values.first().itemMeta as? PotionMeta ?: return@CRecipeContainerImpl
                 Bukkit.getPlayer(ctx.userID)?.let { player ->
                     potionMeta.basePotionType?.let { basePotion ->
                         player.addPotionEffects(basePotion.potionEffects)

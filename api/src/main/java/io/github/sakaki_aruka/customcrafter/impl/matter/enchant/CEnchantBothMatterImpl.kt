@@ -3,7 +3,7 @@ package io.github.sakaki_aruka.customcrafter.impl.matter.enchant
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CEnchantMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CEnchantmentStoreMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
-import io.github.sakaki_aruka.customcrafter.api.objects.matter.CMatterPredicate
+import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterPredicateImpl
 import io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant.CEnchantComponent
 import org.bukkit.Material
 
@@ -25,17 +25,5 @@ data class CEnchantBothMatterImpl(
     override val storedEnchantComponents: Set<CEnchantComponent>,
     override val amount: Int = 1,
     override val mass: Boolean = false,
-    override val predicates: Set<CMatterPredicate>? = null
-): CEnchantMatter, CEnchantmentStoreMatter {
-    override fun asOne(): CEnchantBothMatterImpl {
-        return CEnchantBothMatterImpl(
-            name = name,
-            candidate = candidate,
-            amount = 1,
-            mass = mass,
-            predicates = predicates,
-            enchantComponents = enchantComponents,
-            storedEnchantComponents = storedEnchantComponents
-        )
-    }
-}
+    override val predicates: Set<CMatterPredicateImpl>? = null
+): CEnchantMatter, CEnchantmentStoreMatter

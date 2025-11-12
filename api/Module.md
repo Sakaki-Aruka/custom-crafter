@@ -6,10 +6,11 @@ List of elements
 - api package
   - `api.event`: Custom_Crafter events
   - `api.interfaces`: CMatter, CRecipe and more interfaces
-  - `api.objects`: elements of CMatter and CRecipe
+  - `api.objects`: Elements of CMatter and CRecipe
 - impl package
-  - `impl.matter`: default CMatter implementation classes
-  - `impl.recipe`: default CRecipe implementation class
+  - `impl.matter`: Default CMatter implementation classes
+  - `impl.recipe`: Default CRecipe implementation classes and CRecipeFilter implementations
+  - `impl.result`: Default ResultSupplier implementation class
   - `impl.util`: public utilities
 
 ## Acknowledgement

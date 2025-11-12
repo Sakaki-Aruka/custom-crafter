@@ -2,11 +2,10 @@ package io.github.sakaki_aruka.customcrafter.api.interfaces.recipe
 
 import io.github.sakaki_aruka.customcrafter.api.interfaces.filter.CRecipeFilter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
+import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
-import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeContainer
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
-import io.github.sakaki_aruka.customcrafter.api.objects.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import org.bukkit.inventory.ItemStack
 import java.util.UUID
@@ -60,6 +59,26 @@ interface CRecipe {
      * @return[CRecipe] created new recipe.
      */
     fun replaceItems(newItems: Map<CoordinateComponent, CMatter>): CRecipe
+
+    /**
+     * Minimal requires input items amount
+     *
+     * Default implementation exists
+     *
+     * @return[Int] Minimal requires input items amount
+     * @since 5.0.15
+     */
+    fun requiresInputItemAmountMin(): Int = this.items.size
+
+    /**
+     * Maximum requires input items amount. Inclusive
+     *
+     * Default implementation exists
+     *
+     * @return[Int] Maximum requires input items amount
+     * @since 5.0.15
+     */
+    fun requiresInputItemAmountMax(): Int = this.items.size
 
     /**
      * runs all [containers] if it is not null.
@@ -132,7 +151,7 @@ interface CRecipe {
             val list: MutableList<ItemStack> = mutableListOf()
             suppliers.map { s ->
                 list.addAll(s.f(
-                    ResultSupplier.Config(
+                    ResultSupplier.Context(
                         relate,
                         mapped,
                         shiftClicked,

@@ -1,7 +1,7 @@
 package io.github.sakaki_aruka.customcrafter.impl.matter
 
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
-import io.github.sakaki_aruka.customcrafter.api.objects.matter.CMatterPredicate
+import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatterPredicate
 import org.bukkit.Material
 
 /**
@@ -20,19 +20,6 @@ data class CMatterImpl(
     override val mass: Boolean = false,
     override val predicates: Set<CMatterPredicate>? = null,
 ): CMatter {
-    /**
-     * @see[CMatter.asOne]
-     */
-    override fun asOne(): CMatterImpl {
-        return CMatterImpl(
-            this.name,
-            this.candidate,
-            amount = 1,
-            this.mass,
-            this.predicates,
-        )
-    }
-
     companion object {
         /**
          * Returns [CMatterImpl] build from specified materials.
