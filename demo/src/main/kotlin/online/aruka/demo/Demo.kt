@@ -3,8 +3,8 @@ package online.aruka.demo
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import online.aruka.demo.listener.CustomCrafterAPIPropertiesChangeListener
 import online.aruka.demo.listener.CustomItemRegisteredListener
-import online.aruka.demo.recipe.ShapedRecipeProvider
-import online.aruka.demo.recipe.ShapelessRecipeProvider
+import online.aruka.demo.register.ShapedRecipeProvider
+import online.aruka.demo.register.ShapelessRecipeProvider
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 
