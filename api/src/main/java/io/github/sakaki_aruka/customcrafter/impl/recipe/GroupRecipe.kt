@@ -58,9 +58,9 @@ class GroupRecipe (
                 name: String = UUID.randomUUID().toString()
             ): Context {
                 if (members.isEmpty()) {
-                    throw IllegalArgumentException("")
+                    throw IllegalArgumentException("'members' must not be empty.")
                 } else if (min < 0) {
-                    throw IllegalArgumentException("")
+                    throw IllegalArgumentException("'min' must be zero or positive number.")
                 }
                 return Context(members, min, name)
             }
@@ -71,7 +71,7 @@ class GroupRecipe (
                 return Context(
                     min = 1,
                     members = setOf(coordinate),
-                    name = "DefaultContext: ${UUID.randomUUID()}"
+                    name = "DefaultContext: RandomId-${UUID.randomUUID().toString().take(5)}"
                 )
             }
 
@@ -79,6 +79,12 @@ class GroupRecipe (
                 groups: Set<Context>,
                 items: Map<CoordinateComponent, CMatter>
             ): Result<Unit> {
+                if (groups.isEmpty()) {
+                    return Result.success(Unit)
+                } else if (groups.any { it.members.isEmpty() }) {
+                    return Result.failure(IllegalArgumentException("'GroupRecipe.Context' must contains any coordinates."))
+                }
+
                 val counts: MutableMap<CoordinateComponent, Int> = mutableMapOf()
                 for (group in groups) {
                     for (c in group.members) {
@@ -87,12 +93,16 @@ class GroupRecipe (
                 }
 
                 if (!items.keys.containsAll(counts.keys)) {
-                    return Result.failure(IllegalArgumentException(""))
+                    val builder = StringBuilder("All CoordinateComponents included in the members of the Context in 'groups' must exist as keys in 'items'.${System.lineSeparator()}")
+                    for (notContained in counts.keys - items.keys) {
+                        builder.append("  'items' not contains: $notContained ${System.lineSeparator()}")
+                    }
+                    return Result.failure(IllegalArgumentException(builder.toString()))
                 } else if (counts.values.any { it > 1 }) {
                     val builder = StringBuilder()
                     builder.append("GroupRecipe.Context is not allowed to contain duplicate coordinates. ${System.lineSeparator()}")
                     for ((c, count) in counts.filter { (_, c) -> c > 1 }) {
-                        builder.append("  coordinate: (${c.x}, ${c.y}), times: $count ${System.lineSeparator()}")
+                        builder.append("  duplicated: (${c.x}, ${c.y}), times: $count ${System.lineSeparator()}")
                     }
                     return Result.failure(IllegalArgumentException(builder.toString()))
                 }
