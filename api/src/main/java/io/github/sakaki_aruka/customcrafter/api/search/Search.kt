@@ -199,14 +199,15 @@ object Search {
         recipe: CRecipe,
         crafterID: UUID,
     ): Boolean {
+        if (recipe.items.size < mapped.size) {
+            return false
+        }
         val sortedRecipeCoordinates: List<CoordinateComponent> = recipe.items.keys.sortedBy { it.toIndex() }
         val sortedInputCoordinates: List<CoordinateComponent> = mapped.keys.sortedBy { it.toIndex() }
-        val diffs: MutableSet<Pair<Int, Int>> = mutableSetOf()
-        for ((recipeCoordinate, inputCoordinate) in sortedRecipeCoordinates.zip(sortedInputCoordinates)) {
-            diffs.add(recipeCoordinate.x - inputCoordinate.x to recipeCoordinate.y - inputCoordinate.y)
-            if (diffs.size > 1) {
-                return false
-            }
+        val dx: Int = sortedRecipeCoordinates.first().x - sortedInputCoordinates.first().x
+        val dy: Int = sortedRecipeCoordinates.first().y - sortedInputCoordinates.first().y
+        for (recipeCoordinate in sortedRecipeCoordinates) {
+            val inputCoordinate = CoordinateComponent(recipeCoordinate.x - dx, recipeCoordinate.y - dy)
 
             val matter: CMatter = recipe.items.getValue(recipeCoordinate)
             val input: ItemStack = mapped[inputCoordinate] ?: ItemStack.empty()

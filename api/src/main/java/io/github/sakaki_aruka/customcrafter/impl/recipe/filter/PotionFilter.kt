@@ -13,10 +13,6 @@ import org.bukkit.potion.PotionEffect
  * @since 5.0.6
  */
 object PotionFilter: CRecipeFilter<CPotionMatter> {
-    override fun metaTypeCheck(meta: ItemMeta): Boolean {
-        return meta is PotionMeta
-    }
-
     override fun itemMatterCheck(
         item: ItemStack,
         matter: CPotionMatter

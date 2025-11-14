@@ -8,6 +8,7 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipeContain
 import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
+import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterPredicateImpl
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import java.util.UUID
@@ -18,8 +19,8 @@ class GroupRecipe (
     override val items: Map<CoordinateComponent, CMatter>,
     override val filters: Set<CRecipeFilter<CMatter>>,
     val groups: Set<Context>,
-    override val containers: List<CRecipeContainer>?,
-    override val results: List<ResultSupplier>?,
+    override val containers: List<CRecipeContainer>? = null,
+    override val results: List<ResultSupplier>? = null,
     override val type: CRecipeType = CRecipeType.NORMAL
 ): CRecipe {
 
@@ -35,12 +36,12 @@ class GroupRecipe (
             missingGroups: Set<Context>
         ): Set<Context> {
             val grouped: Set<CoordinateComponent> = missingGroups.map { it.members }.flatten().toSet()
-            val result: MutableSet<Context> = mutableSetOf(*missingGroups.toTypedArray())
+            val result: MutableSet<Context> = missingGroups.toMutableSet()
             for (c in items.keys - grouped) {
                 result.add(Context.default(c))
             }
 
-            Context.isValidGroups(result).getOrThrow()
+            Context.isValidGroups(result, items).exceptionOrNull()?.let { throw it }
             return result
         }
     }
@@ -54,7 +55,7 @@ class GroupRecipe (
             fun of(
                 members: Set<CoordinateComponent>,
                 min: Int,
-                name: String
+                name: String = UUID.randomUUID().toString()
             ): Context {
                 if (members.isEmpty()) {
                     throw IllegalArgumentException("")
@@ -74,8 +75,42 @@ class GroupRecipe (
                 )
             }
 
-            fun isValidGroups(groups: Set<Context>): Result<Unit> {
-                // TODO: impl here
+            fun isValidGroups(
+                groups: Set<Context>,
+                items: Map<CoordinateComponent, CMatter>
+            ): Result<Unit> {
+                val counts: MutableMap<CoordinateComponent, Int> = mutableMapOf()
+                for (group in groups) {
+                    for (c in group.members) {
+                        counts[c] = (counts[c] ?: 0) + 1
+                    }
+                }
+
+                if (!items.keys.containsAll(counts.keys)) {
+                    return Result.failure(IllegalArgumentException(""))
+                } else if (counts.values.any { it > 1 }) {
+                    val builder = StringBuilder()
+                    builder.append("GroupRecipe.Context is not allowed to contain duplicate coordinates. ${System.lineSeparator()}")
+                    for ((c, count) in counts.filter { (_, c) -> c > 1 }) {
+                        builder.append("  coordinate: (${c.x}, ${c.y}), times: $count ${System.lineSeparator()}")
+                    }
+                    return Result.failure(IllegalArgumentException(builder.toString()))
+                }
+
+                for (ctx in groups) {
+                    val airContainableCount: Int = ctx.members.count { c -> items.getValue(c).candidate.any { m -> m.isAir } }
+                    if (airContainableCount != 0 && airContainableCount != ctx.members.size) {
+                        return Result.failure(IllegalArgumentException("The CMatters corresponding to the CoordinateComponents contained in 'groups.members' must either all be air-containable or all not air-containable."))
+                    }
+                }
+
+                val minCoordinate: CoordinateComponent = items.entries.minBy { (c, _) -> c.toIndex() }.key
+
+                if (items.getValue(minCoordinate).candidate.any { it.isAir }) {
+                    return Result.failure(IllegalArgumentException("The GroupRecipe.Matter with the smallest CoordinateComponent#toIndex in the recipe cannot have an element in candidate that satisfies Material#isAir."))
+                }
+
+                return Result.success(Unit)
             }
         }
     }
@@ -101,30 +136,118 @@ class GroupRecipe (
         override val predicates: Set<CMatterPredicate>?,
         val original: CMatter
     ): CMatter {
+
+        private class InspectionResult(
+            val createdBy: Int,
+            val result: Map<Int, Boolean>,
+            val resultConsumed: MutableSet<Int> = mutableSetOf()
+        ) {
+            fun copy(
+                createdBy: Int = this.createdBy,
+                result: Map<Int, Boolean> = this.result.toMap(),
+                resultConsumed: MutableSet<Int> = this.resultConsumed.toMutableSet()
+            ): InspectionResult {
+                return InspectionResult(createdBy, result, resultConsumed)
+            }
+        }
+
         companion object {
             fun of(
                 matter: CMatter,
-                includeAir: Boolean
+                includeAir: Boolean = false
             ): Matter {
+                if (matter is Matter) {
+                    throw IllegalArgumentException("'matter' must not be 'GroupRecipe.Matter'.")
+                }
                 return Matter(
                     name = matter.name,
                     candidate = if (includeAir) matter.candidate + Material.AIR else matter.candidate,
                     amount = matter.amount,
                     mass = matter.mass,
-                    predicates = /* TODO: impl here*/,
+                    predicates = setOf(INSPECTOR, CHECKER),
                     original = matter
                 )
+            }
+
+            private val INSPECTION_RESULTS: MutableMap<UUID, InspectionResult> = mutableMapOf()
+            private fun putResult(key: UUID, result: InspectionResult) {
+                synchronized(INSPECTION_RESULTS) { INSPECTION_RESULTS[key] = result }
+            }
+
+            private fun getCurrent(key: UUID): InspectionResult? {
+                synchronized(INSPECTION_RESULTS) { return INSPECTION_RESULTS[key]?.copy() }
+            }
+
+            private fun remove(key: UUID) {
+                synchronized(INSPECTION_RESULTS) { INSPECTION_RESULTS.remove(key) }
+            }
+
+            private val INSPECTOR: CMatterPredicate = CMatterPredicateImpl { ctx ->
+                if (ctx.recipe !is GroupRecipe /* || ctx.matter !is Matter */) {
+                    return@CMatterPredicateImpl true
+                } else if (getCurrent(ctx.crafterID) != null) {
+                    return@CMatterPredicateImpl true
+                }
+
+                val recipeFirstCoordinate: CoordinateComponent = ctx.recipe.items.keys.minBy { it.toIndex() }
+                val inputFirstCoordinate: CoordinateComponent = ctx.mapped.keys.minBy { it.toIndex() }
+                val dx: Int = recipeFirstCoordinate.x - inputFirstCoordinate.x
+                val dy: Int = recipeFirstCoordinate.y - inputFirstCoordinate.y
+                val groupResult: MutableMap<Context, Int> = mutableMapOf()
+                for ((c, matter) in ctx.recipe.items.entries) {
+                    val context: Context = ctx.recipe.groups.firstOrNull { c in it.members } ?: continue
+                    val input: ItemStack = ctx.mapped[CoordinateComponent(c.x - dx, c.y - dy)]
+                        ?: ItemStack.empty()
+                    val s: Int = if (input.type.isAir) 0 else 1
+                    groupResult[context] = groupResult.getOrDefault(context, 0) + s
+                }
+
+                val coordinateResult: MutableMap<Int, Boolean> = mutableMapOf()
+                for ((context, amount) in groupResult.entries) {
+                    val checkedResult = context.min <= amount
+                    for (coordinate in context.members) {
+                        coordinateResult[coordinate.toIndex()] = checkedResult
+                    }
+                }
+                val inspectionResults = InspectionResult(
+                    createdBy = ctx.coordinate.toIndex(),
+                    result = coordinateResult
+                )
+                putResult(ctx.crafterID, inspectionResults)
+                true
+            }
+
+            private val CHECKER: CMatterPredicate = CMatterPredicateImpl { ctx ->
+                if (ctx.recipe !is GroupRecipe /* || ctx.matter !is Matter */) {
+                    return@CMatterPredicateImpl ctx.matter.predicatesResult(ctx)
+                }
+                val inspectionResult: InspectionResult = getCurrent(ctx.crafterID)
+                    ?: return@CMatterPredicateImpl if (ctx.matter is Matter) ctx.matter.original.predicatesResult(ctx)
+                        else ctx.matter.predicatesResult(ctx)
+                val result: Boolean = inspectionResult.result[ctx.coordinate.toIndex()] ?: true
+                if (inspectionResult.resultConsumed.size == ctx.recipe.groups.sumOf { it.members.size } - 1) {
+                    // last
+                    remove(ctx.crafterID)
+                } else {
+                    putResult(
+                        ctx.crafterID,
+                        inspectionResult.copy(resultConsumed = (inspectionResult.resultConsumed + ctx.coordinate.toIndex()).toMutableSet())
+                    )
+                }
+                return@CMatterPredicateImpl result
             }
         }
 
         override fun isValidMatter(): Result<Unit> {
             return if (this.candidate.isEmpty()) {
                 Result.failure(IllegalStateException("'candidate' must contain correct materials at least one."))
-            } else if (this.candidate.any { !it.isItem }) {
+            } else if (this.candidate.any { !it.isAir && !it.isItem }) {
                 Result.failure(IllegalStateException("'candidate' not allowed to contain materials that are '!Material#isItem'."))
             } else if (this.amount < 1) {
                 Result.failure(IllegalStateException("'amount' must be 1 or more."))
-            } else Result.success(Unit)
+            } else if (this.candidate.all { it.isAir }) {
+                Result.failure(IllegalStateException("GroupMatter#candidate must contain materials what are '!Material#isAir' 1 or more."))
+            }else Result.success(Unit)
         }
 
     }
@@ -141,10 +264,28 @@ class GroupRecipe (
     }
 
     override fun requiresInputItemAmountMin(): Int {
-
+        return this.groups.sumOf { it.min }
     }
 
     override fun isValidRecipe(): Result<Unit> {
-        //
+        return if (this.type != CRecipeType.NORMAL) {
+            Result.failure(
+                NotImplementedError("GroupRecipe is not implemented for `CRecipeType.NORMAL`."))
+        } else if (this.items.isEmpty() || this.items.size > 36) {
+            Result.failure(IllegalStateException("'items' must contain 1 to 36 valid CMatters."))
+        } else if (this.items.entries.minBy { (c, _) -> c.toIndex() }.value.candidate.any { it.isAir }) {
+            Result.failure(IllegalArgumentException("GroupRecipe must not contain Material.AIR at first coordinate."))
+        } else if (this.items.values.any { it.isValidMatter().isFailure }) {
+            val builder = StringBuilder()
+            for ((c, matter) in this.items.entries) {
+                val t: Throwable = matter.isValidMatter().exceptionOrNull()
+                    ?: continue
+                builder.append("[items] x: ${c.x}, y: ${c.y}, ${t.message} ${System.lineSeparator()}")
+            }
+            Result.failure(IllegalStateException(builder.toString()))
+        } else {
+            Context.isValidGroups(this.groups, this.items).takeIf { it.isFailure }?.let { return it }
+            Result.success(Unit)
+        }
     }
 }
