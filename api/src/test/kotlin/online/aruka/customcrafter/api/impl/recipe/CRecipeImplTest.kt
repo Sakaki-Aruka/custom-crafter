@@ -1,4 +1,4 @@
-package online.aruka.customcrafter.api.impl
+package online.aruka.customcrafter.api.impl.recipe
 
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
 import io.github.sakaki_aruka.customcrafter.impl.recipe.CRecipeImpl
@@ -29,18 +29,22 @@ object CRecipeImplTest {
 
     @Test
     fun detectEmptyItemsOnAmorphousTest() {
-        assertThrows<IllegalArgumentException> { CRecipeImpl.amorphous(
-            name = "",
-            items = emptyList()
-        ) }
+        assertThrows<IllegalArgumentException> {
+            CRecipeImpl.amorphous(
+                name = "",
+                items = emptyList()
+            )
+        }
     }
 
     @Test
     fun detectOverTheLimitItemsOnAmorphousTest() {
-        assertThrows<IllegalArgumentException> { CRecipeImpl.amorphous(
-            name = "",
-            items = List(37) { CMatterImpl.single(Material.STONE) }
-        ) }
+        assertThrows<IllegalArgumentException> {
+            CRecipeImpl.amorphous(
+                name = "",
+                items = List(37) { CMatterImpl.single(Material.STONE) }
+            )
+        }
     }
 
     @Test
@@ -49,10 +53,12 @@ object CRecipeImplTest {
             name = "",
             candidate = setOf(Material.AIR)
         )
-        assertThrows<IllegalStateException> { CRecipeImpl.amorphous(
-            name = "",
-            items = listOf(air)
-        ) }
+        assertThrows<IllegalStateException> {
+            CRecipeImpl.amorphous(
+                name = "",
+                items = listOf(air)
+            )
+        }
     }
 
     @Test
@@ -61,18 +67,22 @@ object CRecipeImplTest {
             name = "",
             candidate = setOf(Material.WATER)
         )
-        assertThrows<IllegalStateException> { CRecipeImpl.amorphous(
-            name = "",
-            items = listOf(notItem)
-        ) }
+        assertThrows<IllegalStateException> {
+            CRecipeImpl.amorphous(
+                name = "",
+                items = listOf(notItem)
+            )
+        }
     }
 
     @Test
     fun amorphousSuccessfulOnAmorphousTest() {
         val matter = CMatterImpl.single(Material.STONE)
-        assertDoesNotThrow { CRecipeImpl.amorphous(
-            name = "",
-            listOf(matter)
-        ) }
+        assertDoesNotThrow {
+            CRecipeImpl.amorphous(
+                name = "",
+                listOf(matter)
+            )
+        }
     }
 }

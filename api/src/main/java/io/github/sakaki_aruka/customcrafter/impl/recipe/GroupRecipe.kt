@@ -169,7 +169,7 @@ class GroupRecipe (
                 if (matter is Matter) {
                     throw IllegalArgumentException("'matter' must not be 'GroupRecipe.Matter'.")
                 }
-                return Matter(
+                val matter = Matter(
                     name = matter.name,
                     candidate = if (includeAir) matter.candidate + Material.AIR else matter.candidate,
                     amount = matter.amount,
@@ -177,6 +177,9 @@ class GroupRecipe (
                     predicates = setOf(INSPECTOR, CHECKER),
                     original = matter
                 )
+
+                matter.isValidMatter().exceptionOrNull()?.let { throw it }
+                return matter
             }
 
             private val INSPECTION_RESULTS: MutableMap<UUID, InspectionResult> = mutableMapOf()
