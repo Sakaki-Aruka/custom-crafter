@@ -17,8 +17,8 @@ import kotlin.reflect.KClassifier
 class GroupRecipe (
     override val name: String,
     override val items: Map<CoordinateComponent, CMatter>,
-    override val filters: Set<CRecipeFilter<CMatter>>,
     val groups: Set<Context>,
+    override val filters: Set<CRecipeFilter<CMatter>>? = null,
     override val containers: List<CRecipeContainer>? = null,
     override val results: List<ResultSupplier>? = null,
     override val type: CRecipeType = CRecipeType.NORMAL
@@ -277,7 +277,8 @@ class GroupRecipe (
     }
 
     override fun requiresInputItemAmountMin(): Int {
-        return this.groups.sumOf { it.min }
+        val notGroupedSize: Int = (items.keys - this.groups.map { it.members }.flatten().toSet()).size
+        return notGroupedSize + this.groups.sumOf { it.min }
     }
 
     override fun isValidRecipe(): Result<Unit> {

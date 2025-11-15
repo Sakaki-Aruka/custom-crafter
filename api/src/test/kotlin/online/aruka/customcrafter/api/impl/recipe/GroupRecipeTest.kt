@@ -20,6 +20,7 @@ import org.mockbukkit.mockbukkit.MockBukkit
 import org.mockbukkit.mockbukkit.ServerMock
 import org.mockbukkit.mockbukkit.world.WorldMock
 import java.util.UUID
+import kotlin.math.min
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -376,5 +377,44 @@ object GroupRecipeTest {
         )
 
         assertEquals(0, result.size())
+    }
+
+    @Test
+    fun requiresInputItemAmountMinMaxTest() {
+        val cobblestoneAir: CMatter = GroupRecipe.Matter.of(
+            matter = CMatterImpl.of(Material.COBBLESTONE),
+            includeAir = true
+        )
+
+        val stone: CMatter = CMatterImpl.of(Material.STONE)
+
+        val items: Map<CoordinateComponent, CMatter> = mapOf(
+            CoordinateComponent(0, 0) to cobblestoneAir,
+            CoordinateComponent(0, 1) to cobblestoneAir,
+            CoordinateComponent(0, 2) to cobblestoneAir,
+            CoordinateComponent(1, 0) to stone,
+            CoordinateComponent(1, 1) to stone,
+            CoordinateComponent(1, 2) to stone
+        )
+
+        val groups: Set<GroupRecipe.Context> = setOf(
+            GroupRecipe.Context.of(
+                members = setOf(
+                    CoordinateComponent(0, 0),
+                    CoordinateComponent(0, 1),
+                    CoordinateComponent(0, 2)
+                ),
+                min = 1
+            )
+        )
+
+        val recipe: CRecipe = GroupRecipe(
+            name = "",
+            items = items,
+            groups = groups
+        )
+
+        assertEquals(4, recipe.requiresInputItemAmountMin())
+        assertEquals(6, recipe.requiresInputItemAmountMax())
     }
 }
