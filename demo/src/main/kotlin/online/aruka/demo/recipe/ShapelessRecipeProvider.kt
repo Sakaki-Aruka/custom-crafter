@@ -1,12 +1,12 @@
-package online.aruka.demo.register
+package online.aruka.demo.recipe
 
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterPredicateImpl
 import io.github.sakaki_aruka.customcrafter.impl.recipe.CRecipeContainerImpl
+import io.github.sakaki_aruka.customcrafter.api.objects.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
 import io.github.sakaki_aruka.customcrafter.impl.recipe.CRecipeImpl
-import io.github.sakaki_aruka.customcrafter.impl.result.ResultSupplierImpl
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter.toComponent
 import online.aruka.demo.Demo
 import org.bukkit.Bukkit
@@ -32,8 +32,79 @@ object ShapelessRecipeProvider {
             name = "glow berry recipe",
             items = listOf(glowstone, berry),
             results = listOf(
-                ResultSupplierImpl.timesSingle(ItemStack.of(Material.GLOW_BERRIES))
+                ResultSupplier.timesSingle(ItemStack.of(Material.GLOW_BERRIES))
             )
+        )
+    }
+
+    fun infinityIronBlock(): CRecipe {
+        val normalIronBlock: CMatter = CMatterImpl(
+            name = "normal iron block",
+            candidate = setOf(Material.IRON_BLOCK),
+            predicates = setOf(CMatterPredicateImpl { ctx ->
+                !ctx.input.itemMeta.persistentDataContainer.has(
+                    NamespacedKey(Demo.plugin, "infinity_iron_block_count"),
+                    PersistentDataType.INTEGER
+                )
+            })
+        )
+        val infinityIronBlock: CMatter = CMatterImpl(
+            name = "infinity iron block",
+            candidate = setOf(Material.IRON_BLOCK),
+            predicates = setOf(
+                CMatterPredicateImpl { ctx ->
+                    // CMatterPredicate, container value check
+                    ctx.input.itemMeta.persistentDataContainer.has(
+                        NamespacedKey(Demo.plugin, "infinity_iron_block_count"),
+                        PersistentDataType.INTEGER)
+                },
+
+                CMatterPredicateImpl { ctx ->
+                    // CMatterPredicate, amount check
+                    var count = 0
+                    ctx.mapped.values.forEach { v ->
+                        count += v.itemMeta.persistentDataContainer.getOrDefault(
+                            NamespacedKey(Demo.plugin, "infinity_iron_block_count"),
+                            PersistentDataType.INTEGER,
+                            0
+                        )
+                    }
+
+                    ctx.input.itemMeta.persistentDataContainer.getOrDefault(
+                        NamespacedKey(Demo.plugin, "infinity_iron_block_count"),
+                        PersistentDataType.INTEGER,
+                        0
+                    ) + count < Int.MAX_VALUE
+                },
+            ),
+            mass = true
+        )
+        val supplier = ResultSupplier { ctx ->
+            var count = 0
+            ctx.mapped.values.forEach { v ->
+                v.itemMeta.persistentDataContainer.get(
+                    NamespacedKey(Demo.plugin, "infinity_iron_block_count"),
+                    PersistentDataType.INTEGER
+                )?.let { count += it }
+                    ?: run { count += v.amount }
+            }
+            val block: ItemStack = ItemStack.of(Material.IRON_BLOCK)
+            block.editMeta { meta ->
+                meta.persistentDataContainer.set(
+                    NamespacedKey(Demo.plugin, "infinity_iron_block_count"),
+                    PersistentDataType.INTEGER,
+                    count
+                )
+                meta.displayName("Infinity Iron Block".toComponent())
+                meta.lore(listOf("<green>Contained Iron Block:</green> $count".toComponent()))
+            }
+            listOf(block)
+        }
+
+        return CRecipeImpl.amorphous(
+            name = "infinity iron block recipe",
+            items = List(35) { normalIronBlock } + infinityIronBlock,
+            results = listOf(supplier)
         )
     }
 
@@ -48,7 +119,7 @@ object ShapelessRecipeProvider {
                 )
             })
         )
-        val supplier = ResultSupplierImpl { ctx ->
+        val supplier = ResultSupplier { ctx ->
             val amount: Int = ctx.mapped.values.first().itemMeta.persistentDataContainer.getOrDefault(
                 NamespacedKey(Demo.plugin, "infinity_iron_block_count"),
                 PersistentDataType.INTEGER,
@@ -83,7 +154,7 @@ object ShapelessRecipeProvider {
                 }
             }
         )
-        val supplier = ResultSupplierImpl.timesSingle(ItemStack.of(Material.GLASS_BOTTLE))
+        val supplier = ResultSupplier.timesSingle(ItemStack.of(Material.GLASS_BOTTLE))
         return CRecipeImpl.amorphous(
             name = "potion effect extractor recipe",
             items = listOf(potion),

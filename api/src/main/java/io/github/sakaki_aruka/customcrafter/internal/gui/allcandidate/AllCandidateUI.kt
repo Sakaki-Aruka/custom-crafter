@@ -2,8 +2,6 @@ package io.github.sakaki_aruka.customcrafter.internal.gui.allcandidate
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
-import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipeContainer
-import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.search.Search
@@ -46,16 +44,12 @@ internal class AllCandidateUI(
         }
         result.customs().forEach { (recipe, relation) ->
             val icon: ItemStack = recipe.getResults(
-                ResultSupplier.Context(
-                    recipe = recipe,
-                    relation = relation,
-                    mapped = this.view.materials,
-                    shiftClicked = useShift,
-                    calledTimes = 1,
-                    isMultipleDisplayCall = true,
-                    crafterID = this.player.uniqueId,
-                    list = mutableListOf()
-                )
+                crafterID = this.player.uniqueId,
+                relate = relation,
+                mapped = this.view.materials,
+                shiftClicked = useShift,
+                calledTimes = 1,//recipe.getMinAmount(this.view.materials, true, useShift) ?: 1,
+                isMultipleDisplayCall = true
             ).firstOrNull() ?: replaceRecipeNameTemplate(
                 CustomCrafterAPI.ALL_CANDIDATE_NO_DISPLAYABLE_ITEM,
                 recipe.name
@@ -196,34 +190,26 @@ internal class AllCandidateUI(
                         } else 1
                     listOf(recipe.original.result.asQuantity(minAmount))
                 } else if (recipe !is CVanillaRecipe && mappedRelation != null) {
-                    val results: MutableList<ItemStack> = recipe.getResults(ResultSupplier.Context(
-                        recipe = recipe,
-                        relation = mappedRelation,
+                    recipe.getResults(
+                        crafterID = (event.whoClicked as Player).uniqueId,
+                        relate = mappedRelation,
                         mapped = view.materials,
                         shiftClicked = event.isShiftClick,
-                        calledTimes = recipe.getMinAmount(
-                            map = view.materials,
-                            relation = mappedRelation,
-                            isCraftGUI = false,
-                            shift = event.isShiftClick
-                        ) ?: 1,
-                        isMultipleDisplayCall = false,
-                        list = mutableListOf(),
-                        crafterID = (event.whoClicked as Player).uniqueId
-                    ))
-                    results
+                        calledTimes = recipe.getMinAmount(view.materials, isCraftGUI = false, event.isShiftClick) ?: 1,
+                        isMultipleDisplayCall = false
+                    )
                 } else {
                     return
                 }
 
                 if (recipe !is CVanillaRecipe) {
-                    recipe.runNormalContainers(CRecipeContainer.Context(
-                        userID = (event.whoClicked as Player).uniqueId,
-                        relation = mappedRelation!!,
+                    recipe.runNormalContainers(
+                        crafterID = (event.whoClicked as Player).uniqueId,
+                        relate = mappedRelation!!,
                         mapped = this.view.materials,
                         results = results.toMutableList(),
-                        isAllCandidateDisplayCall = false
-                    ))
+                        isMultipleDisplayCall = false
+                    )
                 }
 
                 results.forEach { item ->

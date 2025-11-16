@@ -21,7 +21,6 @@ interface ResultSupplier {
     /**
      * This class contains ResultSupplier parameters.
      *
-     * @param[recipe] A CRecipe instance what contains this
      * @param[crafterID] Crafter UUID
      * @param[relation] Coordinate mapping between a [CRecipe] and an input Inventory
      * @param[mapped] Coordinates and input items mapping
@@ -31,7 +30,6 @@ interface ResultSupplier {
      * @param[isMultipleDisplayCall] `invoke` called from multiple result display item collector or not
      */
     class Context internal constructor(
-        val recipe: CRecipe,
         val relation: MappedRelation,
         val mapped: Map<CoordinateComponent, ItemStack>,
         val shiftClicked: Boolean,

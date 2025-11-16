@@ -19,10 +19,10 @@ jobs:
           settings-path: ${{ github.workspace }} # location for the settings.xml file
 
       - name: generate docs
-        run: "mvn -pl api dokka:dokka"
+        run: "mvn dokka:dokka"
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./api/docs
+          publish_dir: ./docs

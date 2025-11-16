@@ -5,6 +5,7 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import org.bukkit.inventory.ItemStack
 
 import io.github.sakaki_aruka.customcrafter.impl.recipe.filter.EnchantFilter
+import org.bukkit.inventory.meta.ItemMeta
 
 /**
  * candidate filters for [CRecipe].
@@ -67,6 +68,36 @@ interface CRecipeFilter<out T: CMatter> {
         FAILED,
         NOT_REQUIRED
     }
+
+    /**
+     * returns a result of checks to [ItemMeta] type.
+     *
+     * e.g.
+     * ```
+     * // in EnchantStorageFilter
+     * override fun metaTypeCheck(meta: ItemMeta): Boolean {
+     *     return meta is EnchantmentStorageMeta
+     * }
+     * ```
+     *
+     * in the implementation of this is permitted to return always true in the case of needless to type check.
+     *
+     * e.g.
+     * ```
+     * // in EnchantFilter
+     * // cause you can get enchantments from ItemStack, so items has not to provide ItemMeta.
+     * override fun metaTypeCheck(meta: ItemMeta): Boolean {
+     *     return true
+     * }
+     * ```
+     *
+     * if this returns false, fail to normal candidate checks.
+     *
+     * @param[meta] checked target ItemMeta
+     * @return[Boolean] the provided meta matches the target or not
+     */
+    fun metaTypeCheck(meta: ItemMeta): Boolean
+
 
     /**
      * a candidate checker for normal recipes.

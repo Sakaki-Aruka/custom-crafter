@@ -6,7 +6,9 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
+import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import org.bukkit.inventory.ItemStack
+import java.util.UUID
 
 /**
  * This interface's implementing types can be used as recipes for CustomCrafter.
@@ -79,17 +81,31 @@ interface CRecipe {
     fun requiresInputItemAmountMax(): Int = this.items.size
 
     /**
-     * Runs all [containers] if it is not null.
+     * runs all [containers] if it is not null.
      *
-     * @param[context] Context of CRecipeContainer
-     * @see[CRecipeContainer]
-     * @see[CRecipeContainer.Context]
+     * @param[crafterID] a crafter's uuid
+     * @param[relate] an input inventory and [CRecipe] coordinates relation.
+     * @param[mapped] coordinates and input items relation.
+     * @param[results] generated results by this recipe.
      */
-    fun runNormalContainers(context: CRecipeContainer.Context) {
+    fun runNormalContainers(
+        crafterID: UUID,
+        relate: MappedRelation,
+        mapped: Map<CoordinateComponent, ItemStack>,
+        results: MutableList<ItemStack>,
+        isMultipleDisplayCall: Boolean
+    ) {
         containers?.let { containers ->
-            containers.filter { container -> container.predicate(context) }
-                .forEach { container -> container.consumer(context) }
+            containers.filter { container ->
+                container.predicate(
+                    CRecipeContainer.Context(crafterID, relate, mapped, results, isMultipleDisplayCall)
+            ) }.forEach { container ->
+                container.consumer(
+                    CRecipeContainer.Context(crafterID, relate, mapped, results, isMultipleDisplayCall)
+                )
+            }
         }
+
     }
 
     /**
@@ -113,61 +129,58 @@ interface CRecipe {
     fun multipleCandidateDisplaySettingDefaultCalledTimes(): Int = 1
 
     /**
-     * Returns results of suppliers made
+     * returns results of suppliers made
      *
-     * @param[context] Context of ResultSupplier
-     * @return[MutableList] Generated items list (`MutableList<ItemStack>`). If no item supplier applied, returns an empty list.
-     * @see[ResultSupplier]
-     * @see[ResultSupplier.Context]
+     * @param[crafterID] a crafter's uuid
+     * @param[relate] an input inventory and [CRecipe] coordinates relation.
+     * @param[mapped] coordinates and input items relation.
+     * @param[shiftClicked] shift clicked or not
+     * @param[calledTimes] how many times called this
+     * @param[isMultipleDisplayCall] called from multiple craft result candidate collector or not (since 5.0.8)
+     * @return[MutableList<ItemStack>] generated items list. if no item supplier applied, returns an empty list.
      */
-    fun getResults(context: ResultSupplier.Context): MutableList<ItemStack> {
+    fun getResults(
+        crafterID: UUID,
+        relate: MappedRelation,
+        mapped: Map<CoordinateComponent, ItemStack>,
+        shiftClicked: Boolean,
+        calledTimes: Int,
+        isMultipleDisplayCall: Boolean
+    ): MutableList<ItemStack> {
         return results?.let { suppliers ->
-            suppliers.map { s -> s.f(context) }.flatten().toMutableList()
+            val list: MutableList<ItemStack> = mutableListOf()
+            suppliers.map { s ->
+                list.addAll(s.f(
+                    ResultSupplier.Context(
+                        relate,
+                        mapped,
+                        shiftClicked,
+                        calledTimes,
+                        list,
+                        crafterID,
+                        isMultipleDisplayCall
+                    )
+                ))
+            }
+            list
         } ?: mutableListOf()
     }
 
     /**
-     * Returns min amount
-     *
-     * @param[map] Input items mapping
-     * @param[relation] Coordinate relations in input items and recipe matters
-     * @param[isCraftGUI] Called from Crafting GUI or not
-     * @param[shift] Use Shift-Key (Batch Crafting) or not
-     * @param[withoutMass] Use mass-marked CMatters to min amount calculation or not
-     * @param[includeAir] Use Material#AIR to min amount calculation or not
+     * Get min amount
      * @since 5.0.10
      */
     fun getMinAmount(
         map: Map<CoordinateComponent, ItemStack>,
-        relation: MappedRelation,
         isCraftGUI: Boolean,
-        shift: Boolean,
-        withoutMass: Boolean = true,
-        includeAir: Boolean = false
+        shift: Boolean
     ): Int? {
         if (!shift) return 1
-        var amount = Int.MAX_VALUE
-        for ((c, matter) in this.items) {
-            val inputCoordinate: CoordinateComponent = relation.components.firstOrNull { it.recipe == c }
-                ?.input
-                ?: CoordinateComponent(Int.MIN_VALUE, Int.MIN_VALUE)
-            val item: ItemStack = // map[c] ?: ItemStack.empty()
-                if (inputCoordinate == CoordinateComponent(Int.MIN_VALUE, Int.MIN_VALUE)) ItemStack.empty()
-                else map[inputCoordinate] ?: ItemStack.empty()
-            if (!includeAir && item.type.isEmpty) {
-                continue
-            } else if (withoutMass && matter.mass) {
-                continue
-            }
-
-            val q: Int =
-                if (matter.mass) 1
-                else item.amount
-            if (q < amount) {
-                amount = q
-            }
-        }
-        return amount.takeIf { it != Int.MAX_VALUE } ?: 1
+        return items.entries
+            .filter { (c, _) -> c in Converter.getAvailableCraftingSlotComponents() }
+            .filter { (c, _) -> map[c] != null }
+            .filter { (_, matter) -> !matter.mass }
+            .minOfOrNull { (c, matter) -> map[c]!!.amount / matter.amount }
     }
 
     fun getSlots(): List<Int> {

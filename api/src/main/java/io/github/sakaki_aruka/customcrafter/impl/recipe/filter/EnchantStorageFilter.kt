@@ -12,6 +12,10 @@ import org.bukkit.inventory.meta.ItemMeta
  * @since 5.0.6
  */
 object EnchantStorageFilter: CRecipeFilter<CEnchantmentStoreMatter> {
+    override fun metaTypeCheck(meta: ItemMeta): Boolean {
+        return meta is EnchantmentStorageMeta
+    }
+
     override fun itemMatterCheck(
         item: ItemStack,
         matter: CEnchantmentStoreMatter
