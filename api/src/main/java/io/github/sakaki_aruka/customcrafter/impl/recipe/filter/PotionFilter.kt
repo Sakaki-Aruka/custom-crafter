@@ -4,7 +4,6 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.filter.CRecipeFilter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CPotionMatter
 import io.github.sakaki_aruka.customcrafter.api.objects.matter.potion.CPotionComponent
 import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.inventory.meta.PotionMeta
 import org.bukkit.potion.PotionEffect
 
@@ -17,6 +16,9 @@ object PotionFilter: CRecipeFilter<CPotionMatter> {
         item: ItemStack,
         matter: CPotionMatter
     ): Pair<CRecipeFilter.ResultType ,Boolean> {
+        if (item.itemMeta !is PotionMeta) {
+            return CRecipeFilter.CHECK_NOT_REQUIRED
+        }
         val meta: PotionMeta = item.itemMeta as PotionMeta
         val effects: MutableList<PotionEffect> = meta.customEffects.toMutableList()
         meta.basePotionType?.let {

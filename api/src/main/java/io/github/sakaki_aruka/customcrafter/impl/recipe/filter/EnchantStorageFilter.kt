@@ -5,7 +5,6 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CEnchantmentSt
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.EnchantmentStorageMeta
-import org.bukkit.inventory.meta.ItemMeta
 
 /**
  * A default [CEnchantmentStoreMatter] filter implementation.
@@ -16,6 +15,9 @@ object EnchantStorageFilter: CRecipeFilter<CEnchantmentStoreMatter> {
         item: ItemStack,
         matter: CEnchantmentStoreMatter
     ): Pair<CRecipeFilter.ResultType, Boolean> {
+        if (item.itemMeta !is EnchantmentStorageMeta) {
+            return CRecipeFilter.CHECK_NOT_REQUIRED
+        }
         val stored: Map<Enchantment, Int> = (item.itemMeta as EnchantmentStorageMeta).storedEnchants
         if (matter.storedEnchantComponents.isEmpty()) {
             return CRecipeFilter.CHECK_NOT_REQUIRED

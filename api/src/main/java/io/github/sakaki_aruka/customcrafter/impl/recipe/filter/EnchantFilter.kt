@@ -6,7 +6,6 @@ import io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant.CEnchantC
 import io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant.EnchantStrict
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.meta.ItemMeta
 
 /**
  * A default [CEnchantMatter] filter implementation.
