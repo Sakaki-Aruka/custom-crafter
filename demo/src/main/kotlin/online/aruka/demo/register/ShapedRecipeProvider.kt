@@ -2,12 +2,15 @@ package online.aruka.demo.register
 
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
+import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterPredicateImpl
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
 import io.github.sakaki_aruka.customcrafter.impl.recipe.CRecipeImpl
+import io.github.sakaki_aruka.customcrafter.impl.recipe.GroupRecipe
 import io.github.sakaki_aruka.customcrafter.impl.result.ResultSupplierImpl
+import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter.toComponent
 import online.aruka.demo.Demo
 import org.bukkit.Material
@@ -119,9 +122,9 @@ object ShapedRecipeProvider {
         )
     }
 
-    fun infinityIronBlock(): CRecipe {
+    fun infinityIronBlockCore(): CRecipe {
         val ironBlock: CMatter = CMatterImpl(
-            name = "iron block",
+            name = "iron block core",
             candidate = setOf(Material.IRON_BLOCK),
             predicates = setOf(CMatterPredicateImpl { ctx ->
                 val key = NamespacedKey(Demo.plugin, "infinity_iron_block_count")
@@ -171,6 +174,90 @@ object ShapedRecipeProvider {
             items = items,
             results = listOf(supplier),
             type = CRecipeType.NORMAL
+        )
+    }
+
+    fun infinityIronBlock(): CRecipe {
+        val core: CMatter = GroupRecipe.Matter.of(
+            matter = CMatterImpl(
+                name = "infinity iron block core",
+                candidate = setOf(Material.IRON_BLOCK),
+                predicates = setOf(CMatterPredicateImpl { ctx ->
+                    ctx.input.itemMeta.persistentDataContainer.has(
+                        NamespacedKey(Demo.plugin, "infinity_iron_block_count"),
+                        PersistentDataType.INTEGER,
+                    )
+                }),
+                mass = true
+            ),
+            includeAir = false
+        )
+        val coreContext = GroupRecipe.Context.default(CoordinateComponent(0, 0))
+
+        val ironBlock: CMatter = GroupRecipe.Matter.of(
+            matter = CMatterImpl.of(Material.IRON_BLOCK),
+            includeAir = true
+        )
+        val ironBlockContext = GroupRecipe.Context.of(
+            members = Converter.getAvailableCraftingSlotComponents().filter { it.toIndex() != 0 }.toSet(),
+            min = 1
+        )
+
+        /*
+         * # -> Infinity Iron Block (Core)
+         * + -> Iron Block
+         *
+         * 1x #, 1~35x +
+         */
+        val items: MutableMap<CoordinateComponent, CMatter> = mutableMapOf()
+        items[CoordinateComponent(0, 0)] = core
+        ironBlockContext.members.forEach { c -> items[c] = ironBlock }
+
+        val supplier: ResultSupplier = ResultSupplierImpl { ctx ->
+
+            val core: ItemStack = ctx.mapped.getValue(
+                ctx.relation.components.first { (recipe, _) -> recipe.toIndex() == 0 }.input
+            ).clone()
+            val currentCount: Int = core.itemMeta.persistentDataContainer.getOrDefault(
+                NamespacedKey(Demo.plugin, "infinity_iron_block_count"),
+                PersistentDataType.INTEGER,
+                0
+            )
+            val ironBlockAmount: Int = ctx.mapped.entries
+                .filter { (c, _) -> c.toIndex() != 0 }
+                .sumOf { (_, input) -> input.amount }
+
+            val result: MutableList<ItemStack> = mutableListOf()
+            if (core.amount > 1) {
+                result.add(core.clone().asQuantity(core.amount - 1))
+            }
+
+            val canAddAmount: Int = Int.MAX_VALUE - currentCount
+            if (canAddAmount < ironBlockAmount) {
+                result.add(ItemStack.of(Material.IRON_BLOCK, ironBlockAmount - canAddAmount))
+            }
+
+            val newValue: Int = currentCount + if (canAddAmount < ironBlockAmount) canAddAmount else ironBlockAmount
+
+            core.editMeta { meta ->
+                meta.persistentDataContainer.set(
+                    NamespacedKey(Demo.plugin, "infinity_iron_block_count"),
+                    PersistentDataType.INTEGER,
+                    newValue
+                )
+
+                meta.lore(listOf("<green>Contained Iron Block: <white>$newValue".toComponent()))
+            }
+
+            result.add(core.asOne())
+            return@ResultSupplierImpl result
+        }
+
+        return GroupRecipe(
+            name = "Infinity Iron Block",
+            items = items,
+            groups = setOf(coreContext, ironBlockContext),
+            results = listOf(supplier)
         )
     }
 }
