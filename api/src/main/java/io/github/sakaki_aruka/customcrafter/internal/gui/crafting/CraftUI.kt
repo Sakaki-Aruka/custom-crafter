@@ -4,6 +4,8 @@ import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.event.CreateCustomItemEvent
 import io.github.sakaki_aruka.customcrafter.api.event.PreCreateCustomItemEvent
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
+import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipeContainer
+import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
@@ -175,31 +177,37 @@ internal class CraftUI(
         val mapped: Map<CoordinateComponent, ItemStack> = Converter.standardInputMapping(this.inventory) ?: return
         if (result.customs().isNotEmpty()) {
             val (recipe: CRecipe, relate: MappedRelation) = result.customs().firstOrNull() ?: return
-            if (getMinAmountWithoutMass(relate, recipe, mapped) <= 0) {
-                return
+
+            val amount: Int = recipe.getMinAmount(mapped, relate, isCraftGUI = true, shift = shiftUsed)
+                //?.takeIf { it > 0 }
+                ?: return
+
+            relate.components.forEach { (_, input) -> decrement(this.inventory, input.toIndex(), amount) }
+
+            val results: MutableList<ItemStack> = recipe.getResults(
+                ResultSupplier.Context(
+                    recipe = recipe,
+                    crafterID = player.uniqueId,
+                    relation = relate,
+                    mapped = mapped,
+                    list = mutableListOf(),
+                    shiftClicked = shiftUsed,
+                    calledTimes = amount,
+                    isMultipleDisplayCall = false)
+            )
+
+            recipe.runNormalContainers(CRecipeContainer.Context(
+                userID = player.uniqueId,
+                relation = relate,
+                mapped = mapped,
+                results = results,
+                isAllCandidateDisplayCall = false
+            ))
+
+            if (results.isNotEmpty()) {
+                player.giveItems(saveLimit = true, *results.toTypedArray())
             }
 
-            var amount = 1
-            recipe.items.forEach { (c, m) ->
-                val inputCoordinate = relate.components.find { rel -> rel.recipe == c }
-                    ?.input
-                    ?: return
-                val min: Int = getMinAmountWithoutMass(relate, recipe, mapped)
-                amount = if (m.mass) 1 else (m.amount * (if (shiftUsed) min else 1))
-
-                val slot: Int = inputCoordinate.toIndex()
-                decrement(this.inventory, slot, amount)
-            }
-
-            recipe.getResults(player.uniqueId, relate, mapped, shiftUsed, amount, isMultipleDisplayCall = false)
-                .takeIf { l -> l.isNotEmpty() }
-                ?.let { list ->
-                    recipe.runNormalContainers(player.uniqueId, relate, mapped, list, isMultipleDisplayCall = false)
-                    list.takeIf { l -> l.isNotEmpty() }
-                        ?.forEach { item ->
-                            player.giveItems(saveLimit = true, item)
-                        }
-                }
         } else if (result.vanilla() != null) {
             val min: Int = mapped.values.minOf { i -> i.amount }
             val amount: Int = if (shiftUsed) min else 1
@@ -223,18 +231,6 @@ internal class CraftUI(
         } else {
             gui.setItem(slot, item.asQuantity(qty))
         }
-    }
-
-    private fun getMinAmountWithoutMass(
-        relation: MappedRelation,
-        recipe: CRecipe,
-        mapped: Map<CoordinateComponent, ItemStack>
-    ): Int {
-        return relation.components
-            .filter { c -> Converter.getAvailableCraftingSlotComponents().contains(c.input) }
-            .filter { c -> mapped[c.input] != null && mapped[c.input]!!.type.isItem }
-            .filter { c -> !recipe.items[c.recipe]!!.mass }
-            .minOf { (r, i) -> mapped[i]!!.amount / recipe.items[r]!!.amount }
     }
 
     override fun getInventory(): Inventory = this.inventory

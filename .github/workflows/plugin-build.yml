@@ -21,4 +21,4 @@ jobs:
           cache: 'maven'
 
       - name: Build plugin with Maven
-        run: mvn clean package
+        run: mvn -pl api clean package
