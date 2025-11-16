@@ -148,7 +148,7 @@ object ShapedRecipeProvider {
                     totalIronBlockAmount
                 )
                 meta.displayName("Infinity Iron Block".toComponent())
-                meta.lore(listOf("<green>Contained Iron Block:</green> $totalIronBlockAmount".toComponent()))
+                meta.lore(listOf("<green>Contained Iron Block:<white> $totalIronBlockAmount".toComponent()))
             }
             listOf(core)
         }
@@ -214,18 +214,25 @@ object ShapedRecipeProvider {
         ironBlockContext.members.forEach { c -> items[c] = ironBlock }
 
         val supplier: ResultSupplier = ResultSupplierImpl { ctx ->
+            val coreCoordinate = ctx.relation.components.first { (recipe, _) ->
+                recipe.toIndex() == 0
+            }.input
 
-            val core: ItemStack = ctx.mapped.getValue(
-                ctx.relation.components.first { (recipe, _) -> recipe.toIndex() == 0 }.input
-            ).clone()
+            val limit: Int =
+                if (ctx.shiftClicked) {
+                    ctx.mapped.entries.filter { (c, _) -> c != coreCoordinate }
+                        .minOf { (_, input) -> input.amount }
+                } else 1
+
+            val core: ItemStack = ctx.mapped.getValue(coreCoordinate).clone()
             val currentCount: Int = core.itemMeta.persistentDataContainer.getOrDefault(
                 NamespacedKey(Demo.plugin, "infinity_iron_block_count"),
                 PersistentDataType.INTEGER,
                 0
             )
             val ironBlockAmount: Int = ctx.mapped.entries
-                .filter { (c, _) -> c.toIndex() != 0 }
-                .sumOf { (_, input) -> input.amount }
+                .filter { (c, _) -> c != coreCoordinate }
+                .sumOf { (_, input) -> minOf(limit, input.amount) }
 
             val result: MutableList<ItemStack> = mutableListOf()
             if (core.amount > 1) {
