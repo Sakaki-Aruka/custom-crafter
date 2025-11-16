@@ -10,6 +10,19 @@ import org.bukkit.inventory.ItemStack
 
 /**
  * This interface's implementing types can be used as recipes for CustomCrafter.
+ *
+ * @param[name] Name of this recipe
+ * @param[items] Mapping of CMatter and those coordinates on crafting slots
+ * @param[containers] Containers what run on success to search and crafting
+ * @param[results] List of [ResultSupplier] what provide items to players
+ * @param[filters] List of [CRecipeFilter] what run on search process
+ * @param[type] Type of this recipe. See [CRecipeType]
+ *
+ * @see[CMatter]
+ * @see[CRecipeContainer]
+ * @see[ResultSupplier]
+ * @see[CRecipeFilter]
+ * @see[CRecipeType]
  */
 interface CRecipe {
     val name: String

@@ -13,7 +13,7 @@ import org.bukkit.Material
  * @param[mass] this matter is mass or not (default = false)
  * @param[predicates] if in checks, this matter requires to pass these all. (default = null)
  */
-data class CMatterImpl(
+open class CMatterImpl(
     override val name: String,
     override val candidate: Set<Material>,
     override val amount: Int = 1,

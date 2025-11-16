@@ -21,7 +21,7 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
  * @param[results] A [ResultSupplier] list. (default = null)
  * @param[filters] A recipe filters. (default = [getDefaultFilters])
  */
-data class CRecipeImpl(
+open class CRecipeImpl(
     override val name: String,
     override val items: Map<CoordinateComponent, CMatter>,
     override val type: CRecipeType,

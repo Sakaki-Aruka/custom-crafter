@@ -23,7 +23,7 @@ import org.bukkit.inventory.ItemStack
  * @see[ResultSupplier]
  * @see[ResultSupplier.Context]
  */
-class ResultSupplierImpl(
+open class ResultSupplierImpl(
     override val f: (ResultSupplier.Context) -> List<ItemStack>
 ): ResultSupplier {
     companion object {

@@ -6,6 +6,14 @@ import org.bukkit.Material
 /**
  * This interface's implementing types can be used as materials for [CRecipe].
  *
+ * @param[name] Name of this matter
+ * @param[candidate] Material candidate of this matter
+ * @param[amount] Amount of this matter requires
+ * @param[mass] Always requires 1 item on input
+ * @param[predicates] List of lambda functions what runs on search process
+ *
+ * @see[CRecipe]
+ * @see[CMatterPredicate]
  * @since 5.0.0
  */
 interface CMatter {
@@ -13,7 +21,7 @@ interface CMatter {
     val candidate: Set<Material>
     val amount: Int
     val mass: Boolean
-    val predicates: Set<CMatterPredicate>?
+    val predicates: Collection<CMatterPredicate>?
 
     /**
      * Returns this [CMatter] is a valid or not.

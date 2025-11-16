@@ -172,7 +172,7 @@ class GroupRecipe (
         override val candidate: Set<Material>,
         override val amount: Int,
         override val mass: Boolean,
-        override val predicates: Set<CMatterPredicate>?,
+        override val predicates: List<CMatterPredicate>?,
         val original: CMatter
     ): CMatter {
 
@@ -212,7 +212,7 @@ class GroupRecipe (
                     candidate = if (includeAir) matter.candidate + Material.AIR else matter.candidate,
                     amount = matter.amount,
                     mass = matter.mass,
-                    predicates = setOf(INSPECTOR, CHECKER),
+                    predicates = listOf(INSPECTOR, CHECKER),
                     original = matter
                 )
 
