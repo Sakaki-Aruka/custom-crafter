@@ -27,7 +27,7 @@ data class CRecipeImpl(
     override val type: CRecipeType,
     override val containers: List<CRecipeContainerImpl>? = null,
     override val results: List<ResultSupplier>? = null,
-    override val filters: Set<CRecipeFilter<CMatter>>? = getDefaultFilters()
+    override val filters: List<CRecipeFilter<CMatter>>? = getDefaultFilters()
 ): CRecipe {
     /**
      * @see[CRecipe.replaceItems]
@@ -49,8 +49,8 @@ data class CRecipeImpl(
          *
          * @return[Set] a set of default filters
          */
-        fun getDefaultFilters(): Set<CRecipeFilter<CMatter>> {
-            return setOf(
+        fun getDefaultFilters(): List<CRecipeFilter<CMatter>> {
+            return listOf(
                 EnchantFilter,
                 EnchantStorageFilter,
                 PotionFilter
@@ -71,7 +71,7 @@ data class CRecipeImpl(
             items: List<CMatter>,
             containers: List<CRecipeContainerImpl>? = null,
             results: List<ResultSupplier>? = null,
-            filters: Set<CRecipeFilter<CMatter>>? = getDefaultFilters()
+            filters: List<CRecipeFilter<CMatter>>? = getDefaultFilters()
         ): CRecipeImpl {
             if (items.isEmpty() || items.size > 36) {
                 throw IllegalArgumentException("'items' size must be in range of 1 to 36.")

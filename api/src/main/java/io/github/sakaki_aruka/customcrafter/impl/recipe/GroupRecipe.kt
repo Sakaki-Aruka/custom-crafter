@@ -9,7 +9,6 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterPredicateImpl
-import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import java.util.UUID
@@ -38,7 +37,7 @@ class GroupRecipe (
     override val name: String,
     override val items: Map<CoordinateComponent, CMatter>,
     val groups: Set<Context>,
-    override val filters: Set<CRecipeFilter<CMatter>>? = null,
+    override val filters: List<CRecipeFilter<CMatter>>? = null,
     override val containers: List<CRecipeContainer>? = null,
     override val results: List<ResultSupplier>? = null,
     override val type: CRecipeType = CRecipeType.NORMAL
@@ -46,9 +45,9 @@ class GroupRecipe (
 
     companion object {
         fun createFilters(
-            filters: Set<CRecipeFilter<CMatter>>
-        ): Set<CRecipeFilter<CMatter>> {
-            return setOf(Filter(filters.filter { it !is Filter }.associateBy { it::class }))
+            filters: Collection<CRecipeFilter<CMatter>>
+        ): List<CRecipeFilter<CMatter>> {
+            return listOf(Filter(filters.filter { it !is Filter }.associateBy { it::class }))
         }
 
         fun createGroups(

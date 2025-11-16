@@ -21,7 +21,7 @@ data class CVanillaRecipe internal constructor(
     override val type: CRecipeType,
     override val containers: List<CRecipeContainerImpl>? = null,
     override val results: List<ResultSupplier>? = null,
-    override val filters: Set<CRecipeFilter<CMatter>>? = CRecipeImpl.getDefaultFilters(),
+    override val filters: List<CRecipeFilter<CMatter>>? = CRecipeImpl.getDefaultFilters(),
     val original: Recipe
 ): CRecipe {
     companion object {
