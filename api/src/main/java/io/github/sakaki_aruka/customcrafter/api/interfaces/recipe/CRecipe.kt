@@ -168,19 +168,53 @@ interface CRecipe {
 
     /**
      * Get min amount
+     *
+     * @param[map] Input items mapping
+     * @param[relation] Coordinate relations in input items and recipe matters
+     * @param[isCraftGUI] Called from Crafting GUI or not
+     * @param[shift] Use Shift-Key (Batch Crafting) or not
+     * @param[withoutMass] Use mass-marked CMatters to min amount calculation or not
+     * @param[includeAir] Use Material#AIR to min amount calculation or not
      * @since 5.0.10
      */
     fun getMinAmount(
         map: Map<CoordinateComponent, ItemStack>,
+        relation: MappedRelation,
         isCraftGUI: Boolean,
-        shift: Boolean
+        shift: Boolean,
+        withoutMass: Boolean = true,
+        includeAir: Boolean = false
     ): Int? {
         if (!shift) return 1
-        return items.entries
-            .filter { (c, _) -> c in Converter.getAvailableCraftingSlotComponents() }
-            .filter { (c, _) -> map[c] != null }
-            .filter { (_, matter) -> !matter.mass }
-            .minOfOrNull { (c, matter) -> map[c]!!.amount / matter.amount }
+        var amount = Int.MAX_VALUE
+        for ((c, matter) in this.items) {
+            val inputCoordinate: CoordinateComponent = relation.components.firstOrNull { it.recipe == c }
+                ?.input
+                ?: CoordinateComponent(-1, -1)
+            val item: ItemStack = // map[c] ?: ItemStack.empty()
+                if (inputCoordinate.toIndex() == -10) ItemStack.empty()
+                else map[inputCoordinate] ?: ItemStack.empty()
+            if (!includeAir && item.type.isEmpty) {
+                continue
+            } else if (withoutMass && matter.mass) {
+                continue
+            }
+
+            val q: Int =
+                if (matter.mass) 1
+                else item.amount
+            if (q < amount) {
+                amount = q
+            }
+        }
+        return amount.takeIf { it != Int.MAX_VALUE } ?: 1
+        // TODO: Consider items and map relation (There have diff in anytime)
+//        return items.entries
+//            .filter { (c, _) -> c in Converter.getAvailableCraftingSlotComponents() }
+//            .filter { (c, _) -> map[c] != null }
+//            .filter { (c, _) -> if (includeAir) true else !map.getValue(c).type.isAir }
+//            .filter { (_, matter) -> if (withoutMass) !matter.mass else true }
+//            .minOfOrNull { (c, matter) -> map[c]!!.amount / matter.amount }
     }
 
     fun getSlots(): List<Int> {

@@ -195,7 +195,11 @@ internal class AllCandidateUI(
                         relate = mappedRelation,
                         mapped = view.materials,
                         shiftClicked = event.isShiftClick,
-                        calledTimes = recipe.getMinAmount(view.materials, isCraftGUI = false, event.isShiftClick) ?: 1,
+                        calledTimes = recipe.getMinAmount(
+                            map = view.materials,
+                            relation = mappedRelation,
+                            isCraftGUI = false,
+                            shift = event.isShiftClick) ?: 1,
                         isMultipleDisplayCall = false
                     )
                 } else {

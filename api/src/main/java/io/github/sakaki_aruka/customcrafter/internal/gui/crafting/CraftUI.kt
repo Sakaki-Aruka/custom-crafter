@@ -11,6 +11,7 @@ import io.github.sakaki_aruka.customcrafter.api.search.Search
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter.toComponent
 import io.github.sakaki_aruka.customcrafter.impl.util.InventoryUtil.giveItems
+import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
 import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterUI
 import io.github.sakaki_aruka.customcrafter.internal.gui.allcandidate.AllCandidateUI
 import net.kyori.adventure.text.Component
@@ -175,21 +176,11 @@ internal class CraftUI(
         val mapped: Map<CoordinateComponent, ItemStack> = Converter.standardInputMapping(this.inventory) ?: return
         if (result.customs().isNotEmpty()) {
             val (recipe: CRecipe, relate: MappedRelation) = result.customs().firstOrNull() ?: return
-            if (getMinAmountWithoutMass(relate, recipe, mapped) <= 0) {
-                return
-            }
 
-            var amount = 1
-            recipe.items.forEach { (c, m) ->
-                val inputCoordinate = relate.components.find { rel -> rel.recipe == c }
-                    ?.input
-                    ?: return
-                val min: Int = getMinAmountWithoutMass(relate, recipe, mapped)
-                amount = if (m.mass) 1 else (m.amount * (if (shiftUsed) min else 1))
-
-                val slot: Int = inputCoordinate.toIndex()
-                decrement(this.inventory, slot, amount)
-            }
+            val amount: Int = recipe.getMinAmount(mapped, relate, isCraftGUI = true, shift = shiftUsed)
+                ?.takeIf { it > 0 }
+                ?: return
+            relate.components.forEach { (_, input) -> decrement(this.inventory, input.toIndex(), amount) }
 
             recipe.getResults(player.uniqueId, relate, mapped, shiftUsed, amount, isMultipleDisplayCall = false)
                 .takeIf { l -> l.isNotEmpty() }

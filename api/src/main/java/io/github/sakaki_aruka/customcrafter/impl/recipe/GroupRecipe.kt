@@ -14,6 +14,25 @@ import org.bukkit.inventory.ItemStack
 import java.util.UUID
 import kotlin.reflect.KClassifier
 
+/**
+ * Implementation of [CRecipe].
+ *
+ * This recipe only provides [CRecipeType.NORMAL].
+ *
+ *
+ * @param[name] Name of this recipe
+ * @param[items] Item mapping
+ * @param[groups] Air-containable context set. It can be empty.
+ * @param[filters] [CRecipeFilter] of apply this recipe. This is required if items contains a CMatter that requires a CRecipeFilter. Use the set created by [GroupRecipe.createFilters].
+ * @param[containers] Containers when run on finished to search
+ * @param[results] [ResultSupplier] list
+ * @param[type] Always be [CRecipeType.NORMAL]
+ * @see[CRecipe]
+ * @see[Matter]
+ * @see[Context]
+ * @see[Filter]
+ * @since 5.0.15
+ */
 class GroupRecipe (
     override val name: String,
     override val items: Map<CoordinateComponent, CMatter>,
@@ -28,7 +47,7 @@ class GroupRecipe (
         fun createFilters(
             filters: Set<CRecipeFilter<CMatter>>
         ): Set<CRecipeFilter<CMatter>> {
-            return setOf(Filter(filters.associateBy { it::class }))
+            return setOf(Filter(filters.filter { it !is Filter }.associateBy { it::class }))
         }
 
         fun createGroups(
@@ -108,9 +127,11 @@ class GroupRecipe (
                 }
 
                 for (ctx in groups) {
-                    val airContainableCount: Int = ctx.members.count { c -> items.getValue(c).candidate.any { m -> m.isAir } }
-                    if (airContainableCount != 0 && airContainableCount != ctx.members.size) {
-                        return Result.failure(IllegalArgumentException("The CMatters corresponding to the CoordinateComponents contained in 'groups.members' must either all be air-containable or all not air-containable."))
+                    val airContainableCount: Int = ctx.members.count { c ->
+                        items.getValue(c).candidate.any { m -> m.isAir }
+                    }
+                    if (airContainableCount < ctx.members.size - ctx.min) {
+                        return Result.failure(IllegalArgumentException("There are not enough CMatters that are Air-Containable. (Required: ${ctx.members.size - ctx.min}, Provided: ${airContainableCount})"))
                     }
                 }
 
@@ -138,6 +159,14 @@ class GroupRecipe (
         }
     }
 
+    /**
+     * Air-containable [CMatter] implementation.
+     *
+     * Use [Matter.of] to initialize.
+     * @see[CMatter]
+     * @see[GroupRecipe]
+     * @since 5.0.15
+     */
     class Matter internal constructor(
         override val name: String,
         override val candidate: Set<Material>,
@@ -162,6 +191,15 @@ class GroupRecipe (
         }
 
         companion object {
+            /**
+             * Create [Matter] instance from [CMatter].
+             *
+             * @throws[IllegalArgumentException] If specified [matter] already has been [Matter]
+             * @throws[IllegalStateException] If found some invalid part from specified matter. From [Matter.isValidMatter]
+             * @param[matter] Base matter
+             * @param[includeAir] Add 'Material.AIR' to [matter] candidate or not. (Default false)
+             * @since 5.0.15
+             */
             fun of(
                 matter: CMatter,
                 includeAir: Boolean = false
@@ -248,6 +286,7 @@ class GroupRecipe (
                     )
                 }
                 return@CMatterPredicateImpl result
+                        && if (ctx.matter is Matter) ctx.matter.original.predicatesResult(ctx) else true
             }
         }
 
