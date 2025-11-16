@@ -9,6 +9,7 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterPredicateImpl
+import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import java.util.UUID
@@ -321,13 +322,13 @@ class GroupRecipe (
     }
 
     override fun isValidRecipe(): Result<Unit> {
-        return if (this.type != CRecipeType.NORMAL) {
-            Result.failure(
+        if (this.type != CRecipeType.NORMAL) {
+            return Result.failure(
                 NotImplementedError("GroupRecipe is not implemented for `CRecipeType.NORMAL`."))
         } else if (this.items.isEmpty() || this.items.size > 36) {
-            Result.failure(IllegalStateException("'items' must contain 1 to 36 valid CMatters."))
+            return Result.failure(IllegalStateException("'items' must contain 1 to 36 valid CMatters."))
         } else if (this.items.entries.minBy { (c, _) -> c.toIndex() }.value.candidate.any { it.isAir }) {
-            Result.failure(IllegalArgumentException("GroupRecipe must not contain Material.AIR at first coordinate."))
+            return Result.failure(IllegalArgumentException("GroupRecipe must not contain Material.AIR at first coordinate."))
         } else if (this.items.values.any { it.isValidMatter().isFailure }) {
             val builder = StringBuilder()
             for ((c, matter) in this.items.entries) {
@@ -335,10 +336,10 @@ class GroupRecipe (
                     ?: continue
                 builder.append("[items] x: ${c.x}, y: ${c.y}, ${t.message} ${System.lineSeparator()}")
             }
-            Result.failure(IllegalStateException(builder.toString()))
-        } else {
-            Context.isValidGroups(this.groups, this.items).takeIf { it.isFailure }?.let { return it }
-            Result.success(Unit)
+            return Result.failure(IllegalStateException(builder.toString()))
         }
+
+        Context.isValidGroups(this.groups, this.items).takeIf { it.isFailure }?.let { return it }
+        return Result.success(Unit)
     }
 }
