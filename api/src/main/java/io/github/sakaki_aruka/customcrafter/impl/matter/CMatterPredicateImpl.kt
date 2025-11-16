@@ -11,6 +11,6 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatterPredica
  * @see[io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatterPredicate]
  * @see[io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter.predicates]
  */
-class CMatterPredicateImpl(
+open class CMatterPredicateImpl(
     override val predicate: (CMatterPredicate.Context) -> Boolean
 ): CMatterPredicate

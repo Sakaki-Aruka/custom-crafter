@@ -16,7 +16,7 @@ import org.bukkit.Material
  * @param[predicates] if in checks, this matter requires to pass these all.
  * @param[potionComponents] potion predicates for contained. set of [CPotionComponent].
  */
-data class CPotionMatterImpl(
+open class CPotionMatterImpl(
     override val name: String,
     override val candidate: Set<Material>,
     override val potionComponents: Set<CPotionComponent>,

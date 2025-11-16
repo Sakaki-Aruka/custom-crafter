@@ -16,7 +16,7 @@ import org.bukkit.Material
  * @param[predicates] if in checks, this matter requires to pass these all.
  * @param[enchantComponents] enchant predicates for applied enchantments. set of [CEnchantComponent].
  */
-data class CEnchantMatterImpl(
+open class CEnchantMatterImpl(
     override val name: String,
     override val candidate: Set<Material>,
     override val enchantComponents: Set<CEnchantComponent>,
