@@ -73,6 +73,8 @@ internal class CraftUI(
         override fun isTrigger(event: PlayerInteractEvent): Boolean {
             if (!CustomCrafterAPI.getUseCustomCraftUI()) {
                 return false
+            } else if (!event.action.isRightClick) {
+                return false
             }
             val clicked: Block = event.clickedBlock?.takeIf { b -> b.type == Material.CRAFTING_TABLE }
                 ?: return false
