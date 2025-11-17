@@ -16,6 +16,23 @@ custom crafter は、**PaperMCサーバー専用**のカスタムレシピ提供
 
 ---
 
+## 🎥 デモ映像
+
+<details><summary>クラフトのデモ映像</summary>
+
+1. 基礎ブロックを設置 (`GOLD_BLOCK`).
+2. `infinityIronBlockCore` レシピを利用 [(レシピが定義されたファイルへジャンプ)](./demo/src/main/kotlin/online/aruka/demo/register/ShapedRecipeProvider.kt).
+3. `infinityIronBlock` レシピを利用して鉄ブロックを圧縮 [(レシピが定義されたファイルへジャンプ)](./demo/src/main/kotlin/online/aruka/demo/register/ShapedRecipeProvider.kt).
+4. 同じレシピを利用 (`infinityIronBlock`)
+5. 同じレシピを利用 (`infinityIronBlock`)
+6. `infinityIronBlockExtract` レシピを利用して無限鉄ブロックを解凍 [(レシピが定義されたファイルへジャンプ)](./demo/src/main/kotlin/online/aruka/demo/register/ShapelessRecipeProvider.kt).
+
+![](./resources/crafting-demo.gif)
+
+</details>
+
+---
+
 ## 🛠️ 対応環境とバージョン
 
 | Custom_Crafter Version   | Paper Version   |
