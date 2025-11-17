@@ -40,12 +40,12 @@
                         </directory>
                     </sourceDirectories>
                     <suppressedFiles>
-                        <file>src/main/java/io/github/sakaki_aruka/customcrafter/internal</file>
-                        <file>src/main/java/io/github/sakaki_aruka/customcrafter/CustomCrafter.java</file>
-                        <file>src/main/java/io/github/sakaki_aruka/customcrafter/impl/recipe/CVanillaRecipe.kt</file>
+                        <file>${project.basedir}/src/main/java/io/github/sakaki_aruka/customcrafter/internal</file>
+                        <file>${project.basedir}/src/main/java/io/github/sakaki_aruka/customcrafter/CustomCrafter.java</file>
+                        <file>${project.basedir}/src/main/java/io/github/sakaki_aruka/customcrafter/impl/recipe/CVanillaRecipe.kt</file>
                     </suppressedFiles>
                     <includes>
-                        <include>Module.md</include>
+                        <include>${project.basedir}/Module.md</include>
                     </includes>
                 </configuration>
             </plugin>
