@@ -1,13 +1,19 @@
 # Changelog
 
 # 5.0.15
-CMatter, CRecipe changes.
 
-## Code
-- [Changed] `CustomCrafterAPI#API_VERSION` format has been `5.x.x` from `0.x.x`. (became Plugin Version == API Version)
-- [Changed] `CMatter#isValidCMatter` changed to `CMatter#isValidMatter` and to be customizable impl.
-- [Changed] `CRecipe#isValidCRecipe` changed to `CRecipe#isValidRecipe` and to be customizable impl.
-- [Changed] `CMatterPredicate#predicate` has been using `CMatterPredicate.Context`.
+## ⚠️ Breaking Changes / Important Dependency Change
+
+* The **MCKotlin-Paper** plugin is now **required** to be installed for the library to run, starting from this version.
+
+---
+
+## ✨ New Features and Enhancements
+
+* **[New Feature]** Added a new recipe that allows the use of air items as inputs.
+* **[Enhancement]** Subclasses of `CRecipe` can now override the required input item amount used during the recipe search process.
+* **[Enhancement]** Several default implementation classes have been made `open` to allow for extension through inheritance.
+* **[Other]** Added demonstration plugin code for the `CustomCrafterAPI` to the `demo` module.
 
 # 5.0.14
 Delete auto-crafting feature, internal changes.  
