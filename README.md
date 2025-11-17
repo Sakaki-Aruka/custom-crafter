@@ -18,6 +18,21 @@ You can define custom recipes freely within your own plugin and introduce new el
 
 ---
 
+## Demo Video
+
+<details><summary>Crafting Demo Video</summary>
+
+- Place base blocks (`GOLD_BLOCK`).
+- Create `infinityIronBlockCore` [(Jump to the defined file)](./demo/src/main/kotlin/online/aruka/demo/register/ShapedRecipeProvider.kt).
+- Compress Iron Block with `infinityIronBlock` [(Jump to the defined file)](./demo/src/main/kotlin/online/aruka/demo/register/ShapedRecipeProvider.kt).
+- Extract Infinity Iron Block with `infinityIronBlockExtract` [(Jump to the defined file)](./demo/src/main/kotlin/online/aruka/demo/register/ShapelessRecipeProvider.kt).
+
+![](./resources/crafting-demo.gif)
+
+</details>
+
+---
+
 ## 🛠️ Supported Environments and Versions
 
 | Custom_Crafter Version       | Paper Version   |
