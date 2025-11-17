@@ -4,6 +4,8 @@ custom crafter is a custom recipe provider plugin for **PaperMC servers**, which
 
 You can define custom recipes freely within your own plugin and introduce new elements into the game.
 
+([Japanese Document (日本語ドキュメント)](README_JP.md))
+
 ---
 
 ## 🚀 Key Features
@@ -40,8 +42,12 @@ You can freely create custom recipes from your plugin and register them into the
 
 For more detailed information and a complete list of classes and methods, please refer to:
 
-* [KDoc (Kotlin/JavaDoc)](https://sakaki-aruka.github.io/custom-crafter/)
+* [KDoc (Kotlin)](https://sakaki-aruka.github.io/custom-crafter/)
 * [Wiki (GitHub)](https://github.com/Sakaki-Aruka/custom-crafter/wiki/Intro)
+
+or Build:  
+* KDoc Style: `mvn -pl api dokka:dokka`
+* JavaDoC Style: `mvn -pl api dokka:javadoc`
 
 ### Dependency Information
 
@@ -59,7 +65,7 @@ Latest Version: [![JitPack](https://jitpack.io/v/Sakaki-Aruka/custom-crafter.svg
 <repositories>
    <repository>
       <id>jitpack.io</id>
-      <url>[https://jitpack.io](https://jitpack.io)</url>
+      <url>https://jitpack.io</url>
    </repository>
 </repositories>
 ```
@@ -85,7 +91,7 @@ dependencyResolutionManagement {
    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
    repositories {
       mavenCentral()
-      maven { url '[https://jitpack.io](https://jitpack.io)' }
+      maven { url 'https://jitpack.io' }
    }
 }
 ```
@@ -104,7 +110,7 @@ dependencies {
 ```
 repositories { 
     mavenCentral()
-    maven("[https://jitpack.io](https://jitpack.io)") {
+    maven("https://jitpack.io") {
         name = "jitpack"
     }
 }
