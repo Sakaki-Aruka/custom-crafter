@@ -323,7 +323,7 @@ class GroupRecipe (
     override fun isValidRecipe(): Result<Unit> {
         if (this.type != CRecipeType.NORMAL) {
             return Result.failure(
-                NotImplementedError("GroupRecipe is not implemented for `CRecipeType.NORMAL`."))
+                NotImplementedError("GroupRecipe is not implemented for `CRecipeType.AMORPHOUS`."))
         } else if (this.items.isEmpty() || this.items.size > 36) {
             return Result.failure(IllegalStateException("'items' must contain 1 to 36 valid CMatters."))
         } else if (this.items.entries.minBy { (c, _) -> c.toIndex() }.value.candidate.any { it.isAir }) {
