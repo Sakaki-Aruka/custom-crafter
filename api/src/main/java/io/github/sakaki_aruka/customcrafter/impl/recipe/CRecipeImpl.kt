@@ -29,20 +29,6 @@ open class CRecipeImpl(
     override val results: List<ResultSupplier>? = null,
     override val filters: List<CRecipeFilter<CMatter>>? = getDefaultFilters()
 ): CRecipe {
-    /**
-     * @see[CRecipe.replaceItems]
-     */
-    override fun replaceItems(newItems: Map<CoordinateComponent, CMatter>): CRecipeImpl {
-        return CRecipeImpl(
-            this.name,
-            newItems,
-            this.type,
-            this.containers,
-            this.results,
-            this.filters
-        )
-    }
-
     companion object {
         /**
          * returns default candidate filter what are used in search.

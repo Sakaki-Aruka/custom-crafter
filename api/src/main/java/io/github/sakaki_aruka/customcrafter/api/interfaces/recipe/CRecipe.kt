@@ -64,14 +64,6 @@ interface CRecipe {
     }
 
     /**
-     * replace [items]
-     *
-     * @param[newItems] new items what are replace old.
-     * @return[CRecipe] created new recipe.
-     */
-    fun replaceItems(newItems: Map<CoordinateComponent, CMatter>): CRecipe
-
-    /**
      * Minimal requires input items amount
      *
      * Default implementation exists

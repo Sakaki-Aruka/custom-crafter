@@ -304,17 +304,6 @@ class GroupRecipe (
 
     }
 
-    override fun replaceItems(newItems: Map<CoordinateComponent, CMatter>): GroupRecipe {
-        return GroupRecipe(
-            name = this.name,
-            items = newItems,
-            filters = this.filters,
-            groups = this.groups,
-            containers = this.containers,
-            results = this.results
-        )
-    }
-
     override fun requiresInputItemAmountMin(): Int {
         val notGroupedSize: Int = (items.keys - this.groups.map { it.members }.flatten().toSet()).size
         return notGroupedSize + this.groups.sumOf { it.min }

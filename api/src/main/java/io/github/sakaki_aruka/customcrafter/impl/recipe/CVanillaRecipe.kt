@@ -128,16 +128,4 @@ data class CVanillaRecipe internal constructor(
             return choice.choices.toSet()
         }
     }
-
-    override fun replaceItems(newItems: Map<CoordinateComponent, CMatter>): CRecipe {
-        return CVanillaRecipe(
-            this.name,
-            newItems,
-            this.type,
-            this.containers,
-            this.results,
-            this.filters,
-            this.original
-        )
-    }
 }
