@@ -21,6 +21,28 @@ import kotlin.reflect.KClassifier
  *
  * This recipe has [groups] what is a list of air-containable matter ([GroupRecipe.Matter]).
  *
+ * This recipe has the constraint that "all Context#members to which the key that returns the smallest CoordinateComponent#toIndex value in items belongs cannot have an element in candidate that satisfies Material#isAir."
+ *
+ * ```
+ * items = {
+ *     (0, 0): [Material.AIR, Material.STONE],
+ *     (0, 1): [Material.COBBLESTONE]
+ * }
+ *
+ * // This is invalid groups. Group1 contains the minimum coordinate what keyed with a CMatter that contains Material.AIR.
+ * groups = [Group1{ (0, 0) }, Group2{ (0, 1) }]
+ * ```
+ *
+ * ```
+ * // Other invalid pattern
+ * items = {
+ *     (0, 0): [Material.STONE],
+ *     (0, 1): [Material.AIR, Material.COBBLESTONE]
+ * }
+ *
+ * // This is invalid group.
+ * groups = [Group1{ (0, 0), (0, 1) }]
+ * ```
  *
  * @param[name] Name of this recipe
  * @param[items] Item mapping
@@ -179,6 +201,9 @@ class GroupRecipe (
             }
 
             /**
+             * Checks specified context set and items mapping are valid or not.
+             *
+             * If those are invalid, returns an Exception what includes error messages.
              *
              * @param[groups] Set of [GroupRecipe.Context]
              * @param[items] Item mapping on GroupRecipe
@@ -237,6 +262,14 @@ class GroupRecipe (
         }
     }
 
+    /**
+     * CRecipeFilter<CMatter> implementation class for [GroupRecipe.Matter] .
+     *
+     * Create with [GroupRecipe.createFilters] and some more CRecipeFilter implementations.
+     *
+     * @see[GroupRecipe.createFilters]
+     * @since 5.0.15
+     */
     class Filter internal constructor(
         val filterMapping: Map<KClassifier, CRecipeFilter<CMatter>>
     ): CRecipeFilter<Matter> {
@@ -381,6 +414,10 @@ class GroupRecipe (
             }
         }
 
+        /**
+         * Checks is valid or not.
+         * @see[CMatter.isValidMatter]
+         */
         override fun isValidMatter(): Result<Unit> {
             return if (this.candidate.isEmpty()) {
                 Result.failure(IllegalStateException("'candidate' must contain correct materials at least one."))
