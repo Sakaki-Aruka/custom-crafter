@@ -37,12 +37,12 @@ You can define custom recipes freely within your own plugin and introduce new el
 
 ## 🛠️ Supported Environments and Versions
 
-| Custom_Crafter Version       | Paper Version   |
-|:-----------------------------|:----------------|
-| **5.0.13 ~ 5.0.15 (Latest)** | **1.21.4 ~**    |
-| 5.0.0 ~ 5.0.11               | 1.21.3          |
-| 4.3 (Legacy)                 | 1.21.3          |
-| 4.2 (Legacy)                 | 1.20.1 ~ 1.20.4 |
+| Custom_Crafter Version       | Paper Version        |
+|:-----------------------------|:---------------------|
+| **5.0.13 ~ 5.0.15 (Latest)** | **1.21.4 ~ 1.21.10** |
+| 5.0.0 ~ 5.0.11               | 1.21.3               |
+| 4.3 (Legacy)                 | 1.21.3               |
+| 4.2 (Legacy)                 | 1.20.1 ~ 1.20.4      |
 
 > **⚠️ Essential Warning:**
 > custom crafter **does not support running on Spigot/Bukkit servers**. Please ensure you run it on **PaperMC** or a PaperMC-fork.

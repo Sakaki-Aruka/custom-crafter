@@ -19,6 +19,8 @@ import kotlin.reflect.KClassifier
  *
  * This recipe only provides [CRecipeType.NORMAL].
  *
+ * This recipe has [groups] what is a list of air-containable matter ([GroupRecipe.Matter]).
+ *
  *
  * @param[name] Name of this recipe
  * @param[items] Item mapping
@@ -44,12 +46,42 @@ class GroupRecipe (
 ): CRecipe {
 
     companion object {
+        /**
+         * Creates the CRecipeFilter s required for GroupRecipe#items converted to GroupRecipe.Filter .
+         *
+         * If you want to include CMatter subclasses with  CRecipeFilter s in GroupRecipe#items, you need to use this function to generate and apply a GroupRecipe.Filter.
+         *
+         * ```Kotlin
+         * // Specify default filters
+         * val wrappedDefaultFilter = GroupRecipe.createFilters(CRecipeImpl.getDefaultFilters())
+         *
+         * // wrappedDefaultFilter is List<GroupRecipe.Filter>
+         * ```
+         *
+         * @param[filters] A collection of CRecipeFilter s for CMatter subclasses included in GroupRecipe#items
+         * @return[List] List of GroupRecipe.Filter (includes provided filters mapping)
+         * @since 5.0.15
+         */
         fun createFilters(
             filters: Collection<CRecipeFilter<CMatter>>
         ): List<CRecipeFilter<CMatter>> {
             return listOf(Filter(filters.filter { it !is Filter }.associateBy { it::class }))
         }
 
+        /**
+         * Creates a collection of GroupRecipe.Context s, which are grouping settings that can be set in GroupRecipe#groups.
+         *
+         * [missingGroups] is a collection of already created Context s; any Contexts for coordinates that are not included will be created with default settings and grouped into a single collection.
+         *
+         * If invalid state Context found from a specified set, throws an exception.
+         *
+         * @param[items] Coordinate and CMatter mapping
+         * @param[missingGroups] Set of GroupRecipe.Context what have already created
+         * @throws[IllegalStateException] If a specified set contains invalid state Context.
+         * @see[GroupRecipe.Context.isValidGroups]
+         * @return[Set] A GroupRecipe.Context set what can use for GroupRecipe#groups
+         * @since 5.0.15
+         */
         fun createGroups(
             items: Map<CoordinateComponent, CMatter>,
             missingGroups: Set<Context>
@@ -65,12 +97,49 @@ class GroupRecipe (
         }
     }
 
+    /**
+     * Context of GroupRecipe
+     *
+     * Configure minimum amount in crafting and relation of item placements.
+     *
+     * @param[members] Contained members. A set of coordinate in a recipe.
+     * @param[min] The minimum number of members that must be present when crafting. It MUST be >= 0.
+     * @param[name] Name of this context
+     * @since 5.0.15
+     */
     class Context internal constructor(
         val members: Set<CoordinateComponent>,
         val min: Int,
         val name: String = UUID.randomUUID().toString()
     ) {
         companion object {
+
+            /**
+             * Creates a Context with validations.
+             *
+             * ```Kotlin
+             * // Example
+             * val items = mapOf(
+             *     CoordinateComponent(0, 0) to CMatterImpl.of(Material.STONE)
+             * )
+             *
+             * val context = GroupRecipe.Context.of(
+             *     members = items.keys,
+             *     min = 1
+             * )
+             * // Context:
+             * //   members: CoordinateComponent(0, 0)
+             * //   min: 1
+             * //   name: <Random UUID>
+             * ```
+             *
+             * @param[members] Contained members. A set of coordinate in a recipe.
+             * @param[min] Minimum amount of item placements
+             * @param[name] Name of this context. Default value is a random UUID
+             * @throws[IllegalArgumentException] If [members] is empty or [min] is lesser than 0
+             * @return[GroupRecipe.Context] GroupRecipe.Context
+             * @since 5.0.15
+             */
             fun of(
                 members: Set<CoordinateComponent>,
                 min: Int,
@@ -84,6 +153,21 @@ class GroupRecipe (
                 return Context(members, min, name)
             }
 
+            /**
+             * Create default Context with specified coordinate.
+             *
+             * ```Kotlin
+             * val context = GroupRecipe.Context.default(CoordinateComponent(0, 0))
+             * // Context
+             * //   members: CoordinateComponent(0, 0)
+             * //   min: 1
+             * //   name: <Random UUID>
+             * ```
+             *
+             * @param[coordinate] A coordinate in a recipe
+             * @return[GroupRecipe.Context] Context
+             * @since 5.0.15
+             */
             fun default(
                 coordinate: CoordinateComponent
             ): Context {
@@ -94,6 +178,13 @@ class GroupRecipe (
                 )
             }
 
+            /**
+             *
+             * @param[groups] Set of [GroupRecipe.Context]
+             * @param[items] Item mapping on GroupRecipe
+             * @return[Result] Result of some checks. Use [Result.isSuccess] or [Result.isFailure] to check.
+             * @since 5.0.15
+             */
             fun isValidGroups(
                 groups: Set<Context>,
                 items: Map<CoordinateComponent, CMatter>
