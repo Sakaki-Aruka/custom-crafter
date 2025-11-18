@@ -1,5 +1,6 @@
 package io.github.sakaki_aruka.customcrafter.internal.gui.crafting
 
+import io.github.sakaki_aruka.customcrafter.CustomCrafter
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.event.CreateCustomItemEvent
 import io.github.sakaki_aruka.customcrafter.api.event.PreCreateCustomItemEvent
@@ -21,6 +22,7 @@ import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
+import org.bukkit.event.Event
 import org.bukkit.event.inventory.InventoryAction
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent
@@ -97,7 +99,34 @@ internal class CraftUI(
     }
 
     override fun onPlayerInventoryClick(clicked: Inventory, event: InventoryClickEvent) {
-        //
+        val currentItem: ItemStack = event.currentItem?.clone() ?: return
+        if (event.action != InventoryAction.MOVE_TO_OTHER_INVENTORY
+            || currentItem.type.isAir) {
+            return
+        }
+
+        event.result = Event.Result.DENY
+        event.currentItem = ItemStack.empty()
+
+        val resultSlotItem: ItemStack = event.inventory.getItem(CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT)?.clone()
+            ?: ItemStack.empty()
+
+        // pseudo
+        val stainedGlass: ItemStack = ItemStack.of(Material.BLACK_STAINED_GLASS_PANE).apply {
+            itemMeta = itemMeta.apply {
+                persistentDataContainer.set(
+                    NamespacedKey(CustomCrafter.getInstance(), "protect_result_slot"),
+                    PersistentDataType.STRING,
+                    UUID.randomUUID().toString()
+                )
+            }
+        }
+        event.inventory.setItem(CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT, stainedGlass)
+
+        val remaining: List<ItemStack> = event.inventory.addItem(currentItem).values.toList()
+        // delete pseudo
+        event.inventory.setItem(CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT, resultSlotItem)
+        (event.whoClicked as Player).giveItems(saveLimit = true, *remaining.toTypedArray())
     }
 
     override fun onClose(event: InventoryCloseEvent) {
