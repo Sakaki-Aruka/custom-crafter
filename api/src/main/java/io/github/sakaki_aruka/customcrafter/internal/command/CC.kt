@@ -85,14 +85,16 @@ internal object CC {
         ).then(Commands.literal("registered-recipe-names")
             .executes { ctx ->
                 val builder = StringBuilder()
-                val names: String = CustomCrafterAPI.getRecipes()
+                builder.append(System.lineSeparator())
+                builder.append("=== Registered CustomCrafter recipes overview ===")
+                builder.append(System.lineSeparator())
+                CustomCrafterAPI.getRecipes()
                     .sortedBy { recipe -> recipe.name }
-                    .joinToString(System.lineSeparator()) { recipe ->
-                        builder.clear()
-                        builder.append(recipe.name)
-                        builder.toString()
+                    .forEach { recipe ->
+                        builder.append("<green>  - ${recipe.name.ifEmpty { "(Empty Recipe Name)" }}")
+                        builder.append(System.lineSeparator())
                     }
-                ctx.msg(names)
+                ctx.msg(builder.toString())
                 return@executes SINGLE_SUCCESS
             }
         )
