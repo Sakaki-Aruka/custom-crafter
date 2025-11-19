@@ -1,6 +1,7 @@
 package online.aruka.demo
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
+import online.aruka.demo.listener.CreateCustomItemListener
 import online.aruka.demo.listener.CustomCrafterAPIPropertiesChangeListener
 import online.aruka.demo.listener.CustomItemRegisteredListener
 import online.aruka.demo.register.ShapedRecipeProvider
@@ -23,6 +24,7 @@ class Demo : JavaPlugin() {
         // register listeners to Bukkit api
         Bukkit.getPluginManager().registerEvents(CustomItemRegisteredListener, this)
         Bukkit.getPluginManager().registerEvents(CustomCrafterAPIPropertiesChangeListener, this)
+        Bukkit.getPluginManager().registerEvents(CreateCustomItemListener(), this)
 
         // register shaped recipes
         CustomCrafterAPI.registerRecipe(ShapedRecipeProvider.enchantedGoldenApple())
