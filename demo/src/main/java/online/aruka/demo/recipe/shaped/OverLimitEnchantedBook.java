@@ -16,7 +16,10 @@ import io.github.sakaki_aruka.customcrafter.impl.result.ResultSupplierImpl;
 import kotlin.Pair;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.EnchantmentStorageMeta;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -80,8 +83,35 @@ public class OverLimitEnchantedBook {
         );
 
         ResultSupplier supplier = new ResultSupplierImpl(ctx -> {
-            // TODO; impl here
-            return List.of();
+            List<ItemStack> results = new ArrayList<>();
+            int bookCount = (int) ctx.getMapped().values().stream()
+                    .filter(item -> item.getType() == Material.ENCHANTED_BOOK)
+                    .count();
+            if (bookCount / 2 == 1) {
+                // 2, 3
+                ItemStack lv6 = ItemStack.of(Material.ENCHANTED_BOOK);
+                lv6.editMeta(meta -> {
+                    ((EnchantmentStorageMeta) meta).addStoredEnchant(
+                            Enchantment.EFFICIENCY, 6, true
+                    );
+                });
+                results.add(lv6);
+
+                if (bookCount == 3) {
+                    results.add(ctx.getMapped().values().stream().filter(item ->
+                            item.getType() == Material.ENCHANTED_BOOK
+                    ).collect(Collectors.toList()).getFirst());
+                }
+            } else {
+                ItemStack lv7 = ItemStack.of(Material.ENCHANTED_BOOK);
+                lv7.editMeta(meta -> {
+                    ((EnchantmentStorageMeta) meta).addStoredEnchant(
+                            Enchantment.EFFICIENCY, 7, true
+                    );
+                });
+                results.add(lv7);
+            }
+            return results;
         });
 
         return new GroupRecipe(
