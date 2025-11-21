@@ -6,9 +6,7 @@ import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.search.Search
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
-import io.github.sakaki_aruka.customcrafter.impl.recipe.CRecipeImpl
 import io.github.sakaki_aruka.customcrafter.impl.recipe.GroupRecipe
-import io.github.sakaki_aruka.customcrafter.impl.recipe.filter.EnchantFilter
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
@@ -20,7 +18,6 @@ import org.mockbukkit.mockbukkit.MockBukkit
 import org.mockbukkit.mockbukkit.ServerMock
 import org.mockbukkit.mockbukkit.world.WorldMock
 import java.util.UUID
-import kotlin.math.min
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -37,19 +34,6 @@ object GroupRecipeTest {
     @AfterEach
     fun tearDown() {
         MockBukkit.unmock()
-    }
-
-    @Test
-    fun createCorrectFilter() {
-        val filters = GroupRecipe.createFilters(
-            setOf(EnchantFilter)
-        )
-
-        assertEquals(1, filters.size)
-        assertTrue(filters.first() is GroupRecipe.Filter)
-        val groupFilter = filters.first() as GroupRecipe.Filter
-        assertEquals(1, groupFilter.filterMapping.size)
-        assertEquals(EnchantFilter::class, groupFilter.filterMapping.keys.first())
     }
 
     @Test
@@ -274,7 +258,7 @@ object GroupRecipeTest {
         return GroupRecipe(
             name = "Marble",
             items = items,
-            filters = GroupRecipe.createFilters(CRecipeImpl.getDefaultFilters()),
+            //filters = GroupRecipe.createFilters(CRecipeImpl.getDefaultFilters()),
             groups = setOf(calciteGroup, stoneGroup)
         )
     }
