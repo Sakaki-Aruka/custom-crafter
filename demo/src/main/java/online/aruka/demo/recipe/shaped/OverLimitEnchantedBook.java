@@ -10,7 +10,6 @@ import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType;
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent;
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl;
 import io.github.sakaki_aruka.customcrafter.impl.matter.enchant.CEnchantmentStoreMatterImpl;
-import io.github.sakaki_aruka.customcrafter.impl.recipe.CRecipeImpl;
 import io.github.sakaki_aruka.customcrafter.impl.recipe.GroupRecipe;
 import io.github.sakaki_aruka.customcrafter.impl.result.ResultSupplierImpl;
 import kotlin.Pair;
@@ -115,7 +114,6 @@ public class OverLimitEnchantedBook {
                 "Over Limit Enchanted Book Recipe (Efficiency only)",
                 items,
                 groups,
-                GroupRecipe.Companion.createFilters(CRecipeImpl.Companion.getDefaultFilters()),
                 null,
                 List.of(supplier),
                 CRecipeType.NORMAL

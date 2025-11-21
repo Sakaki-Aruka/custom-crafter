@@ -26,8 +26,7 @@ public class DyeMixin {
                 "Dye mixin without black",
                 colors,
                 null,
-                List.of(supplier),
-                CRecipeImpl.Companion.getDefaultFilters()
+                List.of(supplier)
         );
     }
 }
