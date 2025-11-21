@@ -2,9 +2,13 @@ package io.github.sakaki_aruka.customcrafter.impl.matter.enchant
 
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CEnchantmentStoreMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
+import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatterPredicate
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterPredicateImpl
 import io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant.CEnchantComponent
+import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
 import org.bukkit.Material
+import org.bukkit.enchantments.Enchantment
+import org.bukkit.inventory.meta.EnchantmentStorageMeta
 
 /**
  * A default [CMatter], [CEnchantmentStoreMatter] implemented class.
@@ -22,5 +26,25 @@ data class CEnchantmentStoreMatterImpl(
     override val storedEnchantComponents: Set<CEnchantComponent>,
     override val amount: Int = 1,
     override val mass: Boolean = false,
-    override val predicates: Set<CMatterPredicateImpl>? = null,
-    ): CEnchantmentStoreMatter
+    override val predicates: Set<CMatterPredicate>? = CMatterImpl.defaultMatterPredicates()
+): CEnchantmentStoreMatter {
+    companion object {
+        val DEFAULT_ENCHANT_STORE_CHECKER = CMatterPredicateImpl { ctx ->
+            val enchantStoreMatter = ctx.matter as? CEnchantmentStoreMatter
+                ?: return@CMatterPredicateImpl true
+
+            if (enchantStoreMatter.storedEnchantComponents.isEmpty()) {
+                return@CMatterPredicateImpl true
+            } else if (ctx.input.itemMeta !is EnchantmentStorageMeta) {
+                return@CMatterPredicateImpl false
+            }
+
+            val sources: Map<Enchantment, Int> = (ctx.input.itemMeta as EnchantmentStorageMeta).storedEnchants.entries
+                .associate { it.key to it.value }
+
+            return@CMatterPredicateImpl enchantStoreMatter.storedEnchantComponents.all { component ->
+                CEnchantMatterImpl.enchantBaseCheck(sources, component)
+            }
+        }
+    }
+}

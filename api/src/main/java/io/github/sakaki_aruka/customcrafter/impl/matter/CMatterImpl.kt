@@ -2,6 +2,9 @@ package io.github.sakaki_aruka.customcrafter.impl.matter
 
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatterPredicate
+import io.github.sakaki_aruka.customcrafter.impl.matter.enchant.CEnchantMatterImpl
+import io.github.sakaki_aruka.customcrafter.impl.matter.enchant.CEnchantmentStoreMatterImpl
+import io.github.sakaki_aruka.customcrafter.impl.matter.potion.CPotionMatterImpl
 import org.bukkit.Material
 
 /**
@@ -11,16 +14,32 @@ import org.bukkit.Material
  * @param[candidate] matter candidate materials
  * @param[amount] matter amount (default = 1)
  * @param[mass] this matter is mass or not (default = false)
- * @param[predicates] if in checks, this matter requires to pass these all. (default = null)
+ * @param[predicates] if in checks, this matter requires to pass these all. (default = Enchant, EnchantStorage, Potion checker contains)
  */
 open class CMatterImpl(
     override val name: String,
     override val candidate: Set<Material>,
     override val amount: Int = 1,
     override val mass: Boolean = false,
-    override val predicates: Set<CMatterPredicate>? = null,
+    override val predicates: Set<CMatterPredicate>? = defaultMatterPredicates(),
 ): CMatter {
     companion object {
+        /**
+         * Returns default elements (enchant, enchant storage, potion) predicate set
+         * @return[Set] Returns a default elements checker set
+         * @see[CEnchantMatterImpl.DEFAULT_ENCHANT_CHECKER]
+         * @see[CEnchantmentStoreMatterImpl.DEFAULT_ENCHANT_STORE_CHECKER]
+         * @see[CPotionMatterImpl.DEFAULT_POTION_CHECKER]
+         * @since 5.0.15
+         */
+        fun defaultMatterPredicates(): Set<CMatterPredicate> {
+            return setOf(
+                CEnchantMatterImpl.DEFAULT_ENCHANT_CHECKER,
+                CEnchantmentStoreMatterImpl.DEFAULT_ENCHANT_STORE_CHECKER,
+                CPotionMatterImpl.DEFAULT_POTION_CHECKER
+            )
+        }
+
         /**
          * Returns [CMatterImpl] build from specified materials.
          *

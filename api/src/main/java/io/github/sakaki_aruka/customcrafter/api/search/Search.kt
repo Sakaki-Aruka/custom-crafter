@@ -1,7 +1,6 @@
 package io.github.sakaki_aruka.customcrafter.api.search
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
-import io.github.sakaki_aruka.customcrafter.api.interfaces.filter.CRecipeFilter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatterPredicate
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
@@ -11,8 +10,6 @@ import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelationComponent
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.impl.recipe.CVanillaRecipe
-import io.github.sakaki_aruka.customcrafter.impl.util.Converter
-import io.github.sakaki_aruka.customcrafter.internal.command.CC
 import org.bukkit.Bukkit
 import org.bukkit.World
 import org.bukkit.entity.Player
@@ -22,7 +19,6 @@ import org.bukkit.inventory.Recipe
 import org.chocosolver.solver.Model
 import org.chocosolver.solver.variables.IntVar
 import java.util.UUID
-import kotlin.math.abs
 
 object Search {
 
@@ -227,30 +223,8 @@ object Search {
             if (!matter.predicatesResult(ctx)) {
                 return false
             }
-
-            recipe.filters?.let { filters ->
-                for (filter in filters) {
-                    val (type, result) = applyNormalFilters(input, matter, filter)
-                        ?: continue
-                    when (type) {
-                        CRecipeFilter.ResultType.NOT_REQUIRED -> continue
-                        CRecipeFilter.ResultType.FAILED -> return false
-                        CRecipeFilter.ResultType.SUCCESS -> if (!result) return false
-                    }
-                }
-            } ?: continue
         }
         return true
-    }
-
-    private inline fun <reified T : CMatter> applyNormalFilters(
-        item: ItemStack,
-        matter: CMatter,
-        filter: CRecipeFilter<T>
-    ): Pair<CRecipeFilter.ResultType, Boolean>? {
-        return try {
-            filter.itemMatterCheck(item, matter as T)
-        } catch (_: Exception) { null }
     }
 
 
@@ -282,36 +256,6 @@ object Search {
         return result
     }
 
-    private inline fun <reified T: CMatter> getAmorphousFilterCheckResult(
-        input: Map<CoordinateComponent, ItemStack>,
-        recipe: CRecipe,
-        filter: CRecipeFilter<T>
-    ): Map<Int, Set<Triple<Int, Boolean, Boolean>>> {
-        // Key=RecipeSlot, Value=<InputSlot, Checked, CheckResult>
-        val result: MutableMap<Int, Set<Triple<Int, Boolean, Boolean>>> = mutableMapOf()
-        // map init
-        for (x in 0..5) {
-            for (y in 0..5) {
-                val i = x + y*9
-                result[i] = mutableSetOf(Triple(-1, false, false))
-            }
-        }
-
-        for ((r, matter) in recipe.items.filter { (_, m)  -> m is T }) {
-            val set: MutableSet<Triple<Int, Boolean, Boolean>> = mutableSetOf()
-            for ((i, item) in input.entries) {
-                val (type: CRecipeFilter.ResultType, checkResult: Boolean) = applyNormalFilters(item, matter, filter) ?: continue
-                val filterResult: Boolean = when (type) {
-                    CRecipeFilter.ResultType.NOT_REQUIRED -> true
-                    CRecipeFilter.ResultType.FAILED -> false
-                    CRecipeFilter.ResultType.SUCCESS -> checkResult
-                }
-                set.add(Triple(i.toIndex(), true, filterResult))
-            }
-            result[r.toIndex()] = set.toSet()
-        }
-        return result
-    }
 
     private fun getAmorphousMatterPredicatesCheckResult(
         input: Map<CoordinateComponent, ItemStack>,
@@ -391,11 +335,6 @@ object Search {
         }
 
         addResults(getAmorphousCandidateCheckResult(mapped, recipe))
-        if (!recipe.filters.isNullOrEmpty()) {
-            for (filter in recipe.filters!!) {
-                addResults(getAmorphousFilterCheckResult(mapped, recipe, filter))
-            }
-        }
         addResults(getAmorphousMatterPredicatesCheckResult(mapped, recipe, crafterID))
         addResults(getAmorphousAmountCheckResult(mapped, recipe))
 
