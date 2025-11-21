@@ -1,14 +1,11 @@
 package io.github.sakaki_aruka.customcrafter.impl.recipe
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
-import io.github.sakaki_aruka.customcrafter.api.interfaces.filter.CRecipeFilter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
+import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipeContainer
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
-import io.github.sakaki_aruka.customcrafter.impl.recipe.filter.EnchantFilter
-import io.github.sakaki_aruka.customcrafter.impl.recipe.filter.EnchantStorageFilter
-import io.github.sakaki_aruka.customcrafter.impl.recipe.filter.PotionFilter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
 
 /**
@@ -19,30 +16,15 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
  * @param[type] A type of this recipe. (Normal or Amorphous (=Shapeless))
  * @param[containers] Containers of this recipe. (default = null)
  * @param[results] A [ResultSupplier] list. (default = null)
- * @param[filters] A recipe filters. (default = [getDefaultFilters])
  */
 open class CRecipeImpl(
     override val name: String,
     override val items: Map<CoordinateComponent, CMatter>,
     override val type: CRecipeType,
-    override val containers: List<CRecipeContainerImpl>? = null,
+    override val containers: List<CRecipeContainer>? = null,
     override val results: List<ResultSupplier>? = null,
-    override val filters: List<CRecipeFilter<CMatter>>? = getDefaultFilters()
 ): CRecipe {
     companion object {
-        /**
-         * returns default candidate filter what are used in search.
-         *
-         * @return[Set] a set of default filters
-         */
-        fun getDefaultFilters(): List<CRecipeFilter<CMatter>> {
-            return listOf(
-                EnchantFilter,
-                EnchantStorageFilter,
-                PotionFilter
-            )
-        }
-
         /**
          * Amorphous recipe build wrapper.
          *
@@ -57,7 +39,6 @@ open class CRecipeImpl(
             items: List<CMatter>,
             containers: List<CRecipeContainerImpl>? = null,
             results: List<ResultSupplier>? = null,
-            filters: List<CRecipeFilter<CMatter>>? = getDefaultFilters()
         ): CRecipeImpl {
             if (items.isEmpty() || items.size > 36) {
                 throw IllegalArgumentException("'items' size must be in range of 1 to 36.")
@@ -72,7 +53,6 @@ open class CRecipeImpl(
                 type = CRecipeType.AMORPHOUS,
                 containers = containers,
                 results = results,
-                filters = filters
             )
             recipe.isValidRecipe().exceptionOrNull()?.let { t -> throw t }
             return recipe

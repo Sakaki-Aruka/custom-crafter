@@ -1,6 +1,5 @@
 package io.github.sakaki_aruka.customcrafter.impl.recipe
 
-import io.github.sakaki_aruka.customcrafter.api.interfaces.filter.CRecipeFilter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
@@ -18,13 +17,12 @@ import org.bukkit.inventory.ShapelessRecipe
 /**
  * Deprecated to use. Internal only.
  */
-data class CVanillaRecipe internal constructor(
+class CVanillaRecipe internal constructor(
     override val name: String,
     override val items: Map<CoordinateComponent, CMatter>,
     override val type: CRecipeType,
     override val containers: List<CRecipeContainerImpl>? = null,
     override val results: List<ResultSupplier>? = null,
-    override val filters: List<CRecipeFilter<CMatter>>? = CRecipeImpl.getDefaultFilters(),
     val original: Recipe
 ): CRecipe {
     companion object {

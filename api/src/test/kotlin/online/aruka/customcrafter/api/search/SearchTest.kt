@@ -1,7 +1,6 @@
 package online.aruka.customcrafter.api.search
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
-import io.github.sakaki_aruka.customcrafter.api.interfaces.filter.CRecipeFilter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterPredicateImpl
 import io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant.CEnchantComponent
@@ -15,9 +14,6 @@ import io.github.sakaki_aruka.customcrafter.impl.matter.enchant.CEnchantMatterIm
 import io.github.sakaki_aruka.customcrafter.impl.matter.enchant.CEnchantmentStoreMatterImpl
 import io.github.sakaki_aruka.customcrafter.impl.matter.potion.CPotionMatterImpl
 import io.github.sakaki_aruka.customcrafter.impl.recipe.CRecipeImpl
-import io.github.sakaki_aruka.customcrafter.impl.recipe.filter.EnchantFilter
-import io.github.sakaki_aruka.customcrafter.impl.recipe.filter.EnchantStorageFilter
-import io.github.sakaki_aruka.customcrafter.impl.recipe.filter.PotionFilter
 import io.github.sakaki_aruka.customcrafter.internal.gui.crafting.CraftUI
 import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
@@ -483,142 +479,7 @@ internal object SearchTest {
         assertTrue(recipeSet.isEmpty())
         assertTrue(inputSet.isEmpty())
     }
-    
-    @Test
-    fun enchantFilterTest1() {
-        val noEnchantInput = ItemStack.of(Material.STONE)
-        val onlyEnchantInput = ItemStack.of(Material.STONE).apply {
-            itemMeta = itemMeta.apply {
-                addEnchant(Enchantment.EFFICIENCY, 100, true)
-            }
-        }
-        val strictEnchantInput = ItemStack.of(Material.STONE).apply {
-            itemMeta = itemMeta.apply {
-                addEnchant(Enchantment.EFFICIENCY, 1, true)
-            }
-        }
 
-        val noEnchantMatter = CEnchantMatterImpl(
-            name = "",
-            candidate = setOf(Material.STONE),
-            enchantComponents = setOf()
-        )
-        val onlyEnchantMatter = CEnchantMatterImpl(
-            name = "",
-            candidate = setOf(Material.STONE),
-            enchantComponents = setOf(CEnchantComponent(150, Enchantment.EFFICIENCY, EnchantStrict.ONLY_ENCHANT))
-        )
-        val strictEnchantMatter = CEnchantMatterImpl(
-            name = "",
-            candidate = setOf(Material.STONE),
-            enchantComponents = setOf(CEnchantComponent(1, Enchantment.EFFICIENCY, EnchantStrict.STRICT))
-        )
-
-        assertEquals(
-            CRecipeFilter.ResultType.NOT_REQUIRED,
-            EnchantFilter.itemMatterCheck(noEnchantInput, noEnchantMatter).first
-        )
-        assertEquals(
-            CRecipeFilter.ResultType.FAILED,
-            EnchantFilter.itemMatterCheck(noEnchantInput, onlyEnchantMatter).first
-        )
-        assertEquals(
-            CRecipeFilter.ResultType.FAILED,
-            EnchantFilter.itemMatterCheck(noEnchantInput, strictEnchantMatter).first
-        )
-
-        assertEquals(
-            CRecipeFilter.ResultType.NOT_REQUIRED,
-            EnchantFilter.itemMatterCheck(onlyEnchantInput, noEnchantMatter).first
-        )
-        val (type1, result1) = EnchantFilter.itemMatterCheck(onlyEnchantInput, onlyEnchantMatter)
-        assertEquals(CRecipeFilter.ResultType.SUCCESS, type1)
-        assertTrue(result1)
-        val (type2, result2) = EnchantFilter.itemMatterCheck(onlyEnchantInput, strictEnchantMatter)
-        assertEquals(CRecipeFilter.ResultType.SUCCESS, type2)
-        assertTrue(!result2)
-
-        assertEquals(
-            CRecipeFilter.ResultType.NOT_REQUIRED,
-            EnchantFilter.itemMatterCheck(strictEnchantInput, noEnchantMatter).first
-        )
-        val (type3, result3) = EnchantFilter.itemMatterCheck(strictEnchantInput, onlyEnchantMatter)
-        assertEquals(CRecipeFilter.ResultType.SUCCESS, type3)
-        assertTrue(result3)
-        val (type4, result4) = EnchantFilter.itemMatterCheck(strictEnchantInput, strictEnchantMatter)
-        assertEquals(CRecipeFilter.ResultType.SUCCESS, type4)
-        assertTrue(result4)
-    }
-    
-    @Test
-    fun enchantStoreFilterTest1() {
-        val noEnchantInput = ItemStack.of(Material.ENCHANTED_BOOK)
-        val onlyEnchantInput = ItemStack.of(Material.ENCHANTED_BOOK).apply {
-            itemMeta = itemMeta.apply {
-                (this as EnchantmentStorageMeta).addStoredEnchant(Enchantment.EFFICIENCY, 100, true)
-            }
-        }
-        val strictInput = ItemStack.of(Material.ENCHANTED_BOOK).apply {
-            itemMeta = itemMeta.apply {
-                (this as EnchantmentStorageMeta).addStoredEnchant(Enchantment.EFFICIENCY, 1, true)
-            }
-        }
-
-        val noEnchantMatter = CEnchantmentStoreMatterImpl(
-            name = "",
-            candidate = setOf(Material.ENCHANTED_BOOK),
-            storedEnchantComponents = setOf()
-        )
-
-        val onlyEnchantMatter = CEnchantmentStoreMatterImpl(
-            name = "",
-            candidate = setOf(Material.ENCHANTED_BOOK),
-            setOf(CEnchantComponent(
-                level = 1, enchantment = Enchantment.EFFICIENCY, strict = EnchantStrict.ONLY_ENCHANT))
-        )
-
-        val strictMatter = CEnchantmentStoreMatterImpl(
-            name = "",
-            candidate = setOf(Material.ENCHANTED_BOOK),
-            storedEnchantComponents = setOf(CEnchantComponent(
-                level = 1, enchantment = Enchantment.EFFICIENCY, strict = EnchantStrict.STRICT))
-        )
-
-        assertEquals(
-            CRecipeFilter.ResultType.NOT_REQUIRED,
-            EnchantStorageFilter.itemMatterCheck(noEnchantInput, noEnchantMatter).first
-        )
-        assertEquals(
-            CRecipeFilter.ResultType.FAILED,
-            EnchantStorageFilter.itemMatterCheck(noEnchantInput, onlyEnchantMatter).first
-        )
-        assertEquals(
-            CRecipeFilter.ResultType.FAILED,
-            EnchantStorageFilter.itemMatterCheck(noEnchantInput, strictMatter).first
-        )
-
-        assertEquals(
-            CRecipeFilter.ResultType.NOT_REQUIRED,
-            EnchantStorageFilter.itemMatterCheck(onlyEnchantInput, noEnchantMatter).first
-        )
-        val (strictType1, strictResult1) = EnchantStorageFilter.itemMatterCheck(onlyEnchantInput, onlyEnchantMatter)
-        assertEquals(CRecipeFilter.ResultType.SUCCESS, strictType1)
-        assertTrue(strictResult1)
-        val (strictType2, strictResult2) = EnchantStorageFilter.itemMatterCheck(onlyEnchantInput, strictMatter)
-        assertEquals(CRecipeFilter.ResultType.SUCCESS, strictType2)
-        assertTrue(!strictResult2)
-
-        assertEquals(
-            CRecipeFilter.ResultType.NOT_REQUIRED,
-            EnchantStorageFilter.itemMatterCheck(strictInput, noEnchantMatter).first
-        )
-        val (strictType3, strictResult3) = EnchantStorageFilter.itemMatterCheck(strictInput, onlyEnchantMatter)
-        assertEquals(CRecipeFilter.ResultType.SUCCESS, strictType3)
-        assertTrue(strictResult3)
-        val (strictType4, strictResult4) = EnchantStorageFilter.itemMatterCheck(strictInput, strictMatter)
-        assertEquals(CRecipeFilter.ResultType.SUCCESS, strictType4)
-        assertTrue(strictResult4)
-    }
     
     @Test
     fun potionTest1() {
@@ -683,91 +544,5 @@ internal object SearchTest {
         }
         assertTrue(recipeSet.isEmpty())
         assertTrue(inputSet.isEmpty())
-    }
-    
-    @Test
-    fun potionFilterTest1() {
-        val noEffectPotionInput = ItemStack.of(Material.POTION)
-        val onlyEffectPotionInput = ItemStack.of(Material.POTION).apply {
-            itemMeta = itemMeta.apply {
-                (this as PotionMeta).addCustomEffect(
-                    PotionEffect(
-                        PotionEffectType.POISON, 100, 100,
-                        true),
-                    true
-                )
-            }
-        }
-        val strictPotionInput = ItemStack.of(Material.POTION).apply {
-            itemMeta = itemMeta.apply {
-                (this as PotionMeta).addCustomEffect(
-                    PotionEffect(
-                        PotionEffectType.POISON, 1, 1),
-                    true)
-            }
-        }
-
-        val noEffectMatter = CPotionMatterImpl(
-            name = "",
-            candidate = setOf(Material.POTION),
-            potionComponents = emptySet()
-        )
-        val onlyEffectMatter = CPotionMatterImpl(
-            name = "",
-            candidate = setOf(Material.POTION),
-            potionComponents = setOf(
-                CPotionComponent(
-                    effect = PotionEffect(
-                        PotionEffectType.POISON, 5, 5),
-                    strict = CPotionComponent.PotionStrict.ONLY_EFFECT
-                )
-            )
-        )
-        val strictEffectMatter = CPotionMatterImpl(
-            name = "",
-            candidate = setOf(Material.POTION),
-            potionComponents = setOf(
-                CPotionComponent(
-                    effect = PotionEffect(
-                        PotionEffectType.POISON, 1, 1),
-                    strict = CPotionComponent.PotionStrict.STRICT
-                )
-            )
-        )
-
-        assertEquals(
-            CRecipeFilter.ResultType.NOT_REQUIRED,
-            PotionFilter.itemMatterCheck(noEffectPotionInput, noEffectMatter).first
-        )
-        assertEquals(
-            CRecipeFilter.ResultType.FAILED,
-            PotionFilter.itemMatterCheck(noEffectPotionInput, onlyEffectMatter).first
-        )
-        assertEquals(
-            CRecipeFilter.ResultType.FAILED,
-            PotionFilter.itemMatterCheck(noEffectPotionInput, strictEffectMatter).first
-        )
-
-        assertEquals(
-            CRecipeFilter.ResultType.NOT_REQUIRED,
-            PotionFilter.itemMatterCheck(onlyEffectPotionInput, noEffectMatter).first
-        )
-        val (type1, result1) = PotionFilter.itemMatterCheck(onlyEffectPotionInput, onlyEffectMatter)
-        assertEquals(CRecipeFilter.ResultType.SUCCESS, type1)
-        assertTrue(result1)
-        val (type2, result2) = PotionFilter.itemMatterCheck(onlyEffectPotionInput, strictEffectMatter)
-        assertEquals(CRecipeFilter.ResultType.SUCCESS, type2)
-        assertTrue(!result2)
-
-        assertEquals(
-            CRecipeFilter.ResultType.NOT_REQUIRED,
-            PotionFilter.itemMatterCheck(strictPotionInput, noEffectMatter).first
-        )
-        val (type3, result3) = PotionFilter.itemMatterCheck(strictPotionInput, onlyEffectMatter)
-        assertEquals(CRecipeFilter.ResultType.SUCCESS, type3)
-        assertTrue(result3)
-        val (type4, result4) = PotionFilter.itemMatterCheck(strictPotionInput, strictEffectMatter)
-        assertEquals(CRecipeFilter.ResultType.SUCCESS, type4)
-        assertTrue(result4)
     }
 }

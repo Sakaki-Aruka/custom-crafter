@@ -1,6 +1,5 @@
 package io.github.sakaki_aruka.customcrafter.impl.recipe
 
-import io.github.sakaki_aruka.customcrafter.api.interfaces.filter.CRecipeFilter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatterPredicate
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
@@ -8,11 +7,11 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipeContain
 import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
+import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterPredicateImpl
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import java.util.UUID
-import kotlin.reflect.KClassifier
 
 /**
  * Implementation of [CRecipe].
@@ -47,49 +46,24 @@ import kotlin.reflect.KClassifier
  * @param[name] Name of this recipe
  * @param[items] Item mapping
  * @param[groups] Air-containable context set. It can be empty.
- * @param[filters] [CRecipeFilter] of apply this recipe. This is required if items contains a CMatter that requires a CRecipeFilter. Use the set created by [GroupRecipe.createFilters].
  * @param[containers] Containers when run on finished to search
  * @param[results] [ResultSupplier] list
  * @param[type] Always be [CRecipeType.NORMAL]
  * @see[CRecipe]
  * @see[Matter]
  * @see[Context]
- * @see[Filter]
  * @since 5.0.15
  */
 class GroupRecipe (
     override val name: String,
     override val items: Map<CoordinateComponent, CMatter>,
     val groups: Set<Context>,
-    override val filters: List<CRecipeFilter<CMatter>>? = null,
     override val containers: List<CRecipeContainer>? = null,
     override val results: List<ResultSupplier>? = null,
     override val type: CRecipeType = CRecipeType.NORMAL
 ): CRecipe {
 
     companion object {
-        /**
-         * Creates the CRecipeFilter s required for GroupRecipe#items converted to GroupRecipe.Filter .
-         *
-         * If you want to include CMatter subclasses with  CRecipeFilter s in GroupRecipe#items, you need to use this function to generate and apply a GroupRecipe.Filter.
-         *
-         * ```Kotlin
-         * // Specify default filters
-         * val wrappedDefaultFilter = GroupRecipe.createFilters(CRecipeImpl.getDefaultFilters())
-         *
-         * // wrappedDefaultFilter is List<GroupRecipe.Filter>
-         * ```
-         *
-         * @param[filters] A collection of CRecipeFilter s for CMatter subclasses included in GroupRecipe#items
-         * @return[List] List of GroupRecipe.Filter (includes provided filters mapping)
-         * @since 5.0.15
-         */
-        fun createFilters(
-            filters: Collection<CRecipeFilter<CMatter>>
-        ): List<CRecipeFilter<CMatter>> {
-            return listOf(Filter(filters.filter { it !is Filter }.associateBy { it::class }))
-        }
-
         /**
          * Creates a collection of GroupRecipe.Context s, which are grouping settings that can be set in GroupRecipe#groups.
          *
@@ -263,27 +237,6 @@ class GroupRecipe (
     }
 
     /**
-     * CRecipeFilter<CMatter> implementation class for [GroupRecipe.Matter] .
-     *
-     * Create with [GroupRecipe.createFilters] and some more CRecipeFilter implementations.
-     *
-     * @see[GroupRecipe.createFilters]
-     * @since 5.0.15
-     */
-    class Filter internal constructor(
-        val filterMapping: Map<KClassifier, CRecipeFilter<CMatter>>
-    ): CRecipeFilter<Matter> {
-        override fun itemMatterCheck(
-            item: ItemStack,
-            matter: Matter
-        ): Pair<CRecipeFilter.ResultType, Boolean> {
-            return this.filterMapping[matter.original::class]
-                ?.itemMatterCheck(item, matter.original)
-                ?: CRecipeFilter.CHECK_NOT_REQUIRED
-        }
-    }
-
-    /**
      * Air-containable [CMatter] implementation.
      *
      * Use [Matter.of] to initialize.
@@ -296,7 +249,7 @@ class GroupRecipe (
         override val candidate: Set<Material>,
         override val amount: Int,
         override val mass: Boolean,
-        override val predicates: List<CMatterPredicate>?,
+        override val predicates: List<CMatterPredicate>? = CMatterImpl.defaultMatterPredicates().toList(),
         val original: CMatter
     ): CMatter {
 
