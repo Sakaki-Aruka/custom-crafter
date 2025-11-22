@@ -29,6 +29,11 @@ data class CEnchantmentStoreMatterImpl(
     override val predicates: Set<CMatterPredicate>? = CMatterImpl.defaultMatterPredicates()
 ): CEnchantmentStoreMatter {
     companion object {
+        /**
+         * Default CEnchantStoreMatter components checker implementation on CMatterPredicate
+         *
+         * @since 5.0.15
+         */
         val DEFAULT_ENCHANT_STORE_CHECKER = CMatterPredicateImpl { ctx ->
             if (ctx.input.type.isEmpty) {
                 return@CMatterPredicateImpl true

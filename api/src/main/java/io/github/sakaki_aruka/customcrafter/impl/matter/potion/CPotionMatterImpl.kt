@@ -29,6 +29,11 @@ open class CPotionMatterImpl(
     override val predicates: Set<CMatterPredicate>? = CMatterImpl.defaultMatterPredicates(),
 ): CPotionMatter {
     companion object {
+        /**
+         * Default CPotionMatter components checker implementation on CMatterPredicate
+         *
+         * @since 5.0.15
+         */
         val DEFAULT_POTION_CHECKER: CMatterPredicate = CMatterPredicateImpl { ctx ->
             if (ctx.input.type.isAir) {
                 return@CMatterPredicateImpl true

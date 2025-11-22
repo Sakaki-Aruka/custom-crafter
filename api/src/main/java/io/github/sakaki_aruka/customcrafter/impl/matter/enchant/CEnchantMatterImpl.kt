@@ -30,6 +30,8 @@ open class CEnchantMatterImpl(
 ): CEnchantMatter {
     companion object {
         /**
+         * Default CEnchantMatter components checker implementation on CMatterPredicate
+         *
          * @since 5.0.15
          */
         val DEFAULT_ENCHANT_CHECKER = CMatterPredicateImpl { ctx ->
