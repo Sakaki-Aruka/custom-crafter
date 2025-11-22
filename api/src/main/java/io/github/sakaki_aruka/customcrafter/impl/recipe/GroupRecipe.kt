@@ -9,6 +9,7 @@ import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterPredicateImpl
+import io.github.sakaki_aruka.customcrafter.impl.matter.enchant.CEnchantmentStoreMatterImpl
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import java.util.UUID
@@ -350,7 +351,7 @@ class GroupRecipe (
                     return@CMatterPredicateImpl ctx.matter.predicatesResult(ctx)
                 }
                 val inspectionResult: InspectionResult = getCurrent(ctx.crafterID)
-                    ?: return@CMatterPredicateImpl if (ctx.matter is Matter) ctx.matter.original.predicatesResult(ctx)
+                    ?: return@CMatterPredicateImpl if (ctx.matter is Matter) ctx.matter.original.predicatesResult(ctx.copyWith(matter = ctx.matter.original))
                         else ctx.matter.predicatesResult(ctx)
                 val result: Boolean = inspectionResult.result[ctx.coordinate.toIndex()] ?: true
                 if (inspectionResult.resultConsumed.size == ctx.recipe.groups.sumOf { it.members.size } - 1) {
@@ -363,7 +364,7 @@ class GroupRecipe (
                     )
                 }
                 return@CMatterPredicateImpl result
-                        && if (ctx.matter is Matter) ctx.matter.original.predicatesResult(ctx) else true
+                        && if (ctx.matter is Matter) ctx.matter.original.predicatesResult(ctx.copyWith(matter = ctx.matter.original)) else true
             }
         }
 

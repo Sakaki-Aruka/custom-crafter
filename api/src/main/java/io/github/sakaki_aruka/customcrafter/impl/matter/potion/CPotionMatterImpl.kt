@@ -30,6 +30,9 @@ open class CPotionMatterImpl(
 ): CPotionMatter {
     companion object {
         val DEFAULT_POTION_CHECKER: CMatterPredicate = CMatterPredicateImpl { ctx ->
+            if (ctx.input.type.isAir) {
+                return@CMatterPredicateImpl true
+            }
             val potionMatter = ctx.matter as? CPotionMatter
                 ?: return@CMatterPredicateImpl true
 

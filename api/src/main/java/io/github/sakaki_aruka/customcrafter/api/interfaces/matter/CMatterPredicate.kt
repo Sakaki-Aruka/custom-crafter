@@ -28,12 +28,25 @@ interface CMatterPredicate {
      * @param[crafterID] Crafter UUID
      * @see[CMatterPredicate]
      */
-    data class Context internal constructor(
+    class Context internal constructor(
         val coordinate: CoordinateComponent,
         val matter: CMatter,
         val input: ItemStack,
         val mapped: Map<CoordinateComponent, ItemStack>,
         val recipe: CRecipe,
         val crafterID: UUID
-    )
+    ) {
+        fun copyWith(
+            matter: CMatter = this.matter
+        ): Context {
+            return Context(
+                coordinate = this.coordinate,
+                matter = matter,
+                input = this.input,
+                mapped = this.mapped,
+                recipe = this.recipe,
+                crafterID = this.crafterID
+            )
+        }
+    }
 }

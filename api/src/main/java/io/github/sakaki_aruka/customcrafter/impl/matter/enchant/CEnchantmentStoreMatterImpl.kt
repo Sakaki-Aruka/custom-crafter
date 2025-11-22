@@ -30,6 +30,10 @@ data class CEnchantmentStoreMatterImpl(
 ): CEnchantmentStoreMatter {
     companion object {
         val DEFAULT_ENCHANT_STORE_CHECKER = CMatterPredicateImpl { ctx ->
+            if (ctx.input.type.isEmpty) {
+                return@CMatterPredicateImpl true
+            }
+
             val enchantStoreMatter = ctx.matter as? CEnchantmentStoreMatter
                 ?: return@CMatterPredicateImpl true
 
