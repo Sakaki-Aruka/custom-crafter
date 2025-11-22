@@ -30,9 +30,14 @@ open class CEnchantMatterImpl(
 ): CEnchantMatter {
     companion object {
         /**
+         * Default CEnchantMatter components checker implementation on CMatterPredicate
+         *
          * @since 5.0.15
          */
         val DEFAULT_ENCHANT_CHECKER = CMatterPredicateImpl { ctx ->
+            if (ctx.input.type.isAir) {
+                return@CMatterPredicateImpl true
+            }
             val enchantMatter = ctx.matter as? CEnchantMatter
                 ?: return@CMatterPredicateImpl true
 
