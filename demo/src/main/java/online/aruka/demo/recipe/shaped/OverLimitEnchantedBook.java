@@ -32,7 +32,7 @@ public class OverLimitEnchantedBook {
                 Set.of(new CEnchantComponent(5, Enchantment.EFFICIENCY, EnchantStrict.STRICT)),
                 1,
                 false,
-                null
+                CMatterImpl.Companion.defaultMatterPredicates()
         );
 
         GroupRecipe.Matter book = GroupRecipe.Matter.Companion.of(enchantMatter, true);
@@ -56,14 +56,15 @@ public class OverLimitEnchantedBook {
          */
 
         Map<CoordinateComponent, CMatter> items = CoordinateComponent.Companion.squareFill(3, 0, 0, false)
-                .stream().map(c -> new Pair<CoordinateComponent, CMatter>(
-                        c, c.toIndex() % 2 == 0 ? goldBlock : book)
-                ).collect(Collectors.toMap(Pair::component1, Pair::component2));
+                .stream()
+                .map(c -> new Pair<CoordinateComponent, CMatter>(c, c.toIndex() % 2 == 0 ? goldBlock : book))
+                .collect(Collectors.toMap(Pair::component1, Pair::component2));
 
         Set<GroupRecipe.Context> groups = Set.of(
                 // Gold Block Group
                 GroupRecipe.Context.Companion.of(
-                        items.keySet().stream().filter(c -> c.toIndex() % 2 == 0)
+                        items.keySet().stream()
+                                .filter(c -> c.toIndex() % 2 == 0)
                                 .collect(Collectors.toSet()),
                         5,
                         "Gold Block Context"
@@ -71,7 +72,8 @@ public class OverLimitEnchantedBook {
 
                 // Enchanted Book Group
                 GroupRecipe.Context.Companion.of(
-                        items.keySet().stream().filter(c -> c.toIndex() % 2 == 1)
+                        items.keySet().stream()
+                                .filter(c -> c.toIndex() % 2 == 1)
                                 .collect(Collectors.toSet()),
                         2, // min = 2, coordinates = 4 -> requires book placed on 2 ~ 4 slots
                         "Efficiency Lv.5 Enchanted Book Context"
@@ -94,9 +96,9 @@ public class OverLimitEnchantedBook {
                 results.add(lv6);
 
                 if (bookCount == 3) {
-                    results.add(ctx.getMapped().values().stream().filter(item ->
-                            item.getType() == Material.ENCHANTED_BOOK
-                    ).collect(Collectors.toList()).getFirst());
+                    results.add(ctx.getMapped().values().stream()
+                            .filter(item -> item.getType() == Material.ENCHANTED_BOOK)
+                            .collect(Collectors.toList()).getFirst());
                 }
             } else {
                 ItemStack lv7 = ItemStack.of(Material.ENCHANTED_BOOK);
