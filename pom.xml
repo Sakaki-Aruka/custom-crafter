@@ -27,6 +27,27 @@
         <kotlin.version>2.1.0</kotlin.version>
     </properties>
 
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/license/MIT</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Sakaki Aruka</name>
+            <email>aruka.works@gmail.com</email>
+            <url>https://github.com/Sakaki-Aruka</url>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/Sakaki-Aruka/custom-crafter.git</connection>
+        <developerConnection>scm:git:ssh://github.com:Sakaki-Aruka/custom-crafter.git</developerConnection>
+        <url>http://github.com/Sakaki-Aruka/custom-crafter/tree/master</url>
+    </scm>
+
     <build>
         <plugins>
             <plugin>
