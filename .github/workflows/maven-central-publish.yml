@@ -31,7 +31,7 @@ jobs:
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
 
       - name: "Publish artifacts to Central Publisher Portal"
-        run: "mvn -pl api package deploy --batch-mode --no-transfer-progress"
+        run: "mvn -pl api clean deploy --batch-mode --no-transfer-progress"
         env:
           MAVEN_USERNAME: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
           MAVEN_PASSWORD: ${{ secrets.CENTRAL_TOKEN_PASSWORD }}
