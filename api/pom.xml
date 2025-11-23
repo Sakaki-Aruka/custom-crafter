@@ -4,16 +4,43 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <version>5.0.15</version>
+        <groupId>io.github.sakaki-aruka</groupId>
+        <artifactId>custom-crafter</artifactId>
+    </parent>
+
     <artifactId>custom-crafter-api</artifactId>
     <packaging>jar</packaging>
 
     <name>Custom Crafter API</name>
 
-    <parent>
-        <version>5.0.15</version>
-        <groupId>io.github.sakaki_aruka</groupId>
-        <artifactId>custom-crafter</artifactId>
-    </parent>
+
+    <description>Custom Crafter API supports to provide your full customized recipe to players.</description>
+    <url>https://github.com/Sakaki-Aruka/custom-crafter.git</url>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/license/MIT</url>
+            <distribution>repo</distribution>
+            <comments>This project is distributed under the MIT License.</comments>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>Sakaki Aruka</name>
+            <email>aruka.works@gmail.com</email>
+            <url>https://github.com/Sakaki-Aruka</url>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/Sakaki-Aruka/custom-crafter.git</connection>
+        <developerConnection>scm:git:ssh://github.com:Sakaki-Aruka/custom-crafter.git</developerConnection>
+        <url>http://github.com/Sakaki-Aruka/custom-crafter/</url>
+    </scm>
 
     <build>
         <plugins>
@@ -75,18 +102,11 @@
                             <goal>dokka</goal>
                         </goals>
                     </execution>
-                    <execution>
-                        <id>javadocJar</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>javadocJar</goal>
-                        </goals>
-                    </execution>
                 </executions>
                 <configuration>
                     <moduleName>Custom_Crafter ${project.version}</moduleName>
                     <outputDir>
-                        ${project.basedir}/target
+                        ${project.basedir}/docs
                     </outputDir>
                     <sourceDirectories>
                         <directory>
@@ -162,18 +182,6 @@
         </repository>
     </repositories>
 
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.junit</groupId>
-                <artifactId>junit-bom</artifactId>
-                <version>5.13.4</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
     <dependencies>
         <!-- Virtual Dependency List -->
         <!-- org.jetbrains.kotlin:kotlin-stdlib, scope:compile -->
@@ -204,6 +212,7 @@
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
+            <version>${depend.junit_bom.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
