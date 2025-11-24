@@ -5,12 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <version>5.0.15</version>
+        <version>5.0.15-p1</version>
         <groupId>io.github.sakaki-aruka</groupId>
         <artifactId>custom-crafter</artifactId>
     </parent>
 
-    <version>5.0.15</version>
+    <version>5.0.15-p1</version>
     <groupId>io.github.sakaki-aruka</groupId>
     <artifactId>custom-crafter-api</artifactId>
     <packaging>jar</packaging>

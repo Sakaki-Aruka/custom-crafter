@@ -73,49 +73,28 @@ When using the API, you must assume the CustomCrafter plugin will be present at 
 * Maven: `provided`
 * Gradle: `compileOnly`
 
-Latest Version: [![JitPack](https://jitpack.io/v/Sakaki-Aruka/custom-crafter.svg)](https://jitpack.io/#Sakaki-Aruka/custom-crafter)
+Latest Version: 5.0.15-p1 [Maven Central (versions)](https://central.sonatype.com/artifact/io.github.sakaki-aruka/custom-crafter-api/versions)
 
 <details><summary>Maven Configuration Example</summary>
 
-(repository)
+From Maven Central
+
 ```xml
-<repositories>
-   <repository>
-      <id>jitpack.io</id>
-      <url>https://jitpack.io</url>
-   </repository>
-</repositories>
-```
-(dependency)
-```xml
-<dependencies>
-   <dependency>
-      <groupId>com.github.Sakaki-Aruka</groupId>
-      <artifactId>custom-crafter</artifactId>
-      <version>5.0.15</version>
-      <scope>provided</scope>
-   </dependency>
-</dependencies>
+<dependency>
+    <groupId>io.github.sakaki-aruka</groupId>
+    <artifactId>custom-crafter-api</artifactId>
+    <version>5.0.15-p1</version>
+    <scope>provided</scope>
+</dependency>
 ```
 
 </details>
 
 <details><summary>Gradle (Groovy) Configuration Example</summary>
 
-(repository)
-```groovy
-dependencyResolutionManagement {
-   repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-   repositories {
-      mavenCentral()
-      maven { url 'https://jitpack.io' }
-   }
-}
-```
-(dependency)
 ```groovy
 dependencies {
-   compileOnly 'com.github.Sakaki-Aruka:custom-crafter:5.0.15'
+   compileOnly 'io.github.sakaki-aruka:custom-crafter-api:5.0.15-p1'
 }
 ```
 
@@ -123,20 +102,9 @@ dependencies {
 
 <details><summary>Gradle (Kotlin DSL) Configuration Example</summary>
 
-(repository)
-```
-repositories { 
-    mavenCentral()
-    maven("https://jitpack.io") {
-        name = "jitpack"
-    }
-}
-```
-
-(dependency)
-```
+```Kotlin
 dependencies {
-    compileOnly("com.github.Sakaki-Aruka:custom-crafter:5.0.15")
+    compileOnly("io.github.sakaki-aruka:custom-crafter-api:5.0.15-p1")
 }
 ```
 

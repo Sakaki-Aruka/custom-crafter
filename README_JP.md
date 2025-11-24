@@ -71,70 +71,38 @@ APIを利用する際は、プラグイン実行時にはCustomCrafterプラグ�
 * Maven: `provided`
 * Gradle: `compileOnly`
 
-最新バージョン: [![JitPack](https://jitpack.io/v/Sakaki-Aruka/custom-crafter.svg)](https://jitpack.io/#Sakaki-Aruka/custom-crafter)
+最新バージョン: 5.0.15-p1 [Maven Central (versions)](https://central.sonatype.com/artifact/io.github.sakaki-aruka/custom-crafter-api/versions)
 
-<details><summary>Maven の設定例</summary>
+<details><summary>Maven Configuration Example</summary>
 
-(repository)
+From Maven Central
+
 ```xml
-<repositories>
-   <repository>
-      <id>jitpack.io</id>
-      <url>https://jitpack.io</url>
-   </repository>
-</repositories>
-```
-(dependency)
-```xml
-<dependencies>
-   <dependency>
-      <groupId>com.github.Sakaki-Aruka</groupId>
-      <artifactId>custom-crafter</artifactId>
-      <version>5.0.15</version>
-      <scope>provided</scope>
-   </dependency>
-</dependencies>
+<dependency>
+    <groupId>io.github.sakaki-aruka</groupId>
+    <artifactId>custom-crafter-api</artifactId>
+    <version>5.0.15-p1</version>
+    <scope>provided</scope>
+</dependency>
 ```
 
 </details>
 
-<details><summary>Gradle (Groovy) の設定例</summary>
+<details><summary>Gradle (Groovy) Configuration Example</summary>
 
-(repository)
-```groovy
-dependencyResolutionManagement {
-   repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-   repositories {
-      mavenCentral()
-      maven { url 'https://jitpack.io' }
-   }
-}
-```
-(dependency)
 ```groovy
 dependencies {
-   compileOnly 'com.github.Sakaki-Aruka:custom-crafter:5.0.15'
+   compileOnly 'io.github.sakaki-aruka:custom-crafter-api:5.0.15-p1'
 }
 ```
 
 </details>
 
-<details><summary>Gradle (Kotlin DSL) の設定例</summary>
+<details><summary>Gradle (Kotlin DSL) Configuration Example</summary>
 
-(repository)
-```
-repositories { 
-    mavenCentral()
-    maven("https://jitpack.io") {
-        name = "jitpack"
-    }
-}
-```
-
-(dependency)
-```
+```Kotlin
 dependencies {
-    compileOnly("com.github.Sakaki-Aruka:custom-crafter:5.0.15")
+    compileOnly("io.github.sakaki-aruka:custom-crafter-api:5.0.15-p1")
 }
 ```
 
