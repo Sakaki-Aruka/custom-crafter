@@ -58,7 +58,7 @@
         <!-- org.jetbrains.kotlin:kotlin-stdlib, scope: compile -->
         <!-- io.papermc.paper:paper-api, scope: provided -->
         <dependency>
-            <groupId>io.github.sakaki_aruka</groupId>
+            <groupId>io.github.sakaki-aruka</groupId>
             <artifactId>custom-crafter-api</artifactId>
             <version>${project.parent.version}</version>
             <classifier>original</classifier>
