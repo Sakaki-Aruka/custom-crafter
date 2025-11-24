@@ -118,3 +118,7 @@ run/
 *.puml
 
 .vscode/
+
+*.iml
+
+.secrets

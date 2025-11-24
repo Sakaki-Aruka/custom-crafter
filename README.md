@@ -1,115 +1,110 @@
-# custom crafter
-custom crafter is a plugin for PaperMC servers that provides custom recipes.
+# 💎 custom crafter - The Ultimate Custom Recipe Plugin & Library
+
+custom crafter is a custom recipe provider plugin for **PaperMC servers**, which also functions as a powerful **Custom Recipe Creation Library (API)**.
+
+You can define custom recipes freely within your own plugin and introduce new elements into the game.
+
+([Japanese Document (日本語ドキュメント)](README_JP.md))
 
 ---
 
-# Features
-- Set custom recipes to vanilla items.
-- Set custom recipes to original items.
-- Provide some commands that manages items that material of recipes.
-- Provide those recipes to players.
-- (custom crafter provides crafting vanilla items from vanilla recipes feature.)
+## 🚀 Key Features
+
+* **Set Custom Recipes for Vanilla Items:** Easily add new recipes for existing Minecraft items.
+* **Support for Original Item Crafting:** Use **custom items** created by your plugin as results or materials.
+* **Advanced Material Management:** Provides commands for managing items used as recipe materials. (For Server Administrators)
+* **Seamless Provision to Players:** Automatically integrate your defined custom recipes into the players' crafting environment.
+* **(Compatibility):** Vanilla crafting remains fully functional.
 
 ---
 
-# Support versions
-Paper  
+## 🎥 Demo Video
 
-| Custom Crafter Version | Paper Version   |
-|------------------------|-----------------|
-| 5.0.14 (latest)        | 1.21.4 ~        |
-| 5.0.13, 5.0.13-1       | 1.21.4 ~        |
-| 5.0.0 ~ 5.0.11         | 1.21.3          |
-| 4.3 (legacy)           | 1.21.3          |
-| 4.2 (legacy)           | 1.20.1 ~ 1.20.4 |
+<details><summary>Crafting Demo Video</summary>
 
-(v5.0.12 did not release.)  
+1. Place base blocks (`GOLD_BLOCK`).
+2. Create `infinityIronBlockCore` [(Jump to the file where the recipe is defined)](./demo/src/main/kotlin/online/aruka/demo/register/ShapedRecipeProvider.kt).
+3. Compress Iron Block with `infinityIronBlock` [(Jump to the file where the recipe is defined)](./demo/src/main/kotlin/online/aruka/demo/register/ShapedRecipeProvider.kt).
+4. Use same recipe (`infinityIronBlock`)
+5. Use same recipe (`infinityIronBlock`)
+6. Extract Infinity Iron Block with `infinityIronBlockExtract` [(Jump to the file where the recipe is defined)](./demo/src/main/kotlin/online/aruka/demo/register/ShapelessRecipeProvider.kt).
 
-**WARNING: custom crafter does not support to run on Spigot servers.**
+![](./resources/crafting-demo.gif)
+
+</details>
 
 ---
 
-# API
+## 🛠️ Supported Environments and Versions
 
-custom crafter works API and also a plugin since version 5.0.0 .  
-You can make custom recipes in your plugin and register those.
+| Custom_Crafter Version       | Paper Version        |
+|:-----------------------------|:---------------------|
+| **5.0.13 ~ 5.0.15 (Latest)** | **1.21.4 ~ 1.21.10** |
+| 5.0.0 ~ 5.0.11               | 1.21.3               |
+| 4.3 (Legacy)                 | 1.21.3               |
+| 4.2 (Legacy)                 | 1.20.1 ~ 1.20.4      |
 
-## Documents
-[KDoc](https://sakaki-aruka.github.io/custom-crafter/) / [Wiki (on GitHub)](https://github.com/Sakaki-Aruka/custom-crafter/wiki/Intro)  
-You can build a document what type of JavaDoc with `mvn dokka:javadoc` on the project root.
+> **⚠️ Essential Warning:**
+> custom crafter **does not support running on Spigot/Bukkit servers**. Please ensure you run it on **PaperMC** or a PaperMC-fork.
 
-## Dependency Information
+---
 
-**Note: the version name must be a real version string or `master-SNAPSHOT`.**
+## 💻 Utilizing the API - Integrating into Your Plugin
 
-The latest provided version  
-[![](https://jitpack.io/v/Sakaki-Aruka/custom-crafter.svg)](https://jitpack.io/#Sakaki-Aruka/custom-crafter)
+Since version 5.0.0, custom crafter is designed not only as a plugin but also as an **API** for defining and registering custom recipes.
 
+You can freely create custom recipes from your plugin and register them into the CustomCrafter system.
 
-<details><summary>Maven</summary>
+### Documentation
 
-(repository)
+For more detailed information and a complete list of classes and methods, please refer to:
+
+* [KDoc (Kotlin)](https://sakaki-aruka.github.io/custom-crafter/)
+* [Wiki (GitHub)](https://github.com/Sakaki-Aruka/custom-crafter/wiki/Intro)
+
+or Build:  
+* KDoc Style: `mvn -pl api dokka:dokka`
+* JavaDoC Style: `mvn -pl api dokka:javadoc`
+
+### Dependency Information
+
+When using the API, you must assume the CustomCrafter plugin will be present at runtime. Therefore, set the scope to **compile-time only**.
+
+* Maven: `provided`
+* Gradle: `compileOnly`
+
+Latest Version: 5.0.15-p1 [Maven Central (versions)](https://central.sonatype.com/artifact/io.github.sakaki-aruka/custom-crafter-api/versions)
+
+<details><summary>Maven Configuration Example</summary>
+
+From Maven Central
+
 ```xml
-<repositories>
-   <repository>
-      <id>jitpack.io</id>
-      <url>https://jitpack.io</url>
-   </repository>
-</repositories>
-```
-(dependency)
-```xml
-<dependencies>
-   <dependency>
-      <groupId>com.github.Sakaki-Aruka</groupId>
-      <artifactId>custom-crafter</artifactId>
-      <version>5.0.14</version>
-      <scope>provided</scope>
-   </dependency>
-</dependencies>
-
+<dependency>
+    <groupId>io.github.sakaki-aruka</groupId>
+    <artifactId>custom-crafter-api</artifactId>
+    <version>5.0.15-p1</version>
+    <scope>provided</scope>
+</dependency>
 ```
 
 </details>
 
-<details><summary>Gradle (Groovy) </summary>
+<details><summary>Gradle (Groovy) Configuration Example</summary>
 
-### Gradle (Groovy)
-(repository)
-```groovy
-dependencyResolutionManagement {
-   repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-   repositories {
-      mavenCentral()
-      maven { url 'https://jitpack.io' }
-   }
-}
-```
-(dependency)
 ```groovy
 dependencies {
-   compileOnly 'com.github.Sakaki-Aruka:custom-crafter:5.0.14'
+   compileOnly 'io.github.sakaki-aruka:custom-crafter-api:5.0.15-p1'
 }
 ```
 
 </details>
 
-<details><summary>Gradle (Kotlin DSL)</summary>
+<details><summary>Gradle (Kotlin DSL) Configuration Example</summary>
 
-(repository)
-```
-repositories { 
-    mavenCentral()
-    maven("https://jitpack.io") {
-        name = "jitpack"
-    }
-}
-```
-
-(dependency)
-```
+```Kotlin
 dependencies {
-    compileOnly("com.github.Sakaki-Aruka:custom-crafter:5.0.14")
+    compileOnly("io.github.sakaki-aruka:custom-crafter-api:5.0.15-p1")
 }
 ```
 
@@ -117,123 +112,156 @@ dependencies {
 
 ---
 
-# Getting Started
-0. Make a plugin
-   1. create plugin that uses custom-crafter API
+## ⚙️ Server Installation Steps
 
-1. Install
-   1. [Download from here.(GitHub release page)](https://github.com/Sakaki-Aruka/custom-crafter/releases/latest)
-   2. Place the downloaded file to plugins directory.
-   3. Reboot or reload your server.
+CustomCrafter is written in Kotlin and requires a prerequisite library to run.
 
-
-2. Place base block  
-   custom crafter does not work only a work bench block.  
-   If you want to use custom crafter features, place the base blocks under a work bench block 3 * 3.  
-   The default base block is `GOLD_BLOCK`.
+1.  **Download the CustomCrafter Plugin**
+    1.  [Download the CustomCrafterAPI jar (GitHub Releases)](https://github.com/Sakaki-Aruka/custom-crafter/releases/latest)
+    2.  **Download the MCKotlin-Paper Plugin (Kotlin Runtime)**
+        * Download the file matching your server version from [MCKotlin-Paper (GitHub Releases)](https://github.com/4drian3d/MCKotlin/releases).
+    3.  Place all downloaded files into your `plugins` directory.
+2.  **Start/Reload Your Server**
+3.  **Set Up the Custom Crafting Station (Base Block)**
+    * CustomCrafter recipes do not work with just a standard workbench block.
+    * The custom crafting feature is enabled by placing the base blocks in a **3x3 area directly underneath the standard workbench block**.
+    * The default base block is **`GOLD_BLOCK`**.
 
 ---
 
-# Code Example
+## 🧑‍💻 Code Samples and API Usage
 
-## Version check
-Example code to check if the CustomCrafterAPI version your plugin depends on is fully compatible with the version deployed on your server.
- 
-````kotlin
+Here is a basic guide on defining custom recipes in your plugin using the CustomCrafterAPI.
+
+### Compatibility Check (For Safe Startup)
+
+Example code to check if the CustomCrafterAPI version your plugin depends on is fully compatible with the version deployed on the server.
+
+```kotlin
+/*
+ * This code is intended to strictly check compatibility with the API installed on the server,
+ * and it's not necessarily required for the plugin to function.
+ */
 class YourPlugin: JavaPlugin() {
-    const val DEPEND_CCAPI_VERSION = "0.1.13"
+    // Define the dependent API version as a constant
+    const val DEPEND_API_VERSION = "5.0.15"
     
     @Override
     fun onEnable() {
-        if (!CustomCrafterAPI.hasFullCompatibility(DEPEND_CCAPI_VERSION)) { 
+        // Disable the plugin if there is no compatibility to prevent errors
+        if (!CustomCrafterAPI.hasFullCompatibility(DEPEND_API_VERSION)) { 
             Bukkit.pluginManager.disablePlugin(this)
             return
         }
     }
 }
-````
+```
 
-## Recipe
-### Make Materials
-When creating a custom recipe, you need to specify the arrangement of materials (instances of an implementation class of [CMatterImpl](https://sakaki-aruka.github.io/custom-crafter/custom-crafter/io.github.sakaki_aruka.customcrafter.api.object.matter/-c-matter-impl/index.html) or  [CMatter](https://sakaki-aruka.github.io/custom-crafter/custom-crafter/io.github.sakaki_aruka.customcrafter.api.interfaces.matter/-c-matter/index.html) ) along with their coordinates.  
-Below is an example of how to create the material items used in this process.
+---
+
+### 📝 Recipe Definition
+
+A custom recipe is mainly composed of three elements:
+
+1.  **Custom Material** (`CMatter`): Defines the conditions for the "materials" required for crafting.
+2.  **Crafting Result** (`ResultSupplier`): Defines what is generated as the "result" upon successful crafting.
+3.  **Recipe Body** (`CRecipe`): Groups the materials, results, and crafting shape (shaped/shapeless) for registration.
+
+#### 1. Creating Custom Materials (CMatter)
+
+Define the items (`CMatter`) that serve as materials for the recipe. `CMatter` determines **which item**, **how many**, and **where** it needs to be placed to allow crafting.
+
+* Use `CMatterImpl` or an implementation class of the `CMatter` interface.
+
+**Example: Use 1 Stone OR 1 Cobblestone as a material**
+
 ```Kotlin
 // In Kotlin
 val matter: CMatter = CMatterImpl(
     name = "test-matter",
-    candidate = setOf(Material.STONE, Material.COBBLESTONE),
-    amount = 1,
-    mass = false,
-    predicates = null
+    candidate = setOf(Material.STONE, Material.COBBLESTONE), // Stone or Cobblestone can be used
+    amount = 1, // Required amount
+    mass = false, // true: consider stacking (usually false)
+    predicates = null // Additional NBT or other conditions (usually null)
 )
 ```
 
+**Using the Shorthand (`of`)**
+
+In simple cases where multiple `Material` types are accepted for the `candidate`, the following shorthand is convenient:
+
 ```Kotlin
 // In Kotlin
-val matter: CMatter = CMatterImpl.single(Material.STONE)
+val matter: CMatter = CMatterImpl.of(Material.STONE, Material.COBBLESTONE)
 ```
-This is a common example of creating a Matter that acts as a material when either "Stone" or "Cobblestone" is placed.  
-If only one item type is needed in the `candidate` field and other parameters use default values (which makes it almost identical to vanilla Minecraft recipes), you can use the following shorthand:
+This example creates a **flexible material** that functions as a material if either **Stone** or **Cobblestone** is present.
 
 ---
 
-### Make Results
-Generally, after defining the materials, the next step is to define the crafting result.  
-In CustomCrafter, it is not mandatory to provide an item as a result of crafting. You can also choose to execute a command instead. If you prefer this approach, you can skip this "Results" section and move on to the recipe definition section.
+#### 2. Creating Crafting Results (ResultSupplier)
 
-The creation of results in a custom recipe is mainly handled by [ResultSupplier](https://sakaki-aruka.github.io/custom-crafter/custom-crafter/io.github.sakaki_aruka.customcrafter.api.object.result/-result-supplier/index.html) .
-It allows you to retrieve various conditions during crafting and determine the final output item accordingly.
+Define the items given to the player or the process executed when the recipe is completed.
+
+* If complex processing is not needed, you can skip defining result items and opt for **command execution** as the result instead.
+
+A **ResultSupplier** is a **function (supplier)** that receives various crafting conditions (`Config`) and determines the final output items (`List<ItemStack>`).
+
+**Example: Returning a result based on complex conditions**
+
 ```Kotlin
 // In Kotlin
 val supplier = ResultSupplier { config ->
-    // 'config' is 'ResultSupplier.Config' or 'AutoCraftResultSupplier.Config'. 
-    // This contains some useful values.
+    // 'config' includes information about the crafting environment (player, workbench, etc.)
     
-    // Write processes here.
-    // ResultSupplier is a lambda expression.
-    // Return type is `List<ItemStack>`
-    emptyList<ItemStack>()
+    // Write the process to create and return a list of ItemStacks here.
+    emptyList<ItemStack>() // Example: returns nothing
 }
 ```
-For recipes that do not require complex processing, CustomCrafter provides simplified versions of the above expression.
+
+**Utilizing Simplified Helper Methods**
+
+If complex processing is not required, the helper methods provided by CustomCrafter are useful.
+
 ```Kotlin
 // In Kotlin
-val supplier = ResultSupplier.single(ItemStack(Material.STONE))
-val supplier2 = ResultSupplier.timesSingle(ItemStack(Material.STONE))
+// Always returns the specified ItemStack (e.g., 1 Stone)
+val supplier = ResultSupplier.single(ItemStack.of(Material.STONE))
+
+// Returns the ItemStack multiplied by the number of times the player shift-clicked to craft multiple items (smart behavior)
+val supplier2 = ResultSupplier.timesSingle(ItemStack.of(Material.STONE))
 ```
-[ResultSupplier#single](https://sakaki-aruka.github.io/custom-crafter/custom-crafter/io.github.sakaki_aruka.customcrafter.api.object.result/-result-supplier/-companion/single.html) returns the specified `ItemStack` when the recipe is invoked.
-[ResultSupplier#timesSingle](https://sakaki-aruka.github.io/custom-crafter/custom-crafter/io.github.sakaki_aruka.customcrafter.api.object.result/-result-supplier/-companion/times-single.html) is slightly smarter than `single`. When a player crafts multiple items at once (using Shift + Left Click), it multiplies the number of `ItemStack`s provided by the number of times the recipe is invoked.
-(It might be easier to understand by testing it yourself. 🙂)
+`ResultSupplier#timesSingle` is very convenient as it automatically manages the behavior when a player crafts a large amount at once. 😊
 
 ---
 
-### Make Recipe
-Recipes are the core component of the custom crafting system.  
-They group together custom materials and results, registering them in the CustomCrafter system as a single craftable recipe.
-The default implementation of recipes is [CRecipeImpl](https://sakaki-aruka.github.io/custom-crafter/custom-crafter/io.github.sakaki_aruka.customcrafter.api.object.recipe/-c-recipe-impl/index.html) , but if you require additional customization, you can implement your own `CRecipe` class.
+#### 3. Creating and Registering the Recipe Body (CRecipe)
 
-Below is an example of a simple recipe:
+This is the core component that combines the custom materials and crafting results to **register the recipe** within the CustomCrafter system.
+
+* The default implementation, `CRecipeImpl`, is typically used.
+
+**Example: Defining a Simple Shaped Recipe**
+
 ```Kotlin
 // In Kotlin
 val recipe: CRecipe = CRecipeImpl(
     name = "test-recipe",
-    items = mapOf(CoordinateComponent(0, 0) to matter), // 'matter' is CMatter
-    containers = null,
-    results = setOf(ResultSupplier.timesSingle(Material.STONE)),
-    type = CRecipeType.NORMAL
+    items = mapOf(CoordinateComponent(0, 0) to matter), // 'matter' is the CMatter created in step 1.
+    containers = null, // Additional conditions (permissions, etc.). null if not needed.
+    results = setOf(ResultSupplier.timesSingle(Material.STONE)), // A Set of ResultSuppliers created in step 2.
+    type = CRecipeType.NORMAL // Shaped Recipe
 )
 ```
--   `items`: Specifies the coordinates and corresponding `CMatter` in a map for the crafting grid.
--   `containers`: Defines additional conditions (such as required player permissions) that must be met for the recipe to be crafted. For simple recipes, this is not needed.
--   `results`: A set of `ResultSupplier` instances. If all crafting conditions are met, these are executed, and the resulting items are given to the player.
--   `type`: Specifies the type of the custom recipe. Options include `NORMAL` (shaped recipe) and `AMORPHOUS` (shapeless recipe).  
-    If the recipe is shapeless, the `CoordinateComponent` values in `items` can be arbitrary. 🙂
 
-For elements not covered in this section, please refer to the [documentation](https://sakaki-aruka.github.io/custom-crafter/index.html).
+* `items`: A map of coordinates (`CoordinateComponent(x, y)`) and the required material (`CMatter`) in the crafting grid.
+* `type`: Specifies the recipe shape.
+    * `CRecipeType.NORMAL`: **Shaped Recipe**. The coordinates in `items` are crucial.
+    * `CRecipeType.AMORPHOUS`: **Shapeless Recipe**. The `CoordinateComponent` values in `items` can be arbitrary. 😊
 
 ---
 
-# LICENSE
+## 🔑 License
+
 MIT License
 
 Copyright (c) 2023 - 2025 Sakaki-Aruka
@@ -256,3 +284,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
+---
+
+## 🙏 Acknowledgement
+
+### choco-solver  
+
+This product includes software developed by the IMT Atlantique.
