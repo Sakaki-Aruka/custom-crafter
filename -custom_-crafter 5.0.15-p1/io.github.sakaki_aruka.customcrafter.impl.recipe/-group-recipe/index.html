@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>GroupRecipe</title>
+    <link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">
+        <script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer="defer"></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async="async"></script>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer="defer"></script>
+</head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+            <a class="library-name--link" href="../../../index.html" tabindex="1">
+                    Custom_Crafter 5.0.15-p1
+            </a>
+        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle"
+                type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true"
+                        data-filter="Custom_Crafter 5.0.15-p1/JVM">JVM</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox"
+                        data-role="dropdown-toggle"
+                        aria-controls="platform-tags-listbox"
+                        aria-haspopup="listbox"
+                        aria-expanded="false"
+                        aria-label="Toggle source sets"
+                ></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id="Custom_Crafter 5.0.15-p1/JVM"
+                                       data-filter="Custom_Crafter 5.0.15-p1/JVM"/>
+                                <span class="checkbox--icon"></span>
+                                JVM
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button"
+                    type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config='{"defaultSize": 280, "minSize": 200, "maxSize": 400}'>
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list"
+                    data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    Custom_Crafter 5.0.15-p1
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="classlike" id="content" pageIds="Custom_Crafter 5.0.15-p1::io.github.sakaki_aruka.customcrafter.impl.recipe/GroupRecipe///PointingToDeclaration//107245034">
+  <div class="breadcrumbs"><a href="../../../index.html">Custom_Crafter 5.0.15-p1</a><span class="delimiter">/</span><a href="../index.html">io.github.sakaki_aruka.customcrafter.impl.recipe</a><span class="delimiter">/</span><span class="current">GroupRecipe</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Group</span><wbr></wbr><span><span>Recipe</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter 5.0.15-p1/JVM"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">GroupRecipe</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>items<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><a href="../../io.github.sakaki_aruka.customcrafter.api.objects.recipe/-coordinate-component/index.html">CoordinateComponent</a><span class="token punctuation">, </span><a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.matter/-c-matter/index.html">CMatter</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>groups<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><a href="-context/index.html">GroupRecipe.Context</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>containers<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.recipe/-c-recipe-container/index.html">CRecipeContainer</a><span class="token operator">&gt;</span><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>results<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.result/-result-supplier/index.html">ResultSupplier</a><span class="token operator">&gt;</span><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>type<span class="token operator">: </span><a href="../../io.github.sakaki_aruka.customcrafter.api.objects.recipe/-c-recipe-type/index.html">CRecipeType</a><span class="token operator"> = </span>CRecipeType.NORMAL</span></span><span class="token punctuation">)</span> : <a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.recipe/-c-recipe/index.html">CRecipe</a></div><p class="paragraph">Implementation of <a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.recipe/-c-recipe/index.html">CRecipe</a>.</p><p class="paragraph">This recipe only provides <a href="../../io.github.sakaki_aruka.customcrafter.api.objects.recipe/-c-recipe-type/-n-o-r-m-a-l/index.html">CRecipeType.NORMAL</a>.</p><p class="paragraph">This recipe has <span data-unresolved-link="io.github.sakaki_aruka.customcrafter.impl.recipe/GroupRecipe//#kotlin.String#kotlin.collections.Map[io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent,io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter]#kotlin.collections.Set[io.github.sakaki_aruka.customcrafter.impl.recipe.GroupRecipe.Context]#kotlin.collections.List[io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipeContainer]?#kotlin.collections.List[io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier]?#io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType/PointingToCallableParameters(2)/">groups</span> what is a list of air-containable matter (<a href="-matter/index.html">GroupRecipe.Matter</a>).</p><p class="paragraph">This recipe has the constraint that &quot;all Context#members to which the key that returns the smallest CoordinateComponent#toIndex value in items belongs cannot have an element in candidate that satisfies Material#isAir.&quot;</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">items = {<br>    (0, 0): [Material.AIR, Material.STONE],<br>    (0, 1): [Material.COBBLESTONE]<br>}<br><br>// This is invalid groups. Group1 contains the minimum coordinate what keyed with a CMatter that contains Material.AIR.<br>groups = [Group1{ (0, 0) }, Group2{ (0, 1) }]</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">// Other invalid pattern<br>items = {<br>    (0, 0): [Material.STONE],<br>    (0, 1): [Material.AIR, Material.COBBLESTONE]<br>}<br><br>// This is invalid group.<br>groups = [Group1{ (0, 0), (0, 1) }]</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><span class="kdoc-tag"><h4 class="">Since</h4><p class="paragraph">5.0.15</p></span><h4 class="tableheader">Parameters</h4><div class="table"><div class="table-row table-row_content" data-filterable-current="Custom_Crafter 5.0.15-p1/JVM" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>name</span></span></u></div></span></div><div><div class="title"><p class="paragraph">Name of this recipe</p></div></div></div></div><div class="table-row table-row_content" data-filterable-current="Custom_Crafter 5.0.15-p1/JVM" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>items</span></span></u></div></span></div><div><div class="title"><p class="paragraph">Item mapping</p></div></div></div></div><div class="table-row table-row_content" data-filterable-current="Custom_Crafter 5.0.15-p1/JVM" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>groups</span></span></u></div></span></div><div><div class="title"><p class="paragraph">Air-containable context set. It can be empty.</p></div></div></div></div><div class="table-row table-row_content" data-filterable-current="Custom_Crafter 5.0.15-p1/JVM" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>containers</span></span></u></div></span></div><div><div class="title"><p class="paragraph">Containers when run on finished to search</p></div></div></div></div><div class="table-row table-row_content" data-filterable-current="Custom_Crafter 5.0.15-p1/JVM" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>results</span></span></u></div></span></div><div><div class="title"><p class="paragraph"><a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.result/-result-supplier/index.html">ResultSupplier</a> list</p></div></div></div></div><div class="table-row table-row_content" data-filterable-current="Custom_Crafter 5.0.15-p1/JVM" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>type</span></span></u></div></span></div><div><div class="title"><p class="paragraph">Always be <a href="../../io.github.sakaki_aruka.customcrafter.api.objects.recipe/-c-recipe-type/-n-o-r-m-a-l/index.html">CRecipeType.NORMAL</a></p></div></div></div></div></div><h4 class="tableheader">See also</h4><div class="table"><div class="table-row table-row_content" data-filterable-current="Custom_Crafter 5.0.15-p1/JVM" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.recipe/-c-recipe/index.html"><span><span>CRecipe</span></span></a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current="Custom_Crafter 5.0.15-p1/JVM" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-matter/index.html"><span>Group</span><wbr></wbr><span>Recipe.</span><wbr></wbr><span>Matter</span></a></div></span></div><div></div></div></div><div class="table-row table-row_content" data-filterable-current="Custom_Crafter 5.0.15-p1/JVM" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="-context/index.html"><span>Group</span><wbr></wbr><span>Recipe.</span><wbr></wbr><span>Context</span></a></div></span></div><div></div></div></div></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="tableheader">Constructors</h2>
+        <div class="table"><a data-name="-615494763%2FConstructors%2F107245034" anchor-label="GroupRecipe" id="-615494763%2FConstructors%2F107245034" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM"></a>
+          <div class="table-row table-row_content" data-togglable="CONSTRUCTOR" data-filterable-current="Custom_Crafter 5.0.15-p1/JVM" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-group-recipe.html"><span>Group</span><wbr></wbr><span><span>Recipe</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-615494763%2FConstructors%2F107245034"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter 5.0.15-p1/JVM"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">name<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">, </span></span><span class="parameter ">items<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><a href="../../io.github.sakaki_aruka.customcrafter.api.objects.recipe/-coordinate-component/index.html">CoordinateComponent</a><span class="token punctuation">, </span><a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.matter/-c-matter/index.html">CMatter</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">groups<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><a href="-context/index.html">GroupRecipe.Context</a><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">containers<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.recipe/-c-recipe-container/index.html">CRecipeContainer</a><span class="token operator">&gt;</span><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">results<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.result/-result-supplier/index.html">ResultSupplier</a><span class="token operator">&gt;</span><span class="token operator">?</span><span class="token operator"> = </span>null<span class="token punctuation">, </span></span><span class="parameter ">type<span class="token operator">: </span><a href="../../io.github.sakaki_aruka.customcrafter.api.objects.recipe/-c-recipe-type/index.html">CRecipeType</a><span class="token operator"> = </span>CRecipeType.NORMAL</span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="TYPE">
+        <h2 class="tableheader">Types</h2>
+        <div class="table"><a data-name="-1447774247%2FClasslikes%2F107245034" anchor-label="Companion" id="-1447774247%2FClasslikes%2F107245034" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter 5.0.15-p1/JVM" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-companion/index.html"><span><span>Companion</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1447774247%2FClasslikes%2F107245034"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter 5.0.15-p1/JVM"><div class="symbol monospace"><span class="token keyword">object </span><a href="-companion/index.html">Companion</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1640353686%2FClasslikes%2F107245034" anchor-label="Context" id="1640353686%2FClasslikes%2F107245034" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter 5.0.15-p1/JVM" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-context/index.html"><span><span>Context</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1640353686%2FClasslikes%2F107245034"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter 5.0.15-p1/JVM"><div class="symbol monospace"><span class="token keyword">class </span><a href="-context/index.html">Context</a></div><div class="brief "><p class="paragraph">Context of GroupRecipe</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="172134364%2FClasslikes%2F107245034" anchor-label="Matter" id="172134364%2FClasslikes%2F107245034" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter 5.0.15-p1/JVM" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-matter/index.html"><span><span>Matter</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="172134364%2FClasslikes%2F107245034"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter 5.0.15-p1/JVM"><div class="symbol monospace"><span class="token keyword">class </span><a href="-matter/index.html">Matter</a> : <a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.matter/-c-matter/index.html">CMatter</a></div><div class="brief "><p class="paragraph">Air-containable <a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.matter/-c-matter/index.html">CMatter</a> implementation.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="tableheader">Properties</h2>
+        <div class="table"><a data-name="-298594378%2FProperties%2F107245034" anchor-label="containers" id="-298594378%2FProperties%2F107245034" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter 5.0.15-p1/JVM" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="containers.html"><span><span>containers</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-298594378%2FProperties%2F107245034"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter 5.0.15-p1/JVM"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="containers.html">containers</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.recipe/-c-recipe-container/index.html">CRecipeContainer</a><span class="token operator">&gt;</span><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2012056140%2FProperties%2F107245034" anchor-label="groups" id="-2012056140%2FProperties%2F107245034" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter 5.0.15-p1/JVM" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="groups.html"><span><span>groups</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2012056140%2FProperties%2F107245034"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter 5.0.15-p1/JVM"><div class="symbol monospace"><span class="token keyword">val </span><a href="groups.html">groups</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><a href="-context/index.html">GroupRecipe.Context</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="397338962%2FProperties%2F107245034" anchor-label="items" id="397338962%2FProperties%2F107245034" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter 5.0.15-p1/JVM" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="items.html"><span><span>items</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="397338962%2FProperties%2F107245034"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter 5.0.15-p1/JVM"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="items.html">items</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><a href="../../io.github.sakaki_aruka.customcrafter.api.objects.recipe/-coordinate-component/index.html">CoordinateComponent</a><span class="token punctuation">, </span><a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.matter/-c-matter/index.html">CMatter</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1996363677%2FProperties%2F107245034" anchor-label="name" id="1996363677%2FProperties%2F107245034" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter 5.0.15-p1/JVM" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="name.html"><span><span>name</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1996363677%2FProperties%2F107245034"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter 5.0.15-p1/JVM"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="name.html">name</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="446143644%2FProperties%2F107245034" anchor-label="results" id="446143644%2FProperties%2F107245034" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter 5.0.15-p1/JVM" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="results.html"><span><span>results</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="446143644%2FProperties%2F107245034"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter 5.0.15-p1/JVM"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="results.html">results</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.result/-result-supplier/index.html">ResultSupplier</a><span class="token operator">&gt;</span><span class="token operator">?</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1368828466%2FProperties%2F107245034" anchor-label="type" id="-1368828466%2FProperties%2F107245034" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter 5.0.15-p1/JVM" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="type.html"><span><span>type</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1368828466%2FProperties%2F107245034"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter 5.0.15-p1/JVM"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">val </span><a href="type.html">type</a><span class="token operator">: </span><a href="../../io.github.sakaki_aruka.customcrafter.api.objects.recipe/-c-recipe-type/index.html">CRecipeType</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="-280825842%2FFunctions%2F107245034" anchor-label="getMinAmount" id="-280825842%2FFunctions%2F107245034" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter 5.0.15-p1/JVM" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.recipe/-c-recipe/get-min-amount.html"><span>get</span><wbr></wbr><span>Min</span><wbr></wbr><span><span>Amount</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-280825842%2FFunctions%2F107245034"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter 5.0.15-p1/JVM"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.recipe/-c-recipe/get-min-amount.html"><span class="token function">getMinAmount</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">map<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><a href="../../io.github.sakaki_aruka.customcrafter.api.objects.recipe/-coordinate-component/index.html">CoordinateComponent</a><span class="token punctuation">, </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">relation<span class="token operator">: </span><a href="../../io.github.sakaki_aruka.customcrafter.api.objects/-mapped-relation/index.html">MappedRelation</a><span class="token punctuation">, </span></span><span class="parameter ">isCraftGUI<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span></span><span class="parameter ">shift<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span></span><span class="parameter ">withoutMass<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">true</span><span class="token punctuation">, </span></span><span class="parameter ">includeAir<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">?</span></div><div class="brief "><p class="paragraph">Returns min amount</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-518262519%2FFunctions%2F107245034" anchor-label="getResults" id="-518262519%2FFunctions%2F107245034" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter 5.0.15-p1/JVM" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.recipe/-c-recipe/get-results.html"><span>get</span><wbr></wbr><span><span>Results</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-518262519%2FFunctions%2F107245034"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter 5.0.15-p1/JVM"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.recipe/-c-recipe/get-results.html"><span class="token function">getResults</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">context<span class="token operator">: </span><a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.result/-result-supplier/-context/index.html">ResultSupplier.Context</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-mutable-list/index.html">MutableList</a><span class="token operator">&lt;</span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Returns results of suppliers made</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1179206719%2FFunctions%2F107245034" anchor-label="getSlots" id="1179206719%2FFunctions%2F107245034" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter 5.0.15-p1/JVM" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.recipe/-c-recipe/get-slots.html"><span>get</span><wbr></wbr><span><span>Slots</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1179206719%2FFunctions%2F107245034"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter 5.0.15-p1/JVM"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.recipe/-c-recipe/get-slots.html"><span class="token function">getSlots</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="31880946%2FFunctions%2F107245034" anchor-label="isValidRecipe" id="31880946%2FFunctions%2F107245034" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter 5.0.15-p1/JVM" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="is-valid-recipe.html"><span>is</span><wbr></wbr><span>Valid</span><wbr></wbr><span><span>Recipe</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="31880946%2FFunctions%2F107245034"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter 5.0.15-p1/JVM"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="is-valid-recipe.html"><span class="token function">isValidRecipe</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-result/index.html">Result</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Returns this <a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.recipe/-c-recipe/index.html">CRecipe</a> is a valid or not.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1110249773%2FFunctions%2F107245034" anchor-label="multipleCandidateDisplaySettingDefaultCalledTimes" id="-1110249773%2FFunctions%2F107245034" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter 5.0.15-p1/JVM" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.recipe/-c-recipe/multiple-candidate-display-setting-default-called-times.html"><span>multiple</span><wbr></wbr><span>Candidate</span><wbr></wbr><span>Display</span><wbr></wbr><span>Setting</span><wbr></wbr><span>Default</span><wbr></wbr><span>Called</span><wbr></wbr><span><span>Times</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1110249773%2FFunctions%2F107245034"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter 5.0.15-p1/JVM"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.recipe/-c-recipe/multiple-candidate-display-setting-default-called-times.html"><span class="token function">multipleCandidateDisplaySettingDefaultCalledTimes</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div><div class="brief "><p class="paragraph">This setting is only used for multiple candidate display when it enabled.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1347419847%2FFunctions%2F107245034" anchor-label="multipleCandidateDisplaySettingDefaultShiftClicked" id="-1347419847%2FFunctions%2F107245034" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter 5.0.15-p1/JVM" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.recipe/-c-recipe/multiple-candidate-display-setting-default-shift-clicked.html"><span>multiple</span><wbr></wbr><span>Candidate</span><wbr></wbr><span>Display</span><wbr></wbr><span>Setting</span><wbr></wbr><span>Default</span><wbr></wbr><span>Shift</span><wbr></wbr><span><span>Clicked</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1347419847%2FFunctions%2F107245034"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter 5.0.15-p1/JVM"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.recipe/-c-recipe/multiple-candidate-display-setting-default-shift-clicked.html"><span class="token function">multipleCandidateDisplaySettingDefaultShiftClicked</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">This setting is only used for multiple candidate display when it enabled.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1346548863%2FFunctions%2F107245034" anchor-label="requiresInputItemAmountMax" id="-1346548863%2FFunctions%2F107245034" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter 5.0.15-p1/JVM" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.recipe/-c-recipe/requires-input-item-amount-max.html"><span>requires</span><wbr></wbr><span>Input</span><wbr></wbr><span>Item</span><wbr></wbr><span>Amount</span><wbr></wbr><span><span>Max</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1346548863%2FFunctions%2F107245034"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter 5.0.15-p1/JVM"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.recipe/-c-recipe/requires-input-item-amount-max.html"><span class="token function">requiresInputItemAmountMax</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div><div class="brief "><p class="paragraph">Maximum requires input items amount. Inclusive</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="765737533%2FFunctions%2F107245034" anchor-label="requiresInputItemAmountMin" id="765737533%2FFunctions%2F107245034" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter 5.0.15-p1/JVM" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="requires-input-item-amount-min.html"><span>requires</span><wbr></wbr><span>Input</span><wbr></wbr><span>Item</span><wbr></wbr><span>Amount</span><wbr></wbr><span><span>Min</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="765737533%2FFunctions%2F107245034"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter 5.0.15-p1/JVM"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">override </span><span class="token keyword">fun </span><a href="requires-input-item-amount-min.html"><span class="token function">requiresInputItemAmountMin</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div><div class="brief "><p class="paragraph">Minimal requires input items amount</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1375430041%2FFunctions%2F107245034" anchor-label="runNormalContainers" id="1375430041%2FFunctions%2F107245034" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter 5.0.15-p1/JVM" data-filterable-set="Custom_Crafter 5.0.15-p1/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.recipe/-c-recipe/run-normal-containers.html"><span>run</span><wbr></wbr><span>Normal</span><wbr></wbr><span><span>Containers</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1375430041%2FFunctions%2F107245034"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter 5.0.15-p1/JVM"><div class="symbol monospace"><span class="token keyword">open </span><span class="token keyword">fun </span><a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.recipe/-c-recipe/run-normal-containers.html"><span class="token function">runNormalContainers</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">context<span class="token operator">: </span><a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.recipe/-c-recipe-container/-context/index.html">CRecipeContainer.Context</a></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Runs all <a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.recipe/-c-recipe/containers.html">containers</a> if it is not null.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2025 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
