@@ -22,7 +22,7 @@
         <java.version>21</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <paper_api.version>1.21.4</paper_api.version>
-        <depend.paper_api.version>${paper_api.version}-R0.1-SNAPSHOT</depend.paper_api.version>
+        <depend.paper_api.version>${paper_api.version}-R0.1-20250925.065901-231</depend.paper_api.version>
         <depend.junit_bom.version>5.13.4</depend.junit_bom.version>
         <plugin.maven_shade.version>3.2.4</plugin.maven_shade.version>
 
