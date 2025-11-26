@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>CustomCrafterAPI</title>
+    <link href="../../../images/logo-icon.svg" rel="icon" type="image/svg">
+        <script>var pathToRoot = "../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/sourceset_dependencies.js" async="async"></script>
+<link href="../../../styles/style.css" rel="Stylesheet">
+<link href="../../../styles/main.css" rel="Stylesheet">
+<link href="../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../scripts/navigation-loader.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/platform-content-handler.js" async="async"></script>
+<script type="text/javascript" src="../../../scripts/main.js" defer="defer"></script>
+<script type="text/javascript" src="../../../scripts/prism.js" async="async"></script>
+<script type="text/javascript" src="../../../ui-kit/ui-kit.min.js" defer="defer"></script>
+</head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+            <a class="library-name--link" href="../../../index.html" tabindex="1">
+                    Custom_Crafter
+            </a>
+        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle"
+                type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true"
+                        data-filter="Custom_Crafter/JVM">JVM</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox"
+                        data-role="dropdown-toggle"
+                        aria-controls="platform-tags-listbox"
+                        aria-haspopup="listbox"
+                        aria-expanded="false"
+                        aria-label="Toggle source sets"
+                ></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id="Custom_Crafter/JVM"
+                                       data-filter="Custom_Crafter/JVM"/>
+                                <span class="checkbox--icon"></span>
+                                JVM
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button"
+                    type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config='{"defaultSize": 280, "minSize": 200, "maxSize": 400}'>
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list"
+                    data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    Custom_Crafter
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="classlike" id="content" pageIds="Custom_Crafter::io.github.sakaki_aruka.customcrafter/CustomCrafterAPI///PointingToDeclaration//1867371069">
+  <div class="breadcrumbs"><a href="../../../index.html">Custom_Crafter</a><span class="delimiter">/</span><a href="../index.html">io.github.sakaki_aruka.customcrafter</a><span class="delimiter">/</span><span class="current">CustomCrafterAPI</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Custom</span><wbr></wbr><span>Crafter</span><wbr></wbr><span><span>API</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter/JVM"><div class="symbol monospace"><span class="token keyword">object </span><a href="index.html">CustomCrafterAPI</a></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="PROPERTY">
+        <h2 class="tableheader">Properties</h2>
+        <div class="table"><a data-name="1643302458%2FProperties%2F1867371069" anchor-label="API_VERSION" id="1643302458%2FProperties%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-p-i_-v-e-r-s-i-o-n.html"><span>API_</span><wbr></wbr><span>VERSION</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1643302458%2FProperties%2F1867371069"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter/JVM"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-a-p-i_-v-e-r-s-i-o-n.html">API_VERSION</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></div><div class="brief "><p class="paragraph">Custom Crafter API version.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1834971941%2FProperties%2F1867371069" anchor-label="AUTHORS" id="1834971941%2FProperties%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-a-u-t-h-o-r-s.html"><span><span>AUTHORS</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1834971941%2FProperties%2F1867371069"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter/JVM"><div class="symbol monospace"><span class="token keyword">val </span><a href="-a-u-t-h-o-r-s.html">AUTHORS</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Custom Crafter API author names</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1236218149%2FProperties%2F1867371069" anchor-label="CRAFTING_TABLE_RESULT_SLOT" id="-1236218149%2FProperties%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-c-r-a-f-t-i-n-g_-t-a-b-l-e_-r-e-s-u-l-t_-s-l-o-t.html"><span>CRAFTING_</span><wbr></wbr><span>TABLE_</span><wbr></wbr><span>RESULT_</span><wbr></wbr><span>SLOT</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1236218149%2FProperties%2F1867371069"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter/JVM"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-c-r-a-f-t-i-n-g_-t-a-b-l-e_-r-e-s-u-l-t_-s-l-o-t.html">CRAFTING_TABLE_RESULT_SLOT</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">44</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="12208963%2FProperties%2F1867371069" anchor-label="CRAFTING_TABLE_TOTAL_SIZE" id="12208963%2FProperties%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-c-r-a-f-t-i-n-g_-t-a-b-l-e_-t-o-t-a-l_-s-i-z-e.html"><span>CRAFTING_</span><wbr></wbr><span>TABLE_</span><wbr></wbr><span>TOTAL_</span><wbr></wbr><span>SIZE</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="12208963%2FProperties%2F1867371069"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter/JVM"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-c-r-a-f-t-i-n-g_-t-a-b-l-e_-t-o-t-a-l_-s-i-z-e.html">CRAFTING_TABLE_TOTAL_SIZE</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token operator"> = </span><span class="token constant">54</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2110514696%2FProperties%2F1867371069" anchor-label="IS_BETA" id="2110514696%2FProperties%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-i-s_-b-e-t-a.html"><span>IS_</span><wbr></wbr><span>BETA</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2110514696%2FProperties%2F1867371069"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter/JVM"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-i-s_-b-e-t-a.html">IS_BETA</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">true</span></div><div class="brief "><p class="paragraph">Custom Crafter API is beta or not.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="585059421%2FProperties%2F1867371069" anchor-label="IS_STABLE" id="585059421%2FProperties%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-i-s_-s-t-a-b-l-e.html"><span>IS_</span><wbr></wbr><span>STABLE</span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="585059421%2FProperties%2F1867371069"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter/JVM"><div class="symbol monospace"><span class="token keyword">const </span><span class="token keyword">val </span><a href="-i-s_-s-t-a-b-l-e.html">IS_STABLE</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span></div><div class="brief "><p class="paragraph">Custom Crafter API is stable or not.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="-1750585479%2FFunctions%2F1867371069" anchor-label="defaultAllCandidateNotDisplayableItems" id="-1750585479%2FFunctions%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="default-all-candidate-not-displayable-items.html"><span>default</span><wbr></wbr><span>All</span><wbr></wbr><span>Candidate</span><wbr></wbr><span>Not</span><wbr></wbr><span>Displayable</span><wbr></wbr><span><span>Items</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1750585479%2FFunctions%2F1867371069"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="default-all-candidate-not-displayable-items.html"><span class="token function">defaultAllCandidateNotDisplayableItems</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span></div><div class="brief "><p class="paragraph">Get an item that is used for an all-candidates-menu's not displayable items slot in default.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-237972391%2FFunctions%2F1867371069" anchor-label="getAllCandidateNotDisplayableItem" id="-237972391%2FFunctions%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-all-candidate-not-displayable-item.html"><span>get</span><wbr></wbr><span>All</span><wbr></wbr><span>Candidate</span><wbr></wbr><span>Not</span><wbr></wbr><span>Displayable</span><wbr></wbr><span><span>Item</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-237972391%2FFunctions%2F1867371069"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="get-all-candidate-not-displayable-item.html"><span class="token function">getAllCandidateNotDisplayableItem</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span></div><div class="brief "><p class="paragraph">Get an item that is used for an all-candidates-menu's not displayable items slot.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-816637849%2FFunctions%2F1867371069" anchor-label="getBaseBlock" id="-816637849%2FFunctions%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-base-block.html"><span>get</span><wbr></wbr><span>Base</span><wbr></wbr><span><span>Block</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-816637849%2FFunctions%2F1867371069"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="get-base-block.html"><span class="token function">getBaseBlock</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><span data-unresolved-link="org.bukkit/Material///PointingToDeclaration/">Material</span></div><div class="brief "><p class="paragraph">Gets a base block type.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-371341489%2FFunctions%2F1867371069" anchor-label="getBaseBlockSideSize" id="-371341489%2FFunctions%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-base-block-side-size.html"><span>get</span><wbr></wbr><span>Base</span><wbr></wbr><span>Block</span><wbr></wbr><span>Side</span><wbr></wbr><span><span>Size</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-371341489%2FFunctions%2F1867371069"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="get-base-block-side-size.html"><span class="token function">getBaseBlockSideSize</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div><div class="brief "><p class="paragraph">get base block's side size.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-933001499%2FFunctions%2F1867371069" anchor-label="getRandomNCoordinates" id="-933001499%2FFunctions%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-random-n-coordinates.html"><span>get</span><wbr></wbr><span>Random</span><wbr></wbr><span><span>NCoordinates</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-933001499%2FFunctions%2F1867371069"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="get-random-n-coordinates.html"><span class="token function">getRandomNCoordinates</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">n<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html">Set</a><span class="token operator">&lt;</span><a href="../../io.github.sakaki_aruka.customcrafter.api.objects.recipe/-coordinate-component/index.html">CoordinateComponent</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">returns random generated coordinates.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-2019500642%2FFunctions%2F1867371069" anchor-label="getRecipes" id="-2019500642%2FFunctions%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-recipes.html"><span>get</span><wbr></wbr><span><span>Recipes</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-2019500642%2FFunctions%2F1867371069"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="get-recipes.html"><span class="token function">getRecipes</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.recipe/-c-recipe/index.html">CRecipe</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">returns an IMMUTABLE list what contains all registered recipes.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2136817583%2FFunctions%2F1867371069" anchor-label="getResultGiveCancel" id="2136817583%2FFunctions%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-result-give-cancel.html"><span>get</span><wbr></wbr><span>Result</span><wbr></wbr><span>Give</span><wbr></wbr><span><span>Cancel</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2136817583%2FFunctions%2F1867371069"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="get-result-give-cancel.html"><span class="token function">getResultGiveCancel</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Returns a boolean value that means the Custom Crafter API give result items to players or not.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-645271205%2FFunctions%2F1867371069" anchor-label="getUseCustomCraftUI" id="-645271205%2FFunctions%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-use-custom-craft-u-i.html"><span>get</span><wbr></wbr><span>Use</span><wbr></wbr><span>Custom</span><wbr></wbr><span>Craft</span><wbr></wbr><span><span>UI</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-645271205%2FFunctions%2F1867371069"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="get-use-custom-craft-u-i.html"><span class="token function">getUseCustomCraftUI</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Returns a boolean value that means 'Custom Craft UI open' enabled or not.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-774006468%2FFunctions%2F1867371069" anchor-label="getUseMultipleResultCandidateFeature" id="-774006468%2FFunctions%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="get-use-multiple-result-candidate-feature.html"><span>get</span><wbr></wbr><span>Use</span><wbr></wbr><span>Multiple</span><wbr></wbr><span>Result</span><wbr></wbr><span>Candidate</span><wbr></wbr><span><span>Feature</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-774006468%2FFunctions%2F1867371069"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="get-use-multiple-result-candidate-feature.html"><span class="token function">getUseMultipleResultCandidateFeature</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Returns a boolean value that means 'multiple result candidate' feature enabled or not.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1284224350%2FFunctions%2F1867371069" anchor-label="hasFullCompatibility" id="1284224350%2FFunctions%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="has-full-compatibility.html"><span>has</span><wbr></wbr><span>Full</span><wbr></wbr><span><span>Compatibility</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1284224350%2FFunctions%2F1867371069"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="has-full-compatibility.html"><span class="token function">hasFullCompatibility</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">version<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">Checks full-compatibility</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-800155957%2FFunctions%2F1867371069" anchor-label="registerRecipe" id="-800155957%2FFunctions%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="register-recipe.html"><span>register</span><wbr></wbr><span><span>Recipe</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-800155957%2FFunctions%2F1867371069"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="register-recipe.html"><span class="token function">registerRecipe</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">recipe<span class="token operator">: </span><a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.recipe/-c-recipe/index.html">CRecipe</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">registers a provided recipe and calls <a href="../../io.github.sakaki_aruka.customcrafter.api.event/-register-custom-recipe-event/index.html">RegisterCustomRecipeEvent</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="587097993%2FFunctions%2F1867371069" anchor-label="setAllCandidateNotDisplayableItem" id="587097993%2FFunctions%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-all-candidate-not-displayable-item.html"><span>set</span><wbr></wbr><span>All</span><wbr></wbr><span>Candidate</span><wbr></wbr><span>Not</span><wbr></wbr><span>Displayable</span><wbr></wbr><span><span>Item</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="587097993%2FFunctions%2F1867371069"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="set-all-candidate-not-displayable-item.html"><span class="token function">setAllCandidateNotDisplayableItem</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">item<span class="token operator">: </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token punctuation">, </span></span><span class="parameter ">loreSupplier<span class="token operator">: </span><span class="token punctuation">(</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html">String</a><span class="token punctuation">)</span><span class="token operator"> -&gt; </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><span data-unresolved-link="net.kyori.adventure.text/Component///PointingToDeclaration/">Component</span><span class="token operator">&gt;</span><span class="token operator">?</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Set an item that is used for an all-candidates-menu's not displayable items slot. If the specified items material is not <code class="lang-kotlin">Material#isItem</code>, this throws Errors.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-458521534%2FFunctions%2F1867371069" anchor-label="setBaseBlock" id="-458521534%2FFunctions%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-base-block.html"><span>set</span><wbr></wbr><span>Base</span><wbr></wbr><span><span>Block</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-458521534%2FFunctions%2F1867371069"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="set-base-block.html"><span class="token function">setBaseBlock</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">type<span class="token operator">: </span><span data-unresolved-link="org.bukkit/Material///PointingToDeclaration/">Material</span><span class="token punctuation">, </span></span><span class="parameter ">calledAsync<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets base block with given material.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1855433227%2FFunctions%2F1867371069" anchor-label="setBaseBlockDefault" id="1855433227%2FFunctions%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-base-block-default.html"><span>set</span><wbr></wbr><span>Base</span><wbr></wbr><span>Block</span><wbr></wbr><span><span>Default</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1855433227%2FFunctions%2F1867371069"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="set-base-block-default.html"><span class="token function">setBaseBlockDefault</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">calledAsync<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets <code class="lang-kotlin">BaseBlock</code> to <code class="lang-kotlin">Material.GOLD_BLOCK</code> (default value).</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1855868629%2FFunctions%2F1867371069" anchor-label="setBaseBlockSideSize" id="-1855868629%2FFunctions%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-base-block-side-size.html"><span>set</span><wbr></wbr><span>Base</span><wbr></wbr><span>Block</span><wbr></wbr><span>Side</span><wbr></wbr><span><span>Size</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1855868629%2FFunctions%2F1867371069"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="set-base-block-side-size.html"><span class="token function">setBaseBlockSideSize</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">size<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a><span class="token punctuation">, </span></span><span class="parameter ">calledAsync<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">set base block's side size.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1534339107%2FFunctions%2F1867371069" anchor-label="setBaseBlockSideSizeDefault" id="1534339107%2FFunctions%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-base-block-side-size-default.html"><span>set</span><wbr></wbr><span>Base</span><wbr></wbr><span>Block</span><wbr></wbr><span>Side</span><wbr></wbr><span>Size</span><wbr></wbr><span><span>Default</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1534339107%2FFunctions%2F1867371069"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="set-base-block-side-size-default.html"><span class="token function">setBaseBlockSideSizeDefault</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">calledAsync<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets base block's side size to 3 (default value).</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="2016272476%2FFunctions%2F1867371069" anchor-label="setResultGiveCancel" id="2016272476%2FFunctions%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-result-give-cancel.html"><span>set</span><wbr></wbr><span>Result</span><wbr></wbr><span>Give</span><wbr></wbr><span><span>Cancel</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="2016272476%2FFunctions%2F1867371069"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="set-result-give-cancel.html"><span class="token function">setResultGiveCancel</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">v<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span></span><span class="parameter ">calledAsync<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets a boolean value that means the Custom Crafter API give result items to players or not.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1203038811%2FFunctions%2F1867371069" anchor-label="setResultGiveCancelDefault" id="1203038811%2FFunctions%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-result-give-cancel-default.html"><span>set</span><wbr></wbr><span>Result</span><wbr></wbr><span>Give</span><wbr></wbr><span>Cancel</span><wbr></wbr><span><span>Default</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1203038811%2FFunctions%2F1867371069"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="set-result-give-cancel-default.html"><span class="token function">setResultGiveCancelDefault</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">calledAsync<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets <code class="lang-kotlin">ResultGiveCancel</code> to false (default value).</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1272046032%2FFunctions%2F1867371069" anchor-label="setUseCustomCraftUI" id="-1272046032%2FFunctions%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-use-custom-craft-u-i.html"><span>set</span><wbr></wbr><span>Use</span><wbr></wbr><span>Custom</span><wbr></wbr><span>Craft</span><wbr></wbr><span><span>UI</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1272046032%2FFunctions%2F1867371069"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="set-use-custom-craft-u-i.html"><span class="token function">setUseCustomCraftUI</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">v<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span></span><span class="parameter ">calledAsync<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets 'Custom Craft UI open' enables or not.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="418004015%2FFunctions%2F1867371069" anchor-label="setUseCustomCraftUIDefault" id="418004015%2FFunctions%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-use-custom-craft-u-i-default.html"><span>set</span><wbr></wbr><span>Use</span><wbr></wbr><span>Custom</span><wbr></wbr><span>Craft</span><wbr></wbr><span><span>UIDefault</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="418004015%2FFunctions%2F1867371069"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="set-use-custom-craft-u-i-default.html"><span class="token function">setUseCustomCraftUIDefault</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">calledAsync<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets 'Custom Craft UI open' enable.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-416407721%2FFunctions%2F1867371069" anchor-label="setUseMultipleResultCandidateFeature" id="-416407721%2FFunctions%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-use-multiple-result-candidate-feature.html"><span>set</span><wbr></wbr><span>Use</span><wbr></wbr><span>Multiple</span><wbr></wbr><span>Result</span><wbr></wbr><span>Candidate</span><wbr></wbr><span><span>Feature</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-416407721%2FFunctions%2F1867371069"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="set-use-multiple-result-candidate-feature.html"><span class="token function">setUseMultipleResultCandidateFeature</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">v<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token punctuation">, </span></span><span class="parameter ">calledAsync<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets 'multiple result candidate' feature enables or not.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1508551594%2FFunctions%2F1867371069" anchor-label="setUseMultipleResultCandidateFeatureDefault" id="-1508551594%2FFunctions%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="set-use-multiple-result-candidate-feature-default.html"><span>set</span><wbr></wbr><span>Use</span><wbr></wbr><span>Multiple</span><wbr></wbr><span>Result</span><wbr></wbr><span>Candidate</span><wbr></wbr><span>Feature</span><wbr></wbr><span><span>Default</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1508551594%2FFunctions%2F1867371069"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="set-use-multiple-result-candidate-feature-default.html"><span class="token function">setUseMultipleResultCandidateFeatureDefault</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">calledAsync<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a><span class="token operator"> = </span><span class="token boolean">false</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Sets <code class="lang-kotlin">useMultipleResultCandidateFeature</code> to false (default value).</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1509176402%2FFunctions%2F1867371069" anchor-label="unregisterRecipe" id="1509176402%2FFunctions%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="unregister-recipe.html"><span>unregister</span><wbr></wbr><span><span>Recipe</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1509176402%2FFunctions%2F1867371069"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="unregister-recipe.html"><span class="token function">unregisterRecipe</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">recipe<span class="token operator">: </span><a href="../../io.github.sakaki_aruka.customcrafter.api.interfaces.recipe/-c-recipe/index.html">CRecipe</a></span></span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html">Boolean</a></div><div class="brief "><p class="paragraph">unregisters a provided recipe and calls <a href="../../io.github.sakaki_aruka.customcrafter.api.event/-unregister-custom-recipe-event/index.html">UnregisterCustomRecipeEvent</a>.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2025 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
