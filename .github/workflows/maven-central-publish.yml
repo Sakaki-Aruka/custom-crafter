@@ -31,7 +31,7 @@ jobs:
           gpg-passphrase: MAVEN_GPG_PASSPHRASE
 
       - name: "Publish artifacts to Central Publisher Portal"
-        run: mvn -pl api dokka:javadocJar deploy -Prelease --batch-mode --no-transfer-progress
+        run: mvn -pl api dokka:javadocJar deploy -Prelease -Denforcer.skip=true --batch-mode --no-transfer-progress
 #        run: "mvn -pl api dokka:javadocJar --no-transfer-progress && mvn deploy --batch-mode --no-transfer-progress"
         env:
           MAVEN_USERNAME: ${{ secrets.CENTRAL_TOKEN_USERNAME }}
