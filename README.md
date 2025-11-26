@@ -31,7 +31,13 @@ You can define custom recipes freely within your own plugin and introduce new el
 
 ![](./resources/crafting-demo.gif)
 
-</details>
+</details>  
+
+After cloning this repository locally, you can build a demo plugin that provides the recipe included in this video, as well as several other recipes, by running the following commands.  
+
+`mvn -pl demo package`  
+
+The jar file, which can be placed in the server's plugins directory, will be created in the demo/target directory.
 
 ---
 
@@ -73,7 +79,7 @@ When using the API, you must assume the CustomCrafter plugin will be present at 
 * Maven: `provided`
 * Gradle: `compileOnly`
 
-Latest Version: 5.0.15-p1 [Maven Central (versions)](https://central.sonatype.com/artifact/io.github.sakaki-aruka/custom-crafter-api/versions)
+Latest Version: 5.0.15-p2 [Maven Central (versions)](https://central.sonatype.com/artifact/io.github.sakaki-aruka/custom-crafter-api/versions)
 
 <details><summary>Maven Configuration Example</summary>
 
@@ -83,7 +89,7 @@ From Maven Central
 <dependency>
     <groupId>io.github.sakaki-aruka</groupId>
     <artifactId>custom-crafter-api</artifactId>
-    <version>5.0.15-p1</version>
+    <version>5.0.15-p2</version>
     <scope>provided</scope>
 </dependency>
 ```
@@ -94,7 +100,7 @@ From Maven Central
 
 ```groovy
 dependencies {
-   compileOnly 'io.github.sakaki-aruka:custom-crafter-api:5.0.15-p1'
+   compileOnly 'io.github.sakaki-aruka:custom-crafter-api:5.0.15-p2'
 }
 ```
 
@@ -104,7 +110,7 @@ dependencies {
 
 ```Kotlin
 dependencies {
-    compileOnly("io.github.sakaki-aruka:custom-crafter-api:5.0.15-p1")
+    compileOnly("io.github.sakaki-aruka:custom-crafter-api:5.0.15-p2")
 }
 ```
 

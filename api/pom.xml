@@ -5,13 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <version>5.0.15-p1</version>
+        <version>5.0.15-p2</version>
         <groupId>io.github.sakaki-aruka</groupId>
         <artifactId>custom-crafter</artifactId>
     </parent>
 
-    <version>5.0.15-p1</version>
-    <groupId>io.github.sakaki-aruka</groupId>
     <artifactId>custom-crafter-api</artifactId>
     <packaging>jar</packaging>
 
@@ -103,6 +101,29 @@
     <build>
         <plugins>
             <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <version>1.6.0</version> <configuration>
+                <flattenMode>oss</flattenMode>
+            </configuration>
+                <executions>
+                    <execution>
+                        <id>flatten</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>flatten</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>flatten.clean</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.jetbrains.dokka</groupId>
                 <artifactId>dokka-maven-plugin</artifactId>
                 <version>2.1.0</version>
@@ -115,7 +136,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <moduleName>Custom_Crafter ${project.version}</moduleName>
+                    <moduleName>Custom_Crafter</moduleName>
                     <outputDir>
                         ${project.basedir}/docs
                     </outputDir>
@@ -198,6 +219,16 @@
         <!-- org.jetbrains.kotlin:kotlin-stdlib, scope:compile -->
         <!-- io.papermc.paper:paper-api, scope: provided-->
         <!-- Kotlin -->
+
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-stdlib</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>io.papermc.paper</groupId>
+            <artifactId>paper-api</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.choco-solver</groupId>
