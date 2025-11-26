@@ -29,7 +29,14 @@ custom crafter は、**PaperMCサーバー専用**のカスタムレシピ提供
 
 ![](./resources/crafting-demo.gif)
 
-</details>
+</details>  
+
+上のビデオで利用しているレシピはデモプラグインに含まれています。  
+デモプラグインは、このリポジトリをローカルへクローンした後に以下のコマンドを実行することで作成できます。  
+
+`mvn -pl demo package`  
+
+サーバーの plugins ディレクトリに配置可能な jar ファイルは `demo/target` ディレクトリに出力されます。  
 
 ---
 

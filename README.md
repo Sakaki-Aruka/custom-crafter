@@ -31,7 +31,13 @@ You can define custom recipes freely within your own plugin and introduce new el
 
 ![](./resources/crafting-demo.gif)
 
-</details>
+</details>  
+
+After cloning this repository locally, you can build a demo plugin that provides the recipe included in this video, as well as several other recipes, by running the following commands.  
+
+`mvn -pl demo package`  
+
+The jar file, which can be placed in the server's plugins directory, will be created in the demo/target directory.
 
 ---
 
