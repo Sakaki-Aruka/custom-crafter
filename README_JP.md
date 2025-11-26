@@ -71,7 +71,7 @@ APIを利用する際は、プラグイン実行時にはCustomCrafterプラグ�
 * Maven: `provided`
 * Gradle: `compileOnly`
 
-最新バージョン: 5.0.15-p1 [Maven Central (versions)](https://central.sonatype.com/artifact/io.github.sakaki-aruka/custom-crafter-api/versions)
+最新バージョン: 5.0.15-p2 [Maven Central (versions)](https://central.sonatype.com/artifact/io.github.sakaki-aruka/custom-crafter-api/versions)
 
 <details><summary>Maven Configuration Example</summary>
 
@@ -81,7 +81,7 @@ From Maven Central
 <dependency>
     <groupId>io.github.sakaki-aruka</groupId>
     <artifactId>custom-crafter-api</artifactId>
-    <version>5.0.15-p1</version>
+    <version>5.0.15-p2</version>
     <scope>provided</scope>
 </dependency>
 ```
@@ -92,7 +92,7 @@ From Maven Central
 
 ```groovy
 dependencies {
-   compileOnly 'io.github.sakaki-aruka:custom-crafter-api:5.0.15-p1'
+   compileOnly 'io.github.sakaki-aruka:custom-crafter-api:5.0.15-p2'
 }
 ```
 
@@ -102,7 +102,7 @@ dependencies {
 
 ```Kotlin
 dependencies {
-    compileOnly("io.github.sakaki-aruka:custom-crafter-api:5.0.15-p1")
+    compileOnly("io.github.sakaki-aruka:custom-crafter-api:5.0.15-p2")
 }
 ```
 
