@@ -136,7 +136,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <moduleName>Custom_Crafter ${project.version}</moduleName>
+                    <moduleName>Custom_Crafter</moduleName>
                     <outputDir>
                         ${project.basedir}/docs
                     </outputDir>
