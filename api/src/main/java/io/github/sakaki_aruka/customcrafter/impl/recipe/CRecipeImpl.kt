@@ -4,7 +4,6 @@ import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipeContainer
-import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
 
@@ -13,28 +12,28 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
  *
  * @param[name] A name of this recipe.
  * @param[items] Elements of this recipe.
- * @param[type] A type of this recipe. (Normal or Amorphous (=Shapeless))
+ * @param[type] A type of this recipe. (Shaped or Shapeless)
  * @param[containers] Containers of this recipe. (default = null)
  * @param[results] A [ResultSupplier] list. (default = null)
  */
 open class CRecipeImpl(
     override val name: String,
     override val items: Map<CoordinateComponent, CMatter>,
-    override val type: CRecipeType,
+    override val type: CRecipe.Type,
     override val containers: List<CRecipeContainer>? = null,
     override val results: List<ResultSupplier>? = null,
 ): CRecipe {
     companion object {
         /**
-         * Amorphous recipe build wrapper.
+         * Shapeless recipe build wrapper.
          *
-         * This calls the constructor with arguments and [CRecipeType.AMORPHOUS].
-         * @return[CRecipeImpl] an amorphous recipe
+         * This calls the constructor with arguments and [CRecipe.Type.SHAPELESS].
+         * @return[CRecipeImpl] an shapeless recipe
          * @throws[IllegalArgumentException] Throws if [items] size is out of the range (1 ~ 36).
          * @throws[IllegalStateException] Throws if built recipe is invalid.
          * @since 5.0.14
          */
-        fun amorphous(
+        fun shapeless(
             name: String,
             items: List<CMatter>,
             containers: List<CRecipeContainerImpl>? = null,
@@ -50,7 +49,7 @@ open class CRecipeImpl(
             val recipe = CRecipeImpl(
                 name = name,
                 items = map,
-                type = CRecipeType.AMORPHOUS,
+                type = CRecipe.Type.SHAPELESS,
                 containers = containers,
                 results = results,
             )

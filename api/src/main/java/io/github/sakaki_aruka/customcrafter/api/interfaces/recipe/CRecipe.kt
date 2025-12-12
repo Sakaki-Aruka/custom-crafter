@@ -3,7 +3,6 @@ package io.github.sakaki_aruka.customcrafter.api.interfaces.recipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
-import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import org.bukkit.inventory.ItemStack
 
@@ -14,19 +13,29 @@ import org.bukkit.inventory.ItemStack
  * @param[items] Mapping of CMatter and those coordinates on crafting slots
  * @param[containers] Containers what run on success to search and crafting
  * @param[results] List of [ResultSupplier] what provide items to players
- * @param[type] Type of this recipe. See [CRecipeType]
+ * @param[type] Type of this recipe. See [CRecipe.Type]
  *
  * @see[CMatter]
  * @see[CRecipeContainer]
  * @see[ResultSupplier]
- * @see[CRecipeType]
+ * @see[CRecipe.Type]
  */
 interface CRecipe {
     val name: String
     val items: Map<CoordinateComponent, CMatter>
     val containers: List<CRecipeContainer>?
     val results: List<ResultSupplier>?
-    val type: CRecipeType
+    val type: Type
+
+    /**
+     * Type of [CRecipe]
+     */
+    enum class Type(
+        val type: String
+    ) {
+        SHAPED("SHAPED"),
+        SHAPELESS("SHAPELESS");
+    }
 
     /**
      * Returns this [CRecipe] is a valid or not.
@@ -172,10 +181,10 @@ interface CRecipe {
     }
 
     fun getSlots(): List<Int> {
-        return if (this.type == CRecipeType.NORMAL) {
+        return if (this.type == Type.SHAPED) {
             items.keys.map { c -> c.toIndex() }.sorted()
         } else {
-            // Amorphous
+            // Shapeless
             (0..<this.items.size).sorted()
         }
     }

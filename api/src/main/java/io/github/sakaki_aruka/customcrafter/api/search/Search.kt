@@ -7,7 +7,6 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelationComponent
-import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.impl.recipe.CVanillaRecipe
 import org.bukkit.Bukkit
@@ -156,7 +155,7 @@ object Search {
         /*r.items.size == mapped.size*/
         for (recipe in sourceRecipes.filter { r -> mapped.size in r.requiresInputItemAmountMin()..r.requiresInputItemAmountMax() }) {
             when (recipe.type) {
-                CRecipeType.NORMAL -> {
+                CRecipe.Type.SHAPED -> {
                     if (!normal(mapped, recipe, crafterID)) {
                         continue
                     }
@@ -166,8 +165,8 @@ object Search {
                     customs.add(recipe to MappedRelation(components))
                 }
 
-                CRecipeType.AMORPHOUS -> {
-                    amorphous(mapped, recipe, crafterID)?.let { relation ->
+                CRecipe.Type.SHAPELESS -> {
+                    shapeless(mapped, recipe, crafterID)?.let { relation ->
                         customs.add(recipe to relation)
                     }
                 }
@@ -228,7 +227,7 @@ object Search {
     }
 
 
-    private fun getAmorphousCandidateCheckResult(
+    private fun getShapelessCandidateCheckResult(
         input: Map<CoordinateComponent, ItemStack>,
         recipe: CRecipe
     ): Map<Int, Set<Triple<Int, Boolean, Boolean>>> {
@@ -257,7 +256,7 @@ object Search {
     }
 
 
-    private fun getAmorphousMatterPredicatesCheckResult(
+    private fun getShapelessMatterPredicatesCheckResult(
         input: Map<CoordinateComponent, ItemStack>,
         recipe: CRecipe,
         crafterID: UUID
@@ -285,7 +284,7 @@ object Search {
         return result
     }
 
-    private fun getAmorphousAmountCheckResult(
+    private fun getShapelessAmountCheckResult(
         input: Map<CoordinateComponent, ItemStack>,
         recipe: CRecipe
     ): Map<Int, Set<Triple<Int, Boolean, Boolean>>> {
@@ -315,7 +314,7 @@ object Search {
         return result
     }
 
-    private fun amorphous(
+    private fun shapeless(
         mapped: Map<CoordinateComponent, ItemStack>,
         recipe: CRecipe,
         crafterID: UUID
@@ -334,9 +333,9 @@ object Search {
             }
         }
 
-        addResults(getAmorphousCandidateCheckResult(mapped, recipe))
-        addResults(getAmorphousMatterPredicatesCheckResult(mapped, recipe, crafterID))
-        addResults(getAmorphousAmountCheckResult(mapped, recipe))
+        addResults(getShapelessCandidateCheckResult(mapped, recipe))
+        addResults(getShapelessMatterPredicatesCheckResult(mapped, recipe, crafterID))
+        addResults(getShapelessAmountCheckResult(mapped, recipe))
 
         val merged: MutableMap<Int, MutableSet<Int>> = mutableMapOf()
         for ((k, set) in results) {

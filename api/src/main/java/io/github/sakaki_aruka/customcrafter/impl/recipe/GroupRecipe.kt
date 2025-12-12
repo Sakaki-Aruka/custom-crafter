@@ -5,7 +5,6 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatterPredica
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipeContainer
 import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
-import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterPredicateImpl
@@ -16,7 +15,7 @@ import java.util.UUID
 /**
  * Implementation of [CRecipe].
  *
- * This recipe only provides [CRecipeType.NORMAL].
+ * This recipe only provides [CRecipe.Type.SHAPED].
  *
  * This recipe has [groups] what is a list of air-containable matter ([GroupRecipe.Matter]).
  *
@@ -48,7 +47,7 @@ import java.util.UUID
  * @param[groups] Air-containable context set. It can be empty.
  * @param[containers] Containers when run on finished to search
  * @param[results] [ResultSupplier] list
- * @param[type] Always be [CRecipeType.NORMAL]
+ * @param[type] Always be [CRecipe.Type.SHAPED]
  * @see[CRecipe]
  * @see[Matter]
  * @see[Context]
@@ -60,7 +59,7 @@ class GroupRecipe (
     val groups: Set<Context>,
     override val containers: List<CRecipeContainer>? = null,
     override val results: List<ResultSupplier>? = null,
-    override val type: CRecipeType = CRecipeType.NORMAL
+    override val type: CRecipe.Type = CRecipe.Type.SHAPED
 ): CRecipe {
 
     companion object {
@@ -391,9 +390,9 @@ class GroupRecipe (
     }
 
     override fun isValidRecipe(): Result<Unit> {
-        if (this.type != CRecipeType.NORMAL) {
+        if (this.type == CRecipe.Type.SHAPELESS) {
             return Result.failure(
-                NotImplementedError("GroupRecipe is not implemented for `CRecipeType.AMORPHOUS`."))
+                NotImplementedError("GroupRecipe is not implemented for `CRecipe.Type.SHAPELESS`."))
         } else if (this.items.isEmpty() || this.items.size > 36) {
             return Result.failure(IllegalStateException("'items' must contain 1 to 36 valid CMatters."))
         } else if (this.items.entries.minBy { (c, _) -> c.toIndex() }.value.candidate.any { it.isAir }) {

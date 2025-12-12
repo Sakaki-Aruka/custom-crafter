@@ -60,8 +60,8 @@ open class CPotionMatterImpl(
 
             return@CMatterPredicateImpl potionMatter.potionComponents.all { component ->
                 when (component.strict) {
-                    CPotionComponent.PotionStrict.ONLY_EFFECT -> sources.containsKey(component.effect.type)
-                    CPotionComponent.PotionStrict.STRICT -> {
+                    CPotionComponent.Strict.ONLY_EFFECT -> sources.containsKey(component.effect.type)
+                    CPotionComponent.Strict.STRICT -> {
                         sources.containsKey(component.effect.type)
                                 && sources.getValue(component.effect.type) == component.effect.amplifier
                     }

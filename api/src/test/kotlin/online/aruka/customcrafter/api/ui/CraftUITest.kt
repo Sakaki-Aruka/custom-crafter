@@ -1,7 +1,7 @@
 package online.aruka.customcrafter.api.ui
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
-import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
+import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
 import io.github.sakaki_aruka.customcrafter.impl.recipe.CRecipeImpl
@@ -49,7 +49,7 @@ internal object CraftUITest {
         val recipe = CRecipeImpl(
             name = "",
             items = items,
-            type = CRecipeType.NORMAL
+            type = CRecipe.Type.SHAPED
         )
         repeat(50) {
             CustomCrafterAPI.registerRecipe(recipe)

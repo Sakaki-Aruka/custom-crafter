@@ -6,7 +6,6 @@ import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterPredicateImpl
 import io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant.CEnchantComponent
 import io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant.EnchantStrict
 import io.github.sakaki_aruka.customcrafter.api.objects.matter.potion.CPotionComponent
-import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.search.Search
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
@@ -63,7 +62,7 @@ internal object SearchTest {
         val recipe = CRecipeImpl(
             name = "",
             items = items,
-            type = CRecipeType.NORMAL
+            type = CRecipe.Type.SHAPED
         )
 
         val ui = CraftUI()
@@ -112,12 +111,12 @@ internal object SearchTest {
     }
 
     @Test
-    fun amorphousTest1() {
+    fun shapelessTest1() {
         val matter = CMatterImpl.single(Material.STONE)
         val recipe = CRecipeImpl(
             name = "",
             items = CustomCrafterAPI.getRandomNCoordinates(4).associateWith { _ -> matter },
-            type = CRecipeType.AMORPHOUS
+            type = CRecipe.Type.SHAPELESS
         )
         val ui = CraftUI()
         setOf(0, 1, 45, 46).forEach { i ->
@@ -138,7 +137,7 @@ internal object SearchTest {
 
 
     @Test
-    fun amorphousTest2() {
+    fun shapelessTest2() {
         // mass test
         val slimeBall = CMatterImpl.single(Material.SLIME_BALL)
         val lavaBucket = CMatterImpl("", setOf(Material.LAVA_BUCKET), mass = true)
@@ -148,7 +147,7 @@ internal object SearchTest {
                 CoordinateComponent(0, 0) to slimeBall,
                 CoordinateComponent(0, 1) to lavaBucket
             ),
-            type = CRecipeType.AMORPHOUS
+            type = CRecipe.Type.SHAPELESS
         )
 
         val ui = CraftUI()
@@ -166,7 +165,7 @@ internal object SearchTest {
     }
 
     @Test
-    fun detectUnmatchMaterialCandidateInAmorphousRecipe() {
+    fun detectUnmatchMaterialCandidateInShapelessRecipe() {
         // Recipe: requires 9 stones
         // Input : provides 8 stones and 1 cobblestone
         // -> Fail to mapping
@@ -176,7 +175,7 @@ internal object SearchTest {
         // # #
         // ###
         // # = STONE
-        val recipe = CRecipeImpl.amorphous("", List(9) {stone})
+        val recipe = CRecipeImpl.shapeless("", List(9) {stone})
 
         val ui = CraftUI()
         for (c in CoordinateComponent.square(3)) {
@@ -198,7 +197,7 @@ internal object SearchTest {
     }
 
     @Test
-    fun detectUnmatchEnchantCandidateInAmorphousRecipe() {
+    fun detectUnmatchEnchantCandidateInShapelessRecipe() {
         // Recipe: requires 3 enchanted (efficiency, lv 5, strict) stones
         // Input : provides 3 enchanted (efficiency, lv 5 x2, lv4 x1) stones
         // -> Fail to mapping
@@ -216,7 +215,7 @@ internal object SearchTest {
                 CoordinateComponent(0, 1) to matter,
                 CoordinateComponent(0, 2) to matter
             ),
-            type = CRecipeType.AMORPHOUS
+            type = CRecipe.Type.SHAPELESS
         )
 
         val lv5Stone = ItemStack.of(Material.STONE)
@@ -243,7 +242,7 @@ internal object SearchTest {
     }
 
     @Test
-    fun detectUnmatchEnchantStorageCandidateInAmorphousRecipe() {
+    fun detectUnmatchEnchantStorageCandidateInShapelessRecipe() {
         // Recipe: requires 3 enchanted books (efficiency, lv5, strict)
         // Input : provides 3 enchanted books (efficiency, lv5x2, lv4x1)
         // -> Fail to mapping
@@ -261,7 +260,7 @@ internal object SearchTest {
                 CoordinateComponent(0, 1) to matter,
                 CoordinateComponent(0, 2) to matter
             ),
-            type = CRecipeType.AMORPHOUS
+            type = CRecipe.Type.SHAPELESS
         )
 
         val lv5 = ItemStack.of(Material.ENCHANTED_BOOK)
@@ -288,7 +287,7 @@ internal object SearchTest {
     }
 
     @Test
-    fun detectUnmatchPotionCandidateInAmorphousRecipe() {
+    fun detectUnmatchPotionCandidateInShapelessRecipe() {
         // Recipe: requires 3 potions (luck, lv5, strict)
         // Input : provides 3 potions (luck, lv5x2, lv4x1)
         // -> Fail to mapping
@@ -298,7 +297,7 @@ internal object SearchTest {
             potionComponents = setOf(
                 CPotionComponent(
                     PotionEffect(PotionEffectType.LUCK, 1, 5),
-                    CPotionComponent.PotionStrict.STRICT
+                    CPotionComponent.Strict.STRICT
                 )
             )
         )
@@ -309,7 +308,7 @@ internal object SearchTest {
                 CoordinateComponent(0, 1) to matter,
                 CoordinateComponent(0, 2) to matter
             ),
-            type = CRecipeType.AMORPHOUS
+            type = CRecipe.Type.SHAPELESS
         )
 
         val lv5 = ItemStack.of(Material.POTION)
@@ -336,7 +335,7 @@ internal object SearchTest {
     }
 
     @Test
-    fun detectUnmatchMatterPredicateInAmorphousRecipe() {
+    fun detectUnmatchMatterPredicateInShapelessRecipe() {
         // Recipe: requires to craft by Notch
         // Action: craft by empty UUID user
         // -> Fail to mapping
@@ -355,7 +354,7 @@ internal object SearchTest {
                 CoordinateComponent(0, 1) to matter,
                 CoordinateComponent(1, 1) to matter
             ),
-            type = CRecipeType.AMORPHOUS
+            type = CRecipe.Type.SHAPELESS
         )
 
         val gravel = ItemStack.of(Material.GRAVEL)
@@ -375,7 +374,7 @@ internal object SearchTest {
     }
 
     @Test
-    fun detectUnmatchMatterAmountInAmorphousRecipe() {
+    fun detectUnmatchMatterAmountInShapelessRecipe() {
         // Recipe: requires 3 stones (amount = 2)
         // Input : provides 3 stones (amount = 1)
         // -> Fail to mapping
@@ -391,7 +390,7 @@ internal object SearchTest {
                 CoordinateComponent(0, 1) to matter,
                 CoordinateComponent(0, 2) to matter
             ),
-            type = CRecipeType.AMORPHOUS
+            type = CRecipe.Type.SHAPELESS
         )
 
         val stone = ItemStack.of(Material.STONE, 1)
@@ -441,7 +440,7 @@ internal object SearchTest {
                 CoordinateComponent(0, 2) to onlyEnchant,
                 CoordinateComponent(0, 3) to strict
             ),
-            type = CRecipeType.AMORPHOUS
+            type = CRecipe.Type.SHAPELESS
         )
 
         val input1 = ItemStack(Material.STONE)
@@ -489,7 +488,7 @@ internal object SearchTest {
             setOf(CPotionComponent(
                 PotionEffect(
                     PotionEffectType.POISON, 1, 3),
-                CPotionComponent.PotionStrict.ONLY_EFFECT
+                CPotionComponent.Strict.ONLY_EFFECT
             )))
 
         val strict = CPotionMatterImpl(
@@ -498,7 +497,7 @@ internal object SearchTest {
             setOf(CPotionComponent(
                 PotionEffect(
                     PotionEffectType.POISON, 1, 1),
-                CPotionComponent.PotionStrict.STRICT
+                CPotionComponent.Strict.STRICT
             )))
 
         val recipe: CRecipe = CRecipeImpl(
@@ -507,7 +506,7 @@ internal object SearchTest {
                 CoordinateComponent(0, 0) to onlyEffect,
                 CoordinateComponent(0, 1) to strict
             ),
-            CRecipeType.AMORPHOUS
+            CRecipe.Type.SHAPELESS
         )
 
         val input1 = ItemStack(Material.POTION)

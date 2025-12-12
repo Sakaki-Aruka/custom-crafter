@@ -13,7 +13,7 @@ import org.bukkit.potion.PotionEffect
  */
 data class CPotionComponent(
     val effect: PotionEffect,
-    val strict: PotionStrict
+    val strict: Strict
 ) {
 
     /**
@@ -22,7 +22,7 @@ data class CPotionComponent(
      * ONLY_EFFECT: The system checks only type.
      * STRICT: The system checks amplifier and type.
      */
-    enum class PotionStrict {
+    enum class Strict {
         ONLY_EFFECT,
         STRICT
     }

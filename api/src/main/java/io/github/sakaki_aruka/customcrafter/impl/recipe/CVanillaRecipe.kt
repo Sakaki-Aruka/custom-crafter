@@ -3,7 +3,6 @@ package io.github.sakaki_aruka.customcrafter.impl.recipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipeContainer
-import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
@@ -21,7 +20,7 @@ import org.bukkit.inventory.ShapelessRecipe
 class CVanillaRecipe internal constructor(
     override val name: String,
     override val items: Map<CoordinateComponent, CMatter>,
-    override val type: CRecipeType,
+    override val type: CRecipe.Type,
     override val containers: List<CRecipeContainer>? = null,
     override val results: List<ResultSupplier>? = null,
     val original: Recipe
@@ -46,7 +45,7 @@ class CVanillaRecipe internal constructor(
             return CVanillaRecipe(
                 recipe.key.namespace + recipe.key.key,
                 shapeToItems(recipe.shape, recipe.choiceMap),
-                CRecipeType.NORMAL,
+                CRecipe.Type.SHAPED,
                 results = listOf(ResultSupplierImpl.timesSingle(recipe.result)),
                 original = recipe
             )
@@ -63,7 +62,7 @@ class CVanillaRecipe internal constructor(
             return CVanillaRecipe(
                 recipe.key.namespace + recipe.key.key,
                 shapelessToItems(recipe.choiceList),
-                CRecipeType.AMORPHOUS,
+                CRecipe.Type.SHAPELESS,
                 results = listOf(ResultSupplierImpl.timesSingle(recipe.result)),
                 original = recipe
             )

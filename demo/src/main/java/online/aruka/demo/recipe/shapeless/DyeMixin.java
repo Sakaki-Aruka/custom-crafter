@@ -22,7 +22,7 @@ public class DyeMixin {
 
         ResultSupplier supplier = ResultSupplierImpl.Companion.timesSingle(ItemStack.of(Material.BLACK_DYE));
 
-        return CRecipeImpl.Companion.amorphous(
+        return CRecipeImpl.Companion.shapeless(
                 "Dye mixin without black",
                 colors,
                 null,
