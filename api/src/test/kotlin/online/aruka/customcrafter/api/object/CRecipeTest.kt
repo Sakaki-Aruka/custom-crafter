@@ -46,7 +46,7 @@ object CRecipeTest {
         val over = CRecipeImpl(
             name = "",
             items = (0..36).associate { i ->
-                CoordinateComponent.fromIndex(i, false) to matter },
+                CoordinateComponent.fromIndex(i) to matter },
             type = CRecipe.Type.SHAPELESS
         )
         assertTrue(over.isValidRecipe().isFailure)

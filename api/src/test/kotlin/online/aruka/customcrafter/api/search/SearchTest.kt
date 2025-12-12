@@ -115,7 +115,7 @@ internal object SearchTest {
         val matter = CMatterImpl.single(Material.STONE)
         val recipe = CRecipeImpl(
             name = "",
-            items = CustomCrafterAPI.getRandomNCoordinates(4).associateWith { _ -> matter },
+            items = CoordinateComponent.getN(4).associateWith { _ -> matter },
             type = CRecipe.Type.SHAPELESS
         )
         val ui = CraftUI()

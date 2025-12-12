@@ -32,20 +32,12 @@ data class CoordinateComponent(
         /**
          * returns [CoordinateComponent] from the given index.
          *
-         * if 'followLimit' is true and 'index' is out of range 0-35, throws [IllegalArgumentException]
-         *
-         * @throws[IllegalArgumentException] thrown when 'followLimit' is true and index is out of 0-35.
          * @param[index] the input index
-         * @param[followLimit] checks to the input index is in range of the CustomCrafter's gui limit. default value is true.
          * @return[CoordinateComponent] a converted [CoordinateComponent] from an input
          * @since 5.0.7
          */
-        fun fromIndex(index: Int, followLimit: Boolean = true): CoordinateComponent {
-            val c = CoordinateComponent(index % 9, index / 9)
-            if (followLimit && !inRange(9, c.x, c.y)) {
-                throw IllegalArgumentException("'index' must be in range of 0-35 when you set 'followLimit' is true.")
-            }
-            return c
+        fun fromIndex(index: Int): CoordinateComponent {
+            return CoordinateComponent(index % 9, index / 9)
         }
 
         /**
@@ -117,6 +109,18 @@ data class CoordinateComponent(
                 }
             }
             return result
+        }
+
+        /**
+         * Returns a list what contains specified amount of CoordinateComponent.
+         *
+         * @throws[IllegalArgumentException] If specified [n] is  < 1
+         * @return[List] Result coordinates
+         * @since 5.0.16
+         */
+        fun getN(n: Int): List<CoordinateComponent> {
+            if (n < 1) throw IllegalArgumentException("'n' must be greater than zero.")
+            return (0..<n).map { CoordinateComponent(it % 9, it / 9) }
         }
     }
 }

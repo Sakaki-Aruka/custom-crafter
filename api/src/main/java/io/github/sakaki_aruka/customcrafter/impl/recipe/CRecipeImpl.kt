@@ -43,7 +43,7 @@ open class CRecipeImpl(
                 throw IllegalArgumentException("'items' size must be in range of 1 to 36.")
             }
             val map: Map<CoordinateComponent, CMatter> =
-                CustomCrafterAPI.getRandomNCoordinates(items.size)
+                CoordinateComponent.getN(items.size)
                     .zip(items)
                     .associate { (c, m) -> c to m }
             val recipe = CRecipeImpl(

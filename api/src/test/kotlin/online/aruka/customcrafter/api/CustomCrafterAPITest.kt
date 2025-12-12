@@ -28,15 +28,6 @@ internal object CustomCrafterAPITest {
     }
 
     @Test
-    fun randomCoordinatesTest() {
-        assertTrue(CustomCrafterAPI.getRandomNCoordinates(100).size == 100)
-
-        assertThrows<IllegalArgumentException> {
-            CustomCrafterAPI.getRandomNCoordinates(0)
-        }
-    }
-
-    @Test
     fun baseBlockSizeTest() {
         assertTrue(!CustomCrafterAPI.setBaseBlockSideSize(-1))
         assertTrue(!CustomCrafterAPI.setBaseBlockSideSize(0))

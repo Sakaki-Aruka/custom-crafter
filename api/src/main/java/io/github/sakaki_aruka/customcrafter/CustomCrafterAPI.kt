@@ -354,22 +354,6 @@ object CustomCrafterAPI {
     }
 
     /**
-     * returns random generated coordinates.
-     *
-     * @param[n] amount of coordinates what you want to generate
-     * @throws[IllegalArgumentException] thrown if [n] < 1
-     * @return[Set<CoordinateComponent>] result coordinates
-     */
-    fun getRandomNCoordinates(n: Int): Set<CoordinateComponent> {
-        if (n < 1) throw IllegalArgumentException("'n' must be greater than zero.")
-        val result: MutableSet<CoordinateComponent> = mutableSetOf()
-        repeat(n) { i ->
-            result.add(CoordinateComponent(i % 9, i / 9))
-        }
-        return result
-    }
-
-    /**
      * registers a provided recipe and calls [RegisterCustomRecipeEvent].
      *
      * if a called event is cancelled, always fail to register recipe.
