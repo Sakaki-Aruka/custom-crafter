@@ -3,10 +3,8 @@ package io.github.sakaki_aruka.customcrafter.api.objects
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
-import io.github.sakaki_aruka.customcrafter.internal.gui.crafting.CraftUI
 import org.bukkit.Location
 import org.bukkit.World
-import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 import kotlin.math.max
 
@@ -21,22 +19,6 @@ data class CraftView internal constructor(
     val materials: Map<CoordinateComponent, ItemStack>,
     val result: ItemStack
 ) {
-    /**
-     * converts a view to Custom Crafter's gui.
-     *
-     * @return[Inventory] Custom Crafter's gui
-     */
-    fun toCraftingGUI(): Inventory {
-        val ui = CraftUI()
-        val gui: Inventory = ui.inventory
-
-        ui.bakedDesigner.craftSlots().sortedBy { it.toIndex() }
-            .zip(this.materials.entries.sortedBy { it.key.toIndex() })
-            .forEach { (c, entry) -> gui.setItem(c.toIndex(), entry.value) }
-        gui.setItem(ui.bakedDesigner.resultInt(), this.result)
-        return gui
-    }
-
     /**
      * decrement items from the provided CraftView
      *
@@ -103,15 +85,5 @@ data class CraftView internal constructor(
         this.result.takeIf { item -> !item.isEmpty }?.let { item ->
             world.dropItem(location, item)
         }
-    }
-
-    internal fun reduceMaterials(
-        amount: Int,
-        coordinates: Set<CoordinateComponent> = this.materials.keys
-    ) {
-        this.materials.filter { (c, _) -> c in coordinates }
-            .forEach { (_, item) ->
-                item.amount = max(0, item.amount - amount)
-            }
     }
 }

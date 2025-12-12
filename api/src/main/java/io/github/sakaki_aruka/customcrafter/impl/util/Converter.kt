@@ -5,7 +5,6 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
-import kotlin.math.abs
 
 object Converter {
 

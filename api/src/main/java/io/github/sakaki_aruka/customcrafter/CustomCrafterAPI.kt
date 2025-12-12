@@ -5,7 +5,6 @@ import io.github.sakaki_aruka.customcrafter.api.event.RegisterCustomRecipeEvent
 import io.github.sakaki_aruka.customcrafter.api.event.UnregisterCustomRecipeEvent
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.ui.CraftUIDesigner
-import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.internal.gui.crafting.CraftUI
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
@@ -315,10 +314,14 @@ object CustomCrafterAPI {
     }
 
 
-    //internal const val CRAFTING_TABLE_MAKE_BUTTON_SLOT: Int = 35
-    //const val CRAFTING_TABLE_RESULT_SLOT: Int = 44
-    //const val CRAFTING_TABLE_TOTAL_SIZE: Int = 54
-
+    /**
+     * CraftUI desiner
+     *
+     * You can set own custom desiner.
+     *
+     * @see[CraftUIDesigner]
+     * @since 5.0.16
+     */
     var CRAFT_UI_DESIGNER: CraftUIDesigner = CraftUI
 
     /**
