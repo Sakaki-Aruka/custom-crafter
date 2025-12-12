@@ -4,7 +4,6 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
 import io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant.CEnchantComponent
-import io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant.EnchantStrict
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.search.Search
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
@@ -14,7 +13,6 @@ import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.EnchantmentStorageMeta
-import org.checkerframework.checker.units.qual.min
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -124,7 +122,7 @@ object GroupMatterTest {
                 name = "",
                 candidate = setOf(Material.ENCHANTED_BOOK),
                 storedEnchantComponents = setOf(
-                    CEnchantComponent(5, Enchantment.EFFICIENCY, EnchantStrict.STRICT)
+                    CEnchantComponent(5, Enchantment.EFFICIENCY, CEnchantComponent.Strict.STRICT)
                 )
             ),
             includeAir = false
@@ -171,7 +169,7 @@ object GroupMatterTest {
                 name = "",
                 candidate = setOf(Material.ENCHANTED_BOOK),
                 storedEnchantComponents = setOf(
-                    CEnchantComponent(5, Enchantment.EFFICIENCY, EnchantStrict.STRICT)
+                    CEnchantComponent(5, Enchantment.EFFICIENCY, CEnchantComponent.Strict.STRICT)
                 )
             ),
             includeAir = true

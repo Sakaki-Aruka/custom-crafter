@@ -5,7 +5,6 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatterPredicate
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterPredicateImpl
 import io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant.CEnchantComponent
-import io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant.EnchantStrict
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
 import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
@@ -60,8 +59,8 @@ open class CEnchantMatterImpl(
             required: CEnchantComponent
         ): Boolean {
             return when (required.strict) {
-                EnchantStrict.ONLY_ENCHANT -> enchants.containsKey(required.enchantment)
-                EnchantStrict.STRICT -> {
+                CEnchantComponent.Strict.ONLY_ENCHANT -> enchants.containsKey(required.enchantment)
+                CEnchantComponent.Strict.STRICT -> {
                     enchants.getOrDefault(required.enchantment, -1) == required.level
                 }
             }

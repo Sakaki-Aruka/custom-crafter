@@ -1,10 +1,8 @@
 package online.aruka.customcrafter.api.search
 
-import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterPredicateImpl
 import io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant.CEnchantComponent
-import io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant.EnchantStrict
 import io.github.sakaki_aruka.customcrafter.api.objects.matter.potion.CPotionComponent
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.search.Search
@@ -205,7 +203,7 @@ internal object SearchTest {
             name = "lv5EfficiencyStone",
             candidate = setOf(Material.STONE),
             enchantComponents = setOf(
-                CEnchantComponent(5, Enchantment.EFFICIENCY, EnchantStrict.STRICT)
+                CEnchantComponent(5, Enchantment.EFFICIENCY, CEnchantComponent.Strict.STRICT)
             )
         )
         val recipe = CRecipeImpl(
@@ -250,7 +248,7 @@ internal object SearchTest {
             name = "book",
             candidate = setOf(Material.ENCHANTED_BOOK),
             storedEnchantComponents = setOf(
-                CEnchantComponent(5, Enchantment.EFFICIENCY, EnchantStrict.STRICT)
+                CEnchantComponent(5, Enchantment.EFFICIENCY, CEnchantComponent.Strict.STRICT)
             )
         )
         val recipe = CRecipeImpl(
@@ -417,7 +415,7 @@ internal object SearchTest {
                 CEnchantComponent(
                     level = 1,
                     enchantment = Enchantment.EFFICIENCY,
-                    strict = EnchantStrict.ONLY_ENCHANT
+                    strict = CEnchantComponent.Strict.ONLY_ENCHANT
                 )
             )
         )
@@ -429,7 +427,7 @@ internal object SearchTest {
                 CEnchantComponent(
                     level = 1,
                     enchantment = Enchantment.EFFICIENCY,
-                    strict = EnchantStrict.STRICT
+                    strict = CEnchantComponent.Strict.STRICT
                 )
             )
         )
