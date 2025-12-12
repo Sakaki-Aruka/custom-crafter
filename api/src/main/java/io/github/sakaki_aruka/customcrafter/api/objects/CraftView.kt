@@ -1,10 +1,8 @@
 package io.github.sakaki_aruka.customcrafter.api.objects
 
-import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
-import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import io.github.sakaki_aruka.customcrafter.internal.gui.crafting.CraftUI
 import org.bukkit.Location
 import org.bukkit.World
@@ -23,51 +21,19 @@ data class CraftView internal constructor(
     val materials: Map<CoordinateComponent, ItemStack>,
     val result: ItemStack
 ) {
-    companion object {
-        /**
-         * converting an [Inventory] to [CraftView].
-         * ```
-         * // an example from Java.
-         * Inventory gui = ~~~;
-         * CraftView view = CraftView.fromInventory(gui, true);
-         *
-         * // an example from Kotlin
-         * val gui = ~~~
-         * val view = CraftView.fromInventory(gui)
-         * ```
-         *
-         * @param[inventory] convert target
-         * @param[paddingAir] padding empty slots with [ItemStack.empty] or not. default value is false. (default value can only use from Kotlin.)
-         * @return[CraftView?] A result of converting. If a provided inventory is not custom crafter's gui, returns Null.
-         */
-        fun fromInventory(
-            inventory: Inventory,
-            paddingAir: Boolean = false
-        ): CraftView? {
-            val mapped: MutableMap<CoordinateComponent, ItemStack> = Converter.standardInputMapping(inventory)?.toMutableMap() ?: return null
-            if (paddingAir) {
-                Converter.getAvailableCraftingSlotComponents()
-                    .filter { !mapped.keys.contains(it) }
-                    .forEach { coordinate ->
-                        mapped[coordinate] = ItemStack.empty()
-                    }
-            }
-            val result: ItemStack = inventory.getItem(CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT) ?: ItemStack.empty()
-            return CraftView(mapped, result)
-        }
-    }
-
     /**
      * converts a view to Custom Crafter's gui.
      *
      * @return[Inventory] Custom Crafter's gui
      */
     fun toCraftingGUI(): Inventory {
-        val gui: Inventory = CraftUI().inventory
-        this.materials.entries.forEach { (c, item) ->
-            gui.setItem(c.x + c.y * 9, item)
-        }
-        gui.setItem(CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT, this.result)
+        val ui = CraftUI()
+        val gui: Inventory = ui.inventory
+
+        ui.bakedDesigner.craftSlots().sortedBy { it.toIndex() }
+            .zip(this.materials.entries.sortedBy { it.key.toIndex() })
+            .forEach { (c, entry) -> gui.setItem(c.toIndex(), entry.value) }
+        gui.setItem(ui.bakedDesigner.resultInt(), this.result)
         return gui
     }
 

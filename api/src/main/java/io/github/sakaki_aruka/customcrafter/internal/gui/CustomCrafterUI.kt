@@ -28,12 +28,6 @@ internal interface CustomCrafterUI {
         }
     }
 
-    enum class ClickableType {
-        ALWAYS_CLICKABLE,
-        ALWAYS_UNCLICKABLE,
-        DYNAMIC_TOGGLED
-    }
-
     fun onClose(event: InventoryCloseEvent) {}
     fun onClick(clicked: Inventory, event: InventoryClickEvent)
     fun onPlayerInventoryClick(clicked: Inventory, event: InventoryClickEvent) {
@@ -47,10 +41,6 @@ internal interface CustomCrafterUI {
         fun canFlipPage(): Boolean
         fun flipBackPage()
         fun canFlipBackPage(): Boolean
-    }
-
-    interface Static: CustomCrafterUI {
-        fun getClickableType(slot: Int): ClickableType
     }
 
     interface InteractTriggered {

@@ -145,4 +145,13 @@ internal object ConverterTest {
 
         assertEquals(components, mapping.keys)
     }
+
+    @Test
+    fun shapeStringTest() {
+        val components = CoordinateComponent.squareFill(2)
+        assertEquals("""
+            ##
+            ##
+        """.trimIndent(), Converter.getComponentsShapeString(components))
+    }
 }

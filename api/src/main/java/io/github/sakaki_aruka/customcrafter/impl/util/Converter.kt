@@ -5,6 +5,7 @@ import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
+import kotlin.math.abs
 
 object Converter {
 
@@ -65,6 +66,30 @@ object Converter {
      */
     fun getAvailableCraftingSlotIndices(): Set<Int> {
         return slots
+    }
+
+    fun getComponentsShapeString(
+        list: Collection<CoordinateComponent>,
+        existsSlotChar: Char = '#',
+        notExistsSlotChar: Char = ' '
+    ): String {
+        val minX = list.minOf { it.x }
+        val minY = list.minOf { it.y }
+        val maxX = list.maxOf { it.x }
+        val maxY = list.maxOf { it.y }
+
+        val builder = StringBuilder()
+        (minY..maxY).forEach { y ->
+            (minX..maxX).forEach { x ->
+                builder.append(
+                    if (list.contains(CoordinateComponent(x, y))) existsSlotChar
+                    else notExistsSlotChar
+                )
+            }
+            builder.append(System.lineSeparator())
+        }
+        builder.deleteCharAt(builder.length - 1)
+        return builder.toString()
     }
 
 

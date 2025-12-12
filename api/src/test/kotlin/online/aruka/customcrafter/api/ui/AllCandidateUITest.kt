@@ -89,7 +89,8 @@ object AllCandidateUITest {
             view = view,
             player = server.getPlayer(0),
             result = result,
-            useShift = false
+            useShift = false,
+            bakedCraftUIDesigner = craftUI.bakedDesigner
         )
 
         assertTrue(allCandidateUI.canFlipPage())
@@ -132,7 +133,8 @@ object AllCandidateUITest {
             view = view,
             player = player,
             result = result,
-            useShift = false
+            useShift = false,
+            bakedCraftUIDesigner = craftUI.bakedDesigner
         )
 
         assertTrue(allCandidateUI.canFlipPage())
@@ -182,7 +184,8 @@ object AllCandidateUITest {
             view = view,
             player = player,
             result = result,
-            useShift = false
+            useShift = false,
+            bakedCraftUIDesigner = craftUI.bakedDesigner
         )
 
         assertEquals(0, allCandidateUI.currentPage)
@@ -226,7 +229,8 @@ object AllCandidateUITest {
             view = view,
             player = player,
             result = result,
-            useShift = false
+            useShift = false,
+            bakedCraftUIDesigner = craftUI.bakedDesigner
         )
 
         player.openInventory(allCandidateUI.inventory)
@@ -270,7 +274,8 @@ object AllCandidateUITest {
             view = view,
             player = player,
             result = result,
-            useShift = false
+            useShift = false,
+            bakedCraftUIDesigner = craftUI.bakedDesigner
         )
 
         player.openInventory(allCandidateUI.inventory)

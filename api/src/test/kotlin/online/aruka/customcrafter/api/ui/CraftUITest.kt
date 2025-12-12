@@ -106,7 +106,7 @@ internal object CraftUITest {
         val clickEvent = InventoryClickEvent(
             player.openInventory,
             InventoryType.SlotType.CONTAINER,
-            CustomCrafterAPI.CRAFTING_TABLE_MAKE_BUTTON_SLOT,
+            CraftUI.MAKE_BUTTON, //CustomCrafterAPI.CRAFTING_TABLE_MAKE_BUTTON_SLOT,
             ClickType.SHIFT_RIGHT,
             InventoryAction.NOTHING
         )
@@ -147,7 +147,7 @@ internal object CraftUITest {
         val clickEvent = InventoryClickEvent(
             player.openInventory,
             InventoryType.SlotType.CONTAINER,
-            CustomCrafterAPI.CRAFTING_TABLE_MAKE_BUTTON_SLOT,
+            CraftUI.MAKE_BUTTON ,//CustomCrafterAPI.CRAFTING_TABLE_MAKE_BUTTON_SLOT,
             ClickType.SHIFT_RIGHT,
             InventoryAction.NOTHING
         )
