@@ -38,6 +38,7 @@ open class ResultSupplierImpl(
          * @param[item] Supplied item
          * @return[ResultSupplierImpl] ResultSupplier what returns a given item only once
          */
+        @JvmStatic
         fun single(item: ItemStack): ResultSupplierImpl {
             return ResultSupplierImpl { _ -> listOf(item) }
         }
@@ -53,6 +54,7 @@ open class ResultSupplierImpl(
          * @param[item] Supplied item
          * @return[ResultSupplierImpl] ResultSupplier what returns amount modified item
          */
+        @JvmStatic
         fun timesSingle(item: ItemStack): ResultSupplierImpl {
             return ResultSupplierImpl { ctx ->
                 if (ctx.shiftClicked) {

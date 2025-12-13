@@ -16,7 +16,7 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
  * @param[containers] Containers of this recipe. (default = null)
  * @param[results] A [ResultSupplier] list. (default = null)
  */
-open class CRecipeImpl(
+open class CRecipeImpl @JvmOverloads constructor(
     override val name: String,
     override val items: Map<CoordinateComponent, CMatter>,
     override val type: CRecipe.Type,
@@ -33,6 +33,8 @@ open class CRecipeImpl(
          * @throws[IllegalStateException] Throws if built recipe is invalid.
          * @since 5.0.14
          */
+        @JvmStatic
+        @JvmOverloads
         fun shapeless(
             name: String,
             items: List<CMatter>,

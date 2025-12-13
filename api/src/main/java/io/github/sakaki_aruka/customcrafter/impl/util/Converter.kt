@@ -54,6 +54,7 @@ object Converter {
      *
      * @return[List] a list of [CoordinateComponent]
      */
+    @JvmStatic
     fun getAvailableCraftingSlotComponents(): List<CoordinateComponent> {
         return components
     }
@@ -63,10 +64,40 @@ object Converter {
      *
      * @return[Set<Int>] a set of [Int]
      */
+    @JvmStatic
     fun getAvailableCraftingSlotIndices(): Set<Int> {
         return slots
     }
 
+    /**
+     * ※ This is a high cost function.
+     *
+     * ```kotlin
+     * val list = CoordinateComponent.squareFill(3)
+     * println(Converter.getComponentsShapeString(list))
+     * // -> OUTPUT
+     * // ###
+     * // ###
+     * // ###
+     * ```
+     *
+     * ```kotlin
+     * val list = CoordinateComponent.square(3)
+     * println(Converter.getComponentsShapeString(list))
+     * // -> OUTPUT
+     * // ###
+     * // # #
+     * // ###
+     * ```
+     *
+     * @param[list] List of coordinates
+     * @param[existsSlotChar] This is a char what is used on coordinate exists. Default = `#`.
+     * @param[notExistsSlotChar] This is a char what is used on coordinate NOT exists. Default = ' '(White space).
+     * @return[String] Shape
+     * @since 5.0.16
+     */
+    @JvmStatic
+    @JvmOverloads
     fun getComponentsShapeString(
         list: Collection<CoordinateComponent>,
         existsSlotChar: Char = '#',
@@ -100,6 +131,8 @@ object Converter {
      * @param[noAir] not contains air slots. default true.
      * @return[Map<CoordinateComponent, ItemStack>?] Nullable Map<CoordinateComponent, ItemStack>
      */
+    @JvmStatic
+    @JvmOverloads
     fun standardInputMapping(inventory: Inventory, noAir: Boolean = true): Map<CoordinateComponent, ItemStack>? {
         // CoordinateComponent: zero origin (x, y both)
         if (inventory.isEmpty) return null

@@ -31,6 +31,7 @@ object CustomCrafterAPI {
     /**
      * Custom Crafter API author names
      */
+    @JvmField
     val AUTHORS: Set<String> = setOf("Sakaki-Aruka")
 
     /**
@@ -44,6 +45,7 @@ object CustomCrafterAPI {
      * @return[Boolean] Give or not
      * @since 5.0.11
      */
+    @JvmStatic
     fun getResultGiveCancel(): Boolean = RESULT_GIVE_CANCEL
 
     /**
@@ -56,6 +58,8 @@ object CustomCrafterAPI {
      * @param[calledAsync] Called from async processing or not. (Default = false)
      * @since 5.0.11
      */
+    @JvmStatic
+    @JvmOverloads
     fun setResultGiveCancel(v: Boolean, calledAsync: Boolean = false) {
         if (RESULT_GIVE_CANCEL != v) {
             CustomCrafterAPIPropertiesChangeEvent(
@@ -72,6 +76,8 @@ object CustomCrafterAPI {
      * Sets `ResultGiveCancel` to false (default value).
      * @since 5.0.13
      */
+    @JvmStatic
+    @JvmOverloads
     fun setResultGiveCancelDefault(calledAsync: Boolean = false) {
         if (RESULT_GIVE_CANCEL) {
             CustomCrafterAPIPropertiesChangeEvent(
@@ -94,6 +100,7 @@ object CustomCrafterAPI {
      * @return[Material] base block type
      * @since 5.0.9
      */
+    @JvmStatic
     fun getBaseBlock(): Material = BASE_BLOCK
 
     /**
@@ -105,6 +112,8 @@ object CustomCrafterAPI {
      * @throws[IllegalArgumentException] when specified not a block type
      * @since 5.0.9
      */
+    @JvmStatic
+    @JvmOverloads
     fun setBaseBlock(type: Material, calledAsync: Boolean = false) {
         if (!type.isBlock || type.isAir) {
             throw IllegalArgumentException("'type' must meet 'Material#isBlock'.")
@@ -125,6 +134,8 @@ object CustomCrafterAPI {
      * Sets `BaseBlock` to `Material.GOLD_BLOCK` (default value).
      * @since 5.0.13
      */
+    @JvmStatic
+    @JvmOverloads
     fun setBaseBlockDefault(calledAsync: Boolean = false) {
         if (BASE_BLOCK != Material.GOLD_BLOCK) {
             CustomCrafterAPIPropertiesChangeEvent(
@@ -155,6 +166,7 @@ object CustomCrafterAPI {
      * @return[Boolean] Enabled or not
      * @since 5.0.11 (original 5.0.8)
      */
+    @JvmStatic
     fun getUseMultipleResultCandidateFeature(): Boolean = USE_MULTIPLE_RESULT_CANDIDATE_FEATURE
 
     /**
@@ -166,6 +178,8 @@ object CustomCrafterAPI {
      * @param[calledAsync] Called from async processing or not. (Default = false)
      * @since 5.0.11 (original 5.0.8)
      */
+    @JvmStatic
+    @JvmOverloads
     fun setUseMultipleResultCandidateFeature(v: Boolean, calledAsync: Boolean = false) {
         if (v != USE_MULTIPLE_RESULT_CANDIDATE_FEATURE) {
             CustomCrafterAPIPropertiesChangeEvent(
@@ -182,6 +196,8 @@ object CustomCrafterAPI {
      * Sets `useMultipleResultCandidateFeature` to false (default value).
      * @since 5.0.13
      */
+    @JvmStatic
+    @JvmOverloads
     fun setUseMultipleResultCandidateFeatureDefault(calledAsync: Boolean = false) {
         if (USE_MULTIPLE_RESULT_CANDIDATE_FEATURE) {
             CustomCrafterAPIPropertiesChangeEvent(
@@ -200,6 +216,7 @@ object CustomCrafterAPI {
      * @return[Boolean] Enabled or not
      * @since 5.0.13-1
      */
+    @JvmStatic
     fun getUseCustomCraftUI(): Boolean = USE_CUSTOM_CRAFT_UI
 
     /**
@@ -209,6 +226,8 @@ object CustomCrafterAPI {
      * @param[calledAsync] Called from async processing or not. (Default = false)
      * @since 5.0.13-1
      */
+    @JvmStatic
+    @JvmOverloads
     fun setUseCustomCraftUI(v: Boolean, calledAsync: Boolean = false) {
         if (v != USE_CUSTOM_CRAFT_UI) {
             CustomCrafterAPIPropertiesChangeEvent(
@@ -226,6 +245,8 @@ object CustomCrafterAPI {
      * @param[calledAsync] Called from async processing or not. (Default = false)
      * @since 5.0.13-1
      */
+    @JvmStatic
+    @JvmOverloads
     fun setUseCustomCraftUIDefault(calledAsync: Boolean = false) {
         if (!USE_CUSTOM_CRAFT_UI) {
             CustomCrafterAPIPropertiesChangeEvent(
@@ -257,6 +278,7 @@ object CustomCrafterAPI {
      * @param[version] CustomCrafter version string that is used by your plugin.
      * @since 5.0.13
      */
+    @JvmStatic
     fun hasFullCompatibility(version: String): Boolean {
         return version in setOf("5.0.15")
     }
@@ -276,6 +298,8 @@ object CustomCrafterAPI {
      * @param[calledAsync] Called from async processing or not. (Default = false)
      * @return[Boolean] if successful to change, returns true else false.
      */
+    @JvmStatic
+    @JvmOverloads
     fun setBaseBlockSideSize(size: Int, calledAsync: Boolean = false): Boolean {
         if (size < 3 || size % 2 != 1) return false
         if (size != BASE_BLOCK_SIDE) {
@@ -295,12 +319,15 @@ object CustomCrafterAPI {
      *
      * @return[Int] size
      */
+    @JvmStatic
     fun getBaseBlockSideSize(): Int = BASE_BLOCK_SIDE
 
     /**
      * Sets base block's side size to 3 (default value).
      * @since 5.0.13
      */
+    @JvmStatic
+    @JvmOverloads
     fun setBaseBlockSideSizeDefault(calledAsync: Boolean = false) {
         if (BASE_BLOCK_SIDE != 3) {
             CustomCrafterAPIPropertiesChangeEvent(
@@ -322,6 +349,7 @@ object CustomCrafterAPI {
      * @see[CraftUIDesigner]
      * @since 5.0.16
      */
+    @JvmField
     var CRAFT_UI_DESIGNER: CraftUIDesigner = CraftUI
 
     /**
@@ -354,6 +382,7 @@ object CustomCrafterAPI {
      *
      * @return[List]<[CRecipe]> recipes list
      */
+    @JvmStatic
     fun getRecipes(): List<CRecipe> {
         return synchronized(CustomCrafter.RECIPES) {
             CustomCrafter.RECIPES.toList()
@@ -370,6 +399,7 @@ object CustomCrafterAPI {
      * @param[recipe] a recipe what you want to register.
      * @throws[IllegalStateException] Calls when the specified recipe is invalid
      */
+    @JvmStatic
     fun registerRecipe(recipe: CRecipe): Boolean {
         recipe.isValidRecipe().exceptionOrNull()?.let { t -> throw t }
         if (!RegisterCustomRecipeEvent(recipe).callEvent()) return false
@@ -387,6 +417,7 @@ object CustomCrafterAPI {
      *
      * @param[recipe] a recipe what you want to unregister.
      */
+    @JvmStatic
     fun unregisterRecipe(recipe: CRecipe): Boolean {
         val event = UnregisterCustomRecipeEvent(recipe)
         Bukkit.getPluginManager().callEvent(event)
@@ -401,6 +432,7 @@ object CustomCrafterAPI {
      * @return[ItemStack] An item what is displayed when no displayable items on all-candidates-menu.
      * @since 5.0.9
      */
+    @JvmStatic
     fun getAllCandidateNotDisplayableItem() = ALL_CANDIDATE_NO_DISPLAYABLE_ITEM
 
     /**
@@ -427,6 +459,7 @@ object CustomCrafterAPI {
      * @throws[IllegalArgumentException] If the provided items material is not `Material#isItem`, thrown.
      * @since 5.0.9
      */
+    @JvmStatic
     fun setAllCandidateNotDisplayableItem(
         item: ItemStack,
         loreSupplier: (String) -> List<Component>?
@@ -441,6 +474,7 @@ object CustomCrafterAPI {
      * @return[ItemStack] an item
      * @since 5.0.9
      */
+    @JvmStatic
     fun defaultAllCandidateNotDisplayableItems(): ItemStack {
         val item = ItemStack(Material.COMMAND_BLOCK)
         item.editMeta { meta ->

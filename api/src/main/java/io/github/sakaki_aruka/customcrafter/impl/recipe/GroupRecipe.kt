@@ -53,7 +53,7 @@ import java.util.UUID
  * @see[Context]
  * @since 5.0.15
  */
-class GroupRecipe (
+open class GroupRecipe @JvmOverloads constructor(
     override val name: String,
     override val items: Map<CoordinateComponent, CMatter>,
     val groups: Set<Context>,
@@ -77,6 +77,7 @@ class GroupRecipe (
          * @return[Set] A GroupRecipe.Context set what can use for GroupRecipe#groups
          * @since 5.0.15
          */
+        @JvmStatic
         fun createGroups(
             items: Map<CoordinateComponent, CMatter>,
             missingGroups: Set<Context>
@@ -135,6 +136,8 @@ class GroupRecipe (
              * @return[GroupRecipe.Context] GroupRecipe.Context
              * @since 5.0.15
              */
+            @JvmStatic
+            @JvmOverloads
             fun of(
                 members: Set<CoordinateComponent>,
                 min: Int,
@@ -163,6 +166,7 @@ class GroupRecipe (
              * @return[GroupRecipe.Context] Context
              * @since 5.0.15
              */
+            @JvmStatic
             fun default(
                 coordinate: CoordinateComponent
             ): Context {
@@ -183,6 +187,7 @@ class GroupRecipe (
              * @return[Result] Result of some checks. Use [Result.isSuccess] or [Result.isFailure] to check.
              * @since 5.0.15
              */
+            @JvmStatic
             fun isValidGroups(
                 groups: Set<Context>,
                 items: Map<CoordinateComponent, CMatter>
@@ -257,6 +262,7 @@ class GroupRecipe (
             val result: Map<Int, Boolean>,
             val resultConsumed: MutableSet<Int> = mutableSetOf()
         ) {
+            @JvmOverloads
             fun copy(
                 createdBy: Int = this.createdBy,
                 result: Map<Int, Boolean> = this.result.toMap(),
@@ -276,6 +282,8 @@ class GroupRecipe (
              * @param[includeAir] Add 'Material.AIR' to [matter] candidate or not. (Default false)
              * @since 5.0.15
              */
+            @JvmStatic
+            @JvmOverloads
             fun of(
                 matter: CMatter,
                 includeAir: Boolean = false

@@ -20,7 +20,7 @@ import org.bukkit.potion.PotionEffectType
  * @param[predicates] if in checks, this matter requires to pass these all.
  * @param[potionComponents] potion predicates for contained. set of [CPotionComponent].
  */
-open class CPotionMatterImpl(
+open class CPotionMatterImpl @JvmOverloads constructor(
     override val name: String,
     override val candidate: Set<Material>,
     override val potionComponents: Set<CPotionComponent>,
@@ -34,6 +34,7 @@ open class CPotionMatterImpl(
          *
          * @since 5.0.15
          */
+        @JvmField
         val DEFAULT_POTION_CHECKER: CMatterPredicate = CMatterPredicateImpl { ctx ->
             if (ctx.input.type.isAir) {
                 return@CMatterPredicateImpl true

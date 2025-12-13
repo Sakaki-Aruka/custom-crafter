@@ -19,7 +19,7 @@ import org.bukkit.enchantments.Enchantment
  * @param[predicates] if in checks, this matter requires to pass these all.
  * @param[enchantComponents] enchant predicates for applied enchantments. set of [CEnchantComponent].
  */
-open class CEnchantMatterImpl(
+open class CEnchantMatterImpl @JvmOverloads constructor(
     override val name: String,
     override val candidate: Set<Material>,
     override val enchantComponents: Set<CEnchantComponent>,
@@ -33,6 +33,7 @@ open class CEnchantMatterImpl(
          *
          * @since 5.0.15
          */
+        @JvmField
         val DEFAULT_ENCHANT_CHECKER = CMatterPredicateImpl { ctx ->
             if (ctx.input.type.isAir) {
                 return@CMatterPredicateImpl true

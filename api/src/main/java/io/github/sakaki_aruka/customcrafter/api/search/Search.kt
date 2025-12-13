@@ -110,6 +110,8 @@ object Search {
      * @param[sourceRecipes] A list of searched recipes. (default = CustomCrafterAPI.getRecipes() / since 5.0.10)
      * @return[SearchResult?] A result of a request. If you send one that contains invalid params, returns null.
      */
+    @JvmStatic
+    @JvmOverloads
     fun search(
         player: Player,
         items: Array<ItemStack>,
@@ -142,6 +144,8 @@ object Search {
      * @param[sourceRecipes] A list of searched recipes. (default = CustomCrafterAPI.getRecipes() / since 5.0.10)
      * @return[SearchResult?] A result of a request. If you send one that contains invalid params, returns null.
      */
+    @JvmStatic
+    @JvmOverloads
     fun search(
         crafterID: UUID,
         view: CraftView,
