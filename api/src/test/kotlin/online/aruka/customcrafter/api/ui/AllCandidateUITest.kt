@@ -299,5 +299,57 @@ object AllCandidateUITest {
             backedCraftUI.inventory.getItem(c.toIndex()) != null
                     && backedCraftUI.inventory.getItem(c.toIndex())!!.isSimilar(ItemStack(Material.STONE))
         })
+
+        val resultSlotItem = backedCraftUI.inventory.getItem(backedCraftUI.bakedDesigner.resultInt())
+        assertTrue(resultSlotItem != null)
+        assertEquals(Material.AIR, resultSlotItem.type)
+    }
+
+    @Test
+    fun backToCraftUIResultSlotTakeOverTest() {
+        val player: Player = server.getPlayer(0)
+        val craftUI = CraftUI()
+        CoordinateComponent.square(3).forEach { c ->
+            craftUI.inventory.setItem(c.toIndex(), ItemStack(Material.STONE))
+        }
+
+        craftUI.inventory.setItem(craftUI.bakedDesigner.resultInt(), ItemStack.of(Material.STONE))
+
+        val view = craftUI.toView()
+
+        val result = Search.search(
+            crafterID = UUID.randomUUID(),
+            view = view
+        )
+
+        val allCandidateUI = AllCandidateUI(
+            view = view,
+            player = player,
+            result = result,
+            useShift = false,
+            bakedCraftUIDesigner = craftUI.bakedDesigner
+        )
+
+        player.openInventory(allCandidateUI.inventory)
+
+        val clickEvent = InventoryClickEvent(
+            player.openInventory,
+            InventoryType.SlotType.CONTAINER,
+            AllCandidateUI.BACK_TO_CRAFT,
+            ClickType.SHIFT_RIGHT,
+            InventoryAction.NOTHING
+        )
+        allCandidateUI.onClick(allCandidateUI.inventory, clickEvent)
+
+
+        val backedCraftUI = player.openInventory.topInventory.holder as CraftUI
+        assertTrue(CoordinateComponent.square(3).all { c ->
+            backedCraftUI.inventory.getItem(c.toIndex()) != null
+                    && backedCraftUI.inventory.getItem(c.toIndex())!!.isSimilar(ItemStack(Material.STONE))
+        })
+
+        val resultSlotItem: ItemStack? = backedCraftUI.inventory.getItem(CraftUI.RESULT_SLOT)
+        assertTrue(resultSlotItem != null)
+        assertEquals(Material.STONE, resultSlotItem.type)
     }
 }

@@ -172,6 +172,10 @@ internal class AllCandidateUI(
                 this.view.materials.entries.forEach { (c, item) ->
                     craftUI.inventory.setItem(c.toIndex(), item)
                 }
+                craftUI.inventory.setItem(
+                    this.bakedCraftUIDesigner.resultInt(),
+                    this.view.result
+                )
                 this.dropOnClose = false
                 this.player.openInventory(craftUI.inventory)
                 return
