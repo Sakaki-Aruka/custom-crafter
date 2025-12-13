@@ -23,6 +23,7 @@ interface CRecipeContainer {
          * ```
          * @since 5.0.12
          */
+        @JvmField
         val AlwaysTrue: (Context) -> Boolean = { _ -> true }
 
         /**
@@ -31,6 +32,7 @@ interface CRecipeContainer {
          * ```
          * @since 5.0.12
          */
+        @JvmField
         val None: (Context) -> Unit = { _ -> }
     }
 
