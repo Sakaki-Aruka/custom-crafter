@@ -46,19 +46,9 @@ internal class CraftUI(
 
     init {
         val designContext = CraftUIDesigner.Context(player = caller)
-        bakedDesigner = baked ?: CraftUIDesigner.bake(CustomCrafterAPI.CRAFT_UI_DESIGNER, designContext)
+        bakedDesigner = baked ?: CraftUIDesigner.bake(CustomCrafterAPI.getCraftUIDesigner(), designContext)
 
-        if (!bakedDesigner.isValid()) {
-            throw IllegalStateException(
-                """
-                A designed ui is not valid.
-                CraftSlots must be 36 size and 6x6 square.
-                (Current Slot Size: ${bakedDesigner.craftSlots().size})
-                (Current Coordinates: (#: exists)
-                ${Converter.getComponentsShapeString(bakedDesigner.craftSlots())}
-                )
-                """.trimIndent())
-        }
+        bakedDesigner.isValid().exceptionOrNull()?.let { throw it }
 
         inventory = Bukkit.createInventory(
             this,

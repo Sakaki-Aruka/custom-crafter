@@ -52,11 +52,15 @@ interface CraftUIDesigner {
      * @since 5.0.16
      */
     class Context internal constructor(
-        val player: Player?
-    )
+        val player: Player? = null
+    ) {
+        override fun toString(): String {
+            return "Context: Name=${player?.displayName()}, ID=${player?.uniqueId}"
+        }
+    }
 
     /**
-     * Baked [CraftUIDesigner]
+     * BakedDesigner: An immutable CraftUIDesigner with a set (baked) value.
      *
      * ```kotlin
      * val designer: CraftUIDesigner = ~~~
@@ -95,7 +99,7 @@ interface CraftUIDesigner {
          * @since 5.0.16
          */
         fun craftSlots(): List<CoordinateComponent> {
-            return Converter.getAvailableCraftingSlotComponents()
+            return (0..<54).map { CoordinateComponent.fromIndex(it) }
                 .minus(blankSlots.keys)
                 .minus(result)
                 .minus(makeButton.first)
@@ -114,18 +118,36 @@ interface CraftUIDesigner {
         /**
          * Returns is this valid or not.
          *
-         * @return[Boolean] Check result
+         * @return[Result] Check result
          * @since 5.0.16
          */
-        fun isValid(): Boolean {
+        fun isValid(): Result<Unit> {
             val craftSlots: List<CoordinateComponent> = craftSlots()
             val leftTop: CoordinateComponent = craftSlots.minBy { it.toIndex() }
 
-            if (craftSlots.size != 36) return false
-            if (leftTop.y != 0) return false
-            if (leftTop.x > 3) return false // width <=5, can not use 6 x 6
-            return CoordinateComponent.squareFill(size = 6, dx = leftTop.x, dy = 0)
-                .containsAll(craftSlots.toSet())
+            if (craftSlots.size != 36
+                || leftTop.y != 0
+                || leftTop.x > 3 // width <=5, can not use 6 x 6
+                || !CoordinateComponent.squareFill(size = 6, dx = leftTop.x, dy = 0)
+                    .containsAll(craftSlots.toSet())
+                ) {
+                return Result.failure(IllegalStateException(
+                    """
+                        
+                        CraftSlots must be 36 size and 6x6 square.
+                        Current Slot Size: ${craftSlots.size}
+                        Current Coordinates: ('#': Exists)
+                    """.trimIndent()
+                            + System.lineSeparator()
+                            + Converter.getComponentsShapeString(craftSlots)
+                ))
+            }
+
+            if (blankSlots.values.any { it.type.isAir }) {
+                return Result.failure(IllegalStateException("'blankSlots' must not contain any 'Material#isAir' icons."))
+            }
+
+            return Result.success(Unit)
         }
     }
 
@@ -133,8 +155,10 @@ interface CraftUIDesigner {
         /**
          * @param[designer] UI designer
          * @param[context] Context for baking
+         * @return[BakedDesigner] Baked designer
          * @since 5.0.16
          */
+        @JvmStatic
         fun bake(
             designer: CraftUIDesigner,
             context: Context

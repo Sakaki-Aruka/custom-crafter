@@ -86,13 +86,13 @@ object Converter {
      * println(Converter.getComponentsShapeString(list))
      * // -> OUTPUT
      * // ###
-     * // # #
+     * // #_#
      * // ###
      * ```
      *
      * @param[list] List of coordinates
      * @param[existsSlotChar] This is a char what is used on coordinate exists. Default = `#`.
-     * @param[notExistsSlotChar] This is a char what is used on coordinate NOT exists. Default = ' '(White space).
+     * @param[notExistsSlotChar] This is a char what is used on coordinate NOT exists. Default = `_`.
      * @return[String] Shape
      * @since 5.0.16
      */
@@ -101,7 +101,7 @@ object Converter {
     fun getComponentsShapeString(
         list: Collection<CoordinateComponent>,
         existsSlotChar: Char = '#',
-        notExistsSlotChar: Char = ' '
+        notExistsSlotChar: Char = '_'
     ): String {
         val minX = list.minOf { it.x }
         val minY = list.minOf { it.y }

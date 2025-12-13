@@ -1,6 +1,7 @@
 package io.github.sakaki_aruka.customcrafter.api.event
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
+import io.github.sakaki_aruka.customcrafter.api.interfaces.ui.CraftUIDesigner
 import org.bukkit.Material
 import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
@@ -98,11 +99,18 @@ class CustomCrafterAPIPropertiesChangeEvent<T> internal constructor(
         val name: String
     ) {
         companion object {
+            @JvmField
             val RESULT_GIVE_CANCEL = PropertyKey<Boolean>("RESULT_GIVE_CANCEL")
+            @JvmField
             val BASE_BLOCK = PropertyKey<Material>("BASE_BLOCK")
+            @JvmField
             val USE_MULTIPLE_RESULT_CANDIDATE_FEATURE = PropertyKey<Boolean>("USE_MULTIPLE_CANDIDATE_FEATURE")
+            @JvmField
             val USE_CUSTOM_CRAFT_UI = PropertyKey<Boolean>("USE_CUSTOM_CRAFT_UI")
+            @JvmField
             val BASE_BLOCK_SIDE = PropertyKey<Int>("BASE_BLOCK_SIDE")
+            @JvmField
+            val CRAFT_UI_DESIGNER = PropertyKey<CraftUIDesigner>("CRAFT_UI_DESIGNER")
         }
     }
 

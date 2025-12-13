@@ -5,6 +5,7 @@ import io.github.sakaki_aruka.customcrafter.api.event.RegisterCustomRecipeEvent
 import io.github.sakaki_aruka.customcrafter.api.event.UnregisterCustomRecipeEvent
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.ui.CraftUIDesigner
+import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import io.github.sakaki_aruka.customcrafter.internal.gui.crafting.CraftUI
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
@@ -341,16 +342,53 @@ object CustomCrafterAPI {
     }
 
 
+    private var CRAFT_UI_DESIGNER: CraftUIDesigner = CraftUI
     /**
-     * CraftUI desiner
-     *
-     * You can set own custom desiner.
-     *
-     * @see[CraftUIDesigner]
+     * Returns a current CraftUI designer.
+     * @return[CraftUIDesigner]
      * @since 5.0.16
      */
-    @JvmField
-    var CRAFT_UI_DESIGNER: CraftUIDesigner = CraftUI
+    @JvmStatic
+    fun getCraftUIDesigner(): CraftUIDesigner = CRAFT_UI_DESIGNER
+
+    /**
+     * Sets a new CraftUI designer if a specified is valid.
+     * @param[designer] New CraftUI designer
+     * @param[calledAsync] Called from async processing or not. (Default = false)
+     * @since 5.0.16
+     */
+    @JvmStatic
+    @JvmOverloads
+    fun setCraftUIDesigner(designer: CraftUIDesigner, calledAsync: Boolean = false) {
+        val nullContext = CraftUIDesigner.Context(player = null)
+        val baked: CraftUIDesigner.BakedDesigner = CraftUIDesigner.bake(designer, nullContext)
+        baked.isValid().exceptionOrNull()?.let { throw it }
+
+        CustomCrafterAPIPropertiesChangeEvent(
+            propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.CRAFT_UI_DESIGNER.name,
+            oldValue = CustomCrafterAPIPropertiesChangeEvent.Property(CRAFT_UI_DESIGNER),
+            newValue = CustomCrafterAPIPropertiesChangeEvent.Property(designer),
+            isAsync = calledAsync
+        ).callEvent()
+        CRAFT_UI_DESIGNER = designer
+    }
+
+    /**
+     * Sets the default CraftUI designer.
+     * @param[calledAsync] Called from async processing or not. (Default = false)
+     * @since 5.0.16
+     */
+    @JvmStatic
+    @JvmOverloads
+    fun setCraftUIDesignerDefault(calledAsync: Boolean = false) {
+        CustomCrafterAPIPropertiesChangeEvent(
+            propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.CRAFT_UI_DESIGNER.name,
+            oldValue = CustomCrafterAPIPropertiesChangeEvent.Property(CRAFT_UI_DESIGNER),
+            newValue = CustomCrafterAPIPropertiesChangeEvent.Property(CraftUI),
+            isAsync = calledAsync
+        ).callEvent()
+        CRAFT_UI_DESIGNER = CraftUI
+    }
 
     /**
      * An item that is used for an all-candidates-menu's not displayable items slot.
