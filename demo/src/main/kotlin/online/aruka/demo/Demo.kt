@@ -8,6 +8,7 @@ import online.aruka.demo.recipe.shaped.OverLimitEnchantedBook
 import online.aruka.demo.recipe.shapeless.DyeMixin
 import online.aruka.demo.register.ShapedRecipeProvider
 import online.aruka.demo.register.ShapelessRecipeProvider
+import online.aruka.demo.ui.CraftUI
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 
@@ -41,6 +42,8 @@ class Demo : JavaPlugin() {
         CustomCrafterAPI.registerRecipe(ShapelessRecipeProvider.infinityIronBlockExtract())
         CustomCrafterAPI.registerRecipe(ShapelessRecipeProvider.extractPotion())
         CustomCrafterAPI.registerRecipe(DyeMixin.mixWithoutBlack())
+
+        CustomCrafterAPI.setCraftUIDesigner(CraftUI())
     }
 
     override fun onDisable() {

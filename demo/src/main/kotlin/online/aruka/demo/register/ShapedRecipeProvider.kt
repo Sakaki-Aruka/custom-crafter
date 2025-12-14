@@ -198,7 +198,7 @@ object ShapedRecipeProvider {
             includeAir = true
         )
         val ironBlockContext = GroupRecipe.Context.of(
-            members = Converter.getAvailableCraftingSlotComponents().filter { it.toIndex() != 0 }.toSet(),
+            members = Converter.getDefaultCraftingSlots().filter { it.toIndex() != 0 }.toSet(),
             min = 1
         )
 
