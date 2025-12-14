@@ -55,7 +55,7 @@ object Converter {
      * @return[List] a list of [CoordinateComponent]
      */
     @JvmStatic
-    fun getAvailableCraftingSlotComponents(): List<CoordinateComponent> {
+    fun getDefaultCraftingSlots(): List<CoordinateComponent> {
         return components
     }
 
@@ -65,7 +65,7 @@ object Converter {
      * @return[Set<Int>] a set of [Int]
      */
     @JvmStatic
-    fun getAvailableCraftingSlotIndices(): Set<Int> {
+    fun getDefaultCraftingSlotsInt(): Set<Int> {
         return slots
     }
 
@@ -138,7 +138,7 @@ object Converter {
         if (inventory.isEmpty) return null
         val result: MutableMap<CoordinateComponent, ItemStack> = mutableMapOf()
 
-        for (coordinate in getAvailableCraftingSlotComponents()) {
+        for (coordinate in getDefaultCraftingSlots()) {
             val index: Int = coordinate.x + coordinate.y * 9
             val item: ItemStack = inventory.getItem(index)?.takeIf { if (noAir) !it.isEmpty else true } ?: continue
             result[coordinate] = item

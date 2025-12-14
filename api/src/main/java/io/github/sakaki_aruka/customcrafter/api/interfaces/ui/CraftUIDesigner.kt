@@ -123,23 +123,21 @@ interface CraftUIDesigner {
          */
         fun isValid(): Result<Unit> {
             val craftSlots: List<CoordinateComponent> = craftSlots()
-            val leftTop: CoordinateComponent = craftSlots.minBy { it.toIndex() }
+            val leftTop: Int = craftSlots.minBy { it.toIndex() }.toIndex()
 
             if (craftSlots.size != 36
-                || leftTop.y != 0
-                || leftTop.x > 3 // width <=5, can not use 6 x 6
-                || !CoordinateComponent.squareFill(size = 6, dx = leftTop.x, dy = 0)
-                    .containsAll(craftSlots.toSet())
-                ) {
+                || !CoordinateComponent.squareFill(6).containsAll(craftSlots.map { CoordinateComponent.fromIndex(it.toIndex() - leftTop) })) {
                 return Result.failure(IllegalStateException(
                     """
                         
                         CraftSlots must be 36 size and 6x6 square.
                         Current Slot Size: ${craftSlots.size}
-                        Current Coordinates: ('#': Exists)
+                        Current Coordinates: ('#': Blank, Result or MakeButton Slots, '_': Craft Slots)
                     """.trimIndent()
                             + System.lineSeparator()
-                            + Converter.getComponentsShapeString(craftSlots)
+                            + Converter.getComponentsShapeString(
+                        (0..<54).map { CoordinateComponent.fromIndex(it) }
+                            .minus(craftSlots.toSet()))
                 ))
             }
 

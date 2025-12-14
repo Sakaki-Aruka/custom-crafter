@@ -57,6 +57,8 @@ object CraftUIDesignerTest {
             (0..<54).filter { it % 9 < 6 }.map { CoordinateComponent.fromIndex(it) }.toSet()
                 .containsAll(CraftUIDesigner.bake(anonymous, CraftUIDesigner.Context()).craftSlots())
         )
+
+        assertTrue(CraftUIDesigner.bake(anonymous, CraftUIDesigner.Context()).isValid().isSuccess)
     }
 
     @Test

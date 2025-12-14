@@ -30,7 +30,7 @@ internal object ConverterTest {
 
     @Test
     fun availableSlotComponentsTest() {
-        val list: List<CoordinateComponent> = Converter.getAvailableCraftingSlotComponents()
+        val list: List<CoordinateComponent> = Converter.getDefaultCraftingSlots()
         val components: List<CoordinateComponent> = listOf(
             CoordinateComponent(0, 0),
             CoordinateComponent(1, 0),
@@ -78,11 +78,11 @@ internal object ConverterTest {
     @Test
     fun availableCraftingSlotIndicesTest() {
         val intList: Set<Int> = (0..<54).filter { i -> i % 9 < 6 }.take(36).toSet()
-        val slots: Set<Int> = Converter.getAvailableCraftingSlotIndices()
+        val slots: Set<Int> = Converter.getDefaultCraftingSlotsInt()
         assertEquals(intList.size, slots.size)
         assertTrue(slots.containsAll(intList))
 
-        val componentList = Converter.getAvailableCraftingSlotComponents()
+        val componentList = Converter.getDefaultCraftingSlots()
         val mappedIndices = componentList.map { c -> c.x + c.y * 9 }
         assertEquals(mappedIndices.size, slots.size)
         assertTrue(slots.containsAll(mappedIndices))
@@ -94,7 +94,7 @@ internal object ConverterTest {
         assertEquals(null, Converter.standardInputMapping(emptyInventory))
 
         val stones: Inventory = CraftUI().inventory
-        Converter.getAvailableCraftingSlotIndices().forEach { index ->
+        Converter.getDefaultCraftingSlotsInt().forEach { index ->
             stones.setItem(index, ItemStack(Material.STONE))
         }
 

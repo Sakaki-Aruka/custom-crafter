@@ -5,7 +5,6 @@ import io.github.sakaki_aruka.customcrafter.api.event.RegisterCustomRecipeEvent
 import io.github.sakaki_aruka.customcrafter.api.event.UnregisterCustomRecipeEvent
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.ui.CraftUIDesigner
-import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import io.github.sakaki_aruka.customcrafter.internal.gui.crafting.CraftUI
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
@@ -17,7 +16,7 @@ object CustomCrafterAPI {
     /**
      * Custom Crafter API version.
      */
-    const val API_VERSION: String = "5.0.15"
+    const val API_VERSION: String = "5.0.16"
 
     /**
      * Custom Crafter API is stable or not.
@@ -281,7 +280,7 @@ object CustomCrafterAPI {
      */
     @JvmStatic
     fun hasFullCompatibility(version: String): Boolean {
-        return version in setOf("5.0.15")
+        return version in setOf("5.0.16")
     }
 
 

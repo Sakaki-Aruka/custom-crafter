@@ -236,7 +236,7 @@ object GroupRecipeTest {
         )
 
         val items: MutableMap<CoordinateComponent, CMatter> = mutableMapOf()
-        for (c in Converter.getAvailableCraftingSlotComponents()) {
+        for (c in Converter.getDefaultCraftingSlots()) {
             items[c] = calcite
         }
         items[CoordinateComponent(0, 0)] = stone
