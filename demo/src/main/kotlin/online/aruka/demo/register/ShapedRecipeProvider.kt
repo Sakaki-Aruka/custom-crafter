@@ -43,7 +43,7 @@ object ShapedRecipeProvider {
             results = listOf(
                 ResultSupplierImpl.timesSingle(ItemStack.of(Material.ENCHANTED_GOLDEN_APPLE))
             ),
-            type = CRecipeType.NORMAL
+            type = CRecipe.Type.SHAPED
         )
     }
 
@@ -77,7 +77,7 @@ object ShapedRecipeProvider {
             name = "bulk water bottles recipe",
             items = items,
             results = listOf(supplier),
-            type = CRecipeType.NORMAL
+            type = CRecipe.Type.SHAPED
         )
     }
 
@@ -117,7 +117,7 @@ object ShapedRecipeProvider {
             name = "bulk water bottles (more) recipe",
             items = items,
             results = listOf(supplier),
-            type = CRecipeType.NORMAL
+            type = CRecipe.Type.SHAPED
         )
     }
 
@@ -172,7 +172,7 @@ object ShapedRecipeProvider {
             name = "infinity iron block core",
             items = items,
             results = listOf(supplier),
-            type = CRecipeType.NORMAL
+            type = CRecipe.Type.SHAPED
         )
     }
 
