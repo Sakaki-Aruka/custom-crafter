@@ -1,5 +1,19 @@
 # Changelog
 
+# 5.0.16
+
+## ⚠️ Breaking Changes
+
+* The Enums used for configuring `CMatter` and `CRecipe` have been moved from standalone classes to **nested classes** within their respective parent classes. This requires changes to how these Enums are referenced in existing code.
+* Several functions within the `CustomCrafterAPI` have been relocated to more appropriate classes based on their role. Users consuming the API should review their function calls and make necessary adjustments.
+
+---
+
+## ✨ New Features and Enhancements
+
+* **[New Feature]** Added a new feature that allows the customization of the recipe arrangement (layout) on the crafting screen. This enables more flexible UI design.
+* **[Java Support]** Enhanced Java interoperability for static functions and values.
+
 # 5.0.15(-p1)
 
 ## ⚠️ Breaking Changes / Important Dependency Change
