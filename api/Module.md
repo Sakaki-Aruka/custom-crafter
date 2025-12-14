@@ -1,6 +1,6 @@
 # Module Custom_Crafter
 
-## Custom_Crafter KDoc Top
+## Custom_Crafter (${parent.version}) KDoc Top
 Welcome to Custom_Crafter official document top page !  
 List of elements
 - api package
