@@ -23,6 +23,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.mockbukkit.mockbukkit.MockBukkit
 import org.mockbukkit.mockbukkit.ServerMock
 import org.mockbukkit.mockbukkit.world.WorldMock
+import kotlin.test.assertEquals
 
 internal object CraftUITest {
     private lateinit var server: ServerMock
@@ -164,5 +165,18 @@ internal object CraftUITest {
         assertTrue(placedItems.all { item -> item != null && item.isSimilar(ItemStack(Material.OBSIDIAN)) })
 
         player.openInventory.close()
+    }
+
+    @Test
+    fun defaultDesignerHasValidBlankSlotsTest() {
+        val baked = CraftUI().bakedDesigner
+        assertEquals(16, baked.blankSlots.size)
+        assertEquals(36, baked.craftSlots().size)
+        assertTrue((0..<54).filter { it % 9 < 6 }.map { CoordinateComponent.fromIndex(it) }.containsAll(CraftUI().bakedDesigner.craftSlots()))
+    }
+
+    @Test
+    fun designerIsValidTest() {
+        assertTrue(CraftUI().bakedDesigner.isValid().isSuccess)
     }
 }

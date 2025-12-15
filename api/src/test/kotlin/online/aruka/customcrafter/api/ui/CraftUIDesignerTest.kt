@@ -63,7 +63,7 @@ object CraftUIDesignerTest {
 
     @Test
     fun bakedDesignerResultIntTest() {
-        val baked = CraftUIDesigner.BakedDesigner(
+        val baked = CraftUIDesigner.Baked(
             title = "".toComponent(),
             result = CoordinateComponent.fromIndex(44),
             makeButton = CoordinateComponent.fromIndex(0) to ItemStack.empty(),
@@ -75,7 +75,7 @@ object CraftUIDesignerTest {
 
     @Test
     fun bakedDesignerIsValidDetectSizeNot36Test() {
-        val baked = CraftUIDesigner.BakedDesigner(
+        val baked = CraftUIDesigner.Baked(
             title = "".toComponent(),
             result = CoordinateComponent.fromIndex(44),
             makeButton = CoordinateComponent.fromIndex(35) to ItemStack.empty(),
@@ -87,7 +87,7 @@ object CraftUIDesignerTest {
 
     @Test
     fun bakedDesignerIsValidDetectTopYNot0Test() {
-        val baked = CraftUIDesigner.BakedDesigner(
+        val baked = CraftUIDesigner.Baked(
             title = "".toComponent(),
             result = CoordinateComponent.fromIndex(0),
             makeButton = CoordinateComponent.fromIndex(1) to ItemStack.empty(),
@@ -105,7 +105,7 @@ object CraftUIDesignerTest {
 
     @Test
     fun bakedDesignerIsValidDetectIsAirTest() {
-        val baked = CraftUIDesigner.BakedDesigner(
+        val baked = CraftUIDesigner.Baked(
             title = "".toComponent(),
             result = CoordinateComponent.fromIndex(44),
             makeButton = CoordinateComponent.fromIndex(35) to ItemStack.empty(),
@@ -120,7 +120,7 @@ object CraftUIDesignerTest {
 
     @Test
     fun bakedDesignerIsValidSuccessTest() {
-        val baked = CraftUIDesigner.BakedDesigner(
+        val baked = CraftUIDesigner.Baked(
             title = "".toComponent(),
             result = CoordinateComponent.fromIndex(44),
             makeButton = CoordinateComponent.fromIndex(35) to ItemStack.empty(),

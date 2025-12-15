@@ -75,7 +75,7 @@ interface CraftUIDesigner {
      * @see[CraftUIDesigner.bake]
      * @since 5.0.16
      */
-    class BakedDesigner internal constructor(
+    class Baked internal constructor(
         val title: Component,
         val result: CoordinateComponent,
         val makeButton: Pair<CoordinateComponent, ItemStack>,
@@ -132,7 +132,7 @@ interface CraftUIDesigner {
                         
                         CraftSlots must be 36 size and 6x6 square.
                         Current Slot Size: ${craftSlots.size}
-                        Current Coordinates: ('#': Blank, Result or MakeButton Slots, '_': Craft Slots)
+                        Current Coordinates: ('_': Blank, Result or MakeButton Slots, '#': Craft Slots)
                     """.trimIndent()
                             + System.lineSeparator()
                             + Converter.getComponentsShapeString(
@@ -151,17 +151,18 @@ interface CraftUIDesigner {
 
     companion object {
         /**
+         * Bake a specified designer
+         * @suppress
          * @param[designer] UI designer
          * @param[context] Context for baking
-         * @return[BakedDesigner] Baked designer
+         * @return[Baked] Baked designer
          * @since 5.0.16
          */
-        @JvmStatic
-        fun bake(
+        internal fun bake(
             designer: CraftUIDesigner,
             context: Context
-        ): BakedDesigner {
-            return BakedDesigner(
+        ): Baked {
+            return Baked(
                 title = designer.title(context),
                 result = designer.resultSlot(context),
                 makeButton = designer.makeButton(context),

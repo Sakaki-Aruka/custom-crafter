@@ -29,7 +29,7 @@ internal class AllCandidateUI(
     private val player: Player,
     private val result: Search.SearchResult,
     useShift: Boolean,
-    private val bakedCraftUIDesigner: CraftUIDesigner.BakedDesigner,
+    private val bakedCraftUIDesigner: CraftUIDesigner.Baked,
     private var dropOnClose: Boolean = true,
 ) : CustomCrafterUI.Pageable, InventoryHolder {
     private val inventory: Inventory = Bukkit.createInventory(

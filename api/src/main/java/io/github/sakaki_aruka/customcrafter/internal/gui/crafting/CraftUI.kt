@@ -12,7 +12,6 @@ import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.search.Search
-import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter.toComponent
 import io.github.sakaki_aruka.customcrafter.impl.util.InventoryUtil.giveItems
 import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterUI
@@ -38,11 +37,11 @@ import kotlin.math.max
 internal class CraftUI(
     var dropItemsOnClose: Boolean = true,
     caller: Player? = null,
-    baked: CraftUIDesigner.BakedDesigner? = null
+    baked: CraftUIDesigner.Baked? = null
 ): CustomCrafterUI, InventoryHolder {
 
     private val inventory: Inventory
-    val bakedDesigner: CraftUIDesigner.BakedDesigner
+    val bakedDesigner: CraftUIDesigner.Baked
 
     init {
         val designContext = CraftUIDesigner.Context(player = caller)
@@ -117,7 +116,7 @@ internal class CraftUI(
                 }
             }
             return (0..<54)
-                .filter { it % 9 < 6 }
+                .filter { it % 9 >= 6 }
                 .minus(RESULT_SLOT)
                 .minus(MAKE_BUTTON)
                 .associate { CoordinateComponent.fromIndex(it) to blank }

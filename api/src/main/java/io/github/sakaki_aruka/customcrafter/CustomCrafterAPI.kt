@@ -360,7 +360,7 @@ object CustomCrafterAPI {
     @JvmOverloads
     fun setCraftUIDesigner(designer: CraftUIDesigner, calledAsync: Boolean = false) {
         val nullContext = CraftUIDesigner.Context(player = null)
-        val baked: CraftUIDesigner.BakedDesigner = CraftUIDesigner.bake(designer, nullContext)
+        val baked: CraftUIDesigner.Baked = CraftUIDesigner.bake(designer, nullContext)
         baked.isValid().exceptionOrNull()?.let { throw it }
 
         CustomCrafterAPIPropertiesChangeEvent(
