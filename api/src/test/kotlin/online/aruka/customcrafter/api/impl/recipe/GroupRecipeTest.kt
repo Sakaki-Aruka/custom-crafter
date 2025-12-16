@@ -7,7 +7,6 @@ import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateCompone
 import io.github.sakaki_aruka.customcrafter.api.search.Search
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
 import io.github.sakaki_aruka.customcrafter.impl.recipe.GroupRecipe
-import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.junit.jupiter.api.AfterEach
@@ -236,7 +235,7 @@ object GroupRecipeTest {
         )
 
         val items: MutableMap<CoordinateComponent, CMatter> = mutableMapOf()
-        for (c in Converter.getDefaultCraftingSlots()) {
+        for (c in CoordinateComponent.squareFill(6)) {
             items[c] = calcite
         }
         items[CoordinateComponent(0, 0)] = stone
