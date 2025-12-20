@@ -13,6 +13,7 @@ import org.bukkit.event.block.Action
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryAction
 import org.bukkit.event.inventory.InventoryClickEvent
+import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
@@ -22,6 +23,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.mockbukkit.mockbukkit.MockBukkit
 import org.mockbukkit.mockbukkit.ServerMock
+import org.mockbukkit.mockbukkit.entity.PlayerMock
 import org.mockbukkit.mockbukkit.world.WorldMock
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -182,6 +184,15 @@ internal object CraftUITest {
     }
 
     @Test
+    fun toViewTest() {
+        val ui = CraftUI()
+        ui.inventory.setItem(0, ItemStack.of(Material.STONE))
+
+        assertEquals(1, ui.toView(noAir = true).materials.size)
+        assertTrue(ui.toView(noAir = true).result.type.isAir)
+    }
+
+    @Test
     fun uiOpenIgnoreByPermissionNotEnoughTest() {
         val player: Player = server.getPlayer(0)
         val plugin = MockBukkit.createMockPlugin()
@@ -195,5 +206,16 @@ internal object CraftUITest {
             BlockFace.UP
         )
         assertFalse(CraftUI.isTrigger(event))
+    }
+
+    @Test
+    fun uiCloseItemDropTest() {
+        val player: PlayerMock = server.getPlayer(0)
+        val ui = CraftUI(caller = player)
+        player.openInventory(ui.inventory)
+        ui.inventory.setItem(0, ItemStack.of(Material.STONE))
+        ui.onClose(InventoryCloseEvent(player.openInventory))
+
+        assertTrue(player.inventory.contains(Material.STONE))
     }
 }
