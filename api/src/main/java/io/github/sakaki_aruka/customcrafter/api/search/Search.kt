@@ -105,7 +105,7 @@ object Search {
      *
      * @param[player] A craft-request sender.
      * @param[items] Materials of crafting. this size must equal 36(6*6).
-     * @param[natural] Force to search vanilla recipes or not.(true=not, false=force). The default is true.
+     * @param[forceSearchVanillaRecipe] Force to search vanilla recipes or not.(true=force, false=not). The default is true.
      * @param[onlyFirst] get only first matched custom recipe and mapped. (default = false)
      * @param[sourceRecipes] A list of searched recipes. (default = CustomCrafterAPI.getRecipes() / since 5.0.10)
      * @return[SearchResult?] A result of a request. If you send one that contains invalid params, returns null.
@@ -115,7 +115,7 @@ object Search {
     fun search(
         player: Player,
         items: Array<ItemStack>,
-        natural: Boolean = true,
+        forceSearchVanillaRecipe: Boolean = true,
         onlyFirst: Boolean = false,
         sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes()
     ): SearchResult? {
@@ -129,7 +129,7 @@ object Search {
         }
 
         val view = CraftView(materials, ItemStack.empty())
-        return search(player.uniqueId, view, natural, onlyFirst, sourceRecipes)
+        return search(player.uniqueId, view, forceSearchVanillaRecipe, onlyFirst, sourceRecipes)
     }
 
     /**
@@ -139,7 +139,7 @@ object Search {
      *
      * @param[crafterID] a crafter's UUID
      * @param[view] input crafting gui's view
-     * @param[natural] Force to search vanilla recipes or not.(true=not, false=force). The default is true.
+     * @param[forceSearchVanillaRecipe] Force to search vanilla recipes or not.(true=force, false=not). The default is true.
      * @param[onlyFirst] get only first matched custom recipe and mapped. (default = false)
      * @param[sourceRecipes] A list of searched recipes. (default = CustomCrafterAPI.getRecipes() / since 5.0.10)
      * @return[SearchResult?] A result of a request. If you send one that contains invalid params, returns null.
@@ -149,14 +149,13 @@ object Search {
     fun search(
         crafterID: UUID,
         view: CraftView,
-        natural: Boolean = true,
+        forceSearchVanillaRecipe: Boolean = true,
         onlyFirst: Boolean = false,
         sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes()
     ): SearchResult {
         val mapped: Map<CoordinateComponent, ItemStack> = view.materials
 
         val customs: MutableList<Pair<CRecipe, MappedRelation>> = mutableListOf()
-        /*r.items.size == mapped.size*/
         for (recipe in sourceRecipes.filter { r -> mapped.size in r.requiresInputItemAmountMin()..r.requiresInputItemAmountMax() }) {
             when (recipe.type) {
                 CRecipe.Type.SHAPED -> {
@@ -182,7 +181,7 @@ object Search {
         }
 
         val vanilla: Recipe? =
-            if (natural && customs.isNotEmpty()) null
+            if (!forceSearchVanillaRecipe && customs.isNotEmpty()) null
             else {
                 val world: World = Bukkit.getPlayer(crafterID)
                     ?.world

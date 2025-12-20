@@ -201,7 +201,8 @@ object GroupMatterTest {
         val result = Search.search(
             crafterID = UUID.randomUUID(),
             view = view,
-            sourceRecipes = listOf(recipe)
+            sourceRecipes = listOf(recipe),
+            forceSearchVanillaRecipe = false
         )
 
         // required: Lv.5 (Strict), input Lv.4 -> false

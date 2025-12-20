@@ -51,13 +51,7 @@ interface CraftUIDesigner {
      * @param[player] UI opener or null
      * @since 5.0.16
      */
-    class Context (
-        val player: Player? = null
-    ) {
-        override fun toString(): String {
-            return "Context: Name=${player?.displayName()}, ID=${player?.uniqueId}"
-        }
-    }
+    data class Context (val player: Player? = null)
 
     /**
      * BakedDesigner: An immutable CraftUIDesigner with a set (baked) value.
@@ -75,7 +69,7 @@ interface CraftUIDesigner {
      * @see[CraftUIDesigner.bake]
      * @since 5.0.16
      */
-    class Baked internal constructor(
+    class Baked(
         val title: Component,
         val result: CoordinateComponent,
         val makeButton: Pair<CoordinateComponent, ItemStack>,
@@ -152,13 +146,12 @@ interface CraftUIDesigner {
     companion object {
         /**
          * Bake a specified designer
-         * @suppress
          * @param[designer] UI designer
          * @param[context] Context for baking
          * @return[Baked] Baked designer
          * @since 5.0.16
          */
-        internal fun bake(
+        fun bake(
             designer: CraftUIDesigner,
             context: Context
         ): Baked {

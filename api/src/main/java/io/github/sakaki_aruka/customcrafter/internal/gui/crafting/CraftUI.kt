@@ -195,7 +195,7 @@ internal class CraftUI(
                 val result: Search.SearchResult = Search.search(
                     player.uniqueId,
                     view,
-                    natural = !CustomCrafterAPI.getUseMultipleResultCandidateFeature()
+                    forceSearchVanillaRecipe = !CustomCrafterAPI.getUseMultipleResultCandidateFeature()
                 )
 
                 if (result.size() == 0) return
