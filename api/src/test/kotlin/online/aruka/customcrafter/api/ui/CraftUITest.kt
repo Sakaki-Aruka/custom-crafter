@@ -24,6 +24,7 @@ import org.mockbukkit.mockbukkit.MockBukkit
 import org.mockbukkit.mockbukkit.ServerMock
 import org.mockbukkit.mockbukkit.world.WorldMock
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 
 internal object CraftUITest {
     private lateinit var server: ServerMock
@@ -178,5 +179,21 @@ internal object CraftUITest {
     @Test
     fun designerIsValidTest() {
         assertTrue(CraftUI().bakedDesigner.isValid().isSuccess)
+    }
+
+    @Test
+    fun uiOpenIgnoreByPermissionNotEnoughTest() {
+        val player: Player = server.getPlayer(0)
+        val plugin = MockBukkit.createMockPlugin()
+
+        player.addAttachment(plugin, "cc.craftui.click.open", false)
+        val event = PlayerInteractEvent(
+            player,
+            Action.RIGHT_CLICK_BLOCK,
+            null,
+            server.worlds.first().getBlockAt(0, 64, 0),
+            BlockFace.UP
+        )
+        assertFalse(CraftUI.isTrigger(event))
     }
 }

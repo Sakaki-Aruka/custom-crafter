@@ -64,6 +64,8 @@ internal class CraftUI(
                 return false
             } else if (!event.action.isRightClick) {
                 return false
+            } else if (!event.player.hasPermission("cc.craftui.click.open")) {
+                return false
             }
             val clicked: Block = event.clickedBlock?.takeIf { b -> b.type == Material.CRAFTING_TABLE }
                 ?: return false

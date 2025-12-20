@@ -13,8 +13,6 @@ import org.bukkit.inventory.ItemStack
 internal interface CustomCrafterUI {
 
     companion object {
-        val DEFAULT_PAGE: Inventory = Bukkit.createInventory(null, 54)
-
         val NEXT_BUTTON: ItemStack = ItemStack.of(Material.ENDER_PEARL).apply {
             itemMeta = itemMeta.apply {
                 displayName("<b>NEXT".toComponent())
