@@ -45,7 +45,7 @@ interface CRecipeContainer {
      * @param[isAllCandidateDisplayCall] Called from AllCandidateDisplay feature or not
      * @since 5.0.15
      */
-    class Context internal constructor(
+    class Context (
         val userID: UUID,
         val relation: MappedRelation,
         val mapped: Map<CoordinateComponent, ItemStack>,

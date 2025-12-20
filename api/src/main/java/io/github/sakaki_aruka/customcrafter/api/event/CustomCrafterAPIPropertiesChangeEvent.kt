@@ -52,7 +52,7 @@ import org.bukkit.event.HandlerList
  * @param[newValue] A new value
  * @since[5.0.11]
  */
-class CustomCrafterAPIPropertiesChangeEvent<T> internal constructor(
+class CustomCrafterAPIPropertiesChangeEvent<T> (
     val propertyName: String,
     val oldValue: Property<T>,
     val newValue: Property<T>,

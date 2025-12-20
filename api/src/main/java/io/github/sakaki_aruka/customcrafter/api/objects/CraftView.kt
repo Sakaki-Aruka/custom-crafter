@@ -15,7 +15,7 @@ import kotlin.math.max
  * @param[result] An item that is placed the result item slot.
  */
 
-data class CraftView internal constructor(
+data class CraftView (
     val materials: Map<CoordinateComponent, ItemStack>,
     val result: ItemStack
 ) {

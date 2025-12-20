@@ -51,7 +51,7 @@ interface CraftUIDesigner {
      * @param[player] UI opener or null
      * @since 5.0.16
      */
-    class Context internal constructor(
+    class Context (
         val player: Player? = null
     ) {
         override fun toString(): String {

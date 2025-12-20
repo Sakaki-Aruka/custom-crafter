@@ -28,7 +28,7 @@ interface CMatterPredicate {
      * @param[crafterID] Crafter UUID
      * @see[CMatterPredicate]
      */
-    class Context internal constructor(
+    class Context (
         val coordinate: CoordinateComponent,
         val matter: CMatter,
         val input: ItemStack,
