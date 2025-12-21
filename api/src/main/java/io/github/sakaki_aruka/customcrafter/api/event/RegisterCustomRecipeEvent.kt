@@ -8,10 +8,10 @@ import org.bukkit.event.HandlerList
 /**
  * Called when a recipe registered.
  *
- * @param[recipe] registered recipe.
+ * @param[recipes] registered recipe.
  */
 class RegisterCustomRecipeEvent(
-    val recipe: CRecipe
+    val recipes: List<CRecipe>
 ): Event(), Cancellable {
     companion object {
         @JvmField

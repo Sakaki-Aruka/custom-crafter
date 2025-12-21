@@ -433,15 +433,28 @@ object CustomCrafterAPI {
      *
      * in normally, a result of `RECIPES.add(recipe)`.
      *
-     * @param[recipe] a recipe what you want to register.
+     * @param[recipes] a recipe what you want to register.
      * @throws[IllegalStateException] Calls when the specified recipe is invalid
      */
     @JvmStatic
-    fun registerRecipe(recipe: CRecipe): Boolean {
-        recipe.isValidRecipe().exceptionOrNull()?.let { t -> throw t }
-        if (!RegisterCustomRecipeEvent(recipe).callEvent()) return false
+    fun registerRecipe(vararg recipes: CRecipe): Boolean {
+        if (recipes.any { it.isValidRecipe().isFailure }) {
+            val builder = StringBuilder()
+            builder.append(System.lineSeparator())
+            recipes.forEach { recipe ->
+                recipe.isValidRecipe().exceptionOrNull()?.let { e ->
+                    val name: String = recipe.name.takeIf { name -> name.isNotBlank() } ?: "(Empty Name)"
+                    builder.append("Recipe: $name, Error: ${e.message ?: "(Empty Error Message)"}")
+                    builder.append(System.lineSeparator())
+                }
+            }
+            throw IllegalStateException(builder.toString())
+        }
+        if (!RegisterCustomRecipeEvent(recipes.toList()).callEvent()) {
+            return false
+        }
         return synchronized(CustomCrafter.RECIPES) {
-            CustomCrafter.RECIPES.add(recipe)
+            CustomCrafter.RECIPES.addAll(recipes)
         }
     }
 
@@ -452,16 +465,37 @@ object CustomCrafterAPI {
      *
      * in normally, a result of `RECIPES.remove(recipe)`
      *
-     * @param[recipe] a recipe what you want to unregister.
+     * @param[recipes] a recipe what you want to unregister.
      */
     @JvmStatic
-    fun unregisterRecipe(recipe: CRecipe): Boolean {
-        val event = UnregisterCustomRecipeEvent(recipe)
+    fun unregisterRecipe(vararg recipes: CRecipe): Boolean {
+        val event = UnregisterCustomRecipeEvent(recipes.toList())
         Bukkit.getPluginManager().callEvent(event)
-        if (event.isCancelled) return false
-        return synchronized(CustomCrafter.RECIPES) {
-            CustomCrafter.RECIPES.remove(recipe)
+        if (event.isCancelled) {
+            return false
         }
+        return synchronized(CustomCrafter.RECIPES) {
+            CustomCrafter.RECIPES.removeAll(recipes)
+        }
+    }
+
+    /**
+     * Unregisters all registered recipes.
+     *
+     * @return[Boolean] Unregistering successful or failed
+     * @since 5.0.16
+     */
+    @JvmStatic
+    fun unregisterAllRecipes(): Boolean {
+        val event = UnregisterCustomRecipeEvent(getRecipes())
+        Bukkit.getPluginManager().callEvent(event)
+        if (event.isCancelled) {
+            return false
+        }
+        synchronized(CustomCrafter.RECIPES) {
+            CustomCrafter.RECIPES.clear()
+        }
+        return true
     }
 
     /**
