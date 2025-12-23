@@ -141,7 +141,6 @@ interface CRecipe {
      *
      * @param[map] Input items mapping
      * @param[relation] Coordinate relations in input items and recipe matters
-     * @param[isCraftGUI] Called from Crafting GUI or not
      * @param[shift] Use Shift-Key (Batch Crafting) or not
      * @param[withoutMass] Use mass-marked CMatters to min amount calculation or not
      * @param[includeAir] Use Material#AIR to min amount calculation or not
@@ -150,12 +149,10 @@ interface CRecipe {
     fun getMinAmount(
         map: Map<CoordinateComponent, ItemStack>,
         relation: MappedRelation,
-        isCraftGUI: Boolean,
         shift: Boolean,
         withoutMass: Boolean = true,
         includeAir: Boolean = false
-    ): Int? {
-        if (!shift) return 1
+    ): Int {
         var amount = Int.MAX_VALUE
         for ((c, matter) in this.items) {
             val inputCoordinate: CoordinateComponent = relation.components.firstOrNull { it.recipe == c }
@@ -172,7 +169,11 @@ interface CRecipe {
 
             val q: Int =
                 if (matter.mass) 1
-                else item.amount
+                else
+                    if (shift) item.amount / matter.amount
+                    else
+                        if (item.amount / matter.amount > 0) 1
+                        else 0
             if (q < amount) {
                 amount = q
             }

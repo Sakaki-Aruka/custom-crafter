@@ -1,10 +1,12 @@
 package online.aruka.customcrafter.api.ui
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
+import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
 import io.github.sakaki_aruka.customcrafter.impl.recipe.CRecipeImpl
+import io.github.sakaki_aruka.customcrafter.internal.gui.allcandidate.AllCandidateUI
 import io.github.sakaki_aruka.customcrafter.internal.gui.crafting.CraftUI
 import org.bukkit.Material
 import org.bukkit.block.BlockFace
@@ -171,6 +173,206 @@ internal object CraftUITest {
     }
 
     @Test
+    fun decrementOneItemFromCraftSlotsTest() {
+        val player = server.getPlayer(0)
+        val ui = CraftUI(caller = player)
+        player.openInventory(ui.inventory)
+
+        CoordinateComponent.square(3).forEach {
+            ui.inventory.setItem(it.toIndex(), ItemStack.of(Material.STONE, 64))
+        }
+
+        val clickEvent = InventoryClickEvent(
+            player.openInventory,
+            InventoryType.SlotType.CONTAINER,
+            CraftUI.MAKE_BUTTON,
+            ClickType.RIGHT,
+            InventoryAction.NOTHING
+        )
+        ui.onClick(clicked = ui.inventory, event = clickEvent)
+
+        assertTrue(
+            CoordinateComponent.square(3).all {
+                ui.inventory.getItem(it.toIndex())?.isSimilar(ItemStack.of(Material.STONE, 63)) ?: false
+            }
+        )
+    }
+
+    @Test
+    fun decrementOneItemFromCraftSlotsWithMassItemTest() {
+        val noMass = CMatterImpl.of(Material.STONE)
+        val mass = CMatterImpl("", setOf(Material.WATER_BUCKET), mass = true)
+        val items: MutableMap<CoordinateComponent, CMatter> = mutableMapOf()
+        CoordinateComponent.square(3).forEach { items[it] = noMass }
+        items[CoordinateComponent(1, 1)] = mass
+        // #: Stone, =: WaterBucket (Mass)
+        // ###
+        // #=#
+        // ###
+        val recipe = CRecipeImpl("", items, CRecipe.Type.SHAPED)
+        CustomCrafterAPI.registerRecipe(recipe)
+
+        val player = server.getPlayer(0)
+        val ui = CraftUI(caller = player)
+        player.openInventory(ui.inventory)
+
+        CoordinateComponent.square(3).forEach { ui.inventory.setItem(it.toIndex(), ItemStack.of(Material.STONE, 64)) }
+        ui.inventory.setItem(CoordinateComponent(1, 1).toIndex(), ItemStack.of(Material.WATER_BUCKET))
+
+        val clickEvent = InventoryClickEvent(
+            player.openInventory,
+            InventoryType.SlotType.CONTAINER,
+            CraftUI.MAKE_BUTTON,
+            ClickType.RIGHT,
+            InventoryAction.NOTHING
+        )
+        ui.onClick(clicked = ui.inventory, event = clickEvent)
+
+        assertTrue(
+            CoordinateComponent.square(3).all {
+                ui.inventory.getItem(it.toIndex())?.let { item -> item.type == Material.STONE && item.amount == 63 } ?: false
+            }
+        )
+        assertTrue(ui.inventory.getItem(CoordinateComponent(1, 1).toIndex())?.type?.isAir ?: true)
+
+        CustomCrafterAPI.unregisterAllRecipes()
+    }
+
+    @Test
+    fun decrementItemsFromCraftSlotsWithShiftTest() {
+        val player = server.getPlayer(0)
+        val ui = CraftUI(caller = player)
+        player.openInventory(ui.inventory)
+
+        CoordinateComponent.square(3).forEach {
+            ui.inventory.setItem(it.toIndex(), ItemStack.of(Material.STONE, 64))
+        }
+
+        val clickEvent = InventoryClickEvent(
+            player.openInventory,
+            InventoryType.SlotType.CONTAINER,
+            CraftUI.MAKE_BUTTON ,
+            ClickType.SHIFT_RIGHT,
+            InventoryAction.NOTHING
+        )
+        ui.onClick(clicked = ui.inventory, event = clickEvent)
+
+        assertTrue(
+            CoordinateComponent.square(3).all {
+                ui.inventory.getItem(it.toIndex())?.type?.isAir ?: true
+            }
+        )
+    }
+
+    @Test
+    fun decrementItemsFromCraftSlotsWithShiftAndMassItemTest() {
+        val noMass = CMatterImpl.of(Material.STONE)
+        val mass = CMatterImpl("", setOf(Material.WATER_BUCKET), mass = true)
+        val items: MutableMap<CoordinateComponent, CMatter> = mutableMapOf()
+        CoordinateComponent.square(3).forEach { items[it] = noMass }
+        items[CoordinateComponent(1, 1)] = mass
+        // #: Stone, =: WaterBucket (Mass)
+        // ###
+        // #=#
+        // ###
+        val recipe = CRecipeImpl("", items, CRecipe.Type.SHAPED)
+        CustomCrafterAPI.registerRecipe(recipe)
+
+        val player = server.getPlayer(0)
+        val ui = CraftUI(caller = player)
+        player.openInventory(ui.inventory)
+
+        CoordinateComponent.square(3).forEach { ui.inventory.setItem(it.toIndex(), ItemStack.of(Material.STONE, 64)) }
+        ui.inventory.setItem(CoordinateComponent(1, 1).toIndex(), ItemStack.of(Material.WATER_BUCKET))
+
+        val clickEvent = InventoryClickEvent(
+            player.openInventory,
+            InventoryType.SlotType.CONTAINER,
+            CraftUI.MAKE_BUTTON,
+            ClickType.SHIFT_RIGHT,
+            InventoryAction.NOTHING
+        )
+        ui.onClick(clicked = ui.inventory, event = clickEvent)
+
+        assertTrue(CoordinateComponent.square(3).all { ui.inventory.getItem(it.toIndex())?.type?.isAir ?: true })
+        assertTrue(ui.inventory.getItem(CoordinateComponent(1, 1).toIndex())?.type?.isAir ?: true)
+
+        CustomCrafterAPI.unregisterAllRecipes()
+    }
+
+    @Test
+    fun grabBlankSlotsIgnoreTest() {
+        val player = server.getPlayer(0)
+        val ui = CraftUI(caller = player)
+        player.openInventory(ui.inventory)
+
+        assertTrue(
+            ui.bakedDesigner.blankSlots.all { c ->
+                val event = InventoryClickEvent(
+                    player.openInventory,
+                    InventoryType.SlotType.CONTAINER,
+                    c.key.toIndex(),
+                    ClickType.SHIFT_RIGHT,
+                    InventoryAction.NOTHING
+                )
+                ui.onClick(clicked = ui.inventory, event = event)
+                event.isCancelled
+            }
+        )
+    }
+
+    @Test
+    fun avoidToPlaceItemsOnTheResultSlotTest() {
+        val player = server.getPlayer(0)
+        val ui = CraftUI(caller = player)
+        player.openInventory(ui.inventory)
+
+        player.setItemOnCursor(ItemStack.of(Material.STONE))
+
+        ui.onClick(
+            clicked = ui.inventory,
+            event = InventoryClickEvent(
+                player.openInventory,
+                InventoryType.SlotType.CONTAINER,
+                ui.bakedDesigner.resultInt(),
+                ClickType.LEFT,
+                InventoryAction.PLACE_ONE
+            )
+        )
+
+        assertTrue(ui.inventory.getItem(ui.bakedDesigner.resultInt())?.type?.isAir ?: true)
+    }
+
+    @Test
+    fun openAllCandidateUITest() {
+        val player = server.getPlayer(0)
+        val ui = CraftUI(caller = player)
+        player.openInventory(ui.inventory)
+        ui.inventory.setItem(ui.bakedDesigner.craftSlots().first().toIndex(), ItemStack.of(Material.DIRT))
+
+        val dirt = CMatterImpl.of(Material.DIRT)
+        repeat(5) { CustomCrafterAPI.registerRecipe(CRecipeImpl.shapeless("", listOf(dirt))) }
+
+        CustomCrafterAPI.setUseMultipleResultCandidateFeature(true)
+
+        ui.onClick(
+            clicked = ui.inventory,
+            event = InventoryClickEvent(
+                player.openInventory,
+                InventoryType.SlotType.CONTAINER,
+                ui.bakedDesigner.makeButton.first.toIndex(),
+                ClickType.SHIFT_RIGHT,
+                InventoryAction.NOTHING
+            )
+        )
+
+        assertTrue(player.openInventory.topInventory.holder is AllCandidateUI)
+
+        CustomCrafterAPI.setUseMultipleResultCandidateFeatureDefault()
+        CustomCrafterAPI.unregisterAllRecipes()
+    }
+
+    @Test
     fun defaultDesignerHasValidBlankSlotsTest() {
         val baked = CraftUI().bakedDesigner
         assertEquals(16, baked.blankSlots.size)
@@ -213,9 +415,11 @@ internal object CraftUITest {
         val player: PlayerMock = server.getPlayer(0)
         val ui = CraftUI(caller = player)
         player.openInventory(ui.inventory)
-        ui.inventory.setItem(0, ItemStack.of(Material.STONE))
+        ui.inventory.setItem(ui.bakedDesigner.craftSlots().first().toIndex(), ItemStack.of(Material.STONE))
+        ui.inventory.setItem(ui.bakedDesigner.resultInt(), ItemStack.of(Material.DIRT))
         ui.onClose(InventoryCloseEvent(player.openInventory))
 
         assertTrue(player.inventory.contains(Material.STONE))
+        assertTrue(player.inventory.contains(Material.DIRT))
     }
 }

@@ -241,11 +241,23 @@ internal class CraftUI(
         if (result.customs().isNotEmpty()) {
             val (recipe: CRecipe, relate: MappedRelation) = result.customs().firstOrNull() ?: return
 
-            val amount: Int = recipe.getMinAmount(mapped, relate, isCraftGUI = true, shift = shiftUsed)
-                //?.takeIf { it > 0 }
-                ?: return
+            val amount: Int = recipe.getMinAmount(mapped, relate, shift = shiftUsed)
 
-            relate.components.forEach { (_, input) -> decrement(this.inventory, input.toIndex(), amount) }
+            val decrementedView: CraftView = this.toView().clone().getDecremented(
+                shiftUsed = shiftUsed, recipe = recipe, relations = relate
+            )
+
+            //debug
+            println("amount: $amount")
+
+            decrementedView.materials.forEach { (c, item) ->
+                this.inventory.setItem(c.toIndex(), item)
+            }
+//            val amount: Int = recipe.getMinAmount(mapped, relate, shift = shiftUsed)
+//                //?.takeIf { it > 0 }
+//                ?: return
+//
+//            relate.components.forEach { (_, input) -> decrement(this.inventory, input.toIndex(), amount) }
 
             val results: MutableList<ItemStack> = recipe.getResults(
                 ResultSupplier.Context(
@@ -272,29 +284,33 @@ internal class CraftUI(
             }
 
         } else if (result.vanilla() != null) {
+            // customs: Empty, vanilla: Exists
             val min: Int = mapped.values.minOf { i -> i.amount }
             val amount: Int = if (shiftUsed) min else 1
             bakedDesigner.craftSlots()
                 .filter { c -> this.inventory.getItem(c.toIndex())?.takeIf { item -> !item.type.isEmpty } != null }
-                .forEach { c -> decrement(this.inventory, c.toIndex(), amount) }
+                .forEach { c ->
+                    val newItem = this.inventory.getItem(c.toIndex())
+                    this.inventory.setItem(c.toIndex(), newItem?.asQuantity(newItem.amount - min))
+                }
             val item: ItemStack = result.vanilla()!!.result.apply { this.amount *= amount }
             player.giveItems(items = arrayOf(item))
         }
     }
 
-    private fun decrement(
-        gui: Inventory,
-        slot: Int,
-        amount: Int
-    ) {
-        val item: ItemStack = gui.getItem(slot) ?: return
-        val qty: Int = max(item.amount - amount, 0)
-        if (qty == 0) {
-            gui.setItem(slot, ItemStack.empty())
-        } else {
-            gui.setItem(slot, item.asQuantity(qty))
-        }
-    }
+//    private fun decrement(
+//        gui: Inventory,
+//        slot: Int,
+//        amount: Int
+//    ) {
+//        val item: ItemStack = gui.getItem(slot) ?: return
+//        val qty: Int = max(item.amount - amount, 0)
+//        if (qty == 0) {
+//            gui.setItem(slot, ItemStack.empty())
+//        } else {
+//            gui.setItem(slot, item.asQuantity(qty))
+//        }
+//    }
 
     override fun getInventory(): Inventory = this.inventory
 

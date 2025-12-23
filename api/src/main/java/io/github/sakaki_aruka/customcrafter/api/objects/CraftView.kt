@@ -6,7 +6,6 @@ import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateCompone
 import org.bukkit.Location
 import org.bukkit.World
 import org.bukkit.inventory.ItemStack
-import kotlin.math.max
 
 /**
  * A view of crafting gui.
@@ -20,56 +19,55 @@ data class CraftView (
     val result: ItemStack
 ) {
     /**
-     * decrement items from the provided CraftView
+     * Returns a decremented view what calculated by specified arguments.
      *
-     * if [forCustomSettings] is not null, this runs a process for CRecipe.
-     *
-     * only for Shift clicked
-     *
-     * @param[shiftUsed] a crafter used shift-click or not
-     * @param[forCustomSettings] a matched result info. (requires these when matched custom recipe)
-     * @since 5.0.8
+     * @param[shiftUsed] Consider to using Shift key or not
+     * @param[recipe] Recipe
+     * @param[relations] Relations with `this.materials` and `recipe.items`
+     * @return[CraftView] Decremented view
+     * @since 5.0.16
      */
-    fun getDecrementedCraftView(
-        shiftUsed: Boolean = true,
-        forCustomSettings: Pair<CRecipe, MappedRelation>? = null
+    fun getDecremented(
+        shiftUsed: Boolean,
+        recipe: CRecipe,
+        relations: MappedRelation
     ): CraftView {
-        val minAmount: Int = this.materials.values
-            .filter { item -> !item.isEmpty && item.type.isItem }
-            .minOf { item -> item.amount }
-        return forCustomSettings?.let { (cRecipe, mapped) ->
-            val map: MutableMap<CoordinateComponent, ItemStack> = mutableMapOf()
-            mapped.components.forEach { component ->
-                val matter: CMatter = cRecipe.items[component.recipe]!!
-                val isMass: Boolean = matter.mass
-                val decrementAmount: Int =
-                    if (isMass) 1
-                    else if (shiftUsed) (minAmount / matter.amount) * matter.amount
+        val minAmountWithoutMass: Int = recipe.getMinAmount(
+            map = this.materials, relation = relations, shift = shiftUsed, withoutMass = true, includeAir = false
+        )
+
+        val map: MutableMap<CoordinateComponent, ItemStack> = mutableMapOf()
+        for ((r, i) in relations.components) {
+            val matter: CMatter = recipe.items.getValue(r)
+            val input: ItemStack = this.materials[i] ?: continue
+            val xLimit: Int = minAmountWithoutMass / matter.amount
+
+            val decrementAmount: Int =
+                if (matter.mass) 1
+                else
+                    if (shiftUsed) xLimit * matter.amount
                     else matter.amount
-                val newAmount: Int = max(0, this.materials[component.input]!!.amount - decrementAmount)
-                map[component.input] =
-                    if (newAmount == 0) ItemStack.empty()
-                    else let {
-                        val newItem: ItemStack = this.materials[component.input]?.clone() ?: ItemStack.empty()
-                        newItem.amount = newAmount
-                        newItem
-                    }
+
+            if (input.amount - decrementAmount < 1) {
+                map[i] = ItemStack.empty()
+            } else {
+                map[i] = input.clone().asQuantity(input.amount - decrementAmount)
             }
-            CraftView(map, ItemStack.empty())
-        } ?: run {
-            val map: MutableMap<CoordinateComponent, ItemStack> = mutableMapOf()
-            this.materials.forEach { (c, item) ->
-                val newAmount: Int = max(0, item.amount - if (shiftUsed) minAmount else 1)
-                map[c] =
-                    if (newAmount == 0) ItemStack.empty()
-                    else let {
-                        val newItem: ItemStack = item.clone()
-                        newItem.amount = newAmount
-                        newItem
-                    }
-            }
-            CraftView(map, ItemStack.empty())
         }
+
+        return CraftView(materials = map.toMap(), result = this.result.clone())
+    }
+
+    /**
+     * Returns a cloned view
+     *
+     * @return[CraftView] view of cloned
+     * @since 5.0.16
+     */
+    fun clone(): CraftView {
+        val map: MutableMap<CoordinateComponent, ItemStack> = mutableMapOf()
+        this.materials.forEach { (component, item) -> map[component] = item.clone() }
+        return CraftView(materials = map.toMap(), result = this.result.clone())
     }
 
     /**

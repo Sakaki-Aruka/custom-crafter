@@ -213,7 +213,6 @@ internal class AllCandidateUI(
                         calledTimes = recipe.getMinAmount(
                             map = view.materials,
                             relation = mappedRelation,
-                            isCraftGUI = false,
                             shift = event.isShiftClick
                         ) ?: 1,
                         isMultipleDisplayCall = false,
@@ -245,9 +244,10 @@ internal class AllCandidateUI(
                     this.view = CraftView(this.view.materials, ItemStack.empty())
                 }
 
-                this.view = this.view.getDecrementedCraftView(
+                this.view = this.view.getDecremented(
                     shiftUsed = event.isShiftClick,
-                    forCustomSettings = if (recipe is CVanillaRecipe) null else recipe to mappedRelation!!
+                    recipe = recipe,
+                    relations = mappedRelation!!,
                 )
 
                 val craftUI = CraftUI(
