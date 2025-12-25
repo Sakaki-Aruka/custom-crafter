@@ -249,11 +249,6 @@ internal class CraftUI(
             decrementedView.materials.forEach { (c, item) ->
                 this.inventory.setItem(c.toIndex(), item)
             }
-//            val amount: Int = recipe.getMinAmount(mapped, relate, shift = shiftUsed)
-//                //?.takeIf { it > 0 }
-//                ?: return
-//
-//            relate.components.forEach { (_, input) -> decrement(this.inventory, input.toIndex(), amount) }
 
             val results: MutableList<ItemStack> = recipe.getResults(
                 ResultSupplier.Context(
@@ -293,20 +288,6 @@ internal class CraftUI(
             player.giveItems(items = arrayOf(item))
         }
     }
-
-//    private fun decrement(
-//        gui: Inventory,
-//        slot: Int,
-//        amount: Int
-//    ) {
-//        val item: ItemStack = gui.getItem(slot) ?: return
-//        val qty: Int = max(item.amount - amount, 0)
-//        if (qty == 0) {
-//            gui.setItem(slot, ItemStack.empty())
-//        } else {
-//            gui.setItem(slot, item.asQuantity(qty))
-//        }
-//    }
 
     override fun getInventory(): Inventory = this.inventory
 

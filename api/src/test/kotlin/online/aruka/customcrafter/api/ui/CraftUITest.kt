@@ -407,6 +407,22 @@ internal object CraftUITest {
     }
 
     @Test
+    fun uiOpenSuccessWithValidPermissionTest() {
+        val player: Player = server.getPlayer(0)
+        val plugin = MockBukkit.createMockPlugin()
+
+        player.addAttachment(plugin, "cc.craftui.click.open", true)
+        val event = PlayerInteractEvent(
+            player,
+            Action.RIGHT_CLICK_BLOCK,
+            null,
+            server.worlds.first().getBlockAt(0, 64, 0),
+            BlockFace.UP
+        )
+        assertTrue(CraftUI.isTrigger(event))
+    }
+
+    @Test
     fun uiCloseItemDropTest() {
         val player: PlayerMock = server.getPlayer(0)
         val ui = CraftUI(caller = player)
