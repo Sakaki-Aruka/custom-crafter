@@ -162,7 +162,9 @@ object Search {
                     if (!normal(mapped, recipe, crafterID)) {
                         continue
                     }
-                    val components: Set<MappedRelationComponent> = recipe.items.entries.zip(mapped.entries)
+                    val recipeSortedEntries: List<Map.Entry<CoordinateComponent, CMatter>> = recipe.items.entries.sortedBy { it.key.toIndex() }
+                    val inputSortedEntries: List<Map.Entry<CoordinateComponent, ItemStack>> = mapped.entries.sortedBy { it.key.toIndex() }
+                    val components: Set<MappedRelationComponent> = recipeSortedEntries.zip(inputSortedEntries)
                         .map { (recipeEntry, inputEntry) -> MappedRelationComponent(recipeEntry.key, inputEntry.key) }
                         .toSet()
                     customs.add(recipe to MappedRelation(components))

@@ -100,10 +100,9 @@ object CRecipeTest {
     }
 
     @Test
-    fun getMinAmountTest() {
+    fun getTimesTest() {
         // shift       : false
         // mass        : false
-        // air         : false
         // multi amount: false
         val matter = CMatterImpl.of(Material.STONE)
         val map = CoordinateComponent.squareFill(3).associateWith { matter }
@@ -114,18 +113,17 @@ object CRecipeTest {
             components = CoordinateComponent.squareFill(3).map { MappedRelationComponent(it, it) }.toSet()
         )
 
-        assertEquals(1, recipe.getMinAmount(view, relation, shift = false))
+        assertEquals(1, recipe.getTimes(view, relation, shift = false, withoutMass = true /* Default */))
     }
 
     @Test
-    fun getMinAmountWithMassTest() {
-        // shift       : false
+    fun getTimesWithShiftAndMassTest() {
+        // shift       : true
         // mass        : true
-        // air         : false
         // multi amount: false
         val matter = CMatterImpl.of(Material.STONE)
         val massMatter = CMatterImpl("", setOf(Material.STONE), mass = true)
-        val map = CoordinateComponent.squareFill(3).associateWith { matter } + mapOf(CoordinateComponent(1, 1) to massMatter)
+        val map = CoordinateComponent.square(3).associateWith { matter } + mapOf(CoordinateComponent(1, 1) to massMatter)
         val recipe = CRecipeImpl("", map, CRecipe.Type.SHAPED)
 
         val view = CoordinateComponent.squareFill(3).associateWith { ItemStack.of(Material.STONE, 64) }
@@ -133,16 +131,42 @@ object CRecipeTest {
             components = CoordinateComponent.squareFill(3).map { MappedRelationComponent(it, it) }.toSet()
         )
 
-        assertEquals(1, recipe.getMinAmount(view, relation, shift = false, withoutMass = false, includeAir = false))
+        assertEquals(64, recipe.getTimes(view, relation, shift = true, withoutMass = true))
     }
 
     @Test
-    fun getMinAmountWithoutMassAndIncludeAirTest() {
-        // true, true
+    fun getTimesTestWithShiftAndMultiAmount() {
+        // shift       : true
+        // mass        : false
+        // multi amount: true
+        val matter = CMatterImpl.of(Material.STONE)
+        val multiMatter = CMatterImpl("", setOf(Material.STONE), amount = 5)
+        val map = CoordinateComponent.square(3).associateWith { matter } + mapOf(CoordinateComponent(1, 1) to multiMatter)
+        val recipe = CRecipeImpl("", map, CRecipe.Type.SHAPED)
+
+        val view = CoordinateComponent.squareFill(3).associateWith { ItemStack.of(Material.STONE, 64) }
+        val relation = MappedRelation(
+            components = CoordinateComponent.squareFill(3).map { MappedRelationComponent(it, it) }.toSet()
+        )
+
+        // min(64/1, 64/5) = 12
+        assertEquals(12, recipe.getTimes(view, relation, shift = true, withoutMass = true))
     }
 
     @Test
-    fun getMinAmountWithMassAndNotIncludeAirTest() {
-        // false, true
+    fun getTimesWithShiftTest() {
+        // shift       : true
+        // mass        : false
+        // multi amount: false
+        val matter = CMatterImpl.of(Material.STONE)
+        val map = CoordinateComponent.squareFill(3).associateWith { matter }
+        val recipe = CRecipeImpl("", map, CRecipe.Type.SHAPED)
+
+        val view = CoordinateComponent.squareFill(3).associateWith { ItemStack.of(Material.STONE, 64) }
+        val relation = MappedRelation(
+            components = CoordinateComponent.squareFill(3).map { MappedRelationComponent(it, it) }.toSet()
+        )
+
+        assertEquals(64, recipe.getTimes(view, relation, shift = true, withoutMass = false))
     }
 }

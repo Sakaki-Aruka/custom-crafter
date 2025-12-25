@@ -143,29 +143,24 @@ interface CRecipe {
      * @param[relation] Coordinate relations in input items and recipe matters
      * @param[shift] Use Shift-Key (Batch Crafting) or not
      * @param[withoutMass] Use mass-marked CMatters to min amount calculation or not
-     * @param[includeAir] Use Material#AIR to min amount calculation or not
      * @since 5.0.10
      */
-    fun getMinAmount(
+    fun getTimes(
         map: Map<CoordinateComponent, ItemStack>,
         relation: MappedRelation,
         shift: Boolean,
-        withoutMass: Boolean = true,
-        includeAir: Boolean = false
+        withoutMass: Boolean = true
     ): Int {
         var amount = Int.MAX_VALUE
         for ((c, matter) in this.items) {
-            val inputCoordinate: CoordinateComponent = relation.components.firstOrNull { it.recipe == c }
-                ?.input
-                ?: CoordinateComponent(Int.MIN_VALUE, Int.MIN_VALUE)
-            val item: ItemStack = // map[c] ?: ItemStack.empty()
-                if (inputCoordinate == CoordinateComponent(Int.MIN_VALUE, Int.MIN_VALUE)) ItemStack.empty()
-                else map[inputCoordinate] ?: ItemStack.empty()
-            if (!includeAir && item.type.isEmpty) {
-                continue
-            } else if (withoutMass && matter.mass) {
+            if (withoutMass && matter.mass) {
                 continue
             }
+
+            val inputCoordinate: CoordinateComponent = relation.components.firstOrNull { it.recipe == c }
+                ?.input
+                ?: continue
+            val item: ItemStack = map[inputCoordinate] ?: continue
 
             val q: Int =
                 if (matter.mass) 1

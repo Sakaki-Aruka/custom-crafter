@@ -3,6 +3,8 @@ package online.aruka.customcrafter.api.ui
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
+import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
+import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelationComponent
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
 import io.github.sakaki_aruka.customcrafter.impl.recipe.CRecipeImpl
@@ -64,11 +66,7 @@ internal object CraftUITest {
 
     @AfterEach
     fun tearDown() {
-        val recipes = CustomCrafterAPI.getRecipes()
-        recipes.forEach { recipe ->
-            CustomCrafterAPI.unregisterRecipe(recipe)
-        }
-
+        CustomCrafterAPI.unregisterAllRecipes()
         MockBukkit.unmock()
     }
 

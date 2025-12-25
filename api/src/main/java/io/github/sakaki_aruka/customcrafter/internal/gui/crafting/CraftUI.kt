@@ -32,7 +32,6 @@ import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 import java.util.UUID
-import kotlin.math.max
 
 internal class CraftUI(
     var dropItemsOnClose: Boolean = true,
@@ -241,14 +240,11 @@ internal class CraftUI(
         if (result.customs().isNotEmpty()) {
             val (recipe: CRecipe, relate: MappedRelation) = result.customs().firstOrNull() ?: return
 
-            val amount: Int = recipe.getMinAmount(mapped, relate, shift = shiftUsed)
+            val amount: Int = recipe.getTimes(mapped, relate, shift = shiftUsed)
 
             val decrementedView: CraftView = this.toView().clone().getDecremented(
                 shiftUsed = shiftUsed, recipe = recipe, relations = relate
             )
-
-            //debug
-            println("amount: $amount")
 
             decrementedView.materials.forEach { (c, item) ->
                 this.inventory.setItem(c.toIndex(), item)

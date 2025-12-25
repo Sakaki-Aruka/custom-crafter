@@ -136,9 +136,7 @@ object CraftViewTest {
 
         val decremented = view.getDecremented(shiftUsed = true, recipe, relation)
 
-        assertTrue(
-            decremented.materials.all { (_, item) -> item.type.isAir }
-        )
+        assertTrue(decremented.materials.all { (_, item) -> item.type.isAir })
     }
 
     @Test
@@ -164,9 +162,7 @@ object CraftViewTest {
 
         val decremented = view.getDecremented(shiftUsed = false, recipe, relation)
 
-        assertTrue(
-            decremented.materials.all { (_, item) -> item.amount == 63 }
-        )
+        assertTrue(decremented.materials.all { (_, item) -> item.amount == 63 })
     }
 
     @Test
@@ -177,7 +173,7 @@ object CraftViewTest {
          * .amount >= 1 matter: false
          */
         val matter = CMatterImpl.of(Material.STONE)
-        val massMatter = CMatterImpl("", setOf(Material.STONE), mass = true)
+        val massMatter = CMatterImpl("", setOf(Material.WATER_BUCKET), mass = true)
         val map = CoordinateComponent.square(3).associateWith { matter } + mapOf(CoordinateComponent(1, 1) to massMatter)
         val recipe = CRecipeImpl("", map, CRecipe.Type.SHAPED)
         val relation = MappedRelation(
@@ -186,7 +182,8 @@ object CraftViewTest {
             }.toSet()
         )
         val view = CraftView(
-            materials = CoordinateComponent.squareFill(3).associateWith { ItemStack.of(Material.STONE, 64) },
+            materials = CoordinateComponent.square(3).associateWith { ItemStack.of(Material.STONE, 64) } + mapOf(
+                CoordinateComponent(1, 1) to ItemStack.of(Material.WATER_BUCKET, 2)),
             result = ItemStack.empty()
         )
 
@@ -204,7 +201,7 @@ object CraftViewTest {
             }
         )
 
-        assertEquals(63, decremented.materials.getValue(CoordinateComponent(1, 1)).amount)
+        assertEquals(1, decremented.materials.getValue(CoordinateComponent(1, 1)).amount)
     }
 
     @Test

@@ -32,15 +32,13 @@ data class CraftView (
         recipe: CRecipe,
         relations: MappedRelation
     ): CraftView {
-        val minAmountWithoutMass: Int = recipe.getMinAmount(
-            map = this.materials, relation = relations, shift = shiftUsed, withoutMass = true, includeAir = false
-        )
+        val minAmount: Int = recipe.getTimes(this.materials, relations, shiftUsed, withoutMass = true)
 
         val map: MutableMap<CoordinateComponent, ItemStack> = mutableMapOf()
         for ((r, i) in relations.components) {
             val matter: CMatter = recipe.items.getValue(r)
             val input: ItemStack = this.materials[i] ?: continue
-            val xLimit: Int = minAmountWithoutMass / matter.amount
+            val xLimit: Int = minAmount
 
             val decrementAmount: Int =
                 if (matter.mass) 1

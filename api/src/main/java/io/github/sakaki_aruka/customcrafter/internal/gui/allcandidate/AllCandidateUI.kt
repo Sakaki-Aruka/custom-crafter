@@ -210,7 +210,7 @@ internal class AllCandidateUI(
                         relation = mappedRelation,
                         mapped = view.materials,
                         shiftClicked = event.isShiftClick,
-                        calledTimes = recipe.getMinAmount(
+                        calledTimes = recipe.getTimes(
                             map = view.materials,
                             relation = mappedRelation,
                             shift = event.isShiftClick
