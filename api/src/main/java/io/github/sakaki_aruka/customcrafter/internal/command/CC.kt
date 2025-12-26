@@ -171,7 +171,11 @@ internal object CC {
         )
 
     val command: LiteralArgumentBuilder<CommandSourceStack> = Commands.literal("cc")
-        .then(Get)
-        .then(Set)
+        .then(Get.requires { ctx ->
+            ctx.sender.hasPermission("cc.command")
+        })
+        .then(Set.requires { ctx ->
+            ctx.sender.hasPermission("cc.command")
+        })
         .then(Open)
 }
