@@ -214,7 +214,7 @@ internal class AllCandidateUI(
                             map = view.materials,
                             relation = mappedRelation,
                             shift = event.isShiftClick
-                        ) ?: 1,
+                        ),
                         isMultipleDisplayCall = false,
                         list = mutableListOf(),
                         crafterID = (event.whoClicked as Player).uniqueId

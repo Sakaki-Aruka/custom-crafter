@@ -25,15 +25,6 @@ interface CRecipeContainer {
          */
         @JvmField
         val AlwaysTrue: (Context) -> Boolean = { _ -> true }
-
-        /**
-         * ```kotlin
-         * val None: (Context) -> Unit = { _ -> }
-         * ```
-         * @since 5.0.12
-         */
-        @JvmField
-        val None: (Context) -> Unit = { _ -> }
     }
 
     /**

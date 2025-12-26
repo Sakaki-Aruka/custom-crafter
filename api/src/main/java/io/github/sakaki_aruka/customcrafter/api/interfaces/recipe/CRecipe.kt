@@ -103,26 +103,6 @@ interface CRecipe {
     }
 
     /**
-     * This setting is only used for multiple candidate display when it enabled.
-     *
-     * This func returns false on default.
-     *
-     * @return[Boolean] default shift clicked
-     * @since 5.0.8
-     */
-    fun multipleCandidateDisplaySettingDefaultShiftClicked(): Boolean = false
-
-    /**
-     * This setting is only used for multiple candidate display when it enabled.
-     *
-     * This func returns 1 on default.
-     *
-     * @return[Int] default called time
-     * @since 5.0.8
-     */
-    fun multipleCandidateDisplaySettingDefaultCalledTimes(): Int = 1
-
-    /**
      * Returns results of suppliers made
      *
      * @param[context] Context of ResultSupplier
@@ -174,14 +154,5 @@ interface CRecipe {
             }
         }
         return amount.takeIf { it != Int.MAX_VALUE } ?: 1
-    }
-
-    fun getSlots(): List<Int> {
-        return if (this.type == Type.SHAPED) {
-            items.keys.map { c -> c.toIndex() }.sorted()
-        } else {
-            // Shapeless
-            (0..<this.items.size).sorted()
-        }
     }
 }

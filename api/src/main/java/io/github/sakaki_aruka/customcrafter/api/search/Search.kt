@@ -11,7 +11,6 @@ import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateCompone
 import io.github.sakaki_aruka.customcrafter.impl.recipe.CVanillaRecipe
 import org.bukkit.Bukkit
 import org.bukkit.World
-import org.bukkit.entity.Player
 import org.bukkit.inventory.CraftingRecipe
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.Recipe
@@ -97,42 +96,6 @@ object Search {
     // one: Boolean
 
     /**
-     * 6x6 crafting items.
-     *
-     * zero origin & do not skip empty slots (do padding = use ItemStack#empty())
-     *
-     *  A search-result is not guaranteed what is not empty.
-     *
-     * @param[player] A craft-request sender.
-     * @param[items] Materials of crafting. this size must equal 36(6*6).
-     * @param[forceSearchVanillaRecipe] Force to search vanilla recipes or not.(true=force, false=not). The default is true.
-     * @param[onlyFirst] get only first matched custom recipe and mapped. (default = false)
-     * @param[sourceRecipes] A list of searched recipes. (default = CustomCrafterAPI.getRecipes() / since 5.0.10)
-     * @return[SearchResult?] A result of a request. If you send one that contains invalid params, returns null.
-     */
-    @JvmStatic
-    @JvmOverloads
-    fun search(
-        player: Player,
-        items: Array<ItemStack>,
-        forceSearchVanillaRecipe: Boolean = true,
-        onlyFirst: Boolean = false,
-        sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes()
-    ): SearchResult? {
-        if (items.size != 36) return null
-        val materials: MutableMap<CoordinateComponent, ItemStack> = mutableMapOf()
-        for (y: Int in (0..<6)) {
-            for (x: Int in (0..<6)) {
-                val index: Int = x + y * 9
-                materials[CoordinateComponent(x, y)] = items[index]
-            }
-        }
-
-        val view = CraftView(materials, ItemStack.empty())
-        return search(player.uniqueId, view, forceSearchVanillaRecipe, onlyFirst, sourceRecipes)
-    }
-
-    /**
      * search main method.
      *
      * this is more recommended than [search] (use List<ItemStack>).
@@ -143,6 +106,7 @@ object Search {
      * @param[onlyFirst] get only first matched custom recipe and mapped. (default = false)
      * @param[sourceRecipes] A list of searched recipes. (default = CustomCrafterAPI.getRecipes() / since 5.0.10)
      * @return[SearchResult?] A result of a request. If you send one that contains invalid params, returns null.
+     * @throws[IllegalArgumentException] Throws when 'view.materials' is empty or their size out of range 1 to 36.
      */
     @JvmStatic
     @JvmOverloads
@@ -153,6 +117,9 @@ object Search {
         onlyFirst: Boolean = false,
         sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes()
     ): SearchResult {
+        if (view.materials.isEmpty() || view.materials.size > 36) {
+            throw IllegalArgumentException("'view#materials' size must be in range of 1 to 36. (current: ${view.materials.size})")
+        }
         val mapped: Map<CoordinateComponent, ItemStack> = view.materials
 
         val customs: MutableList<Pair<CRecipe, MappedRelation>> = mutableListOf()
