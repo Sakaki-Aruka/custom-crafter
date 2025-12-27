@@ -277,14 +277,14 @@ internal class CraftUI(
         } else if (result.vanilla() != null) {
             // customs: Empty, vanilla: Exists
             val min: Int = mapped.values.minOf { i -> i.amount }
-            val amount: Int = if (shiftUsed) min else 1
+            val decrementAmount: Int = if (shiftUsed) min else 1
             bakedDesigner.craftSlots()
                 .filter { c -> this.inventory.getItem(c.toIndex())?.takeIf { item -> !item.type.isEmpty } != null }
                 .forEach { c ->
                     val newItem = this.inventory.getItem(c.toIndex())
-                    this.inventory.setItem(c.toIndex(), newItem?.asQuantity(newItem.amount - min))
+                    this.inventory.setItem(c.toIndex(), newItem?.asQuantity(newItem.amount - decrementAmount))
                 }
-            val item: ItemStack = result.vanilla()!!.result.apply { this.amount *= amount }
+            val item: ItemStack = result.vanilla()!!.result.apply { this.amount *= decrementAmount }
             player.giveItems(items = arrayOf(item))
         }
     }

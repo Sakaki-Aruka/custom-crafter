@@ -434,4 +434,54 @@ internal object CraftUITest {
         assertTrue(player.inventory.contains(Material.STONE))
         assertTrue(player.inventory.contains(Material.DIRT))
     }
+
+    @Test
+    fun vanillaRecipeSingleCraftTest() {
+        val player: Player = server.getPlayer(0)
+        val ui = CraftUI(caller = player)
+        player.openInventory(ui.inventory)
+
+        ui.inventory.setItem(
+            ui.bakedDesigner.craftSlots().first().toIndex(),
+            ItemStack.of(Material.GOLD_BLOCK, 64)
+        )
+
+        ui.onClick(
+            clicked = ui.inventory,
+            event = InventoryClickEvent(
+                player.openInventory,
+                InventoryType.SlotType.CONTAINER,
+                ui.bakedDesigner.makeButton.first.toIndex(),
+                ClickType.RIGHT,
+                InventoryAction.NOTHING
+            )
+        )
+
+        assertTrue(ui.inventory.getItem(ui.bakedDesigner.craftSlots().first().toIndex())?.amount == 63)
+    }
+
+    @Test
+    fun vanillaRecipeBatchCraftTest() {
+        val player: Player = server.getPlayer(0)
+        val ui = CraftUI(caller = player)
+        player.openInventory(ui.inventory)
+
+        ui.inventory.setItem(
+            ui.bakedDesigner.craftSlots().first().toIndex(),
+            ItemStack.of(Material.GOLD_BLOCK, 64)
+        )
+
+        ui.onClick(
+            clicked = ui.inventory,
+            event = InventoryClickEvent(
+                player.openInventory,
+                InventoryType.SlotType.CONTAINER,
+                ui.bakedDesigner.makeButton.first.toIndex(),
+                ClickType.SHIFT_RIGHT,
+                InventoryAction.NOTHING
+            )
+        )
+
+        assertTrue(ui.inventory.getItem(ui.bakedDesigner.craftSlots().first().toIndex())?.amount == 0)
+    }
 }
