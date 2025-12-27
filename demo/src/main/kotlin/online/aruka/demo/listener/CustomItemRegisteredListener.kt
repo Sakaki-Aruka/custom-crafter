@@ -8,6 +8,6 @@ import org.bukkit.event.Listener
 object CustomItemRegisteredListener: Listener {
     @EventHandler
     fun RegisterCustomRecipeEvent.onRegister() {
-        Demo.plugin.logger.info("New Custom Recipe Registered: ${this.recipe.name}")
+        Demo.plugin.logger.info("New Custom Recipe Registered: ${this.recipes.joinToString(",") { it.name }}")
     }
 }
