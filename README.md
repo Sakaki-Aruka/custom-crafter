@@ -45,7 +45,7 @@ The jar file, which can be placed in the server's plugins directory, will be cre
 
 | Custom_Crafter Version       | Paper Version        |
 |:-----------------------------|:---------------------|
-| **5.0.13 ~ 5.0.16 (Latest)** | **1.21.4 ~ 1.21.10** |
+| **5.0.13 ~ 5.0.16 (Latest)** | **1.21.4 ~ 1.21.11** |
 | 5.0.0 ~ 5.0.11               | 1.21.3               |
 | 4.3 (Legacy)                 | 1.21.3               |
 | 4.2 (Legacy)                 | 1.20.1 ~ 1.20.4      |
