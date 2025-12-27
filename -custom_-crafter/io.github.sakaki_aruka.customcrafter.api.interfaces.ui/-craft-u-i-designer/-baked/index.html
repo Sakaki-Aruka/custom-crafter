@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>Baked</title>
+    <link href="../../../../images/logo-icon.svg" rel="icon" type="image/svg">
+        <script>var pathToRoot = "../../../../";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async="async"></script>
+<script type="text/javascript" src="../../../../scripts/sourceset_dependencies.js" async="async"></script>
+<link href="../../../../styles/style.css" rel="Stylesheet">
+<link href="../../../../styles/main.css" rel="Stylesheet">
+<link href="../../../../styles/prism.css" rel="Stylesheet">
+<link href="../../../../styles/logo-styles.css" rel="Stylesheet">
+<link href="../../../../ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="../../../../scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="../../../../scripts/navigation-loader.js" async="async"></script>
+<script type="text/javascript" src="../../../../scripts/platform-content-handler.js" async="async"></script>
+<script type="text/javascript" src="../../../../scripts/main.js" defer="defer"></script>
+<script type="text/javascript" src="../../../../scripts/prism.js" async="async"></script>
+<script type="text/javascript" src="../../../../ui-kit/ui-kit.min.js" defer="defer"></script>
+</head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+            <a class="library-name--link" href="../../../../index.html" tabindex="1">
+                    Custom_Crafter
+            </a>
+        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle"
+                type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true"
+                        data-filter="Custom_Crafter/JVM">JVM</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox"
+                        data-role="dropdown-toggle"
+                        aria-controls="platform-tags-listbox"
+                        aria-haspopup="listbox"
+                        aria-expanded="false"
+                        aria-label="Toggle source sets"
+                ></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id="Custom_Crafter/JVM"
+                                       data-filter="Custom_Crafter/JVM"/>
+                                <span class="checkbox--icon"></span>
+                                JVM
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button"
+                    type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config='{"defaultSize": 280, "minSize": 200, "maxSize": 400}'>
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list"
+                    data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    Custom_Crafter
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" data-page-type="classlike" id="content" pageIds="Custom_Crafter::io.github.sakaki_aruka.customcrafter.api.interfaces.ui/CraftUIDesigner.Baked///PointingToDeclaration//1867371069">
+  <div class="breadcrumbs"><a href="../../../../index.html">Custom_Crafter</a><span class="delimiter">/</span><a href="../../index.html">io.github.sakaki_aruka.customcrafter.api.interfaces.ui</a><span class="delimiter">/</span><a href="../index.html">CraftUIDesigner</a><span class="delimiter">/</span><span class="current">Baked</span></div>
+  <div class="cover ">
+    <h1 class="cover"><span><span>Baked</span></span></h1>
+    <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter/JVM"><div class="symbol monospace"><span class="token keyword">class </span><a href="index.html">Baked</a><span class="token punctuation">(</span><span class="parameters "><span class="parameter "><span class="token keyword">val </span>title<span class="token operator">: </span><span data-unresolved-link="net.kyori.adventure.text/Component///PointingToDeclaration/">Component</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>result<span class="token operator">: </span><a href="../../../io.github.sakaki_aruka.customcrafter.api.objects.recipe/-coordinate-component/index.html">CoordinateComponent</a><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>makeButton<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-pair/index.html">Pair</a><span class="token operator">&lt;</span><a href="../../../io.github.sakaki_aruka.customcrafter.api.objects.recipe/-coordinate-component/index.html">CoordinateComponent</a><span class="token punctuation">, </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter "><span class="token keyword">val </span>blankSlots<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><a href="../../../io.github.sakaki_aruka.customcrafter.api.objects.recipe/-coordinate-component/index.html">CoordinateComponent</a><span class="token punctuation">, </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div><p class="paragraph">BakedDesigner: An immutable CraftUIDesigner with a set (baked) value.</p><div class="sample-container"><pre><code class="block lang-kotlin" theme="idea">val designer: CraftUIDesigner = ~~~<br>val context: CraftUIDesigner.Context = ~~~<br>val baked: BakedDesigner = CraftUIDesigner.bake(designer, context)</code></pre><span class="copy-tooltip"><div class="copy-popup-wrapper popup-to-left"><span class="copy-popup-icon"></span><span>Content copied to clipboard</span></div><span class="copy-icon"></span></span></div><span class="kdoc-tag"><h4 class="">Since</h4><p class="paragraph">5.0.16</p></span><h4 class="tableheader">Parameters</h4><div class="table"><div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>title</span></span></u></div></span></div><div><div class="title"><p class="paragraph">Title of UI</p></div></div></div></div><div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span><span>result</span></span></u></div></span></div><div><div class="title"><p class="paragraph">Coordinate of result slot</p></div></div></div></div><div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>make</span><wbr></wbr><span><span>Button</span></span></u></div></span></div><div><div class="title"><p class="paragraph">Make button coordinate and icon (item)</p></div></div></div></div><div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><u><span>blank</span><wbr></wbr><span><span>Slots</span></span></u></div></span></div><div><div class="title"><p class="paragraph">Unclickable slot coordinates and icons</p></div></div></div></div></div><h4 class="tableheader">See also</h4><div class="table"><div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM"><div class="main-subrow keyValue "><div class=""><span class="inline-flex"><div><a href="../-companion/bake.html"><span>Craft</span><wbr></wbr><span>UIDesigner.</span><wbr></wbr><span>Companion.</span><wbr></wbr><span>bake</span></a></div></span></div><div></div></div></div></div></div></div>
+  </div>
+  <div class="tabbedcontent">
+    <div class="tabs-section" tabs-section="tabs-section"><button class="section-tab" data-active="" data-togglable="CONSTRUCTOR,TYPE,PROPERTY,FUNCTION">Members</button></div>
+    <div class="tabs-section-body">
+      <div data-togglable="CONSTRUCTOR">
+        <h2 class="tableheader">Constructors</h2>
+        <div class="table"><a data-name="353241310%2FConstructors%2F1867371069" anchor-label="Baked" id="353241310%2FConstructors%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+          <div class="table-row table-row_content" data-togglable="CONSTRUCTOR" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="-baked.html"><span><span>Baked</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="353241310%2FConstructors%2F1867371069"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter/JVM"><div class="symbol monospace"><span class="token keyword">constructor</span><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">title<span class="token operator">: </span><span data-unresolved-link="net.kyori.adventure.text/Component///PointingToDeclaration/">Component</span><span class="token punctuation">, </span></span><span class="parameter ">result<span class="token operator">: </span><a href="../../../io.github.sakaki_aruka.customcrafter.api.objects.recipe/-coordinate-component/index.html">CoordinateComponent</a><span class="token punctuation">, </span></span><span class="parameter ">makeButton<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-pair/index.html">Pair</a><span class="token operator">&lt;</span><a href="../../../io.github.sakaki_aruka.customcrafter.api.objects.recipe/-coordinate-component/index.html">CoordinateComponent</a><span class="token punctuation">, </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token operator">&gt;</span><span class="token punctuation">, </span></span><span class="parameter ">blankSlots<span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><a href="../../../io.github.sakaki_aruka.customcrafter.api.objects.recipe/-coordinate-component/index.html">CoordinateComponent</a><span class="token punctuation">, </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token operator">&gt;</span></span></span><span class="token punctuation">)</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="PROPERTY">
+        <h2 class="tableheader">Properties</h2>
+        <div class="table"><a data-name="1681592846%2FProperties%2F1867371069" anchor-label="blankSlots" id="1681592846%2FProperties%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="blank-slots.html"><span>blank</span><wbr></wbr><span><span>Slots</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1681592846%2FProperties%2F1867371069"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter/JVM"><div class="symbol monospace"><span class="token keyword">val </span><a href="blank-slots.html">blankSlots</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-map/index.html">Map</a><span class="token operator">&lt;</span><a href="../../../io.github.sakaki_aruka.customcrafter.api.objects.recipe/-coordinate-component/index.html">CoordinateComponent</a><span class="token punctuation">, </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-464516753%2FProperties%2F1867371069" anchor-label="makeButton" id="-464516753%2FProperties%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="make-button.html"><span>make</span><wbr></wbr><span><span>Button</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-464516753%2FProperties%2F1867371069"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter/JVM"><div class="symbol monospace"><span class="token keyword">val </span><a href="make-button.html">makeButton</a><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-pair/index.html">Pair</a><span class="token operator">&lt;</span><a href="../../../io.github.sakaki_aruka.customcrafter.api.objects.recipe/-coordinate-component/index.html">CoordinateComponent</a><span class="token punctuation">, </span><span data-unresolved-link="org.bukkit.inventory/ItemStack///PointingToDeclaration/">ItemStack</span><span class="token operator">&gt;</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1466764210%2FProperties%2F1867371069" anchor-label="result" id="1466764210%2FProperties%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="result.html"><span><span>result</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1466764210%2FProperties%2F1867371069"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter/JVM"><div class="symbol monospace"><span class="token keyword">val </span><a href="result.html">result</a><span class="token operator">: </span><a href="../../../io.github.sakaki_aruka.customcrafter.api.objects.recipe/-coordinate-component/index.html">CoordinateComponent</a></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1486415693%2FProperties%2F1867371069" anchor-label="title" id="-1486415693%2FProperties%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="title.html"><span><span>title</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1486415693%2FProperties%2F1867371069"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter/JVM"><div class="symbol monospace"><span class="token keyword">val </span><a href="title.html">title</a><span class="token operator">: </span><span data-unresolved-link="net.kyori.adventure.text/Component///PointingToDeclaration/">Component</span></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div data-togglable="FUNCTION">
+        <h2 class="tableheader">Functions</h2>
+        <div class="table"><a data-name="-1188696327%2FFunctions%2F1867371069" anchor-label="apply" id="-1188696327%2FFunctions%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="apply.html"><span><span>apply</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1188696327%2FFunctions%2F1867371069"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="apply.html"><span class="token function">apply</span></a><span class="token punctuation">(</span><span class="parameters "><span class="parameter ">ui<span class="token operator">: </span><span data-unresolved-link="org.bukkit.inventory/Inventory///PointingToDeclaration/">Inventory</span></span></span><span class="token punctuation">)</span></div><div class="brief "><p class="paragraph">Applies designer to a provided ui (inventory).</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="-1266715174%2FFunctions%2F1867371069" anchor-label="craftSlots" id="-1266715174%2FFunctions%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="craft-slots.html"><span>craft</span><wbr></wbr><span><span>Slots</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1266715174%2FFunctions%2F1867371069"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="craft-slots.html"><span class="token function">craftSlots</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html">List</a><span class="token operator">&lt;</span><a href="../../../io.github.sakaki_aruka.customcrafter.api.objects.recipe/-coordinate-component/index.html">CoordinateComponent</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Returns craft slots (6x6)</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1855153113%2FFunctions%2F1867371069" anchor-label="isValid" id="1855153113%2FFunctions%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="is-valid.html"><span>is</span><wbr></wbr><span><span>Valid</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1855153113%2FFunctions%2F1867371069"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="is-valid.html"><span class="token function">isValid</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-result/index.html">Result</a><span class="token operator">&lt;</span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html">Unit</a><span class="token operator">&gt;</span></div><div class="brief "><p class="paragraph">Returns is this valid or not.</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+<a data-name="1515074233%2FFunctions%2F1867371069" anchor-label="resultInt" id="1515074233%2FFunctions%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+          <div class="table-row table-row_content" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+            <div class="main-subrow keyValue ">
+              <div class=""><span class="inline-flex">
+                  <div><a href="result-int.html"><span>result</span><wbr></wbr><span><span>Int</span></span></a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1515074233%2FFunctions%2F1867371069"></span>
+                    <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+                  </span></span></div>
+              <div>
+                <div class="title">
+                  <div class="platform-hinted " data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter/JVM"><div class="symbol monospace"><span class="token keyword">fun </span><a href="result-int.html"><span class="token function">resultInt</span></a><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token operator">: </span><a href="https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html">Int</a></div><div class="brief "><p class="paragraph">Returns result slot coordinate (Int)</p></div></div></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2025 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
