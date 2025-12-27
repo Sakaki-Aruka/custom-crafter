@@ -7,6 +7,6 @@ package io.github.sakaki_aruka.customcrafter.api.objects
  * @param[components] Relation components. ->[MappedRelationComponent]
  */
 
-data class MappedRelation internal constructor(
+data class MappedRelation (
     val components: Set<MappedRelationComponent>
 )

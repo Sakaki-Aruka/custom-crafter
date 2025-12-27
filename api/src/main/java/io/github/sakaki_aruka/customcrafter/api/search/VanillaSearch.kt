@@ -16,6 +16,7 @@ object VanillaSearch {
      * @param[view] an input view
      * @return[Recipe] a found recipe
      */
+    @JvmStatic
     fun search(
         world: World,
         view: CraftView
@@ -33,6 +34,7 @@ object VanillaSearch {
      * @return[Recipe] a found recipe
      * @since 5.0.14
      */
+    @JvmStatic
     fun search(
         world: World,
         mapped: Map<CoordinateComponent, ItemStack>

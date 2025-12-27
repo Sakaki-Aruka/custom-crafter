@@ -5,7 +5,6 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatterPredicate
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterPredicateImpl
 import io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant.CEnchantComponent
-import io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant.EnchantStrict
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
 import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
@@ -20,7 +19,7 @@ import org.bukkit.enchantments.Enchantment
  * @param[predicates] if in checks, this matter requires to pass these all.
  * @param[enchantComponents] enchant predicates for applied enchantments. set of [CEnchantComponent].
  */
-open class CEnchantMatterImpl(
+open class CEnchantMatterImpl @JvmOverloads constructor(
     override val name: String,
     override val candidate: Set<Material>,
     override val enchantComponents: Set<CEnchantComponent>,
@@ -34,6 +33,7 @@ open class CEnchantMatterImpl(
          *
          * @since 5.0.15
          */
+        @JvmField
         val DEFAULT_ENCHANT_CHECKER = CMatterPredicateImpl { ctx ->
             if (ctx.input.type.isAir) {
                 return@CMatterPredicateImpl true
@@ -60,8 +60,8 @@ open class CEnchantMatterImpl(
             required: CEnchantComponent
         ): Boolean {
             return when (required.strict) {
-                EnchantStrict.ONLY_ENCHANT -> enchants.containsKey(required.enchantment)
-                EnchantStrict.STRICT -> {
+                CEnchantComponent.Strict.ONLY_ENCHANT -> enchants.containsKey(required.enchantment)
+                CEnchantComponent.Strict.STRICT -> {
                     enchants.getOrDefault(required.enchantment, -1) == required.level
                 }
             }

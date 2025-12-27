@@ -7,11 +7,11 @@ import io.github.sakaki_aruka.customcrafter.api.event.PreCreateCustomItemEvent
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipeContainer
 import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
+import io.github.sakaki_aruka.customcrafter.api.interfaces.ui.CraftUIDesigner
 import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.search.Search
-import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter.toComponent
 import io.github.sakaki_aruka.customcrafter.impl.util.InventoryUtil.giveItems
 import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterUI
@@ -32,50 +32,38 @@ import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 import java.util.UUID
-import kotlin.math.max
 
 internal class CraftUI(
-    var dropItemsOnClose: Boolean = true
+    var dropItemsOnClose: Boolean = true,
+    caller: Player? = null,
+    baked: CraftUIDesigner.Baked? = null
 ): CustomCrafterUI, InventoryHolder {
 
-    private val inventory: Inventory = Bukkit.createInventory(
-        this,
-        54,
-        "Custom Crafter".toComponent()
-    )
+    private val inventory: Inventory
+    val bakedDesigner: CraftUIDesigner.Baked
 
     init {
-        (0..<54).forEach { slot ->
-            this.inventory.setItem(slot, ItemStack(Material.BLACK_STAINED_GLASS_PANE).apply {
-                itemMeta = itemMeta.apply {
-                    displayName(Component.empty())
-                    // An additional datum to prevent accidental menu operation
-                    persistentDataContainer.set(
-                        NamespacedKey("custom_crafter", UUID.randomUUID().toString()),
-                        PersistentDataType.STRING,
-                        UUID.randomUUID().toString()
-                    )
-                }
-            })
-        }
-        Converter.getAvailableCraftingSlotComponents().forEach { c ->
-            val index: Int = c.x + c.y * 9
-            this.inventory.setItem(index, ItemStack.empty())
-        }
-        val makeButton: ItemStack = ItemStack(Material.ANVIL).apply {
-            itemMeta = itemMeta.apply {
-                displayName(Component.text("Making items"))
-            }
-        }
-        this.inventory.setItem(CustomCrafterAPI.CRAFTING_TABLE_MAKE_BUTTON_SLOT, makeButton)
-        this.inventory.setItem(CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT, ItemStack.empty())
+        val designContext = CraftUIDesigner.Context(player = caller)
+        bakedDesigner = baked ?: CraftUIDesigner.bake(CustomCrafterAPI.getCraftUIDesigner(), designContext)
+
+        bakedDesigner.isValid().exceptionOrNull()?.let { throw it }
+
+        inventory = Bukkit.createInventory(
+            this,
+            54,
+            bakedDesigner.title
+        )
+
+        bakedDesigner.apply(inventory)
     }
 
-    companion object: CustomCrafterUI.InteractTriggered {
+    companion object: CustomCrafterUI.InteractTriggered, CraftUIDesigner {
         override fun isTrigger(event: PlayerInteractEvent): Boolean {
             if (!CustomCrafterAPI.getUseCustomCraftUI()) {
                 return false
             } else if (!event.action.isRightClick) {
+                return false
+            } else if (!event.player.hasPermission("cc.craftui.click.open")) {
                 return false
             }
             val clicked: Block = event.clickedBlock?.takeIf { b -> b.type == Material.CRAFTING_TABLE }
@@ -94,7 +82,45 @@ internal class CraftUI(
 
         override fun open(event: PlayerInteractEvent) {
             event.isCancelled = true
-            event.player.openInventory(CraftUI().inventory)
+            event.player.openInventory(CraftUI(caller = event.player).inventory)
+        }
+
+        const val RESULT_SLOT = 44
+        const val MAKE_BUTTON = 35
+
+        override fun title(context: CraftUIDesigner.Context): Component {
+            return "Custom Crafter".toComponent()
+        }
+
+        override fun resultSlot(context: CraftUIDesigner.Context): CoordinateComponent {
+            return CoordinateComponent.fromIndex(RESULT_SLOT)
+        }
+
+        override fun makeButton(context: CraftUIDesigner.Context): Pair<CoordinateComponent, ItemStack> {
+            return CoordinateComponent.fromIndex(MAKE_BUTTON) to ItemStack(Material.ANVIL).apply {
+                itemMeta = itemMeta.apply {
+                    customName(Component.text("Making items"))
+                }
+            }
+        }
+
+        override fun blankSlots(context: CraftUIDesigner.Context): Map<CoordinateComponent, ItemStack> {
+            val blank = ItemStack.of(Material.BLACK_STAINED_GLASS_PANE).apply {
+                itemMeta = itemMeta.apply {
+                    displayName(Component.empty())
+                    // An additional datum to prevent accidental menu operation
+                    persistentDataContainer.set(
+                        NamespacedKey("custom_crafter", UUID.randomUUID().toString()),
+                        PersistentDataType.STRING,
+                        UUID.randomUUID().toString()
+                    )
+                }
+            }
+            return (0..<54)
+                .filter { it % 9 >= 6 }
+                .minus(RESULT_SLOT)
+                .minus(MAKE_BUTTON)
+                .associate { CoordinateComponent.fromIndex(it) to blank }
         }
     }
 
@@ -108,7 +134,7 @@ internal class CraftUI(
         event.result = Event.Result.DENY
         event.currentItem = ItemStack.empty()
 
-        val resultSlotItem: ItemStack = event.inventory.getItem(CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT)?.clone()
+        val resultSlotItem: ItemStack = event.inventory.getItem(this.bakedDesigner.resultInt())?.clone()
             ?: ItemStack.empty()
 
         // pseudo
@@ -121,11 +147,11 @@ internal class CraftUI(
                 )
             }
         }
-        event.inventory.setItem(CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT, stainedGlass)
+        event.inventory.setItem(this.bakedDesigner.resultInt(), stainedGlass)
 
         val remaining: List<ItemStack> = event.inventory.addItem(currentItem).values.toList()
         // delete pseudo
-        event.inventory.setItem(CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT, resultSlotItem)
+        event.inventory.setItem(this.bakedDesigner.resultInt(), resultSlotItem)
         (event.whoClicked as Player).giveItems(saveLimit = true, *remaining.toTypedArray())
     }
 
@@ -133,7 +159,7 @@ internal class CraftUI(
         if (!this.dropItemsOnClose) {
             return
         }
-        val view: CraftView = CraftView.fromInventory(event.inventory) ?: return
+        val view: CraftView = this.toView()
         val player: Player = event.player as? Player ?: return
         player.giveItems(saveLimit = true, *view.materials.values.toTypedArray(), view.result)
     }
@@ -143,9 +169,11 @@ internal class CraftUI(
         event: InventoryClickEvent
     ) {
         val player: Player = event.whoClicked as? Player ?: return
+        val clickedCoordinate = CoordinateComponent.fromIndex(event.rawSlot)
+
         event.isCancelled = true
-        when (event.rawSlot) {
-            CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT -> {
+        when (clickedCoordinate) {
+            this.bakedDesigner.result -> {
                 if (event.action in setOf(
                         InventoryAction.PLACE_ONE,
                         InventoryAction.PLACE_ALL,
@@ -158,8 +186,8 @@ internal class CraftUI(
                 return
             }
 
-            CustomCrafterAPI.CRAFTING_TABLE_MAKE_BUTTON_SLOT -> {
-                val view: CraftView = CraftView.fromInventory(inventory) ?: return
+            this.bakedDesigner.makeButton.first -> {
+                val view: CraftView = this.toView()
                 if (view.materials.values.none { i -> !i.isEmpty }) return
                 val preEvent = PreCreateCustomItemEvent(player, view, event.click)
                 Bukkit.getPluginManager().callEvent(preEvent)
@@ -168,20 +196,20 @@ internal class CraftUI(
                 val result: Search.SearchResult = Search.search(
                     player.uniqueId,
                     view,
-                    natural = !CustomCrafterAPI.getUseMultipleResultCandidateFeature()
+                    forceSearchVanillaRecipe = !CustomCrafterAPI.getUseMultipleResultCandidateFeature()
                 )
 
+                if (result.size() == 0) return
                 CreateCustomItemEvent(player, view, result, event.click).callEvent()
                 if (CustomCrafterAPI.getResultGiveCancel()) return
-
-                if (result.customs().isEmpty() && result.vanilla() == null) return
 
                 if (CustomCrafterAPI.getUseMultipleResultCandidateFeature() && result.size() > 1) {
                     val allCandidateUI = AllCandidateUI(
                         view = view,
                         player = player,
                         result = result,
-                        useShift = event.isShiftClick
+                        useShift = event.isShiftClick,
+                        bakedCraftUIDesigner = this.bakedDesigner
                     )
                     if (!allCandidateUI.inventory.isEmpty) {
                         this.dropItemsOnClose = false
@@ -192,7 +220,7 @@ internal class CraftUI(
                 }
             }
 
-            in Converter.getAvailableCraftingSlotIndices() -> {
+            in bakedDesigner.craftSlots() -> {
                 event.isCancelled = false
             }
         }
@@ -205,15 +233,22 @@ internal class CraftUI(
     ) {
         if (result.size() < 1) return
 
-        val mapped: Map<CoordinateComponent, ItemStack> = Converter.standardInputMapping(this.inventory) ?: return
+        val mapped: Map<CoordinateComponent, ItemStack> = bakedDesigner.craftSlots()
+            .map { c -> c to (this.inventory.getItem(c.toIndex()) ?: ItemStack.empty()) }
+            .filter { (_, item) -> !item.type.isAir }
+            .toMap()
         if (result.customs().isNotEmpty()) {
             val (recipe: CRecipe, relate: MappedRelation) = result.customs().firstOrNull() ?: return
 
-            val amount: Int = recipe.getMinAmount(mapped, relate, isCraftGUI = true, shift = shiftUsed)
-                //?.takeIf { it > 0 }
-                ?: return
+            val amount: Int = recipe.getTimes(mapped, relate, shift = shiftUsed)
 
-            relate.components.forEach { (_, input) -> decrement(this.inventory, input.toIndex(), amount) }
+            val decrementedView: CraftView = this.toView().clone().getDecremented(
+                shiftUsed = shiftUsed, recipe = recipe, relations = relate
+            )
+
+            decrementedView.materials.forEach { (c, item) ->
+                this.inventory.setItem(c.toIndex(), item)
+            }
 
             val results: MutableList<ItemStack> = recipe.getResults(
                 ResultSupplier.Context(
@@ -240,27 +275,17 @@ internal class CraftUI(
             }
 
         } else if (result.vanilla() != null) {
+            // customs: Empty, vanilla: Exists
             val min: Int = mapped.values.minOf { i -> i.amount }
-            val amount: Int = if (shiftUsed) min else 1
-            Converter.getAvailableCraftingSlotIndices()
-                .filter { s -> this.inventory.getItem(s)?.takeIf { item -> !item.type.isEmpty } != null }
-                .forEach { s -> decrement(this.inventory, s, amount) }
-            val item: ItemStack = result.vanilla()!!.result.apply { this.amount *= amount }
+            val decrementAmount: Int = if (shiftUsed) min else 1
+            bakedDesigner.craftSlots()
+                .filter { c -> this.inventory.getItem(c.toIndex())?.takeIf { item -> !item.type.isEmpty } != null }
+                .forEach { c ->
+                    val newItem = this.inventory.getItem(c.toIndex())
+                    this.inventory.setItem(c.toIndex(), newItem?.asQuantity(newItem.amount - decrementAmount))
+                }
+            val item: ItemStack = result.vanilla()!!.result.apply { this.amount *= decrementAmount }
             player.giveItems(items = arrayOf(item))
-        }
-    }
-
-    private fun decrement(
-        gui: Inventory,
-        slot: Int,
-        amount: Int
-    ) {
-        val item: ItemStack = gui.getItem(slot) ?: return
-        val qty: Int = max(item.amount - amount, 0)
-        if (qty == 0) {
-            gui.setItem(slot, ItemStack.empty())
-        } else {
-            gui.setItem(slot, item.asQuantity(qty))
         }
     }
 
@@ -270,15 +295,14 @@ internal class CraftUI(
         noAir: Boolean = true
     ): CraftView {
         val materials: MutableMap<CoordinateComponent, ItemStack> = mutableMapOf()
-        for (slot in Converter.getAvailableCraftingSlotIndices()) {
-            val c: CoordinateComponent = CoordinateComponent.fromIndex(slot)
-            val item: ItemStack = this.inventory.getItem(slot)
+        for (c in bakedDesigner.craftSlots()) {
+            val item: ItemStack = this.inventory.getItem(c.toIndex())
                 ?.takeIf { item -> !item.isEmpty }
                 ?: if (noAir) continue else ItemStack.empty()
             materials[c] = item
         }
 
-        val result: ItemStack = this.inventory.getItem(CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT)
+        val result: ItemStack = this.inventory.getItem(this.bakedDesigner.resultInt())
             ?: ItemStack.empty()
         return CraftView(materials, result)
     }

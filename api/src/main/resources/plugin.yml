@@ -13,3 +13,9 @@ commands:
 permissions:
   cc.command:
     default: op
+
+  cc.craftui.click.open:
+    default: true
+
+  cc.craftui.command.open:
+    default: false

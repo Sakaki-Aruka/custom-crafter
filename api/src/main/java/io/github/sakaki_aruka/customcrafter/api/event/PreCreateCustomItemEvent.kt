@@ -17,7 +17,7 @@ import org.bukkit.event.inventory.ClickType
  * @param[clickType] A click type what is player did
  */
 
-class PreCreateCustomItemEvent internal constructor(
+class PreCreateCustomItemEvent (
     val player: Player,
     val view: CraftView,
     val clickType: ClickType

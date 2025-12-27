@@ -5,7 +5,6 @@ import io.github.sakaki_aruka.customcrafter.internal.InternalAPI;
 import io.github.sakaki_aruka.customcrafter.internal.command.CC;
 import io.github.sakaki_aruka.customcrafter.internal.listener.InventoryClickListener;
 import io.github.sakaki_aruka.customcrafter.internal.listener.InventoryCloseListener;
-import io.github.sakaki_aruka.customcrafter.internal.listener.NoPlayerListener;
 import io.github.sakaki_aruka.customcrafter.internal.listener.PlayerInteractListener;
 import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
 import org.bukkit.Bukkit;
@@ -29,7 +28,6 @@ public final class CustomCrafter extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(InventoryClickListener.INSTANCE, instance);
         Bukkit.getPluginManager().registerEvents(InventoryCloseListener.INSTANCE, instance);
         Bukkit.getPluginManager().registerEvents(PlayerInteractListener.INSTANCE, instance);
-        Bukkit.getPluginManager().registerEvents(NoPlayerListener.Companion, instance);
         this.getLifecycleManager().registerEventHandler(
                 LifecycleEvents.COMMANDS,
                 commands -> {

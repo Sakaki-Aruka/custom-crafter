@@ -9,7 +9,7 @@ import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateCompone
  * @param[input] An input items coordinate.
  */
 
-data class MappedRelationComponent internal constructor(
+data class MappedRelationComponent (
     val recipe: CoordinateComponent,
     val input: CoordinateComponent
 )

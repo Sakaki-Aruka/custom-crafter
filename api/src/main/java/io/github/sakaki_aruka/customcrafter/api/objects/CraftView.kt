@@ -1,16 +1,11 @@
 package io.github.sakaki_aruka.customcrafter.api.objects
 
-import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
-import io.github.sakaki_aruka.customcrafter.impl.util.Converter
-import io.github.sakaki_aruka.customcrafter.internal.gui.crafting.CraftUI
 import org.bukkit.Location
 import org.bukkit.World
-import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
-import kotlin.math.max
 
 /**
  * A view of crafting gui.
@@ -19,109 +14,58 @@ import kotlin.math.max
  * @param[result] An item that is placed the result item slot.
  */
 
-data class CraftView internal constructor(
+data class CraftView (
     val materials: Map<CoordinateComponent, ItemStack>,
     val result: ItemStack
 ) {
-    companion object {
-        /**
-         * converting an [Inventory] to [CraftView].
-         * ```
-         * // an example from Java.
-         * Inventory gui = ~~~;
-         * CraftView view = CraftView.fromInventory(gui, true);
-         *
-         * // an example from Kotlin
-         * val gui = ~~~
-         * val view = CraftView.fromInventory(gui)
-         * ```
-         *
-         * @param[inventory] convert target
-         * @param[paddingAir] padding empty slots with [ItemStack.empty] or not. default value is false. (default value can only use from Kotlin.)
-         * @return[CraftView?] A result of converting. If a provided inventory is not custom crafter's gui, returns Null.
-         */
-        fun fromInventory(
-            inventory: Inventory,
-            paddingAir: Boolean = false
-        ): CraftView? {
-            val mapped: MutableMap<CoordinateComponent, ItemStack> = Converter.standardInputMapping(inventory)?.toMutableMap() ?: return null
-            if (paddingAir) {
-                Converter.getAvailableCraftingSlotComponents()
-                    .filter { !mapped.keys.contains(it) }
-                    .forEach { coordinate ->
-                        mapped[coordinate] = ItemStack.empty()
-                    }
-            }
-            val result: ItemStack = inventory.getItem(CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT) ?: ItemStack.empty()
-            return CraftView(mapped, result)
-        }
-    }
-
     /**
-     * converts a view to Custom Crafter's gui.
+     * Returns a decremented view what calculated by specified arguments.
      *
-     * @return[Inventory] Custom Crafter's gui
+     * @param[shiftUsed] Consider to using Shift key or not
+     * @param[recipe] Recipe
+     * @param[relations] Relations with `this.materials` and `recipe.items`
+     * @return[CraftView] Decremented view
+     * @since 5.0.16
      */
-    fun toCraftingGUI(): Inventory {
-        val gui: Inventory = CraftUI().inventory
-        this.materials.entries.forEach { (c, item) ->
-            gui.setItem(c.x + c.y * 9, item)
-        }
-        gui.setItem(CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT, this.result)
-        return gui
-    }
-
-    /**
-     * decrement items from the provided CraftView
-     *
-     * if [forCustomSettings] is not null, this runs a process for CRecipe.
-     *
-     * only for Shift clicked
-     *
-     * @param[shiftUsed] a crafter used shift-click or not
-     * @param[forCustomSettings] a matched result info. (requires these when matched custom recipe)
-     * @since 5.0.8
-     */
-    fun getDecrementedCraftView(
-        shiftUsed: Boolean = true,
-        forCustomSettings: Pair<CRecipe, MappedRelation>? = null
+    fun getDecremented(
+        shiftUsed: Boolean,
+        recipe: CRecipe,
+        relations: MappedRelation
     ): CraftView {
-        val minAmount: Int = this.materials.values
-            .filter { item -> !item.isEmpty && item.type.isItem }
-            .minOf { item -> item.amount }
-        return forCustomSettings?.let { (cRecipe, mapped) ->
-            val map: MutableMap<CoordinateComponent, ItemStack> = mutableMapOf()
-            mapped.components.forEach { component ->
-                val matter: CMatter = cRecipe.items[component.recipe]!!
-                val isMass: Boolean = matter.mass
-                val decrementAmount: Int =
-                    if (isMass) 1
-                    else if (shiftUsed) (minAmount / matter.amount) * matter.amount
+        val minAmount: Int = recipe.getTimes(this.materials, relations, shiftUsed, withoutMass = true)
+
+        val map: MutableMap<CoordinateComponent, ItemStack> = mutableMapOf()
+        for ((r, i) in relations.components) {
+            val matter: CMatter = recipe.items.getValue(r)
+            val input: ItemStack = this.materials[i] ?: continue
+            val xLimit: Int = minAmount
+
+            val decrementAmount: Int =
+                if (matter.mass) 1
+                else
+                    if (shiftUsed) xLimit * matter.amount
                     else matter.amount
-                val newAmount: Int = max(0, this.materials[component.input]!!.amount - decrementAmount)
-                map[component.input] =
-                    if (newAmount == 0) ItemStack.empty()
-                    else let {
-                        val newItem: ItemStack = this.materials[component.input]?.clone() ?: ItemStack.empty()
-                        newItem.amount = newAmount
-                        newItem
-                    }
+
+            if (input.amount - decrementAmount < 1) {
+                map[i] = ItemStack.empty()
+            } else {
+                map[i] = input.clone().asQuantity(input.amount - decrementAmount)
             }
-            CraftView(map, ItemStack.empty())
-        } ?: run {
-            val map: MutableMap<CoordinateComponent, ItemStack> = mutableMapOf()
-            this.materials.forEach { (c, item) ->
-                val newAmount: Int = max(0, item.amount - if (shiftUsed) minAmount else 1)
-                map[c] =
-                    if (newAmount == 0) ItemStack.empty()
-                    else let {
-                        val newItem: ItemStack = item.clone()
-                        newItem.amount = newAmount
-                        newItem
-                    }
-            }
-            CraftView(map, ItemStack.empty())
         }
+
+        return CraftView(materials = map.toMap(), result = this.result.clone())
+    }
+
+    /**
+     * Returns a cloned view
+     *
+     * @return[CraftView] view of cloned
+     * @since 5.0.16
+     */
+    fun clone(): CraftView {
+        val map: MutableMap<CoordinateComponent, ItemStack> = mutableMapOf()
+        this.materials.forEach { (component, item) -> map[component] = item.clone() }
+        return CraftView(materials = map.toMap(), result = this.result.clone())
     }
 
     /**
@@ -137,15 +81,5 @@ data class CraftView internal constructor(
         this.result.takeIf { item -> !item.isEmpty }?.let { item ->
             world.dropItem(location, item)
         }
-    }
-
-    internal fun reduceMaterials(
-        amount: Int,
-        coordinates: Set<CoordinateComponent> = this.materials.keys
-    ) {
-        this.materials.filter { (c, _) -> c in coordinates }
-            .forEach { (_, item) ->
-                item.amount = max(0, item.amount - amount)
-            }
     }
 }

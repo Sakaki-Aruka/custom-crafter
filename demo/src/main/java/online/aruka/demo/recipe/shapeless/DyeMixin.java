@@ -17,12 +17,12 @@ public class DyeMixin {
     public static CRecipe mixWithoutBlack() {
         List<CMatter> colors = MaterialTags.DYES.getValues().stream()
                 .filter(dye -> dye != Material.BLACK_DYE)
-                .map(CMatterImpl.Companion::of)
+                .map(CMatterImpl::of)
                 .collect(Collectors.toList());
 
-        ResultSupplier supplier = ResultSupplierImpl.Companion.timesSingle(ItemStack.of(Material.BLACK_DYE));
+        ResultSupplier supplier = ResultSupplierImpl.timesSingle(ItemStack.of(Material.BLACK_DYE));
 
-        return CRecipeImpl.Companion.amorphous(
+        return CRecipeImpl.shapeless(
                 "Dye mixin without black",
                 colors,
                 null,

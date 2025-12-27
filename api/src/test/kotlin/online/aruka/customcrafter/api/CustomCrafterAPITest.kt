@@ -1,7 +1,12 @@
 package online.aruka.customcrafter.api
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
+import io.github.sakaki_aruka.customcrafter.api.interfaces.ui.CraftUIDesigner
+import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
+import io.github.sakaki_aruka.customcrafter.impl.util.Converter.toComponent
+import net.kyori.adventure.text.Component
 import org.bukkit.Material
+import org.bukkit.inventory.ItemStack
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -25,15 +30,6 @@ internal object CustomCrafterAPITest {
     @AfterEach
     fun tearDown() {
         MockBukkit.unmock()
-    }
-
-    @Test
-    fun randomCoordinatesTest() {
-        assertTrue(CustomCrafterAPI.getRandomNCoordinates(100).size == 100)
-
-        assertThrows<IllegalArgumentException> {
-            CustomCrafterAPI.getRandomNCoordinates(0)
-        }
     }
 
     @Test
@@ -64,6 +60,39 @@ internal object CustomCrafterAPITest {
 
         CustomCrafterAPI.setBaseBlockDefault()
         assertTrue(CustomCrafterAPI.getBaseBlock() == Material.GOLD_BLOCK)
+    }
+
+    @Test
+    fun craftUIDesignerTest() {
+        val anonymous = object: CraftUIDesigner {
+            override fun blankSlots(context: CraftUIDesigner.Context): Map<CoordinateComponent, ItemStack> {
+                val blank = ItemStack.of(Material.STONE)
+                return (0..<54).filter { it % 9 > 5 }
+                    .map { CoordinateComponent.fromIndex(it) }
+                    .associateWith { blank }
+            }
+
+            override fun makeButton(context: CraftUIDesigner.Context): Pair<CoordinateComponent, ItemStack> {
+                return CoordinateComponent.fromIndex(35) to ItemStack.of(Material.STONE)
+            }
+
+            override fun resultSlot(context: CraftUIDesigner.Context): CoordinateComponent {
+                return CoordinateComponent.fromIndex(44)
+            }
+
+            override fun title(context: CraftUIDesigner.Context): Component {
+                return "".toComponent()
+            }
+        }
+
+        CustomCrafterAPI.setCraftUIDesigner(anonymous)
+
+        val nullContext = CraftUIDesigner.Context()
+        assertTrue((0..<54).filter { it % 9 > 5 }.map { CoordinateComponent.fromIndex(it) }
+            .containsAll(CustomCrafterAPI.getCraftUIDesigner().blankSlots(nullContext).keys)
+        )
+
+        CustomCrafterAPI.setCraftUIDesignerDefault()
     }
 
     // MockBukkit error

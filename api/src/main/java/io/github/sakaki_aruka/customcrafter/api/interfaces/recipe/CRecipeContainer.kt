@@ -23,15 +23,8 @@ interface CRecipeContainer {
          * ```
          * @since 5.0.12
          */
+        @JvmField
         val AlwaysTrue: (Context) -> Boolean = { _ -> true }
-
-        /**
-         * ```kotlin
-         * val None: (Context) -> Unit = { _ -> }
-         * ```
-         * @since 5.0.12
-         */
-        val None: (Context) -> Unit = { _ -> }
     }
 
     /**
@@ -43,7 +36,7 @@ interface CRecipeContainer {
      * @param[isAllCandidateDisplayCall] Called from AllCandidateDisplay feature or not
      * @since 5.0.15
      */
-    class Context internal constructor(
+    class Context (
         val userID: UUID,
         val relation: MappedRelation,
         val mapped: Map<CoordinateComponent, ItemStack>,

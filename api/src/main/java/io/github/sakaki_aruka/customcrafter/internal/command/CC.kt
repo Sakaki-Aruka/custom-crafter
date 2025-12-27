@@ -6,10 +6,12 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter.toComponent
+import io.github.sakaki_aruka.customcrafter.internal.gui.crafting.CraftUI
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
 import io.papermc.paper.command.brigadier.argument.ArgumentTypes
 import org.bukkit.Material
+import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
 internal object CC {
@@ -33,6 +35,10 @@ internal object CC {
      *   - BASE_BLOCK
      *   - USE_MULTIPLE_RESULT_CANDIDATE_FEATURE
      *   - BASE_BLOCK_SIDE
+     *
+     * - Other Part
+     *   - Open
+     *     - CraftUI
      */
 
     private const val SINGLE_SUCCESS: Int = 1
@@ -151,7 +157,25 @@ internal object CC {
             )
         )
 
+    private val Open: LiteralArgumentBuilder<CommandSourceStack> = Commands.literal("open")
+        .then(Commands.literal("craft")
+            .requires { ctx ->
+                (ctx.sender as? Player)?.permissionValue("cc.craftui.command.open")?.toBooleanOrElse(false)
+                    ?: false
+            }
+            .executes { ctx ->
+                val player: Player = ctx.source.sender as Player
+                player.openInventory(CraftUI(caller = player).inventory)
+                return@executes SINGLE_SUCCESS
+            }
+        )
+
     val command: LiteralArgumentBuilder<CommandSourceStack> = Commands.literal("cc")
-        .then(Get)
-        .then(Set)
+        .then(Get.requires { ctx ->
+            ctx.sender.hasPermission("cc.command")
+        })
+        .then(Set.requires { ctx ->
+            ctx.sender.hasPermission("cc.command")
+        })
+        .then(Open)
 }

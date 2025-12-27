@@ -30,7 +30,7 @@ interface ResultSupplier {
      * @param[calledTimes] Calculated minimum amount with [CMatter.amount]
      * @param[isMultipleDisplayCall] `invoke` called from multiple result display item collector or not
      */
-    class Context internal constructor(
+    class Context (
         val recipe: CRecipe,
         val relation: MappedRelation,
         val mapped: Map<CoordinateComponent, ItemStack>,

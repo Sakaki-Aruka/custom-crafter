@@ -16,7 +16,7 @@ import org.bukkit.Material
  * @param[mass] this matter is mass or not (default = false)
  * @param[predicates] if in checks, this matter requires to pass these all. (default = Enchant, EnchantStorage, Potion checker contains)
  */
-open class CMatterImpl(
+open class CMatterImpl @JvmOverloads constructor(
     override val name: String,
     override val candidate: Set<Material>,
     override val amount: Int = 1,
@@ -32,6 +32,7 @@ open class CMatterImpl(
          * @see[CPotionMatterImpl.DEFAULT_POTION_CHECKER]
          * @since 5.0.15
          */
+        @JvmStatic
         fun defaultMatterPredicates(): Set<CMatterPredicate> {
             return setOf(
                 CEnchantMatterImpl.DEFAULT_ENCHANT_CHECKER,
@@ -60,6 +61,7 @@ open class CMatterImpl(
          * @return[CMatterImpl] Built matter
          * @throws[IllegalStateException] Throws when [materials] is empty and contains invalid material
          */
+        @JvmStatic
         fun of(vararg materials: Material): CMatterImpl {
             val matter = CMatterImpl(
                 name = materials.joinToString("-") { m -> m.name },
@@ -91,6 +93,7 @@ open class CMatterImpl(
          *
          * @param[material] a candidate of this matter.
          */
+        @JvmStatic
         fun single(material: Material): CMatterImpl = of(material)
 
         /**
@@ -113,6 +116,7 @@ open class CMatterImpl(
          * @return[CMatterImpl] Built matter
          * @throws[IllegalStateException] Throws when [materials] is empty and contains invalid material
          */
+        @JvmStatic
         fun multi(vararg materials: Material): CMatterImpl = of(*materials)
     }
 }

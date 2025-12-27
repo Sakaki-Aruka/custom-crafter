@@ -5,8 +5,6 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter;
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe;
 import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier;
 import io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant.CEnchantComponent;
-import io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant.EnchantStrict;
-import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType;
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent;
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl;
 import io.github.sakaki_aruka.customcrafter.impl.matter.enchant.CEnchantmentStoreMatterImpl;
@@ -29,15 +27,15 @@ public class OverLimitEnchantedBook {
         CEnchantmentStoreMatter enchantMatter = new CEnchantmentStoreMatterImpl(
                 "Lv.5 Efficiency Enchanted Book",
                 Set.of(Material.ENCHANTED_BOOK),
-                Set.of(new CEnchantComponent(5, Enchantment.EFFICIENCY, EnchantStrict.STRICT)),
+                Set.of(new CEnchantComponent(5, Enchantment.EFFICIENCY, CEnchantComponent.Strict.STRICT)),
                 1,
                 false,
-                CMatterImpl.Companion.defaultMatterPredicates()
+                CMatterImpl.defaultMatterPredicates()
         );
 
-        GroupRecipe.Matter book = GroupRecipe.Matter.Companion.of(enchantMatter, true);
-        GroupRecipe.Matter goldBlock = GroupRecipe.Matter.Companion.of(
-                CMatterImpl.Companion.of(Material.GOLD_BLOCK),
+        GroupRecipe.Matter book = GroupRecipe.Matter.of(enchantMatter, true);
+        GroupRecipe.Matter goldBlock = GroupRecipe.Matter.of(
+                CMatterImpl.of(Material.GOLD_BLOCK),
                 false
         );
 
@@ -55,14 +53,14 @@ public class OverLimitEnchantedBook {
          *   - Enchanted Book Amount = 4: x1, Efficiency Lv.7 Enchanted Book
          */
 
-        Map<CoordinateComponent, CMatter> items = CoordinateComponent.Companion.squareFill(3, 0, 0, false)
+        Map<CoordinateComponent, CMatter> items = CoordinateComponent.squareFill(3, 0, 0, false)
                 .stream()
                 .map(c -> new Pair<CoordinateComponent, CMatter>(c, c.toIndex() % 2 == 0 ? goldBlock : book))
                 .collect(Collectors.toMap(Pair::component1, Pair::component2));
 
         Set<GroupRecipe.Context> groups = Set.of(
                 // Gold Block Group
-                GroupRecipe.Context.Companion.of(
+                GroupRecipe.Context.of(
                         items.keySet().stream()
                                 .filter(c -> c.toIndex() % 2 == 0)
                                 .collect(Collectors.toSet()),
@@ -71,7 +69,7 @@ public class OverLimitEnchantedBook {
                 ),
 
                 // Enchanted Book Group
-                GroupRecipe.Context.Companion.of(
+                GroupRecipe.Context.of(
                         items.keySet().stream()
                                 .filter(c -> c.toIndex() % 2 == 1)
                                 .collect(Collectors.toSet()),
@@ -118,7 +116,7 @@ public class OverLimitEnchantedBook {
                 groups,
                 null,
                 List.of(supplier),
-                CRecipeType.NORMAL
+                CRecipe.Type.SHAPED
         );
     }
 }

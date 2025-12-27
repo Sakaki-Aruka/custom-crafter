@@ -20,7 +20,7 @@ import org.bukkit.inventory.meta.EnchantmentStorageMeta
  * @param[predicates] if in checks, this matter requires to pass these all.
  * @param[storedEnchantComponents] enchant predicates for stored enchantments. set of [CEnchantComponent].
  */
-data class CEnchantmentStoreMatterImpl(
+open class CEnchantmentStoreMatterImpl @JvmOverloads constructor(
     override val name: String,
     override val candidate: Set<Material>,
     override val storedEnchantComponents: Set<CEnchantComponent>,
@@ -34,6 +34,7 @@ data class CEnchantmentStoreMatterImpl(
          *
          * @since 5.0.15
          */
+        @JvmField
         val DEFAULT_ENCHANT_STORE_CHECKER = CMatterPredicateImpl { ctx ->
             if (ctx.input.type.isEmpty) {
                 return@CMatterPredicateImpl true

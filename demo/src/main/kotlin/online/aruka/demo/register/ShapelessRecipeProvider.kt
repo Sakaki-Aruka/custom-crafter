@@ -7,7 +7,6 @@ import io.github.sakaki_aruka.customcrafter.impl.recipe.CRecipeContainerImpl
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
 import io.github.sakaki_aruka.customcrafter.impl.recipe.CRecipeImpl
 import io.github.sakaki_aruka.customcrafter.impl.result.ResultSupplierImpl
-import io.github.sakaki_aruka.customcrafter.impl.util.Converter.toComponent
 import online.aruka.demo.Demo
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -28,7 +27,7 @@ object ShapelessRecipeProvider {
          *
          * returns 1x glow berries
          */
-        return CRecipeImpl.amorphous(
+        return CRecipeImpl.shapeless(
             name = "glow berry recipe",
             items = listOf(glowstone, berry),
             results = listOf(
@@ -60,7 +59,7 @@ object ShapelessRecipeProvider {
                 listOf(ItemStack.of(Material.IRON_BLOCK, amount))
             }
         }
-        return CRecipeImpl.amorphous(
+        return CRecipeImpl.shapeless(
             name = "infinity iron block extract recipe",
             items = listOf(infinityIronBlock),
             results = listOf(supplier)
@@ -84,7 +83,7 @@ object ShapelessRecipeProvider {
             }
         )
         val supplier = ResultSupplierImpl.timesSingle(ItemStack.of(Material.GLASS_BOTTLE))
-        return CRecipeImpl.amorphous(
+        return CRecipeImpl.shapeless(
             name = "potion effect extractor recipe",
             items = listOf(potion),
             containers = listOf(container),

@@ -4,6 +4,7 @@ import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipeContainer
 import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
+import io.github.sakaki_aruka.customcrafter.api.interfaces.ui.CraftUIDesigner
 import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.search.Search
@@ -28,7 +29,8 @@ internal class AllCandidateUI(
     private val player: Player,
     private val result: Search.SearchResult,
     useShift: Boolean,
-    private var dropOnClose: Boolean = true
+    private val bakedCraftUIDesigner: CraftUIDesigner.Baked,
+    private var dropOnClose: Boolean = true,
 ) : CustomCrafterUI.Pageable, InventoryHolder {
     private val inventory: Inventory = Bukkit.createInventory(
         this,
@@ -163,10 +165,17 @@ internal class AllCandidateUI(
             }
 
             BACK_TO_CRAFT -> {
-                val craftUI = CraftUI()
+                val craftUI = CraftUI(
+                    caller = event.whoClicked as? Player,
+                    baked = this.bakedCraftUIDesigner
+                )
                 this.view.materials.entries.forEach { (c, item) ->
                     craftUI.inventory.setItem(c.toIndex(), item)
                 }
+                craftUI.inventory.setItem(
+                    this.bakedCraftUIDesigner.resultInt(),
+                    this.view.result
+                )
                 this.dropOnClose = false
                 this.player.openInventory(craftUI.inventory)
                 return
@@ -201,12 +210,11 @@ internal class AllCandidateUI(
                         relation = mappedRelation,
                         mapped = view.materials,
                         shiftClicked = event.isShiftClick,
-                        calledTimes = recipe.getMinAmount(
+                        calledTimes = recipe.getTimes(
                             map = view.materials,
                             relation = mappedRelation,
-                            isCraftGUI = false,
                             shift = event.isShiftClick
-                        ) ?: 1,
+                        ),
                         isMultipleDisplayCall = false,
                         list = mutableListOf(),
                         crafterID = (event.whoClicked as Player).uniqueId
@@ -236,16 +244,20 @@ internal class AllCandidateUI(
                     this.view = CraftView(this.view.materials, ItemStack.empty())
                 }
 
-                this.view = this.view.getDecrementedCraftView(
+                this.view = this.view.getDecremented(
                     shiftUsed = event.isShiftClick,
-                    forCustomSettings = if (recipe is CVanillaRecipe) null else recipe to mappedRelation!!
+                    recipe = recipe,
+                    relations = mappedRelation!!,
                 )
 
-                val craftUI = CraftUI()
+                val craftUI = CraftUI(
+                    caller = event.whoClicked as? Player,
+                    baked = this.bakedCraftUIDesigner
+                )
                 this.view.materials.entries.forEach { (c, item) ->
                     craftUI.inventory.setItem(c.toIndex(), item)
                 }
-                craftUI.inventory.setItem(CustomCrafterAPI.CRAFTING_TABLE_RESULT_SLOT, this.view.result)
+                craftUI.inventory.setItem(this.bakedCraftUIDesigner.resultInt(), this.view.result)
                 this.dropOnClose = false
                 player.openInventory(craftUI.inventory)
             }

@@ -19,7 +19,7 @@ import org.bukkit.Material
  * @param[enchantComponents] enchant predicates for applied enchantments. set of [CEnchantComponent].
  * @param[storedEnchantComponents] enchant predicates for stored enchantments. set of [CEnchantComponent].
  */
-data class CEnchantBothMatterImpl(
+open class CEnchantBothMatterImpl @JvmOverloads constructor(
     override val name: String,
     override val candidate: Set<Material>,
     override val enchantComponents: Set<CEnchantComponent>,

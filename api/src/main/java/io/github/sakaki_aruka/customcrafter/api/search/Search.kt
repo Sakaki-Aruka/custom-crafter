@@ -7,12 +7,10 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelationComponent
-import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.impl.recipe.CVanillaRecipe
 import org.bukkit.Bukkit
 import org.bukkit.World
-import org.bukkit.entity.Player
 import org.bukkit.inventory.CraftingRecipe
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.Recipe
@@ -98,76 +96,49 @@ object Search {
     // one: Boolean
 
     /**
-     * 6x6 crafting items.
-     *
-     * zero origin & do not skip empty slots (do padding = use ItemStack#empty())
-     *
-     *  A search-result is not guaranteed what is not empty.
-     *
-     * @param[player] A craft-request sender.
-     * @param[items] Materials of crafting. this size must equal 36(6*6).
-     * @param[natural] Force to search vanilla recipes or not.(true=not, false=force). The default is true.
-     * @param[onlyFirst] get only first matched custom recipe and mapped. (default = false)
-     * @param[sourceRecipes] A list of searched recipes. (default = CustomCrafterAPI.getRecipes() / since 5.0.10)
-     * @return[SearchResult?] A result of a request. If you send one that contains invalid params, returns null.
-     */
-    fun search(
-        player: Player,
-        items: Array<ItemStack>,
-        natural: Boolean = true,
-        onlyFirst: Boolean = false,
-        sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes()
-    ): SearchResult? {
-        if (items.size != 36) return null
-        val materials: MutableMap<CoordinateComponent, ItemStack> = mutableMapOf()
-        for (y: Int in (0..<6)) {
-            for (x: Int in (0..<6)) {
-                val index: Int = x + y * 9
-                materials[CoordinateComponent(x, y)] = items[index]
-            }
-        }
-
-        val view = CraftView(materials, ItemStack.empty())
-        return search(player.uniqueId, view, natural, onlyFirst, sourceRecipes)
-    }
-
-    /**
      * search main method.
      *
      * this is more recommended than [search] (use List<ItemStack>).
      *
      * @param[crafterID] a crafter's UUID
      * @param[view] input crafting gui's view
-     * @param[natural] Force to search vanilla recipes or not.(true=not, false=force). The default is true.
+     * @param[forceSearchVanillaRecipe] Force to search vanilla recipes or not.(true=force, false=not). The default is true.
      * @param[onlyFirst] get only first matched custom recipe and mapped. (default = false)
      * @param[sourceRecipes] A list of searched recipes. (default = CustomCrafterAPI.getRecipes() / since 5.0.10)
      * @return[SearchResult?] A result of a request. If you send one that contains invalid params, returns null.
+     * @throws[IllegalArgumentException] Throws when 'view.materials' is empty or their size out of range 1 to 36.
      */
+    @JvmStatic
+    @JvmOverloads
     fun search(
         crafterID: UUID,
         view: CraftView,
-        natural: Boolean = true,
+        forceSearchVanillaRecipe: Boolean = true,
         onlyFirst: Boolean = false,
         sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes()
     ): SearchResult {
+        if (view.materials.isEmpty() || view.materials.size > 36) {
+            throw IllegalArgumentException("'view#materials' size must be in range of 1 to 36. (current: ${view.materials.size})")
+        }
         val mapped: Map<CoordinateComponent, ItemStack> = view.materials
 
         val customs: MutableList<Pair<CRecipe, MappedRelation>> = mutableListOf()
-        /*r.items.size == mapped.size*/
         for (recipe in sourceRecipes.filter { r -> mapped.size in r.requiresInputItemAmountMin()..r.requiresInputItemAmountMax() }) {
             when (recipe.type) {
-                CRecipeType.NORMAL -> {
+                CRecipe.Type.SHAPED -> {
                     if (!normal(mapped, recipe, crafterID)) {
                         continue
                     }
-                    val components: Set<MappedRelationComponent> = recipe.items.entries.zip(mapped.entries)
+                    val recipeSortedEntries: List<Map.Entry<CoordinateComponent, CMatter>> = recipe.items.entries.sortedBy { it.key.toIndex() }
+                    val inputSortedEntries: List<Map.Entry<CoordinateComponent, ItemStack>> = mapped.entries.sortedBy { it.key.toIndex() }
+                    val components: Set<MappedRelationComponent> = recipeSortedEntries.zip(inputSortedEntries)
                         .map { (recipeEntry, inputEntry) -> MappedRelationComponent(recipeEntry.key, inputEntry.key) }
                         .toSet()
                     customs.add(recipe to MappedRelation(components))
                 }
 
-                CRecipeType.AMORPHOUS -> {
-                    amorphous(mapped, recipe, crafterID)?.let { relation ->
+                CRecipe.Type.SHAPELESS -> {
+                    shapeless(mapped, recipe, crafterID)?.let { relation ->
                         customs.add(recipe to relation)
                     }
                 }
@@ -179,7 +150,7 @@ object Search {
         }
 
         val vanilla: Recipe? =
-            if (natural && customs.isNotEmpty()) null
+            if (!forceSearchVanillaRecipe && customs.isNotEmpty()) null
             else {
                 val world: World = Bukkit.getPlayer(crafterID)
                     ?.world
@@ -228,7 +199,7 @@ object Search {
     }
 
 
-    private fun getAmorphousCandidateCheckResult(
+    private fun getShapelessCandidateCheckResult(
         input: Map<CoordinateComponent, ItemStack>,
         recipe: CRecipe
     ): Map<Int, Set<Triple<Int, Boolean, Boolean>>> {
@@ -257,7 +228,7 @@ object Search {
     }
 
 
-    private fun getAmorphousMatterPredicatesCheckResult(
+    private fun getShapelessMatterPredicatesCheckResult(
         input: Map<CoordinateComponent, ItemStack>,
         recipe: CRecipe,
         crafterID: UUID
@@ -285,7 +256,7 @@ object Search {
         return result
     }
 
-    private fun getAmorphousAmountCheckResult(
+    private fun getShapelessAmountCheckResult(
         input: Map<CoordinateComponent, ItemStack>,
         recipe: CRecipe
     ): Map<Int, Set<Triple<Int, Boolean, Boolean>>> {
@@ -315,7 +286,7 @@ object Search {
         return result
     }
 
-    private fun amorphous(
+    private fun shapeless(
         mapped: Map<CoordinateComponent, ItemStack>,
         recipe: CRecipe,
         crafterID: UUID
@@ -334,9 +305,9 @@ object Search {
             }
         }
 
-        addResults(getAmorphousCandidateCheckResult(mapped, recipe))
-        addResults(getAmorphousMatterPredicatesCheckResult(mapped, recipe, crafterID))
-        addResults(getAmorphousAmountCheckResult(mapped, recipe))
+        addResults(getShapelessCandidateCheckResult(mapped, recipe))
+        addResults(getShapelessMatterPredicatesCheckResult(mapped, recipe, crafterID))
+        addResults(getShapelessAmountCheckResult(mapped, recipe))
 
         val merged: MutableMap<Int, MutableSet<Int>> = mutableMapOf()
         for ((k, set) in results) {

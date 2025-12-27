@@ -28,9 +28,9 @@ object CRecipeImplTest {
     }
 
     @Test
-    fun detectEmptyItemsOnAmorphousTest() {
+    fun detectEmptyItemsOnShapelessTest() {
         assertThrows<IllegalArgumentException> {
-            CRecipeImpl.amorphous(
+            CRecipeImpl.shapeless(
                 name = "",
                 items = emptyList()
             )
@@ -38,9 +38,9 @@ object CRecipeImplTest {
     }
 
     @Test
-    fun detectOverTheLimitItemsOnAmorphousTest() {
+    fun detectOverTheLimitItemsOnShapelessTest() {
         assertThrows<IllegalArgumentException> {
-            CRecipeImpl.amorphous(
+            CRecipeImpl.shapeless(
                 name = "",
                 items = List(37) { CMatterImpl.single(Material.STONE) }
             )
@@ -48,13 +48,13 @@ object CRecipeImplTest {
     }
 
     @Test
-    fun detectAirMatterOnAmorphousTest() {
+    fun detectAirMatterOnShapelessTest() {
         val air = CMatterImpl(
             name = "",
             candidate = setOf(Material.AIR)
         )
         assertThrows<IllegalStateException> {
-            CRecipeImpl.amorphous(
+            CRecipeImpl.shapeless(
                 name = "",
                 items = listOf(air)
             )
@@ -62,13 +62,13 @@ object CRecipeImplTest {
     }
 
     @Test
-    fun detectNotItemMatterOnAmorphousTest() {
+    fun detectNotItemMatterOnShapelessTest() {
         val notItem = CMatterImpl(
             name = "",
             candidate = setOf(Material.WATER)
         )
         assertThrows<IllegalStateException> {
-            CRecipeImpl.amorphous(
+            CRecipeImpl.shapeless(
                 name = "",
                 items = listOf(notItem)
             )
@@ -76,10 +76,10 @@ object CRecipeImplTest {
     }
 
     @Test
-    fun amorphousSuccessfulOnAmorphousTest() {
+    fun shapelessSuccessfulOnShapelessTest() {
         val matter = CMatterImpl.single(Material.STONE)
         assertDoesNotThrow {
-            CRecipeImpl.amorphous(
+            CRecipeImpl.shapeless(
                 name = "",
                 listOf(matter)
             )

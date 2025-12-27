@@ -4,7 +4,6 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterPredicateImpl
-import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CRecipeType
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
 import io.github.sakaki_aruka.customcrafter.impl.recipe.CRecipeImpl
@@ -44,7 +43,7 @@ object ShapedRecipeProvider {
             results = listOf(
                 ResultSupplierImpl.timesSingle(ItemStack.of(Material.ENCHANTED_GOLDEN_APPLE))
             ),
-            type = CRecipeType.NORMAL
+            type = CRecipe.Type.SHAPED
         )
     }
 
@@ -78,7 +77,7 @@ object ShapedRecipeProvider {
             name = "bulk water bottles recipe",
             items = items,
             results = listOf(supplier),
-            type = CRecipeType.NORMAL
+            type = CRecipe.Type.SHAPED
         )
     }
 
@@ -118,7 +117,7 @@ object ShapedRecipeProvider {
             name = "bulk water bottles (more) recipe",
             items = items,
             results = listOf(supplier),
-            type = CRecipeType.NORMAL
+            type = CRecipe.Type.SHAPED
         )
     }
 
@@ -173,7 +172,7 @@ object ShapedRecipeProvider {
             name = "infinity iron block core",
             items = items,
             results = listOf(supplier),
-            type = CRecipeType.NORMAL
+            type = CRecipe.Type.SHAPED
         )
     }
 
@@ -199,7 +198,9 @@ object ShapedRecipeProvider {
             includeAir = true
         )
         val ironBlockContext = GroupRecipe.Context.of(
-            members = Converter.getAvailableCraftingSlotComponents().filter { it.toIndex() != 0 }.toSet(),
+            members = CoordinateComponent.squareFill(6)
+                .minus(CoordinateComponent(0, 0))
+                .toSet(),
             min = 1
         )
 
