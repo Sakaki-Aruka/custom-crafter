@@ -11,8 +11,15 @@
 
 ## ✨ New Features and Enhancements
 
-* **[New Feature]** Added a new feature that allows the customization of the recipe arrangement (layout) on the crafting screen. This enables more flexible UI design.
-* **[Java Support]** Enhanced Java interoperability for static functions and values.
+* **[New Feature]** Added a new feature that allows the customization of the recipe arrangement (layout) on the crafting screen. This enables more flexible UI design. (`CraftUIDesigner`)
+* **[Enhancement]** Enhanced Java interoperability for static functions and values.
+* **[Enhancement]** Users can now initialize several classes.
+
+---
+
+## 🛠 Fix
+
+* We can now return correct answers for several search patterns.
 
 # 5.0.15(-p1)
 
