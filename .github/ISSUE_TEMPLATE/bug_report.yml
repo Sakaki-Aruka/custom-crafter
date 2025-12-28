@@ -1,0 +1,37 @@
+name: Bug Report
+description: Bug report
+title: "[Bug]: "
+labels: ["bug"]
+type: bug
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      value: summary
+
+  - type: textarea
+    id: reproduce
+    attributes:
+      value: steps of reproduce
+
+  - type: textarea
+    id: expected behavior
+    attributes:
+      value: expected behavior
+
+  - type: textarea
+    id: actual behavior
+    attributes:
+      value: actual behavior
+
+  - type: textarea
+    id: environment
+    attributes:
+      value: |
+        Server: e.g. Paper 1.21.10
+        Plugin: e.g. CustomCrafter 5.0.16, MCKotlin, CustomCrafterDemo 5.0.16
+
+  - type: textarea
+    id: logs
+    attributes:
+      value: logs / stack trace
