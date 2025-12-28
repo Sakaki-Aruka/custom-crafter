@@ -2,7 +2,6 @@ name: Bug Report
 description: Bug report
 title: "[Bug]: "
 labels: ["bug"]
-type: bug
 body:
   - type: textarea
     id: summary
@@ -15,12 +14,12 @@ body:
       label: reproduction steps
 
   - type: textarea
-    id: expected behavior
+    id: expected_behavior
     attributes:
       label: expected behavior
 
   - type: textarea
-    id: actual behavior
+    id: actual_behavior
     attributes:
       label: actual behavior
 
