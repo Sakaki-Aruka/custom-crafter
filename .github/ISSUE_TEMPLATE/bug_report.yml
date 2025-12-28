@@ -7,26 +7,27 @@ body:
   - type: textarea
     id: summary
     attributes:
-      value: summary
+      label: summary of this report
 
   - type: textarea
     id: reproduce
     attributes:
-      value: steps of reproduce
+      label: reproduction steps
 
   - type: textarea
     id: expected behavior
     attributes:
-      value: expected behavior
+      label: expected behavior
 
   - type: textarea
     id: actual behavior
     attributes:
-      value: actual behavior
+      label: actual behavior
 
   - type: textarea
     id: environment
     attributes:
+      label: environment
       value: |
         Server: e.g. Paper 1.21.10
         Plugin: e.g. CustomCrafter 5.0.16, MCKotlin, CustomCrafterDemo 5.0.16
@@ -34,4 +35,5 @@ body:
   - type: textarea
     id: logs
     attributes:
+      label: logs or stack trace (IP masked)
       value: logs / stack trace
