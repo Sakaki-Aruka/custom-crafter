@@ -21,6 +21,7 @@ import org.chocosolver.solver.Model
 import org.chocosolver.solver.variables.IntVar
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.Executors
 
 object Search {
 
@@ -99,6 +100,8 @@ object Search {
 
     // one: Boolean
 
+    private val asyncExecutor = Executors.newVirtualThreadPerTaskExecutor()
+
     /**
      * Returns a CompletableFuture that performs asynchronous searches using the input items and recipes.
      *
@@ -135,14 +138,14 @@ object Search {
 
         return CompletableFuture.allOf(
             *recipes.map { recipe ->
-                CompletableFuture.runAsync {
+                CompletableFuture.runAsync ({
                     when(recipe.type) {
                         CRecipe.Type.SHAPED -> shaped(view, recipe, crafterID, session)
                         CRecipe.Type.SHAPELESS -> shapeless(view, recipe, crafterID, session)
                     }?.let {
                         synchronized(customs) { customs.add(recipe to it) }
                     }
-                }
+                }, asyncExecutor)
             }.toTypedArray()
         ).thenApply { _ -> return@thenApply SearchResult(vanilla, customs) }
     }

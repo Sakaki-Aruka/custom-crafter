@@ -1,6 +1,8 @@
 package online.aruka.customcrafter.api.search
 
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
+import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.search.CRecipePredicate
+import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterPredicateImpl
 import io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant.CEnchantComponent
 import io.github.sakaki_aruka.customcrafter.api.objects.matter.potion.CPotionComponent
@@ -26,7 +28,10 @@ import org.mockbukkit.mockbukkit.MockBukkit
 import org.mockbukkit.mockbukkit.ServerMock
 import org.mockbukkit.mockbukkit.inventory.ItemStackMock
 import org.mockbukkit.mockbukkit.world.WorldMock
+import java.time.Duration
 import java.util.UUID
+import java.util.concurrent.CompletableFuture
+import kotlin.system.measureTimeMillis
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -541,5 +546,59 @@ internal object SearchTest {
         }
         assertTrue(recipeSet.isEmpty())
         assertTrue(inputSet.isEmpty())
+    }
+
+    @Test
+    fun asyncShapedSearchTest() {
+        val matter = CMatterImpl.of(Material.STONE)
+        val recipe = CRecipeImpl(
+            "",
+            CoordinateComponent.squareFill(6).associateWith { matter },
+            CRecipe.Type.SHAPED
+        )
+
+        val view = CraftView(
+            materials = CoordinateComponent.squareFill(6).associateWith { ItemStack.of(Material.STONE) },
+            result = ItemStack.empty()
+        )
+
+        val future: CompletableFuture<Search.SearchResult> = Search.asyncSearch(crafterID = UUID.randomUUID(), view, listOf(recipe))
+        val result = future.get()
+
+        assertEquals(1, result.size())
+        assertEquals(1, result.customs().size)
+    }
+
+    @Test
+    fun asyncShapelessSearchTest() {
+        val matter = CMatterImpl.of(Material.STONE)
+        val recipePredicate = object : CRecipePredicate {
+            override fun test(ctx: CRecipePredicate.Context): Boolean {
+                Thread.sleep(3000)
+                return true
+            }
+        }
+        val recipe = CRecipeImpl(
+            "",
+            CoordinateComponent.squareFill(6).associateWith { matter },
+            predicates = listOf(recipePredicate),
+            type = CRecipe.Type.SHAPELESS
+        )
+
+        val view = CraftView(
+            materials = CoordinateComponent.squareFill(6).associateWith { ItemStack.of(Material.STONE) },
+            result = ItemStack.empty()
+        )
+
+        val times = 1000
+        val list = (0..<times).map { recipe }
+
+        val future: CompletableFuture<Search.SearchResult> = Search.asyncSearch(crafterID = UUID.randomUUID(), view, list)
+        var result: Search.SearchResult
+
+        println("time: ${measureTimeMillis { result = future.get() }} ms")
+
+        assertEquals(times, result.size())
+        assertEquals(times, result.customs().size)
     }
 }
