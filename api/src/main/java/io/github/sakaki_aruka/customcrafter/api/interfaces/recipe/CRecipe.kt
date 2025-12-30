@@ -1,6 +1,8 @@
 package io.github.sakaki_aruka.customcrafter.api.interfaces.recipe
 
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
+import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.search.CRecipePredicate
+import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.search.SearchPreprocessor
 import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
@@ -23,6 +25,8 @@ import org.bukkit.inventory.ItemStack
 interface CRecipe {
     val name: String
     val items: Map<CoordinateComponent, CMatter>
+    val preprocessors: List<SearchPreprocessor>?
+    val predicates: List<CRecipePredicate>?
     val containers: List<CRecipeContainer>?
     val results: List<ResultSupplier>?
     val type: Type
@@ -87,6 +91,20 @@ interface CRecipe {
      * @since 5.0.15
      */
     fun requiresInputItemAmountMax(): Int = this.items.size
+
+    /**
+     * @since 5.0.17
+     */
+    fun runPreprocessors(context: SearchPreprocessor.Context) {
+        this.preprocessors?.let { it.forEach { p -> p.run(context) } }
+    }
+
+    /**
+     *
+     */
+    fun getRecipePredicateResults(context: CRecipePredicate.Context, whenEmptyDefault: Boolean = true): Boolean {
+        return this.predicates?.let { it.all { predicate -> predicate.test(context) } } ?: whenEmptyDefault
+    }
 
     /**
      * Runs all [containers] if it is not null.

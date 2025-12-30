@@ -3,6 +3,7 @@ package online.aruka.customcrafter.api.impl.matter
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatterPredicate
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
+import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.search.SearchSession
 import io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant.CEnchantComponent
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
@@ -52,7 +53,8 @@ object CEnchantMatterImplTest {
             input = ItemStack.empty(),
             mapped = map,
             recipe = recipe,
-            crafterID = UUID.randomUUID()
+            crafterID = UUID.randomUUID(),
+            session = SearchSession.SYNC_SESSION
         )
 
         assertTrue(CEnchantMatterImpl.DEFAULT_ENCHANT_CHECKER.predicate(context))
@@ -73,7 +75,8 @@ object CEnchantMatterImplTest {
             input = ItemStack.of(Material.DIRT),
             mapped = map,
             recipe = recipe,
-            crafterID = UUID.randomUUID()
+            crafterID = UUID.randomUUID(),
+            session = SearchSession.SYNC_SESSION
         )
 
         assertTrue(CEnchantMatterImpl.DEFAULT_ENCHANT_CHECKER.predicate(context))
@@ -94,7 +97,8 @@ object CEnchantMatterImplTest {
             input = ItemStack.of(Material.DIRT),
             mapped = map,
             recipe = recipe,
-            crafterID = UUID.randomUUID()
+            crafterID = UUID.randomUUID(),
+            session = SearchSession.SYNC_SESSION
         )
 
         assertTrue(CEnchantMatterImpl.DEFAULT_ENCHANT_CHECKER.predicate(context))
@@ -122,7 +126,8 @@ object CEnchantMatterImplTest {
             input = ItemStack.of(Material.DIRT),
             mapped = map,
             recipe = recipe,
-            crafterID = UUID.randomUUID()
+            crafterID = UUID.randomUUID(),
+            session = SearchSession.SYNC_SESSION
         )
 
         assertFalse(CEnchantMatterImpl.DEFAULT_ENCHANT_CHECKER.predicate(context))

@@ -3,6 +3,7 @@ package online.aruka.customcrafter.api.impl.matter
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatterPredicate
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
+import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.search.SearchSession
 import io.github.sakaki_aruka.customcrafter.api.objects.matter.potion.CPotionComponent
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
@@ -54,7 +55,8 @@ object CPotionMatterImplTest {
             input = ItemStack.empty(),
             mapped = map,
             recipe = recipe,
-            crafterID = UUID.randomUUID()
+            crafterID = UUID.randomUUID(),
+            session = SearchSession.SYNC_SESSION
         )
 
         assertTrue(CPotionMatterImpl.DEFAULT_POTION_CHECKER.predicate(context))
@@ -75,7 +77,8 @@ object CPotionMatterImplTest {
             input = ItemStack.of(Material.DIRT),
             mapped = map,
             recipe = recipe,
-            crafterID = UUID.randomUUID()
+            crafterID = UUID.randomUUID(),
+            session = SearchSession.SYNC_SESSION
         )
 
         assertTrue(CPotionMatterImpl.DEFAULT_POTION_CHECKER.predicate(context))
@@ -96,7 +99,8 @@ object CPotionMatterImplTest {
             input = ItemStack.of(Material.DIRT),
             mapped = map,
             recipe = recipe,
-            crafterID = UUID.randomUUID()
+            crafterID = UUID.randomUUID(),
+            session = SearchSession.SYNC_SESSION
         )
 
         assertTrue(CPotionMatterImpl.DEFAULT_POTION_CHECKER.predicate(context))
@@ -119,7 +123,8 @@ object CPotionMatterImplTest {
             input = ItemStack.of(Material.DIRT),
             mapped = map,
             recipe = recipe,
-            crafterID = UUID.randomUUID()
+            crafterID = UUID.randomUUID(),
+            session = SearchSession.SYNC_SESSION
         )
 
         assertFalse(CPotionMatterImpl.DEFAULT_POTION_CHECKER.predicate(context))
@@ -155,7 +160,8 @@ object CPotionMatterImplTest {
             input = lv1,
             mapped = map1,
             recipe = recipe,
-            crafterID = UUID.randomUUID()
+            crafterID = UUID.randomUUID(),
+            session = SearchSession.SYNC_SESSION
         )
 
         val context3 = CMatterPredicate.Context(
@@ -164,7 +170,8 @@ object CPotionMatterImplTest {
             input = lv3,
             mapped = map3,
             recipe = recipe,
-            crafterID = UUID.randomUUID()
+            crafterID = UUID.randomUUID(),
+            session = SearchSession.SYNC_SESSION
         )
 
         assertTrue(CPotionMatterImpl.DEFAULT_POTION_CHECKER.predicate(context1))
@@ -201,7 +208,8 @@ object CPotionMatterImplTest {
             input = lv1,
             mapped = map1,
             recipe = recipe,
-            crafterID = UUID.randomUUID()
+            crafterID = UUID.randomUUID(),
+            session = SearchSession.SYNC_SESSION
         )
 
         val context3 = CMatterPredicate.Context(
@@ -210,7 +218,8 @@ object CPotionMatterImplTest {
             input = lv3,
             mapped = map3,
             recipe = recipe,
-            crafterID = UUID.randomUUID()
+            crafterID = UUID.randomUUID(),
+            session = SearchSession.SYNC_SESSION
         )
 
         assertTrue(CPotionMatterImpl.DEFAULT_POTION_CHECKER.predicate(context1))

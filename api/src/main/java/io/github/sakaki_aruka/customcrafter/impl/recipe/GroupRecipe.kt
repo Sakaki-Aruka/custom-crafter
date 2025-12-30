@@ -4,6 +4,8 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatterPredicate
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipeContainer
+import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.search.CRecipePredicate
+import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.search.SearchPreprocessor
 import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
@@ -57,6 +59,8 @@ open class GroupRecipe @JvmOverloads constructor(
     override val name: String,
     override val items: Map<CoordinateComponent, CMatter>,
     val groups: Set<Context>,
+    override val preprocessors: List<SearchPreprocessor>? = null,
+    override val predicates: List<CRecipePredicate>? = null,
     override val containers: List<CRecipeContainer>? = null,
     override val results: List<ResultSupplier>? = null,
     override val type: CRecipe.Type = CRecipe.Type.SHAPED

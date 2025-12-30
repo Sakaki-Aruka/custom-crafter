@@ -1,9 +1,10 @@
 package io.github.sakaki_aruka.customcrafter.impl.recipe
 
-import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipeContainer
+import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.search.CRecipePredicate
+import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.search.SearchPreprocessor
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
 
@@ -20,6 +21,8 @@ open class CRecipeImpl @JvmOverloads constructor(
     override val name: String,
     override val items: Map<CoordinateComponent, CMatter>,
     override val type: CRecipe.Type,
+    override val preprocessors: List<SearchPreprocessor>? = null,
+    override val predicates: List<CRecipePredicate>? = null,
     override val containers: List<CRecipeContainer>? = null,
     override val results: List<ResultSupplier>? = null,
 ): CRecipe {
@@ -38,6 +41,8 @@ open class CRecipeImpl @JvmOverloads constructor(
         fun shapeless(
             name: String,
             items: List<CMatter>,
+            preprocessors: List<SearchPreprocessor>? = null,
+            predicates: List<CRecipePredicate>? = null,
             containers: List<CRecipeContainerImpl>? = null,
             results: List<ResultSupplier>? = null,
         ): CRecipeImpl {
@@ -52,6 +57,8 @@ open class CRecipeImpl @JvmOverloads constructor(
                 name = name,
                 items = map,
                 type = CRecipe.Type.SHAPELESS,
+                preprocessors = preprocessors,
+                predicates = predicates,
                 containers = containers,
                 results = results,
             )

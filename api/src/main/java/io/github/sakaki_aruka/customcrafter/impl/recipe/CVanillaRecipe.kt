@@ -3,6 +3,8 @@ package io.github.sakaki_aruka.customcrafter.impl.recipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipeContainer
+import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.search.CRecipePredicate
+import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.search.SearchPreprocessor
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
@@ -21,6 +23,8 @@ class CVanillaRecipe internal constructor(
     override val name: String,
     override val items: Map<CoordinateComponent, CMatter>,
     override val type: CRecipe.Type,
+    override val preprocessors: List<SearchPreprocessor>? = null,
+    override val predicates: List<CRecipePredicate>? = null,
     override val containers: List<CRecipeContainer>? = null,
     override val results: List<ResultSupplier>? = null,
     val original: Recipe
@@ -76,7 +80,7 @@ class CVanillaRecipe internal constructor(
                     candidates.firstOrNull()?.name ?: "vanilla matter default name",
                     candidates
                 )
-                result[CoordinateComponent.Companion.fromIndex(index)] = matter
+                result[CoordinateComponent.fromIndex(index)] = matter
             }
             return result
         }
@@ -93,7 +97,7 @@ class CVanillaRecipe internal constructor(
                     candidates.firstOrNull()?.name ?: "vanilla matter default name",
                     candidates
                 )
-                result[CoordinateComponent.Companion.fromIndex(index)] = matter
+                result[CoordinateComponent.fromIndex(index)] = matter
             }
             return result
         }

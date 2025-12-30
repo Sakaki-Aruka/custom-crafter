@@ -1,6 +1,8 @@
 package io.github.sakaki_aruka.customcrafter.api.interfaces.matter
 
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
+import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.search.SearchKVClient
+import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.search.SearchSession
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import org.bukkit.inventory.ItemStack
 import java.util.UUID
@@ -14,7 +16,7 @@ import java.util.UUID
  * @see[Context]
  * @see[CMatter.predicates]
  */
-interface CMatterPredicate {
+interface CMatterPredicate: SearchKVClient {
     val predicate: (Context) -> Boolean
 
     /**
@@ -34,8 +36,9 @@ interface CMatterPredicate {
         val input: ItemStack,
         val mapped: Map<CoordinateComponent, ItemStack>,
         val recipe: CRecipe,
-        val crafterID: UUID
-    ) {
+        val crafterID: UUID,
+        override val session: SearchSession
+    ): SearchKVClient.Context {
         fun copyWith(
             matter: CMatter = this.matter
         ): Context {
@@ -45,7 +48,8 @@ interface CMatterPredicate {
                 input = this.input,
                 mapped = this.mapped,
                 recipe = this.recipe,
-                crafterID = this.crafterID
+                crafterID = this.crafterID,
+                session = this.session
             )
         }
     }
