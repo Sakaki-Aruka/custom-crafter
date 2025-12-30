@@ -4,7 +4,7 @@ import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatterPredicate
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
-import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.search.CRecipePredicate
+import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipePredicate
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.search.SearchPreprocessor
 import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation

@@ -28,6 +28,23 @@ interface CRecipeContainer {
     }
 
     /**
+     * Asyncable [CRecipeContainer].
+     *
+     * ```kotlin
+     * // Example
+     * val container = object : CRecipeContainer.Asyncable {
+     *     override fun predicate(ctx: Context): Boolean = true
+     *     override fun consumer(ctx: Context) {
+     *         //
+     *     }
+     * }
+     * ```
+     *
+     * @since 5.0.17
+     */
+    interface Asyncable: CRecipeContainer
+
+    /**
      * Context of CRecipeContainer
      * @param[userID] Crafter's ID
      * @param[relation] Relation of input and recipe

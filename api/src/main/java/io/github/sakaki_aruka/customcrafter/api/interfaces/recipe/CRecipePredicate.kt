@@ -1,6 +1,7 @@
-package io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.search
+package io.github.sakaki_aruka.customcrafter.api.interfaces.recipe
 
-import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
+import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.search.SearchKVClient
+import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.search.SearchSession
 import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import java.util.UUID

@@ -227,6 +227,12 @@ internal class CraftUI(
     }
 
     private fun normalCrafting(
+        //
+    ) {
+        //
+    }
+
+    private fun normalCrafting(
         result: Search.SearchResult,
         shiftUsed: Boolean,
         player: Player
