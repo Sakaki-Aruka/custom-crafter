@@ -13,6 +13,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Executors;
 
 public final class CustomCrafter extends JavaPlugin {
 
@@ -34,6 +35,8 @@ public final class CustomCrafter extends JavaPlugin {
                     commands.registrar().register(CC.INSTANCE.getCommand().build());
                 }
         );
+
+        CustomCrafterAPI.EXECUTOR = Executors.newSingleThreadExecutor();
     }
 
     public CustomCrafterAPI getAPI() {
@@ -43,6 +46,7 @@ public final class CustomCrafter extends JavaPlugin {
     @Override
     public void onDisable() {
         InternalAPI.INSTANCE.shutdown();
+        CustomCrafterAPI.EXECUTOR.shutdown();
     }
 
     public static CustomCrafter getInstance(){

@@ -5,7 +5,6 @@ import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.event.CreateCustomItemEvent
 import io.github.sakaki_aruka.customcrafter.api.event.PreCreateCustomItemEvent
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
-import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipeContainer
 import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.api.interfaces.ui.CraftUIDesigner
 import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
@@ -226,9 +225,15 @@ internal class CraftUI(
         }
     }
 
-    private fun normalCrafting(
+    private fun asyncSearchHandler(event: InventoryClickEvent) {
+        // called from the main thread (synced)
+        // TODO: Open SearchWaitUI
         //
-    ) {
+
+        // TODO: AsyncCreateCustomItemEvent (UnCancellable)
+    }
+
+    private fun syncSearchHandler(event: InventoryClickEvent) {
         //
     }
 
@@ -256,25 +261,16 @@ internal class CraftUI(
                 this.inventory.setItem(c.toIndex(), item)
             }
 
-            val results: MutableList<ItemStack> = recipe.getResults(
+            val results: List<ItemStack> = recipe.getResults(
                 ResultSupplier.Context(
                     recipe = recipe,
                     crafterID = player.uniqueId,
                     relation = relate,
                     mapped = mapped,
-                    list = mutableListOf(),
                     shiftClicked = shiftUsed,
                     calledTimes = amount,
                     isMultipleDisplayCall = false)
             )
-
-            recipe.runNormalContainers(CRecipeContainer.Context(
-                userID = player.uniqueId,
-                relation = relate,
-                mapped = mapped,
-                results = results,
-                isAllCandidateDisplayCall = false
-            ))
 
             if (results.isNotEmpty()) {
                 player.giveItems(saveLimit = true, *results.toTypedArray())

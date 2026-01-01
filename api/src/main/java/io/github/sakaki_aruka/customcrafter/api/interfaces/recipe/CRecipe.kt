@@ -1,33 +1,28 @@
 package io.github.sakaki_aruka.customcrafter.api.interfaces.recipe
 
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
-import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipePredicate
-import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.search.SearchPreprocessor
 import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import org.bukkit.inventory.ItemStack
+import java.util.concurrent.CompletableFuture
 
 /**
  * This interface's implementing types can be used as recipes for CustomCrafter.
  *
  * @param[name] Name of this recipe
  * @param[items] Mapping of CMatter and those coordinates on crafting slots
- * @param[containers] Containers what run on success to search and crafting
  * @param[results] List of [ResultSupplier] what provide items to players
  * @param[type] Type of this recipe. See [CRecipe.Type]
  *
  * @see[CMatter]
- * @see[CRecipeContainer]
  * @see[ResultSupplier]
  * @see[CRecipe.Type]
  */
 interface CRecipe {
     val name: String
     val items: Map<CoordinateComponent, CMatter>
-    val preprocessors: List<SearchPreprocessor>?
     val predicates: List<CRecipePredicate>?
-    val containers: List<CRecipeContainer>?
     val results: List<ResultSupplier>?
     val type: Type
 
@@ -93,31 +88,34 @@ interface CRecipe {
     fun requiresInputItemAmountMax(): Int = this.items.size
 
     /**
+     * TODO: Write description
      * @since 5.0.17
      */
-    fun runPreprocessors(context: SearchPreprocessor.Context) {
-        this.preprocessors?.let { it.forEach { p -> p.run(context) } }
-    }
-
-    /**
-     *
-     */
-    fun getRecipePredicateResults(context: CRecipePredicate.Context, whenEmptyDefault: Boolean = true): Boolean {
+    fun getRecipePredicateResults(
+        context: CRecipePredicate.Context,
+        whenEmptyDefault: Boolean = true
+    ): Boolean {
         return this.predicates?.let { it.all { predicate -> predicate.test(context) } } ?: whenEmptyDefault
     }
 
     /**
-     * Runs all [containers] if it is not null.
-     *
-     * @param[context] Context of CRecipeContainer
-     * @see[CRecipeContainer]
-     * @see[CRecipeContainer.Context]
+     * TODO: Write description
+     * @return[CompletableFuture] Result of run tests
+     * @since 5.0.17
      */
-    fun runNormalContainers(context: CRecipeContainer.Context) {
-        containers?.let { containers ->
-            containers.filter { container -> container.predicate(context) }
-                .forEach { container -> container.consumer(context) }
+    fun asyncGetRecipePredicateResults(
+        context: CRecipePredicate.Context,
+        whenEmptyDefault: Boolean = true
+    ): CompletableFuture<Boolean> {
+        val predicates: List<CRecipePredicate> = this.predicates.takeIf { !it.isNullOrEmpty() }
+            ?: return CompletableFuture.completedFuture(whenEmptyDefault)
+
+        val futures: List<CompletableFuture<Boolean>> = predicates.map { predicate ->
+            CompletableFuture.supplyAsync { predicate.test(context) }
         }
+
+        return CompletableFuture.allOf(*futures.toTypedArray())
+            .thenApply { futures.all { it.join() } }
     }
 
     /**
@@ -128,10 +126,21 @@ interface CRecipe {
      * @see[ResultSupplier]
      * @see[ResultSupplier.Context]
      */
-    fun getResults(context: ResultSupplier.Context): MutableList<ItemStack> {
+    fun getResults(context: ResultSupplier.Context): List<ItemStack> {
         return results?.let { suppliers ->
-            suppliers.map { s -> s.f(context) }.flatten().toMutableList()
+            suppliers.flatMap { s -> s.supply(context) }.toMutableList()
         } ?: mutableListOf()
+    }
+
+    fun asyncGetResults(context: ResultSupplier.Context): CompletableFuture<List<ItemStack>> {
+        val suppliers: List<ResultSupplier> = this.results ?: return CompletableFuture.completedFuture(emptyList())
+
+        val futures: List<CompletableFuture<List<ItemStack>>> = suppliers.map { supplier ->
+            CompletableFuture.supplyAsync { supplier.supply(context) }
+        }
+
+        return CompletableFuture.allOf(*futures.toTypedArray())
+            .thenApply { futures.flatMap { it.join() } }
     }
 
     /**

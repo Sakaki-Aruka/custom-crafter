@@ -11,6 +11,7 @@ import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
+import java.util.concurrent.ExecutorService
 
 object CustomCrafterAPI {
     /**
@@ -33,6 +34,12 @@ object CustomCrafterAPI {
      */
     @JvmField
     val AUTHORS: Set<String> = setOf("Sakaki-Aruka")
+
+    /**
+     * @suppress
+     * CustomCrafterAPI default async executor
+     */
+    internal lateinit var EXECUTOR: ExecutorService
 
     /**
      * @suppress

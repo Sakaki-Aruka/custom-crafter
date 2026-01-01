@@ -2,7 +2,6 @@ package io.github.sakaki_aruka.customcrafter.internal.gui.allcandidate
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
-import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipeContainer
 import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.api.interfaces.ui.CraftUIDesigner
 import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
@@ -56,7 +55,6 @@ internal class AllCandidateUI(
                     calledTimes = 1,
                     isMultipleDisplayCall = true,
                     crafterID = this.player.uniqueId,
-                    list = mutableListOf()
                 )
             ).firstOrNull() ?: replaceRecipeNameTemplate(
                 CustomCrafterAPI.ALL_CANDIDATE_NO_DISPLAYABLE_ITEM,
@@ -205,7 +203,7 @@ internal class AllCandidateUI(
                         } else 1
                     listOf(recipe.original.result.asQuantity(minAmount))
                 } else if (recipe !is CVanillaRecipe && mappedRelation != null) {
-                    val results: MutableList<ItemStack> = recipe.getResults(ResultSupplier.Context(
+                    val results: List<ItemStack> = recipe.getResults(ResultSupplier.Context(
                         recipe = recipe,
                         relation = mappedRelation,
                         mapped = view.materials,
@@ -216,22 +214,11 @@ internal class AllCandidateUI(
                             shift = event.isShiftClick
                         ),
                         isMultipleDisplayCall = false,
-                        list = mutableListOf(),
                         crafterID = (event.whoClicked as Player).uniqueId
                     ))
                     results
                 } else {
                     return
-                }
-
-                if (recipe !is CVanillaRecipe) {
-                    recipe.runNormalContainers(CRecipeContainer.Context(
-                        userID = (event.whoClicked as Player).uniqueId,
-                        relation = mappedRelation!!,
-                        mapped = this.view.materials,
-                        results = results.toMutableList(),
-                        isAllCandidateDisplayCall = false
-                    ))
                 }
 
                 results.forEach { item ->

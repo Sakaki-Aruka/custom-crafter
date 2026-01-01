@@ -3,9 +3,7 @@ package io.github.sakaki_aruka.customcrafter.impl.recipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatterPredicate
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
-import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipeContainer
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipePredicate
-import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.search.SearchPreprocessor
 import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
@@ -47,7 +45,6 @@ import java.util.UUID
  * @param[name] Name of this recipe
  * @param[items] Item mapping
  * @param[groups] Air-containable context set. It can be empty.
- * @param[containers] Containers when run on finished to search
  * @param[results] [ResultSupplier] list
  * @param[type] Always be [CRecipe.Type.SHAPED]
  * @see[CRecipe]
@@ -59,9 +56,7 @@ open class GroupRecipe @JvmOverloads constructor(
     override val name: String,
     override val items: Map<CoordinateComponent, CMatter>,
     val groups: Set<Context>,
-    override val preprocessors: List<SearchPreprocessor>? = null,
     override val predicates: List<CRecipePredicate>? = null,
-    override val containers: List<CRecipeContainer>? = null,
     override val results: List<ResultSupplier>? = null,
     override val type: CRecipe.Type = CRecipe.Type.SHAPED
 ): CRecipe {

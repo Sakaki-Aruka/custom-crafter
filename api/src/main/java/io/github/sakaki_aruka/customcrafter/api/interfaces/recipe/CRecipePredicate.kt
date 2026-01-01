@@ -1,19 +1,16 @@
 package io.github.sakaki_aruka.customcrafter.api.interfaces.recipe
 
-import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.search.SearchKVClient
-import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.search.SearchSession
 import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import java.util.UUID
 
-interface CRecipePredicate: SearchKVClient {
+interface CRecipePredicate {
     class Context(
         val input: CraftView,
         val crafterID: UUID,
         val recipe: CRecipe,
-        val relation: MappedRelation,
-        override val session: SearchSession
-    ): SearchKVClient.Context
+        val relation: MappedRelation
+    )
 
     fun test(ctx: Context): Boolean
 }

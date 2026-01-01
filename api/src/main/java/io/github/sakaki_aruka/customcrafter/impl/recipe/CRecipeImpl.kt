@@ -2,9 +2,7 @@ package io.github.sakaki_aruka.customcrafter.impl.recipe
 
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
-import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipeContainer
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipePredicate
-import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.search.SearchPreprocessor
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
 
@@ -14,16 +12,13 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
  * @param[name] A name of this recipe.
  * @param[items] Elements of this recipe.
  * @param[type] A type of this recipe. (Shaped or Shapeless)
- * @param[containers] Containers of this recipe. (default = null)
  * @param[results] A [ResultSupplier] list. (default = null)
  */
 open class CRecipeImpl @JvmOverloads constructor(
     override val name: String,
     override val items: Map<CoordinateComponent, CMatter>,
     override val type: CRecipe.Type,
-    override val preprocessors: List<SearchPreprocessor>? = null,
     override val predicates: List<CRecipePredicate>? = null,
-    override val containers: List<CRecipeContainer>? = null,
     override val results: List<ResultSupplier>? = null,
 ): CRecipe {
     companion object {
@@ -41,9 +36,7 @@ open class CRecipeImpl @JvmOverloads constructor(
         fun shapeless(
             name: String,
             items: List<CMatter>,
-            preprocessors: List<SearchPreprocessor>? = null,
             predicates: List<CRecipePredicate>? = null,
-            containers: List<CRecipeContainerImpl>? = null,
             results: List<ResultSupplier>? = null,
         ): CRecipeImpl {
             if (items.isEmpty() || items.size > 36) {
@@ -57,9 +50,7 @@ open class CRecipeImpl @JvmOverloads constructor(
                 name = name,
                 items = map,
                 type = CRecipe.Type.SHAPELESS,
-                preprocessors = preprocessors,
                 predicates = predicates,
-                containers = containers,
                 results = results,
             )
             recipe.isValidRecipe().exceptionOrNull()?.let { t -> throw t }
