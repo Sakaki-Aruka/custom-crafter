@@ -6,7 +6,6 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe;
 import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier;
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl;
 import io.github.sakaki_aruka.customcrafter.impl.recipe.CRecipeImpl;
-import io.github.sakaki_aruka.customcrafter.impl.result.ResultSupplierImpl;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -20,7 +19,7 @@ public class DyeMixin {
                 .map(CMatterImpl::of)
                 .collect(Collectors.toList());
 
-        ResultSupplier supplier = ResultSupplierImpl.timesSingle(ItemStack.of(Material.BLACK_DYE));
+        ResultSupplier supplier = ResultSupplier.timesSingle(ItemStack.of(Material.BLACK_DYE));
 
         return CRecipeImpl.shapeless(
                 "Dye mixin without black",
