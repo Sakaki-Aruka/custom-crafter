@@ -10,6 +10,7 @@ import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelationComponent
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.impl.recipe.CVanillaRecipe
+import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
 import org.bukkit.Bukkit
 import org.bukkit.World
 import org.bukkit.inventory.CraftingRecipe
@@ -19,7 +20,6 @@ import org.chocosolver.solver.Model
 import org.chocosolver.solver.variables.IntVar
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
-import java.util.concurrent.Executors
 
 object Search {
 
@@ -121,7 +121,6 @@ object Search {
 
         val mapped: Map<CoordinateComponent, ItemStack> = view.materials
 
-        val customs: MutableList<Pair<CRecipe, MappedRelation>> = mutableListOf()
         val recipes: List<CRecipe> = sourceRecipes.filter { recipe ->
             mapped.size in recipe.requiresInputItemAmountMin()..recipe.requiresInputItemAmountMax()
         }
@@ -132,25 +131,11 @@ object Search {
                     CRecipe.Type.SHAPED -> shaped(view, recipe, crafterID)
                     CRecipe.Type.SHAPELESS -> shapeless(view, recipe, crafterID)
                 }?.let { recipe to it }
-                // TODO: fix Thread-executor
-            }, if (CustomCrafterAPI::EXECUTOR.isInitialized) CustomCrafterAPI.EXECUTOR else Executors.newVirtualThreadPerTaskExecutor())
+            }, InternalAPI.asyncExecutor())
         }
 
         return CompletableFuture.allOf(*futures.toTypedArray())
             .thenApply { SearchResult(vanilla, futures.mapNotNull { it.join() }) }
-
-//        return CompletableFuture.allOf(
-//            *recipes.map { recipe ->
-//                CompletableFuture.runAsync ({
-//                    when(recipe.type) {
-//                        CRecipe.Type.SHAPED -> shaped(view, recipe, crafterID)
-//                        CRecipe.Type.SHAPELESS -> shapeless(view, recipe, crafterID)
-//                    }?.let {
-//                        synchronized(customs) { customs.add(recipe to it) }
-//                    }
-//                }, CustomCrafterAPI.EXECUTOR)
-//            }.toTypedArray()
-//        ).thenApply { _ -> return@thenApply SearchResult(vanilla, customs) }
     }
 
     /**

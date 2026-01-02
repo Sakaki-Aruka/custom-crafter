@@ -1,6 +1,7 @@
 package io.github.sakaki_aruka.customcrafter.impl.util
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafter
+import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 import java.util.concurrent.Callable
@@ -10,13 +11,17 @@ object AsyncUtil {
     fun <T> Callable<T>.fromBukkitMainThread(
         plugin: JavaPlugin = CustomCrafter.getInstance()
     ): T {
-        return Bukkit.getScheduler().callSyncMethod(plugin, this).get()
+        return if (Bukkit.isPrimaryThread()) {
+            this.call()
+        } else {
+            InternalAPI.scheduler().callSyncMethod(plugin, this).get()
+        }
     }
 
     fun <T> Callable<T>.futureFromBukkitMainThread(
         plugin: JavaPlugin = CustomCrafter.getInstance()
     ): Future<T> {
-        return Bukkit.getScheduler().callSyncMethod(plugin, this)
+        return InternalAPI.scheduler().callSyncMethod(plugin, this)
     }
 
     @JvmStatic
@@ -25,7 +30,7 @@ object AsyncUtil {
         callable: Callable<T>,
         plugin: JavaPlugin = CustomCrafter.getInstance()
     ): T {
-        return Bukkit.getScheduler().callSyncMethod(plugin, callable).get()
+        return callable.fromBukkitMainThread(plugin)
     }
 
     @JvmStatic
@@ -34,6 +39,6 @@ object AsyncUtil {
         callable: Callable<T>,
         plugin: JavaPlugin = CustomCrafter.getInstance()
     ): Future<T> {
-        return Bukkit.getScheduler().callSyncMethod(plugin, callable)
+        return callable.futureFromBukkitMainThread(plugin)
     }
 }
