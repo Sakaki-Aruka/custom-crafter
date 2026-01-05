@@ -8,8 +8,10 @@ import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.search.Search
 import io.github.sakaki_aruka.customcrafter.impl.recipe.CVanillaRecipe
+import io.github.sakaki_aruka.customcrafter.impl.util.AsyncUtil.fromBukkitMainThread
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter.toComponent
 import io.github.sakaki_aruka.customcrafter.impl.util.InventoryUtil.giveItems
+import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
 import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterUI
 import io.github.sakaki_aruka.customcrafter.internal.gui.crafting.CraftUI
 import org.bukkit.Bukkit
@@ -21,9 +23,15 @@ import org.bukkit.inventory.CraftingRecipe
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
+import java.util.concurrent.Callable
+import java.util.concurrent.CancellationException
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
 
 internal class AllCandidateUI(
-    override var currentPage: Int = 0,
+    override val currentPage: AtomicInteger = AtomicInteger(0),
     private var view: CraftView,
     private val player: Player,
     private val result: Search.SearchResult,
@@ -36,52 +44,71 @@ internal class AllCandidateUI(
         54,
         "All Candidate".toComponent()
     )
-    private val elements: Map<Int, Map<Int, Pair<ItemStack, CRecipe>>>
+    private val isInitializedWithActualData: AtomicBoolean = AtomicBoolean(false)
+    private val pages: ConcurrentHashMap<Int, ConcurrentHashMap<Int, Pair<ItemStack, CRecipe>>> = ConcurrentHashMap<Int, ConcurrentHashMap<Int, Pair<ItemStack, CRecipe>>>()
+        .apply {
+            // Initialize with empty data
+            repeat((result.size() + 44) / 45) { index ->
+                put(index, ConcurrentHashMap())
+            }
+        }
+    private val pageGenerateWorker: CompletableFuture<*>
+
+    /**
+     * Codes have to call this from an ASYNC thread.
+     * @suppress
+     */
+    fun displayUpdatedPages() {
+        //
+    }
 
     init {
-        val e: MutableList<Pair<ItemStack, CRecipe>> = mutableListOf()
-        result.vanilla()?.let { v ->
-            CVanillaRecipe.fromVanilla(v as CraftingRecipe)?.let { r ->
-                e.add(v.result to r)
+        val workers: MutableSet<CompletableFuture<Pair<ItemStack, CRecipe>>> = mutableSetOf()
+        this.inventory.apply {
+            pageContentsAt(0).forEach { (slot, icon) -> setItem(slot, icon) }
+        }
+
+        // Start Async Processes
+        result.vanilla()?.let { vanilla ->
+            CVanillaRecipe.fromVanilla(vanilla as CraftingRecipe)?.let { recipe ->
+                workers.add(CompletableFuture.completedFuture(vanilla.result to recipe))
             }
         }
         result.customs().forEach { (recipe, relation) ->
-            val icon: ItemStack = recipe.getResults(
-                ResultSupplier.Context(
+            workers.add(CompletableFuture.supplyAsync ({
+                val context = ResultSupplier.Context(
                     recipe = recipe,
                     relation = relation,
                     mapped = this.view.materials,
                     shiftClicked = useShift,
                     calledTimes = 1,
                     isMultipleDisplayCall = true,
-                    crafterID = this.player.uniqueId,
+                    crafterID = this.player.uniqueId,)
+                Pair(
+                    recipe.asyncGetResults(context).get().firstOrNull()
+                        ?: replaceRecipeNameTemplate(CustomCrafterAPI.ALL_CANDIDATE_NO_DISPLAYABLE_ITEM, recipe.name),
+                    recipe
                 )
-            ).firstOrNull() ?: replaceRecipeNameTemplate(
-                CustomCrafterAPI.ALL_CANDIDATE_NO_DISPLAYABLE_ITEM,
-                recipe.name
-            )
-            e.add(icon to recipe)
+            }, InternalAPI.asyncExecutor()))
         }
 
-        this.elements = e.chunked(45)
-            .withIndex()
-            .associate { (index, list) -> index to list }
-            .map { (index, list) ->
-                index to list.withIndex().associate { (i, l) -> i to l }
-            }.toMap()
-
-        this.elements[0]?.let { map ->
-            map.entries.forEach { (i, pair) ->
-                val (result: ItemStack, _) = pair
-                this.inventory.setItem(i, result)
-            }
-        }
-
-        if (this.result.size() > 45) {
-            this.inventory.setItem(NEXT, CustomCrafterUI.NEXT_BUTTON)
-        }
-
-        this.inventory.setItem(BACK_TO_CRAFT, BACK_TO_CRAFT_BUTTON)
+        pageGenerateWorker = CompletableFuture.allOf(*workers.toTypedArray())
+            .exceptionallyAsync ({ throwable ->
+                if (throwable !is CancellationException) {
+                    throw throwable
+                }
+                null
+            }, InternalAPI.asyncExecutor())
+            .thenAcceptAsync ({
+                val elements: List<Pair<ItemStack, CRecipe>> = workers.map { it.join() }
+                elements.chunked(45).withIndex()
+                    .associate { (index, list) -> index to list }
+                    .forEach { (index, list) ->
+                        // Page and Elements
+                        this.pages[index] = list.withIndex().associate { (i, l) -> i to l }.let { ConcurrentHashMap(it) }
+                    }
+                this.isInitializedWithActualData.set(true)
+            }, InternalAPI.asyncExecutor())
     }
 
     companion object {
@@ -96,48 +123,51 @@ internal class AllCandidateUI(
         }
     }
 
+    fun pageContentsAt(pageNumber: Int): Map<Int, ItemStack> {
+        if (pageNumber !in (0..<pages.size)) {
+            throw IllegalArgumentException("'pageNumber' must be in range of 0 ~ ${pages.size - 1}.")
+        }
+
+        val page: MutableMap<Int, ItemStack> = this.pages[pageNumber]
+            ?.let { map -> map.entries.associate { (index, pair) -> index to pair.first }.toMutableMap() }
+            ?: return emptyMap()
+
+        page[BACK_TO_CRAFT] = BACK_TO_CRAFT_BUTTON
+
+        if (pageNumber > 0) {
+            page[PREVIOUS] = CustomCrafterUI.PREVIOUS_BUTTON
+        }
+
+        if (pageNumber < pages.size - 1) {
+            page[NEXT] = CustomCrafterUI.NEXT_BUTTON
+        }
+        return page.toMap()
+    }
+
     override fun flipPage() {
         if (!canFlipPage()) return
-        this.currentPage++
-        val targetElements: Map<Int, Pair<ItemStack, CRecipe>> = this.elements[this.currentPage]
-            ?: return
-        (0..<this.inventory.size).forEach { index ->
-            this.inventory.setItem(
-                index,
-                targetElements[index]?.first ?: ItemStack.empty()
-            )
+        this.currentPage.incrementAndGet()
+        this.inventory.clear()
+        pageContentsAt(this.currentPage.get()).entries.forEach { (slot, icon) ->
+            this.inventory.setItem(slot, icon)
         }
-        this.inventory.setItem(PREVIOUS, CustomCrafterUI.PREVIOUS_BUTTON)
-        if (canFlipPage()) {
-            this.inventory.setItem(NEXT, CustomCrafterUI.NEXT_BUTTON)
-        }
-        this.inventory.setItem(BACK_TO_CRAFT, BACK_TO_CRAFT_BUTTON)
     }
 
     override fun canFlipPage(): Boolean {
-        return this.currentPage < this.elements.size - 1
+        return this.currentPage.get() < this.pages.size - 1
     }
 
     override fun flipBackPage() {
         if (!canFlipBackPage()) return
-        this.currentPage--
-        val targetElements: Map<Int, Pair<ItemStack, CRecipe>> = this.elements[this.currentPage]
-            ?: return
-        (0..<this.inventory.size).forEach { index ->
-            this.inventory.setItem(
-                index,
-                targetElements[index]?.first ?: ItemStack.empty()
-            )
+        this.currentPage.decrementAndGet()
+        this.inventory.clear()
+        pageContentsAt(this.currentPage.get()).entries.forEach { (slot, icon) ->
+            this.inventory.setItem(slot, icon)
         }
-        if (canFlipBackPage()) {
-            this.inventory.setItem(PREVIOUS, CustomCrafterUI.PREVIOUS_BUTTON)
-        }
-        this.inventory.setItem(NEXT, CustomCrafterUI.NEXT_BUTTON)
-        this.inventory.setItem(BACK_TO_CRAFT, BACK_TO_CRAFT_BUTTON)
     }
 
     override fun canFlipBackPage(): Boolean {
-        return this.currentPage > 0
+        return this.currentPage.get() > 0
     }
 
     override fun onClose(event: InventoryCloseEvent) {
@@ -145,6 +175,7 @@ internal class AllCandidateUI(
             return
         }
         player.giveItems(saveLimit = true, *this.view.materials.values.toTypedArray(), this.view.result)
+        this.pageGenerateWorker.cancel(true)
     }
 
     override fun onClick(
@@ -188,44 +219,42 @@ internal class AllCandidateUI(
                     return
                 }
                 val player: Player = event.whoClicked as? Player ?: return
-                val recipe: CRecipe = this.elements[this.currentPage]?.let { icons ->
-                    icons[event.rawSlot]?.second
+                val recipe: CRecipe = this.pages[this.currentPage.get()]?.let { contents ->
+                    contents[event.rawSlot]?.second
                 } ?: return
                 val mappedRelation: MappedRelation? = this.result.getMergedResults()
                     .firstOrNull { (r, _) -> r == recipe }?.second
 
-                val results: List<ItemStack> = if (recipe is CVanillaRecipe && mappedRelation == null) {
-                    val minAmount: Int =
-                        if (event.isShiftClick) {
-                            this.view.materials.values
-                                .filter { item -> !item.type.isEmpty && item.type.isItem }
-                                .minOf { item -> item.amount }
-                        } else 1
-                    listOf(recipe.original.result.asQuantity(minAmount))
-                } else if (recipe !is CVanillaRecipe && mappedRelation != null) {
-                    val results: List<ItemStack> = recipe.getResults(ResultSupplier.Context(
-                        recipe = recipe,
-                        relation = mappedRelation,
-                        mapped = view.materials,
-                        shiftClicked = event.isShiftClick,
-                        calledTimes = recipe.getTimes(
-                            map = view.materials,
-                            relation = mappedRelation,
-                            shift = event.isShiftClick
-                        ),
-                        isMultipleDisplayCall = false,
-                        crafterID = (event.whoClicked as Player).uniqueId
-                    ))
-                    results
-                } else {
+                if (recipe !is CVanillaRecipe && mappedRelation == null) {
                     return
                 }
 
-                results.forEach { item ->
-                    if (!item.isEmpty) {
-                        player.location.world.dropItem(player.location, item)
-                    }
-                }
+                val relation: MappedRelation = (recipe as? CVanillaRecipe)?.relateWith(view)
+                    ?: mappedRelation
+                        ?: return
+
+                CompletableFuture.runAsync ({
+                    val results: List<ItemStack> = recipe.getResults(ResultSupplier.Context(
+                        recipe = recipe,
+                        relation = relation,
+                        mapped = view.materials,
+                        shiftClicked = event.isShiftClick,
+                        calledTimes = recipe.getTimes(view.materials, relation, event.isShiftClick),
+                        isMultipleDisplayCall = false,
+                        crafterID = player.uniqueId
+                    ))
+
+                    Callable {
+                        results.forEach { item ->
+                            if (!item.isEmpty) {
+                                Bukkit.getPlayer(player.uniqueId)?.let { p ->
+                                    p.location.world.dropItem(player.location, item)
+                                }
+                            }
+                        }
+                    }.fromBukkitMainThread()
+                }, InternalAPI.asyncExecutor())
+
                 if (!this.view.result.isEmpty) {
                     player.location.world.dropItem(player.location, this.view.result)
                     this.view = CraftView(this.view.materials, ItemStack.empty())

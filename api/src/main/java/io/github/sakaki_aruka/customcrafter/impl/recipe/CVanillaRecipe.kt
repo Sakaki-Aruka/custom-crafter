@@ -5,6 +5,9 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipePredicate
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
+import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
+import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
+import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelationComponent
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
 import org.bukkit.Material
 import org.bukkit.inventory.CraftingRecipe
@@ -124,5 +127,24 @@ class CVanillaRecipe internal constructor(
         private fun materialChoiceToCandidate(choice: RecipeChoice.MaterialChoice): Set<Material> {
             return choice.choices.toSet()
         }
+    }
+
+    fun relateWith(view: CraftView): MappedRelation {
+        val viewSize: Int = view.materials.filterNot { it.value.type.isAir }.count()
+        if (viewSize != this.items.size) {
+            throw IllegalArgumentException("'view#materials' size is not equals with this recipes size. (view size: ${viewSize}, recipe size: ${items.size})")
+        }
+
+        val dx: Int = view.materials.keys.maxOf { it.x } - view.materials.keys.minOf { it.x }
+        val dy: Int = view.materials.keys.maxOf { it.y } - view.materials.keys.minOf { it.y }
+        if (dx > 3 || dy > 3) {
+            throw IllegalArgumentException("")
+        }
+
+        return MappedRelation(
+            this.items.keys.sortedBy { it.toIndex() }.zip(view.materials.keys.sortedBy { it.toIndex() }).map { (recipe, input) ->
+                MappedRelationComponent(recipe, input)
+            }.toSet()
+        )
     }
 }

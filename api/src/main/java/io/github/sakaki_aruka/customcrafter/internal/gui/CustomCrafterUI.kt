@@ -9,6 +9,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
+import java.util.concurrent.atomic.AtomicInteger
 
 internal interface CustomCrafterUI {
 
@@ -33,7 +34,7 @@ internal interface CustomCrafterUI {
     }
 
     interface Pageable: CustomCrafterUI {
-        var currentPage: Int
+        val currentPage: AtomicInteger
 
         fun flipPage()
         fun canFlipPage(): Boolean
