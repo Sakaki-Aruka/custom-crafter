@@ -57,7 +57,7 @@ object CPotionMatterImplTest {
             crafterID = UUID.randomUUID()
         )
 
-        assertTrue(CPotionMatterImpl.DEFAULT_POTION_CHECKER.predicate(context))
+        assertTrue(CPotionMatterImpl.DEFAULT_POTION_CHECKER.test(context))
     }
 
     @Test
@@ -78,7 +78,7 @@ object CPotionMatterImplTest {
             crafterID = UUID.randomUUID()
         )
 
-        assertTrue(CPotionMatterImpl.DEFAULT_POTION_CHECKER.predicate(context))
+        assertTrue(CPotionMatterImpl.DEFAULT_POTION_CHECKER.test(context))
     }
 
     @Test
@@ -99,7 +99,7 @@ object CPotionMatterImplTest {
             crafterID = UUID.randomUUID()
         )
 
-        assertTrue(CPotionMatterImpl.DEFAULT_POTION_CHECKER.predicate(context))
+        assertTrue(CPotionMatterImpl.DEFAULT_POTION_CHECKER.test(context))
     }
 
     @Test
@@ -122,7 +122,7 @@ object CPotionMatterImplTest {
             crafterID = UUID.randomUUID()
         )
 
-        assertFalse(CPotionMatterImpl.DEFAULT_POTION_CHECKER.predicate(context))
+        assertFalse(CPotionMatterImpl.DEFAULT_POTION_CHECKER.test(context))
     }
 
     @Test
@@ -167,8 +167,8 @@ object CPotionMatterImplTest {
             crafterID = UUID.randomUUID()
         )
 
-        assertTrue(CPotionMatterImpl.DEFAULT_POTION_CHECKER.predicate(context1))
-        assertTrue(CPotionMatterImpl.DEFAULT_POTION_CHECKER.predicate(context3))
+        assertTrue(CPotionMatterImpl.DEFAULT_POTION_CHECKER.test(context1))
+        assertTrue(CPotionMatterImpl.DEFAULT_POTION_CHECKER.test(context3))
     }
 
     @Test
@@ -213,7 +213,7 @@ object CPotionMatterImplTest {
             crafterID = UUID.randomUUID()
         )
 
-        assertTrue(CPotionMatterImpl.DEFAULT_POTION_CHECKER.predicate(context1))
-        assertFalse(CPotionMatterImpl.DEFAULT_POTION_CHECKER.predicate(context3))
+        assertTrue(CPotionMatterImpl.DEFAULT_POTION_CHECKER.test(context1))
+        assertFalse(CPotionMatterImpl.DEFAULT_POTION_CHECKER.test(context3))
     }
 }

@@ -73,6 +73,6 @@ interface CMatter {
      * @return[Boolean] all or nothing.
      */
     fun predicatesResult(ctx: CMatterPredicate.Context): Boolean {
-        return predicates?.all { p -> p.predicate(ctx) } ?: true
+        return predicates?.all { p -> p.test(ctx) } ?: true
     }
 }

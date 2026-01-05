@@ -128,8 +128,8 @@ object Search {
         val futures: List<CompletableFuture<Pair<CRecipe, MappedRelation>?>> = recipes.mapNotNull { recipe ->
             CompletableFuture.supplyAsync( {
                 when (recipe.type) {
-                    CRecipe.Type.SHAPED -> shaped(view, recipe, crafterID)
-                    CRecipe.Type.SHAPELESS -> shapeless(view, recipe, crafterID)
+                    CRecipe.Type.SHAPED -> shaped(view, recipe, crafterID, isAsync = true)
+                    CRecipe.Type.SHAPELESS -> shapeless(view, recipe, crafterID, isAsync = true)
                 }?.let { recipe to it }
             }, InternalAPI.asyncExecutor())
         }
@@ -192,7 +192,8 @@ object Search {
     private fun shaped(
         view: CraftView,
         recipe: CRecipe,
-        crafterID: UUID
+        crafterID: UUID,
+        isAsync: Boolean = false
     ): MappedRelation? {
         if (recipe.items.size < view.materials.size) {
             return null
@@ -219,7 +220,7 @@ object Search {
                 }
             }
 
-            val matterPredicateContext = CMatterPredicate.Context(recipeCoordinate, matter, input, view.materials, recipe, crafterID)
+            val matterPredicateContext = CMatterPredicate.Context(recipeCoordinate, matter, input, view.materials, recipe, crafterID, isAsync = isAsync)
             if (!matter.predicatesResult(matterPredicateContext)) {
                 return null
             }
@@ -228,7 +229,7 @@ object Search {
 
         val relation = MappedRelation(components)
 
-        val recipePredicateContext = CRecipePredicate.Context(view, crafterID, recipe, relation)
+        val recipePredicateContext = CRecipePredicate.Context(view, crafterID, recipe, relation, isAsync = isAsync)
         if (!recipe.getRecipePredicateResults(recipePredicateContext)) {
             return null
         }
@@ -269,7 +270,8 @@ object Search {
     private fun getShapelessMatterPredicatesCheckResult(
         input: Map<CoordinateComponent, ItemStack>,
         recipe: CRecipe,
-        crafterID: UUID
+        crafterID: UUID,
+        isAsync: Boolean = false
     ): Map<Int, Set<Triple<Int, Boolean, Boolean>>> {
         // Key=RecipeSlot, Value=<InputSlot, Checked, CheckResult>
         val result: MutableMap<Int, Set<Triple<Int, Boolean, Boolean>>> = mutableMapOf()
@@ -285,7 +287,7 @@ object Search {
             val set: MutableSet<Triple<Int, Boolean, Boolean>> = mutableSetOf()
             for ((i, item) in input.entries) {
                 if (matter.hasPredicates()) {
-                    val ctx = CMatterPredicate.Context(r, matter, item, input, recipe, crafterID)
+                    val ctx = CMatterPredicate.Context(r, matter, item, input, recipe, crafterID, isAsync = isAsync)
                     set.add(Triple(i.toIndex(), true, matter.predicatesResult(ctx)))
                 }
             }
@@ -327,7 +329,8 @@ object Search {
     private fun shapeless(
         view: CraftView,
         recipe: CRecipe,
-        crafterID: UUID
+        crafterID: UUID,
+        isAsync: Boolean = false
     ): MappedRelation? {
 
         // MapKey=RecipeSlot, MapValue=<InputSlot, Checked, CheckResult>
@@ -344,7 +347,7 @@ object Search {
         }
 
         addResults(getShapelessCandidateCheckResult(view.materials, recipe))
-        addResults(getShapelessMatterPredicatesCheckResult(view.materials, recipe, crafterID))
+        addResults(getShapelessMatterPredicatesCheckResult(view.materials, recipe, crafterID, isAsync))
         addResults(getShapelessAmountCheckResult(view.materials, recipe))
 
         val merged: MutableMap<Int, MutableSet<Int>> = mutableMapOf()
@@ -404,7 +407,7 @@ object Search {
         }
 
         val relation = MappedRelation(relationComponents)
-        val recipePredicateContext = CRecipePredicate.Context(view, crafterID, recipe, relation)
+        val recipePredicateContext = CRecipePredicate.Context(view, crafterID, recipe, relation, isAsync = isAsync)
         if (!recipe.getRecipePredicateResults(recipePredicateContext)) {
             return null
         }

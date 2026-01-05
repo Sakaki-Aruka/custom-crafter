@@ -64,14 +64,20 @@ fun interface ResultSupplier {
      * @param[shiftClicked] Shift-clicked or not
      * @param[calledTimes] Calculated minimum amount with [CMatter.amount]
      * @param[isMultipleDisplayCall] `invoke` called from multiple result display item collector or not
+     * @param[isAsync] Called from async or not (since 5.0.17)
      */
-    class Context (
+    class Context @JvmOverloads constructor(
         val recipe: CRecipe,
         val relation: MappedRelation,
         val mapped: Map<CoordinateComponent, ItemStack>,
         val shiftClicked: Boolean,
         val calledTimes: Int,
         val crafterID: UUID,
-        val isMultipleDisplayCall: Boolean
-    )
+        val isMultipleDisplayCall: Boolean,
+        val isAsync: Boolean = false
+    ) {
+        fun copyWith(isAsync: Boolean): Context {
+            return Context(recipe, relation, mapped, shiftClicked, calledTimes, crafterID, isMultipleDisplayCall, isAsync)
+        }
+    }
 }

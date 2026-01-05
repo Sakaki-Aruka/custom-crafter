@@ -7,7 +7,6 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipePredica
 import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
-import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterPredicateImpl
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import java.util.UUID
@@ -42,9 +41,14 @@ import java.util.UUID
  * groups = [Group1{ (0, 0), (0, 1) }]
  * ```
  *
+ * ---
+ *
+ * GroupRecipe has to contains [GroupRecipe.recipePredicate] in [GroupRecipe.predicates].
+ *
  * @param[name] Name of this recipe
  * @param[items] Item mapping
  * @param[groups] Air-containable context set. It can be empty.
+ * @param[predicates] Predicates of this recipe. (default = `listOf(GroupRecipe.recipePredicate)`)
  * @param[results] [ResultSupplier] list
  * @param[type] Always be [CRecipe.Type.SHAPED]
  * @see[CRecipe]
@@ -56,7 +60,7 @@ open class GroupRecipe @JvmOverloads constructor(
     override val name: String,
     override val items: Map<CoordinateComponent, CMatter>,
     val groups: Set<Context>,
-    override val predicates: List<CRecipePredicate>? = null,
+    override val predicates: List<CRecipePredicate>? = listOf(recipePredicate),
     override val results: List<ResultSupplier>? = null,
     override val type: CRecipe.Type = CRecipe.Type.SHAPED
 ): CRecipe {
@@ -89,6 +93,30 @@ open class GroupRecipe @JvmOverloads constructor(
 
             Context.isValidGroups(result, items).exceptionOrNull()?.let { throw it }
             return result
+        }
+
+        /**
+         * GroupRecipe inspection Core
+         * @since 5.0.17
+         */
+        @JvmField
+        val recipePredicate = CRecipePredicate { ctx ->
+            val recipe: GroupRecipe = ctx.recipe as? GroupRecipe
+                ?: return@CRecipePredicate true
+            val recipeFirstCoordinate: CoordinateComponent = recipe.items.keys.minBy { it.toIndex() }
+            val inputFirstCoordinate: CoordinateComponent = ctx.input.materials.keys.minBy { it.toIndex() }
+            val dx: Int = recipeFirstCoordinate.x - inputFirstCoordinate.x
+            val dy: Int = recipeFirstCoordinate.y - inputFirstCoordinate.y
+            val groupResult: MutableMap<Context, Int> = mutableMapOf()
+            for ((c, matter) in recipe.items.entries) {
+                val context: Context = recipe.groups.firstOrNull { c in it.members } ?: continue
+                val input: ItemStack = ctx.input.materials[CoordinateComponent(c.x - dx, c.y - dy)]
+                    ?: ItemStack.empty()
+                val s: Int = if (input.type.isAir) 0 else 1
+                groupResult[context] = groupResult.getOrDefault(context, 0) + s
+            }
+
+            return@CRecipePredicate groupResult.entries.all { (context, amount) -> context.min <= amount }
         }
     }
 
@@ -255,22 +283,6 @@ open class GroupRecipe @JvmOverloads constructor(
         override val predicates: List<CMatterPredicate>? = CMatterImpl.defaultMatterPredicates().toList(),
         val original: CMatter
     ): CMatter {
-
-        private class InspectionResult(
-            val createdBy: Int,
-            val result: Map<Int, Boolean>,
-            val resultConsumed: MutableSet<Int> = mutableSetOf()
-        ) {
-            @JvmOverloads
-            fun copy(
-                createdBy: Int = this.createdBy,
-                result: Map<Int, Boolean> = this.result.toMap(),
-                resultConsumed: MutableSet<Int> = this.resultConsumed.toMutableSet()
-            ): InspectionResult {
-                return InspectionResult(createdBy, result, resultConsumed)
-            }
-        }
-
         companion object {
             /**
              * Create [Matter] instance from [CMatter].
@@ -295,7 +307,7 @@ open class GroupRecipe @JvmOverloads constructor(
                     candidate = if (includeAir) matter.candidate + Material.AIR else matter.candidate,
                     amount = matter.amount,
                     mass = matter.mass,
-                    predicates = listOf(INSPECTOR, CHECKER),
+                    predicates = listOf(originalChecker),
                     original = matter
                 )
 
@@ -303,73 +315,17 @@ open class GroupRecipe @JvmOverloads constructor(
                 return matter
             }
 
-            private val INSPECTION_RESULTS: MutableMap<UUID, InspectionResult> = mutableMapOf()
-            private fun putResult(key: UUID, result: InspectionResult) {
-                synchronized(INSPECTION_RESULTS) { INSPECTION_RESULTS[key] = result }
-            }
-
-            private fun getCurrent(key: UUID): InspectionResult? {
-                synchronized(INSPECTION_RESULTS) { return INSPECTION_RESULTS[key]?.copy() }
-            }
-
-            private fun remove(key: UUID) {
-                synchronized(INSPECTION_RESULTS) { INSPECTION_RESULTS.remove(key) }
-            }
-
-            private val INSPECTOR: CMatterPredicate = CMatterPredicateImpl { ctx ->
-                if (ctx.recipe !is GroupRecipe /* || ctx.matter !is Matter */) {
-                    return@CMatterPredicateImpl true
-                } else if (getCurrent(ctx.crafterID) != null) {
-                    return@CMatterPredicateImpl true
-                }
-
-                val recipeFirstCoordinate: CoordinateComponent = ctx.recipe.items.keys.minBy { it.toIndex() }
-                val inputFirstCoordinate: CoordinateComponent = ctx.mapped.keys.minBy { it.toIndex() }
-                val dx: Int = recipeFirstCoordinate.x - inputFirstCoordinate.x
-                val dy: Int = recipeFirstCoordinate.y - inputFirstCoordinate.y
-                val groupResult: MutableMap<Context, Int> = mutableMapOf()
-                for ((c, matter) in ctx.recipe.items.entries) {
-                    val context: Context = ctx.recipe.groups.firstOrNull { c in it.members } ?: continue
-                    val input: ItemStack = ctx.mapped[CoordinateComponent(c.x - dx, c.y - dy)]
-                        ?: ItemStack.empty()
-                    val s: Int = if (input.type.isAir) 0 else 1
-                    groupResult[context] = groupResult.getOrDefault(context, 0) + s
-                }
-
-                val coordinateResult: MutableMap<Int, Boolean> = mutableMapOf()
-                for ((context, amount) in groupResult.entries) {
-                    val checkedResult = context.min <= amount
-                    for (coordinate in context.members) {
-                        coordinateResult[coordinate.toIndex()] = checkedResult
-                    }
-                }
-                val inspectionResults = InspectionResult(
-                    createdBy = ctx.coordinate.toIndex(),
-                    result = coordinateResult
-                )
-                putResult(ctx.crafterID, inspectionResults)
-                true
-            }
-
-            private val CHECKER: CMatterPredicate = CMatterPredicateImpl { ctx ->
-                if (ctx.recipe !is GroupRecipe /* || ctx.matter !is Matter */) {
-                    return@CMatterPredicateImpl ctx.matter.predicatesResult(ctx)
-                }
-                val inspectionResult: InspectionResult = getCurrent(ctx.crafterID)
-                    ?: return@CMatterPredicateImpl if (ctx.matter is Matter) ctx.matter.original.predicatesResult(ctx.copyWith(matter = ctx.matter.original))
-                        else ctx.matter.predicatesResult(ctx)
-                val result: Boolean = inspectionResult.result[ctx.coordinate.toIndex()] ?: true
-                if (inspectionResult.resultConsumed.size == ctx.recipe.groups.sumOf { it.members.size } - 1) {
-                    // last
-                    remove(ctx.crafterID)
+            /**
+             * GroupRecipe.Matter 's IMPORTANT checker
+             * @since 5.0.17
+             */
+            @JvmField
+            val originalChecker = CMatterPredicate { ctx ->
+                if (ctx.matter is Matter) {
+                    ctx.matter.original.predicatesResult(ctx.copyWith(matter = ctx.matter.original))
                 } else {
-                    putResult(
-                        ctx.crafterID,
-                        inspectionResult.copy(resultConsumed = (inspectionResult.resultConsumed + ctx.coordinate.toIndex()).toMutableSet())
-                    )
+                    ctx.matter.predicatesResult(ctx)
                 }
-                return@CMatterPredicateImpl result
-                        && if (ctx.matter is Matter) ctx.matter.original.predicatesResult(ctx.copyWith(matter = ctx.matter.original)) else true
             }
         }
 

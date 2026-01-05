@@ -88,7 +88,10 @@ interface CRecipe {
     fun requiresInputItemAmountMax(): Int = this.items.size
 
     /**
-     * TODO: Write description
+     * Returns [CRecipePredicate] inspection result
+     * @param[context] Context of inspection
+     * @param[whenEmptyDefault] Result returned when [CRecipe.predicates] is null or empty (default = true)
+     * @return[Boolean] Result of run tests
      * @since 5.0.17
      */
     fun getRecipePredicateResults(
@@ -99,7 +102,11 @@ interface CRecipe {
     }
 
     /**
-     * TODO: Write description
+     * Returns [CRecipePredicate] inspection result on async.
+     *
+     * Even if the given [CRecipePredicate.Context.isAsync] is false, it is unexpectedly true at runtime and provided to the executed predicates.
+     * @param[context] Context of inspection
+     * @param[whenEmptyDefault] Result returned when [CRecipe.predicates] is null or empty (default = true)
      * @return[CompletableFuture] Result of run tests
      * @since 5.0.17
      */
@@ -107,11 +114,12 @@ interface CRecipe {
         context: CRecipePredicate.Context,
         whenEmptyDefault: Boolean = true
     ): CompletableFuture<Boolean> {
+        val modifiedContext = context.copyWith(isAsync = true)
         val predicates: List<CRecipePredicate> = this.predicates.takeIf { !it.isNullOrEmpty() }
             ?: return CompletableFuture.completedFuture(whenEmptyDefault)
 
         val futures: List<CompletableFuture<Boolean>> = predicates.map { predicate ->
-            CompletableFuture.supplyAsync { predicate.test(context) }
+            CompletableFuture.supplyAsync { predicate.test(modifiedContext) }
         }
 
         return CompletableFuture.allOf(*futures.toTypedArray())
@@ -133,10 +141,11 @@ interface CRecipe {
     }
 
     fun asyncGetResults(context: ResultSupplier.Context): CompletableFuture<List<ItemStack>> {
+        val modifiedContext = context.copyWith(isAsync = true)
         val suppliers: List<ResultSupplier> = this.results ?: return CompletableFuture.completedFuture(emptyList())
 
         val futures: List<CompletableFuture<List<ItemStack>>> = suppliers.map { supplier ->
-            CompletableFuture.supplyAsync { supplier.supply(context) }
+            CompletableFuture.supplyAsync { supplier.supply(modifiedContext) }
         }
 
         return CompletableFuture.allOf(*futures.toTypedArray())

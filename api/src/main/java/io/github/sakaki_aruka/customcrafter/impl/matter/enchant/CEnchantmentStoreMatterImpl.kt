@@ -3,7 +3,6 @@ package io.github.sakaki_aruka.customcrafter.impl.matter.enchant
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CEnchantmentStoreMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatterPredicate
-import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterPredicateImpl
 import io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant.CEnchantComponent
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
 import org.bukkit.Material
@@ -35,24 +34,24 @@ open class CEnchantmentStoreMatterImpl @JvmOverloads constructor(
          * @since 5.0.15
          */
         @JvmField
-        val DEFAULT_ENCHANT_STORE_CHECKER = CMatterPredicateImpl { ctx ->
+        val DEFAULT_ENCHANT_STORE_CHECKER = CMatterPredicate { ctx ->
             if (ctx.input.type.isEmpty) {
-                return@CMatterPredicateImpl true
+                return@CMatterPredicate true
             }
 
             val enchantStoreMatter = ctx.matter as? CEnchantmentStoreMatter
-                ?: return@CMatterPredicateImpl true
+                ?: return@CMatterPredicate true
 
             if (enchantStoreMatter.storedEnchantComponents.isEmpty()) {
-                return@CMatterPredicateImpl true
+                return@CMatterPredicate true
             } else if (ctx.input.itemMeta !is EnchantmentStorageMeta) {
-                return@CMatterPredicateImpl false
+                return@CMatterPredicate false
             }
 
             val sources: Map<Enchantment, Int> = (ctx.input.itemMeta as EnchantmentStorageMeta).storedEnchants.entries
                 .associate { it.key to it.value }
 
-            return@CMatterPredicateImpl enchantStoreMatter.storedEnchantComponents.all { component ->
+            return@CMatterPredicate enchantStoreMatter.storedEnchantComponents.all { component ->
                 CEnchantMatterImpl.enchantBaseCheck(sources, component)
             }
         }

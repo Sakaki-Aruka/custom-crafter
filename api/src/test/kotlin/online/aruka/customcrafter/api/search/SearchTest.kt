@@ -1,9 +1,9 @@
 package online.aruka.customcrafter.api.search
 
+import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatterPredicate
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipePredicate
 import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
-import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterPredicateImpl
 import io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant.CEnchantComponent
 import io.github.sakaki_aruka.customcrafter.api.objects.matter.potion.CPotionComponent
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
@@ -347,7 +347,7 @@ internal object SearchTest {
         val matter = CMatterImpl(
             name = "",
             candidate = setOf(Material.GRAVEL),
-            predicates = setOf(CMatterPredicateImpl { ctx -> ctx.crafterID == NotchID})
+            predicates = setOf(CMatterPredicate { ctx -> ctx.crafterID == NotchID })
         )
         val recipe = CRecipeImpl(
             name = "",
@@ -572,11 +572,9 @@ internal object SearchTest {
     @Test
     fun asyncShapelessSearchTest() {
         val matter = CMatterImpl.of(Material.STONE)
-        val recipePredicate = object : CRecipePredicate {
-            override fun test(ctx: CRecipePredicate.Context): Boolean {
-                Thread.sleep(3000)
-                return true
-            }
+        val recipePredicate = CRecipePredicate {
+            Thread.sleep(3000)
+            true
         }
         val recipe = CRecipeImpl(
             "",
