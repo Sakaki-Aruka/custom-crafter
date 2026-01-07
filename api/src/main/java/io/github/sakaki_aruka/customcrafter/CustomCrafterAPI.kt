@@ -13,6 +13,7 @@ import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicReference
 
 object CustomCrafterAPI {
     /**
@@ -95,14 +96,14 @@ object CustomCrafterAPI {
      * @suppress
      * @see[CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK]
      */
-    private var BASE_BLOCK: Material = Material.GOLD_BLOCK
+    private var BASE_BLOCK: AtomicReference<Material> = AtomicReference(Material.GOLD_BLOCK)
     /**
      * Gets a base block type.
      * @return[Material] base block type
      * @since 5.0.9
      */
     @JvmStatic
-    fun getBaseBlock(): Material = BASE_BLOCK
+    fun getBaseBlock(): Material = BASE_BLOCK.get()
 
     /**
      * Sets base block with given material.
@@ -120,15 +121,15 @@ object CustomCrafterAPI {
             throw IllegalArgumentException("'type' must meet 'Material#isBlock'.")
         }
 
-        if (type != BASE_BLOCK) {
+        val currentValue: Material = BASE_BLOCK.getAndSet(type)
+        if (type != currentValue) {
             CustomCrafterAPIPropertiesChangeEvent(
                 propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK.name,
-                oldValue = CustomCrafterAPIPropertiesChangeEvent.Property(BASE_BLOCK),
+                oldValue = CustomCrafterAPIPropertiesChangeEvent.Property(currentValue),
                 newValue = CustomCrafterAPIPropertiesChangeEvent.Property(type),
                 isAsync = calledAsync
             ).callEvent()
         }
-        BASE_BLOCK = type
     }
 
     /**
@@ -138,15 +139,15 @@ object CustomCrafterAPI {
     @JvmStatic
     @JvmOverloads
     fun setBaseBlockDefault(calledAsync: Boolean = false) {
-        if (BASE_BLOCK != Material.GOLD_BLOCK) {
+        val currentValue: Material = BASE_BLOCK.getAndSet(Material.GOLD_BLOCK)
+        if (currentValue != Material.GOLD_BLOCK) {
             CustomCrafterAPIPropertiesChangeEvent(
                 propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK.name,
-                oldValue = CustomCrafterAPIPropertiesChangeEvent.Property(BASE_BLOCK),
+                oldValue = CustomCrafterAPIPropertiesChangeEvent.Property(currentValue),
                 newValue = CustomCrafterAPIPropertiesChangeEvent.Property(Material.GOLD_BLOCK),
                 isAsync = calledAsync
             ).callEvent()
         }
-        BASE_BLOCK = Material.GOLD_BLOCK
     }
 
     /**
@@ -342,14 +343,14 @@ object CustomCrafterAPI {
     }
 
 
-    private var CRAFT_UI_DESIGNER: CraftUIDesigner = CraftUI
+    private var CRAFT_UI_DESIGNER: AtomicReference<CraftUIDesigner> = AtomicReference(CraftUI)
     /**
      * Returns a current CraftUI designer.
      * @return[CraftUIDesigner]
      * @since 5.0.16
      */
     @JvmStatic
-    fun getCraftUIDesigner(): CraftUIDesigner = CRAFT_UI_DESIGNER
+    fun getCraftUIDesigner(): CraftUIDesigner = CRAFT_UI_DESIGNER.get()
 
     /**
      * Sets a new CraftUI designer if a specified is valid.
@@ -364,13 +365,13 @@ object CustomCrafterAPI {
         val baked: CraftUIDesigner.Baked = CraftUIDesigner.bake(designer, nullContext)
         baked.isValid().exceptionOrNull()?.let { throw it }
 
+        val currentValue: CraftUIDesigner = CRAFT_UI_DESIGNER.getAndSet(designer)
         CustomCrafterAPIPropertiesChangeEvent(
             propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.CRAFT_UI_DESIGNER.name,
-            oldValue = CustomCrafterAPIPropertiesChangeEvent.Property(CRAFT_UI_DESIGNER),
+            oldValue = CustomCrafterAPIPropertiesChangeEvent.Property(currentValue),
             newValue = CustomCrafterAPIPropertiesChangeEvent.Property(designer),
             isAsync = calledAsync
         ).callEvent()
-        CRAFT_UI_DESIGNER = designer
     }
 
     /**
@@ -381,13 +382,13 @@ object CustomCrafterAPI {
     @JvmStatic
     @JvmOverloads
     fun setCraftUIDesignerDefault(calledAsync: Boolean = false) {
+        val currentValue: CraftUIDesigner = CRAFT_UI_DESIGNER.getAndSet(CraftUI)
         CustomCrafterAPIPropertiesChangeEvent(
             propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.CRAFT_UI_DESIGNER.name,
-            oldValue = CustomCrafterAPIPropertiesChangeEvent.Property(CRAFT_UI_DESIGNER),
+            oldValue = CustomCrafterAPIPropertiesChangeEvent.Property(currentValue),
             newValue = CustomCrafterAPIPropertiesChangeEvent.Property(CraftUI),
             isAsync = calledAsync
         ).callEvent()
-        CRAFT_UI_DESIGNER = CraftUI
     }
 
     /**
