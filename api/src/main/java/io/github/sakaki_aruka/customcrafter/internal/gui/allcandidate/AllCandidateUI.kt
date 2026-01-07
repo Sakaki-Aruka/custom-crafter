@@ -44,7 +44,7 @@ internal class AllCandidateUI(
         54,
         "All Candidate".toComponent()
     )
-    private val isInitializedWithActualData: AtomicBoolean = AtomicBoolean(false)
+    private val isClosed: AtomicBoolean = AtomicBoolean(false)
     private val pages: ConcurrentHashMap<Int, ConcurrentHashMap<Int, Pair<ItemStack, CRecipe>>> = ConcurrentHashMap<Int, ConcurrentHashMap<Int, Pair<ItemStack, CRecipe>>>()
         .apply {
             // Initialize with empty data
@@ -52,15 +52,6 @@ internal class AllCandidateUI(
                 put(index, ConcurrentHashMap())
             }
         }
-    private val pageGenerateWorker: CompletableFuture<*>
-
-    /**
-     * Codes have to call this from an ASYNC thread.
-     * @suppress
-     */
-    fun displayUpdatedPages() {
-        //
-    }
 
     init {
         val workers: MutableSet<CompletableFuture<Pair<ItemStack, CRecipe>>> = mutableSetOf()
@@ -89,10 +80,12 @@ internal class AllCandidateUI(
                         ?: replaceRecipeNameTemplate(CustomCrafterAPI.ALL_CANDIDATE_NO_DISPLAYABLE_ITEM, recipe.name),
                     recipe
                 )
-            }, InternalAPI.asyncExecutor()))
+            }, InternalAPI.asyncExecutor())
+                .exceptionallyAsync { InternalAPI.warn(it.stackTraceToString()); null }
+            )
         }
 
-        pageGenerateWorker = CompletableFuture.allOf(*workers.toTypedArray())
+        CompletableFuture.allOf(*workers.toTypedArray())
             .exceptionallyAsync ({ throwable ->
                 if (throwable !is CancellationException) {
                     throw throwable
@@ -100,6 +93,9 @@ internal class AllCandidateUI(
                 null
             }, InternalAPI.asyncExecutor())
             .thenAcceptAsync ({
+                if (this.isClosed.get()) {
+                    return@thenAcceptAsync
+                }
                 val elements: List<Pair<ItemStack, CRecipe>> = workers.map { it.join() }
                 elements.chunked(45).withIndex()
                     .associate { (index, list) -> index to list }
@@ -107,8 +103,29 @@ internal class AllCandidateUI(
                         // Page and Elements
                         this.pages[index] = list.withIndex().associate { (i, l) -> i to l }.let { ConcurrentHashMap(it) }
                     }
-                this.isInitializedWithActualData.set(true)
+                iconsUpdate(this.currentPage.get())
             }, InternalAPI.asyncExecutor())
+    }
+
+    private fun iconsUpdate(pageNum: Int) {
+        Callable {
+            if (this.isClosed.get()) {
+                return@Callable
+            } else if (this.currentPage.get() != pageNum) {
+                return@Callable
+            }
+
+            this.player.openInventory.topInventory.let { opening ->
+                if (opening.holder !is AllCandidateUI) {
+                    return@Callable
+                }
+                pages[pageNum]?.let { contents ->
+                    contents.entries.forEach { (slot, pair) ->
+                        opening.setItem(slot, pair.first)
+                    }
+                }
+            }
+        }.fromBukkitMainThread()
     }
 
     companion object {
@@ -175,7 +192,7 @@ internal class AllCandidateUI(
             return
         }
         player.giveItems(saveLimit = true, *this.view.materials.values.toTypedArray(), this.view.result)
-        this.pageGenerateWorker.cancel(true)
+        this.isClosed.set(true)
     }
 
     override fun onClick(

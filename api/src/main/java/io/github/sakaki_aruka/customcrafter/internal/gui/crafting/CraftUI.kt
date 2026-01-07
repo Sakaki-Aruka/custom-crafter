@@ -35,6 +35,7 @@ import org.bukkit.persistence.PersistentDataType
 import java.util.UUID
 import java.util.concurrent.Callable
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.atomic.AtomicBoolean
 
 internal class CraftUI(
     var dropItemsOnClose: Boolean = true,
@@ -44,6 +45,8 @@ internal class CraftUI(
 
     private val inventory: Inventory
     val bakedDesigner: CraftUIDesigner.Baked
+
+    private val isClosed: AtomicBoolean = AtomicBoolean(false)
 
     init {
         val designContext = CraftUIDesigner.Context(player = caller)
@@ -159,6 +162,7 @@ internal class CraftUI(
     }
 
     override fun onClose(event: InventoryCloseEvent) {
+        this.isClosed.set(true)
         if (!this.dropItemsOnClose) {
             return
         }
@@ -244,7 +248,9 @@ internal class CraftUI(
         )
 
         Callable {
-            player.openInventory(allUI.inventory)
+            if (!this.isClosed.get()) {
+                player.openInventory(allUI.inventory)
+            }
         }.fromBukkitMainThread()
 
     }
