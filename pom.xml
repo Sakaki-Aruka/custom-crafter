@@ -6,7 +6,7 @@
 
     <groupId>io.github.sakaki-aruka</groupId>
     <artifactId>custom-crafter</artifactId>
-    <version>5.0.16</version>
+    <version>5.0.17</version>
     <packaging>pom</packaging>
 
     <modules>
