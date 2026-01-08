@@ -55,7 +55,7 @@ object CEnchantMatterImplTest {
             crafterID = UUID.randomUUID()
         )
 
-        assertTrue(CEnchantMatterImpl.DEFAULT_ENCHANT_CHECKER.predicate(context))
+        assertTrue(CEnchantMatterImpl.DEFAULT_ENCHANT_CHECKER.test(context))
     }
 
     @Test
@@ -76,7 +76,7 @@ object CEnchantMatterImplTest {
             crafterID = UUID.randomUUID()
         )
 
-        assertTrue(CEnchantMatterImpl.DEFAULT_ENCHANT_CHECKER.predicate(context))
+        assertTrue(CEnchantMatterImpl.DEFAULT_ENCHANT_CHECKER.test(context))
     }
 
     @Test
@@ -97,7 +97,7 @@ object CEnchantMatterImplTest {
             crafterID = UUID.randomUUID()
         )
 
-        assertTrue(CEnchantMatterImpl.DEFAULT_ENCHANT_CHECKER.predicate(context))
+        assertTrue(CEnchantMatterImpl.DEFAULT_ENCHANT_CHECKER.test(context))
     }
 
     @Test
@@ -125,7 +125,7 @@ object CEnchantMatterImplTest {
             crafterID = UUID.randomUUID()
         )
 
-        assertFalse(CEnchantMatterImpl.DEFAULT_ENCHANT_CHECKER.predicate(context))
+        assertFalse(CEnchantMatterImpl.DEFAULT_ENCHANT_CHECKER.test(context))
     }
 
     @Test

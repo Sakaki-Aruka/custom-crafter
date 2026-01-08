@@ -1,5 +1,26 @@
 # Changelog
 
+# 5.0.17
+
+## ⚠️ Breaking Changes
+
+* Refactored **`*Predicate`** and **`ResultSupplier`** interfaces as functional interfaces (**SAM**) and removed their default implementations. This allows for concise lambda expressions, but existing code relying on the previous inheritance structure will require updates.
+* Removed internal utility and container classes, specifically **`CRecipeContainer`** and **`InventoryUtil`**. Logic depending on these classes must be migrated to the new API structure.
+* The recipe evaluation system has been overhauled with the introduction of `CRecipePredicate`, which may require adjustments to how evaluation logic is invoked in your implementation.
+
+---
+
+## ✨ New Features and Enhancements
+
+* **[New Feature]** Added **`CRecipePredicate`**, a new system that allows for comprehensive evaluation across the entire recipe. This enables the implementation of highly flexible and advanced recipe validation logic.
+* **[New Feature]** Added support for **asynchronous operations**. This improves server performance by allowing heavy processing tasks to be handled off the main thread.
+
+---
+
+## 🛠 Fix
+
+* Conducted internal cleanup by removing obsolete classes and optimizing interfaces to improve overall maintainability.
+
 # 5.0.16
 
 ## ⚠️ Breaking Changes

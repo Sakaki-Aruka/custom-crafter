@@ -3,7 +3,6 @@ package io.github.sakaki_aruka.customcrafter.impl.matter.potion
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatterPredicate
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CPotionMatter
-import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterPredicateImpl
 import io.github.sakaki_aruka.customcrafter.api.objects.matter.potion.CPotionComponent
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
 import org.bukkit.Material
@@ -35,18 +34,18 @@ open class CPotionMatterImpl @JvmOverloads constructor(
          * @since 5.0.15
          */
         @JvmField
-        val DEFAULT_POTION_CHECKER: CMatterPredicate = CMatterPredicateImpl { ctx ->
+        val DEFAULT_POTION_CHECKER: CMatterPredicate = CMatterPredicate { ctx ->
             if (ctx.input.type.isAir) {
-                return@CMatterPredicateImpl true
+                return@CMatterPredicate true
             }
             val potionMatter = ctx.matter as? CPotionMatter
-                ?: return@CMatterPredicateImpl true
+                ?: return@CMatterPredicate true
 
             if (potionMatter.potionComponents.isEmpty()) {
-                return@CMatterPredicateImpl true
+                return@CMatterPredicate true
             } else if (ctx.input.itemMeta !is PotionMeta) {
                 // CPotionComponent required, but the input does not have potion effects
-                return@CMatterPredicateImpl false
+                return@CMatterPredicate false
             }
 
             // Key: Type of potion, Value: Effect level
@@ -59,7 +58,7 @@ open class CPotionMatterImpl @JvmOverloads constructor(
                 list.forEach { effect -> sources[effect.type] = effect.amplifier }
             }
 
-            return@CMatterPredicateImpl potionMatter.potionComponents.all { component ->
+            return@CMatterPredicate potionMatter.potionComponents.all { component ->
                 when (component.strict) {
                     CPotionComponent.Strict.ONLY_EFFECT -> sources.containsKey(component.effect.type)
                     CPotionComponent.Strict.STRICT -> {

@@ -3,17 +3,16 @@ package io.github.sakaki_aruka.customcrafter.internal.gui.crafting
 import io.github.sakaki_aruka.customcrafter.CustomCrafter
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.event.CreateCustomItemEvent
-import io.github.sakaki_aruka.customcrafter.api.event.PreCreateCustomItemEvent
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
-import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipeContainer
 import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.api.interfaces.ui.CraftUIDesigner
 import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.search.Search
+import io.github.sakaki_aruka.customcrafter.impl.util.AsyncUtil.fromBukkitMainThread
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter.toComponent
-import io.github.sakaki_aruka.customcrafter.impl.util.InventoryUtil.giveItems
+import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
 import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterUI
 import io.github.sakaki_aruka.customcrafter.internal.gui.allcandidate.AllCandidateUI
 import net.kyori.adventure.text.Component
@@ -32,6 +31,9 @@ import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 import java.util.UUID
+import java.util.concurrent.Callable
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.atomic.AtomicBoolean
 
 internal class CraftUI(
     var dropItemsOnClose: Boolean = true,
@@ -41,6 +43,8 @@ internal class CraftUI(
 
     private val inventory: Inventory
     val bakedDesigner: CraftUIDesigner.Baked
+
+    private val isClosed: AtomicBoolean = AtomicBoolean(false)
 
     init {
         val designContext = CraftUIDesigner.Context(player = caller)
@@ -152,23 +156,23 @@ internal class CraftUI(
         val remaining: List<ItemStack> = event.inventory.addItem(currentItem).values.toList()
         // delete pseudo
         event.inventory.setItem(this.bakedDesigner.resultInt(), resultSlotItem)
-        (event.whoClicked as Player).giveItems(saveLimit = true, *remaining.toTypedArray())
+        (event.whoClicked as Player).give(remaining)
     }
 
     override fun onClose(event: InventoryCloseEvent) {
+        this.isClosed.set(true)
         if (!this.dropItemsOnClose) {
             return
         }
         val view: CraftView = this.toView()
         val player: Player = event.player as? Player ?: return
-        player.giveItems(saveLimit = true, *view.materials.values.toTypedArray(), view.result)
+        player.give(view.materials.values + view.result)
     }
 
     override fun onClick(
         clicked: Inventory,
         event: InventoryClickEvent
     ) {
-        val player: Player = event.whoClicked as? Player ?: return
         val clickedCoordinate = CoordinateComponent.fromIndex(event.rawSlot)
 
         event.isCancelled = true
@@ -189,35 +193,8 @@ internal class CraftUI(
             this.bakedDesigner.makeButton.first -> {
                 val view: CraftView = this.toView()
                 if (view.materials.values.none { i -> !i.isEmpty }) return
-                val preEvent = PreCreateCustomItemEvent(player, view, event.click)
-                Bukkit.getPluginManager().callEvent(preEvent)
-                if (preEvent.isCancelled) return
 
-                val result: Search.SearchResult = Search.search(
-                    player.uniqueId,
-                    view,
-                    forceSearchVanillaRecipe = !CustomCrafterAPI.getUseMultipleResultCandidateFeature()
-                )
-
-                if (result.size() == 0) return
-                CreateCustomItemEvent(player, view, result, event.click).callEvent()
-                if (CustomCrafterAPI.getResultGiveCancel()) return
-
-                if (CustomCrafterAPI.getUseMultipleResultCandidateFeature() && result.size() > 1) {
-                    val allCandidateUI = AllCandidateUI(
-                        view = view,
-                        player = player,
-                        result = result,
-                        useShift = event.isShiftClick,
-                        bakedCraftUIDesigner = this.bakedDesigner
-                    )
-                    if (!allCandidateUI.inventory.isEmpty) {
-                        this.dropItemsOnClose = false
-                        player.openInventory(allCandidateUI.inventory)
-                    }
-                } else {
-                    normalCrafting(result, event.isShiftClick, player)
-                }
+                asyncSearchHandler(event)
             }
 
             in bakedDesigner.craftSlots() -> {
@@ -226,58 +203,88 @@ internal class CraftUI(
         }
     }
 
-    private fun normalCrafting(
+    private fun asyncSearchHandler(event: InventoryClickEvent) {
+        // called from the main thread (synced)
+        val player: Player = (event.whoClicked as? Player) ?: return
+        val shiftUsed: Boolean = event.isShiftClick
+
+        CompletableFuture.runAsync({
+            // Async
+            val result: Search.SearchResult = Search.asyncSearch(
+                crafterID = player.uniqueId,
+                view = this.toView()
+            ).get()
+
+            if (CustomCrafterAPI.getUseMultipleResultCandidateFeature() && result.size() > 1) {
+                // AllCandidate Open on MainThread
+                openAllCandidateUI(result, shiftUsed, player)
+            } else if (result.customs().isNotEmpty()) {
+                giveCustomRecipeResults(result, shiftUsed, player)
+            } else if (result.vanilla() != null) {
+                giveVanillaRecipeResults(result, shiftUsed, player)
+            }
+        }, InternalAPI.asyncExecutor())
+    }
+
+    private fun openAllCandidateUI(
         result: Search.SearchResult,
         shiftUsed: Boolean,
         player: Player
     ) {
-        if (result.size() < 1) return
+        this.dropItemsOnClose = false
+        val allUI = AllCandidateUI(
+            view = this.toView(),
+            player = player,
+            result = result,
+            useShift = shiftUsed,
+            bakedCraftUIDesigner = this.bakedDesigner
+        )
 
-        val mapped: Map<CoordinateComponent, ItemStack> = bakedDesigner.craftSlots()
-            .map { c -> c to (this.inventory.getItem(c.toIndex()) ?: ItemStack.empty()) }
-            .filter { (_, item) -> !item.type.isAir }
-            .toMap()
-        if (result.customs().isNotEmpty()) {
-            val (recipe: CRecipe, relate: MappedRelation) = result.customs().firstOrNull() ?: return
+        Callable {
+            if (!this.isClosed.get()) {
+                player.openInventory(allUI.inventory)
+            }
+        }.fromBukkitMainThread()
 
-            val amount: Int = recipe.getTimes(mapped, relate, shift = shiftUsed)
+    }
 
-            val decrementedView: CraftView = this.toView().clone().getDecremented(
-                shiftUsed = shiftUsed, recipe = recipe, relations = relate
-            )
+    private fun giveCustomRecipeResults(
+        result: Search.SearchResult,
+        shiftUsed: Boolean,
+        player: Player
+    ) {
+        val (recipe: CRecipe, relate: MappedRelation) = result.customs().firstOrNull() ?: return
+        val view: CraftView = this.toView()
+        val amount: Int = recipe.getTimes(view.materials, relate, shiftUsed)
+        val decrementedView: CraftView = view.clone().getDecremented(shiftUsed, recipe, relate)
 
+        CreateCustomItemEvent(player, view, result, shiftUsed, isAsync = true).callEvent()
+
+        Callable {
             decrementedView.materials.forEach { (c, item) ->
                 this.inventory.setItem(c.toIndex(), item)
             }
+        }.fromBukkitMainThread()
 
-            val results: MutableList<ItemStack> = recipe.getResults(
-                ResultSupplier.Context(
-                    recipe = recipe,
-                    crafterID = player.uniqueId,
-                    relation = relate,
-                    mapped = mapped,
-                    list = mutableListOf(),
-                    shiftClicked = shiftUsed,
-                    calledTimes = amount,
-                    isMultipleDisplayCall = false)
-            )
+        val results: List<ItemStack> = recipe.asyncGetResults(ResultSupplier.Context(
+            recipe, relate, view.materials, shiftUsed, amount, player.uniqueId,false
+        )).get()
 
-            recipe.runNormalContainers(CRecipeContainer.Context(
-                userID = player.uniqueId,
-                relation = relate,
-                mapped = mapped,
-                results = results,
-                isAllCandidateDisplayCall = false
-            ))
+        Callable {
+            player.give(*results.toTypedArray())
+        }.fromBukkitMainThread()
+    }
 
-            if (results.isNotEmpty()) {
-                player.giveItems(saveLimit = true, *results.toTypedArray())
-            }
+    private fun giveVanillaRecipeResults(
+        result: Search.SearchResult,
+        shiftUsed: Boolean,
+        player: Player
+    ) {
+        val view: CraftView = this.toView()
+        val min: Int = view.materials.values.minOf { it.amount }
+        val decrementAmount: Int = if (shiftUsed) min else 1
 
-        } else if (result.vanilla() != null) {
-            // customs: Empty, vanilla: Exists
-            val min: Int = mapped.values.minOf { i -> i.amount }
-            val decrementAmount: Int = if (shiftUsed) min else 1
+        Callable {
             bakedDesigner.craftSlots()
                 .filter { c -> this.inventory.getItem(c.toIndex())?.takeIf { item -> !item.type.isEmpty } != null }
                 .forEach { c ->
@@ -285,8 +292,8 @@ internal class CraftUI(
                     this.inventory.setItem(c.toIndex(), newItem?.asQuantity(newItem.amount - decrementAmount))
                 }
             val item: ItemStack = result.vanilla()!!.result.apply { this.amount *= decrementAmount }
-            player.giveItems(items = arrayOf(item))
-        }
+            player.give(item)
+        }.fromBukkitMainThread()
     }
 
     override fun getInventory(): Inventory = this.inventory

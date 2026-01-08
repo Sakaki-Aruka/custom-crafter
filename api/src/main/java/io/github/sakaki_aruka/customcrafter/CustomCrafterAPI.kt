@@ -11,12 +11,15 @@ import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
+import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicReference
 
 object CustomCrafterAPI {
     /**
      * Custom Crafter API version.
      */
-    const val API_VERSION: String = "5.0.16"
+    const val API_VERSION: String = "5.0.17"
 
     /**
      * Custom Crafter API is stable or not.
@@ -38,7 +41,7 @@ object CustomCrafterAPI {
      * @suppress
      * @see[CustomCrafterAPIPropertiesChangeEvent.PropertyKey.RESULT_GIVE_CANCEL]
      */
-    private var RESULT_GIVE_CANCEL: Boolean = false
+    private var RESULT_GIVE_CANCEL: AtomicBoolean = AtomicBoolean(false)
 
     /**
      * Returns a boolean value that means the Custom Crafter API give result items to players or not.
@@ -46,7 +49,7 @@ object CustomCrafterAPI {
      * @since 5.0.11
      */
     @JvmStatic
-    fun getResultGiveCancel(): Boolean = RESULT_GIVE_CANCEL
+    fun getResultGiveCancel(): Boolean = RESULT_GIVE_CANCEL.get()
 
     /**
      * Sets a boolean value that means the Custom Crafter API give result items to players or not.
@@ -61,15 +64,15 @@ object CustomCrafterAPI {
     @JvmStatic
     @JvmOverloads
     fun setResultGiveCancel(v: Boolean, calledAsync: Boolean = false) {
-        if (RESULT_GIVE_CANCEL != v) {
+        val currentValue: Boolean = RESULT_GIVE_CANCEL.getAndSet(v)
+        if (currentValue != v) {
             CustomCrafterAPIPropertiesChangeEvent(
                 propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.RESULT_GIVE_CANCEL.name,
-                oldValue = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(RESULT_GIVE_CANCEL),
-                newValue = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(v),
+                oldValue = CustomCrafterAPIPropertiesChangeEvent.Property(currentValue),
+                newValue = CustomCrafterAPIPropertiesChangeEvent.Property(v),
                 isAsync = calledAsync
             ).callEvent()
         }
-        RESULT_GIVE_CANCEL = v
     }
 
     /**
@@ -79,29 +82,28 @@ object CustomCrafterAPI {
     @JvmStatic
     @JvmOverloads
     fun setResultGiveCancelDefault(calledAsync: Boolean = false) {
-        if (RESULT_GIVE_CANCEL) {
+        if (RESULT_GIVE_CANCEL.getAndSet(false)) {
             CustomCrafterAPIPropertiesChangeEvent(
                 propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.RESULT_GIVE_CANCEL.name,
-                oldValue = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(RESULT_GIVE_CANCEL),
-                newValue = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(false),
+                oldValue = CustomCrafterAPIPropertiesChangeEvent.Property(true),
+                newValue = CustomCrafterAPIPropertiesChangeEvent.Property(false),
                 isAsync = calledAsync
             ).callEvent()
         }
-        RESULT_GIVE_CANCEL = false
     }
 
     /**
      * @suppress
      * @see[CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK]
      */
-    private var BASE_BLOCK: Material = Material.GOLD_BLOCK
+    private var BASE_BLOCK: AtomicReference<Material> = AtomicReference(Material.GOLD_BLOCK)
     /**
      * Gets a base block type.
      * @return[Material] base block type
      * @since 5.0.9
      */
     @JvmStatic
-    fun getBaseBlock(): Material = BASE_BLOCK
+    fun getBaseBlock(): Material = BASE_BLOCK.get()
 
     /**
      * Sets base block with given material.
@@ -119,15 +121,15 @@ object CustomCrafterAPI {
             throw IllegalArgumentException("'type' must meet 'Material#isBlock'.")
         }
 
-        if (type != BASE_BLOCK) {
+        val currentValue: Material = BASE_BLOCK.getAndSet(type)
+        if (type != currentValue) {
             CustomCrafterAPIPropertiesChangeEvent(
                 propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK.name,
-                oldValue = CustomCrafterAPIPropertiesChangeEvent.Property<Material>(BASE_BLOCK),
-                newValue = CustomCrafterAPIPropertiesChangeEvent.Property<Material>(type),
+                oldValue = CustomCrafterAPIPropertiesChangeEvent.Property(currentValue),
+                newValue = CustomCrafterAPIPropertiesChangeEvent.Property(type),
                 isAsync = calledAsync
             ).callEvent()
         }
-        BASE_BLOCK = type
     }
 
     /**
@@ -137,15 +139,15 @@ object CustomCrafterAPI {
     @JvmStatic
     @JvmOverloads
     fun setBaseBlockDefault(calledAsync: Boolean = false) {
-        if (BASE_BLOCK != Material.GOLD_BLOCK) {
+        val currentValue: Material = BASE_BLOCK.getAndSet(Material.GOLD_BLOCK)
+        if (currentValue != Material.GOLD_BLOCK) {
             CustomCrafterAPIPropertiesChangeEvent(
                 propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK.name,
-                oldValue = CustomCrafterAPIPropertiesChangeEvent.Property<Material>(BASE_BLOCK),
-                newValue = CustomCrafterAPIPropertiesChangeEvent.Property<Material>(Material.GOLD_BLOCK),
+                oldValue = CustomCrafterAPIPropertiesChangeEvent.Property(currentValue),
+                newValue = CustomCrafterAPIPropertiesChangeEvent.Property(Material.GOLD_BLOCK),
                 isAsync = calledAsync
             ).callEvent()
         }
-        BASE_BLOCK = Material.GOLD_BLOCK
     }
 
     /**
@@ -156,7 +158,7 @@ object CustomCrafterAPI {
      * @since 5.0.8
      * @see[CustomCrafterAPIPropertiesChangeEvent.PropertyKey.USE_MULTIPLE_RESULT_CANDIDATE_FEATURE]
      */
-    private var USE_MULTIPLE_RESULT_CANDIDATE_FEATURE = false
+    private var USE_MULTIPLE_RESULT_CANDIDATE_FEATURE: AtomicBoolean = AtomicBoolean(false)
 
     /**
      * Returns a boolean value that means 'multiple result candidate' feature enabled or not.
@@ -167,7 +169,7 @@ object CustomCrafterAPI {
      * @since 5.0.11 (original 5.0.8)
      */
     @JvmStatic
-    fun getUseMultipleResultCandidateFeature(): Boolean = USE_MULTIPLE_RESULT_CANDIDATE_FEATURE
+    fun getUseMultipleResultCandidateFeature(): Boolean = USE_MULTIPLE_RESULT_CANDIDATE_FEATURE.get()
 
     /**
      * Sets 'multiple result candidate' feature enables or not.
@@ -181,15 +183,15 @@ object CustomCrafterAPI {
     @JvmStatic
     @JvmOverloads
     fun setUseMultipleResultCandidateFeature(v: Boolean, calledAsync: Boolean = false) {
-        if (v != USE_MULTIPLE_RESULT_CANDIDATE_FEATURE) {
+        val currentValue: Boolean = USE_MULTIPLE_RESULT_CANDIDATE_FEATURE.getAndSet(v)
+        if (v != currentValue) {
             CustomCrafterAPIPropertiesChangeEvent(
                 propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.USE_MULTIPLE_RESULT_CANDIDATE_FEATURE.name,
-                oldValue = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(USE_MULTIPLE_RESULT_CANDIDATE_FEATURE),
-                newValue = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(v),
+                oldValue = CustomCrafterAPIPropertiesChangeEvent.Property(currentValue),
+                newValue = CustomCrafterAPIPropertiesChangeEvent.Property(v),
                 isAsync = calledAsync
             ).callEvent()
         }
-        USE_MULTIPLE_RESULT_CANDIDATE_FEATURE = v
     }
 
     /**
@@ -199,25 +201,24 @@ object CustomCrafterAPI {
     @JvmStatic
     @JvmOverloads
     fun setUseMultipleResultCandidateFeatureDefault(calledAsync: Boolean = false) {
-        if (USE_MULTIPLE_RESULT_CANDIDATE_FEATURE) {
+        if (USE_MULTIPLE_RESULT_CANDIDATE_FEATURE.getAndSet(false)) {
             CustomCrafterAPIPropertiesChangeEvent(
                 propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.USE_MULTIPLE_RESULT_CANDIDATE_FEATURE.name,
-                oldValue = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(USE_MULTIPLE_RESULT_CANDIDATE_FEATURE),
-                newValue = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(false),
+                oldValue = CustomCrafterAPIPropertiesChangeEvent.Property(true),
+                newValue = CustomCrafterAPIPropertiesChangeEvent.Property(false),
                 isAsync = calledAsync
             ).callEvent()
         }
-        USE_MULTIPLE_RESULT_CANDIDATE_FEATURE = false
     }
 
-    private var USE_CUSTOM_CRAFT_UI = true
+    private var USE_CUSTOM_CRAFT_UI = AtomicBoolean(true)
     /**
      * Returns a boolean value that means 'Custom Craft UI open' enabled or not.
      * @return[Boolean] Enabled or not
      * @since 5.0.13-1
      */
     @JvmStatic
-    fun getUseCustomCraftUI(): Boolean = USE_CUSTOM_CRAFT_UI
+    fun getUseCustomCraftUI(): Boolean = USE_CUSTOM_CRAFT_UI.get()
 
     /**
      * Sets 'Custom Craft UI open' enables or not.
@@ -229,15 +230,15 @@ object CustomCrafterAPI {
     @JvmStatic
     @JvmOverloads
     fun setUseCustomCraftUI(v: Boolean, calledAsync: Boolean = false) {
-        if (v != USE_CUSTOM_CRAFT_UI) {
+        val currentValue: Boolean = USE_CUSTOM_CRAFT_UI.getAndSet(v)
+        if (v != currentValue) {
             CustomCrafterAPIPropertiesChangeEvent(
                 propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.USE_CUSTOM_CRAFT_UI.name,
-                oldValue = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(USE_CUSTOM_CRAFT_UI),
-                newValue = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(v),
+                oldValue = CustomCrafterAPIPropertiesChangeEvent.Property(currentValue),
+                newValue = CustomCrafterAPIPropertiesChangeEvent.Property(v),
                 isAsync = calledAsync
             ).callEvent()
         }
-        USE_CUSTOM_CRAFT_UI = v
     }
 
     /**
@@ -248,15 +249,14 @@ object CustomCrafterAPI {
     @JvmStatic
     @JvmOverloads
     fun setUseCustomCraftUIDefault(calledAsync: Boolean = false) {
-        if (!USE_CUSTOM_CRAFT_UI) {
+        if (!USE_CUSTOM_CRAFT_UI.getAndSet(true)) {
             CustomCrafterAPIPropertiesChangeEvent(
                 propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.USE_CUSTOM_CRAFT_UI.name,
-                oldValue = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(USE_CUSTOM_CRAFT_UI),
-                newValue = CustomCrafterAPIPropertiesChangeEvent.Property<Boolean>(true),
+                oldValue = CustomCrafterAPIPropertiesChangeEvent.Property(false),
+                newValue = CustomCrafterAPIPropertiesChangeEvent.Property(true),
                 isAsync = calledAsync
             ).callEvent()
         }
-        USE_CUSTOM_CRAFT_UI = true
     }
 
     /**
@@ -280,7 +280,7 @@ object CustomCrafterAPI {
      */
     @JvmStatic
     fun hasFullCompatibility(version: String): Boolean {
-        return version in setOf("5.0.16")
+        return version in setOf("5.0.17")
     }
 
 
@@ -288,7 +288,7 @@ object CustomCrafterAPI {
      * @suppress
      * @see[CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK_SIDE]
      */
-    private var BASE_BLOCK_SIDE: Int = 3
+    private var BASE_BLOCK_SIDE = AtomicInteger(3)//3
     /**
      * set base block's side size.
      *
@@ -301,16 +301,18 @@ object CustomCrafterAPI {
     @JvmStatic
     @JvmOverloads
     fun setBaseBlockSideSize(size: Int, calledAsync: Boolean = false): Boolean {
-        if (size < 3 || size % 2 != 1) return false
-        if (size != BASE_BLOCK_SIDE) {
+        if (size < 3 || size % 2 != 1) {
+            return false
+        }
+        val currentValue: Int = BASE_BLOCK_SIDE.getAndSet(size)
+        if (size != currentValue) {
             CustomCrafterAPIPropertiesChangeEvent(
                 propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK_SIDE.name,
-                oldValue = CustomCrafterAPIPropertiesChangeEvent.Property<Int>(BASE_BLOCK_SIDE),
-                newValue = CustomCrafterAPIPropertiesChangeEvent.Property<Int>(size),
+                oldValue = CustomCrafterAPIPropertiesChangeEvent.Property(currentValue),
+                newValue = CustomCrafterAPIPropertiesChangeEvent.Property(size),
                 isAsync = calledAsync
             ).callEvent()
         }
-        BASE_BLOCK_SIDE = size
         return true
     }
 
@@ -320,7 +322,7 @@ object CustomCrafterAPI {
      * @return[Int] size
      */
     @JvmStatic
-    fun getBaseBlockSideSize(): Int = BASE_BLOCK_SIDE
+    fun getBaseBlockSideSize(): Int = BASE_BLOCK_SIDE.get()
 
     /**
      * Sets base block's side size to 3 (default value).
@@ -329,26 +331,26 @@ object CustomCrafterAPI {
     @JvmStatic
     @JvmOverloads
     fun setBaseBlockSideSizeDefault(calledAsync: Boolean = false) {
-        if (BASE_BLOCK_SIDE != 3) {
+        val currentValue: Int = BASE_BLOCK_SIDE.getAndSet(3)
+        if (currentValue != 3) {
             CustomCrafterAPIPropertiesChangeEvent(
                 propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK_SIDE.name,
-                oldValue = CustomCrafterAPIPropertiesChangeEvent.Property<Int>(BASE_BLOCK_SIDE),
-                newValue = CustomCrafterAPIPropertiesChangeEvent.Property<Int>(3),
+                oldValue = CustomCrafterAPIPropertiesChangeEvent.Property(currentValue),
+                newValue = CustomCrafterAPIPropertiesChangeEvent.Property(3),
                 isAsync = calledAsync
             ).callEvent()
         }
-        BASE_BLOCK_SIDE = 3
     }
 
 
-    private var CRAFT_UI_DESIGNER: CraftUIDesigner = CraftUI
+    private var CRAFT_UI_DESIGNER: AtomicReference<CraftUIDesigner> = AtomicReference(CraftUI)
     /**
      * Returns a current CraftUI designer.
      * @return[CraftUIDesigner]
      * @since 5.0.16
      */
     @JvmStatic
-    fun getCraftUIDesigner(): CraftUIDesigner = CRAFT_UI_DESIGNER
+    fun getCraftUIDesigner(): CraftUIDesigner = CRAFT_UI_DESIGNER.get()
 
     /**
      * Sets a new CraftUI designer if a specified is valid.
@@ -363,13 +365,13 @@ object CustomCrafterAPI {
         val baked: CraftUIDesigner.Baked = CraftUIDesigner.bake(designer, nullContext)
         baked.isValid().exceptionOrNull()?.let { throw it }
 
+        val currentValue: CraftUIDesigner = CRAFT_UI_DESIGNER.getAndSet(designer)
         CustomCrafterAPIPropertiesChangeEvent(
             propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.CRAFT_UI_DESIGNER.name,
-            oldValue = CustomCrafterAPIPropertiesChangeEvent.Property(CRAFT_UI_DESIGNER),
+            oldValue = CustomCrafterAPIPropertiesChangeEvent.Property(currentValue),
             newValue = CustomCrafterAPIPropertiesChangeEvent.Property(designer),
             isAsync = calledAsync
         ).callEvent()
-        CRAFT_UI_DESIGNER = designer
     }
 
     /**
@@ -380,13 +382,13 @@ object CustomCrafterAPI {
     @JvmStatic
     @JvmOverloads
     fun setCraftUIDesignerDefault(calledAsync: Boolean = false) {
+        val currentValue: CraftUIDesigner = CRAFT_UI_DESIGNER.getAndSet(CraftUI)
         CustomCrafterAPIPropertiesChangeEvent(
             propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.CRAFT_UI_DESIGNER.name,
-            oldValue = CustomCrafterAPIPropertiesChangeEvent.Property(CRAFT_UI_DESIGNER),
+            oldValue = CustomCrafterAPIPropertiesChangeEvent.Property(currentValue),
             newValue = CustomCrafterAPIPropertiesChangeEvent.Property(CraftUI),
             isAsync = calledAsync
         ).callEvent()
-        CRAFT_UI_DESIGNER = CraftUI
     }
 
     /**
@@ -504,7 +506,9 @@ object CustomCrafterAPI {
      * @since 5.0.9
      */
     @JvmStatic
-    fun getAllCandidateNotDisplayableItem() = ALL_CANDIDATE_NO_DISPLAYABLE_ITEM
+    fun getAllCandidateNotDisplayableItem() = synchronized(ALL_CANDIDATE_NO_DISPLAYABLE_ITEM) {
+        ALL_CANDIDATE_NO_DISPLAYABLE_ITEM
+    }
 
     /**
      * Set an item that is used for an all-candidates-menu's not displayable items slot.
@@ -535,9 +539,15 @@ object CustomCrafterAPI {
         item: ItemStack,
         loreSupplier: (String) -> List<Component>?
     ) {
-        if (!item.type.isItem) throw IllegalArgumentException("'item' material must be 'Material#isItem'.")
-        ALL_CANDIDATE_NO_DISPLAYABLE_ITEM = item
-        ALL_CANDIDATE_NO_DISPLAYABLE_ITEM_LORE_SUPPLIER = loreSupplier
+        if (!item.type.isItem) {
+            throw IllegalArgumentException("'item' material must be 'Material#isItem'.")
+        }
+        synchronized(ALL_CANDIDATE_NO_DISPLAYABLE_ITEM) {
+            ALL_CANDIDATE_NO_DISPLAYABLE_ITEM = item
+        }
+        synchronized(ALL_CANDIDATE_NO_DISPLAYABLE_ITEM_LORE_SUPPLIER) {
+            ALL_CANDIDATE_NO_DISPLAYABLE_ITEM_LORE_SUPPLIER = loreSupplier
+        }
     }
 
     /**

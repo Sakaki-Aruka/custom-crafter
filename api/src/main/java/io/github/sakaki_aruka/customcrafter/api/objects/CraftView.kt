@@ -82,4 +82,17 @@ data class CraftView (
             world.dropItem(location, item)
         }
     }
+
+    /**
+     * Returns a view what is excluded empty slot
+     * @return[CraftView] Result View
+     * @since 5.0.17
+     */
+    fun excludeAir(): CraftView {
+        val result: ItemStack = this.result.clone()
+        val map: Map<CoordinateComponent, ItemStack> = this.materials.entries
+            .filterNot { (_, item) -> item.type.isAir }
+            .associate { (k, v) -> k to v }
+        return CraftView(map, result)
+    }
 }

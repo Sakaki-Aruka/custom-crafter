@@ -1,15 +1,13 @@
 package online.aruka.demo.register
 
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
+import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatterPredicate
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
-import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterPredicateImpl
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
 import io.github.sakaki_aruka.customcrafter.impl.recipe.CRecipeImpl
 import io.github.sakaki_aruka.customcrafter.impl.recipe.GroupRecipe
-import io.github.sakaki_aruka.customcrafter.impl.result.ResultSupplierImpl
-import io.github.sakaki_aruka.customcrafter.impl.util.Converter
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter.toComponent
 import online.aruka.demo.Demo
 import org.bukkit.Material
@@ -41,7 +39,7 @@ object ShapedRecipeProvider {
             name = "enchanted golden apple recipe",
             items = items,
             results = listOf(
-                ResultSupplierImpl.timesSingle(ItemStack.of(Material.ENCHANTED_GOLDEN_APPLE))
+                ResultSupplier.timesSingle(ItemStack.of(Material.ENCHANTED_GOLDEN_APPLE))
             ),
             type = CRecipe.Type.SHAPED
         )
@@ -51,11 +49,11 @@ object ShapedRecipeProvider {
         val emptyBottle: CMatter = CMatterImpl.single(Material.GLASS_BOTTLE)
         val waterBucket: CMatter = CMatterImpl.single(Material.WATER_BUCKET)
 
-        val supplier = ResultSupplierImpl { ctx ->
+        val supplier = ResultSupplier { ctx ->
             val list: MutableList<ItemStack> = mutableListOf()
             list.add(ItemStack.of(Material.POTION, ctx.calledTimes * 4))
             list.add(ItemStack.of(Material.BUCKET, ctx.calledTimes))
-            return@ResultSupplierImpl list
+            list
         }
 
         /*
@@ -89,7 +87,7 @@ object ShapedRecipeProvider {
             mass = true
         )
 
-        val supplier = ResultSupplierImpl { ctx ->
+        val supplier = ResultSupplier { ctx ->
             listOf(
                 ItemStack.of(Material.POTION, ctx.calledTimes * 4),
                 ItemStack.of(Material.BUCKET)
@@ -125,7 +123,7 @@ object ShapedRecipeProvider {
         val ironBlock: CMatter = CMatterImpl(
             name = "iron block core",
             candidate = setOf(Material.IRON_BLOCK),
-            predicates = setOf(CMatterPredicateImpl { ctx ->
+            predicates = setOf(CMatterPredicate { ctx ->
                 val key = NamespacedKey(Demo.plugin, "infinity_iron_block_count")
                 !ctx.input.itemMeta.persistentDataContainer.has(key, PersistentDataType.LONG)
             })
@@ -136,7 +134,7 @@ object ShapedRecipeProvider {
             mass = true
         )
 
-        val supplier = ResultSupplierImpl { ctx ->
+        val supplier = ResultSupplier { ctx ->
             val totalIronBlockAmount: Int = ctx.mapped.values.filter { v -> v.type == Material.IRON_BLOCK }
                 .sumOf { i -> i.amount }
             val core: ItemStack = ItemStack.of(Material.IRON_BLOCK)
@@ -181,7 +179,7 @@ object ShapedRecipeProvider {
             matter = CMatterImpl(
                 name = "infinity iron block core",
                 candidate = setOf(Material.IRON_BLOCK),
-                predicates = setOf(CMatterPredicateImpl { ctx ->
+                predicates = setOf(CMatterPredicate { ctx ->
                     ctx.input.itemMeta.persistentDataContainer.has(
                         NamespacedKey(Demo.plugin, "infinity_iron_block_count"),
                         PersistentDataType.INTEGER,
@@ -214,7 +212,7 @@ object ShapedRecipeProvider {
         items[CoordinateComponent(0, 0)] = core
         ironBlockContext.members.forEach { c -> items[c] = ironBlock }
 
-        val supplier: ResultSupplier = ResultSupplierImpl { ctx ->
+        val supplier = ResultSupplier { ctx ->
             val coreCoordinate = ctx.relation.components.first { (recipe, _) ->
                 recipe.toIndex() == 0
             }.input
@@ -258,7 +256,7 @@ object ShapedRecipeProvider {
             }
 
             result.add(core.asOne())
-            return@ResultSupplierImpl result
+            result
         }
 
         return GroupRecipe(
