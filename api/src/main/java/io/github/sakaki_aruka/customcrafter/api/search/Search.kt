@@ -102,6 +102,12 @@ object Search {
      * Returns a CompletableFuture that performs asynchronous searches using the input items and recipes.
      *
      * Since almost all processing in this search is done asynchronously, exceptions will occur when accessing the world or entities (due to Bukkit API's asynchronous processing limitations).
+     *
+     * @param[crafterID] Crafter UUID
+     * @param[view] View of input slots
+     * @param[sourceRecipes] Search target recipes (default = [CustomCrafterAPI.getRecipes])
+     * @return[CompletableFuture] Future task of a search result
+     * @since 5.0.17
      */
     @JvmStatic
     @JvmOverloads
@@ -148,7 +154,7 @@ object Search {
      * @param[forceSearchVanillaRecipe] Force to search vanilla recipes or not.(true=force, false=not). The default is true.
      * @param[onlyFirst] get only first matched custom recipe and mapped. (default = false)
      * @param[sourceRecipes] A list of searched recipes. (default = CustomCrafterAPI.getRecipes() / since 5.0.10)
-     * @return[SearchResult?] A result of a request. If you send one that contains invalid params, returns null.
+     * @return[SearchResult] A result of a request. If you send one that contains invalid params, returns null.
      * @throws[IllegalArgumentException] Throws when 'view.materials' is empty or their size out of range 1 to 36.
      */
     @JvmStatic
