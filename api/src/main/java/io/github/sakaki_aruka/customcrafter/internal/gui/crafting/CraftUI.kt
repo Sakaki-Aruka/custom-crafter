@@ -3,7 +3,6 @@ package io.github.sakaki_aruka.customcrafter.internal.gui.crafting
 import io.github.sakaki_aruka.customcrafter.CustomCrafter
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.event.CreateCustomItemEvent
-import io.github.sakaki_aruka.customcrafter.api.event.PreCreateCustomItemEvent
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.api.interfaces.ui.CraftUIDesigner
@@ -174,7 +173,6 @@ internal class CraftUI(
         clicked: Inventory,
         event: InventoryClickEvent
     ) {
-        val player: Player = event.whoClicked as? Player ?: return
         val clickedCoordinate = CoordinateComponent.fromIndex(event.rawSlot)
 
         event.isCancelled = true
@@ -195,9 +193,6 @@ internal class CraftUI(
             this.bakedDesigner.makeButton.first -> {
                 val view: CraftView = this.toView()
                 if (view.materials.values.none { i -> !i.isEmpty }) return
-                val preEvent = PreCreateCustomItemEvent(player, view, event.click)
-                Bukkit.getPluginManager().callEvent(preEvent)
-                if (preEvent.isCancelled) return
 
                 asyncSearchHandler(event)
             }
@@ -213,7 +208,6 @@ internal class CraftUI(
         val player: Player = (event.whoClicked as? Player) ?: return
         val shiftUsed: Boolean = event.isShiftClick
 
-        // TODO: AsyncCreateCustomItemEvent (UnCancellable)
         CompletableFuture.runAsync({
             // Async
             val result: Search.SearchResult = Search.asyncSearch(
@@ -264,15 +258,19 @@ internal class CraftUI(
         val amount: Int = recipe.getTimes(view.materials, relate, shiftUsed)
         val decrementedView: CraftView = view.clone().getDecremented(shiftUsed, recipe, relate)
 
-        val results: List<ItemStack> = recipe.asyncGetResults(ResultSupplier.Context(
-            recipe, relate, view.materials, shiftUsed, amount, player.uniqueId,false
-        )).get()
+        CreateCustomItemEvent(player, view, result, shiftUsed, isAsync = true).callEvent()
 
         Callable {
             decrementedView.materials.forEach { (c, item) ->
                 this.inventory.setItem(c.toIndex(), item)
             }
+        }.fromBukkitMainThread()
 
+        val results: List<ItemStack> = recipe.asyncGetResults(ResultSupplier.Context(
+            recipe, relate, view.materials, shiftUsed, amount, player.uniqueId,false
+        )).get()
+
+        Callable {
             player.give(*results.toTypedArray())
         }.fromBukkitMainThread()
     }

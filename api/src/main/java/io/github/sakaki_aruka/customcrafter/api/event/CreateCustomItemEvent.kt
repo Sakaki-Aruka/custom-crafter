@@ -5,7 +5,6 @@ import io.github.sakaki_aruka.customcrafter.api.search.Search
 import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
-import org.bukkit.event.inventory.ClickType
 
 /**
  * Called when a player did craft items what through custom crafting table.
@@ -13,14 +12,16 @@ import org.bukkit.event.inventory.ClickType
  * @param[player] A crafter
  * @param[view] A view of crafting gui
  * @param[result] A result of crafting
- * @param[clickType] A click type what is player did
+ * @param[shiftUsed] Shift-key used or not (since 5.0.17)
+ * @param[isAsync] Called from async or not (since 5.0.17)
  */
 
 class CreateCustomItemEvent (
     val player: Player,
     val view: CraftView,
     val result: Search.SearchResult?,
-    val clickType: ClickType
+    val shiftUsed: Boolean,
+    val isAsync: Boolean
 ): Event() {
     companion object {
         @JvmField

@@ -1,6 +1,7 @@
 package io.github.sakaki_aruka.customcrafter.internal.gui.allcandidate
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
+import io.github.sakaki_aruka.customcrafter.api.event.CreateCustomItemEvent
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.api.interfaces.ui.CraftUIDesigner
@@ -260,14 +261,10 @@ internal class AllCandidateUI(
                         crafterID = player.uniqueId
                     ))
 
+                    CreateCustomItemEvent(player, this.view, this.result, event.isShiftClick, isAsync = true).callEvent()
+
                     Callable {
-                        results.forEach { item ->
-                            if (!item.isEmpty) {
-                                Bukkit.getPlayer(player.uniqueId)?.let { p ->
-                                    p.location.world.dropItem(player.location, item)
-                                }
-                            }
-                        }
+                        player.give(results)
                     }.fromBukkitMainThread()
                 }, InternalAPI.asyncExecutor())
 
