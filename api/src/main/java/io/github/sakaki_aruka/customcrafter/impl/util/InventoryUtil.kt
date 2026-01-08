@@ -4,6 +4,11 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
 object InventoryUtil {
+    /**
+     * Gives items to a player
+     * @param[saveLimit] Considers `Material.maxStackSize` or not
+     * @param[items] Items
+     */
     fun Player.giveItems(
         saveLimit: Boolean = true,
         vararg items: ItemStack

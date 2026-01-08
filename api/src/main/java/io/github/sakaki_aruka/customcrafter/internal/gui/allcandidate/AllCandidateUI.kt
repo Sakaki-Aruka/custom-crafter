@@ -193,7 +193,6 @@ internal class AllCandidateUI(
             return
         }
         player.giveItems(saveLimit = true, *this.view.materials.values.toTypedArray(), this.view.result)
-        //player.give((this.view.materials.values + this.view.result).filterNot { it.type.isAir })
         this.isClosed.set(true)
     }
 
@@ -266,7 +265,6 @@ internal class AllCandidateUI(
                     CreateCustomItemEvent(player, this.view, this.result, event.isShiftClick, isAsync = true).callEvent()
 
                     Callable {
-                        //player.give(results.filterNot { it.type.isAir })
                         player.giveItems(saveLimit = true, *results.toTypedArray())
                     }.fromBukkitMainThread()
                 }, InternalAPI.asyncExecutor())

@@ -167,7 +167,6 @@ internal class CraftUI(
         }
         val view: CraftView = this.toView()
         val player: Player = event.player as? Player ?: return
-        //player.give((view.materials.values + view.result).filterNot { it.type.isAir })
         player.giveItems(saveLimit = true, *view.materials.values.toTypedArray(), view.result)
     }
 
@@ -273,7 +272,6 @@ internal class CraftUI(
         )).get()
 
         Callable {
-            //player.give(results.filterNot { it.type.isAir })
             player.giveItems(saveLimit = true, *results.toTypedArray())
         }.fromBukkitMainThread()
     }
@@ -296,7 +294,6 @@ internal class CraftUI(
                 }
             val item: ItemStack = result.vanilla()!!.result.apply { this.amount *= decrementAmount }
             if (!item.type.isAir) {
-                //player.give(item)
                 player.giveItems(saveLimit = true, item)
             }
         }.fromBukkitMainThread()
