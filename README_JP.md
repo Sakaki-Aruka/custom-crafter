@@ -42,12 +42,12 @@ custom crafter は、**PaperMCサーバー専用**のカスタムレシピ提供
 
 ## 🛠️ 対応環境とバージョン
 
-| Custom_Crafter Version   | Paper Version        |
-|:-------------------------|:---------------------|
-| **5.0.13 ~ 5.0.17 (最新)** | **1.21.4 ~ 1.21.11** |
-| 5.0.0 ~ 5.0.11           | 1.21.3               |
-| 4.3 (レガシー)               | 1.21.3               |
-| 4.2 (レガシー)               | 1.20.1 ~ 1.20.4      |
+| Custom_Crafter Version      | Paper Version        |
+|:----------------------------|:---------------------|
+| **5.0.13 ~ 5.0.17-p1 (最新)** | **1.21.4 ~ 1.21.11** |
+| 5.0.0 ~ 5.0.11              | 1.21.3               |
+| 4.3 (レガシー)                  | 1.21.3               |
+| 4.2 (レガシー)                  | 1.20.1 ~ 1.20.4      |
 
 > **⚠️ 警告:**
 > custom crafter は **Spigot/Bukkit サーバーでの動作をサポートしていません**。必ず **PaperMC** またはそのフォークで実行してください。
@@ -78,7 +78,7 @@ APIを利用する際は、プラグイン実行時にはCustomCrafterプラグ�
 * Maven: `provided`
 * Gradle: `compileOnly`
 
-最新バージョン: 5.0.17 [Maven Central (versions)](https://central.sonatype.com/artifact/io.github.sakaki-aruka/custom-crafter-api/versions)
+最新バージョン: 5.0.17-p1 [Maven Central (versions)](https://central.sonatype.com/artifact/io.github.sakaki-aruka/custom-crafter-api/versions)
 
 <details><summary>Maven Configuration Example</summary>
 
@@ -88,7 +88,7 @@ From Maven Central
 <dependency>
     <groupId>io.github.sakaki-aruka</groupId>
     <artifactId>custom-crafter-api</artifactId>
-    <version>5.0.17</version>
+    <version>5.0.17-p1</version>
     <scope>provided</scope>
 </dependency>
 ```
@@ -99,7 +99,7 @@ From Maven Central
 
 ```groovy
 dependencies {
-   compileOnly 'io.github.sakaki-aruka:custom-crafter-api:5.0.17'
+   compileOnly 'io.github.sakaki-aruka:custom-crafter-api:5.0.17-p1'
 }
 ```
 
@@ -109,7 +109,7 @@ dependencies {
 
 ```Kotlin
 dependencies {
-    compileOnly("io.github.sakaki-aruka:custom-crafter-api:5.0.17")
+    compileOnly("io.github.sakaki-aruka:custom-crafter-api:5.0.17-p1")
 }
 ```
 
@@ -145,7 +145,7 @@ CustomCrafterAPIを使って、あなたのプラグインでカスタムレシ�
 ```kotlin
 class YourPlugin: JavaPlugin() {
     // 依存するAPIのバージョンを定数として定義
-    const val DEPEND_CCAPI_VERSION = "5.0.17"
+    const val DEPEND_CCAPI_VERSION = "5.0.17-p1"
     
     @Override
     fun onEnable() {

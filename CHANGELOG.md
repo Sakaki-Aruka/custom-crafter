@@ -1,5 +1,13 @@
 # Changelog
 
+# 5.0.17-p1
+
+## ✨ New Features and Enhancements
+* **[Enhancement]** Add recipe relation map utility functions on `CoordinateComponent`.
+
+## 🛠 Fix
+* Page close error fix
+
 # 5.0.17
 
 ## ⚠️ Breaking Changes
