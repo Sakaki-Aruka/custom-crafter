@@ -8,6 +8,17 @@ import java.util.concurrent.Callable
 import java.util.concurrent.Future
 
 object AsyncUtil {
+    /**
+     * Returns value from bukkit main thread.
+     *
+     * ```kotlin
+     * // Example (In Async Thread)
+     * val players = Callable { Bukkit.getOnlinePlayers() }.fromBukkitMainThread()
+     * ```
+     *
+     * @return[T] Specified type value
+     * @since 5.0.17
+     */
     fun <T> Callable<T>.fromBukkitMainThread(
         plugin: JavaPlugin = CustomCrafter.getInstance()
     ): T {
@@ -18,6 +29,17 @@ object AsyncUtil {
         }
     }
 
+    /**
+     * Returns `Future<T>` from bukkit main thread.
+     *
+     * ```kotlin
+     * // Example (In Async Thread)
+     * val futureTask = Callable { Bukkit.getOnlinePlayers() }.futureFromBukkitMainThread()
+     * val players = futureTask.get()
+     * ```
+     * @return[Future] Future task
+     * @since 5.0.17
+     */
     fun <T> Callable<T>.futureFromBukkitMainThread(
         plugin: JavaPlugin = CustomCrafter.getInstance()
     ): Future<T> {
