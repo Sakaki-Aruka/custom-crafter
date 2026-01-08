@@ -166,7 +166,7 @@ internal class CraftUI(
         }
         val view: CraftView = this.toView()
         val player: Player = event.player as? Player ?: return
-        player.give(view.materials.values + view.result)
+        player.give((view.materials.values + view.result).filterNot { it.type.isAir })
     }
 
     override fun onClick(
@@ -271,7 +271,7 @@ internal class CraftUI(
         )).get()
 
         Callable {
-            player.give(*results.toTypedArray())
+            player.give(results.filterNot { it.type.isAir })
         }.fromBukkitMainThread()
     }
 
@@ -292,7 +292,9 @@ internal class CraftUI(
                     this.inventory.setItem(c.toIndex(), newItem?.asQuantity(newItem.amount - decrementAmount))
                 }
             val item: ItemStack = result.vanilla()!!.result.apply { this.amount *= decrementAmount }
-            player.give(item)
+            if (!item.type.isAir) {
+                player.give(item)
+            }
         }.fromBukkitMainThread()
     }
 

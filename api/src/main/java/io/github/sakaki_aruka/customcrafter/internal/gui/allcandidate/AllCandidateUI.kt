@@ -191,7 +191,7 @@ internal class AllCandidateUI(
         if (!this.dropOnClose) {
             return
         }
-        player.give(this.view.materials.values + this.view.result)
+        player.give((this.view.materials.values + this.view.result).filterNot { it.type.isAir })
         this.isClosed.set(true)
     }
 
@@ -264,7 +264,7 @@ internal class AllCandidateUI(
                     CreateCustomItemEvent(player, this.view, this.result, event.isShiftClick, isAsync = true).callEvent()
 
                     Callable {
-                        player.give(results)
+                        player.give(results.filterNot { it.type.isAir })
                     }.fromBukkitMainThread()
                 }, InternalAPI.asyncExecutor())
 
