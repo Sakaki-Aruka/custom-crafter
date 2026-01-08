@@ -2,11 +2,13 @@ package io.github.sakaki_aruka.customcrafter.impl.recipe
 
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
-import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipeContainer
+import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipePredicate
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
+import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
+import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
+import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelationComponent
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
-import io.github.sakaki_aruka.customcrafter.impl.result.ResultSupplierImpl
 import org.bukkit.Material
 import org.bukkit.inventory.CraftingRecipe
 import org.bukkit.inventory.Recipe
@@ -21,7 +23,7 @@ class CVanillaRecipe internal constructor(
     override val name: String,
     override val items: Map<CoordinateComponent, CMatter>,
     override val type: CRecipe.Type,
-    override val containers: List<CRecipeContainer>? = null,
+    override val predicates: List<CRecipePredicate>? = null,
     override val results: List<ResultSupplier>? = null,
     val original: Recipe
 ): CRecipe {
@@ -46,7 +48,7 @@ class CVanillaRecipe internal constructor(
                 recipe.key.namespace + recipe.key.key,
                 shapeToItems(recipe.shape, recipe.choiceMap),
                 CRecipe.Type.SHAPED,
-                results = listOf(ResultSupplierImpl.timesSingle(recipe.result)),
+                results = listOf(ResultSupplier.timesSingle(recipe.result)),
                 original = recipe
             )
         }
@@ -63,7 +65,7 @@ class CVanillaRecipe internal constructor(
                 recipe.key.namespace + recipe.key.key,
                 shapelessToItems(recipe.choiceList),
                 CRecipe.Type.SHAPELESS,
-                results = listOf(ResultSupplierImpl.timesSingle(recipe.result)),
+                results = listOf(ResultSupplier.timesSingle(recipe.result)),
                 original = recipe
             )
         }
@@ -76,7 +78,7 @@ class CVanillaRecipe internal constructor(
                     candidates.firstOrNull()?.name ?: "vanilla matter default name",
                     candidates
                 )
-                result[CoordinateComponent.Companion.fromIndex(index)] = matter
+                result[CoordinateComponent.fromIndex(index)] = matter
             }
             return result
         }
@@ -93,7 +95,7 @@ class CVanillaRecipe internal constructor(
                     candidates.firstOrNull()?.name ?: "vanilla matter default name",
                     candidates
                 )
-                result[CoordinateComponent.Companion.fromIndex(index)] = matter
+                result[CoordinateComponent.fromIndex(index)] = matter
             }
             return result
         }
@@ -125,5 +127,24 @@ class CVanillaRecipe internal constructor(
         private fun materialChoiceToCandidate(choice: RecipeChoice.MaterialChoice): Set<Material> {
             return choice.choices.toSet()
         }
+    }
+
+    fun relateWith(view: CraftView): MappedRelation {
+        val viewSize: Int = view.materials.filterNot { it.value.type.isAir }.count()
+        if (viewSize != this.items.size) {
+            throw IllegalArgumentException("'view#materials' size is not equals with this recipes size. (view size: ${viewSize}, recipe size: ${items.size})")
+        }
+
+        val dx: Int = view.materials.keys.maxOf { it.x } - view.materials.keys.minOf { it.x }
+        val dy: Int = view.materials.keys.maxOf { it.y } - view.materials.keys.minOf { it.y }
+        if (dx > 3 || dy > 3) {
+            throw IllegalArgumentException("")
+        }
+
+        return MappedRelation(
+            this.items.keys.sortedBy { it.toIndex() }.zip(view.materials.keys.sortedBy { it.toIndex() }).map { (recipe, input) ->
+                MappedRelationComponent(recipe, input)
+            }.toSet()
+        )
     }
 }

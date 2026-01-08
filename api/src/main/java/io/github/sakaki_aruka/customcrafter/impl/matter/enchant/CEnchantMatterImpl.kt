@@ -3,7 +3,6 @@ package io.github.sakaki_aruka.customcrafter.impl.matter.enchant
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CEnchantMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatterPredicate
-import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterPredicateImpl
 import io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant.CEnchantComponent
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
 import org.bukkit.Material
@@ -34,23 +33,23 @@ open class CEnchantMatterImpl @JvmOverloads constructor(
          * @since 5.0.15
          */
         @JvmField
-        val DEFAULT_ENCHANT_CHECKER = CMatterPredicateImpl { ctx ->
+        val DEFAULT_ENCHANT_CHECKER = CMatterPredicate { ctx ->
             if (ctx.input.type.isAir) {
-                return@CMatterPredicateImpl true
+                return@CMatterPredicate true
             }
             val enchantMatter = ctx.matter as? CEnchantMatter
-                ?: return@CMatterPredicateImpl true
+                ?: return@CMatterPredicate true
 
             if (enchantMatter.enchantComponents.isEmpty()) {
-                return@CMatterPredicateImpl true
+                return@CMatterPredicate true
             } else if (ctx.input.itemMeta.enchants.isEmpty()) {
-                return@CMatterPredicateImpl false
+                return@CMatterPredicate false
             }
 
             val sources: MutableMap<Enchantment, Int> = mutableMapOf()
             ctx.input.enchantments.entries.forEach { (type, level) -> sources[type] = level }
             ctx.input.itemMeta.enchants.entries.forEach { (type, level) -> sources[type] = level }
-            return@CMatterPredicateImpl enchantMatter.enchantComponents.all { component ->
+            return@CMatterPredicate enchantMatter.enchantComponents.all { component ->
                 enchantBaseCheck(sources, component)
             }
         }

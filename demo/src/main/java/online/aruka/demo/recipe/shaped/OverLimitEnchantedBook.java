@@ -9,7 +9,6 @@ import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateCompone
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl;
 import io.github.sakaki_aruka.customcrafter.impl.matter.enchant.CEnchantmentStoreMatterImpl;
 import io.github.sakaki_aruka.customcrafter.impl.recipe.GroupRecipe;
-import io.github.sakaki_aruka.customcrafter.impl.result.ResultSupplierImpl;
 import kotlin.Pair;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
@@ -78,7 +77,7 @@ public class OverLimitEnchantedBook {
                 )
         );
 
-        ResultSupplier supplier = new ResultSupplierImpl(ctx -> {
+        ResultSupplier supplier = ctx -> {
             List<ItemStack> results = new ArrayList<>();
             int bookCount = (int) ctx.getMapped().values().stream()
                     .filter(item -> item.getType() == Material.ENCHANTED_BOOK)
@@ -87,9 +86,7 @@ public class OverLimitEnchantedBook {
                 // 2, 3
                 ItemStack lv6 = ItemStack.of(Material.ENCHANTED_BOOK);
                 lv6.editMeta(meta -> {
-                    ((EnchantmentStorageMeta) meta).addStoredEnchant(
-                            Enchantment.EFFICIENCY, 6, true
-                    );
+                    ((EnchantmentStorageMeta) meta).addStoredEnchant(Enchantment.EFFICIENCY, 6, true);
                 });
                 results.add(lv6);
 
@@ -101,14 +98,12 @@ public class OverLimitEnchantedBook {
             } else {
                 ItemStack lv7 = ItemStack.of(Material.ENCHANTED_BOOK);
                 lv7.editMeta(meta -> {
-                    ((EnchantmentStorageMeta) meta).addStoredEnchant(
-                            Enchantment.EFFICIENCY, 7, true
-                    );
+                    ((EnchantmentStorageMeta) meta).addStoredEnchant(Enchantment.EFFICIENCY, 7, true);
                 });
                 results.add(lv7);
             }
             return results;
-        });
+        };
 
         return new GroupRecipe(
                 "Over Limit Enchanted Book Recipe (Efficiency only)",

@@ -9,14 +9,50 @@ import java.util.UUID
 
 /**
  * Result items supplier of [CRecipe].
- *
- * @param[f] Lambda expression what receives a context, returns items list
- * @see[io.github.sakaki_aruka.customcrafter.impl.result.ResultSupplierImpl]
  */
-interface ResultSupplier {
-    val f: (Context) -> List<ItemStack>
+fun interface ResultSupplier {
+    fun supply(ctx: Context): List<ItemStack>
 
-    operator fun invoke(ctx: Context): List<ItemStack> = f(ctx)
+    companion object {
+        /**
+         * Return a single item lambda (supplier) what not consider shift click.
+         * If you want to consider shift click, use [timesSingle] instead of this.
+         *
+         * ```
+         * return ResultSupplier { listOf(item) }
+         * ```
+         *
+         * @param[item] Supplied item
+         * @return[ResultSupplier] ResultSupplier what returns a given item only once
+         */
+        @JvmStatic
+        fun single(item: ItemStack): ResultSupplier {
+            return ResultSupplier { listOf(item) }
+        }
+
+        /**
+         * Returns a single item lambda that considers shift click.
+         * If a player does not shift chick, the following second expression will not execute (returns 'item' directly.).
+         *
+         * This calculates result item amount with following expressions.
+         * - `minimumAmount = inputAmount / recipeRequiresAmount(=[CMatter].amount)`
+         * - `amount = [item].amount * minimumAmount`
+         *
+         * @param[item] Supplied item
+         * @return[ResultSupplier] ResultSupplier what returns amount modified item
+         */
+        @JvmStatic
+        fun timesSingle(item: ItemStack): ResultSupplier {
+            return ResultSupplier { context ->
+                val cloned: ItemStack = item.clone()
+                if (context.shiftClicked) {
+                    cloned.amount *= context.calledTimes
+                }
+
+                listOf(cloned)
+            }
+        }
+    }
 
     /**
      * This class contains ResultSupplier parameters.
@@ -25,19 +61,23 @@ interface ResultSupplier {
      * @param[crafterID] Crafter UUID
      * @param[relation] Coordinate mapping between a [CRecipe] and an input Inventory
      * @param[mapped] Coordinates and input items mapping
-     * @param[list] Result items that are made by a [CRecipe]
      * @param[shiftClicked] Shift-clicked or not
      * @param[calledTimes] Calculated minimum amount with [CMatter.amount]
      * @param[isMultipleDisplayCall] `invoke` called from multiple result display item collector or not
+     * @param[isAsync] Called from async or not (since 5.0.17)
      */
-    class Context (
+    class Context @JvmOverloads constructor(
         val recipe: CRecipe,
         val relation: MappedRelation,
         val mapped: Map<CoordinateComponent, ItemStack>,
         val shiftClicked: Boolean,
         val calledTimes: Int,
-        val list: MutableList<ItemStack>,
         val crafterID: UUID,
-        val isMultipleDisplayCall: Boolean
-    )
+        val isMultipleDisplayCall: Boolean,
+        val isAsync: Boolean = false
+    ) {
+        fun copyWith(isAsync: Boolean): Context {
+            return Context(recipe, relation, mapped, shiftClicked, calledTimes, crafterID, isMultipleDisplayCall, isAsync)
+        }
+    }
 }
