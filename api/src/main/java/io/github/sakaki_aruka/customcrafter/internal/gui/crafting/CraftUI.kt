@@ -12,6 +12,7 @@ import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateCompone
 import io.github.sakaki_aruka.customcrafter.api.search.Search
 import io.github.sakaki_aruka.customcrafter.impl.util.AsyncUtil.fromBukkitMainThread
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter.toComponent
+import io.github.sakaki_aruka.customcrafter.impl.util.InventoryUtil.giveItems
 import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
 import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterUI
 import io.github.sakaki_aruka.customcrafter.internal.gui.allcandidate.AllCandidateUI
@@ -166,7 +167,8 @@ internal class CraftUI(
         }
         val view: CraftView = this.toView()
         val player: Player = event.player as? Player ?: return
-        player.give((view.materials.values + view.result).filterNot { it.type.isAir })
+        //player.give((view.materials.values + view.result).filterNot { it.type.isAir })
+        player.giveItems(saveLimit = true, *view.materials.values.toTypedArray(), view.result)
     }
 
     override fun onClick(
@@ -271,7 +273,8 @@ internal class CraftUI(
         )).get()
 
         Callable {
-            player.give(results.filterNot { it.type.isAir })
+            //player.give(results.filterNot { it.type.isAir })
+            player.giveItems(saveLimit = true, *results.toTypedArray())
         }.fromBukkitMainThread()
     }
 
@@ -293,7 +296,8 @@ internal class CraftUI(
                 }
             val item: ItemStack = result.vanilla()!!.result.apply { this.amount *= decrementAmount }
             if (!item.type.isAir) {
-                player.give(item)
+                //player.give(item)
+                player.giveItems(saveLimit = true, item)
             }
         }.fromBukkitMainThread()
     }
