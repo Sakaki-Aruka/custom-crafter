@@ -19,7 +19,7 @@ object CustomCrafterAPI {
     /**
      * Custom Crafter API version.
      */
-    const val API_VERSION: String = "5.0.17"
+    const val API_VERSION: String = "5.0.17-p1"
 
     /**
      * Custom Crafter API is stable or not.
@@ -280,7 +280,7 @@ object CustomCrafterAPI {
      */
     @JvmStatic
     fun hasFullCompatibility(version: String): Boolean {
-        return version in setOf("5.0.17")
+        return version in setOf("5.0.17-p1")
     }
 
 
