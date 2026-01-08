@@ -10,7 +10,6 @@ import io.github.sakaki_aruka.customcrafter.api.search.Search
 import io.github.sakaki_aruka.customcrafter.impl.recipe.CVanillaRecipe
 import io.github.sakaki_aruka.customcrafter.impl.util.AsyncUtil.fromBukkitMainThread
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter.toComponent
-import io.github.sakaki_aruka.customcrafter.impl.util.InventoryUtil.giveItems
 import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
 import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterUI
 import io.github.sakaki_aruka.customcrafter.internal.gui.crafting.CraftUI
@@ -191,7 +190,7 @@ internal class AllCandidateUI(
         if (!this.dropOnClose) {
             return
         }
-        player.giveItems(saveLimit = true, *this.view.materials.values.toTypedArray(), this.view.result)
+        player.give(this.view.materials.values + this.view.result)
         this.isClosed.set(true)
     }
 
