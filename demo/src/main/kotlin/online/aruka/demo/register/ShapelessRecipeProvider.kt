@@ -1,9 +1,9 @@
 package online.aruka.demo.register
 
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
+import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatterPredicate
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
-import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterPredicateImpl
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
 import io.github.sakaki_aruka.customcrafter.impl.recipe.CRecipeImpl
 import io.github.sakaki_aruka.customcrafter.impl.util.AsyncUtil.fromBukkitMainThread
@@ -42,7 +42,7 @@ object ShapelessRecipeProvider {
         val infinityIronBlock: CMatter = CMatterImpl(
             name = "infinity iron block",
             candidate = setOf(Material.IRON_BLOCK),
-            predicates = setOf(CMatterPredicateImpl { ctx ->
+            predicates = setOf(CMatterPredicate { ctx ->
                 ctx.input.itemMeta.persistentDataContainer.has(
                     NamespacedKey(Demo.plugin, "infinity_iron_block_count"),
                     PersistentDataType.INTEGER

@@ -1,5 +1,19 @@
 # Changelog
 
+# 5.0.17
+
+## ⚠️ Breaking Changes
+### Added
+- Added **`CRecipePredicate`** to allow comprehensive evaluation across the entire recipe.
+- Added support for **asynchronous operations**.
+
+### Changed
+- Refactored **`*Predicate`** and **`ResultSupplier`** interfaces as functional interfaces (**SAM**) and removed their default implementations.
+
+### Removed
+- Removed **`CRecipeContainer`**.
+- Removed **`InventoryUtil`**.
+
 # 5.0.16
 
 ## ⚠️ Breaking Changes
