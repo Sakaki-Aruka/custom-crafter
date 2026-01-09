@@ -216,9 +216,6 @@ internal class CraftUI(
                 view = this.toView()
             ).get()
 
-            //debug
-            println("customs: ${result.customs().size}")
-
             if (CustomCrafterAPI.getUseMultipleResultCandidateFeature() && result.size() > 1) {
                 // AllCandidate Open on MainThread
                 openAllCandidateUI(result, shiftUsed, player)
