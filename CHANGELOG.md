@@ -1,5 +1,10 @@
 # Changelog
 
+# 5.0.17-p2
+
+## 🛠 Fix
+* Result item give fix
+
 # 5.0.17-p1
 
 ## ✨ New Features and Enhancements

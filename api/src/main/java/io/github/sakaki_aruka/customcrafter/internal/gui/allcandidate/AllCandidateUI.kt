@@ -75,7 +75,9 @@ internal class AllCandidateUI(
                     shiftClicked = useShift,
                     calledTimes = 1,
                     isMultipleDisplayCall = true,
-                    crafterID = this.player.uniqueId,)
+                    crafterID = this.player.uniqueId,
+                    isAsync = true
+                )
                 Pair(
                     recipe.asyncGetResults(context).get().firstOrNull()
                         ?: replaceRecipeNameTemplate(CustomCrafterAPI.ALL_CANDIDATE_NO_DISPLAYABLE_ITEM, recipe.name),
@@ -252,7 +254,7 @@ internal class AllCandidateUI(
                         ?: return
 
                 CompletableFuture.runAsync ({
-                    val results: List<ItemStack> = recipe.getResults(ResultSupplier.Context(
+                    val results: List<ItemStack> = recipe.asyncGetResults(ResultSupplier.Context(
                         recipe = recipe,
                         relation = relation,
                         mapped = view.materials,
@@ -260,9 +262,11 @@ internal class AllCandidateUI(
                         calledTimes = recipe.getTimes(view.materials, relation, event.isShiftClick),
                         isMultipleDisplayCall = false,
                         crafterID = player.uniqueId
-                    ))
+                    )).get()
 
-                    CreateCustomItemEvent(player, this.view, this.result, event.isShiftClick, isAsync = true).callEvent()
+                    Callable {
+                        CreateCustomItemEvent(player, this.view, this.result, event.isShiftClick, isAsync = true).callEvent()
+                    }.fromBukkitMainThread()
 
                     Callable {
                         player.giveItems(saveLimit = true, *results.toTypedArray())

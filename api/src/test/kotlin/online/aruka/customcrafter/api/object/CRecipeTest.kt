@@ -1,6 +1,7 @@
 package online.aruka.customcrafter.api.`object`
 
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
+import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelationComponent
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.assertNull
 import org.mockbukkit.mockbukkit.MockBukkit
 import org.mockbukkit.mockbukkit.ServerMock
 import org.mockbukkit.mockbukkit.world.WorldMock
+import java.util.UUID
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -168,5 +170,33 @@ object CRecipeTest {
         )
 
         assertEquals(64, recipe.getTimes(view, relation, shift = true, withoutMass = false))
+    }
+
+    @Test
+    fun asyncGetResultsTest() {
+        val matter = CMatterImpl.of(Material.COBBLESTONE)
+        val map = mapOf(CoordinateComponent(0, 0) to matter)
+        val supplier = ResultSupplier {
+            listOf(ItemStack.of(Material.STONE))
+        }
+        val recipe = CRecipeImpl("", map, CRecipe.Type.SHAPED, results = listOf(supplier))
+        val relation = MappedRelation(setOf(MappedRelationComponent(
+          recipe = CoordinateComponent(0, 0), input = CoordinateComponent(0, 0)
+        )))
+        val context = ResultSupplier.Context(
+            recipe = recipe,
+            relation = relation,
+            mapped = mapOf(CoordinateComponent(0, 0) to ItemStack.of(Material.COBBLESTONE)),
+            shiftClicked = false,
+            calledTimes = 1,
+            crafterID = UUID.randomUUID(),
+            isMultipleDisplayCall = false,
+            isAsync = true
+        )
+
+        val future = recipe.asyncGetResults(context)
+        val resultList = future.get()
+
+        assertEquals(1, resultList.size)
     }
 }
