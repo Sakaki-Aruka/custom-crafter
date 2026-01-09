@@ -136,8 +136,8 @@ interface CRecipe {
      */
     fun getResults(context: ResultSupplier.Context): List<ItemStack> {
         return results?.let { suppliers ->
-            suppliers.flatMap { s -> s.supply(context) }.toMutableList()
-        } ?: mutableListOf()
+            suppliers.flatMap { s -> s.supply(context) }.toList()
+        } ?: emptyList()
     }
 
     fun asyncGetResults(context: ResultSupplier.Context): CompletableFuture<List<ItemStack>> {

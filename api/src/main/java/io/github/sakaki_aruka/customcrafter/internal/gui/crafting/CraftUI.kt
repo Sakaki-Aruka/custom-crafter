@@ -216,6 +216,9 @@ internal class CraftUI(
                 view = this.toView()
             ).get()
 
+            //debug
+            println("customs: ${result.customs().size}")
+
             if (CustomCrafterAPI.getUseMultipleResultCandidateFeature() && result.size() > 1) {
                 // AllCandidate Open on MainThread
                 openAllCandidateUI(result, shiftUsed, player)
@@ -259,7 +262,9 @@ internal class CraftUI(
         val amount: Int = recipe.getTimes(view.materials, relate, shiftUsed)
         val decrementedView: CraftView = view.clone().getDecremented(shiftUsed, recipe, relate)
 
-        CreateCustomItemEvent(player, view, result, shiftUsed, isAsync = true).callEvent()
+        Callable {
+            CreateCustomItemEvent(player, view, result, shiftUsed, isAsync = true).callEvent()
+        }.fromBukkitMainThread()
 
         Callable {
             decrementedView.materials.forEach { (c, item) ->
@@ -268,7 +273,7 @@ internal class CraftUI(
         }.fromBukkitMainThread()
 
         val results: List<ItemStack> = recipe.asyncGetResults(ResultSupplier.Context(
-            recipe, relate, view.materials, shiftUsed, amount, player.uniqueId,false
+            recipe, relate, view.materials, shiftUsed, amount, player.uniqueId,false, isAsync = true
         )).get()
 
         Callable {
