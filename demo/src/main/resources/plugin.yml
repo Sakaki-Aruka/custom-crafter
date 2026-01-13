@@ -2,5 +2,5 @@ name: demo
 version: '${project.version}' #'5.0.15'
 main: online.aruka.demo.Demo
 api-version: '${paper_api.version}' #'1.21'
-depend: ["Custom_Crafter", "MCKotlin-Paper"]
+depend: ["Custom_Crafter"]
 authors: ["Sakaki-Aruka"]
