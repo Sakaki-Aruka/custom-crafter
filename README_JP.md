@@ -73,6 +73,14 @@ custom crafter はバージョン 5.0.0 以降、プラグインとしてだけ�
 
 ### 依存関係の設定
 
+CustomCrafterAPI を依存関係に持つプラグインは `plugin.yml` の `depend` セクションに `Custom_Crafter` と追記する必要があります。  
+```yaml
+depend:
+  - "Custom_Crafter"
+```
+
+---
+
 最新バージョン: 5.0.18 [Maven Central (versions)](https://central.sonatype.com/artifact/io.github.sakaki-aruka/custom-crafter-api/versions)  
 
 API を利用する際は、プラグイン実行時に CustomCrafterAPI プラグインが存在することを前提とするため、実行環境から提供される設定にしてください。  

@@ -74,10 +74,18 @@ or Build:
 
 ### Dependency Information
 
+Plugins that depend on CustomCrafterAPI must add `Custom_Crafter` to the `depend` section of their `plugin.yml`.  
+```yaml
+depend:
+  - "Custom_Crafter"
+```
+
+---
+
 Latest Version: 5.0.18 [Maven Central (versions)](https://central.sonatype.com/artifact/io.github.sakaki-aruka/custom-crafter-api/versions)  
 
 When using the API, you must assume the CustomCrafter plugin will be present at runtime. Therefore, set the scope to **compile-time only**.  
-Also, if you are creating plugins in Kotlin, please set the Kotlin-stdlib dependency to "compile-time only". (No need to add anything to `plugin.yml`)  
+Also, if you are creating plugins in Kotlin, please set the Kotlin-stdlib dependency to "compile-time only".  
 
 "compile-time" scope names in:
 * Maven: `provided`
