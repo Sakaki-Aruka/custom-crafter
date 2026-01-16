@@ -42,12 +42,12 @@ custom crafter は、**PaperMCサーバー専用**のカスタムレシピ提供
 
 ## 🛠️ 対応環境とバージョン
 
-| Custom_Crafter Version      | Paper Version        |
-|:----------------------------|:---------------------|
-| **5.0.13 ~ 5.0.17-p2 (最新)** | **1.21.4 ~ 1.21.11** |
-| 5.0.0 ~ 5.0.11              | 1.21.3               |
-| 4.3 (レガシー)                  | 1.21.3               |
-| 4.2 (レガシー)                  | 1.20.1 ~ 1.20.4      |
+| Custom_Crafter Version   | Paper Version        |
+|:-------------------------|:---------------------|
+| **5.0.13 ~ 5.0.18 (最新)** | **1.21.4 ~ 1.21.11** |
+| 5.0.0 ~ 5.0.11           | 1.21.3               |
+| 4.3 (レガシー)               | 1.21.3               |
+| 4.2 (レガシー)               | 1.20.1 ~ 1.20.4      |
 
 > **⚠️ 警告:**
 > custom crafter は **Spigot/Bukkit サーバーでの動作をサポートしていません**。必ず **PaperMC** またはそのフォークで実行してください。
@@ -73,33 +73,59 @@ custom crafter はバージョン 5.0.0 以降、プラグインとしてだけ�
 
 ### 依存関係の設定
 
-APIを利用する際は、プラグイン実行時にはCustomCrafterプラグインが存在することを前提とするため、実行環境から提供される設定にしてください。
+CustomCrafterAPI を依存関係に持つプラグインは `plugin.yml` の `depend` セクションに `Custom_Crafter` と追記する必要があります。  
+```yaml
+depend:
+  - "Custom_Crafter"
+```
 
+---
+
+最新バージョン: 5.0.18 [Maven Central (versions)](https://central.sonatype.com/artifact/io.github.sakaki-aruka/custom-crafter-api/versions)  
+
+API を利用する際は、プラグイン実行時に CustomCrafterAPI プラグインが存在することを前提とするため、実行環境から提供される設定にしてください。  
+プラグインで Kotlin を利用している場合、 Kotlin-stdlib の依存関係も実行環境から提供される設定にしてください。(`plugin.yml` などに追記する必要はありません)  
+
+各ビルドシステムにおける「実行環境から提供される」依存関係の設定名  
 * Maven: `provided`
 * Gradle: `compileOnly`
-
-最新バージョン: 5.0.17-p2 [Maven Central (versions)](https://central.sonatype.com/artifact/io.github.sakaki-aruka/custom-crafter-api/versions)
 
 <details><summary>Maven Configuration Example</summary>
 
 From Maven Central
 
 ```xml
+<!-- CustomCrafterAPI の依存関係 -->
 <dependency>
     <groupId>io.github.sakaki-aruka</groupId>
     <artifactId>custom-crafter-api</artifactId>
-    <version>5.0.17-p2</version>
+    <version>5.0.18</version>
+    <scope>provided</scope>
+</dependency>
+
+<!-- kotlin-stdlib の依存関係 (Kotlin 利用時のみ) -->
+<dependency>
+    <groupId>org.jetbrains.kotlin</groupId>
+    <artifactId>kotlin-stdlib</artifactId>
+    <version>2.3.0</version>
     <scope>provided</scope>
 </dependency>
 ```
+
+
 
 </details>
 
 <details><summary>Gradle (Groovy) Configuration Example</summary>
 
 ```groovy
+// CustomCrafterAPI の依存関係
 dependencies {
-   compileOnly 'io.github.sakaki-aruka:custom-crafter-api:5.0.17-p2'
+    // CustomCrafterAPI の依存関係
+    compileOnly 'io.github.sakaki-aruka:custom-crafter-api:5.0.18'
+    
+    // kotlin-stdlib の依存関係 (Kotlin 利用時のみ)
+    compileOnly 'org.jetbrains.kotlin:kotlin-stdlib:2.3.0'
 }
 ```
 
@@ -108,8 +134,13 @@ dependencies {
 <details><summary>Gradle (Kotlin DSL) Configuration Example</summary>
 
 ```Kotlin
+
 dependencies {
-    compileOnly("io.github.sakaki-aruka:custom-crafter-api:5.0.17-p2")
+    // CustomCrafterAPI の依存関係
+    compileOnly("io.github.sakaki-aruka:custom-crafter-api:5.0.18")
+
+    // kotlin-stdlib の依存関係 (Kotlin 利用時のみ)
+    compileOnly("org.jetbrains.kotlin:kotlin-stdlib:2.3.0")
 }
 ```
 
@@ -123,9 +154,7 @@ CustomCrafterはKotlinで書かれており、実行には前提となるライ�
 
 1.  **CustomCrafterプラグインのダウンロード**
     1.  [CustomCrafterAPI 本体をダウンロード (GitHubリリースページ)](https://github.com/Sakaki-Aruka/custom-crafter/releases/latest)
-    2.  **MCKotlin-Paper プラグイン (Kotlin実行環境) をダウンロード**
-        * [MCKotlin-Paper (GitHubリリースページ)](https://github.com/4drian3d/MCKotlin/releases) から、ご自身のサーバーバージョンに合ったファイルをダウンロードしてください。
-    3.  ダウンロードしたファイルをすべて `plugins` ディレクトリに入れます。
+    2. ダウンロードしたファイルをすべて `plugins` ディレクトリに入れます。
 2.  **サーバーの起動/リロード**
 3.  **カスタムクラフト台の設置 (ベースブロック)**
     * CustomCrafterのレシピは、通常の作業台ブロックだけでは動作しません。
@@ -145,7 +174,7 @@ CustomCrafterAPIを使って、あなたのプラグインでカスタムレシ�
 ```kotlin
 class YourPlugin: JavaPlugin() {
     // 依存するAPIのバージョンを定数として定義
-    const val DEPEND_CCAPI_VERSION = "5.0.17-p2"
+    const val DEPEND_CCAPI_VERSION = "5.0.18"
     
     @Override
     fun onEnable() {

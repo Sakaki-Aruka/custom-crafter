@@ -3,8 +3,9 @@ version: '${project.version}'
 main: io.github.sakaki_aruka.customcrafter.CustomCrafter
 api-version: '${paper_api.version}' #"1.21.4"
 authors: [ Sakaki-Aruka ]
-depend:
-  - MCKotlin-Paper
+
+libraries:
+  - "org.jetbrains.kotlin:kotlin-stdlib:${kotlin.version}"
 
 commands:
   cc:

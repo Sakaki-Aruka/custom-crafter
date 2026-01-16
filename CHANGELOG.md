@@ -1,5 +1,11 @@
 # Changelog
 
+# 5.0.18
+
+## ✨ New Features and Enhancements
+
+* **[Enhancement]** MCKotlin-Paper is no longer required to run CustomCrafterAPI.
+
 # 5.0.17-p2
 
 ## 🛠 Fix
