@@ -96,10 +96,19 @@ Also, if you are creating plugins in Kotlin, please set the Kotlin-stdlib depend
 From Maven Central
 
 ```xml
+<!-- CustomCrafterAPI Dependency -->
 <dependency>
     <groupId>io.github.sakaki-aruka</groupId>
     <artifactId>custom-crafter-api</artifactId>
     <version>5.0.18</version>
+    <scope>provided</scope>
+</dependency>
+
+<!-- kotlin-stdlib Dependency -->
+<dependency>
+    <groupId>org.jetbrains.kotlin</groupId>
+    <artifactId>kotlin-stdlib</artifactId>
+    <version>2.3.0</version>
     <scope>provided</scope>
 </dependency>
 ```
@@ -110,7 +119,11 @@ From Maven Central
 
 ```groovy
 dependencies {
-   compileOnly 'io.github.sakaki-aruka:custom-crafter-api:5.0.18'
+    // CustomCrafterAPI Dependency
+    compileOnly 'io.github.sakaki-aruka:custom-crafter-api:5.0.18'
+    
+    // kotlin-stdlib Dependency (If you needed)
+    compileOnly 'org.jetbrains.kotlin:kotlin-stdlib:2.3.0'
 }
 ```
 
@@ -120,7 +133,11 @@ dependencies {
 
 ```Kotlin
 dependencies {
+    // CustomCrafterAPI Dependency
     compileOnly("io.github.sakaki-aruka:custom-crafter-api:5.0.18")
+    
+    // kotlin-stdlib Dependency (If you needed)
+    compileOnly("org.jetbrains.kotlin:kotlin-stdlib:2.3.0")
 }
 ```
 

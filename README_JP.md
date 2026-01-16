@@ -95,21 +95,37 @@ API を利用する際は、プラグイン実行時に CustomCrafterAPI プラ�
 From Maven Central
 
 ```xml
+<!-- CustomCrafterAPI の依存関係 -->
 <dependency>
     <groupId>io.github.sakaki-aruka</groupId>
     <artifactId>custom-crafter-api</artifactId>
     <version>5.0.18</version>
     <scope>provided</scope>
 </dependency>
+
+<!-- kotlin-stdlib の依存関係 (Kotlin 利用時のみ) -->
+<dependency>
+    <groupId>org.jetbrains.kotlin</groupId>
+    <artifactId>kotlin-stdlib</artifactId>
+    <version>2.3.0</version>
+    <scope>provided</scope>
+</dependency>
 ```
+
+
 
 </details>
 
 <details><summary>Gradle (Groovy) Configuration Example</summary>
 
 ```groovy
+// CustomCrafterAPI の依存関係
 dependencies {
-   compileOnly 'io.github.sakaki-aruka:custom-crafter-api:5.0.18'
+    // CustomCrafterAPI の依存関係
+    compileOnly 'io.github.sakaki-aruka:custom-crafter-api:5.0.18'
+    
+    // kotlin-stdlib の依存関係 (Kotlin 利用時のみ)
+    compileOnly 'org.jetbrains.kotlin:kotlin-stdlib:2.3.0'
 }
 ```
 
@@ -118,8 +134,13 @@ dependencies {
 <details><summary>Gradle (Kotlin DSL) Configuration Example</summary>
 
 ```Kotlin
+
 dependencies {
+    // CustomCrafterAPI の依存関係
     compileOnly("io.github.sakaki-aruka:custom-crafter-api:5.0.18")
+
+    // kotlin-stdlib の依存関係 (Kotlin 利用時のみ)
+    compileOnly("org.jetbrains.kotlin:kotlin-stdlib:2.3.0")
 }
 ```
 
