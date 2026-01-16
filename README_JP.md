@@ -73,14 +73,14 @@ custom crafter はバージョン 5.0.0 以降、プラグインとしてだけ�
 
 ### 依存関係の設定
 
-APIを利用する際は、プラグイン実行時にはCustomCrafterプラグインが存在することを前提とするため、実行環境から提供される設定にしてください。  
-また、プラグインで Kotlin-stdlib のバージョン 2.1.0 以前を利用する場合はこちらも実行環境から提供される設定にしてください。それより新しいバージョンを利用する場合は `plugin.yml` に `libraries: ["org.jetbrains.kotlin:kotlin-stdlib:<プラグインで使用する Kotlin バージョン>"]` を追加してください。  
+最新バージョン: 5.0.18 [Maven Central (versions)](https://central.sonatype.com/artifact/io.github.sakaki-aruka/custom-crafter-api/versions)  
+
+API を利用する際は、プラグイン実行時に CustomCrafterAPI プラグインが存在することを前提とするため、実行環境から提供される設定にしてください。  
+プラグインで Kotlin を利用している場合、 Kotlin-stdlib の依存関係も実行環境から提供される設定にしてください。(`plugin.yml` などに追記する必要はありません)  
 
 各ビルドシステムにおける「実行環境から提供される」依存関係の設定名  
 * Maven: `provided`
 * Gradle: `compileOnly`
-
-最新バージョン: 5.0.18 [Maven Central (versions)](https://central.sonatype.com/artifact/io.github.sakaki-aruka/custom-crafter-api/versions)
 
 <details><summary>Maven Configuration Example</summary>
 

@@ -74,15 +74,14 @@ or Build:
 
 ### Dependency Information
 
-When using the API, you must assume the CustomCrafter plugin will be present at runtime. Therefore, set the scope to **compile-time only**.  
+Latest Version: 5.0.18 [Maven Central (versions)](https://central.sonatype.com/artifact/io.github.sakaki-aruka/custom-crafter-api/versions)  
 
-When using version 2.1.0 or earlier of kotlin-stdlib in your plugin, please specify a dependency that is "compile-time only". When using versions later than that, please add `libraries: ["org.jetbrains.kotlin:kotlin-stdlib:<YOUR_PLUGIN_DEPENDS_KOTLIN_VERSION>"]` to your `plugin.yml`.  
+When using the API, you must assume the CustomCrafter plugin will be present at runtime. Therefore, set the scope to **compile-time only**.  
+Also, if you are creating plugins in Kotlin, please set the Kotlin-stdlib dependency to "compile-time only". (No need to add anything to `plugin.yml`)  
 
 "compile-time" scope names in:
 * Maven: `provided`
 * Gradle: `compileOnly`
-
-Latest Version: 5.0.18 [Maven Central (versions)](https://central.sonatype.com/artifact/io.github.sakaki-aruka/custom-crafter-api/versions)
 
 <details><summary>Maven Configuration Example</summary>
 

@@ -5,7 +5,7 @@ api-version: '${paper_api.version}' #"1.21.4"
 authors: [ Sakaki-Aruka ]
 
 libraries:
-  - "org.jetbrains.kotlin:kotlin-stdlib:2.1.0"
+  - "org.jetbrains.kotlin:kotlin-stdlib:${kotlin.version}"
 
 commands:
   cc:

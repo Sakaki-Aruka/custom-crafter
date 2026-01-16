@@ -27,7 +27,7 @@
         <plugin.maven_shade.version>3.6.1</plugin.maven_shade.version>
 
         <!-- Kotlin -->
-        <kotlin.version>2.1.0</kotlin.version>
+        <kotlin.version>2.3.0</kotlin.version>
     </properties>
 
     <licenses>
