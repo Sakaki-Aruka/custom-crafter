@@ -21,8 +21,8 @@ class CreateCustomItemEvent (
     val view: CraftView,
     val result: Search.SearchResult?,
     val shiftUsed: Boolean,
-    val isAsync: Boolean
-): Event() {
+    isAsync: Boolean
+): Event(isAsync) {
     companion object {
         @JvmField
         val HANDLER_LIST: HandlerList = HandlerList()
