@@ -10,7 +10,7 @@
     <name>Custom Crafter API Impl Demo</name>
 
     <parent>
-        <version>5.0.18</version>
+        <version>5.0.19</version>
         <groupId>io.github.sakaki-aruka</groupId>
         <artifactId>custom-crafter</artifactId>
     </parent>

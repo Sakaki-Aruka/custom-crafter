@@ -1,5 +1,13 @@
 # Changelog
 
+# 5.0.19
+
+## ✨ New Features and Enhancements
+* **[Enhancement]** Search speed for shapeless recipes is now faster.
+
+## 🛠 Fix
+* Event internal fix
+
 # 5.0.18
 
 ## ✨ New Features and Enhancements

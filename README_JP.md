@@ -44,7 +44,7 @@ custom crafter は、**PaperMCサーバー専用**のカスタムレシピ提供
 
 | Custom_Crafter Version   | Paper Version        |
 |:-------------------------|:---------------------|
-| **5.0.13 ~ 5.0.18 (最新)** | **1.21.4 ~ 1.21.11** |
+| **5.0.13 ~ 5.0.19 (最新)** | **1.21.4 ~ 1.21.11** |
 | 5.0.0 ~ 5.0.11           | 1.21.3               |
 | 4.3 (レガシー)               | 1.21.3               |
 | 4.2 (レガシー)               | 1.20.1 ~ 1.20.4      |
@@ -81,7 +81,7 @@ depend:
 
 ---
 
-最新バージョン: 5.0.18 [Maven Central (versions)](https://central.sonatype.com/artifact/io.github.sakaki-aruka/custom-crafter-api/versions)  
+最新バージョン: 5.0.19 [Maven Central (versions)](https://central.sonatype.com/artifact/io.github.sakaki-aruka/custom-crafter-api/versions)  
 
 API を利用する際は、プラグイン実行時に CustomCrafterAPI プラグインが存在することを前提とするため、実行環境から提供される設定にしてください。  
 プラグインで Kotlin を利用している場合、 Kotlin-stdlib の依存関係も実行環境から提供される設定にしてください。(`plugin.yml` などに追記する必要はありません)  
@@ -99,7 +99,7 @@ From Maven Central
 <dependency>
     <groupId>io.github.sakaki-aruka</groupId>
     <artifactId>custom-crafter-api</artifactId>
-    <version>5.0.18</version>
+    <version>5.0.19</version>
     <scope>provided</scope>
 </dependency>
 
@@ -122,7 +122,7 @@ From Maven Central
 // CustomCrafterAPI の依存関係
 dependencies {
     // CustomCrafterAPI の依存関係
-    compileOnly 'io.github.sakaki-aruka:custom-crafter-api:5.0.18'
+    compileOnly 'io.github.sakaki-aruka:custom-crafter-api:5.0.19'
     
     // kotlin-stdlib の依存関係 (Kotlin 利用時のみ)
     compileOnly 'org.jetbrains.kotlin:kotlin-stdlib:2.3.0'
@@ -137,7 +137,7 @@ dependencies {
 
 dependencies {
     // CustomCrafterAPI の依存関係
-    compileOnly("io.github.sakaki-aruka:custom-crafter-api:5.0.18")
+    compileOnly("io.github.sakaki-aruka:custom-crafter-api:5.0.19")
 
     // kotlin-stdlib の依存関係 (Kotlin 利用時のみ)
     compileOnly("org.jetbrains.kotlin:kotlin-stdlib:2.3.0")
@@ -174,7 +174,7 @@ CustomCrafterAPIを使って、あなたのプラグインでカスタムレシ�
 ```kotlin
 class YourPlugin: JavaPlugin() {
     // 依存するAPIのバージョンを定数として定義
-    const val DEPEND_CCAPI_VERSION = "5.0.18"
+    const val DEPEND_CCAPI_VERSION = "5.0.19"
     
     @Override
     fun onEnable() {
