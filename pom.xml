@@ -6,7 +6,7 @@
 
     <groupId>io.github.sakaki-aruka</groupId>
     <artifactId>custom-crafter</artifactId>
-    <version>5.0.19</version>
+    <version>5.0.20</version>
     <packaging>pom</packaging>
 
     <modules>
@@ -50,7 +50,7 @@
     <scm>
         <connection>scm:git:git://github.com/Sakaki-Aruka/custom-crafter.git</connection>
         <developerConnection>scm:git:ssh://github.com:Sakaki-Aruka/custom-crafter.git</developerConnection>
-        <url>http://github.com/Sakaki-Aruka/custom-crafter/</url>
+        <url>https://github.com/Sakaki-Aruka/custom-crafter/</url>
     </scm>
 
     <build>
