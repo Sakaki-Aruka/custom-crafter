@@ -21,13 +21,11 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent
-import org.bukkit.inventory.CraftingRecipe
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
 import java.util.Collections
 import java.util.concurrent.Callable
-import java.util.concurrent.CancellationException
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
@@ -49,71 +47,51 @@ internal class AllCandidateUI(
     )
     private val isClosed: AtomicBoolean = AtomicBoolean(false)
     private val asyncContextReferences: MutableList<AsyncContext> = Collections.synchronizedList(mutableListOf())
-    private val pages: ConcurrentHashMap<Int, ConcurrentHashMap<Int, Pair<ItemStack, CRecipe>>> = ConcurrentHashMap<Int, ConcurrentHashMap<Int, Pair<ItemStack, CRecipe>>>()
-        .apply {
-            // Initialize with empty data
-            repeat((result.size() + 44) / 45) { index ->
-                put(index, ConcurrentHashMap())
+    private val pages: ConcurrentHashMap<Int, ConcurrentHashMap<Int, Pair<ItemStack, CRecipe>>> = ConcurrentHashMap()
+
+    init {
+        val chunked = this.result.getMergedResults().chunked(45)
+        chunked.withIndex().forEach { (pageIndex, list) ->
+            val currentPageItems = ConcurrentHashMap<Int, ItemStack>()
+            list.withIndex().forEach { (slotIndex, pair) ->
+                val (recipe, relation: MappedRelation?) = pair
+                currentPageItems[slotIndex] = ungeneratedItem(recipe.name)
+
+                CompletableFuture.runAsync({
+                    if (recipe is CVanillaRecipe) {
+                        pages[pageIndex]?.put(slotIndex, recipe.original.result to recipe)
+                        iconsUpdate(pageIndex)
+                        return@runAsync
+                    }
+
+                    val asyncContext = AsyncContext.ofTurnOff()
+                    val context = ResultSupplier.Context(
+                        recipe = recipe,
+                        relation = relation ?: MappedRelation(emptySet()),
+                        mapped = this.view.materials,
+                        shiftClicked = useShift,
+                        calledTimes = 1,
+                        isMultipleDisplayCall = true,
+                        crafterID = this.player.uniqueId,
+                        asyncContext = asyncContext
+                    )
+
+                    pages[pageIndex]?.put(
+                        slotIndex,
+                        Pair(recipe.asyncGetResults(context).get().firstOrNull()
+                            ?: replaceRecipeNameTemplate(CustomCrafterAPI.ALL_CANDIDATE_NO_DISPLAYABLE_ITEM, recipe.name),
+                            recipe
+                        )
+                    )
+                    iconsUpdate(pageIndex)
+
+                }, InternalAPI.asyncExecutor())
             }
         }
 
-    init {
-        val workers: MutableSet<CompletableFuture<Pair<ItemStack, CRecipe>>> = mutableSetOf()
         this.inventory.apply {
             pageContentsAt(0).forEach { (slot, icon) -> setItem(slot, icon) }
         }
-
-        // Start Async Processes
-        result.vanilla()?.let { vanilla ->
-            CVanillaRecipe.fromVanilla(vanilla as CraftingRecipe)?.let { recipe ->
-                workers.add(CompletableFuture.completedFuture(vanilla.result to recipe))
-            }
-        }
-        result.customs().forEach { (recipe, relation) ->
-            workers.add(CompletableFuture.supplyAsync ({
-                val context = ResultSupplier.Context(
-                    recipe = recipe,
-                    relation = relation,
-                    mapped = this.view.materials,
-                    shiftClicked = useShift,
-                    calledTimes = 1,
-                    isMultipleDisplayCall = true,
-                    crafterID = this.player.uniqueId,
-                    asyncContext = AsyncContext.ofTurnOff()
-                )
-
-                context.asyncContext?.let { this.asyncContextReferences.add(it) }
-
-                Pair(
-                    recipe.asyncGetResults(context).get().firstOrNull()
-                        ?: replaceRecipeNameTemplate(CustomCrafterAPI.ALL_CANDIDATE_NO_DISPLAYABLE_ITEM, recipe.name),
-                    recipe
-                )
-            }, InternalAPI.asyncExecutor())
-                .exceptionallyAsync { InternalAPI.warn(it.stackTraceToString()); null }
-            )
-        }
-
-        CompletableFuture.allOf(*workers.toTypedArray())
-            .exceptionallyAsync ({ throwable ->
-                if (throwable !is CancellationException) {
-                    throw throwable
-                }
-                null
-            }, InternalAPI.asyncExecutor())
-            .thenAcceptAsync ({
-                if (this.isClosed.get()) {
-                    return@thenAcceptAsync
-                }
-                val elements: List<Pair<ItemStack, CRecipe>> = workers.map { it.join() }
-                elements.chunked(45).withIndex()
-                    .associate { (index, list) -> index to list }
-                    .forEach { (index, list) ->
-                        // Page and Elements
-                        this.pages[index] = list.withIndex().associate { (i, l) -> i to l }.let { ConcurrentHashMap(it) }
-                    }
-                iconsUpdate(this.currentPage.get())
-            }, InternalAPI.asyncExecutor())
     }
 
     private fun iconsUpdate(pageNum: Int) {
@@ -145,6 +123,16 @@ internal class AllCandidateUI(
         val BACK_TO_CRAFT_BUTTON = ItemStack.of(Material.CRAFTING_TABLE).apply {
             itemMeta = itemMeta.apply {
                 displayName("<b>BACK TO CRAFT".toComponent())
+            }
+        }
+
+        fun ungeneratedItem(recipeName: String): ItemStack = ItemStack.of(Material.BARRIER).apply {
+            itemMeta = itemMeta.apply {
+                displayName("UN-GENERATED".toComponent())
+                lore(listOf(
+                    "<white>Recipe Name: <b>$recipeName</b>".toComponent(),
+                    "<white>Items for this recipe have not been created yet.".toComponent()
+                ))
             }
         }
     }
