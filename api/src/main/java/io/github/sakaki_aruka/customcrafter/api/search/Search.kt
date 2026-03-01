@@ -5,6 +5,7 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatterPredicate
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipePredicate
+import io.github.sakaki_aruka.customcrafter.api.objects.AsyncContext
 import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelationComponent
@@ -96,6 +97,75 @@ object Search {
         //  -> There is same reason with the above q.
     }
 
+    /**
+     * Query of searching
+     * @param[searchMode] Search mode
+     * @param[vanillaSearchMode] Vanilla recipe search mode
+     * @param[asyncContext] Async search context (default = null)
+     * @since 5.0.20
+     */
+    class SearchQuery @JvmOverloads constructor(
+        val searchMode: SearchMode,
+        val vanillaSearchMode: VanillaSearchMode,
+        val asyncContext: AsyncContext? = null
+    ) {
+        /**
+         * Mode of searching
+         * - Only-first: Only first match recipe
+         * - All (Default): All recipes
+         * @since 5.0.20
+         */
+        enum class SearchMode {
+            ONLY_FIRST,
+            ALL;
+        }
+
+        /**
+         * Mode of vanilla recipe searching
+         * - Force: Force search vanilla recipe
+         * - If-customs-not-found (Default): if custom recipes not found
+         * @since 5.0.20
+         */
+        enum class VanillaSearchMode {
+            FORCE,
+            IF_CUSTOMS_NOT_FOUND
+        }
+
+        companion object {
+            /**
+             * Default search query setting
+             * @since 5.0.20
+             */
+            @JvmField
+            val DEFAULT = SearchQuery(
+                searchMode = SearchMode.ALL,
+                vanillaSearchMode = VanillaSearchMode.IF_CUSTOMS_NOT_FOUND,
+                asyncContext = null
+            )
+
+            @JvmField
+            val ASYNC_DEFAULT = SearchQuery(
+                searchMode = SearchMode.ALL,
+                vanillaSearchMode = VanillaSearchMode.IF_CUSTOMS_NOT_FOUND,
+                asyncContext = AsyncContext.ofTurnOff()
+            )
+
+            /**
+             * Default search query setting with a given async context
+             * @since 5.0.20
+             */
+            @JvmStatic
+            @JvmOverloads
+            fun defaultModeOf(asyncContext: AsyncContext? = null): SearchQuery {
+                return SearchQuery(
+                    searchMode = DEFAULT.searchMode,
+                    vanillaSearchMode = DEFAULT.vanillaSearchMode,
+                    asyncContext = asyncContext
+                )
+            }
+        }
+    }
+
     // one: Boolean
 
     /**
@@ -105,6 +175,7 @@ object Search {
      *
      * @param[crafterID] Crafter UUID
      * @param[view] View of input slots
+     * @param[query] Query of searching (since 5.0.20)
      * @param[sourceRecipes] Search target recipes (default = [CustomCrafterAPI.getRecipes])
      * @return[CompletableFuture] Future task of a search result
      * @since 5.0.17
@@ -114,6 +185,7 @@ object Search {
     fun asyncSearch(
         crafterID: UUID,
         view: CraftView,
+        query: SearchQuery = SearchQuery.ASYNC_DEFAULT,
         sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes()
     ): CompletableFuture<SearchResult> {
         if (view.materials.isEmpty() || view.materials.size > 36) {
@@ -131,13 +203,47 @@ object Search {
             mapped.size in recipe.requiresInputItemAmountMin()..recipe.requiresInputItemAmountMax()
         }
 
-        val futures: List<CompletableFuture<Pair<CRecipe, MappedRelation>?>> = recipes.mapNotNull { recipe ->
-            CompletableFuture.supplyAsync( {
+        val tasks = recipes.map { recipe ->
+            CompletableFuture.supplyAsync({
                 when (recipe.type) {
-                    CRecipe.Type.SHAPED -> shaped(view, recipe, crafterID, isAsync = true)
-                    CRecipe.Type.SHAPELESS -> shapeless(view, recipe, crafterID, isAsync = true)
-                }?.let { recipe to it }
+                    CRecipe.Type.SHAPED -> shaped(view, recipe, crafterID, AsyncContext.ofTurnOff())
+                    CRecipe.Type.SHAPELESS -> shapeless(view, recipe, crafterID, AsyncContext.ofTurnOff())
+                }?.let { mapped -> recipe to mapped }
             }, InternalAPI.asyncExecutor())
+        }
+
+        var futures: List<CompletableFuture<Pair<CRecipe, MappedRelation>?>>
+        if (query.searchMode == SearchQuery.SearchMode.ONLY_FIRST) {
+            val findFirst: CompletableFuture<Pair<CRecipe, MappedRelation>?> = CompletableFuture()
+            tasks.forEach {
+                it.thenApply { pair ->
+                    if (pair != null) {
+                        if (findFirst.complete(pair)) {
+                            tasks.forEach { t -> t.cancel(true) }
+                            query.asyncContext?.interrupt()
+                        }
+                    }
+                }
+            }
+
+            CompletableFuture.allOf(*tasks.toTypedArray()).thenRun {
+                if (!findFirst.isDone) {
+                    findFirst.complete(null)
+                }
+            }
+
+            return findFirst.thenApply { result ->
+                SearchResult(vanilla, result?.let { listOf(it) } ?: emptyList())
+            }
+        } else {
+            futures = recipes.mapNotNull { recipe ->
+                CompletableFuture.supplyAsync({
+                    when (recipe.type) {
+                        CRecipe.Type.SHAPED -> shaped(view, recipe, crafterID, AsyncContext.ofTurnOff())
+                        CRecipe.Type.SHAPELESS -> shapeless(view, recipe, crafterID, AsyncContext.ofTurnOff())
+                    }?.let { recipe to it }
+                }, InternalAPI.asyncExecutor())
+            }
         }
 
         return CompletableFuture.allOf(*futures.toTypedArray())
@@ -199,7 +305,7 @@ object Search {
         view: CraftView,
         recipe: CRecipe,
         crafterID: UUID,
-        isAsync: Boolean = false
+        asyncContext: AsyncContext? = null
     ): MappedRelation? {
         if (recipe.items.size < view.materials.size) {
             return null
@@ -226,7 +332,9 @@ object Search {
                 }
             }
 
-            val matterPredicateContext = CMatterPredicate.Context(recipeCoordinate, matter, input, view.materials, recipe, crafterID, isAsync = isAsync)
+            val matterPredicateContext = CMatterPredicate.Context(recipeCoordinate, matter, input, view.materials, recipe, crafterID,
+                asyncContext = asyncContext
+            )
             if (!matter.predicatesResult(matterPredicateContext)) {
                 return null
             }
@@ -235,7 +343,7 @@ object Search {
 
         val relation = MappedRelation(components)
 
-        val recipePredicateContext = CRecipePredicate.Context(view, crafterID, recipe, relation, isAsync = isAsync)
+        val recipePredicateContext = CRecipePredicate.Context(view, crafterID, recipe, relation, asyncContext)
         if (!recipe.getRecipePredicateResults(recipePredicateContext)) {
             return null
         }
@@ -277,7 +385,8 @@ object Search {
         input: Map<CoordinateComponent, ItemStack>,
         recipe: CRecipe,
         crafterID: UUID,
-        isAsync: Boolean = false
+        //isAsync: Boolean = false
+        asyncContext: AsyncContext? = null
     ): Map<Int, Set<Triple<Int, Boolean, Boolean>>> {
         // Key=RecipeSlot, Value=<InputSlot, Checked, CheckResult>
         val result: MutableMap<Int, Set<Triple<Int, Boolean, Boolean>>> = mutableMapOf()
@@ -293,7 +402,7 @@ object Search {
             val set: MutableSet<Triple<Int, Boolean, Boolean>> = mutableSetOf()
             for ((i, item) in input.entries) {
                 if (matter.hasPredicates()) {
-                    val ctx = CMatterPredicate.Context(r, matter, item, input, recipe, crafterID, isAsync = isAsync)
+                    val ctx = CMatterPredicate.Context(r, matter, item, input, recipe, crafterID, asyncContext)
                     set.add(Triple(i.toIndex(), true, matter.predicatesResult(ctx)))
                 }
             }
@@ -336,7 +445,7 @@ object Search {
         view: CraftView,
         recipe: CRecipe,
         crafterID: UUID,
-        isAsync: Boolean = false
+        asyncContext: AsyncContext? = null
     ): MappedRelation? {
 
         // MapKey=RecipeSlot, MapValue=<InputSlot, Checked, CheckResult>
@@ -353,7 +462,7 @@ object Search {
         }
 
         addResults(getShapelessCandidateCheckResult(view.materials, recipe))
-        addResults(getShapelessMatterPredicatesCheckResult(view.materials, recipe, crafterID, isAsync))
+        addResults(getShapelessMatterPredicatesCheckResult(view.materials, recipe, crafterID, asyncContext))
         addResults(getShapelessAmountCheckResult(view.materials, recipe))
 
         val merged: MutableMap<Int, MutableSet<Int>> = mutableMapOf()
@@ -413,7 +522,7 @@ object Search {
         }
 
         val relation = MappedRelation(relationComponents)
-        val recipePredicateContext = CRecipePredicate.Context(view, crafterID, recipe, relation, isAsync = isAsync)
+        val recipePredicateContext = CRecipePredicate.Context(view, crafterID, recipe, relation, asyncContext)
         if (!recipe.getRecipePredicateResults(recipePredicateContext)) {
             return null
         }

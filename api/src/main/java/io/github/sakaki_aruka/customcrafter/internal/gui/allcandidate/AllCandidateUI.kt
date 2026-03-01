@@ -5,6 +5,7 @@ import io.github.sakaki_aruka.customcrafter.api.event.CreateCustomItemEvent
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.api.interfaces.ui.CraftUIDesigner
+import io.github.sakaki_aruka.customcrafter.api.objects.AsyncContext
 import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.search.Search
@@ -24,6 +25,7 @@ import org.bukkit.inventory.CraftingRecipe
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
+import java.util.Collections
 import java.util.concurrent.Callable
 import java.util.concurrent.CancellationException
 import java.util.concurrent.CompletableFuture
@@ -46,6 +48,7 @@ internal class AllCandidateUI(
         "All Candidate".toComponent()
     )
     private val isClosed: AtomicBoolean = AtomicBoolean(false)
+    private val asyncContextReferences: MutableList<AsyncContext> = Collections.synchronizedList(mutableListOf())
     private val pages: ConcurrentHashMap<Int, ConcurrentHashMap<Int, Pair<ItemStack, CRecipe>>> = ConcurrentHashMap<Int, ConcurrentHashMap<Int, Pair<ItemStack, CRecipe>>>()
         .apply {
             // Initialize with empty data
@@ -76,8 +79,11 @@ internal class AllCandidateUI(
                     calledTimes = 1,
                     isMultipleDisplayCall = true,
                     crafterID = this.player.uniqueId,
-                    isAsync = true
+                    asyncContext = AsyncContext.ofTurnOff()
                 )
+
+                context.asyncContext?.let { this.asyncContextReferences.add(it) }
+
                 Pair(
                     recipe.asyncGetResults(context).get().firstOrNull()
                         ?: replaceRecipeNameTemplate(CustomCrafterAPI.ALL_CANDIDATE_NO_DISPLAYABLE_ITEM, recipe.name),
@@ -191,6 +197,7 @@ internal class AllCandidateUI(
     }
 
     override fun onClose(event: InventoryCloseEvent) {
+        this.asyncContextReferences.forEach { it.interrupt() }
         if (!this.dropOnClose) {
             return
         }
@@ -254,15 +261,17 @@ internal class AllCandidateUI(
                         ?: return
 
                 CompletableFuture.runAsync ({
-                    val results: List<ItemStack> = recipe.asyncGetResults(ResultSupplier.Context(
+                    val resultSupplierContext = ResultSupplier.Context(
                         recipe = recipe,
                         relation = relation,
                         mapped = view.materials,
                         shiftClicked = event.isShiftClick,
                         calledTimes = recipe.getTimes(view.materials, relation, event.isShiftClick),
                         isMultipleDisplayCall = false,
-                        crafterID = player.uniqueId
-                    )).get()
+                        crafterID = player.uniqueId,
+                        asyncContext = AsyncContext.ofTurnOff()
+                    )
+                    val results: List<ItemStack> = recipe.asyncGetResults(resultSupplierContext).get()
 
                     Callable {
                         CreateCustomItemEvent(player, this.view, this.result, event.isShiftClick, isAsync = true).callEvent()

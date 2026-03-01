@@ -2,6 +2,7 @@ package online.aruka.customcrafter.api.`object`
 
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
+import io.github.sakaki_aruka.customcrafter.api.objects.AsyncContext
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelationComponent
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
@@ -191,7 +192,7 @@ object CRecipeTest {
             calledTimes = 1,
             crafterID = UUID.randomUUID(),
             isMultipleDisplayCall = false,
-            isAsync = true
+            asyncContext = AsyncContext.ofTurnOff()
         )
 
         val future = recipe.asyncGetResults(context)

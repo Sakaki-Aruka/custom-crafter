@@ -2,6 +2,7 @@ package io.github.sakaki_aruka.customcrafter.api.interfaces.recipe
 
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
+import io.github.sakaki_aruka.customcrafter.api.objects.AsyncContext
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import org.bukkit.inventory.ItemStack
@@ -114,7 +115,7 @@ interface CRecipe {
         context: CRecipePredicate.Context,
         whenEmptyDefault: Boolean = true
     ): CompletableFuture<Boolean> {
-        val modifiedContext = context.copyWith(isAsync = true)
+        val modifiedContext = context.toAsync()
         val predicates: List<CRecipePredicate> = this.predicates.takeIf { !it.isNullOrEmpty() }
             ?: return CompletableFuture.completedFuture(whenEmptyDefault)
 
@@ -141,7 +142,7 @@ interface CRecipe {
     }
 
     fun asyncGetResults(context: ResultSupplier.Context): CompletableFuture<List<ItemStack>> {
-        val modifiedContext = context.copyWith(isAsync = true)
+        val modifiedContext = context.toAsync()
         val suppliers: List<ResultSupplier> = this.results ?: return CompletableFuture.completedFuture(emptyList())
 
         val futures: List<CompletableFuture<List<ItemStack>>> = suppliers.map { supplier ->

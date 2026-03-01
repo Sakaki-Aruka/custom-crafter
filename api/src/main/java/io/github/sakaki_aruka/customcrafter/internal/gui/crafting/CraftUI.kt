@@ -6,6 +6,7 @@ import io.github.sakaki_aruka.customcrafter.api.event.CreateCustomItemEvent
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.api.interfaces.ui.CraftUIDesigner
+import io.github.sakaki_aruka.customcrafter.api.objects.AsyncContext
 import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
@@ -213,7 +214,8 @@ internal class CraftUI(
             // Async
             val result: Search.SearchResult = Search.asyncSearch(
                 crafterID = player.uniqueId,
-                view = this.toView()
+                view = this.toView(),
+                query = Search.SearchQuery.ASYNC_DEFAULT
             ).get()
 
             if (CustomCrafterAPI.getUseMultipleResultCandidateFeature() && result.size() > 1) {
@@ -269,9 +271,10 @@ internal class CraftUI(
             }
         }.fromBukkitMainThread()
 
-        val results: List<ItemStack> = recipe.asyncGetResults(ResultSupplier.Context(
-            recipe, relate, view.materials, shiftUsed, amount, player.uniqueId,false, isAsync = true
-        )).get()
+        val resultSupplierContext = ResultSupplier.Context(
+            recipe, relate, view.materials, shiftUsed, amount, player.uniqueId,false, asyncContext = AsyncContext.ofTurnOff()
+        )
+        val results: List<ItemStack> = recipe.asyncGetResults(resultSupplierContext).get()
 
         Callable {
             player.giveItems(saveLimit = true, *results.toTypedArray())
