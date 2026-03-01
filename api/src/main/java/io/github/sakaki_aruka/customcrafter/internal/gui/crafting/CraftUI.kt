@@ -38,7 +38,7 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.atomic.AtomicBoolean
 
 internal class CraftUI(
-    var dropItemsOnClose: Boolean = true,
+    val dropOnClose: AtomicBoolean = AtomicBoolean(true),
     caller: Player? = null,
     baked: CraftUIDesigner.Baked? = null
 ): CustomCrafterUI, InventoryHolder {
@@ -163,7 +163,7 @@ internal class CraftUI(
 
     override fun onClose(event: InventoryCloseEvent) {
         this.isClosed.set(true)
-        if (!this.dropItemsOnClose) {
+        if (!this.dropOnClose.get()) {
             return
         }
         val view: CraftView = this.toView()
@@ -234,7 +234,7 @@ internal class CraftUI(
         shiftUsed: Boolean,
         player: Player
     ) {
-        this.dropItemsOnClose = false
+        this.dropOnClose.set(false)
         val allUI = AllCandidateUI(
             view = this.toView(),
             player = player,

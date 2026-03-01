@@ -40,7 +40,7 @@ internal class AllCandidateUI(
     private val result: Search.SearchResult,
     useShift: Boolean,
     private val bakedCraftUIDesigner: CraftUIDesigner.Baked,
-    private var dropOnClose: Boolean = true,
+    private val dropOnClose: AtomicBoolean = AtomicBoolean(true)
 ) : CustomCrafterUI.Pageable, InventoryHolder {
     private val inventory: Inventory = Bukkit.createInventory(
         this,
@@ -198,7 +198,7 @@ internal class AllCandidateUI(
 
     override fun onClose(event: InventoryCloseEvent) {
         this.asyncContextReferences.forEach { it.interrupt() }
-        if (!this.dropOnClose) {
+        if (!this.dropOnClose.get()) {
             return
         }
         player.giveItems(saveLimit = true, *this.view.materials.values.toTypedArray(), this.view.result)
@@ -232,7 +232,7 @@ internal class AllCandidateUI(
                     this.bakedCraftUIDesigner.resultInt(),
                     this.view.result
                 )
-                this.dropOnClose = false
+                this.dropOnClose.set(false)
                 this.player.openInventory(craftUI.inventory)
                 return
             }
@@ -301,7 +301,7 @@ internal class AllCandidateUI(
                     craftUI.inventory.setItem(c.toIndex(), item)
                 }
                 craftUI.inventory.setItem(this.bakedCraftUIDesigner.resultInt(), this.view.result)
-                this.dropOnClose = false
+                this.dropOnClose.set(false)
                 player.openInventory(craftUI.inventory)
             }
         }
