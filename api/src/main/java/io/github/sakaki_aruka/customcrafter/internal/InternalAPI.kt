@@ -1,5 +1,6 @@
 package io.github.sakaki_aruka.customcrafter.internal
 
+import com.tcoded.folialib.FoliaLib
 import io.github.sakaki_aruka.customcrafter.CustomCrafter
 import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterUI
 import org.bukkit.Bukkit
@@ -12,10 +13,15 @@ import java.util.concurrent.Executors
 
 internal object InternalAPI {
 
+    val foliaLib: FoliaLib by lazy {
+        FoliaLib(CustomCrafter.getInstance())
+    }
+
     @JvmStatic
     fun startup() {
         EXECUTOR = Executors.newVirtualThreadPerTaskExecutor()
         SCHEDULER = Bukkit.getScheduler()
+        info("Platform type: ${foliaLib.implType.name}")
     }
 
     @JvmStatic
