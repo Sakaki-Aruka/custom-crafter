@@ -4,10 +4,8 @@ import com.tcoded.folialib.FoliaLib
 import io.github.sakaki_aruka.customcrafter.CustomCrafter
 import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterUI
 import org.bukkit.Bukkit
-import org.bukkit.Server
 import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.inventory.InventoryHolder
-import org.bukkit.scheduler.BukkitScheduler
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -20,7 +18,6 @@ internal object InternalAPI {
     @JvmStatic
     fun startup() {
         EXECUTOR = Executors.newVirtualThreadPerTaskExecutor()
-        SCHEDULER = Bukkit.getScheduler()
         info("Platform type: ${foliaLib.implType.name}")
     }
 
@@ -53,13 +50,4 @@ internal object InternalAPI {
      * CustomCrafterAPI default async executor
      */
     private lateinit var EXECUTOR: ExecutorService
-
-    fun scheduler(server: Server = Bukkit.getServer()): BukkitScheduler {
-        if (!::SCHEDULER.isInitialized) {
-            SCHEDULER = server.scheduler
-        }
-        return SCHEDULER
-    }
-
-    private lateinit var SCHEDULER: BukkitScheduler
 }

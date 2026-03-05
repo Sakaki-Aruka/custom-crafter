@@ -46,7 +46,6 @@ internal object CraftUITest {
         server = MockBukkit.mock()
         server.addWorld(WorldMock())
         server.addPlayer()
-        InternalAPI.scheduler(server)
 
         server.worlds.first().let { world ->
             val base = world.getBlockAt(0, 64, 0)
