@@ -6,7 +6,6 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
 import io.github.sakaki_aruka.customcrafter.impl.recipe.CRecipeImpl
-import io.github.sakaki_aruka.customcrafter.impl.util.AsyncUtil.fromBukkitMainThread
 import online.aruka.demo.Demo
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -15,7 +14,6 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.PotionMeta
 import org.bukkit.persistence.PersistentDataType
 import org.bukkit.potion.PotionEffect
-import java.util.concurrent.Callable
 
 object ShapelessRecipeProvider {
     fun glowBerry(): CRecipe {
@@ -79,9 +77,9 @@ object ShapelessRecipeProvider {
                 effects.addAll(potionMeta.customEffects)
             }
 
-            Callable {
+            Bukkit.getScheduler().runTask(Demo.plugin) { _ ->
                 Bukkit.getPlayer(ctx.crafterID)?.addPotionEffects(effects)
-            }.fromBukkitMainThread()
+            }
 
             emptyList()
         }

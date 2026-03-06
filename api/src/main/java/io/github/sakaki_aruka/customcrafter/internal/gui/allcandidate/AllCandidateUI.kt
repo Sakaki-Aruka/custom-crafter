@@ -10,7 +10,6 @@ import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.search.Search
 import io.github.sakaki_aruka.customcrafter.impl.recipe.CVanillaRecipe
-import io.github.sakaki_aruka.customcrafter.impl.util.AsyncUtil.fromBukkitMainThread
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter.toComponent
 import io.github.sakaki_aruka.customcrafter.impl.util.InventoryUtil.giveItems
 import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
@@ -25,7 +24,6 @@ import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
 import java.util.Collections
-import java.util.concurrent.Callable
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
@@ -85,7 +83,7 @@ internal class AllCandidateUI(
                     )
                     iconsUpdate(pageIndex)
 
-                }, InternalAPI.asyncExecutor())
+                }, InternalAPI.executor)
             }
         }
 
@@ -95,16 +93,14 @@ internal class AllCandidateUI(
     }
 
     private fun iconsUpdate(pageNum: Int) {
-        Callable {
-            if (this.isClosed.get()) {
-                return@Callable
-            } else if (this.currentPage.get() != pageNum) {
-                return@Callable
-            }
+        if (this.isClosed.get() || this.currentPage.get() != pageNum) {
+            return
+        }
 
+        InternalAPI.foliaLib.scheduler.runAtEntity(this.player) {
             this.player.openInventory.topInventory.let { opening ->
                 if (opening.holder !is AllCandidateUI) {
-                    return@Callable
+                    return@runAtEntity
                 }
                 pages[pageNum]?.let { contents ->
                     contents.entries.forEach { (slot, pair) ->
@@ -112,7 +108,7 @@ internal class AllCandidateUI(
                     }
                 }
             }
-        }.fromBukkitMainThread()
+        }
     }
 
     companion object {
@@ -261,14 +257,14 @@ internal class AllCandidateUI(
                     )
                     val results: List<ItemStack> = recipe.asyncGetResults(resultSupplierContext).get()
 
-                    Callable {
-                        CreateCustomItemEvent(player, this.view, this.result, event.isShiftClick, isAsync = true).callEvent()
-                    }.fromBukkitMainThread()
+                    InternalAPI.foliaLib.scheduler.runAtEntity(player) {
+                        CreateCustomItemEvent(player, this.view, this.result, event.isShiftClick, isAsync = false).callEvent()
+                    }
 
-                    Callable {
+                    InternalAPI.foliaLib.scheduler.runAtEntity(player) {
                         player.giveItems(saveLimit = true, *results.toTypedArray())
-                    }.fromBukkitMainThread()
-                }, InternalAPI.asyncExecutor())
+                    }
+                }, InternalAPI.executor)
 
                 if (!this.view.result.isEmpty) {
                     player.location.world.dropItem(player.location, this.view.result)
