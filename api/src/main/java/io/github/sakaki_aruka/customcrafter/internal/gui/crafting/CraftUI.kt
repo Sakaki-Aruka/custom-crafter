@@ -224,7 +224,7 @@ internal class CraftUI(
             } else if (result.vanilla() != null) {
                 giveVanillaRecipeResults(result, shiftUsed, player)
             }
-        }, InternalAPI.asyncExecutor())
+        }, InternalAPI.executor)
     }
 
     private fun openAllCandidateUI(

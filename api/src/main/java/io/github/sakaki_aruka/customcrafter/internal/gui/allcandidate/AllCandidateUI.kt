@@ -83,7 +83,7 @@ internal class AllCandidateUI(
                     )
                     iconsUpdate(pageIndex)
 
-                }, InternalAPI.asyncExecutor())
+                }, InternalAPI.executor)
             }
         }
 
@@ -264,7 +264,7 @@ internal class AllCandidateUI(
                     InternalAPI.foliaLib.scheduler.runAtEntity(player) {
                         player.giveItems(saveLimit = true, *results.toTypedArray())
                     }
-                }, InternalAPI.asyncExecutor())
+                }, InternalAPI.executor)
 
                 if (!this.view.result.isEmpty) {
                     player.location.world.dropItem(player.location, this.view.result)

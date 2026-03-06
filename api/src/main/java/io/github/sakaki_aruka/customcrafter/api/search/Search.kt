@@ -209,7 +209,7 @@ object Search {
                     CRecipe.Type.SHAPED -> shaped(view, recipe, crafterID, AsyncContext.ofTurnOff())
                     CRecipe.Type.SHAPELESS -> shapeless(view, recipe, crafterID, AsyncContext.ofTurnOff())
                 }?.let { mapped -> recipe to mapped }
-            }, InternalAPI.asyncExecutor())
+            }, InternalAPI.executor)
         }
 
         var futures: List<CompletableFuture<Pair<CRecipe, MappedRelation>?>>
@@ -242,7 +242,7 @@ object Search {
                         CRecipe.Type.SHAPED -> shaped(view, recipe, crafterID, AsyncContext.ofTurnOff())
                         CRecipe.Type.SHAPELESS -> shapeless(view, recipe, crafterID, AsyncContext.ofTurnOff())
                     }?.let { recipe to it }
-                }, InternalAPI.asyncExecutor())
+                }, InternalAPI.executor)
             }
         }
 

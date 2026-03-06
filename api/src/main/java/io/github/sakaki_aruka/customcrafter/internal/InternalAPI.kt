@@ -15,9 +15,10 @@ internal object InternalAPI {
         FoliaLib(CustomCrafter.getInstance())
     }
 
+    val executor: ExecutorService = Executors.newVirtualThreadPerTaskExecutor()
+
     @JvmStatic
     fun startup() {
-        EXECUTOR = Executors.newVirtualThreadPerTaskExecutor()
         info("Platform type: ${foliaLib.implType.name}")
     }
 
@@ -32,22 +33,9 @@ internal object InternalAPI {
                 player.closeInventory()
             }
         }
-        EXECUTOR.shutdown()
+        executor.shutdown()
     }
 
     fun warn(str: String) = CustomCrafter.getInstance().logger.warning(str)
     fun info(str: String) = CustomCrafter.getInstance().logger.info(str)
-
-    fun asyncExecutor(): ExecutorService {
-        if (!::EXECUTOR.isInitialized) {
-            EXECUTOR = Executors.newVirtualThreadPerTaskExecutor()
-        }
-        return EXECUTOR
-    }
-
-    /**
-     * @suppress
-     * CustomCrafterAPI default async executor
-     */
-    private lateinit var EXECUTOR: ExecutorService
 }
