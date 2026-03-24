@@ -25,10 +25,64 @@ export default defineConfig({
                     items: ['getting-started'],
                 },
                 {
+                    label: 'CustomCrafterAPI',
+                    items: ['api/customcrafter-api', 'api/search'],
+                },
+                {
                     label: 'Recipe',
                     translations: { ja: 'レシピ' },
-                    items: ['recipe/recipe', 'recipe/matter', 'recipe/result']
-                }
+                    items: ['recipe/recipe', 'recipe/matter', 'recipe/result', 'recipe/predicate'],
+                },
+                {
+                    label: 'Extra',
+                    translations: { ja: '追加要素' },
+                    items: ['extra/craftui-designer'],
+                },
+                {
+                    label: 'Events',
+                    translations: { ja: 'イベント' },
+                    items: ['events'],
+                },
+                {
+                    label: 'Objects',
+                    translations: { ja: 'オブジェクト' },
+                    items: [
+                        'objects/async-context',
+                        'objects/craft-view',
+                        'objects/mapped-relation',
+                    ],
+                },
+                {
+                    label: 'Utilities',
+                    translations: { ja: 'ユーティリティ' },
+                    items: [
+                        'util/converter',
+                        'util/inventory-util',
+                    ],
+                },
+                {
+                    label: 'Implementations',
+                    translations: { ja: '実装クラス' },
+                    items: [
+                        {
+                            label: 'Matter',
+                            translations: { ja: 'Matter' },
+                            items: [
+                                'impl/matter/cmatter-impl',
+                                'impl/matter/enchant',
+                                'impl/matter/potion',
+                            ],
+                        },
+                        {
+                            label: 'Recipe',
+                            translations: { ja: 'Recipe' },
+                            items: [
+                                'impl/recipe/crecipe-impl',
+                                'impl/recipe/group-recipe',
+                            ],
+                        },
+                    ],
+                },
 			],
 		}),
 	],

@@ -30,13 +30,13 @@ With a few exceptions, specifying zero elements or a `Material` where `Material.
 
 ### mass
 
-`mass` is a somewhat special value. When set to `false` it has no effect, but setting it to `true` changes several behaviors.
+`mass` is a somewhat special value. When set to `false` it has no effect on recipe crafting, but setting it to `true` changes several behaviours.
 When `true`, the CMatter's quantity specification (`amount`) is ignored, and it also affects the quantity calculation at crafting time.
 The reason quantity is ignored is that this flag means "at least one item of this type needs to be present."
-"At least one" means that the count of items which pass all checks other than quantity for this CMatter must be 1 or more.
-Therefore, when calculating how many times the result-generating function should be called, items corresponding to a CMatter with `mass = true` are excluded from the count; instead, the smallest value obtained by dividing the count of the remaining items by their respective `amount` is used.
+"At least one" means that the count of items which pass all checks other than the quantity check for this CMatter must be 1 or more.
+Therefore, when calculating how many times the result-generating function should be called, items corresponding to a CMatter with `mass = true` are excluded from the calculation; instead, the smallest value obtained by dividing the count of the remaining items by their respective `amount` is used.
 
-This property makes it easier to handle both stackable items and normally non-stackable items such as water buckets or potions in the same recipe.
+This property makes it easier to handle both stackable items and normally non-stackable items such as water buckets or potions together in the same recipe.
 
 ```kotlin
 val wetSponge = CMatterImpl.of(Material.WET_SPONGE) // mass = false
@@ -63,8 +63,8 @@ val spongeDry = CRecipeImpl(
 ### predicates
 
 `predicates` can contain inspection logic for areas that `candidate` alone cannot cover.
-It is a set of `CMatterPredicate` — a functional interface — each of which must accept a `CMatterPredicate.Context` and return a `Boolean`.
-In addition to inspecting the item itself, you can also load information from a database or file to make a judgment.
+It is a set of `CMatterPredicate` — a functional interface — each of which must accept a `CMatterPredicate.Context` (the context) and return a `Boolean`.
+In addition to inspecting the item itself, you can also load information from a database or file to make a judgement.
 Because execution may occur on an asynchronous thread, it is recommended to call `isAsync` on the context to check whether the current thread is asynchronous.
 
 <details><summary>Default implementation of CPotionMatter's inspection logic</summary>
@@ -112,50 +112,167 @@ val DEFAULT_POTION_CHECKER = CMatterPredicate { ctx ->
 Asynchronous execution uses virtual threads available in Java 21 and later.
 
 Java's asynchronous processing works cooperatively, so it is not possible to forcibly interrupt an in-progress task.
-Therefore, periodically check the async context's `isInterrupted()` to see whether an interrupt request (a request to stop processing) has been issued.
+Therefore, periodically check the async context's (`asyncContext`) `isInterrupted()` to see whether an interrupt request (a request to stop processing) has been issued.
 :::
 
 ## Other
 
-CMatter instances registered with CustomCrafterAPI must satisfy certain criteria. Unless `CMatter#isValidMatter` is overridden, the default check mechanism is called every time a recipe is registered to verify integrity.
+CMatter instances used in recipes registered with CustomCrafterAPI must satisfy certain criteria. Unless `CMatter#isValidMatter` is overridden, the default check mechanism is invoked every time a recipe is registered to verify integrity.
 Recipes containing CMatter that does not pass the `isValidMatter` check cannot be registered with CustomCrafterAPI.
 
 ## Subtypes
 
 ### CEnchantMatter(Impl)
 
-A CMatter implementation extended for items that have enchantments.
-It holds a set of `CEnchantComponent` instances that define enchantment restrictions.
+A CMatter implementation extended for items that have enchantments applied directly to them.
+It holds a set of `CEnchantComponent` instances (`enchantComponents`) that define enchantment restrictions.
+The inspection passes only when all `CEnchantComponent` instances in the set match.
 
 `CEnchantComponent` has the following fields:
-- Level
-- Enchantment type
-- Strictness
-  - The item only needs to have the specified enchantment type
-  - The item must have the specified enchantment type at the specified level
 
-It checks whether the placed item satisfies these restrictions.
+| Field | Type | Description |
+|-------|------|-------------|
+| `level` | `Int` | Required enchantment level |
+| `enchantment` | `Enchantment` | Required enchantment type |
+| `strict` | `CEnchantComponent.Strict` | Strictness of the restriction |
+
+The possible values of `CEnchantComponent.Strict` are:
+
+| Value | Description |
+|-------|-------------|
+| `ONLY_ENCHANT` | The item only needs to contain the specified enchantment type (any level is acceptable) |
+| `STRICT` | The item must contain exactly the specified enchantment type at exactly the specified level |
+
+```kotlin
+// Require a Diamond Pickaxe with at least Efficiency I
+val efficientPickaxe = CEnchantMatterImpl(
+    name = "efficient-pickaxe",
+    candidate = setOf(Material.DIAMOND_PICKAXE),
+    amount = 1,
+    mass = false,
+    predicates = null,
+    enchantComponents = setOf(
+        CEnchantComponent(
+            level = 1,
+            enchantment = Enchantment.EFFICIENCY,
+            strict = CEnchantComponent.Strict.ONLY_ENCHANT // any level of 1 or above is fine
+        )
+    )
+)
+
+// Require a Diamond Pickaxe with exactly Unbreaking III
+val durablePickaxe = CEnchantMatterImpl(
+    name = "durable-pickaxe",
+    candidate = setOf(Material.DIAMOND_PICKAXE),
+    amount = 1,
+    mass = false,
+    predicates = null,
+    enchantComponents = setOf(
+        CEnchantComponent(
+            level = 3,
+            enchantment = Enchantment.UNBREAKING,
+            strict = CEnchantComponent.Strict.STRICT // must be exactly III
+        )
+    )
+)
+```
 
 This `CEnchantComponent` can also be used for restrictions on enchanted books.
 
 ### CEnchantmentStoreMatter(Impl)
 
-A CMatter implementation extended for items that can store enchantments (primarily enchanted books).
-Like `CEnchantMatter`, it holds `CEnchantComponent` instances.
+A CMatter implementation extended for items that store enchantments (primarily enchanted books).
+Like `CEnchantMatter`, it holds `CEnchantComponent` instances, but the field name is `storedEnchantComponents`.
+It inspects stored enchantments (Stored Enchantments) rather than enchantments applied directly to the item.
+
+```kotlin
+// Require an Enchanted Book storing Efficiency III
+val efficiencyBook = CEnchantmentStoreMatterImpl(
+    name = "efficiency-book",
+    candidate = setOf(Material.ENCHANTED_BOOK),
+    amount = 1,
+    mass = true,
+    predicates = null,
+    storedEnchantComponents = setOf(
+        CEnchantComponent(
+            level = 3,
+            enchantment = Enchantment.EFFICIENCY,
+            strict = CEnchantComponent.Strict.STRICT
+        )
+    )
+)
+```
 
 ### CEnchantBothMatterImpl
 
 A CMatter implementation that implements both `CEnchantMatter` and `CEnchantmentStoreMatter`.
+Use this when you want to inspect both directly applied enchantments and stored enchantments within a single CMatter.
+
+```kotlin
+// Inspect both directly applied and stored enchantments
+val bothEnchant = CEnchantBothMatterImpl(
+    name = "both-enchant",
+    candidate = setOf(Material.DIAMOND_SWORD, Material.ENCHANTED_BOOK),
+    amount = 1,
+    mass = false,
+    predicates = null,
+    enchantComponents = setOf(
+        CEnchantComponent(1, Enchantment.SHARPNESS, CEnchantComponent.Strict.ONLY_ENCHANT)
+    ),
+    storedEnchantComponents = setOf(
+        CEnchantComponent(1, Enchantment.SHARPNESS, CEnchantComponent.Strict.ONLY_ENCHANT)
+    )
+)
+```
 
 ### CPotionMatter(Impl)
 
 A CMatter implementation extended for potions.
-It holds a set of `CPotionComponent` instances that define potion restrictions.
+It holds a set of `CPotionComponent` instances (`potionComponents`) that define potion restrictions.
+The inspection passes only when all `CPotionComponent` instances in the set match.
 
 `CPotionComponent` has the following fields:
-- PotionEffect (includes type, duration, level, etc.)
-- Strictness
-  - The item only needs to contain the specified potion type
-  - The item must contain the specified potion type at the specified level
 
-It checks whether the placed item satisfies these restrictions.
+| Field | Type | Description |
+|-------|------|-------------|
+| `effect` | `PotionEffect` | Required potion effect (includes type, duration, and level) |
+| `strict` | `CPotionComponent.Strict` | Strictness of the restriction |
+
+The possible values of `CPotionComponent.Strict` are:
+
+| Value | Description |
+|-------|-------------|
+| `ONLY_EFFECT` | The item only needs to contain the specified potion effect type (any level is acceptable) |
+| `STRICT` | The item must contain the specified potion effect type at exactly the specified level |
+
+```kotlin
+// Require a potion with the Glowing effect (any level)
+val glowingPotion = CPotionMatterImpl(
+    name = "glowing-potion",
+    candidate = setOf(Material.POTION, Material.SPLASH_POTION),
+    amount = 1,
+    mass = true,
+    predicates = null,
+    potionComponents = setOf(
+        CPotionComponent(
+            effect = PotionEffect(PotionEffectType.GLOWING, 200, 0),
+            strict = CPotionComponent.Strict.ONLY_EFFECT // any level is acceptable
+        )
+    )
+)
+
+// Require a Fire Resistance potion strictly (level 0, duration 600 ticks)
+val fireResistPotion = CPotionMatterImpl(
+    name = "fire-resist-potion",
+    candidate = setOf(Material.POTION),
+    amount = 1,
+    mass = true,
+    predicates = null,
+    potionComponents = setOf(
+        CPotionComponent(
+            effect = PotionEffect(PotionEffectType.FIRE_RESISTANCE, 600, 0),
+            strict = CPotionComponent.Strict.STRICT // type and level must match exactly
+        )
+    )
+)
+```

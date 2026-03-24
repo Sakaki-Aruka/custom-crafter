@@ -124,38 +124,155 @@ CustomCrafterAPI に登録するレシピに使用されている CMatter はい
 
 ### CEnchantMatter(Impl)
 
-エンチャントを含むアイテム向けの拡張がされた CMatter 実装です。  
-エンチャントの制限を定義した `CEnchantComponent` の集合を持ちます。  
+エンチャントを含むアイテム向けの拡張がされた CMatter 実装です。
+エンチャントの制限を定義した `CEnchantComponent` の集合 (`enchantComponents`) を持ちます。
+集合内のすべての `CEnchantComponent` が合致した場合のみ検査を通過します。
 
-CEnchantComponent は
-- レベル
-- エンチャントの種類
-- 制限の強さ
-  - 指定された種類のエンチャントが含まれていれば良い
-  - 指定された種類とレベルのエンチャントを含む必要がある
+`CEnchantComponent` は以下のフィールドを持ちます。
 
-を要素に持ち、配置されたアイテムがそれらの制限に合致するかどうかを判定します。  
+| フィールド | 型 | 概要 |
+|------------|-----|------|
+| `level` | `Int` | 要求するエンチャントのレベル |
+| `enchantment` | `Enchantment` | 要求するエンチャントの種類 |
+| `strict` | `CEnchantComponent.Strict` | 制限の強さ |
 
-この `CEnchantComponent` はエンチャント本への制限などにも利用可能です。  
+`CEnchantComponent.Strict` の値は以下のとおりです。
+
+| 値 | 概要 |
+|----|------|
+| `ONLY_ENCHANT` | 指定した種類のエンチャントが含まれていれば良い (レベルは問わない) |
+| `STRICT` | 指定した種類かつ指定したレベルのエンチャントを含む必要がある |
+
+```kotlin
+// 効率強化 I 以上のダイヤモンドツルハシを要求する
+val efficientPickaxe = CEnchantMatterImpl(
+    name = "efficient-pickaxe",
+    candidate = setOf(Material.DIAMOND_PICKAXE),
+    amount = 1,
+    mass = false,
+    predicates = null,
+    enchantComponents = setOf(
+        CEnchantComponent(
+            level = 1,
+            enchantment = Enchantment.EFFICIENCY,
+            strict = CEnchantComponent.Strict.ONLY_ENCHANT // レベルは 1 以上なら何でも良い
+        )
+    )
+)
+
+// 耐久力ちょうど III のダイヤモンドツルハシを要求する
+val durablePickaxe = CEnchantMatterImpl(
+    name = "durable-pickaxe",
+    candidate = setOf(Material.DIAMOND_PICKAXE),
+    amount = 1,
+    mass = false,
+    predicates = null,
+    enchantComponents = setOf(
+        CEnchantComponent(
+            level = 3,
+            enchantment = Enchantment.UNBREAKING,
+            strict = CEnchantComponent.Strict.STRICT // ちょうど III でなければいけない
+        )
+    )
+)
+```
+
+この `CEnchantComponent` はエンチャント本への制限などにも利用可能です。
 
 ### CEnchantmentStoreMatter(Impl)
 
-エンチャントを付与可能なアイテム (主にエンチャント本) 向けの拡張がされた CMatter 実装です。  
-CEnchantMatter と同じく、 `CEnchantComponent` を持ちます。  
+エンチャントを格納したアイテム (主にエンチャント本) 向けの拡張がされた CMatter 実装です。
+`CEnchantMatter` と同じく `CEnchantComponent` を持ちますが、フィールド名は `storedEnchantComponents` です。
+アイテムに直接付与されたエンチャントではなく、格納されたエンチャント (Stored Enchantments) を検査します。
+
+```kotlin
+// 効率強化 III が格納されたエンチャント本を要求する
+val efficiencyBook = CEnchantmentStoreMatterImpl(
+    name = "efficiency-book",
+    candidate = setOf(Material.ENCHANTED_BOOK),
+    amount = 1,
+    mass = true,
+    predicates = null,
+    storedEnchantComponents = setOf(
+        CEnchantComponent(
+            level = 3,
+            enchantment = Enchantment.EFFICIENCY,
+            strict = CEnchantComponent.Strict.STRICT
+        )
+    )
+)
+```
 
 ### CEnchantBothMatterImpl
 
-CEnchantMatter, CEnchantmentStoreMatter の両方を実装した CMatter 実装です。
+`CEnchantMatter` と `CEnchantmentStoreMatter` の両方を実装した CMatter 実装です。
+アイテムに直接付与されたエンチャントと格納されたエンチャントの両方を 1 つの CMatter で検査したい場合に使用します。
+
+```kotlin
+// 直接付与とストアドの両方のエンチャントを検査する
+val bothEnchant = CEnchantBothMatterImpl(
+    name = "both-enchant",
+    candidate = setOf(Material.DIAMOND_SWORD, Material.ENCHANTED_BOOK),
+    amount = 1,
+    mass = false,
+    predicates = null,
+    enchantComponents = setOf(
+        CEnchantComponent(1, Enchantment.SHARPNESS, CEnchantComponent.Strict.ONLY_ENCHANT)
+    ),
+    storedEnchantComponents = setOf(
+        CEnchantComponent(1, Enchantment.SHARPNESS, CEnchantComponent.Strict.ONLY_ENCHANT)
+    )
+)
+```
 
 ### CPotionMatter(Impl)
 
-ポーション向けの拡張がされた CMatter 実装です。  
-ポーションの制限を定義した `CPotionComponent` の集合を持ちます。  
+ポーション向けの拡張がされた CMatter 実装です。
+ポーションの制限を定義した `CPotionComponent` の集合 (`potionComponents`) を持ちます。
+集合内のすべての `CPotionComponent` が合致した場合のみ検査を通過します。
 
-CPotionComponent は
-- PotionEffect (種類、効果時間、レベルなどを含む)
-- 制限の強さ
-  - 指定された種類のポーションが含まれていれば良い
-  - 指定された種類とレベルのポーションを含む必要がある
+`CPotionComponent` は以下のフィールドを持ちます。
 
-を要素に持ち、配置されたアイテムがそれらの制限に合致するかどうかを判定します。  
+| フィールド | 型 | 概要 |
+|------------|-----|------|
+| `effect` | `PotionEffect` | 要求するポーション効果 (種類・効果時間・レベルを含む) |
+| `strict` | `CPotionComponent.Strict` | 制限の強さ |
+
+`CPotionComponent.Strict` の値は以下のとおりです。
+
+| 値 | 概要 |
+|----|------|
+| `ONLY_EFFECT` | 指定した種類のポーション効果が含まれていれば良い (レベルは問わない) |
+| `STRICT` | 指定した種類かつ指定したレベルのポーション効果を含む必要がある |
+
+```kotlin
+// 発光効果 (レベル問わず) が付いたポーションを要求する
+val glowingPotion = CPotionMatterImpl(
+    name = "glowing-potion",
+    candidate = setOf(Material.POTION, Material.SPLASH_POTION),
+    amount = 1,
+    mass = true,
+    predicates = null,
+    potionComponents = setOf(
+        CPotionComponent(
+            effect = PotionEffect(PotionEffectType.GLOWING, 200, 0),
+            strict = CPotionComponent.Strict.ONLY_EFFECT // レベルは問わない
+        )
+    )
+)
+
+// 耐火ポーション (レベル 0、効果時間 600 ティック) を厳密に要求する
+val fireResistPotion = CPotionMatterImpl(
+    name = "fire-resist-potion",
+    candidate = setOf(Material.POTION),
+    amount = 1,
+    mass = true,
+    predicates = null,
+    potionComponents = setOf(
+        CPotionComponent(
+            effect = PotionEffect(PotionEffectType.FIRE_RESISTANCE, 600, 0),
+            strict = CPotionComponent.Strict.STRICT // 種類とレベルが完全一致する必要がある
+        )
+    )
+)
+```
