@@ -1,5 +1,7 @@
 ---
-title: Welcome to CustomCrafterAPI tutorial
+title: Welcome to CustomCrafterAPI
 ---
 
-Hello !
+Welcome to the CustomCrafterAPI documentation.
+
+For a quick introduction, head to the [Getting Started](/getting-started/) page.

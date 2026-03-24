@@ -21,11 +21,13 @@ export default defineConfig({
 			sidebar: [
                 {
                     label: 'Getting started',
+                    translations: { ja: 'はじめに' },
                     items: ['getting-started'],
                 },
                 {
                     label: 'Recipe',
-                    items: ['recipe']
+                    translations: { ja: 'レシピ' },
+                    items: ['recipe/recipe', 'recipe/matter', 'recipe/result']
                 }
 			],
 		}),

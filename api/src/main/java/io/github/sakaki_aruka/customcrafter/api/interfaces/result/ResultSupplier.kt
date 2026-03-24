@@ -23,12 +23,12 @@ fun interface ResultSupplier {
          * return ResultSupplier { listOf(item) }
          * ```
          *
-         * @param[item] Supplied item
+         * @param[items] Supplied items
          * @return[ResultSupplier] ResultSupplier what returns a given item only once
          */
         @JvmStatic
-        fun single(item: ItemStack): ResultSupplier {
-            return ResultSupplier { listOf(item) }
+        fun single(vararg items: ItemStack): ResultSupplier {
+            return ResultSupplier { items.toList() }
         }
 
         /**
@@ -37,20 +37,21 @@ fun interface ResultSupplier {
          *
          * This calculates result item amount with following expressions.
          * - `minimumAmount = inputAmount / recipeRequiresAmount(=[CMatter].amount)`
-         * - `amount = [item].amount * minimumAmount`
+         * - `amount = [items].amount * minimumAmount`
          *
-         * @param[item] Supplied item
+         * @param[items] Supplied items
          * @return[ResultSupplier] ResultSupplier what returns amount modified item
          */
         @JvmStatic
-        fun timesSingle(item: ItemStack): ResultSupplier {
+        fun timesSingle(vararg items: ItemStack): ResultSupplier {
             return ResultSupplier { context ->
-                val cloned: ItemStack = item.clone()
-                if (context.shiftClicked) {
-                    cloned.amount *= context.calledTimes
+                items.map { item ->
+                    val cloned: ItemStack = item.clone()
+                    if (context.shiftClicked) {
+                        cloned.amount *= context.calledTimes
+                    }
+                    cloned
                 }
-
-                listOf(cloned)
             }
         }
     }

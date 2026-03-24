@@ -1,5 +1,7 @@
 ---
-title: CustomCrafterAPI 入門
+title: CustomCrafterAPI へようこそ
 ---
 
-こんにちは！
+CustomCrafterAPI のドキュメントへようこそ。
+
+まずは[入門ページ](/ja/getting-started/)をご覧ください。
