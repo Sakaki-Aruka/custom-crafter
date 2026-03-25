@@ -1,4 +1,5 @@
-docs/
+api/docs/
+!api/document/docs/
 
 # User-specific stuff
 .idea/
