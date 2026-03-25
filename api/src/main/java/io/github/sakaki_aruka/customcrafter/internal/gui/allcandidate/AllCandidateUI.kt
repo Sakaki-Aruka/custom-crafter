@@ -50,10 +50,11 @@ internal class AllCandidateUI(
     init {
         val chunked = this.result.getMergedResults().chunked(45)
         chunked.withIndex().forEach { (pageIndex, list) ->
-            val currentPageItems = ConcurrentHashMap<Int, ItemStack>()
+            val pageMap = ConcurrentHashMap<Int, Pair<ItemStack, CRecipe>>()
+            pages[pageIndex] = pageMap
             list.withIndex().forEach { (slotIndex, pair) ->
                 val (recipe, relation: MappedRelation?) = pair
-                currentPageItems[slotIndex] = ungeneratedItem(recipe.name)
+                pageMap[slotIndex] = ungeneratedItem(recipe.name) to recipe
 
                 CompletableFuture.runAsync({
                     if (recipe is CVanillaRecipe) {
