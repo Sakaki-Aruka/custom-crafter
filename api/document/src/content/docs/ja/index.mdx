@@ -1,0 +1,70 @@
+---
+title: CustomCrafterAPI
+template: splash
+hero:
+  tagline: 1×1〜6×6 のカスタムクラフトレシピを Minecraft プラグインに追加する API
+  actions:
+    - text: はじめに
+      link: /ja/getting-started/
+      icon: right-arrow
+      variant: primary
+    - text: GitHub
+      link: https://github.com/Sakaki-Aruka/custom-crafter
+      icon: external
+      variant: minimal
+---
+
+## CustomCrafterAPI とは
+
+CustomCrafterAPI は、Minecraft のプラグイン開発者が **1×1〜6×6 サイズのカスタムクラフトレシピ**をサーバーに追加するための基盤プラグインです。
+
+バニラのレシピのようにアイテムの種類だけを参照する単純なものから、エンチャントやポーション効果などのメタデータ、外部データベースや API を参照して成果物を決定するような高度なレシピまで、柔軟に実装できます。
+
+---
+
+## 主な特徴
+
+**可変サイズのレシピ**
+1×1 から 6×6 までの自由な配置でレシピを定義できます。定形・不定形の両方に対応しています。
+
+**豊富なアイテム条件**
+Material の種類だけでなく、エンチャント・ストアドエンチャント・ポーション効果・カスタムメタデータを条件に指定できます。
+
+**非同期検索対応**
+Java 21 の仮想スレッドを利用した非同期レシピ検索により、多数のレシピや重い predicates がサーバーの TPS に影響しません。
+
+**高い拡張性**
+インターフェースを実装した独自クラスを作成することで、データベースや外部 API を参照するレシピや、プレイヤーごとに異なる UI デザインなども実現できます。
+
+---
+
+## バージョンについて
+
+:::caution
+バージョン **5.X.X はアルファ版**です。1 つのバージョンアップで API が大幅に変更される可能性があります。
+バージョン **6.0.0 以降が正式版**として扱われます。
+依存関係として利用するバージョンとサーバーに導入されている CustomCrafterAPI のバージョンに互換性があるかを必ず確認してください。
+:::
+
+最新版のダウンロードや依存関係の追加は以下から行えます。
+
+| 配布先 | 用途 |
+|--------|------|
+| [Modrinth](https://modrinth.com/plugin/custom-crafter-api/versions) | プラグイン jar のダウンロード |
+| [GitHub Releases](https://github.com/Sakaki-Aruka/custom-crafter/releases) | プラグイン jar のダウンロード |
+| [Maven Central](https://central.sonatype.com/artifact/io.github.sakaki-aruka/custom-crafter-api) | ライブラリとして依存関係に追加 |
+
+Maven では `provided`、Gradle では `compileOnly` のスコープで追加してください。
+
+---
+
+## ドキュメント構成
+
+| ページ | 内容 |
+|--------|------|
+| [はじめに](/ja/getting-started/) | インストール方法と基本概念 |
+| [CustomCrafterAPI オブジェクト](/ja/api/customcrafter-api/) | レシピ登録・解除と各種設定 |
+| [検索 API](/ja/api/search/) | レシピ検索の仕組みと非同期検索 |
+| [レシピ](/ja/recipe/recipe/) | CMatter・CRecipe・ResultSupplier の使い方 |
+| [実装クラス](/ja/impl/matter/cmatter-impl/) | 標準実装クラスの詳細リファレンス |
+| [イベント](/ja/events/) | CustomCrafterAPI が発行するイベント一覧 |

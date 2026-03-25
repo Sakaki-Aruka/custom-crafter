@@ -1,0 +1,70 @@
+---
+title: CustomCrafterAPI
+template: splash
+hero:
+  tagline: Add custom crafting recipes from 1×1 to 6×6 to your Minecraft plugin
+  actions:
+    - text: Getting Started
+      link: /en/getting-started/
+      icon: right-arrow
+      variant: primary
+    - text: GitHub
+      link: https://github.com/Sakaki-Aruka/custom-crafter
+      icon: external
+      variant: minimal
+---
+
+## What is CustomCrafterAPI
+
+CustomCrafterAPI is a foundation plugin for Minecraft plugin developers to add **custom crafting recipes from 1×1 up to 6×6 in size** to their servers.
+
+From simple recipes that check only the item type — just like vanilla recipes — to advanced ones that inspect enchantments, potion effects, and other metadata, or even determine the output by querying an external database or API, CustomCrafterAPI supports a wide range of implementations.
+
+---
+
+## Key Features
+
+**Variable Recipe Sizes**
+Define recipes with any arrangement from 1×1 to 6×6. Both shaped and shapeless recipe types are supported.
+
+**Rich Item Conditions**
+Specify conditions beyond just the Material type — enchantments, stored enchantments, potion effects, and custom metadata are all supported.
+
+**Async Search Support**
+Asynchronous recipe search using Java 21 virtual threads ensures that large numbers of recipes or heavy predicates do not impact server TPS.
+
+**Highly Extensible**
+By implementing the provided interfaces with your own classes, you can build recipes that query databases or external APIs, or craft UI designs that vary per player.
+
+---
+
+## Versioning
+
+:::caution
+Versions **5.X.X are alpha releases**. The API may change significantly between minor versions.
+Versions **6.0.0 and later are considered stable releases**.
+Always verify that the version you depend on is compatible with the CustomCrafterAPI version installed on the server.
+:::
+
+Download the latest release or add it as a dependency from the following sources:
+
+| Source | Purpose |
+|--------|---------|
+| [Modrinth](https://modrinth.com/plugin/custom-crafter-api/versions) | Download the plugin jar |
+| [GitHub Releases](https://github.com/Sakaki-Aruka/custom-crafter/releases) | Download the plugin jar |
+| [Maven Central](https://central.sonatype.com/artifact/io.github.sakaki-aruka/custom-crafter-api) | Add as a library dependency |
+
+Use the `provided` scope in Maven or `compileOnly` in Gradle.
+
+---
+
+## Documentation Overview
+
+| Page | Contents |
+|------|---------|
+| [Getting Started](/en/getting-started/) | Installation and core concepts |
+| [CustomCrafterAPI Object](/en/api/customcrafter-api/) | Recipe registration, removal, and settings |
+| [Search API](/en/api/search/) | Recipe search and async search |
+| [Recipe](/en/recipe/recipe/) | How to use CMatter, CRecipe, and ResultSupplier |
+| [Implementations](/en/impl/matter/cmatter-impl/) | Detailed reference for standard implementation classes |
+| [Events](/en/events/) | Events fired by CustomCrafterAPI |
