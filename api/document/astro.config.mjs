@@ -2,8 +2,13 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 
+const site = process.env.DEPLOY_SITE ?? 'http://localhost:4321';
+const base = process.env.DEPLOY_BASE ?? '';
+
 // https://astro.build/config
 export default defineConfig({
+	site,
+	base,
 	integrations: [
 		starlight({
 			title: 'CustomCrafterAPI documents',
