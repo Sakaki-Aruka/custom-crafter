@@ -20,7 +20,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Generate KDoc
-        run: mvn -pl api resources:resources dokka:dokka
+        run: mvn -pl api resources:resources dokka:dokka -ntp
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -37,7 +37,7 @@ jobs:
         working-directory: api/document
         run: npm run build
         env:
-          DEPLOY_SITE: https://sakaki-aruka.github.io
+          DEPLOY_SITE: https://sakaki-aruka.github.io/custom-crafter/document
           DEPLOY_BASE: /custom-crafter/document
 
       - name: Assemble deploy directory
