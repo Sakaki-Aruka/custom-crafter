@@ -2,8 +2,8 @@
 import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 
-const site = process.env.DEPLOY_SITE ?? 'http://localhost:4321';
 const base = process.env.DEPLOY_BASE ?? '';
+const site = (process.env.DEPLOY_SITE ?? 'http://localhost:4321') + base;
 
 // https://astro.build/config
 export default defineConfig({

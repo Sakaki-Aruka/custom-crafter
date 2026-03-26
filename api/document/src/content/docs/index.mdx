@@ -1,40 +1,37 @@
 ---
-title: Welcome to Starlight
-description: Get started building your docs site with Starlight.
-template: splash # Remove or comment out this line to display the site sidebar on this page.
+title: CustomCrafterAPI
+description: Add custom crafting recipes from 1×1 to 6×6 to your Minecraft plugin.
+template: splash
 hero:
-  tagline: Congrats on setting up a new Starlight project!
-  image:
-    file: ../../assets/houston.webp
+  tagline: Add custom crafting recipes from 1×1 to 6×6 to your Minecraft plugin
   actions:
-    - text: Example Guide
-      link: /guides/example/
+    - text: English
+      link: /en/
       icon: right-arrow
-    - text: Read the Starlight docs
-      link: https://starlight.astro.build
+      variant: primary
+    - text: 日本語
+      link: /ja/
+      icon: right-arrow
+      variant: secondary
+    - text: GitHub
+      link: https://github.com/Sakaki-Aruka/custom-crafter
       icon: external
       variant: minimal
 ---
 
 import { Card, CardGrid } from '@astrojs/starlight/components';
 
-## Next steps
-
-<CardGrid stagger>
-	<Card title="Update content" icon="pencil">
-		Edit `src/content/docs/index.mdx` to see this page change.
-	</Card>
-	<Card title="Change page layout" icon="document">
-		Delete `template: splash` in `src/content/docs/index.mdx` to display a
-		sidebar on this page.
-	</Card>
-	<Card title="Add new content" icon="add-document">
-		Add Markdown or MDX files to `src/content/docs` to create new pages.
-	</Card>
-	<Card title="Configure your site" icon="setting">
-		Edit your `sidebar` and other config in `astro.config.mjs`.
-	</Card>
-	<Card title="Read the docs" icon="open-book">
-		Learn more in [the Starlight Docs](https://starlight.astro.build/).
-	</Card>
+<CardGrid>
+  <Card title="Plugin & API Library" icon="puzzle">
+    Use CustomCrafter as a standalone plugin, or depend on it as an API library to register your own custom recipes from your plugin.
+  </Card>
+  <Card title="1×1 to 6×6 Recipes" icon="document">
+    Define shaped or shapeless recipes in any grid size from 1×1 up to 6×6. Material conditions can span enchantments, potion effects, and custom metadata.
+  </Card>
+  <Card title="Folia & Async Support" icon="rocket">
+    Recipe searches run on Java 21 virtual threads, keeping server TPS unaffected even with large recipe sets or heavy predicates.
+  </Card>
+  <Card title="PaperMC 1.21.4+" icon="star">
+    Requires PaperMC or a PaperMC fork. Spigot and Bukkit servers are not supported.
+  </Card>
 </CardGrid>

@@ -66,8 +66,8 @@ You can freely create custom recipes from your plugin and register them into the
 
 For more detailed information and a complete list of classes and methods, please refer to:
 
-* [KDoc (Kotlin)](https://sakaki-aruka.github.io/custom-crafter/)
-* [Wiki (GitHub)](https://github.com/Sakaki-Aruka/custom-crafter/wiki/Intro)
+* [KDoc (Kotlin)](https://sakaki-aruka.github.io/custom-crafter/kdoc/)
+* [Document](https://github.com/Sakaki-Aruka/custom-crafter/document/)
 
 or Build:  
 * KDoc Style: `mvn -pl api dokka:dokka`
