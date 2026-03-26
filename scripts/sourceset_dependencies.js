@@ -1,1 +1,0 @@
-sourceset_dependencies='{"Custom_Crafter/JVM":[]}'
