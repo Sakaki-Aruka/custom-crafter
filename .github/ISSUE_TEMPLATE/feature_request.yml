@@ -1,0 +1,71 @@
+name: Feature Request
+description: Propose a new feature or API addition
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: summary
+      description: A concise description of the feature you are proposing.
+    validations:
+      required: true
+
+  - type: textarea
+    id: motivation
+    attributes:
+      label: motivation
+      description: Why is this feature needed? What problem does it solve, or what use case does it enable?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed_solution
+    attributes:
+      label: proposed solution
+      description: |
+        Describe how you envision the feature working. Code snippets or pseudo-code are welcome.
+        If this touches the public API (packages under `api.interfaces`, `api.objects`, `api.event`, etc.),
+        please sketch the interface/method signature you have in mind.
+
+  - type: dropdown
+    id: scope
+    attributes:
+      label: scope
+      description: Which part of the project does this affect?
+      options:
+        - Public API (api.interfaces / api.objects / api.event)
+        - Default implementation (impl.*)
+        - Internal plugin logic (internal.*)
+        - GUI / CraftUI
+        - Documentation (KDoc / Starlight)
+        - CI / Build
+        - Other
+    validations:
+      required: true
+
+  - type: dropdown
+    id: breaking
+    attributes:
+      label: is this a breaking change?
+      description: Would existing API consumers need to update their code?
+      options:
+        - "No"
+        - "Yes"
+        - "Unsure"
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: alternatives considered
+      description: Any workarounds or alternative designs you thought of.
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: environment (if relevant)
+      value: |
+        Server: e.g. Paper 1.21.10
+        Plugin: e.g. CustomCrafter 5.0.20
