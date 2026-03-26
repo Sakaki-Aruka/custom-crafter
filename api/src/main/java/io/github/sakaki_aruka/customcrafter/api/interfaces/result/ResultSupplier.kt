@@ -2,6 +2,7 @@ package io.github.sakaki_aruka.customcrafter.api.interfaces.result
 
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
+import io.github.sakaki_aruka.customcrafter.api.objects.AsyncContext
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import org.bukkit.inventory.ItemStack
@@ -22,12 +23,12 @@ fun interface ResultSupplier {
          * return ResultSupplier { listOf(item) }
          * ```
          *
-         * @param[item] Supplied item
+         * @param[items] Supplied items
          * @return[ResultSupplier] ResultSupplier what returns a given item only once
          */
         @JvmStatic
-        fun single(item: ItemStack): ResultSupplier {
-            return ResultSupplier { listOf(item) }
+        fun single(vararg items: ItemStack): ResultSupplier {
+            return ResultSupplier { items.toList() }
         }
 
         /**
@@ -36,20 +37,21 @@ fun interface ResultSupplier {
          *
          * This calculates result item amount with following expressions.
          * - `minimumAmount = inputAmount / recipeRequiresAmount(=[CMatter].amount)`
-         * - `amount = [item].amount * minimumAmount`
+         * - `amount = [items].amount * minimumAmount`
          *
-         * @param[item] Supplied item
+         * @param[items] Supplied items
          * @return[ResultSupplier] ResultSupplier what returns amount modified item
          */
         @JvmStatic
-        fun timesSingle(item: ItemStack): ResultSupplier {
+        fun timesSingle(vararg items: ItemStack): ResultSupplier {
             return ResultSupplier { context ->
-                val cloned: ItemStack = item.clone()
-                if (context.shiftClicked) {
-                    cloned.amount *= context.calledTimes
+                items.map { item ->
+                    val cloned: ItemStack = item.clone()
+                    if (context.shiftClicked) {
+                        cloned.amount *= context.calledTimes
+                    }
+                    cloned
                 }
-
-                listOf(cloned)
             }
         }
     }
@@ -64,7 +66,7 @@ fun interface ResultSupplier {
      * @param[shiftClicked] Shift-clicked or not
      * @param[calledTimes] Calculated minimum amount with [CMatter.amount]
      * @param[isMultipleDisplayCall] `invoke` called from multiple result display item collector or not
-     * @param[isAsync] Called from async or not (since 5.0.17)
+     * @param[asyncContext] Async context (since 5.0.20)
      */
     class Context @JvmOverloads constructor(
         val recipe: CRecipe,
@@ -74,10 +76,37 @@ fun interface ResultSupplier {
         val calledTimes: Int,
         val crafterID: UUID,
         val isMultipleDisplayCall: Boolean,
-        val isAsync: Boolean = false
+        val asyncContext: AsyncContext? = null
     ) {
-        fun copyWith(isAsync: Boolean): Context {
-            return Context(recipe, relation, mapped, shiftClicked, calledTimes, crafterID, isMultipleDisplayCall, isAsync)
+        /**
+         * Copy with a given parameter.
+         *
+         * @param[asyncContext] Async states context
+         * @return[ResultSupplier.Context] Changes applied context
+         * @since 5.0.20
+         */
+        fun copyWith(asyncContext: AsyncContext? = null): Context {
+            return Context(recipe, relation, mapped, shiftClicked, calledTimes, crafterID, isMultipleDisplayCall, asyncContext)
         }
+
+        /**
+         * If no async context exists, returns a newly added one.
+         * @return[ResultSupplier.Context] Modified context
+         * @since 5.0.20
+         */
+        fun toAsync(): Context {
+            return if (isAsync()) {
+                this
+            } else {
+                copyWith(AsyncContext.ofTurnOff())
+            }
+        }
+
+        /**
+         * Returns whether this inspection is async.
+         * @return[Boolean] Async or not
+         * @since 5.0.20
+         */
+        fun isAsync(): Boolean = asyncContext == null
     }
 }

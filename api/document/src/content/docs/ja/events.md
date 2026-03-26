@@ -1,0 +1,174 @@
+---
+title: イベント
+---
+
+## CustomCrafterAPI のイベント
+
+CustomCrafterAPI は Bukkit の `Event` を実装した独自のイベントをいくつか発火します。
+これらは通常の Bukkit イベントと同じ方法でリッスン・ハンドリングできます。
+
+---
+
+## RegisterCustomRecipeEvent
+
+レシピが `CustomCrafterAPI.registerRecipe()` によって登録されようとするときに発火します。
+`Cancellable` を実装しており、キャンセルするとレシピの登録が失敗します。
+
+| プロパティ | 型 | 概要 |
+|------------|-----|------|
+| `recipes` | `List<CRecipe>` | 登録しようとしているレシピのリスト |
+
+```kotlin
+class RecipeRegisterListener : Listener {
+    @EventHandler
+    fun onRegister(event: RegisterCustomRecipeEvent) {
+        event.recipes.forEach { recipe ->
+            println("レシピ登録: ${recipe.name}")
+        }
+
+        // 特定の名前のレシピ登録をキャンセルする例
+        if (event.recipes.any { it.name.startsWith("forbidden-") }) {
+            event.isCancelled = true
+            println("登録をキャンセルしました。")
+        }
+    }
+}
+```
+
+---
+
+## UnregisterCustomRecipeEvent
+
+レシピが `CustomCrafterAPI.unregisterRecipe()` または `CustomCrafterAPI.unregisterAllRecipes()` によって解除されようとするときに発火します。
+`Cancellable` を実装しており、キャンセルするとレシピの解除が失敗します。
+
+| プロパティ | 型 | 概要 |
+|------------|-----|------|
+| `recipes` | `List<CRecipe>` | 解除しようとしているレシピのリスト |
+
+```kotlin
+class RecipeUnregisterListener : Listener {
+    @EventHandler
+    fun onUnregister(event: UnregisterCustomRecipeEvent) {
+        event.recipes.forEach { recipe ->
+            println("レシピ解除: ${recipe.name}")
+        }
+
+        // 特定のレシピは解除させない例
+        if (event.recipes.any { it.name == "protected-recipe" }) {
+            event.isCancelled = true
+        }
+    }
+}
+```
+
+---
+
+## CreateCustomItemEvent
+
+アイテムが作成された (クラフトが実行された) ときに発火します。
+このイベントはキャンセル不可です。
+
+| プロパティ | 型 | 概要 |
+|------------|-----|------|
+| `player` | `Player` | クラフトを実行したプレイヤー |
+| `view` | `CraftView` | クラフト時の UI 入力状態 |
+| `result` | `Search.SearchResult?` | 検索結果。`null` の場合はクラフトが成立しなかったことを示す |
+| `shiftUsed` | `Boolean` | シフトキーを押して一括作成したかどうか (5.0.17 以降) |
+| `isAsync` | `Boolean` | 非同期スレッドからの呼び出しかどうか (5.0.17 以降) |
+
+```kotlin
+class CreateItemListener : Listener {
+    @EventHandler
+    fun onCreateItem(event: CreateCustomItemEvent) {
+        val result = event.result ?: return
+
+        // 作成されたカスタムレシピの名前をログに出力する
+        result.customs().forEach { (recipe, _) ->
+            println("${event.player.name} が ${recipe.name} を作成しました。")
+        }
+
+        // 一括作成の場合に追加処理を行う例
+        if (event.shiftUsed) {
+            println("一括作成が使用されました。")
+        }
+    }
+}
+```
+
+---
+
+## CustomCrafterAPIPropertiesChangeEvent
+
+`CustomCrafterAPI` のミュータブルなプロパティ (設定値) が変更されたときに発火します。
+変更前の値と変更後の値の両方が含まれます。
+
+このイベントはジェネリックで、変更されたプロパティの型 `T` を持ちます。
+
+| プロパティ | 型 | 概要 |
+|------------|-----|------|
+| `propertyName` | `String` | 変更されたプロパティの名前 |
+| `oldValue` | `Property<T>` | 変更前の値 |
+| `newValue` | `Property<T>` | 変更後の値 |
+| `isAsync` | `Boolean` | 非同期スレッドからの変更かどうか |
+
+`Property<T>` から型安全に値を取り出すには `PropertyKey<T>` を使用します。
+
+```kotlin
+val key = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK
+val value: Material? = property.getOrNull(key)
+```
+
+定義済みの `PropertyKey` は以下のとおりです：
+
+| キー | 対応する型 | 対応するプロパティ |
+|------|-----------|----------------|
+| `RESULT_GIVE_CANCEL` | `Boolean` | ResultGiveCancel |
+| `BASE_BLOCK` | `Material` | BaseBlock |
+| `USE_MULTIPLE_RESULT_CANDIDATE_FEATURE` | `Boolean` | UseMultipleResultCandidateFeature |
+| `USE_CUSTOM_CRAFT_UI` | `Boolean` | UseCustomCraftUI |
+| `BASE_BLOCK_SIDE` | `Int` | BaseBlockSide |
+| `CRAFT_UI_DESIGNER` | `CraftUIDesigner` | CraftUIDesigner |
+
+### 実装例: ベースブロックの変更を検知する
+
+```kotlin
+class PropertiesChangeListener : Listener {
+    @EventHandler
+    fun <T> onPropertiesChange(event: CustomCrafterAPIPropertiesChangeEvent<T>) {
+        val key = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK
+
+        // プロパティ名で対象のイベントだけ絞り込む
+        if (event.propertyName != key.propertyName) return
+
+        val oldBlock: Material = event.oldValue.getOrNull(key) ?: return
+        val newBlock: Material = event.newValue.getOrNull(key) ?: return
+
+        println("ベースブロックが ${oldBlock.name} から ${newBlock.name} に変更されました。")
+    }
+}
+```
+
+### 実装例: 複数プロパティをまとめて監視する
+
+```kotlin
+class AllPropertiesChangeListener : Listener {
+    @EventHandler
+    fun <T> onPropertiesChange(event: CustomCrafterAPIPropertiesChangeEvent<T>) {
+        when (event.propertyName) {
+            CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK.propertyName -> {
+                val newValue = event.newValue.getOrNull(
+                    CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK
+                )
+                println("ベースブロック変更: $newValue")
+            }
+            CustomCrafterAPIPropertiesChangeEvent.PropertyKey.USE_CUSTOM_CRAFT_UI.propertyName -> {
+                val newValue = event.newValue.getOrNull(
+                    CustomCrafterAPIPropertiesChangeEvent.PropertyKey.USE_CUSTOM_CRAFT_UI
+                )
+                println("カスタム UI 有効化: $newValue")
+            }
+        }
+    }
+}
+```

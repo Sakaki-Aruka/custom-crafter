@@ -6,11 +6,11 @@ import io.github.sakaki_aruka.customcrafter.api.event.CreateCustomItemEvent
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.api.interfaces.ui.CraftUIDesigner
+import io.github.sakaki_aruka.customcrafter.api.objects.AsyncContext
 import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.api.search.Search
-import io.github.sakaki_aruka.customcrafter.impl.util.AsyncUtil.fromBukkitMainThread
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter.toComponent
 import io.github.sakaki_aruka.customcrafter.impl.util.InventoryUtil.giveItems
 import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
@@ -32,12 +32,11 @@ import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
 import org.bukkit.persistence.PersistentDataType
 import java.util.UUID
-import java.util.concurrent.Callable
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.atomic.AtomicBoolean
 
 internal class CraftUI(
-    var dropItemsOnClose: Boolean = true,
+    val dropOnClose: AtomicBoolean = AtomicBoolean(true),
     caller: Player? = null,
     baked: CraftUIDesigner.Baked? = null
 ): CustomCrafterUI, InventoryHolder {
@@ -162,7 +161,7 @@ internal class CraftUI(
 
     override fun onClose(event: InventoryCloseEvent) {
         this.isClosed.set(true)
-        if (!this.dropItemsOnClose) {
+        if (!this.dropOnClose.get()) {
             return
         }
         val view: CraftView = this.toView()
@@ -213,7 +212,8 @@ internal class CraftUI(
             // Async
             val result: Search.SearchResult = Search.asyncSearch(
                 crafterID = player.uniqueId,
-                view = this.toView()
+                view = this.toView(),
+                query = Search.SearchQuery.ASYNC_DEFAULT
             ).get()
 
             if (CustomCrafterAPI.getUseMultipleResultCandidateFeature() && result.size() > 1) {
@@ -224,7 +224,7 @@ internal class CraftUI(
             } else if (result.vanilla() != null) {
                 giveVanillaRecipeResults(result, shiftUsed, player)
             }
-        }, InternalAPI.asyncExecutor())
+        }, InternalAPI.executor)
     }
 
     private fun openAllCandidateUI(
@@ -232,7 +232,7 @@ internal class CraftUI(
         shiftUsed: Boolean,
         player: Player
     ) {
-        this.dropItemsOnClose = false
+        this.dropOnClose.set(false)
         val allUI = AllCandidateUI(
             view = this.toView(),
             player = player,
@@ -241,11 +241,11 @@ internal class CraftUI(
             bakedCraftUIDesigner = this.bakedDesigner
         )
 
-        Callable {
+        InternalAPI.foliaLib.scheduler.runAtEntity(player) {
             if (!this.isClosed.get()) {
                 player.openInventory(allUI.inventory)
             }
-        }.fromBukkitMainThread()
+        }
 
     }
 
@@ -259,23 +259,24 @@ internal class CraftUI(
         val amount: Int = recipe.getTimes(view.materials, relate, shiftUsed)
         val decrementedView: CraftView = view.clone().getDecremented(shiftUsed, recipe, relate)
 
-        Callable {
-            CreateCustomItemEvent(player, view, result, shiftUsed, isAsync = true).callEvent()
-        }.fromBukkitMainThread()
+        InternalAPI.foliaLib.scheduler.runAtEntity(player) {
+            CreateCustomItemEvent(player, view, result, shiftUsed, isAsync = false).callEvent()
+        }
 
-        Callable {
+        InternalAPI.foliaLib.scheduler.runAtEntity(player) {
             decrementedView.materials.forEach { (c, item) ->
                 this.inventory.setItem(c.toIndex(), item)
             }
-        }.fromBukkitMainThread()
+        }
 
-        val results: List<ItemStack> = recipe.asyncGetResults(ResultSupplier.Context(
-            recipe, relate, view.materials, shiftUsed, amount, player.uniqueId,false, isAsync = true
-        )).get()
+        val resultSupplierContext = ResultSupplier.Context(
+            recipe, relate, view.materials, shiftUsed, amount, player.uniqueId,false, asyncContext = AsyncContext.ofTurnOff()
+        )
+        val results: List<ItemStack> = recipe.asyncGetResults(resultSupplierContext).get()
 
-        Callable {
+        InternalAPI.foliaLib.scheduler.runAtEntity(player) {
             player.giveItems(saveLimit = true, *results.toTypedArray())
-        }.fromBukkitMainThread()
+        }
     }
 
     private fun giveVanillaRecipeResults(
@@ -287,7 +288,7 @@ internal class CraftUI(
         val min: Int = view.materials.values.minOf { it.amount }
         val decrementAmount: Int = if (shiftUsed) min else 1
 
-        Callable {
+        InternalAPI.foliaLib.scheduler.runAtEntity(player) {
             bakedDesigner.craftSlots()
                 .filter { c -> this.inventory.getItem(c.toIndex())?.takeIf { item -> !item.type.isEmpty } != null }
                 .forEach { c ->
@@ -298,7 +299,7 @@ internal class CraftUI(
             if (!item.type.isAir) {
                 player.giveItems(saveLimit = true, item)
             }
-        }.fromBukkitMainThread()
+        }
     }
 
     override fun getInventory(): Inventory = this.inventory

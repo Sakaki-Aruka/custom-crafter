@@ -1,5 +1,11 @@
 # Changelog
 
+# 5.0.20
+
+## ✨ New Features and Enhancements
+* **[Enhancement]** Async interruption support
+* **[Enhancement]** Faster rendering in AllCandidateUI
+
 # 5.0.19
 
 ## ✨ New Features and Enhancements

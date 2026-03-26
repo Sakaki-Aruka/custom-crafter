@@ -37,9 +37,8 @@ jobs:
         id: check_collision
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ steps.get_version.outputs.VERSION }}
         run: |
-          TAG_NAME="${{ steps.get_version.outputs.VERSION }}"
-
           if git ls-remote --heads origin "$TAG_NAME" | grep -q "$TAG_NAME"; then
             echo "::error::Branch name collision detected! A branch named '$TAG_NAME' already exists."
             echo "Please delete the branch '$TAG_NAME' manually or update the version in pom.xml."
@@ -51,9 +50,9 @@ jobs:
       - name: Create Release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG_NAME: ${{ steps.get_version.outputs.VERSION }}
         run: |
-          mvn -pl api clean install && mvn -pl demo clean package
-          TAG_NAME="${{ steps.get_version.outputs.VERSION }}"
+          mvn -pl api clean install -ntp && mvn -pl demo clean package -ntp
           
           cat <<EOF > release-note
           **This release is accompanied by two attached files.**  

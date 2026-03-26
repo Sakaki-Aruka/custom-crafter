@@ -22,6 +22,7 @@ import org.bukkit.event.inventory.InventoryAction
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.event.inventory.InventoryType
+import org.bukkit.event.Event
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.inventory.ItemStack
 import org.junit.jupiter.api.AfterEach
@@ -35,6 +36,7 @@ import org.mockbukkit.mockbukkit.entity.PlayerMock
 import org.mockbukkit.mockbukkit.scheduler.BukkitSchedulerMock
 import org.mockbukkit.mockbukkit.world.WorldMock
 import java.time.Duration
+import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 
@@ -46,7 +48,6 @@ internal object CraftUITest {
         server = MockBukkit.mock()
         server.addWorld(WorldMock())
         server.addPlayer()
-        InternalAPI.scheduler(server)
 
         server.worlds.first().let { world ->
             val base = world.getBlockAt(0, 64, 0)
@@ -310,48 +311,48 @@ internal object CraftUITest {
 //        CustomCrafterAPI.unregisterAllRecipes()
 //    }
 //
-//    @Test
-//    fun grabBlankSlotsIgnoreTest() {
-//        val player = server.getPlayer(0)
-//        val ui = CraftUI(caller = player)
-//        player.openInventory(ui.inventory)
-//
-//        assertTrue(
-//            ui.bakedDesigner.blankSlots.all { c ->
-//                val event = InventoryClickEvent(
-//                    player.openInventory,
-//                    InventoryType.SlotType.CONTAINER,
-//                    c.key.toIndex(),
-//                    ClickType.SHIFT_RIGHT,
-//                    InventoryAction.NOTHING
-//                )
-//                ui.onClick(clicked = ui.inventory, event = event)
-//                event.isCancelled
-//            }
-//        )
-//    }
-//
-//    @Test
-//    fun avoidToPlaceItemsOnTheResultSlotTest() {
-//        val player = server.getPlayer(0)
-//        val ui = CraftUI(caller = player)
-//        player.openInventory(ui.inventory)
-//
-//        player.setItemOnCursor(ItemStack.of(Material.STONE))
-//
-//        ui.onClick(
-//            clicked = ui.inventory,
-//            event = InventoryClickEvent(
-//                player.openInventory,
-//                InventoryType.SlotType.CONTAINER,
-//                ui.bakedDesigner.resultInt(),
-//                ClickType.LEFT,
-//                InventoryAction.PLACE_ONE
-//            )
-//        )
-//
-//        assertTrue(ui.inventory.getItem(ui.bakedDesigner.resultInt())?.type?.isAir ?: true)
-//    }
+    @Test
+    fun grabBlankSlotsIgnoreTest() {
+        val player = server.getPlayer(0)
+        val ui = CraftUI(caller = player)
+        player.openInventory(ui.inventory)
+
+        assertTrue(
+            ui.bakedDesigner.blankSlots.all { c ->
+                val event = InventoryClickEvent(
+                    player.openInventory,
+                    InventoryType.SlotType.CONTAINER,
+                    c.key.toIndex(),
+                    ClickType.SHIFT_RIGHT,
+                    InventoryAction.NOTHING
+                )
+                ui.onClick(clicked = ui.inventory, event = event)
+                event.isCancelled
+            }
+        )
+    }
+
+    @Test
+    fun avoidToPlaceItemsOnTheResultSlotTest() {
+        val player = server.getPlayer(0)
+        val ui = CraftUI(caller = player)
+        player.openInventory(ui.inventory)
+
+        player.setItemOnCursor(ItemStack.of(Material.STONE))
+
+        ui.onClick(
+            clicked = ui.inventory,
+            event = InventoryClickEvent(
+                player.openInventory,
+                InventoryType.SlotType.CONTAINER,
+                ui.bakedDesigner.resultInt(),
+                ClickType.LEFT,
+                InventoryAction.PLACE_ONE
+            )
+        )
+
+        assertTrue(ui.inventory.getItem(ui.bakedDesigner.resultInt())?.type?.isAir ?: true)
+    }
 //
 //    @Test
 //    fun openAllCandidateUITest() {
@@ -382,72 +383,252 @@ internal object CraftUITest {
 //        CustomCrafterAPI.unregisterAllRecipes()
 //    }
 //
-//    @Test
-//    fun defaultDesignerHasValidBlankSlotsTest() {
-//        val baked = CraftUI().bakedDesigner
-//        assertEquals(16, baked.blankSlots.size)
-//        assertEquals(36, baked.craftSlots().size)
-//        assertTrue((0..<54).filter { it % 9 < 6 }.map { CoordinateComponent.fromIndex(it) }.containsAll(CraftUI().bakedDesigner.craftSlots()))
-//    }
-//
-//    @Test
-//    fun designerIsValidTest() {
-//        assertTrue(CraftUI().bakedDesigner.isValid().isSuccess)
-//    }
-//
-//    @Test
-//    fun toViewTest() {
-//        val ui = CraftUI()
-//        ui.inventory.setItem(0, ItemStack.of(Material.STONE))
-//
-//        assertEquals(1, ui.toView(noAir = true).materials.size)
-//        assertTrue(ui.toView(noAir = true).result.type.isAir)
-//    }
-//
-//    @Test
-//    fun uiOpenIgnoreByPermissionNotEnoughTest() {
-//        val player: Player = server.getPlayer(0)
-//        val plugin = MockBukkit.createMockPlugin()
-//
-//        player.addAttachment(plugin, "cc.craftui.click.open", false)
-//        val event = PlayerInteractEvent(
-//            player,
-//            Action.RIGHT_CLICK_BLOCK,
-//            null,
-//            server.worlds.first().getBlockAt(0, 64, 0),
-//            BlockFace.UP
-//        )
-//        assertFalse(CraftUI.isTrigger(event))
-//    }
-//
-//    @Test
-//    fun uiOpenSuccessWithValidPermissionTest() {
-//        val player: Player = server.getPlayer(0)
-//        val plugin = MockBukkit.createMockPlugin()
-//
-//        player.addAttachment(plugin, "cc.craftui.click.open", true)
-//        val event = PlayerInteractEvent(
-//            player,
-//            Action.RIGHT_CLICK_BLOCK,
-//            null,
-//            server.worlds.first().getBlockAt(0, 64, 0),
-//            BlockFace.UP
-//        )
-//        assertTrue(CraftUI.isTrigger(event))
-//    }
-//
-//    @Test
-//    fun uiCloseItemDropTest() {
-//        val player: PlayerMock = server.getPlayer(0)
-//        val ui = CraftUI(caller = player)
-//        player.openInventory(ui.inventory)
-//        ui.inventory.setItem(ui.bakedDesigner.craftSlots().first().toIndex(), ItemStack.of(Material.STONE))
-//        ui.inventory.setItem(ui.bakedDesigner.resultInt(), ItemStack.of(Material.DIRT))
-//        ui.onClose(InventoryCloseEvent(player.openInventory))
-//
-//        assertTrue(player.inventory.contains(Material.STONE))
-//        assertTrue(player.inventory.contains(Material.DIRT))
-//    }
+    @Test
+    fun isTriggerReturnsFalseWhenCustomCraftUIDisabledTest() {
+        CustomCrafterAPI.setUseCustomCraftUI(false)
+        try {
+            val player: Player = server.getPlayer(0)
+            val event = PlayerInteractEvent(
+                player,
+                Action.RIGHT_CLICK_BLOCK,
+                null,
+                server.worlds.first().getBlockAt(0, 64, 0),
+                BlockFace.UP
+            )
+            assertFalse(CraftUI.isTrigger(event))
+        } finally {
+            CustomCrafterAPI.setUseCustomCraftUIDefault()
+        }
+    }
+
+    @Test
+    fun isTriggerReturnsFalseForNonRightClickTest() {
+        val player: Player = server.getPlayer(0)
+        val event = PlayerInteractEvent(
+            player,
+            Action.LEFT_CLICK_BLOCK,
+            null,
+            server.worlds.first().getBlockAt(0, 64, 0),
+            BlockFace.UP
+        )
+        assertFalse(CraftUI.isTrigger(event))
+    }
+
+    @Test
+    fun isTriggerReturnsFalseWhenBlockIsNotCraftingTableTest() {
+        val player: Player = server.getPlayer(0)
+        server.worlds.first().getBlockAt(2, 64, 0).type = Material.STONE
+        val event = PlayerInteractEvent(
+            player,
+            Action.RIGHT_CLICK_BLOCK,
+            null,
+            server.worlds.first().getBlockAt(2, 64, 0),
+            BlockFace.UP
+        )
+        assertFalse(CraftUI.isTrigger(event))
+    }
+
+    @Test
+    fun isTriggerReturnsFalseWhenBaseBlockMissingTest() {
+        val player: Player = server.getPlayer(0)
+        server.worlds.first().getBlockAt(0, 63, 0).type = Material.AIR
+        val event = PlayerInteractEvent(
+            player,
+            Action.RIGHT_CLICK_BLOCK,
+            null,
+            server.worlds.first().getBlockAt(0, 64, 0),
+            BlockFace.UP
+        )
+        assertFalse(CraftUI.isTrigger(event))
+    }
+
+    @Test
+    fun allowPickupFromResultSlotTest() {
+        val player: PlayerMock = server.getPlayer(0)
+        val ui = CraftUI(caller = player)
+        player.openInventory(ui.inventory)
+        ui.inventory.setItem(ui.bakedDesigner.resultInt(), ItemStack.of(Material.STONE))
+
+        val event = InventoryClickEvent(
+            player.openInventory,
+            InventoryType.SlotType.CONTAINER,
+            ui.bakedDesigner.resultInt(),
+            ClickType.LEFT,
+            InventoryAction.PICKUP_ALL
+        )
+        ui.onClick(clicked = ui.inventory, event = event)
+
+        assertFalse(event.isCancelled)
+    }
+
+    @Test
+    fun craftSlotClickIsNotCancelledTest() {
+        val player: PlayerMock = server.getPlayer(0)
+        val ui = CraftUI(caller = player)
+        player.openInventory(ui.inventory)
+
+        val event = InventoryClickEvent(
+            player.openInventory,
+            InventoryType.SlotType.CONTAINER,
+            ui.bakedDesigner.craftSlots().first().toIndex(),
+            ClickType.LEFT,
+            InventoryAction.PICKUP_ONE
+        )
+        ui.onClick(clicked = ui.inventory, event = event)
+
+        assertFalse(event.isCancelled)
+    }
+
+    @Test
+    fun makeButtonClickWithEmptySlotsDoesNothingTest() {
+        val player: PlayerMock = server.getPlayer(0)
+        val ui = CraftUI(caller = player)
+        player.openInventory(ui.inventory)
+
+        val event = InventoryClickEvent(
+            player.openInventory,
+            InventoryType.SlotType.CONTAINER,
+            CraftUI.MAKE_BUTTON,
+            ClickType.LEFT,
+            InventoryAction.NOTHING
+        )
+        ui.onClick(clicked = ui.inventory, event = event)
+
+        assertTrue(event.isCancelled)
+        assertTrue(ui.bakedDesigner.craftSlots().all { c ->
+            ui.inventory.getItem(c.toIndex())?.type?.isAir ?: true
+        })
+    }
+
+    @Test
+    fun onPlayerInventoryClickNonMoveActionIsIgnoredTest() {
+        val player: PlayerMock = server.getPlayer(0)
+        val ui = CraftUI(caller = player)
+        player.openInventory(ui.inventory)
+
+        val event = InventoryClickEvent(
+            player.openInventory,
+            InventoryType.SlotType.CONTAINER,
+            54,
+            ClickType.LEFT,
+            InventoryAction.PICKUP_ONE
+        )
+        event.currentItem = ItemStack.of(Material.STONE)
+
+        ui.onPlayerInventoryClick(ui.inventory, event)
+
+        assertFalse(event.result == Event.Result.DENY)
+        assertTrue(ui.bakedDesigner.craftSlots().none { c ->
+            ui.inventory.getItem(c.toIndex())?.type == Material.STONE
+        })
+    }
+
+    @Test
+    fun onPlayerInventoryClickAirItemIsIgnoredTest() {
+        val player: PlayerMock = server.getPlayer(0)
+        val ui = CraftUI(caller = player)
+        player.openInventory(ui.inventory)
+
+        val event = InventoryClickEvent(
+            player.openInventory,
+            InventoryType.SlotType.CONTAINER,
+            54,
+            ClickType.SHIFT_LEFT,
+            InventoryAction.MOVE_TO_OTHER_INVENTORY
+        )
+        // currentItem is null/AIR (not set)
+
+        ui.onPlayerInventoryClick(ui.inventory, event)
+
+        assertFalse(event.result == Event.Result.DENY)
+    }
+
+    @Test
+    fun onCloseDoesNotDropItemsWhenDropOnCloseIsFalseTest() {
+        val player: PlayerMock = server.getPlayer(0)
+        val ui = CraftUI(dropOnClose = AtomicBoolean(false), caller = player)
+        player.openInventory(ui.inventory)
+        ui.inventory.setItem(ui.bakedDesigner.craftSlots().first().toIndex(), ItemStack.of(Material.STONE))
+        ui.onClose(InventoryCloseEvent(player.openInventory))
+
+        assertFalse(player.inventory.contains(Material.STONE))
+    }
+
+    @Test
+    fun toViewWithNoAirFalseIncludesAllCraftSlotsTest() {
+        val ui = CraftUI()
+        ui.inventory.setItem(0, ItemStack.of(Material.STONE))
+
+        val view = ui.toView(noAir = false)
+        assertEquals(36, view.materials.size)
+    }
+
+    @Test
+    fun defaultDesignerHasValidBlankSlotsTest() {
+        val baked = CraftUI().bakedDesigner
+        assertEquals(16, baked.blankSlots.size)
+        assertEquals(36, baked.craftSlots().size)
+        assertTrue((0..<54).filter { it % 9 < 6 }.map { CoordinateComponent.fromIndex(it) }.containsAll(CraftUI().bakedDesigner.craftSlots()))
+    }
+
+    @Test
+    fun designerIsValidTest() {
+        assertTrue(CraftUI().bakedDesigner.isValid().isSuccess)
+    }
+
+    @Test
+    fun toViewTest() {
+        val ui = CraftUI()
+        ui.inventory.setItem(0, ItemStack.of(Material.STONE))
+
+        assertEquals(1, ui.toView(noAir = true).materials.size)
+        assertTrue(ui.toView(noAir = true).result.type.isAir)
+    }
+
+    @Test
+    fun uiOpenIgnoreByPermissionNotEnoughTest() {
+        val player: Player = server.getPlayer(0)
+        val plugin = MockBukkit.createMockPlugin()
+
+        player.addAttachment(plugin, "cc.craftui.click.open", false)
+        val event = PlayerInteractEvent(
+            player,
+            Action.RIGHT_CLICK_BLOCK,
+            null,
+            server.worlds.first().getBlockAt(0, 64, 0),
+            BlockFace.UP
+        )
+        assertFalse(CraftUI.isTrigger(event))
+    }
+
+    @Test
+    fun uiOpenSuccessWithValidPermissionTest() {
+        val player: Player = server.getPlayer(0)
+        val plugin = MockBukkit.createMockPlugin()
+
+        player.addAttachment(plugin, "cc.craftui.click.open", true)
+        val event = PlayerInteractEvent(
+            player,
+            Action.RIGHT_CLICK_BLOCK,
+            null,
+            server.worlds.first().getBlockAt(0, 64, 0),
+            BlockFace.UP
+        )
+        assertTrue(CraftUI.isTrigger(event))
+    }
+
+    @Test
+    fun uiCloseItemDropTest() {
+        val player: PlayerMock = server.getPlayer(0)
+        val ui = CraftUI(caller = player)
+        player.openInventory(ui.inventory)
+        ui.inventory.setItem(ui.bakedDesigner.craftSlots().first().toIndex(), ItemStack.of(Material.STONE))
+        ui.inventory.setItem(ui.bakedDesigner.resultInt(), ItemStack.of(Material.DIRT))
+        ui.onClose(InventoryCloseEvent(player.openInventory))
+
+        assertTrue(player.inventory.contains(Material.STONE))
+        assertTrue(player.inventory.contains(Material.DIRT))
+    }
 //
 //    @Test
 //    fun vanillaRecipeSingleCraftTest() {

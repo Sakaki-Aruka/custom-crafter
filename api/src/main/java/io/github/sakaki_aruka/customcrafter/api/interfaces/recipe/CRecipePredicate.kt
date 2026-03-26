@@ -1,5 +1,6 @@
 package io.github.sakaki_aruka.customcrafter.api.interfaces.recipe
 
+import io.github.sakaki_aruka.customcrafter.api.objects.AsyncContext
 import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import java.util.UUID
@@ -19,7 +20,7 @@ fun interface CRecipePredicate {
      * @param[crafterID] Crafter UUID
      * @param[recipe] Recipe
      * @param[relation] Pre-result of inspection
-     * @param[isAsync] Called from async or not (default = false)
+     * @param[asyncContext] Async context (since 5.0.20)
      * @since 5.0.17
      */
     class Context @JvmOverloads constructor(
@@ -27,16 +28,37 @@ fun interface CRecipePredicate {
         val crafterID: UUID,
         val recipe: CRecipe,
         val relation: MappedRelation,
-        val isAsync: Boolean = false
+        val asyncContext: AsyncContext? = null
     ) {
+        /**
+         * Returns whether this inspection is async.
+         * @return[Boolean] Async or not
+         * @since 5.0.20
+         */
+        fun isAsync(): Boolean = asyncContext == null
+
+        /**
+         * If no async context exists, returns a newly added one.
+         * @return[CRecipePredicate.Context] Modified context
+         * @since 5.0.20
+         */
+        fun toAsync(): Context {
+            return if (isAsync()) {
+                this
+            } else {
+                copyWith(AsyncContext.ofTurnOff())
+            }
+        }
+
         /**
          * Copy with a given parameter
          * @param[isAsync] Called async or not
          * @return[CRecipePredicate.Context] Modified context
          * @since 5.0.17
          */
-        fun copyWith(isAsync: Boolean): Context {
-            return Context(input, crafterID, recipe, relation, isAsync)
+        fun copyWith(asyncContext: AsyncContext? = null): Context {
+            val newAsyncContext = asyncContext ?: this.asyncContext
+            return Context(input, crafterID, recipe, relation, newAsyncContext)
         }
     }
 

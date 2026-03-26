@@ -562,7 +562,7 @@ internal object SearchTest {
             result = ItemStack.empty()
         )
 
-        val future: CompletableFuture<Search.SearchResult> = Search.asyncSearch(crafterID = UUID.randomUUID(), view, listOf(recipe))
+        val future: CompletableFuture<Search.SearchResult> = Search.asyncSearch(crafterID = UUID.randomUUID(), view, sourceRecipes = listOf(recipe))
         val result = future.get()
 
         assertEquals(1, result.size())
@@ -591,12 +591,48 @@ internal object SearchTest {
         val times = 1000
         val list = (0..<times).map { recipe }
 
-        val future: CompletableFuture<Search.SearchResult> = Search.asyncSearch(crafterID = UUID.randomUUID(), view, list)
+        val future: CompletableFuture<Search.SearchResult> = Search.asyncSearch(crafterID = UUID.randomUUID(), view, sourceRecipes = list)
         var result: Search.SearchResult
 
         println("time: ${measureTimeMillis { result = future.get() }} ms")
 
         assertEquals(times, result.size())
         assertEquals(times, result.customs().size)
+    }
+
+    @Test
+    fun searchModeTest() {
+        val matter = CMatterImpl.of(Material.STONE)
+        val recipe = CRecipeImpl(
+            "",
+            CoordinateComponent.squareFill(6).associateWith { matter },
+            type = CRecipe.Type.SHAPELESS
+        )
+
+        val view = CraftView(
+            materials = CoordinateComponent.squareFill(6).associateWith { ItemStack.of(Material.STONE) },
+            result = ItemStack.empty()
+        )
+
+        val times = 1000
+        val list = List(times) { recipe }
+
+        val onlyFirst = Search.asyncSearch(
+            crafterID = UUID.randomUUID(),
+            view,
+            sourceRecipes = list,
+            query = Search.SearchQuery(Search.SearchQuery.SearchMode.ONLY_FIRST, Search.SearchQuery.DEFAULT.vanillaSearchMode)
+        ).get()
+
+        assertEquals(1, onlyFirst.size())
+
+        val all = Search.asyncSearch(
+            crafterID = UUID.randomUUID(),
+            view = view,
+            sourceRecipes = list,
+            query = Search.SearchQuery(Search.SearchQuery.SearchMode.ALL, Search.SearchQuery.DEFAULT.vanillaSearchMode)
+        ).get()
+
+        assertEquals(1000, all.size())
     }
 }
