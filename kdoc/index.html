@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+    <title>Custom_Crafter</title>
+    <link href="images/logo-icon.svg" rel="icon" type="image/svg">
+        <script>var pathToRoot = "";</script>
+    <script>document.documentElement.classList.replace("no-js", "js");</script>
+    <script>const storage = localStorage.getItem("dokka-dark-mode")
+      if (storage == null) {
+        const osDarkSchemePreferred = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+        if (osDarkSchemePreferred === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      } else {
+        const savedDarkMode = JSON.parse(storage)
+        if (savedDarkMode === true) {
+          document.getElementsByTagName("html")[0].classList.add("theme-dark")
+        }
+      }
+    </script>
+<script type="text/javascript" src="https://unpkg.com/kotlin-playground@1/dist/playground.min.js" async="async"></script>
+<script type="text/javascript" src="scripts/sourceset_dependencies.js" async="async"></script>
+<link href="styles/style.css" rel="Stylesheet">
+<link href="styles/main.css" rel="Stylesheet">
+<link href="styles/prism.css" rel="Stylesheet">
+<link href="styles/logo-styles.css" rel="Stylesheet">
+<link href="ui-kit/ui-kit.min.css" rel="Stylesheet">
+<script type="text/javascript" src="scripts/safe-local-storage_blocking.js"></script>
+<script type="text/javascript" src="scripts/navigation-loader.js" async="async"></script>
+<script type="text/javascript" src="scripts/platform-content-handler.js" async="async"></script>
+<script type="text/javascript" src="scripts/main.js" defer="defer"></script>
+<script type="text/javascript" src="scripts/prism.js" async="async"></script>
+<script type="text/javascript" src="ui-kit/ui-kit.min.js" defer="defer"></script>
+</head>
+<body>
+<div class="root">
+    <header class="navigation theme-dark" id="navigation-wrapper" role="banner">
+            <a class="library-name--link" href="index.html" tabindex="1">
+                    Custom_Crafter
+            </a>
+        <button class="navigation-controls--btn navigation-controls--btn_toc ui-kit_mobile-only" id="toc-toggle"
+                type="button">Toggle table of contents
+        </button>
+        <div class="navigation-controls--break ui-kit_mobile-only"></div>
+        <div class="library-version" id="library-version">
+        </div>
+        <div class="navigation-controls">
+        <ul class="filter-section filter-section_loading" id="filter-section" aria-label="Target filter">
+                <button class="platform-tag platform-selector jvm-like" data-active="" aria-pressed="true"
+                        data-filter="Custom_Crafter/JVM">JVM</button>
+            <div class="dropdown filter-section--dropdown" data-role="dropdown" id="filter-section-dropdown">
+                <button class="button button_dropdown filter-section--dropdown-toggle" role="combobox"
+                        data-role="dropdown-toggle"
+                        aria-controls="platform-tags-listbox"
+                        aria-haspopup="listbox"
+                        aria-expanded="false"
+                        aria-label="Toggle source sets"
+                ></button>
+                <ul role="listbox" id="platform-tags-listbox" class="dropdown--list" data-role="dropdown-listbox" aria-label="Target filter">
+                    <div class="dropdown--header"><span>Target filter</span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close target filter">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                        <li role="option" class="dropdown--option platform-selector-option jvm-like" tabindex="0">
+                            <label class="checkbox">
+                                <input type="checkbox" class="checkbox--input" id="Custom_Crafter/JVM"
+                                       data-filter="Custom_Crafter/JVM"/>
+                                <span class="checkbox--icon"></span>
+                                JVM
+                            </label>
+                        </li>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </ul>
+            <button class="navigation-controls--btn navigation-controls--btn_theme" id="theme-toggle-button"
+                    type="button">Switch theme
+            </button>
+            <div class="navigation-controls--btn navigation-controls--btn_search" id="searchBar" role="button">Search in
+                API
+            </div>
+        </div>
+    </header>
+    <div id="container">
+        <nav id="leftColumn" class="sidebar" data-item-type="SECTION" data-item-config='{"defaultSize": 280, "minSize": 200, "maxSize": 400}'>
+            <a class="toc--skip-link" href="#main">Skip to content</a>
+            <div class="dropdown theme-dark_mobile" data-role="dropdown" id="toc-dropdown">
+                <ul role="listbox" id="toc-listbox" class="dropdown--list dropdown--list_toc-list"
+                    data-role="dropdown-listbox" aria-label="Table of contents">
+                    <div class="dropdown--header">
+                            <span>
+                                    Custom_Crafter
+                            </span>
+                        <button class="button" data-role="dropdown-toggle" aria-label="Close table of contents">
+                            <i class="ui-kit-icon ui-kit-icon_cross"></i>
+                        </button>
+                    </div>
+                    <div class="sidebar--inner" id="sideMenu"></div>
+                </ul>
+                <div class="dropdown--overlay"></div>
+            </div>
+        </nav>
+        <div id="resizer" class="resizer" data-item-type="BAR"></div>
+        <div id="main" data-item-type="SECTION" role="main">
+<div class="main-content" id="content" pageIds="Custom_Crafter::////PointingToDeclaration//1867371069">
+  <div class="breadcrumbs"></div>
+  <div class="cover ">
+    <h1 class="cover"><span>Custom_</span><wbr></wbr><span>Crafter</span></h1>
+    <div class="platform-hinted UnderCoverText" data-platform-hinted="data-platform-hinted"><div class="content sourceset-dependent-content" data-active="" data-togglable="Custom_Crafter/JVM"><h2 class="">Custom_Crafter (5.0.20) KDoc Top</h2><p class="paragraph">Welcome to Custom_Crafter official document top page !<br>List of elements</p><ul><li><p class="paragraph">api package</p></li><ul><li><p class="paragraph"><code class="lang-kotlin">api.event</code>: Custom_Crafter events</p></li><li><p class="paragraph"><code class="lang-kotlin">api.interfaces</code>: CMatter, CRecipe and more interfaces</p></li><li><p class="paragraph"><code class="lang-kotlin">api.objects</code>: Elements of CMatter and CRecipe</p></li></ul><li><p class="paragraph">impl package</p></li><ul><li><p class="paragraph"><code class="lang-kotlin">impl.matter</code>: Default CMatter implementation classes</p></li><li><p class="paragraph"><code class="lang-kotlin">impl.recipe</code>: Default CRecipe implementation classes and CRecipeFilter implementations</p></li><li><p class="paragraph"><code class="lang-kotlin">impl.result</code>: Default ResultSupplier implementation class</p></li><li><p class="paragraph"><code class="lang-kotlin">impl.util</code>: public utilities</p></li></ul></ul><h2 class="">Acknowledgement</h2><h3 class="">choco-solver</h3><p class="paragraph">This product includes software developed by the IMT Atlantique.</p></div></div>
+  </div>
+  <h2 class="">Packages</h2>
+  <div class="table"><a data-name="189628496%2FPackages%2F1867371069" anchor-label="io.github.sakaki_aruka.customcrafter" id="189628496%2FPackages%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+    <div class="table-row table-row_platform-tagged" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-custom_-crafter/io.github.sakaki_aruka.customcrafter/index.html">io.github.sakaki_aruka.customcrafter</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="189628496%2FPackages%2F1867371069"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right platform-tags--wrapper">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">JVM</div>
+            </div>
+          </div>
+        </div>
+        <div><span class="brief-comment"><a data-name="189628496%2FPackages%2F1867371069" anchor-label="io.github.sakaki_aruka.customcrafter" id="189628496%2FPackages%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+            <p class="paragraph">CustomCrafterAPI is here.</p>
+          </span></div>
+      </div>
+    </div>
+<a data-name="1978122792%2FPackages%2F1867371069" anchor-label="io.github.sakaki_aruka.customcrafter.api.event" id="1978122792%2FPackages%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+    <div class="table-row table-row_platform-tagged" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-custom_-crafter/io.github.sakaki_aruka.customcrafter.api.event/index.html">io.github.sakaki_aruka.customcrafter.api.event</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1978122792%2FPackages%2F1867371069"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right platform-tags--wrapper">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">JVM</div>
+            </div>
+          </div>
+        </div>
+        <div><span class="brief-comment"><a data-name="1978122792%2FPackages%2F1867371069" anchor-label="io.github.sakaki_aruka.customcrafter.api.event" id="1978122792%2FPackages%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+            <p class="paragraph">Custom_Crafter custom events</p>
+          </span></div>
+      </div>
+    </div>
+<a data-name="-4728157%2FPackages%2F1867371069" anchor-label="io.github.sakaki_aruka.customcrafter.api.interfaces.matter" id="-4728157%2FPackages%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+    <div class="table-row table-row_platform-tagged" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-custom_-crafter/io.github.sakaki_aruka.customcrafter.api.interfaces.matter/index.html">io.github.sakaki_aruka.customcrafter.api.interfaces.matter</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-4728157%2FPackages%2F1867371069"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right platform-tags--wrapper">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">JVM</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-1706853584%2FPackages%2F1867371069" anchor-label="io.github.sakaki_aruka.customcrafter.api.interfaces.recipe" id="-1706853584%2FPackages%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+    <div class="table-row table-row_platform-tagged" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-custom_-crafter/io.github.sakaki_aruka.customcrafter.api.interfaces.recipe/index.html">io.github.sakaki_aruka.customcrafter.api.interfaces.recipe</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1706853584%2FPackages%2F1867371069"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right platform-tags--wrapper">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">JVM</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="759744767%2FPackages%2F1867371069" anchor-label="io.github.sakaki_aruka.customcrafter.api.interfaces.result" id="759744767%2FPackages%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+    <div class="table-row table-row_platform-tagged" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-custom_-crafter/io.github.sakaki_aruka.customcrafter.api.interfaces.result/index.html">io.github.sakaki_aruka.customcrafter.api.interfaces.result</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="759744767%2FPackages%2F1867371069"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right platform-tags--wrapper">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">JVM</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-1957070666%2FPackages%2F1867371069" anchor-label="io.github.sakaki_aruka.customcrafter.api.interfaces.ui" id="-1957070666%2FPackages%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+    <div class="table-row table-row_platform-tagged" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-custom_-crafter/io.github.sakaki_aruka.customcrafter.api.interfaces.ui/index.html">io.github.sakaki_aruka.customcrafter.api.interfaces.ui</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-1957070666%2FPackages%2F1867371069"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right platform-tags--wrapper">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">JVM</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="1438151970%2FPackages%2F1867371069" anchor-label="io.github.sakaki_aruka.customcrafter.api.objects" id="1438151970%2FPackages%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+    <div class="table-row table-row_platform-tagged" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-custom_-crafter/io.github.sakaki_aruka.customcrafter.api.objects/index.html">io.github.sakaki_aruka.customcrafter.api.objects</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1438151970%2FPackages%2F1867371069"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right platform-tags--wrapper">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">JVM</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-40994308%2FPackages%2F1867371069" anchor-label="io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant" id="-40994308%2FPackages%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+    <div class="table-row table-row_platform-tagged" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-custom_-crafter/io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant/index.html">io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-40994308%2FPackages%2F1867371069"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right platform-tags--wrapper">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">JVM</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="1197259412%2FPackages%2F1867371069" anchor-label="io.github.sakaki_aruka.customcrafter.api.objects.matter.potion" id="1197259412%2FPackages%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+    <div class="table-row table-row_platform-tagged" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-custom_-crafter/io.github.sakaki_aruka.customcrafter.api.objects.matter.potion/index.html">io.github.sakaki_aruka.customcrafter.api.objects.matter.potion</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1197259412%2FPackages%2F1867371069"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right platform-tags--wrapper">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">JVM</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="-470442786%2FPackages%2F1867371069" anchor-label="io.github.sakaki_aruka.customcrafter.api.objects.recipe" id="-470442786%2FPackages%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+    <div class="table-row table-row_platform-tagged" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-custom_-crafter/io.github.sakaki_aruka.customcrafter.api.objects.recipe/index.html">io.github.sakaki_aruka.customcrafter.api.objects.recipe</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-470442786%2FPackages%2F1867371069"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right platform-tags--wrapper">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">JVM</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="996605662%2FPackages%2F1867371069" anchor-label="io.github.sakaki_aruka.customcrafter.api.search" id="996605662%2FPackages%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+    <div class="table-row table-row_platform-tagged" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-custom_-crafter/io.github.sakaki_aruka.customcrafter.api.search/index.html">io.github.sakaki_aruka.customcrafter.api.search</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="996605662%2FPackages%2F1867371069"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right platform-tags--wrapper">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">JVM</div>
+            </div>
+          </div>
+        </div>
+        <div><span class="brief-comment"><a data-name="996605662%2FPackages%2F1867371069" anchor-label="io.github.sakaki_aruka.customcrafter.api.search" id="996605662%2FPackages%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+            <p class="paragraph">Search functions</p>
+          </span></div>
+      </div>
+    </div>
+<a data-name="-791619215%2FPackages%2F1867371069" anchor-label="io.github.sakaki_aruka.customcrafter.impl.matter" id="-791619215%2FPackages%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+    <div class="table-row table-row_platform-tagged" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-custom_-crafter/io.github.sakaki_aruka.customcrafter.impl.matter/index.html">io.github.sakaki_aruka.customcrafter.impl.matter</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-791619215%2FPackages%2F1867371069"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right platform-tags--wrapper">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">JVM</div>
+            </div>
+          </div>
+        </div>
+        <div><span class="brief-comment"><a data-name="-791619215%2FPackages%2F1867371069" anchor-label="io.github.sakaki_aruka.customcrafter.impl.matter" id="-791619215%2FPackages%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+            <p class="paragraph">Default CMatter implementations</p>
+          </span></div>
+      </div>
+    </div>
+<a data-name="1532376860%2FPackages%2F1867371069" anchor-label="io.github.sakaki_aruka.customcrafter.impl.matter.enchant" id="1532376860%2FPackages%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+    <div class="table-row table-row_platform-tagged" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-custom_-crafter/io.github.sakaki_aruka.customcrafter.impl.matter.enchant/index.html">io.github.sakaki_aruka.customcrafter.impl.matter.enchant</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1532376860%2FPackages%2F1867371069"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right platform-tags--wrapper">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">JVM</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="555276660%2FPackages%2F1867371069" anchor-label="io.github.sakaki_aruka.customcrafter.impl.matter.potion" id="555276660%2FPackages%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+    <div class="table-row table-row_platform-tagged" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-custom_-crafter/io.github.sakaki_aruka.customcrafter.impl.matter.potion/index.html">io.github.sakaki_aruka.customcrafter.impl.matter.potion</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="555276660%2FPackages%2F1867371069"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right platform-tags--wrapper">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">JVM</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+<a data-name="1801222654%2FPackages%2F1867371069" anchor-label="io.github.sakaki_aruka.customcrafter.impl.recipe" id="1801222654%2FPackages%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+    <div class="table-row table-row_platform-tagged" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-custom_-crafter/io.github.sakaki_aruka.customcrafter.impl.recipe/index.html">io.github.sakaki_aruka.customcrafter.impl.recipe</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="1801222654%2FPackages%2F1867371069"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right platform-tags--wrapper">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">JVM</div>
+            </div>
+          </div>
+        </div>
+        <div><span class="brief-comment"><a data-name="1801222654%2FPackages%2F1867371069" anchor-label="io.github.sakaki_aruka.customcrafter.impl.recipe" id="1801222654%2FPackages%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+            <p class="paragraph">Default CRecipe and CRecipeFilter implementations</p>
+          </span></div>
+      </div>
+    </div>
+<a data-name="-800778510%2FPackages%2F1867371069" anchor-label="io.github.sakaki_aruka.customcrafter.impl.util" id="-800778510%2FPackages%2F1867371069" data-filterable-set="Custom_Crafter/JVM"></a>
+    <div class="table-row table-row_platform-tagged" data-filterable-current="Custom_Crafter/JVM" data-filterable-set="Custom_Crafter/JVM">
+      <div>
+        <div class="main-subrow ">
+          <div class=""><span class="inline-flex">
+              <div><a href="-custom_-crafter/io.github.sakaki_aruka.customcrafter.impl.util/index.html">io.github.sakaki_aruka.customcrafter.impl.util</a></div>
+<span class="anchor-wrapper"><span class="anchor-icon" pointing-to="-800778510%2FPackages%2F1867371069"></span>
+                <div class="copy-popup-wrapper "><span class="copy-popup-icon"></span><span>Link copied to clipboard</span></div>
+              </span></span></div>
+          <div class="pull-right platform-tags--wrapper">
+            <div class="platform-tags no-gutters">
+              <div class="platform-tag jvm-like">JVM</div>
+            </div>
+          </div>
+        </div>
+        <div></div>
+      </div>
+    </div>
+  </div>
+</div>
+    <div class="footer">
+        <div class="footer--container">
+            <a href="#content" id="go-to-top-link" class="footer--button footer--button_go-to-top"></a>
+            <div class="footer--content">
+                <div>
+                    <span>Generated by </span>
+                    <a class="footer--link footer--link_external" href="https://github.com/Kotlin/dokka">
+                        Dokka
+                    </a>
+                    <div>© 2026 Copyright</div>
+                </div>
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>
