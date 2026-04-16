@@ -64,6 +64,7 @@ internal class AllCandidateUI(
                     }
 
                     val asyncContext = AsyncContext.ofTurnOff()
+                    asyncContextReferences.add(asyncContext)
                     val context = ResultSupplier.Context(
                         recipe = recipe,
                         relation = relation ?: MappedRelation(emptySet()),
@@ -258,8 +259,8 @@ internal class AllCandidateUI(
                     )
                     val results: List<ItemStack> = recipe.asyncGetResults(resultSupplierContext).get()
 
-                    InternalAPI.foliaLib.scheduler.runAtEntity(player) {
-                        CreateCustomItemEvent(player, this.view, this.result, event.isShiftClick, isAsync = false).callEvent()
+                    InternalAPI.foliaLib.scheduler.runAtEntity(player) { task ->
+                        CreateCustomItemEvent(player, this.view, this.result, event.isShiftClick, isAsync = task.isAsync).callEvent()
                     }
 
                     InternalAPI.foliaLib.scheduler.runAtEntity(player) {
