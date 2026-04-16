@@ -110,7 +110,7 @@ internal class AllCandidateUI(
                     }
                 }
             }
-        }
+        }.get()
     }
 
     companion object {
@@ -259,13 +259,13 @@ internal class AllCandidateUI(
                     )
                     val results: List<ItemStack> = recipe.asyncGetResults(resultSupplierContext).get()
 
-                    InternalAPI.foliaLib.scheduler.runAtEntity(player) { task ->
-                        CreateCustomItemEvent(player, this.view, this.result, event.isShiftClick, isAsync = task.isAsync).callEvent()
-                    }
+                    InternalAPI.foliaLib.scheduler.runAtEntity(player) {
+                        CreateCustomItemEvent(player, this.view, this.result, event.isShiftClick, isAsync = false).callEvent()
+                    }.get()
 
                     InternalAPI.foliaLib.scheduler.runAtEntity(player) {
                         player.giveItems(saveLimit = true, *results.toTypedArray())
-                    }
+                    }.get()
                 }, InternalAPI.executor)
 
                 if (!this.view.result.isEmpty) {

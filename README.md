@@ -45,7 +45,7 @@ The jar file, which can be placed in the server's plugins directory, will be cre
 
 | Custom_Crafter Version | Paper Version        |
 |:-----------------------|:---------------------|
-| **5.0.20 (Latest)**    | **1.21.4 ~ 1.21.11** |
+| **5.0.20-p1 (Latest)** | **1.21.4 ~ 1.21.11** |
 | 5.0.13 ~ 5.0.19        | 1.21.4 ~ 1.21.11     |
 | 5.0.0 ~ 5.0.11         | 1.21.3               |
 | 4.3 (Legacy)           | 1.21.3               |
@@ -83,7 +83,7 @@ depend:
 
 ---
 
-Latest Version: 5.0.20 [Maven Central (versions)](https://central.sonatype.com/artifact/io.github.sakaki-aruka/custom-crafter-api/versions)  
+Latest Version: 5.0.20-p1 [Maven Central (versions)](https://central.sonatype.com/artifact/io.github.sakaki-aruka/custom-crafter-api/versions)  
 
 When using the API, you must assume the CustomCrafter plugin will be present at runtime. Therefore, set the scope to **compile-time only**.  
 Also, if you are creating plugins in Kotlin, please set the Kotlin-stdlib dependency to "compile-time only".  
@@ -101,7 +101,7 @@ From Maven Central
 <dependency>
     <groupId>io.github.sakaki-aruka</groupId>
     <artifactId>custom-crafter-api</artifactId>
-    <version>5.0.20</version>
+    <version>5.0.20-p1</version>
     <scope>provided</scope>
 </dependency>
 
@@ -121,7 +121,7 @@ From Maven Central
 ```groovy
 dependencies {
     // CustomCrafterAPI Dependency
-    compileOnly 'io.github.sakaki-aruka:custom-crafter-api:5.0.20'
+    compileOnly 'io.github.sakaki-aruka:custom-crafter-api:5.0.20-p1'
     
     // kotlin-stdlib Dependency (If you needed)
     compileOnly 'org.jetbrains.kotlin:kotlin-stdlib:2.3.0'
@@ -135,7 +135,7 @@ dependencies {
 ```Kotlin
 dependencies {
     // CustomCrafterAPI Dependency
-    compileOnly("io.github.sakaki-aruka:custom-crafter-api:5.0.20")
+    compileOnly("io.github.sakaki-aruka:custom-crafter-api:5.0.20-p1")
     
     // kotlin-stdlib Dependency (If you needed)
     compileOnly("org.jetbrains.kotlin:kotlin-stdlib:2.3.0")
@@ -176,7 +176,7 @@ Example code to check if the CustomCrafterAPI version your plugin depends on is 
  */
 class YourPlugin: JavaPlugin() {
     // Define the dependent API version as a constant
-    const val DEPEND_API_VERSION = "5.0.20"
+    const val DEPEND_API_VERSION = "5.0.20-p1"
     
     @Override
     fun onEnable() {
