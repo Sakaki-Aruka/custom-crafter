@@ -1,5 +1,10 @@
 # Changelog
 
+# 5.0.20-p1
+
+## 🛠 Fix
+* Fixed FoliaLib scheduler tasks not awaiting `CompletableFuture` completion (added `.get()` calls in `AllCandidateUI` and `CraftUI`)
+
 # 5.0.20
 
 ## ✨ New Features and Enhancements
