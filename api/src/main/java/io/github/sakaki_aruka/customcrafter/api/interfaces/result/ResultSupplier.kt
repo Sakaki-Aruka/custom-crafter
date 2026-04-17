@@ -65,7 +65,7 @@ fun interface ResultSupplier {
      * @param[mapped] Coordinates and input items mapping
      * @param[shiftClicked] Shift-clicked or not
      * @param[calledTimes] Calculated minimum amount with [CMatter.amount]
-     * @param[isMultipleDisplayCall] `invoke` called from multiple result display item collector or not
+     * @param[callMode] Indicates whether this invocation is a real craft or an icon generation for display (since 5.0.21)
      * @param[asyncContext] Async context (since 5.0.20)
      */
     class Context @JvmOverloads constructor(
@@ -75,9 +75,23 @@ fun interface ResultSupplier {
         val shiftClicked: Boolean,
         val calledTimes: Int,
         val crafterID: UUID,
-        val isMultipleDisplayCall: Boolean,
+        val callMode: CallMode,
         val asyncContext: AsyncContext? = null
     ) {
+
+        /**
+         * Indicates the purpose of a [supply] invocation.
+         *
+         * - [CRAFT]: The player performed an actual craft. Items should be delivered normally.
+         * - [ICON]: The result is used only as a display icon (e.g. in AllCandidate feature).
+         *   Heavy computation may be skipped; the returned items are not given to the player.
+         *
+         * @since 5.0.21
+         */
+        enum class CallMode {
+            CRAFT,
+            ICON
+        }
         /**
          * Copy with a given parameter.
          *
@@ -86,7 +100,7 @@ fun interface ResultSupplier {
          * @since 5.0.20
          */
         fun copyWith(asyncContext: AsyncContext? = null): Context {
-            return Context(recipe, relation, mapped, shiftClicked, calledTimes, crafterID, isMultipleDisplayCall, asyncContext)
+            return Context(recipe, relation, mapped, shiftClicked, calledTimes, crafterID, callMode, asyncContext)
         }
 
         /**
@@ -107,6 +121,6 @@ fun interface ResultSupplier {
          * @return[Boolean] Async or not
          * @since 5.0.20
          */
-        fun isAsync(): Boolean = asyncContext == null
+        fun isAsync(): Boolean = asyncContext != null
     }
 }

@@ -9,7 +9,7 @@ import org.bukkit.Material
  * @param[name] Name of this matter
  * @param[candidate] Material candidate of this matter
  * @param[amount] Amount of this matter requires
- * @param[mass] Always requires 1 item on input
+ * @param[anyAmount] If `true`, any input amount ≥ 1 is accepted regardless of [amount]. If `false`, input must have at least [amount] items.
  * @param[predicates] List of lambda functions what runs on search process
  *
  * @see[CRecipe]
@@ -20,7 +20,7 @@ interface CMatter {
     val name: String
     val candidate: Set<Material>
     val amount: Int
-    val mass: Boolean
+    val anyAmount: Boolean
     val predicates: Collection<CMatterPredicate>?
 
     /**

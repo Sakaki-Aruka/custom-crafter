@@ -257,8 +257,7 @@ object Search {
      *
      * @param[crafterID] a crafter's UUID
      * @param[view] input crafting gui's view
-     * @param[forceSearchVanillaRecipe] Force to search vanilla recipes or not.(true=force, false=not). The default is true.
-     * @param[onlyFirst] get only first matched custom recipe and mapped. (default = false)
+     * @param[searchQuery] Query that controls search behaviour (search mode and vanilla search mode). (default = [SearchQuery.DEFAULT])
      * @param[sourceRecipes] A list of searched recipes. (default = CustomCrafterAPI.getRecipes() / since 5.0.10)
      * @return[SearchResult] A result of a request. If you send one that contains invalid params, returns null.
      * @throws[IllegalArgumentException] Throws when 'view.materials' is empty or their size out of range 1 to 36.
@@ -268,8 +267,7 @@ object Search {
     fun search(
         crafterID: UUID,
         view: CraftView,
-        forceSearchVanillaRecipe: Boolean = true,
-        onlyFirst: Boolean = false,
+        searchQuery: SearchQuery = SearchQuery.DEFAULT,
         sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes(),
     ): SearchResult {
         if (view.materials.isEmpty() || view.materials.size > 36) {
@@ -284,13 +282,13 @@ object Search {
                 CRecipe.Type.SHAPELESS -> shapeless(view, recipe, crafterID)
             }?.let { customs.add(recipe to it) }
 
-            if (onlyFirst && customs.isNotEmpty()) {
+            if (searchQuery.searchMode == SearchQuery.SearchMode.ONLY_FIRST && customs.isNotEmpty()) {
                 break
             }
         }
 
         val vanilla: Recipe? =
-            if (!forceSearchVanillaRecipe && customs.isNotEmpty()) null
+            if (searchQuery.vanillaSearchMode != SearchQuery.VanillaSearchMode.FORCE && customs.isNotEmpty()) null
             else {
                 val world: World = Bukkit.getPlayer(crafterID)
                     ?.world
@@ -325,9 +323,9 @@ object Search {
             }
 
             if (!input.type.isAir) {
-                if (matter.mass && input.amount < 1) {
+                if (matter.anyAmount && input.amount < 1) {
                     return null
-                } else if (!matter.mass && input.amount < matter.amount) {
+                } else if (!matter.anyAmount && input.amount < matter.amount) {
                     return null
                 }
             }
@@ -429,7 +427,7 @@ object Search {
             val set: MutableSet<Triple<Int, Boolean, Boolean>> = mutableSetOf()
             for ((i, item) in input.entries) {
                 val amountResult: Boolean =
-                    if (matter.mass) {
+                    if (matter.anyAmount) {
                         item.amount > 0
                     } else {
                         item.amount >= matter.amount

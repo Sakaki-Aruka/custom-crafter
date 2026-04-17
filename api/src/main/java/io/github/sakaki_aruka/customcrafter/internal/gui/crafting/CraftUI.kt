@@ -270,7 +270,7 @@ internal class CraftUI(
         }.get()
 
         val resultSupplierContext = ResultSupplier.Context(
-            recipe, relate, view.materials, shiftUsed, amount, player.uniqueId,false, asyncContext = AsyncContext.ofTurnOff()
+            recipe, relate, view.materials, shiftUsed, amount, player.uniqueId, ResultSupplier.Context.CallMode.CRAFT, asyncContext = AsyncContext.ofTurnOff()
         )
         val results: List<ItemStack> = recipe.asyncGetResults(resultSupplierContext).get()
 

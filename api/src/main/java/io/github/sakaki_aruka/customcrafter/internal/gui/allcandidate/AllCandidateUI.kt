@@ -71,7 +71,7 @@ internal class AllCandidateUI(
                         mapped = this.view.materials,
                         shiftClicked = useShift,
                         calledTimes = 1,
-                        isMultipleDisplayCall = true,
+                        callMode = ResultSupplier.Context.CallMode.ICON,
                         crafterID = this.player.uniqueId,
                         asyncContext = asyncContext
                     )
@@ -253,7 +253,7 @@ internal class AllCandidateUI(
                         mapped = view.materials,
                         shiftClicked = event.isShiftClick,
                         calledTimes = recipe.getTimes(view.materials, relation, event.isShiftClick),
-                        isMultipleDisplayCall = false,
+                        callMode = ResultSupplier.Context.CallMode.CRAFT,
                         crafterID = player.uniqueId,
                         asyncContext = AsyncContext.ofTurnOff()
                     )
