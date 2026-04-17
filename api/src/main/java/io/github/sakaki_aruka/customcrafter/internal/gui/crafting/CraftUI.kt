@@ -245,7 +245,7 @@ internal class CraftUI(
             if (!this.isClosed.get()) {
                 player.openInventory(allUI.inventory)
             }
-        }
+        }.get()
 
     }
 
@@ -261,13 +261,13 @@ internal class CraftUI(
 
         InternalAPI.foliaLib.scheduler.runAtEntity(player) {
             CreateCustomItemEvent(player, view, result, shiftUsed, isAsync = false).callEvent()
-        }
+        }.get()
 
         InternalAPI.foliaLib.scheduler.runAtEntity(player) {
             decrementedView.materials.forEach { (c, item) ->
                 this.inventory.setItem(c.toIndex(), item)
             }
-        }
+        }.get()
 
         val resultSupplierContext = ResultSupplier.Context(
             recipe, relate, view.materials, shiftUsed, amount, player.uniqueId,false, asyncContext = AsyncContext.ofTurnOff()
@@ -276,7 +276,7 @@ internal class CraftUI(
 
         InternalAPI.foliaLib.scheduler.runAtEntity(player) {
             player.giveItems(saveLimit = true, *results.toTypedArray())
-        }
+        }.get()
     }
 
     private fun giveVanillaRecipeResults(
@@ -299,7 +299,7 @@ internal class CraftUI(
             if (!item.type.isAir) {
                 player.giveItems(saveLimit = true, item)
             }
-        }
+        }.get()
     }
 
     override fun getInventory(): Inventory = this.inventory
