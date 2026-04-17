@@ -2,7 +2,6 @@ package io.github.sakaki_aruka.customcrafter.api.interfaces.recipe
 
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
-import io.github.sakaki_aruka.customcrafter.api.objects.AsyncContext
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
 import org.bukkit.inventory.ItemStack
@@ -170,7 +169,7 @@ interface CRecipe {
     ): Int {
         var amount = Int.MAX_VALUE
         for ((c, matter) in this.items) {
-            if (withoutMass && matter.mass) {
+            if (withoutMass && matter.anyAmount) {
                 continue
             }
 
@@ -180,7 +179,7 @@ interface CRecipe {
             val item: ItemStack = map[inputCoordinate] ?: continue
 
             val q: Int =
-                if (matter.mass) 1
+                if (matter.anyAmount) 1
                 else
                     if (shift) item.amount / matter.amount
                     else

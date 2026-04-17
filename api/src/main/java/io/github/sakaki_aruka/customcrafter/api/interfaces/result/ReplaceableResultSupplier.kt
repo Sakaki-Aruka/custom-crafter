@@ -164,7 +164,7 @@ interface ReplaceableResultSupplier: ResultSupplier {
         val shiftClicked: Boolean = sourceContext.shiftClicked
         val calledTimes: Int = sourceContext.calledTimes
         val crafterID: UUID = sourceContext.crafterID
-        val isMultipleDisplayCall: Boolean = sourceContext.isMultipleDisplayCall
+        val callMode: ResultSupplier.Context.CallMode = sourceContext.callMode
     }
 
     /**

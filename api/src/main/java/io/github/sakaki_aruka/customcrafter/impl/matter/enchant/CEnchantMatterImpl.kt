@@ -14,7 +14,7 @@ import org.bukkit.enchantments.Enchantment
  * @param[name] matter name
  * @param[candidate] matter candidate materials
  * @param[amount] matter amount
- * @param[mass] this matter is mass or not
+ * @param[anyAmount] this matter is mass or not
  * @param[predicates] if in checks, this matter requires to pass these all.
  * @param[enchantComponents] enchant predicates for applied enchantments. set of [CEnchantComponent].
  */
@@ -23,7 +23,7 @@ open class CEnchantMatterImpl @JvmOverloads constructor(
     override val candidate: Set<Material>,
     override val enchantComponents: Set<CEnchantComponent>,
     override val amount: Int = 1,
-    override val mass: Boolean = false,
+    override val anyAmount: Boolean = false,
     override val predicates: Set<CMatterPredicate>? = CMatterImpl.defaultMatterPredicates()
 ): CEnchantMatter {
     companion object {

@@ -279,7 +279,7 @@ open class GroupRecipe @JvmOverloads constructor(
         override val name: String,
         override val candidate: Set<Material>,
         override val amount: Int,
-        override val mass: Boolean,
+        override val anyAmount: Boolean,
         override val predicates: List<CMatterPredicate>? = CMatterImpl.defaultMatterPredicates().toList(),
         val original: CMatter
     ): CMatter {
@@ -306,7 +306,7 @@ open class GroupRecipe @JvmOverloads constructor(
                     name = matter.name,
                     candidate = if (includeAir) matter.candidate + Material.AIR else matter.candidate,
                     amount = matter.amount,
-                    mass = matter.mass,
+                    anyAmount = matter.anyAmount,
                     predicates = listOf(originalChecker),
                     original = matter
                 )

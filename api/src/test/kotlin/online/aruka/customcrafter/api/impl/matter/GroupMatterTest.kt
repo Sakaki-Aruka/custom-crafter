@@ -202,7 +202,10 @@ object GroupMatterTest {
             crafterID = UUID.randomUUID(),
             view = view,
             sourceRecipes = listOf(recipe),
-            forceSearchVanillaRecipe = false
+            searchQuery = Search.SearchQuery(
+                searchMode = Search.SearchQuery.SearchMode.ALL,
+                vanillaSearchMode = Search.SearchQuery.VanillaSearchMode.IF_CUSTOMS_NOT_FOUND
+            )
         )
 
         // required: Lv.5 (Strict), input Lv.4 -> false

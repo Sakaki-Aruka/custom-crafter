@@ -13,14 +13,14 @@ import org.bukkit.Material
  * @param[name] matter name
  * @param[candidate] matter candidate materials
  * @param[amount] matter amount (default = 1)
- * @param[mass] this matter is mass or not (default = false)
+ * @param[anyAmount] If `true`, any input amount ≥ 1 is accepted regardless of [amount]. (default = false)
  * @param[predicates] if in checks, this matter requires to pass these all. (default = Enchant, EnchantStorage, Potion checker contains)
  */
 open class CMatterImpl @JvmOverloads constructor(
     override val name: String,
     override val candidate: Set<Material>,
     override val amount: Int = 1,
-    override val mass: Boolean = false,
+    override val anyAmount: Boolean = false,
     override val predicates: Set<CMatterPredicate>? = defaultMatterPredicates(),
 ): CMatter {
     companion object {
@@ -52,7 +52,7 @@ open class CMatterImpl @JvmOverloads constructor(
          *     name = "STONE-COBBLESTONE",
          *     candidate = setOf(Material.STONE, Material.COBBLESTONE),
          *     amount = 1,
-         *     mass = false,
+         *     anyAmount = false,
          *     predicates = null
          * )
          * ```
@@ -86,7 +86,7 @@ open class CMatterImpl @JvmOverloads constructor(
          *     name = "STONE",
          *     candidate = setOf(Material.STONE),
          *     amount = 1,
-         *     mass = false,
+         *     anyAmount = false,
          *     predicates = null
          * )
          * ```
@@ -107,7 +107,7 @@ open class CMatterImpl @JvmOverloads constructor(
          *     name = "STONE-COBBLESTONE",
          *     candidate = setOf(Material.STONE, Material.COBBLESTONE),
          *     amount = 1,
-         *     mass = false,
+         *     anyAmount = false,
          *     predicates = null
          * )
          * ```

@@ -125,7 +125,7 @@ object CRecipeTest {
         // mass        : true
         // multi amount: false
         val matter = CMatterImpl.of(Material.STONE)
-        val massMatter = CMatterImpl("", setOf(Material.STONE), mass = true)
+        val massMatter = CMatterImpl("", setOf(Material.STONE), anyAmount = true)
         val map = CoordinateComponent.square(3).associateWith { matter } + mapOf(CoordinateComponent(1, 1) to massMatter)
         val recipe = CRecipeImpl("", map, CRecipe.Type.SHAPED)
 
@@ -191,7 +191,7 @@ object CRecipeTest {
             shiftClicked = false,
             calledTimes = 1,
             crafterID = UUID.randomUUID(),
-            isMultipleDisplayCall = false,
+            callMode = ResultSupplier.Context.CallMode.CRAFT,
             asyncContext = AsyncContext.ofTurnOff()
         )
 

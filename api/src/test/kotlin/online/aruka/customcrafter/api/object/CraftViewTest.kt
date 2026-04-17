@@ -147,7 +147,7 @@ object CraftViewTest {
          * .amount >= 1 matter: false
          */
         val matter = CMatterImpl.of(Material.STONE)
-        val massMatter = CMatterImpl("", setOf(Material.STONE), mass = true)
+        val massMatter = CMatterImpl("", setOf(Material.STONE), anyAmount = true)
         val map = CoordinateComponent.square(3).associateWith { matter } + mapOf(CoordinateComponent(1, 1) to massMatter)
         val recipe = CRecipeImpl("", map, CRecipe.Type.SHAPED)
         val relation = MappedRelation(
@@ -173,7 +173,7 @@ object CraftViewTest {
          * .amount >= 1 matter: false
          */
         val matter = CMatterImpl.of(Material.STONE)
-        val massMatter = CMatterImpl("", setOf(Material.WATER_BUCKET), mass = true)
+        val massMatter = CMatterImpl("", setOf(Material.WATER_BUCKET), anyAmount = true)
         val map = CoordinateComponent.square(3).associateWith { matter } + mapOf(CoordinateComponent(1, 1) to massMatter)
         val recipe = CRecipeImpl("", map, CRecipe.Type.SHAPED)
         val relation = MappedRelation(
@@ -212,7 +212,7 @@ object CraftViewTest {
          * .amount >= 1 matter: true
          */
         val multiMatter = CMatterImpl("", setOf(Material.STONE), amount = 4)
-        val massMatter = CMatterImpl("", setOf(Material.STONE), mass = true, amount = 4)
+        val massMatter = CMatterImpl("", setOf(Material.STONE), anyAmount = true, amount = 4)
         val map = CoordinateComponent.square(3).associateWith { multiMatter } + mapOf(CoordinateComponent(1, 1) to massMatter)
         val recipe = CRecipeImpl("", map, CRecipe.Type.SHAPED)
         val relation = MappedRelation(
@@ -244,7 +244,7 @@ object CraftViewTest {
          * .amount >= 1 matter: true
          */
         val multiMatter = CMatterImpl("", setOf(Material.STONE), amount = 4)
-        val massMatter = CMatterImpl("", setOf(Material.STONE), mass = true, amount = 4)
+        val massMatter = CMatterImpl("", setOf(Material.STONE), anyAmount = true, amount = 4)
         val map = CoordinateComponent.square(3).associateWith { multiMatter } + mapOf(CoordinateComponent(1, 1) to massMatter)
         val recipe = CRecipeImpl("", map, CRecipe.Type.SHAPED)
         val relation = MappedRelation(

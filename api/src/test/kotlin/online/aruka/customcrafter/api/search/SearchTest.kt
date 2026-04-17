@@ -28,7 +28,6 @@ import org.mockbukkit.mockbukkit.MockBukkit
 import org.mockbukkit.mockbukkit.ServerMock
 import org.mockbukkit.mockbukkit.inventory.ItemStackMock
 import org.mockbukkit.mockbukkit.world.WorldMock
-import java.time.Duration
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
 import kotlin.system.measureTimeMillis
@@ -143,7 +142,7 @@ internal object SearchTest {
     fun shapelessTest2() {
         // mass test
         val slimeBall = CMatterImpl.single(Material.SLIME_BALL)
-        val lavaBucket = CMatterImpl("", setOf(Material.LAVA_BUCKET), mass = true)
+        val lavaBucket = CMatterImpl("", setOf(Material.LAVA_BUCKET), anyAmount = true)
         val recipe = CRecipeImpl(
             name = "",
             items = mapOf(

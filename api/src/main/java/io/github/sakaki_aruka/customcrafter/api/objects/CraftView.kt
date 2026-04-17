@@ -41,7 +41,7 @@ data class CraftView (
             val xLimit: Int = minAmount
 
             val decrementAmount: Int =
-                if (matter.mass) 1
+                if (matter.anyAmount) 1
                 else
                     if (shiftUsed) xLimit * matter.amount
                     else matter.amount
