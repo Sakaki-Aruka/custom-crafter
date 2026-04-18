@@ -268,8 +268,7 @@ object GroupRecipeTest {
         val view = CraftView(
             materials = recipe.items.entries.associate { (c, matter) ->
                 c to ItemStack.of(matter.candidate.first())
-            },
-            result = ItemStack.empty()
+            }
         )
 
         val result = Search.search(
@@ -292,7 +291,6 @@ object GroupRecipeTest {
                     c to ItemStack.of(matter.candidate.first())
                 } else c to ItemStack.empty()
             },
-            result = ItemStack.empty()
         )
 
         val result = Search.search(
@@ -321,7 +319,6 @@ object GroupRecipeTest {
                     c to ItemStack.of(Material.CALCITE)
                 } else c to ItemStack.empty()
             },
-            result = ItemStack.empty()
         )
 
         val result = Search.search(
@@ -350,7 +347,6 @@ object GroupRecipeTest {
                     c to ItemStack.of(Material.CALCITE)
                 } else c to ItemStack.empty()
             },
-            result = ItemStack.empty()
         )
 
         val result = Search.search(

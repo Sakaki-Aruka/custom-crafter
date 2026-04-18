@@ -50,7 +50,6 @@ object CraftViewTest {
         )
         val view = CraftView(
             materials = CoordinateComponent.squareFill(4).associateWith { ItemStack.of(Material.STONE, 64) },
-            result = ItemStack.empty()
         )
 
         val decremented = view.getDecremented(shiftUsed = false, recipe, relation)
@@ -77,7 +76,6 @@ object CraftViewTest {
         )
         val view = CraftView(
             materials = CoordinateComponent.squareFill(4).associateWith { ItemStack.of(Material.STONE, 64) },
-            result = ItemStack.empty()
         )
 
         val decremented = view.getDecremented(shiftUsed = false, recipe, relation)
@@ -104,7 +102,6 @@ object CraftViewTest {
         )
         val view = CraftView(
             materials = CoordinateComponent.squareFill(4).associateWith { ItemStack.of(Material.STONE, 64) },
-            result = ItemStack.empty()
         )
 
         val decremented = view.getDecremented(shiftUsed = true, recipe, relation)
@@ -131,7 +128,6 @@ object CraftViewTest {
         )
         val view = CraftView(
             materials = CoordinateComponent.squareFill(4).associateWith { ItemStack.of(Material.STONE, 64) },
-            result = ItemStack.empty()
         )
 
         val decremented = view.getDecremented(shiftUsed = true, recipe, relation)
@@ -157,7 +153,6 @@ object CraftViewTest {
         )
         val view = CraftView(
             materials = CoordinateComponent.squareFill(3).associateWith { ItemStack.of(Material.STONE, 64) },
-            result = ItemStack.empty()
         )
 
         val decremented = view.getDecremented(shiftUsed = false, recipe, relation)
@@ -184,7 +179,6 @@ object CraftViewTest {
         val view = CraftView(
             materials = CoordinateComponent.square(3).associateWith { ItemStack.of(Material.STONE, 64) } + mapOf(
                 CoordinateComponent(1, 1) to ItemStack.of(Material.WATER_BUCKET, 2)),
-            result = ItemStack.empty()
         )
 
         val decremented = view.getDecremented(shiftUsed = true, recipe, relation)
@@ -222,7 +216,6 @@ object CraftViewTest {
         )
         val view = CraftView(
             materials = CoordinateComponent.squareFill(3).associateWith { ItemStack.of(Material.STONE, 64) },
-            result = ItemStack.empty()
         )
 
         val decremented = view.getDecremented(shiftUsed = false, recipe, relation)
@@ -254,7 +247,6 @@ object CraftViewTest {
         )
         val view = CraftView(
             materials = CoordinateComponent.squareFill(3).associateWith { ItemStack.of(Material.STONE, 64) },
-            result = ItemStack.empty()
         )
 
         val decremented = view.getDecremented(shiftUsed = true, recipe, relation)
@@ -272,7 +264,6 @@ object CraftViewTest {
     fun cloneTest() {
         val source = CraftView(
             materials = CoordinateComponent.squareFill(6).associateWith { ItemStack.of(Material.STONE, 64) },
-            result = ItemStack.of(Material.DIRT, 16)
         )
 
         val cloned = source.clone()
@@ -284,6 +275,5 @@ object CraftViewTest {
             }
         )
 
-        assertTrue(cloned.result.type == Material.DIRT && cloned.result.amount == 16)
     }
 }
