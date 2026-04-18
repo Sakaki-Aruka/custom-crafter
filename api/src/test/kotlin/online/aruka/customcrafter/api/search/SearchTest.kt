@@ -558,7 +558,6 @@ internal object SearchTest {
 
         val view = CraftView(
             materials = CoordinateComponent.squareFill(6).associateWith { ItemStack.of(Material.STONE) },
-            result = ItemStack.empty()
         )
 
         val future: CompletableFuture<Search.SearchResult> = Search.asyncSearch(crafterID = UUID.randomUUID(), view, sourceRecipes = listOf(recipe))
@@ -584,7 +583,6 @@ internal object SearchTest {
 
         val view = CraftView(
             materials = CoordinateComponent.squareFill(6).associateWith { ItemStack.of(Material.STONE) },
-            result = ItemStack.empty()
         )
 
         val times = 1000
@@ -610,7 +608,6 @@ internal object SearchTest {
 
         val view = CraftView(
             materials = CoordinateComponent.squareFill(6).associateWith { ItemStack.of(Material.STONE) },
-            result = ItemStack.empty()
         )
 
         val times = 1000

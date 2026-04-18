@@ -23,14 +23,6 @@ interface CraftUIDesigner {
     fun title(context: Context): Component
 
     /**
-     * Result slot coordinate
-     * @param[context] Execution context
-     * @return[CoordinateComponent] Coordinate of result slot
-     * @since 5.0.16
-     */
-    fun resultSlot(context: Context): CoordinateComponent
-
-    /**
      * Make button slot coordinate and make button item (icon)
      * @param[context] Execution context
      * @return[Pair] Pair of coordinate and item
@@ -63,7 +55,6 @@ interface CraftUIDesigner {
      * ```
      *
      * @param[title] Title of UI
-     * @param[result] Coordinate of result slot
      * @param[makeButton] Make button coordinate and icon (item)
      * @param[blankSlots] Unclickable slot coordinates and icons
      * @see[CraftUIDesigner.bake]
@@ -71,7 +62,6 @@ interface CraftUIDesigner {
      */
     class Baked(
         val title: Component,
-        val result: CoordinateComponent,
         val makeButton: Pair<CoordinateComponent, ItemStack>,
         val blankSlots: Map<CoordinateComponent, ItemStack>
     ) {
@@ -95,18 +85,7 @@ interface CraftUIDesigner {
         fun craftSlots(): List<CoordinateComponent> {
             return (0..<54).map { CoordinateComponent.fromIndex(it) }
                 .minus(blankSlots.keys)
-                .minus(result)
                 .minus(makeButton.first)
-        }
-
-        /**
-         * Returns result slot coordinate (Int)
-         *
-         * @return[Int] Slot index
-         * @since 5.0.16
-         */
-        fun resultInt(): Int {
-            return this.result.toIndex()
         }
 
         /**
@@ -157,7 +136,6 @@ interface CraftUIDesigner {
         ): Baked {
             return Baked(
                 title = designer.title(context),
-                result = designer.resultSlot(context),
                 makeButton = designer.makeButton(context),
                 blankSlots = designer.blankSlots(context)
             )

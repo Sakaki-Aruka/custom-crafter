@@ -144,7 +144,6 @@ object GroupMatterTest {
 
         val view = CraftView(
             materials = mapOf(CoordinateComponent(0, 0) to lv4Efficiency),
-            result = ItemStack.empty()
         )
 
         val result = Search.search(
@@ -195,7 +194,6 @@ object GroupMatterTest {
 
         val view = CraftView(
             materials = mapOf(CoordinateComponent(0, 0) to ItemStack.of(Material.STONE)),
-            result = ItemStack.empty()
         )
 
         val result = Search.search(

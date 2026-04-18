@@ -46,10 +46,6 @@ object CraftUIDesignerTest {
                 return CoordinateComponent.fromIndex(35) to ItemStack.of(Material.STONE)
             }
 
-            override fun resultSlot(context: CraftUIDesigner.Context): CoordinateComponent {
-                return CoordinateComponent.fromIndex(44)
-            }
-
             override fun title(context: CraftUIDesigner.Context): Component {
                 return "".toComponent()
             }
@@ -64,22 +60,9 @@ object CraftUIDesignerTest {
     }
 
     @Test
-    fun bakedDesignerResultIntTest() {
-        val baked = CraftUIDesigner.Baked(
-            title = "".toComponent(),
-            result = CoordinateComponent.fromIndex(44),
-            makeButton = CoordinateComponent.fromIndex(0) to ItemStack.empty(),
-            blankSlots = emptyMap()
-        )
-
-        assertEquals(44, baked.resultInt())
-    }
-
-    @Test
     fun bakedDesignerIsValidDetectSizeNot36Test() {
         val baked = CraftUIDesigner.Baked(
             title = "".toComponent(),
-            result = CoordinateComponent.fromIndex(44),
             makeButton = CoordinateComponent.fromIndex(35) to ItemStack.empty(),
             blankSlots = emptyMap()
         )
@@ -91,7 +74,6 @@ object CraftUIDesignerTest {
     fun bakedDesignerIsValidDetectTopYNot0Test() {
         val baked = CraftUIDesigner.Baked(
             title = "".toComponent(),
-            result = CoordinateComponent.fromIndex(0),
             makeButton = CoordinateComponent.fromIndex(1) to ItemStack.empty(),
             blankSlots = (0..<54).filter { it / 9 > 1 }.map { CoordinateComponent.fromIndex(it) }
                 .associateWith { ItemStack.of(Material.STONE) }
@@ -106,7 +88,6 @@ object CraftUIDesignerTest {
         // craft slots = 5x6 = 30 != 36 -> isValid fails
         val baked = CraftUIDesigner.Baked(
             title = "".toComponent(),
-            result = CoordinateComponent.fromIndex(53),
             makeButton = CoordinateComponent.fromIndex(44) to ItemStack.empty(),
             blankSlots = (0..<54)
                 .filter { it % 9 <= 3 }
@@ -120,11 +101,9 @@ object CraftUIDesignerTest {
     fun bakedDesignerIsValidDetectIsAirTest() {
         val baked = CraftUIDesigner.Baked(
             title = "".toComponent(),
-            result = CoordinateComponent.fromIndex(44),
             makeButton = CoordinateComponent.fromIndex(35) to ItemStack.empty(),
             blankSlots = (0..<54).filter { it % 9 >= 6 }.map { CoordinateComponent.fromIndex(it) }
                 .minus(CoordinateComponent.fromIndex(35))
-                .minus(CoordinateComponent.fromIndex(44))
                 .associateWith { ItemStack.empty() }
         )
 
@@ -135,11 +114,9 @@ object CraftUIDesignerTest {
     fun bakedDesignerIsValidSuccessTest() {
         val baked = CraftUIDesigner.Baked(
             title = "".toComponent(),
-            result = CoordinateComponent.fromIndex(44),
             makeButton = CoordinateComponent.fromIndex(35) to ItemStack.empty(),
             blankSlots = (0..<54).filter { it % 9 >= 6 }.map { CoordinateComponent.fromIndex(it) }
                 .minus(CoordinateComponent.fromIndex(35))
-                .minus(CoordinateComponent.fromIndex(44))
                 .associateWith { ItemStack.of(Material.STONE) }
         )
 
@@ -147,17 +124,15 @@ object CraftUIDesignerTest {
     }
 
     @Test
-    fun craftSlotsExcludesResultAndMakeButtonTest() {
+    fun craftSlotsExcludesMakeButtonTest() {
         val baked = CraftUIDesigner.Baked(
             title = "".toComponent(),
-            result = CoordinateComponent.fromIndex(44),
             makeButton = CoordinateComponent.fromIndex(35) to ItemStack.empty(),
             blankSlots = emptyMap()
         )
         val craftSlots = baked.craftSlots()
-        assertFalse(craftSlots.contains(CoordinateComponent.fromIndex(44)))
         assertFalse(craftSlots.contains(CoordinateComponent.fromIndex(35)))
-        assertEquals(52, craftSlots.size)
+        assertEquals(53, craftSlots.size)
     }
 
     @Test
@@ -166,7 +141,6 @@ object CraftUIDesignerTest {
         val blankItem = ItemStack.of(Material.STONE)
         val baked = CraftUIDesigner.Baked(
             title = "".toComponent(),
-            result = CoordinateComponent.fromIndex(44),
             makeButton = CoordinateComponent.fromIndex(35) to makeButtonItem,
             blankSlots = mapOf(CoordinateComponent.fromIndex(6) to blankItem)
         )

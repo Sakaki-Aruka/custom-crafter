@@ -187,7 +187,7 @@ internal class AllCandidateUI(
         if (!this.dropOnClose.get()) {
             return
         }
-        player.giveItems(saveLimit = true, *this.view.materials.values.toTypedArray(), this.view.result)
+        player.giveItems(saveLimit = true, *this.view.materials.values.toTypedArray())
         this.isClosed.set(true)
     }
 
@@ -214,10 +214,7 @@ internal class AllCandidateUI(
                 this.view.materials.entries.forEach { (c, item) ->
                     craftUI.inventory.setItem(c.toIndex(), item)
                 }
-                craftUI.inventory.setItem(
-                    this.bakedCraftUIDesigner.resultInt(),
-                    this.view.result
-                )
+
                 this.dropOnClose.set(false)
                 this.player.openInventory(craftUI.inventory)
                 return
@@ -268,11 +265,6 @@ internal class AllCandidateUI(
                     }.get()
                 }, InternalAPI.executor)
 
-                if (!this.view.result.isEmpty) {
-                    player.location.world.dropItem(player.location, this.view.result)
-                    this.view = CraftView(this.view.materials, ItemStack.empty())
-                }
-
                 this.view = this.view.getDecremented(
                     shiftUsed = event.isShiftClick,
                     recipe = recipe,
@@ -286,7 +278,6 @@ internal class AllCandidateUI(
                 this.view.materials.entries.forEach { (c, item) ->
                     craftUI.inventory.setItem(c.toIndex(), item)
                 }
-                craftUI.inventory.setItem(this.bakedCraftUIDesigner.resultInt(), this.view.result)
                 this.dropOnClose.set(false)
                 player.openInventory(craftUI.inventory)
             }

@@ -89,15 +89,10 @@ internal class CraftUI(
             event.player.openInventory(CraftUI(caller = event.player).inventory)
         }
 
-        const val RESULT_SLOT = 44
         const val MAKE_BUTTON = 35
 
         override fun title(context: CraftUIDesigner.Context): Component {
             return "Custom Crafter".toComponent()
-        }
-
-        override fun resultSlot(context: CraftUIDesigner.Context): CoordinateComponent {
-            return CoordinateComponent.fromIndex(RESULT_SLOT)
         }
 
         override fun makeButton(context: CraftUIDesigner.Context): Pair<CoordinateComponent, ItemStack> {
@@ -122,7 +117,6 @@ internal class CraftUI(
             }
             return (0..<54)
                 .filter { it % 9 >= 6 }
-                .minus(RESULT_SLOT)
                 .minus(MAKE_BUTTON)
                 .associate { CoordinateComponent.fromIndex(it) to blank }
         }
@@ -138,24 +132,7 @@ internal class CraftUI(
         event.result = Event.Result.DENY
         event.currentItem = ItemStack.empty()
 
-        val resultSlotItem: ItemStack = event.inventory.getItem(this.bakedDesigner.resultInt())?.clone()
-            ?: ItemStack.empty()
-
-        // pseudo
-        val stainedGlass: ItemStack = ItemStack.of(Material.BLACK_STAINED_GLASS_PANE).apply {
-            itemMeta = itemMeta.apply {
-                persistentDataContainer.set(
-                    NamespacedKey(CustomCrafter.getInstance(), "protect_result_slot"),
-                    PersistentDataType.STRING,
-                    UUID.randomUUID().toString()
-                )
-            }
-        }
-        event.inventory.setItem(this.bakedDesigner.resultInt(), stainedGlass)
-
         val remaining: List<ItemStack> = event.inventory.addItem(currentItem).values.toList()
-        // delete pseudo
-        event.inventory.setItem(this.bakedDesigner.resultInt(), resultSlotItem)
         (event.whoClicked as Player).give(remaining)
     }
 
@@ -166,7 +143,7 @@ internal class CraftUI(
         }
         val view: CraftView = this.toView()
         val player: Player = event.player as? Player ?: return
-        player.giveItems(saveLimit = true, *view.materials.values.toTypedArray(), view.result)
+        player.giveItems(saveLimit = true, *view.materials.values.toTypedArray())
     }
 
     override fun onClick(
@@ -177,19 +154,6 @@ internal class CraftUI(
 
         event.isCancelled = true
         when (clickedCoordinate) {
-            this.bakedDesigner.result -> {
-                if (event.action in setOf(
-                        InventoryAction.PLACE_ONE,
-                        InventoryAction.PLACE_ALL,
-                        InventoryAction.PLACE_SOME,
-                        InventoryAction.PLACE_FROM_BUNDLE
-                )) {
-                    return
-                }
-                event.isCancelled = false
-                return
-            }
-
             this.bakedDesigner.makeButton.first -> {
                 val view: CraftView = this.toView()
                 if (view.materials.values.none { i -> !i.isEmpty }) return
@@ -315,8 +279,6 @@ internal class CraftUI(
             materials[c] = item
         }
 
-        val result: ItemStack = this.inventory.getItem(this.bakedDesigner.resultInt())
-            ?: ItemStack.empty()
-        return CraftView(materials, result)
+        return CraftView(materials)
     }
 }
