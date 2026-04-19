@@ -123,3 +123,4 @@ run/
 *.iml
 
 .secrets
+.serena/
