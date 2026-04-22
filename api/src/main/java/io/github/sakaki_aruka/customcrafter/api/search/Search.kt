@@ -35,6 +35,12 @@ object Search {
         private val vanilla: Recipe?,
         private val customs: List<Pair<CRecipe, MappedRelation>>,
     ) {
+
+        companion object {
+            @JvmField
+            val EMPTY = SearchResult(null, emptyList())
+        }
+
         /**
          * returns a nullable vanilla recipe.
          *
@@ -84,6 +90,19 @@ object Search {
                 CVanillaRecipe.fromVanilla(v as CraftingRecipe)?.let { r -> result.add(r to null) }
             }
             this.customs.forEach { (recipe, relation) -> result.add(recipe to relation) }
+            return result
+        }
+
+        fun getMergedResults(view: CraftView): List<Pair<CRecipe, MappedRelation>> {
+            val result: MutableList<Pair<CRecipe, MappedRelation>> = mutableListOf()
+            this.vanilla?.let { v ->
+                CVanillaRecipe.fromVanilla(v as CraftingRecipe)?.let { r ->
+                    result.add(r to r.relateWith(view))
+                }
+            }
+            this.customs.forEach { (recipe, relation) ->
+                result.add(recipe to relation)
+            }
             return result
         }
 
@@ -206,8 +225,8 @@ object Search {
         val tasks = recipes.map { recipe ->
             CompletableFuture.supplyAsync({
                 when (recipe.type) {
-                    CRecipe.Type.SHAPED -> shaped(view, recipe, crafterID, AsyncContext.ofTurnOff())
-                    CRecipe.Type.SHAPELESS -> shapeless(view, recipe, crafterID, AsyncContext.ofTurnOff())
+                    CRecipe.Type.SHAPED -> shaped(view, recipe, crafterID, query.asyncContext ?: AsyncContext.ofTurnOff())
+                    CRecipe.Type.SHAPELESS -> shapeless(view, recipe, crafterID, query.asyncContext ?: AsyncContext.ofTurnOff())
                 }?.let { mapped -> recipe to mapped }
             }, InternalAPI.executor)
         }
@@ -239,7 +258,7 @@ object Search {
             futures = recipes.mapNotNull { recipe ->
                 CompletableFuture.supplyAsync({
                     when (recipe.type) {
-                        CRecipe.Type.SHAPED -> shaped(view, recipe, crafterID, AsyncContext.ofTurnOff())
+                        CRecipe.Type.SHAPED -> shaped(view, recipe, crafterID, query.asyncContext ?: AsyncContext.ofTurnOff())
                         CRecipe.Type.SHAPELESS -> shapeless(view, recipe, crafterID, AsyncContext.ofTurnOff())
                     }?.let { recipe to it }
                 }, InternalAPI.executor)
