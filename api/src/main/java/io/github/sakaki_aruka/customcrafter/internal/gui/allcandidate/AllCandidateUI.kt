@@ -2,6 +2,7 @@ package io.github.sakaki_aruka.customcrafter.internal.gui.allcandidate
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.event.CreateCustomItemEvent
+import io.github.sakaki_aruka.customcrafter.api.event.failure.ResultItemGiveFailEvent
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.api.interfaces.ui.CraftUIDesigner
@@ -260,9 +261,13 @@ internal class AllCandidateUI(
                         CreateCustomItemEvent(player, this.view, this.result, event.isShiftClick, isAsync = false).callEvent()
                     }.get()
 
-                    InternalAPI.foliaLib.scheduler.runAtEntity(player) {
-                        player.giveItems(saveLimit = true, *results.toTypedArray())
-                    }.get()
+                    if (player.isOnline) {
+                        InternalAPI.foliaLib.scheduler.runAtEntity(player) {
+                            player.giveItems(saveLimit = true, *results.toTypedArray())
+                        }.get()
+                    } else {
+                        ResultItemGiveFailEvent(results, resultSupplierContext, true).callEvent()
+                    }
                 }, InternalAPI.executor)
 
                 this.view = this.view.getDecremented(
