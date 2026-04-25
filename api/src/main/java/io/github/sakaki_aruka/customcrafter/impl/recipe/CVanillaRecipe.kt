@@ -86,7 +86,7 @@ class CVanillaRecipe internal constructor(
         /**
          * Converts a vanilla transmute recipe to a CRecipe.
          *
-         * @paran[recipe] A target transmute recipe
+         * @param[recipe] A target transmute recipe
          * @return[CVanillaRecipe] A result CRecipe
          * @since 5.0.21
          */
@@ -115,7 +115,7 @@ class CVanillaRecipe internal constructor(
 
             return CVanillaRecipe(
                 name = recipe.key.namespace + recipe.key.key,
-                items = CoordinateComponent.getN(2).zip(setOf(source, catalyst)).toMap(),
+                items = CoordinateComponent.getN(2).zip(listOf(source, catalyst)).toMap(),
                 type = CRecipe.Type.SHAPELESS,
                 results = listOf(resultSupplier),
                 original = recipe
