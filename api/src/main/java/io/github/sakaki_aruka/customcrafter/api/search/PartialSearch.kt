@@ -26,10 +26,12 @@ import java.util.concurrent.CompletableFuture
  * are excluded from all partial searches.
  *
  * @see asyncPartialSearch
+ * @since 5.0.21
  */
 object PartialSearch {
     /**
      * Represents the degree to which a recipe's slots are satisfied by the current input.
+     * @since 5.0.21
      */
     enum class MatchState {
         /** Every required recipe slot is covered by a corresponding input item. */
@@ -40,6 +42,7 @@ object PartialSearch {
 
         /**
          * Returns `true` when this state is not [ALL].
+         * @since 5.0.21
          */
         fun isPartialMatch(): Boolean = this != ALL
     }
@@ -49,6 +52,7 @@ object PartialSearch {
      *
      * Each instance represents one candidate recipe together with the match
      * information derived from comparing the current [CraftView] against that recipe.
+     * @since 5.0.21
      */
     interface PartialSearchResult {
         /** The candidate recipe that was evaluated. */
@@ -56,11 +60,13 @@ object PartialSearch {
 
         /**
          * Returns the set of recipe slot coordinates that are covered by at least one input item.
+         * @since 5.0.21
          */
         fun matched(): Set<CoordinateComponent>
 
         /**
          * Returns the set of recipe slot coordinates that have no matching input item.
+         * @since 5.0.21
          */
         fun notEnough(): Set<CoordinateComponent>
 
@@ -69,6 +75,7 @@ object PartialSearch {
          *
          * The default implementation returns [MatchState.ALL] when [notEnough] is empty,
          * otherwise [MatchState.PARTIAL_NOT_ENOUGH].
+         * @since 5.0.21
          */
         fun state(): MatchState {
             return when {
@@ -83,6 +90,7 @@ object PartialSearch {
      *
      * @param[recipe] The shaped recipe that was evaluated.
      * @param[relation] The coordinate mapping between matched recipe slots and input slots.
+     * @since 5.0.21
      */
     class PartialShapedResult(
         override val recipe: CRecipe,
@@ -90,6 +98,7 @@ object PartialSearch {
     ): PartialSearchResult {
         /**
          * Returns the recipe slot coordinates that are covered by [relation].
+         * @since 5.0.21
          */
         override fun matched(): Set<CoordinateComponent> {
             return this.relation.components.map { (k, _) -> k }.toSet()
@@ -97,6 +106,7 @@ object PartialSearch {
 
         /**
          * Returns the recipe slot coordinates not present in [relation].
+         * @since 5.0.21
          */
         override fun notEnough(): Set<CoordinateComponent> {
             return this.recipe.items.keys - matched()
@@ -114,6 +124,7 @@ object PartialSearch {
      * @param[recipe] The shapeless recipe that was evaluated.
      * @param[relations] A map from each matchable recipe slot coordinate to the set of
      *   input slot coordinates that are individually compatible with that slot.
+     * @since 5.0.21
      */
     class PartialShapelessResult(
         override val recipe: CRecipe,
@@ -121,6 +132,7 @@ object PartialSearch {
     ): PartialSearchResult {
         /**
          * Returns the recipe slot coordinates that have at least one compatible input slot.
+         * @since 5.0.21
          */
         override fun matched(): Set<CoordinateComponent> {
             return this.relations.keys
@@ -128,6 +140,7 @@ object PartialSearch {
 
         /**
          * Returns the recipe slot coordinates that have no compatible input slot.
+         * @since 5.0.21
          */
         override fun notEnough(): Set<CoordinateComponent> {
             return this.recipe.items.keys - matched()
@@ -141,6 +154,7 @@ object PartialSearch {
          * `notEnough().isEmpty()` check would produce a false [MatchState.ALL] in that
          * situation.  An augmenting-path algorithm (Kuhn's algorithm) is used to find
          * the true maximum matching size and compare it against [CRecipe.items].
+         * @since 5.0.21
          */
         override fun state(): MatchState {
             val inputToRecipe = mutableMapOf<CoordinateComponent, CoordinateComponent>()
@@ -174,6 +188,7 @@ object PartialSearch {
          * matter, mirroring the information in [relations] with a matter-oriented key.
          *
          * @return A map from each recipe matter to the set of compatible input slot coordinates.
+         * @since 5.0.21
          */
         fun weakRelations(): Map<CMatter, Set<CoordinateComponent>> {
             return recipe.items.map { (c, matter) ->
@@ -209,6 +224,7 @@ object PartialSearch {
      * @return A [CompletableFuture] that resolves to the list of partial-search results.
      *   The list is empty when no recipe even partially matches the current input.
      * @throws IllegalArgumentException if [view] contains zero items or more than 36 items.
+     * @since 5.0.21
      */
     @JvmStatic
     @JvmOverloads
