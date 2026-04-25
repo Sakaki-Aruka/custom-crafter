@@ -1,6 +1,7 @@
 package io.github.sakaki_aruka.customcrafter.impl.recipe
 
 import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
+import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatterPredicate
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipePredicate
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
@@ -11,10 +12,12 @@ import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelationComponent
 import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
 import org.bukkit.Material
 import org.bukkit.inventory.CraftingRecipe
+import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.Recipe
 import org.bukkit.inventory.RecipeChoice
 import org.bukkit.inventory.ShapedRecipe
 import org.bukkit.inventory.ShapelessRecipe
+import org.bukkit.inventory.TransmuteRecipe
 
 /**
  * A [CRecipe] wrapper for vanilla [Recipe] instances. For internal use only; instantiation is restricted to internal code.
@@ -31,7 +34,7 @@ class CVanillaRecipe internal constructor(
         /**
          * Converts a vanilla [CraftingRecipe] to a [CVanillaRecipe].
          *
-         * @param[recipe] A vanilla crafting recipe ([ShapedRecipe] or [ShapelessRecipe])
+         * @param[recipe] A vanilla crafting recipe ([ShapedRecipe], [ShapelessRecipe] or [TransmuteRecipe])
          * @return[CVanillaRecipe] The converted recipe, or `null` if [recipe] is neither shaped nor shapeless
          */
         @JvmStatic
@@ -39,6 +42,7 @@ class CVanillaRecipe internal constructor(
             return when (recipe) {
                 is ShapedRecipe -> fromShaped(recipe)
                 is ShapelessRecipe -> fromShapeless(recipe)
+                is TransmuteRecipe -> fromTransmute(recipe)
                 else -> null
             }
         }
@@ -47,7 +51,7 @@ class CVanillaRecipe internal constructor(
          * Converts a vanilla shaped recipe to a CRecipe.
          *
          * @param[recipe] A target shaped recipe
-         * @return[CRecipe] A result CRecipe
+         * @return[CVanillaRecipe] A result CRecipe
          * @since 5.0.11
          */
         @JvmStatic
@@ -65,7 +69,7 @@ class CVanillaRecipe internal constructor(
          * Converts a vanilla shapeless recipe to a CRecipe.
          *
          * @param[recipe] A target shapeless recipe
-         * @return[CRecipe] A result CRecipe
+         * @return[CVanillaRecipe] A result CRecipe
          * @since 5.0.11
          */
         @JvmStatic
@@ -79,13 +83,53 @@ class CVanillaRecipe internal constructor(
             )
         }
 
+        /**
+         * Converts a vanilla transmute recipe to a CRecipe.
+         *
+         * @paran[recipe] A target transmute recipe
+         * @return[CVanillaRecipe] A result CRecipe
+         * @since 5.0.21
+         */
+        @JvmStatic
+        fun fromTransmute(recipe: TransmuteRecipe): CVanillaRecipe {
+            val source: CMatter = CMatterImpl(
+                name = "${recipe.key.namespace}, ${recipe.key.key} input (source)",
+                candidate = choiceToCandidates(recipe.input),
+                predicates = setOf(choiceToPredicate(recipe.input))
+            )
+            val catalyst: CMatter = CMatterImpl(
+                name = "${recipe.key.namespace}, ${recipe.key.key} input (catalyst)",
+                candidate = choiceToCandidates(recipe.material),
+                predicates = setOf(choiceToPredicate(recipe.material))
+            )
+
+            val resultSupplier = ResultSupplier { context ->
+                val source: ItemStack = context.mapped
+                    .filter { (_, item) -> recipe.input.test(item) }
+                    .map { (_, item) -> item }
+                    .firstOrNull()
+                    ?: return@ResultSupplier emptyList()
+
+                listOf(source.withType(recipe.result.type))
+            }
+
+            return CVanillaRecipe(
+                name = recipe.key.namespace + recipe.key.key,
+                items = CoordinateComponent.getN(2).zip(setOf(source, catalyst)).toMap(),
+                type = CRecipe.Type.SHAPELESS,
+                results = listOf(resultSupplier),
+                original = recipe
+            )
+        }
+
         private fun shapelessToItems(choices: List<RecipeChoice>): Map<CoordinateComponent, CMatter> {
             val result: MutableMap<CoordinateComponent, CMatter> = mutableMapOf()
             choices.withIndex().forEach { (index, choice) ->
                 val candidates: Set<Material> = choiceToCandidates(choice)
                 val matter: CMatter = CMatterImpl(
                     candidates.firstOrNull()?.name ?: "vanilla matter default name",
-                    candidates
+                    candidate = candidates,
+                    predicates = setOf(choiceToPredicate(choice))
                 )
                 result[CoordinateComponent.fromIndex(index)] = matter
             }
@@ -96,25 +140,26 @@ class CVanillaRecipe internal constructor(
             shape: Array<out String>,
             map: Map<Char, RecipeChoice>
         ): Map<CoordinateComponent, CMatter> {
-            val candidateMap: Map<Char, Set<Material>> = getCandidateMap(map)
             val result: MutableMap<CoordinateComponent, CMatter> = mutableMapOf()
-            shape.withIndex().forEach { (index, c) ->
-                val candidates: Set<Material> = candidateMap[c.first()] ?: emptySet()
-                val matter: CMatter = CMatterImpl(
-                    candidates.firstOrNull()?.name ?: "vanilla matter default name",
-                    candidates
-                )
-                result[CoordinateComponent.fromIndex(index)] = matter
+            for ((y: Int, line: String) in shape.withIndex()) {
+                for ((x: Int, c: Char) in line.toList().withIndex()) {
+                    val choice: RecipeChoice = map[c] ?: continue
+                    val candidates: Set<Material> = choiceToCandidates(choice)
+                    val matter: CMatter = CMatterImpl(
+                        name = candidates.firstOrNull()?.name ?: "vanilla matter default name",
+                        candidate = candidates,
+                        predicates = setOf(choiceToPredicate(choice))
+                    )
+                    result[CoordinateComponent(x, y)] = matter
+                }
             }
             return result
         }
 
-        private fun getCandidateMap(map: Map<Char, RecipeChoice>): Map<Char, Set<Material>> {
-            val result: MutableMap<Char, Set<Material>> = mutableMapOf()
-            for ((c, choice) in map.entries) {
-                result[c] = choiceToCandidates(choice)
+        private fun choiceToPredicate(choice: RecipeChoice): CMatterPredicate {
+            return CMatterPredicate { context ->
+                return@CMatterPredicate choice.test(context.input)
             }
-            return result
         }
 
         private fun choiceToCandidates(choice: RecipeChoice): Set<Material> {
