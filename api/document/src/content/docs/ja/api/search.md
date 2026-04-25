@@ -262,4 +262,5 @@ PartialSearch.asyncPartialSearch(player.uniqueId, view).thenAccept { results ->
         }
     }
 }
+```
 この情報は `ResultSupplier.Context.relation` や `CRecipePredicate.Context.relation` として渡され、どのスロットに何が配置されていたかを追跡するために使用します。
