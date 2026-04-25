@@ -42,18 +42,19 @@ object Search {
         }
 
         /**
-         * returns a nullable vanilla recipe.
+         * Returns a nullable vanilla recipe.
          *
-         * When below situations, [vanilla] is null.
-         * - If [customs] is not empty and a search query's 'natural' is true.
-         * - If an input is not matched all registered vanilla recipes.
-         * @return[vanilla] PaperMCs Recipe ([Recipe]). This is NOT a [CRecipe].
+         * [vanilla] is null in the following situations:
+         * - [vanillaSearchMode][SearchQuery.VanillaSearchMode] is [SearchQuery.VanillaSearchMode.IF_CUSTOMS_NOT_FOUND] and [customs] is not empty.
+         * - The input does not match any registered vanilla recipe.
+         * @return[Recipe] PaperMC's [Recipe]. This is NOT a [CRecipe].
          */
         fun vanilla() = this.vanilla
 
         /**
-         * returns custom recipes.
+         * Returns found custom recipes with their coordinate relations.
          *
+         * @return[List] List of pairs of matched [CRecipe] and its [MappedRelation]
          */
         fun customs() = this.customs
 
@@ -93,6 +94,14 @@ object Search {
             return result
         }
 
+        /**
+         * Returns all recipes and their relations, with vanilla recipes resolved against [view].
+         *
+         * Unlike [getMergedResults], this overload always includes the vanilla recipe with a concrete [MappedRelation].
+         * @param[view] The crafting view used to compute the vanilla recipe's relation
+         * @return[List] List of pairs of [CRecipe] and [MappedRelation]
+         * @since 5.0.11
+         */
         fun getMergedResults(view: CraftView): List<Pair<CRecipe, MappedRelation>> {
             val result: MutableList<Pair<CRecipe, MappedRelation>> = mutableListOf()
             this.vanilla?.let { v ->
@@ -162,6 +171,10 @@ object Search {
                 asyncContext = null
             )
 
+            /**
+             * Default search query setting with async context enabled
+             * @since 5.0.20
+             */
             @JvmField
             val ASYNC_DEFAULT = SearchQuery(
                 searchMode = SearchMode.ALL,
@@ -197,6 +210,7 @@ object Search {
      * @param[query] Query of searching (since 5.0.20)
      * @param[sourceRecipes] Search target recipes (default = [CustomCrafterAPI.getRecipes])
      * @return[CompletableFuture] Future task of a search result
+     * @throws[IllegalArgumentException] If [view] materials is empty or size exceeds 36
      * @since 5.0.17
      */
     @JvmStatic
@@ -278,7 +292,7 @@ object Search {
      * @param[view] input crafting gui's view
      * @param[searchQuery] Query that controls search behaviour (search mode and vanilla search mode). (default = [SearchQuery.DEFAULT])
      * @param[sourceRecipes] A list of searched recipes. (default = CustomCrafterAPI.getRecipes() / since 5.0.10)
-     * @return[SearchResult] A result of a request. If you send one that contains invalid params, returns null.
+     * @return[SearchResult] A result of a search.
      * @throws[IllegalArgumentException] Throws when 'view.materials' is empty or their size out of range 1 to 36.
      */
     @JvmStatic

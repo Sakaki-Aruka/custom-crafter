@@ -11,20 +11,20 @@ import java.util.concurrent.CompletableFuture
 /**
  * This interface's implementing types can be used as recipes for CustomCrafter.
  *
- * @param[name] Name of this recipe
- * @param[items] Mapping of CMatter and those coordinates on crafting slots
- * @param[results] List of [ResultSupplier] what provide items to players
- * @param[type] Type of this recipe. See [CRecipe.Type]
- *
  * @see[CMatter]
  * @see[ResultSupplier]
  * @see[CRecipe.Type]
  */
 interface CRecipe {
+    /** Name of this recipe. */
     val name: String
+    /** Mapping of [CMatter] to their coordinates on the crafting slots. */
     val items: Map<CoordinateComponent, CMatter>
+    /** List of [CRecipePredicate] that run during recipe matching. `null` or empty means no additional conditions. */
     val predicates: List<CRecipePredicate>?
+    /** List of [ResultSupplier] that provide items to players. `null` or empty means no items are produced. */
     val results: List<ResultSupplier>?
+    /** Type of this recipe. See [CRecipe.Type]. */
     val type: Type
 
     /**
@@ -41,8 +41,8 @@ interface CRecipe {
      * Returns this [CRecipe] is a valid or not.
      *
      * CRecipe's default implementation checks below conditions.
-     * - [CRecipe.items] size (in range 1 to 36 ?)
-     * - contained [CMatter] are all valid (Do all [CRecipe.items] elements pass [CMatter.isValidMatter]?)
+     * - [CRecipe.items] size is in range 1 to 36
+     * - All contained [CMatter] pass [CMatter.isValidMatter]
      *
      * ```kotlin
      * // (Usage)
@@ -105,7 +105,8 @@ interface CRecipe {
     /**
      * Returns [CRecipePredicate] inspection result on async.
      *
-     * Even if the given [CRecipePredicate.Context.isAsync] is false, it is unexpectedly true at runtime and provided to the executed predicates.
+     * Each predicate runs on a virtual thread (off the main thread).
+     * Even if the given [CRecipePredicate.Context.asyncContext] is null, an async context is set internally before predicates run.
      * @param[context] Context of inspection
      * @param[whenEmptyDefault] Result returned when [CRecipe.predicates] is null or empty (default = true)
      * @return[CompletableFuture] Result of run tests
@@ -131,7 +132,7 @@ interface CRecipe {
      * Returns results of suppliers made
      *
      * @param[context] Context of ResultSupplier
-     * @return[MutableList] Generated items list (`MutableList<ItemStack>`). If no item supplier applied, returns an empty list.
+     * @return[List] Generated items list. If no item supplier applied, returns an empty list.
      * @see[ResultSupplier]
      * @see[ResultSupplier.Context]
      */
@@ -141,6 +142,16 @@ interface CRecipe {
         } ?: emptyList()
     }
 
+    /**
+     * Returns results of suppliers made asynchronously.
+     *
+     * Each supplier runs on a virtual thread (off the main thread).
+     * Even if [ResultSupplier.Context.asyncContext] is null, an async context is set internally before suppliers run.
+     * @param[context] Context of ResultSupplier
+     * @return[CompletableFuture] Future of generated items list. If no supplier applied, completes with an empty list.
+     * @see[ResultSupplier]
+     * @see[ResultSupplier.Context]
+     */
     fun asyncGetResults(context: ResultSupplier.Context): CompletableFuture<List<ItemStack>> {
         val modifiedContext = context.toAsync()
         val suppliers: List<ResultSupplier> = this.results ?: return CompletableFuture.completedFuture(emptyList())
@@ -154,12 +165,13 @@ interface CRecipe {
     }
 
     /**
-     * Returns min amount
+     * Returns the minimum craft count calculated from input item amounts and recipe requirements.
      *
      * @param[map] Input items mapping
      * @param[relation] Coordinate relations in input items and recipe matters
      * @param[shift] Use Shift-Key (Batch Crafting) or not
-     * @param[withoutMass] Use mass-marked CMatters to min amount calculation or not
+     * @param[withoutMass] Exclude [CMatter.anyAmount]-marked matters from the calculation or not
+     * @return[Int] Minimum craft count. Returns 1 if no constraining matter exists.
      * @since 5.0.10
      */
     fun getTimes(

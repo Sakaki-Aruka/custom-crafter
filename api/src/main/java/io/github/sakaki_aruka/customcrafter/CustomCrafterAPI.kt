@@ -290,13 +290,13 @@ object CustomCrafterAPI {
      */
     private var BASE_BLOCK_SIDE = AtomicInteger(3)//3
     /**
-     * set base block's side size.
+     * Sets base block's side size.
      *
-     * default size = 3.
+     * Default size = 3.
      *
-     * @param[size] this argument must be odd and more than zero.
+     * @param[size] Must be an odd number and 3 or greater. Returns false if the condition is not met.
      * @param[calledAsync] Called from async processing or not. (Default = false)
-     * @return[Boolean] if successful to change, returns true else false.
+     * @return[Boolean] `true` if the value was changed successfully, `false` if [size] is invalid.
      */
     @JvmStatic
     @JvmOverloads

@@ -18,6 +18,9 @@ fun interface CMatterPredicate {
      * Runs this operation.
      * If [Context.asyncContext] is non-null, periodically check [AsyncContext.isInterrupted] and return early when true to support cooperative cancellation.
      *
+     * When [Context.isAsync] returns `true`, this method is invoked off the main thread.
+     * Avoid calling Bukkit API that requires the main thread directly; use a scheduler (e.g. FoliaLib) if main-thread access is needed.
+     *
      * @param[ctx] Context of operation
      * @return[Boolean] Result of operation
      * @since 5.0.17
@@ -47,10 +50,10 @@ fun interface CMatterPredicate {
     ) {
         /**
          * Returns whether this inspection is async.
-         * @return[Boolean] Async or not
+         * @return[Boolean] `true` if [asyncContext] is non-null
          * @since 5.0.20
          */
-        fun isAsync(): Boolean = asyncContext == null
+        fun isAsync(): Boolean = asyncContext != null
 
         /**
          * If no async context exists, returns a newly added one.

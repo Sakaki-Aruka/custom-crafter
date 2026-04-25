@@ -6,21 +6,20 @@ import org.bukkit.Material
 /**
  * This interface's implementing types can be used as materials for [CRecipe].
  *
- * @param[name] Name of this matter
- * @param[candidate] Material candidate of this matter
- * @param[amount] Amount of this matter requires
- * @param[anyAmount] If `true`, any input amount ≥ 1 is accepted regardless of [amount]. If `false`, input must have at least [amount] items.
- * @param[predicates] List of lambda functions what runs on search process
- *
  * @see[CRecipe]
  * @see[CMatterPredicate]
  * @since 5.0.0
  */
 interface CMatter {
+    /** Name of this matter. */
     val name: String
+    /** Set of acceptable [Material] types for this slot. */
     val candidate: Set<Material>
+    /** Required item count. Ignored when [anyAmount] is `true`. Must be 1 or greater. */
     val amount: Int
+    /** If `true`, any input amount ≥ 1 is accepted regardless of [amount]. If `false`, input must have at least [amount] items. */
     val anyAmount: Boolean
+    /** List of additional [CMatterPredicate] checks that run during slot matching. `null` or empty means no additional conditions. */
     val predicates: Collection<CMatterPredicate>?
 
     /**
@@ -62,10 +61,10 @@ interface CMatter {
     /**
      * Returns a merged result of all predicates run.
      *
-     * ```Kotlin
-     * // Default implementation on `CMatter#predicateResult`
-     * fun predicateResult(ctx: CMatterPredicate.Context): Boolean {
-     *     return predicates?.all { p -> p.predicate(ctx) } ?: true
+     * ```kotlin
+     * // Default implementation on `CMatter#predicatesResult`
+     * fun predicatesResult(ctx: CMatterPredicate.Context): Boolean {
+     *     return predicates?.all { p -> p.test(ctx) } ?: true
      * }
      * ```
      *
