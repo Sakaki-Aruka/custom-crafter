@@ -1,5 +1,19 @@
 # Changelog
 
+# 5.0.21
+
+## ✨ New Features and Enhancements
+* **[New Feature]** Added `ReplaceableResultSupplier` interface: writes items back into crafting UI slots after a craft, enabling ingredient transformation (e.g. returning a modified tool) and byproduct placement patterns.
+* **[New Feature]** Added `ResultSupplier.Context.CallMode` enum (`CRAFT` / `ICON`): allows `supply()` implementations to distinguish a real craft from an icon-generation call (e.g. in the AllCandidateUI display), replacing the old `isMultipleDisplayCall` field.
+* **[New Feature]** Added `CraftInputInterruptEvent`: fired when a player interacts with input slots or closes the CraftUI while a craft process is in progress.
+* **[New Feature]** Added `PreventDoubleCraftEvent`: fired when a player attempts to start a new craft while one is already running.
+* **[Enhancement]** Added `PartialSearch` API: asynchronous partial recipe match search for crafting hints and autocomplete suggestions. Supports both shaped and shapeless recipes.
+
+## 🛠 Fix
+* Fixed a race condition in `ONLY_FIRST` search mode that could return an empty result even when a matching recipe existed.
+* Fixed `isAsync()` returning an inverted value in `CMatterPredicate.Context` and `CRecipePredicate.Context`.
+* `CompletableFuture` tasks now consistently run on virtual threads.
+
 # 5.0.20-p1
 
 ## 🛠 Fix

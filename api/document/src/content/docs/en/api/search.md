@@ -212,3 +212,54 @@ data class MappedRelationComponent(
 For example, if a shaped recipe requires stone at `(0,0)`, there are cases where the recipe still matches even if the player places the item at `(2,2)`.
 In that case the `MappedRelationComponent` would be `recipe = (0,0), input = (2,2)`.
 This information is passed as `ResultSupplier.Context.relation` and `CRecipePredicate.Context.relation`, and is used to track which item was placed in which slot.
+
+---
+
+## PartialSearch
+
+`PartialSearch` provides asynchronous partial recipe match searches.
+A partial match occurs when the player's current crafting grid satisfies some — but not necessarily all — of a recipe's required slots.
+This is useful for crafting hints, recipe guides, and autocomplete suggestions.
+
+Recipes implementing `UnPartialSearchableRecipe` are excluded from all partial searches.
+
+```kotlin
+fun asyncPartialSearch(
+    crafterId: UUID,
+    view: CraftView,
+    searchQuery: SearchQuery = SearchQuery.ASYNC_DEFAULT,
+    sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes()
+): CompletableFuture<List<PartialSearchResult>>
+```
+
+### PartialSearchResult
+
+Each entry in the returned list implements `PartialSearchResult`:
+
+| Method | Return type | Description |
+|--------|-------------|-------------|
+| `recipe` | `CRecipe` | The candidate recipe that was evaluated |
+| `matched()` | `Set<CoordinateComponent>` | Recipe slot coordinates covered by at least one input item |
+| `notEnough()` | `Set<CoordinateComponent>` | Recipe slot coordinates that have no matching input item |
+| `state()` | `MatchState` | `ALL` if all slots are satisfied; `PARTIAL_NOT_ENOUGH` otherwise |
+
+`PartialShapedResult` is returned for shaped recipes and includes a `relation: MappedRelation`.
+`PartialShapelessResult` is returned for shapeless recipes and exposes `weakRelations()` — a matter-keyed map of compatible input slots.
+
+### Example
+
+```kotlin
+val player: Player = /* ... */
+val view = CraftView(
+    materials = mapOf(CoordinateComponent(0, 0) to ItemStack.of(Material.STONE)),
+    result = ItemStack.empty()
+)
+
+PartialSearch.asyncPartialSearch(player.uniqueId, view).thenAccept { results ->
+    results.forEach { result ->
+        println("Recipe: ${result.recipe.name}, state: ${result.state()}")
+        if (result.notEnough().isNotEmpty()) {
+            println("  Missing slots: ${result.notEnough()}")
+        }
+    }
+}

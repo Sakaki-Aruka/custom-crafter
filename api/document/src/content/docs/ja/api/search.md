@@ -211,4 +211,55 @@ data class MappedRelationComponent(
 
 たとえば定形レシピで `(0,0)` に石を要求しているとき、プレイヤーが `(2,2)` にアイテムを配置してもレシピに合致する場合があります。
 その際の `MappedRelationComponent` は `recipe = (0,0), input = (2,2)` となります。
+
+---
+
+## PartialSearch
+
+`PartialSearch` は非同期の部分一致レシピ検索を提供します。
+部分一致とは、プレイヤーの現在のクラフトグリッドがレシピの要求スロットの一部（必ずしも全部ではない）を満たしている状態を指します。
+クラフトヒントやレシピガイド、オートコンプリート提案などに活用できます。
+
+`UnPartialSearchableRecipe` を実装しているレシピは部分一致検索から除外されます。
+
+```kotlin
+fun asyncPartialSearch(
+    crafterId: UUID,
+    view: CraftView,
+    searchQuery: SearchQuery = SearchQuery.ASYNC_DEFAULT,
+    sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes()
+): CompletableFuture<List<PartialSearchResult>>
+```
+
+### PartialSearchResult
+
+返されるリストの各要素は `PartialSearchResult` を実装します。
+
+| メソッド | 戻り値型 | 概要 |
+|--------|---------|------|
+| `recipe` | `CRecipe` | 評価された候補レシピ |
+| `matched()` | `Set<CoordinateComponent>` | 少なくとも 1 つの入力アイテムに対応したレシピスロットの座標 |
+| `notEnough()` | `Set<CoordinateComponent>` | 対応する入力アイテムがないレシピスロットの座標 |
+| `state()` | `MatchState` | 全スロットが満たされていれば `ALL`、不足があれば `PARTIAL_NOT_ENOUGH` |
+
+定形レシピの場合は `PartialShapedResult` が返され、`relation: MappedRelation` を持ちます。
+不定形レシピの場合は `PartialShapelessResult` が返され、Matter をキーとした候補入力スロットのマッピング `weakRelations()` を持ちます。
+
+### 実装例
+
+```kotlin
+val player: Player = /* ... */
+val view = CraftView(
+    materials = mapOf(CoordinateComponent(0, 0) to ItemStack.of(Material.STONE)),
+    result = ItemStack.empty()
+)
+
+PartialSearch.asyncPartialSearch(player.uniqueId, view).thenAccept { results ->
+    results.forEach { result ->
+        println("レシピ: ${result.recipe.name}, 状態: ${result.state()}")
+        if (result.notEnough().isNotEmpty()) {
+            println("  不足スロット: ${result.notEnough()}")
+        }
+    }
+}
 この情報は `ResultSupplier.Context.relation` や `CRecipePredicate.Context.relation` として渡され、どのスロットに何が配置されていたかを追跡するために使用します。
