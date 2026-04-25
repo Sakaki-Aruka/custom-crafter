@@ -20,7 +20,7 @@ fun interface CRecipePredicate {
      * @param[crafterID] Crafter UUID
      * @param[recipe] Recipe
      * @param[relation] Pre-result of inspection
-     * @param[asyncContext] Async context (since 5.0.20)
+     * @param[asyncContext] Async context (since 5.0.20). When non-null, [test] implementations should periodically check [AsyncContext.isInterrupted] and return early if true.
      * @since 5.0.17
      */
     class Context @JvmOverloads constructor(
@@ -63,7 +63,8 @@ fun interface CRecipePredicate {
     }
 
     /**
-     * Inspection method
+     * Inspection method.
+     * If [Context.asyncContext] is non-null, periodically check [AsyncContext.isInterrupted] and return early when true to support cooperative cancellation.
      * @param[ctx] Context of inspection
      * @return[Boolean] Result of inspection
      * @since 5.0.17
