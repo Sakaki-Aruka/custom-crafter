@@ -12,6 +12,13 @@ import java.util.UUID
  * Result items supplier of [CRecipe].
  */
 fun interface ResultSupplier {
+    /**
+     * Supplies result items.
+     * If [Context.asyncContext] is non-null, periodically check [AsyncContext.isInterrupted] and return early when true to support cooperative cancellation.
+     *
+     * @param[ctx] Context of supply
+     * @return[List] Result items
+     */
     fun supply(ctx: Context): List<ItemStack>
 
     companion object {
@@ -66,7 +73,7 @@ fun interface ResultSupplier {
      * @param[shiftClicked] Shift-clicked or not
      * @param[calledTimes] Calculated minimum amount with [CMatter.amount]
      * @param[callMode] Indicates whether this invocation is a real craft or an icon generation for display (since 5.0.21)
-     * @param[asyncContext] Async context (since 5.0.20)
+     * @param[asyncContext] Async context (since 5.0.20). When non-null, [supply] implementations should periodically check [AsyncContext.isInterrupted] and return early if true.
      */
     class Context @JvmOverloads constructor(
         val recipe: CRecipe,

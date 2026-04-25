@@ -21,7 +21,8 @@ class AsyncContext(
     }
 
     /**
-     * Returns interrupted or not
+     * Returns interrupted or not.
+     * Async operation implementors should poll this periodically and return early when true to support cooperative cancellation.
      * @return[Boolean] Interrupted or not
      * @since 5.0.20
      */

@@ -16,6 +16,7 @@ fun interface CMatterPredicate {
 
     /**
      * Runs this operation.
+     * If [Context.asyncContext] is non-null, periodically check [AsyncContext.isInterrupted] and return early when true to support cooperative cancellation.
      *
      * @param[ctx] Context of operation
      * @return[Boolean] Result of operation
@@ -32,7 +33,7 @@ fun interface CMatterPredicate {
      * @param[mapped] User input items mapping
      * @param[recipe] A CRecipe what contains a CMatterPredicate who receives this
      * @param[crafterID] Crafter UUID
-     * @param[asyncContext] Async context.
+     * @param[asyncContext] Async context. When non-null, [test] implementations should periodically check [AsyncContext.isInterrupted] and return early if true.
      * @see[CMatterPredicate]
      */
     class Context @JvmOverloads constructor(
