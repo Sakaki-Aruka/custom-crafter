@@ -8,6 +8,7 @@
 * **[New Feature]** Added `CraftInputInterruptEvent`: fired when a player interacts with input slots or closes the CraftUI while a craft process is in progress.
 * **[New Feature]** Added `PreventDoubleCraftEvent`: fired when a player attempts to start a new craft while one is already running.
 * **[Enhancement]** Added `PartialSearch` API: asynchronous partial recipe match search for crafting hints and autocomplete suggestions. Supports both shaped and shapeless recipes.
+* **[New Feature]** Added `CVanillaRecipe.fromTransmute()`: converts a vanilla `TransmuteRecipe` into a `CVanillaRecipe`, enabling transmute recipes to be used with `PartialSearch` and other CustomCrafter features. Each ingredient's `RecipeChoice` is converted to a `CMatterPredicate` via `RecipeChoice.test()`, so NBT and exact-item constraints are preserved.
 
 ## 🛠 Fix
 * Fixed a race condition in `ONLY_FIRST` search mode that could return an empty result even when a matching recipe existed.
