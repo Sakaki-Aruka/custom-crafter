@@ -225,8 +225,8 @@ object Search {
         val tasks = recipes.map { recipe ->
             CompletableFuture.supplyAsync({
                 when (recipe.type) {
-                    CRecipe.Type.SHAPED -> shaped(view, recipe, crafterID, query.asyncContext ?: AsyncContext.ofTurnOff())
-                    CRecipe.Type.SHAPELESS -> shapeless(view, recipe, crafterID, query.asyncContext ?: AsyncContext.ofTurnOff())
+                    CRecipe.Type.SHAPED -> shaped(view, recipe, crafterID, query.asyncContext)
+                    CRecipe.Type.SHAPELESS -> shapeless(view, recipe, crafterID, query.asyncContext)
                 }?.let { mapped -> recipe to mapped }
             }, InternalAPI.executor)
         }
@@ -258,8 +258,8 @@ object Search {
             futures = recipes.mapNotNull { recipe ->
                 CompletableFuture.supplyAsync({
                     when (recipe.type) {
-                        CRecipe.Type.SHAPED -> shaped(view, recipe, crafterID, query.asyncContext ?: AsyncContext.ofTurnOff())
-                        CRecipe.Type.SHAPELESS -> shapeless(view, recipe, crafterID, AsyncContext.ofTurnOff())
+                        CRecipe.Type.SHAPED -> shaped(view, recipe, crafterID, query.asyncContext)
+                        CRecipe.Type.SHAPELESS -> shapeless(view, recipe, crafterID, query.asyncContext)
                     }?.let { recipe to it }
                 }, InternalAPI.executor)
             }
