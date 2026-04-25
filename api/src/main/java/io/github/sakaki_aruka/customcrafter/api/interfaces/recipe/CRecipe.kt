@@ -4,6 +4,7 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
+import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
 import org.bukkit.inventory.ItemStack
 import java.util.concurrent.CompletableFuture
 
@@ -119,7 +120,7 @@ interface CRecipe {
             ?: return CompletableFuture.completedFuture(whenEmptyDefault)
 
         val futures: List<CompletableFuture<Boolean>> = predicates.map { predicate ->
-            CompletableFuture.supplyAsync { predicate.test(modifiedContext) }
+            CompletableFuture.supplyAsync({ predicate.test(modifiedContext) }, InternalAPI.executor)
         }
 
         return CompletableFuture.allOf(*futures.toTypedArray())
@@ -145,7 +146,7 @@ interface CRecipe {
         val suppliers: List<ResultSupplier> = this.results ?: return CompletableFuture.completedFuture(emptyList())
 
         val futures: List<CompletableFuture<List<ItemStack>>> = suppliers.map { supplier ->
-            CompletableFuture.supplyAsync { supplier.supply(modifiedContext) }
+            CompletableFuture.supplyAsync({ supplier.supply(modifiedContext) }, InternalAPI.executor)
         }
 
         return CompletableFuture.allOf(*futures.toTypedArray())
