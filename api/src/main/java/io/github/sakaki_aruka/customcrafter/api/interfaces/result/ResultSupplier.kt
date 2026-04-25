@@ -16,6 +16,9 @@ fun interface ResultSupplier {
      * Supplies result items.
      * If [Context.asyncContext] is non-null, periodically check [AsyncContext.isInterrupted] and return early when true to support cooperative cancellation.
      *
+     * When [Context.isAsync] returns `true`, this method is invoked off the main thread.
+     * Avoid calling Bukkit API that requires the main thread directly; use a scheduler (e.g. FoliaLib) if main-thread access is needed.
+     *
      * @param[ctx] Context of supply
      * @return[List] Result items
      */
