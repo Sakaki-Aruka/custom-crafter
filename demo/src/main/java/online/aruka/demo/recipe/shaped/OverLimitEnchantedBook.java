@@ -78,6 +78,10 @@ public class OverLimitEnchantedBook {
         );
 
         ResultSupplier supplier = ctx -> {
+            // Skip heavy computation for icon-generation calls (e.g. AllCandidateUI display)
+            if (ctx.getCallMode() == ResultSupplier.Context.CallMode.ICON) {
+                return List.of(ItemStack.of(Material.ENCHANTED_BOOK));
+            }
             List<ItemStack> results = new ArrayList<>();
             int bookCount = (int) ctx.getMapped().values().stream()
                     .filter(item -> item.getType() == Material.ENCHANTED_BOOK)
