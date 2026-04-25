@@ -12,6 +12,7 @@ import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
  * @param[name] A name of this recipe.
  * @param[items] Elements of this recipe.
  * @param[type] A type of this recipe. (Shaped or Shapeless)
+ * @param[predicates] Additional conditions evaluated during recipe matching. (default = null)
  * @param[results] A [ResultSupplier] list. (default = null)
  */
 open class CRecipeImpl @JvmOverloads constructor(
@@ -26,7 +27,11 @@ open class CRecipeImpl @JvmOverloads constructor(
          * Shapeless recipe build wrapper.
          *
          * This calls the constructor with arguments and [CRecipe.Type.SHAPELESS].
-         * @return[CRecipeImpl] an shapeless recipe
+         * @param[name] A name of this recipe.
+         * @param[items] Matter list. Order is not significant (shapeless).
+         * @param[predicates] Additional conditions evaluated during recipe matching. (default = null)
+         * @param[results] A [ResultSupplier] list. (default = null)
+         * @return[CRecipeImpl] A shapeless recipe
          * @throws[IllegalArgumentException] Throws if [items] size is out of the range (1 ~ 36).
          * @throws[IllegalStateException] Throws if built recipe is invalid.
          * @since 5.0.14

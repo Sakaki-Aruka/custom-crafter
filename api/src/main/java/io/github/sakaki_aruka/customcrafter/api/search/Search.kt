@@ -35,19 +35,26 @@ object Search {
         private val vanilla: Recipe?,
         private val customs: List<Pair<CRecipe, MappedRelation>>,
     ) {
+
+        companion object {
+            @JvmField
+            val EMPTY = SearchResult(null, emptyList())
+        }
+
         /**
-         * returns a nullable vanilla recipe.
+         * Returns a nullable vanilla recipe.
          *
-         * When below situations, [vanilla] is null.
-         * - If [customs] is not empty and a search query's 'natural' is true.
-         * - If an input is not matched all registered vanilla recipes.
-         * @return[vanilla] PaperMCs Recipe ([Recipe]). This is NOT a [CRecipe].
+         * [vanilla] is null in the following situations:
+         * - [vanillaSearchMode][SearchQuery.VanillaSearchMode] is [SearchQuery.VanillaSearchMode.IF_CUSTOMS_NOT_FOUND] and [customs] is not empty.
+         * - The input does not match any registered vanilla recipe.
+         * @return[Recipe] PaperMC's [Recipe]. This is NOT a [CRecipe].
          */
         fun vanilla() = this.vanilla
 
         /**
-         * returns custom recipes.
+         * Returns found custom recipes with their coordinate relations.
          *
+         * @return[List] List of pairs of matched [CRecipe] and its [MappedRelation]
          */
         fun customs() = this.customs
 
@@ -84,6 +91,27 @@ object Search {
                 CVanillaRecipe.fromVanilla(v as CraftingRecipe)?.let { r -> result.add(r to null) }
             }
             this.customs.forEach { (recipe, relation) -> result.add(recipe to relation) }
+            return result
+        }
+
+        /**
+         * Returns all recipes and their relations, with vanilla recipes resolved against [view].
+         *
+         * Unlike [getMergedResults], this overload always includes the vanilla recipe with a concrete [MappedRelation].
+         * @param[view] The crafting view used to compute the vanilla recipe's relation
+         * @return[List] List of pairs of [CRecipe] and [MappedRelation]
+         * @since 5.0.11
+         */
+        fun getMergedResults(view: CraftView): List<Pair<CRecipe, MappedRelation>> {
+            val result: MutableList<Pair<CRecipe, MappedRelation>> = mutableListOf()
+            this.vanilla?.let { v ->
+                CVanillaRecipe.fromVanilla(v as CraftingRecipe)?.let { r ->
+                    result.add(r to r.relateWith(view))
+                }
+            }
+            this.customs.forEach { (recipe, relation) ->
+                result.add(recipe to relation)
+            }
             return result
         }
 
@@ -143,6 +171,10 @@ object Search {
                 asyncContext = null
             )
 
+            /**
+             * Default search query setting with async context enabled
+             * @since 5.0.20
+             */
             @JvmField
             val ASYNC_DEFAULT = SearchQuery(
                 searchMode = SearchMode.ALL,
@@ -178,6 +210,7 @@ object Search {
      * @param[query] Query of searching (since 5.0.20)
      * @param[sourceRecipes] Search target recipes (default = [CustomCrafterAPI.getRecipes])
      * @return[CompletableFuture] Future task of a search result
+     * @throws[IllegalArgumentException] If [view] materials is empty or size exceeds 36
      * @since 5.0.17
      */
     @JvmStatic
@@ -206,48 +239,31 @@ object Search {
         val tasks = recipes.map { recipe ->
             CompletableFuture.supplyAsync({
                 when (recipe.type) {
-                    CRecipe.Type.SHAPED -> shaped(view, recipe, crafterID, AsyncContext.ofTurnOff())
-                    CRecipe.Type.SHAPELESS -> shapeless(view, recipe, crafterID, AsyncContext.ofTurnOff())
+                    CRecipe.Type.SHAPED -> shaped(view, recipe, crafterID, query.asyncContext)
+                    CRecipe.Type.SHAPELESS -> shapeless(view, recipe, crafterID, query.asyncContext)
                 }?.let { mapped -> recipe to mapped }
             }, InternalAPI.executor)
         }
 
-        var futures: List<CompletableFuture<Pair<CRecipe, MappedRelation>?>>
         if (query.searchMode == SearchQuery.SearchMode.ONLY_FIRST) {
             val findFirst: CompletableFuture<Pair<CRecipe, MappedRelation>?> = CompletableFuture()
-            tasks.forEach {
-                it.thenApply { pair ->
-                    if (pair != null) {
-                        if (findFirst.complete(pair)) {
-                            tasks.forEach { t -> t.cancel(true) }
-                            query.asyncContext?.interrupt()
-                        }
+            val derived = tasks.map { task ->
+                task.thenAccept { pair ->
+                    if (pair != null && findFirst.complete(pair)) {
+                        query.asyncContext?.interrupt()
                     }
                 }
             }
-
-            CompletableFuture.allOf(*tasks.toTypedArray()).thenRun {
-                if (!findFirst.isDone) {
-                    findFirst.complete(null)
-                }
+            CompletableFuture.allOf(*derived.toTypedArray()).thenRun {
+                findFirst.complete(null)
             }
-
             return findFirst.thenApply { result ->
                 SearchResult(vanilla, result?.let { listOf(it) } ?: emptyList())
             }
-        } else {
-            futures = recipes.mapNotNull { recipe ->
-                CompletableFuture.supplyAsync({
-                    when (recipe.type) {
-                        CRecipe.Type.SHAPED -> shaped(view, recipe, crafterID, AsyncContext.ofTurnOff())
-                        CRecipe.Type.SHAPELESS -> shapeless(view, recipe, crafterID, AsyncContext.ofTurnOff())
-                    }?.let { recipe to it }
-                }, InternalAPI.executor)
-            }
         }
 
-        return CompletableFuture.allOf(*futures.toTypedArray())
-            .thenApply { SearchResult(vanilla, futures.mapNotNull { it.join() }) }
+        return CompletableFuture.allOf(*tasks.toTypedArray())
+            .thenApply { SearchResult(vanilla, tasks.mapNotNull { it.join() }) }
     }
 
     /**
@@ -257,10 +273,9 @@ object Search {
      *
      * @param[crafterID] a crafter's UUID
      * @param[view] input crafting gui's view
-     * @param[forceSearchVanillaRecipe] Force to search vanilla recipes or not.(true=force, false=not). The default is true.
-     * @param[onlyFirst] get only first matched custom recipe and mapped. (default = false)
+     * @param[searchQuery] Query that controls search behaviour (search mode and vanilla search mode). (default = [SearchQuery.DEFAULT])
      * @param[sourceRecipes] A list of searched recipes. (default = CustomCrafterAPI.getRecipes() / since 5.0.10)
-     * @return[SearchResult] A result of a request. If you send one that contains invalid params, returns null.
+     * @return[SearchResult] A result of a search.
      * @throws[IllegalArgumentException] Throws when 'view.materials' is empty or their size out of range 1 to 36.
      */
     @JvmStatic
@@ -268,8 +283,7 @@ object Search {
     fun search(
         crafterID: UUID,
         view: CraftView,
-        forceSearchVanillaRecipe: Boolean = true,
-        onlyFirst: Boolean = false,
+        searchQuery: SearchQuery = SearchQuery.DEFAULT,
         sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes(),
     ): SearchResult {
         if (view.materials.isEmpty() || view.materials.size > 36) {
@@ -284,13 +298,13 @@ object Search {
                 CRecipe.Type.SHAPELESS -> shapeless(view, recipe, crafterID)
             }?.let { customs.add(recipe to it) }
 
-            if (onlyFirst && customs.isNotEmpty()) {
+            if (searchQuery.searchMode == SearchQuery.SearchMode.ONLY_FIRST && customs.isNotEmpty()) {
                 break
             }
         }
 
         val vanilla: Recipe? =
-            if (!forceSearchVanillaRecipe && customs.isNotEmpty()) null
+            if (searchQuery.vanillaSearchMode != SearchQuery.VanillaSearchMode.FORCE && customs.isNotEmpty()) null
             else {
                 val world: World = Bukkit.getPlayer(crafterID)
                     ?.world
@@ -325,9 +339,9 @@ object Search {
             }
 
             if (!input.type.isAir) {
-                if (matter.mass && input.amount < 1) {
+                if (matter.anyAmount && input.amount < 1) {
                     return null
-                } else if (!matter.mass && input.amount < matter.amount) {
+                } else if (!matter.anyAmount && input.amount < matter.amount) {
                     return null
                 }
             }
@@ -429,7 +443,7 @@ object Search {
             val set: MutableSet<Triple<Int, Boolean, Boolean>> = mutableSetOf()
             for ((i, item) in input.entries) {
                 val amountResult: Boolean =
-                    if (matter.mass) {
+                    if (matter.anyAmount) {
                         item.amount > 0
                     } else {
                         item.amount >= matter.amount

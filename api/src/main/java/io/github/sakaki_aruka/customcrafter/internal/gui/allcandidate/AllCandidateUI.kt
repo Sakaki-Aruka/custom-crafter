@@ -2,6 +2,7 @@ package io.github.sakaki_aruka.customcrafter.internal.gui.allcandidate
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.event.CreateCustomItemEvent
+import io.github.sakaki_aruka.customcrafter.api.event.failure.ResultItemGiveFailEvent
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.api.interfaces.ui.CraftUIDesigner
@@ -23,11 +24,11 @@ import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
-import java.util.Collections
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
+import java.util.concurrent.atomic.AtomicReference
 
 internal class AllCandidateUI(
     override val currentPage: AtomicInteger = AtomicInteger(0),
@@ -44,7 +45,7 @@ internal class AllCandidateUI(
         "All Candidate".toComponent()
     )
     private val isClosed: AtomicBoolean = AtomicBoolean(false)
-    private val asyncContextReferences: MutableList<AsyncContext> = Collections.synchronizedList(mutableListOf())
+    private val iconGeneratorAsyncContext: AtomicReference<AsyncContext> = AtomicReference(AsyncContext.ofTurnOff())
     private val pages: ConcurrentHashMap<Int, ConcurrentHashMap<Int, Pair<ItemStack, CRecipe>>> = ConcurrentHashMap()
 
     init {
@@ -63,16 +64,15 @@ internal class AllCandidateUI(
                         return@runAsync
                     }
 
-                    val asyncContext = AsyncContext.ofTurnOff()
                     val context = ResultSupplier.Context(
                         recipe = recipe,
                         relation = relation ?: MappedRelation(emptySet()),
                         mapped = this.view.materials,
                         shiftClicked = useShift,
                         calledTimes = 1,
-                        isMultipleDisplayCall = true,
+                        callMode = ResultSupplier.Context.CallMode.ICON,
                         crafterID = this.player.uniqueId,
-                        asyncContext = asyncContext
+                        asyncContext = iconGeneratorAsyncContext.get()
                     )
 
                     pages[pageIndex]?.put(
@@ -182,12 +182,12 @@ internal class AllCandidateUI(
     }
 
     override fun onClose(event: InventoryCloseEvent) {
-        this.asyncContextReferences.forEach { it.interrupt() }
+        this.isClosed.set(true)
+        this.iconGeneratorAsyncContext.get()?.interrupt()
         if (!this.dropOnClose.get()) {
             return
         }
-        player.giveItems(saveLimit = true, *this.view.materials.values.toTypedArray(), this.view.result)
-        this.isClosed.set(true)
+        player.giveItems(saveLimit = true, *this.view.materials.values.toTypedArray())
     }
 
     override fun onClick(
@@ -213,10 +213,7 @@ internal class AllCandidateUI(
                 this.view.materials.entries.forEach { (c, item) ->
                     craftUI.inventory.setItem(c.toIndex(), item)
                 }
-                craftUI.inventory.setItem(
-                    this.bakedCraftUIDesigner.resultInt(),
-                    this.view.result
-                )
+
                 this.dropOnClose.set(false)
                 this.player.openInventory(craftUI.inventory)
                 return
@@ -252,7 +249,7 @@ internal class AllCandidateUI(
                         mapped = view.materials,
                         shiftClicked = event.isShiftClick,
                         calledTimes = recipe.getTimes(view.materials, relation, event.isShiftClick),
-                        isMultipleDisplayCall = false,
+                        callMode = ResultSupplier.Context.CallMode.CRAFT,
                         crafterID = player.uniqueId,
                         asyncContext = AsyncContext.ofTurnOff()
                     )
@@ -262,15 +259,14 @@ internal class AllCandidateUI(
                         CreateCustomItemEvent(player, this.view, this.result, event.isShiftClick, isAsync = false).callEvent()
                     }.get()
 
-                    InternalAPI.foliaLib.scheduler.runAtEntity(player) {
-                        player.giveItems(saveLimit = true, *results.toTypedArray())
-                    }.get()
+                    if (player.isOnline) {
+                        InternalAPI.foliaLib.scheduler.runAtEntity(player) {
+                            player.giveItems(saveLimit = true, *results.toTypedArray())
+                        }.get()
+                    } else {
+                        ResultItemGiveFailEvent(results, resultSupplierContext, true).callEvent()
+                    }
                 }, InternalAPI.executor)
-
-                if (!this.view.result.isEmpty) {
-                    player.location.world.dropItem(player.location, this.view.result)
-                    this.view = CraftView(this.view.materials, ItemStack.empty())
-                }
 
                 this.view = this.view.getDecremented(
                     shiftUsed = event.isShiftClick,
@@ -285,7 +281,6 @@ internal class AllCandidateUI(
                 this.view.materials.entries.forEach { (c, item) ->
                     craftUI.inventory.setItem(c.toIndex(), item)
                 }
-                craftUI.inventory.setItem(this.bakedCraftUIDesigner.resultInt(), this.view.result)
                 this.dropOnClose.set(false)
                 player.openInventory(craftUI.inventory)
             }

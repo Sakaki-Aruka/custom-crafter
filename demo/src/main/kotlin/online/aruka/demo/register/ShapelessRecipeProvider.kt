@@ -69,6 +69,9 @@ object ShapelessRecipeProvider {
     fun extractPotion(): CRecipe {
         val potion: CMatter = CMatterImpl.of(Material.POTION, Material.SPLASH_POTION, Material.LINGERING_POTION)
         val extractor = ResultSupplier { ctx ->
+            // Skip side effects for icon-generation calls (e.g. AllCandidateUI display)
+            if (ctx.callMode == ResultSupplier.Context.CallMode.ICON) return@ResultSupplier emptyList()
+
             val potionMeta: PotionMeta = ctx.mapped.values.first().itemMeta as? PotionMeta
                 ?: return@ResultSupplier emptyList()
             val effects: MutableList<PotionEffect> = mutableListOf()

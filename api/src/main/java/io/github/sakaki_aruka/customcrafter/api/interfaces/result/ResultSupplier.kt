@@ -12,6 +12,16 @@ import java.util.UUID
  * Result items supplier of [CRecipe].
  */
 fun interface ResultSupplier {
+    /**
+     * Supplies result items.
+     * If [Context.asyncContext] is non-null, periodically check [AsyncContext.isInterrupted] and return early when true to support cooperative cancellation.
+     *
+     * When [Context.isAsync] returns `true`, this method is invoked off the main thread.
+     * Avoid calling Bukkit API that requires the main thread directly; use a scheduler (e.g. FoliaLib) if main-thread access is needed.
+     *
+     * @param[ctx] Context of supply
+     * @return[List] Result items
+     */
     fun supply(ctx: Context): List<ItemStack>
 
     companion object {
@@ -65,8 +75,8 @@ fun interface ResultSupplier {
      * @param[mapped] Coordinates and input items mapping
      * @param[shiftClicked] Shift-clicked or not
      * @param[calledTimes] Calculated minimum amount with [CMatter.amount]
-     * @param[isMultipleDisplayCall] `invoke` called from multiple result display item collector or not
-     * @param[asyncContext] Async context (since 5.0.20)
+     * @param[callMode] Indicates whether this invocation is a real craft or an icon generation for display (since 5.0.21)
+     * @param[asyncContext] Async context (since 5.0.20). When non-null, [supply] implementations should periodically check [AsyncContext.isInterrupted] and return early if true.
      */
     class Context @JvmOverloads constructor(
         val recipe: CRecipe,
@@ -75,9 +85,23 @@ fun interface ResultSupplier {
         val shiftClicked: Boolean,
         val calledTimes: Int,
         val crafterID: UUID,
-        val isMultipleDisplayCall: Boolean,
+        val callMode: CallMode,
         val asyncContext: AsyncContext? = null
     ) {
+
+        /**
+         * Indicates the purpose of a [supply] invocation.
+         *
+         * - [CRAFT]: The player performed an actual craft. Items should be delivered normally.
+         * - [ICON]: The result is used only as a display icon (e.g. in AllCandidate feature).
+         *   Heavy computation may be skipped; the returned items are not given to the player.
+         *
+         * @since 5.0.21
+         */
+        enum class CallMode {
+            CRAFT,
+            ICON
+        }
         /**
          * Copy with a given parameter.
          *
@@ -86,7 +110,7 @@ fun interface ResultSupplier {
          * @since 5.0.20
          */
         fun copyWith(asyncContext: AsyncContext? = null): Context {
-            return Context(recipe, relation, mapped, shiftClicked, calledTimes, crafterID, isMultipleDisplayCall, asyncContext)
+            return Context(recipe, relation, mapped, shiftClicked, calledTimes, crafterID, callMode, asyncContext)
         }
 
         /**
@@ -107,6 +131,6 @@ fun interface ResultSupplier {
          * @return[Boolean] Async or not
          * @since 5.0.20
          */
-        fun isAsync(): Boolean = asyncContext == null
+        fun isAsync(): Boolean = asyncContext != null
     }
 }

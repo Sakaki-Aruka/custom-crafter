@@ -84,7 +84,7 @@ object ShapedRecipeProvider {
         val waterBucket: CMatter = CMatterImpl(
             name = "water bucket (mass)",
             candidate = setOf(Material.WATER_BUCKET),
-            mass = true
+            anyAmount = true
         )
 
         val supplier = ResultSupplier { ctx ->
@@ -131,7 +131,7 @@ object ShapedRecipeProvider {
         val obsidian: CMatter = CMatterImpl(
             name = "obsidian",
             candidate = setOf(Material.OBSIDIAN),
-            mass = true
+            anyAmount = true
         )
 
         val supplier = ResultSupplier { ctx ->
@@ -185,7 +185,7 @@ object ShapedRecipeProvider {
                         PersistentDataType.INTEGER,
                     )
                 }),
-                mass = true
+                anyAmount = true
             ),
             includeAir = false
         )

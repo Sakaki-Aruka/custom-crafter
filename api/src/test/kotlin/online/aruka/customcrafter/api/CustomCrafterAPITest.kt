@@ -76,10 +76,6 @@ internal object CustomCrafterAPITest {
                 return CoordinateComponent.fromIndex(35) to ItemStack.of(Material.STONE)
             }
 
-            override fun resultSlot(context: CraftUIDesigner.Context): CoordinateComponent {
-                return CoordinateComponent.fromIndex(44)
-            }
-
             override fun title(context: CraftUIDesigner.Context): Component {
                 return "".toComponent()
             }

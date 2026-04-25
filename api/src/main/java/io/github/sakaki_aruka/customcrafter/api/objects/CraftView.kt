@@ -11,12 +11,10 @@ import org.bukkit.inventory.ItemStack
  * A view of crafting gui.
  *
  * @param[materials] A mapping of materials what were placed by a player.
- * @param[result] An item that is placed the result item slot.
  */
 
 data class CraftView (
-    val materials: Map<CoordinateComponent, ItemStack>,
-    val result: ItemStack
+    val materials: Map<CoordinateComponent, ItemStack>
 ) {
     /**
      * Returns a decremented view what calculated by specified arguments.
@@ -41,7 +39,7 @@ data class CraftView (
             val xLimit: Int = minAmount
 
             val decrementAmount: Int =
-                if (matter.mass) 1
+                if (matter.anyAmount) 1
                 else
                     if (shiftUsed) xLimit * matter.amount
                     else matter.amount
@@ -53,7 +51,7 @@ data class CraftView (
             }
         }
 
-        return CraftView(materials = map.toMap(), result = this.result.clone())
+        return CraftView(materials = map.toMap())
     }
 
     /**
@@ -65,7 +63,7 @@ data class CraftView (
     fun clone(): CraftView {
         val map: MutableMap<CoordinateComponent, ItemStack> = mutableMapOf()
         this.materials.forEach { (component, item) -> map[component] = item.clone() }
-        return CraftView(materials = map.toMap(), result = this.result.clone())
+        return CraftView(materials = map.toMap())
     }
 
     /**
@@ -77,10 +75,6 @@ data class CraftView (
     fun drop(world: World, location: Location) {
         this.materials.values.filter { item -> !item.isEmpty }
             .forEach { item -> world.dropItem(location, item) }
-
-        this.result.takeIf { item -> !item.isEmpty }?.let { item ->
-            world.dropItem(location, item)
-        }
     }
 
     /**
@@ -89,10 +83,9 @@ data class CraftView (
      * @since 5.0.17
      */
     fun excludeAir(): CraftView {
-        val result: ItemStack = this.result.clone()
         val map: Map<CoordinateComponent, ItemStack> = this.materials.entries
             .filterNot { (_, item) -> item.type.isAir }
             .associate { (k, v) -> k to v }
-        return CraftView(map, result)
+        return CraftView(map)
     }
 }

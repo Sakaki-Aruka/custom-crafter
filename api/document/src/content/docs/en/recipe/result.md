@@ -37,7 +37,7 @@ As noted above, the context provides a variety of state:
 | `shiftClicked` | `Boolean` | Whether bulk crafting mode is active (i.e., whether the Shift key was held) |
 | `calledTimes` | `Int` | The number of crafts (if in bulk crafting mode, the maximum craftable quantity) |
 | `crafterID` | `UUID` | The UUID of the player who performed the craft |
-| `isMultipleDisplayCall` | `Boolean` | Whether this call originates from the "show all crafting candidates" feature |
+| `callMode` | `CallMode` | Whether this call is a real craft (`CRAFT`) or an icon-generation call for display purposes (`ICON`, e.g. in AllCandidateUI) |
 | `asyncContext` | `AsyncContext?` | Context for async execution; `null` during synchronous execution |
 
 You can use these values inside `ResultSupplier` to decide what items to produce.
@@ -54,17 +54,21 @@ For example, suppose a recipe requires "2 Stones + 1 Gold Ingot" and the player 
 
 Using `ResultSupplier.timesSingle` multiplies the result item count by `calledTimes`.
 
-### About isMultipleDisplayCall
+### About callMode
 
-When `UseMultipleResultCandidateFeature` is enabled, there is a feature that previews the result items of multiple matching recipes for the given input.
-During a call made for this preview, `isMultipleDisplayCall = true`.
+`callMode` is a `CallMode` enum value that indicates the purpose of the `supply()` invocation:
 
-It is recommended to check this flag according to your logic so that side effects (such as database writes) do not occur during preview calls.
+| Value | Description |
+|-------|-------------|
+| `CRAFT` | The player performed an actual craft. Items should be delivered normally. |
+| `ICON` | The result is used only as a display icon (e.g. in AllCandidateUI). Heavy computation may be skipped; returned items are not given to the player. |
+
+It is recommended to skip side effects (such as database writes) when `callMode` is `ICON`.
 
 ```kotlin
 val result = ResultSupplier { ctx ->
-    if (ctx.isMultipleDisplayCall) {
-        // Do not trigger side effects for preview-only calls
+    if (ctx.callMode == ResultSupplier.Context.CallMode.ICON) {
+        // Do not trigger side effects for display-only calls
         return@ResultSupplier listOf(ItemStack.of(Material.DIAMOND))
     }
     // Update the database only during actual crafting
@@ -148,5 +152,69 @@ val customResult = ResultSupplier { ctx ->
         return@ResultSupplier listOf(ItemStack.of(Material.ENCHANTED_GOLDEN_APPLE))
     }
     listOf(ItemStack.of(Material.GOLDEN_APPLE))
+}
+```
+
+---
+
+## ReplaceableResultSupplier
+
+`ReplaceableResultSupplier` is a subinterface of `ResultSupplier` that writes items back into crafting UI slots after a craft completes, instead of (or in addition to) giving them directly to the player.
+
+Typical use cases:
+- Ingredient transformation — returning a modified or depleted tool to the grid after use
+- Byproduct placement — returning an empty bucket after a filled bucket is consumed
+
+`supply()` is already implemented and always returns an empty list; item delivery is handled inside `replaceResultHandler`.
+
+### Required methods
+
+| Method | Description |
+|--------|-------------|
+| `replaceQueries(ctx)` | Returns a map of grid coordinates to items that should be written back. Called on an executor thread. |
+| `replaceResultHandler(results, usedQueries, usedContext)` | Called after all write-back attempts complete. Use this to inspect per-slot outcomes or deliver items to the player. |
+
+### ReplaceState
+
+Each slot's outcome is reported as a `ReplaceState` value:
+
+| Value | Description |
+|-------|-------------|
+| `SUCCESS` | The item was successfully placed into the slot |
+| `ITEM_ALREADY_PLACED` | The slot already contained an item; write-back was skipped |
+| `UI_CLOSED` | The CraftUI was closed before write-back could complete |
+| `PLAYER_OFFLINE` | The player was offline when `supply()` was called |
+| `TIMEOUT` | The entity scheduler did not execute within `timeoutMilli()` milliseconds |
+| `UNKNOWN` | The operation timed out before `replaceQueries()` returned |
+
+### timeoutMilli()
+
+Returns the maximum number of milliseconds to wait for the scheduler. Defaults to `1000` ms. Override to change this threshold.
+
+### Example
+
+```kotlin
+class EmptyBucketReplacer : ReplaceableResultSupplier {
+    override fun replaceQueries(ctx: ReplaceableResultSupplier.Context): Map<CoordinateComponent, ItemStack> {
+        // Replace each input bucket slot with an empty bucket
+        return ctx.relation.components.associate { (_, inputCoord) ->
+            inputCoord to ItemStack.of(Material.BUCKET)
+        }
+    }
+
+    override fun replaceResultHandler(
+        results: Map<CoordinateComponent, ReplaceableResultSupplier.ReplaceState>,
+        usedQueries: Map<CoordinateComponent, ItemStack>?,
+        usedContext: ReplaceableResultSupplier.Context
+    ) {
+        val failed = results.filter { (_, state) -> !state.isSuccess() }
+        if (failed.isNotEmpty()) {
+            // Fall back: give the player the items that could not be placed
+            val player = Bukkit.getPlayer(usedContext.crafterID) ?: return
+            failed.keys.forEach { coord ->
+                usedQueries?.get(coord)?.let { player.inventory.addItem(it) }
+            }
+        }
+    }
 }
 ```

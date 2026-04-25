@@ -149,6 +149,50 @@ class PropertiesChangeListener : Listener {
 }
 ```
 
+---
+
+## CraftInputInterruptEvent
+
+Fired when a player interacts with the crafting input slots or closes the CraftUI while a craft process (recipe search or result generation) is already in progress, causing the ongoing process to be interrupted.
+This event is not cancellable.
+
+| Property | Type | Description |
+|------------|-----|------|
+| `interrupter` | `Player` | The player who caused the interruption |
+| `isAsync` | `Boolean` | Whether the event was fired from an asynchronous thread |
+
+```kotlin
+class CraftInputInterruptListener : Listener {
+    @EventHandler
+    fun onInterrupt(event: CraftInputInterruptEvent) {
+        println("${event.interrupter.name} interrupted an ongoing craft.")
+    }
+}
+```
+
+---
+
+## PreventDoubleCraftEvent
+
+Fired when a player attempts to start a new craft while a craft process (recipe search or result generation) is already running, causing the new attempt to be blocked.
+This event is not cancellable.
+
+| Property | Type | Description |
+|------------|-----|------|
+| `player` | `Player` | The player who attempted the double craft |
+| `isAsync` | `Boolean` | Whether the event was fired from an asynchronous thread |
+
+```kotlin
+class PreventDoubleCraftListener : Listener {
+    @EventHandler
+    fun onPrevent(event: PreventDoubleCraftEvent) {
+        event.player.sendMessage("Please wait for the current craft to finish.")
+    }
+}
+```
+
+---
+
 ### Example: Monitoring Multiple Properties Together
 
 ```kotlin

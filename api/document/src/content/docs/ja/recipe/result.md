@@ -38,7 +38,7 @@ fun interface ResultSupplier {
 | `shiftClicked` | `Boolean` | 一括作成モードであるか (Shift キーが押下されているか) |
 | `calledTimes` | `Int` | 作成回数 (一括作成時は作成可能な最大個数) |
 | `crafterID` | `UUID` | クラフトを実行したプレイヤーの UUID |
-| `isMultipleDisplayCall` | `Boolean` | 全候補一括表示機能からの呼び出しかどうか |
+| `callMode` | `CallMode` | 実際のクラフト (`CRAFT`) か、表示用のアイコン生成呼び出し (`ICON`、例: AllCandidateUI) かを示す |
 | `asyncContext` | `AsyncContext?` | 非同期実行時用コンテキスト。同期実行時は `null` |
 
 これらの値を利用して ResultSupplier の中で作成するアイテムを決定できます。
@@ -56,18 +56,21 @@ fun interface ResultSupplier {
 
 `ResultSupplier.timesSingle` を使うと成果物の個数が `calledTimes` 倍になります。
 
-### isMultipleDisplayCall について
+### callMode について
 
-`UseMultipleResultCandidateFeature` が有効な場合、入力されたアイテムに合致する複数のレシピの成果物をプレビューとして表示する機能があります。
-この表示のための呼び出し時には `isMultipleDisplayCall = true` となります。
+`callMode` は `supply()` の呼び出し目的を示す `CallMode` enum です。
 
-プレビュー呼び出し時にも副作用（データベース書き込みなど）が発生しないよう、
-処理内容に応じてこのフラグを確認することを推奨します。
+| 値 | 概要 |
+|----|------|
+| `CRAFT` | プレイヤーが実際にクラフトを実行した。通常通りアイテムを提供する。 |
+| `ICON` | 表示用のアイコン生成呼び出し（例: AllCandidateUI）。重い処理をスキップしてよく、返したアイテムはプレイヤーに渡されない。 |
+
+`callMode` が `ICON` の場合は副作用（データベース書き込みなど）をスキップすることを推奨します。
 
 ```kotlin
 val result = ResultSupplier { ctx ->
-    if (ctx.isMultipleDisplayCall) {
-        // プレビュー表示のみの場合は副作用を発生させない
+    if (ctx.callMode == ResultSupplier.Context.CallMode.ICON) {
+        // 表示用呼び出し時は副作用を発生させない
         return@ResultSupplier listOf(ItemStack.of(Material.DIAMOND))
     }
     // 実際のクラフト時のみデータベースを更新する
@@ -152,6 +155,70 @@ val customResult = ResultSupplier { ctx ->
         return@ResultSupplier listOf(ItemStack.of(Material.ENCHANTED_GOLDEN_APPLE))
     }
     listOf(ItemStack.of(Material.GOLDEN_APPLE))
+}
+```
+
+---
+
+## ReplaceableResultSupplier
+
+`ReplaceableResultSupplier` は `ResultSupplier` のサブインターフェースで、クラフト完了後にアイテムをプレイヤーに直接渡すのではなく（またはそれに加えて）、クラフト UI のスロットへ書き戻します。
+
+主なユースケース:
+- 素材の変換 — 使用後にアイテムをスロットへ戻す（例: 消耗したツールを改変して返却）
+- 副産物の配置 — バケツ使用後に空のバケツをスロットへ戻す
+
+`supply()` は実装済みで常に空のリストを返します。プレイヤーへのアイテム提供は `replaceResultHandler` 内で行います。
+
+### 実装が必要なメソッド
+
+| メソッド | 概要 |
+|--------|------|
+| `replaceQueries(ctx)` | スロットへ書き戻すアイテムのマッピングを返す。エグゼキュータースレッド上で呼び出される。 |
+| `replaceResultHandler(results, usedQueries, usedContext)` | 全書き戻し処理完了後に呼び出される。スロットごとの結果を確認したり、プレイヤーへのアイテム提供を行う。 |
+
+### ReplaceState
+
+各スロットの処理結果は `ReplaceState` で報告されます。
+
+| 値 | 概要 |
+|----|------|
+| `SUCCESS` | スロットへのアイテム配置に成功した |
+| `ITEM_ALREADY_PLACED` | スロットにすでにアイテムが存在したため書き戻しをスキップした |
+| `UI_CLOSED` | 書き戻し前に CraftUI が閉じられた |
+| `PLAYER_OFFLINE` | `supply()` 呼び出し時にプレイヤーがオフラインだった |
+| `TIMEOUT` | `timeoutMilli()` ミリ秒以内にエンティティスケジューラが実行されなかった |
+| `UNKNOWN` | `replaceQueries()` の完了前にタイムアウトした |
+
+### timeoutMilli()
+
+スケジューラの最大待機時間（ミリ秒）を返します。デフォルトは `1000` ms。オーバーライドして変更できます。
+
+### 実装例
+
+```kotlin
+class EmptyBucketReplacer : ReplaceableResultSupplier {
+    override fun replaceQueries(ctx: ReplaceableResultSupplier.Context): Map<CoordinateComponent, ItemStack> {
+        // 入力バケツスロットを空のバケツで置き換える
+        return ctx.relation.components.associate { (_, inputCoord) ->
+            inputCoord to ItemStack.of(Material.BUCKET)
+        }
+    }
+
+    override fun replaceResultHandler(
+        results: Map<CoordinateComponent, ReplaceableResultSupplier.ReplaceState>,
+        usedQueries: Map<CoordinateComponent, ItemStack>?,
+        usedContext: ReplaceableResultSupplier.Context
+    ) {
+        val failed = results.filter { (_, state) -> !state.isSuccess() }
+        if (failed.isNotEmpty()) {
+            // フォールバック: 配置できなかったアイテムをプレイヤーに渡す
+            val player = Bukkit.getPlayer(usedContext.crafterID) ?: return
+            failed.keys.forEach { coord ->
+                usedQueries?.get(coord)?.let { player.inventory.addItem(it) }
+            }
+        }
+    }
 }
 ```
 

@@ -303,9 +303,6 @@ object AllCandidateUITest {
             backedCraftUI.inventory.getItem(c.toIndex()) != null
                     && backedCraftUI.inventory.getItem(c.toIndex())!!.isSimilar(ItemStack(Material.STONE))
         })
-
-        val resultSlotItem = backedCraftUI.inventory.getItem(backedCraftUI.bakedDesigner.resultInt())
-        assertTrue(resultSlotItem == null || resultSlotItem.type.isAir)
     }
 
     @Test
@@ -315,9 +312,6 @@ object AllCandidateUITest {
         CoordinateComponent.square(3).forEach { c ->
             craftUI.inventory.setItem(c.toIndex(), ItemStack(Material.STONE))
         }
-
-        craftUI.inventory.setItem(craftUI.bakedDesigner.resultInt(), ItemStack.of(Material.STONE))
-
         val view = craftUI.toView()
 
         val result = Search.search(
@@ -350,10 +344,6 @@ object AllCandidateUITest {
             backedCraftUI.inventory.getItem(c.toIndex()) != null
                     && backedCraftUI.inventory.getItem(c.toIndex())!!.isSimilar(ItemStack(Material.STONE))
         })
-
-        val resultSlotItem: ItemStack? = backedCraftUI.inventory.getItem(CraftUI.RESULT_SLOT)
-        assertTrue(resultSlotItem != null)
-        assertEquals(Material.STONE, resultSlotItem.type)
     }
 
     @Test

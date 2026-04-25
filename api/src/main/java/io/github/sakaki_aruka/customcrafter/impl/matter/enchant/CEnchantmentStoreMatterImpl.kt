@@ -15,7 +15,7 @@ import org.bukkit.inventory.meta.EnchantmentStorageMeta
  * @param[name] matter name
  * @param[candidate] matter candidate materials
  * @param[amount] matter amount
- * @param[mass] this matter is mass or not
+ * @param[anyAmount] this matter is mass or not
  * @param[predicates] if in checks, this matter requires to pass these all.
  * @param[storedEnchantComponents] enchant predicates for stored enchantments. set of [CEnchantComponent].
  */
@@ -24,7 +24,7 @@ open class CEnchantmentStoreMatterImpl @JvmOverloads constructor(
     override val candidate: Set<Material>,
     override val storedEnchantComponents: Set<CEnchantComponent>,
     override val amount: Int = 1,
-    override val mass: Boolean = false,
+    override val anyAmount: Boolean = false,
     override val predicates: Set<CMatterPredicate>? = CMatterImpl.defaultMatterPredicates()
 ): CEnchantmentStoreMatter {
     companion object {

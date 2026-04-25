@@ -149,6 +149,50 @@ class PropertiesChangeListener : Listener {
 }
 ```
 
+---
+
+## CraftInputInterruptEvent
+
+クラフト処理（レシピ検索または成果物生成）が進行中に、プレイヤーが入力スロットを操作したり CraftUI を閉じたりして、処理が中断されたときに発火します。
+このイベントはキャンセル不可です。
+
+| プロパティ | 型 | 概要 |
+|------------|-----|------|
+| `interrupter` | `Player` | 中断を引き起こしたプレイヤー |
+| `isAsync` | `Boolean` | 非同期スレッドから発火されたかどうか |
+
+```kotlin
+class CraftInputInterruptListener : Listener {
+    @EventHandler
+    fun onInterrupt(event: CraftInputInterruptEvent) {
+        println("${event.interrupter.name} が進行中のクラフトを中断しました。")
+    }
+}
+```
+
+---
+
+## PreventDoubleCraftEvent
+
+クラフト処理（レシピ検索または成果物生成）がすでに実行中の状態で、プレイヤーが新たなクラフトを開始しようとしてブロックされたときに発火します。
+このイベントはキャンセル不可です。
+
+| プロパティ | 型 | 概要 |
+|------------|-----|------|
+| `player` | `Player` | 二重クラフトを試みたプレイヤー |
+| `isAsync` | `Boolean` | 非同期スレッドから発火されたかどうか |
+
+```kotlin
+class PreventDoubleCraftListener : Listener {
+    @EventHandler
+    fun onPrevent(event: PreventDoubleCraftEvent) {
+        event.player.sendMessage("現在のクラフトが完了するまでお待ちください。")
+    }
+}
+```
+
+---
+
 ### 実装例: 複数プロパティをまとめて監視する
 
 ```kotlin

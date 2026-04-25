@@ -13,14 +13,14 @@ import org.bukkit.Material
  * @param[name] matter name
  * @param[candidate] matter candidate materials
  * @param[amount] matter amount (default = 1)
- * @param[mass] this matter is mass or not (default = false)
+ * @param[anyAmount] If `true`, any input amount ≥ 1 is accepted regardless of [amount]. (default = false)
  * @param[predicates] if in checks, this matter requires to pass these all. (default = Enchant, EnchantStorage, Potion checker contains)
  */
 open class CMatterImpl @JvmOverloads constructor(
     override val name: String,
     override val candidate: Set<Material>,
     override val amount: Int = 1,
-    override val mass: Boolean = false,
+    override val anyAmount: Boolean = false,
     override val predicates: Set<CMatterPredicate>? = defaultMatterPredicates(),
 ): CMatter {
     companion object {
@@ -52,14 +52,14 @@ open class CMatterImpl @JvmOverloads constructor(
          *     name = "STONE-COBBLESTONE",
          *     candidate = setOf(Material.STONE, Material.COBBLESTONE),
          *     amount = 1,
-         *     mass = false,
-         *     predicates = null
+         *     anyAmount = false,
+         *     predicates = defaultMatterPredicates()
          * )
          * ```
          *
          * @param[materials] Candidate materials
          * @return[CMatterImpl] Built matter
-         * @throws[IllegalStateException] Throws when [materials] is empty and contains invalid material
+         * @throws[IllegalStateException] Throws when [materials] is empty or contains invalid material
          */
         @JvmStatic
         fun of(vararg materials: Material): CMatterImpl {
@@ -74,9 +74,9 @@ open class CMatterImpl @JvmOverloads constructor(
         }
 
         /**
-         * returns single candidate [CMatterImpl].
+         * Returns single candidate [CMatterImpl].
          *
-         * its name is [material]'s name. `material.name`.
+         * Its name is [material]'s name. `material.name`.
          *
          * ```kotlin
          * // below 2 matters are same
@@ -86,12 +86,14 @@ open class CMatterImpl @JvmOverloads constructor(
          *     name = "STONE",
          *     candidate = setOf(Material.STONE),
          *     amount = 1,
-         *     mass = false,
-         *     predicates = null
+         *     anyAmount = false,
+         *     predicates = defaultMatterPredicates()
          * )
          * ```
          *
-         * @param[material] a candidate of this matter.
+         * @param[material] A candidate of this matter.
+         * @return[CMatterImpl] Built matter
+         * @throws[IllegalStateException] Throws when [material] is invalid
          */
         @JvmStatic
         fun single(material: Material): CMatterImpl = of(material)
@@ -107,14 +109,14 @@ open class CMatterImpl @JvmOverloads constructor(
          *     name = "STONE-COBBLESTONE",
          *     candidate = setOf(Material.STONE, Material.COBBLESTONE),
          *     amount = 1,
-         *     mass = false,
+         *     anyAmount = false,
          *     predicates = null
          * )
          * ```
          *
          * @param[materials] Candidate materials
          * @return[CMatterImpl] Built matter
-         * @throws[IllegalStateException] Throws when [materials] is empty and contains invalid material
+         * @throws[IllegalStateException] Throws when [materials] is empty or contains invalid material
          */
         @JvmStatic
         fun multi(vararg materials: Material): CMatterImpl = of(*materials)

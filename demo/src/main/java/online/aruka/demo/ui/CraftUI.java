@@ -24,11 +24,6 @@ public class CraftUI implements CraftUIDesigner {
     }
 
     @Override
-    public @NotNull CoordinateComponent resultSlot(@NotNull Context context) {
-        return CoordinateComponent.fromIndex(27);
-    }
-
-    @Override
     public @NotNull Pair<CoordinateComponent, ItemStack> makeButton(@NotNull Context context) {
         ItemStack button = ItemStack.of(Material.CRAFTING_TABLE);
         button.editMeta(meta -> meta.customName(MiniMessage.miniMessage().deserialize("<white>Click and Craft")));
@@ -41,7 +36,7 @@ public class CraftUI implements CraftUIDesigner {
         for (int y = 0; y < 6; y++) {
             for (int x = 0; x < 3; x++) {
                 var c = new CoordinateComponent(x, y);
-                if (c.toIndex() == 18 || c.toIndex() == 27) continue;
+                if (c.toIndex() == 18) continue;
                 var blank = ItemStack.of(Material.BLACK_STAINED_GLASS_PANE);
                 blank.editMeta(meta -> {
                     meta.customName(Component.text(""));

@@ -332,27 +332,6 @@ internal object CraftUITest {
         )
     }
 
-    @Test
-    fun avoidToPlaceItemsOnTheResultSlotTest() {
-        val player = server.getPlayer(0)
-        val ui = CraftUI(caller = player)
-        player.openInventory(ui.inventory)
-
-        player.setItemOnCursor(ItemStack.of(Material.STONE))
-
-        ui.onClick(
-            clicked = ui.inventory,
-            event = InventoryClickEvent(
-                player.openInventory,
-                InventoryType.SlotType.CONTAINER,
-                ui.bakedDesigner.resultInt(),
-                ClickType.LEFT,
-                InventoryAction.PLACE_ONE
-            )
-        )
-
-        assertTrue(ui.inventory.getItem(ui.bakedDesigner.resultInt())?.type?.isAir ?: true)
-    }
 //
 //    @Test
 //    fun openAllCandidateUITest() {
@@ -440,25 +419,6 @@ internal object CraftUITest {
             BlockFace.UP
         )
         assertFalse(CraftUI.isTrigger(event))
-    }
-
-    @Test
-    fun allowPickupFromResultSlotTest() {
-        val player: PlayerMock = server.getPlayer(0)
-        val ui = CraftUI(caller = player)
-        player.openInventory(ui.inventory)
-        ui.inventory.setItem(ui.bakedDesigner.resultInt(), ItemStack.of(Material.STONE))
-
-        val event = InventoryClickEvent(
-            player.openInventory,
-            InventoryType.SlotType.CONTAINER,
-            ui.bakedDesigner.resultInt(),
-            ClickType.LEFT,
-            InventoryAction.PICKUP_ALL
-        )
-        ui.onClick(clicked = ui.inventory, event = event)
-
-        assertFalse(event.isCancelled)
     }
 
     @Test
@@ -566,7 +526,7 @@ internal object CraftUITest {
     @Test
     fun defaultDesignerHasValidBlankSlotsTest() {
         val baked = CraftUI().bakedDesigner
-        assertEquals(16, baked.blankSlots.size)
+        assertEquals(17, baked.blankSlots.size)
         assertEquals(36, baked.craftSlots().size)
         assertTrue((0..<54).filter { it % 9 < 6 }.map { CoordinateComponent.fromIndex(it) }.containsAll(CraftUI().bakedDesigner.craftSlots()))
     }
@@ -582,7 +542,6 @@ internal object CraftUITest {
         ui.inventory.setItem(0, ItemStack.of(Material.STONE))
 
         assertEquals(1, ui.toView(noAir = true).materials.size)
-        assertTrue(ui.toView(noAir = true).result.type.isAir)
     }
 
     @Test
@@ -623,11 +582,9 @@ internal object CraftUITest {
         val ui = CraftUI(caller = player)
         player.openInventory(ui.inventory)
         ui.inventory.setItem(ui.bakedDesigner.craftSlots().first().toIndex(), ItemStack.of(Material.STONE))
-        ui.inventory.setItem(ui.bakedDesigner.resultInt(), ItemStack.of(Material.DIRT))
         ui.onClose(InventoryCloseEvent(player.openInventory))
 
         assertTrue(player.inventory.contains(Material.STONE))
-        assertTrue(player.inventory.contains(Material.DIRT))
     }
 //
 //    @Test

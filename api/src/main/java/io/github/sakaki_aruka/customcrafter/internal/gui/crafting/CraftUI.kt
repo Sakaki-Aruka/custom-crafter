@@ -1,8 +1,10 @@
 package io.github.sakaki_aruka.customcrafter.internal.gui.crafting
 
-import io.github.sakaki_aruka.customcrafter.CustomCrafter
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.api.event.CreateCustomItemEvent
+import io.github.sakaki_aruka.customcrafter.api.event.failure.CraftInputInterruptEvent
+import io.github.sakaki_aruka.customcrafter.api.event.failure.PreventDoubleCraftEvent
+import io.github.sakaki_aruka.customcrafter.api.event.failure.ResultItemGiveFailEvent
 import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.api.interfaces.ui.CraftUIDesigner
@@ -14,6 +16,7 @@ import io.github.sakaki_aruka.customcrafter.api.search.Search
 import io.github.sakaki_aruka.customcrafter.impl.util.Converter.toComponent
 import io.github.sakaki_aruka.customcrafter.impl.util.InventoryUtil.giveItems
 import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
+import io.github.sakaki_aruka.customcrafter.internal.gui.CraftUIState
 import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterUI
 import io.github.sakaki_aruka.customcrafter.internal.gui.allcandidate.AllCandidateUI
 import net.kyori.adventure.text.Component
@@ -34,6 +37,7 @@ import org.bukkit.persistence.PersistentDataType
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicReference
 
 internal class CraftUI(
     val dropOnClose: AtomicBoolean = AtomicBoolean(true),
@@ -45,6 +49,8 @@ internal class CraftUI(
     val bakedDesigner: CraftUIDesigner.Baked
 
     private val isClosed: AtomicBoolean = AtomicBoolean(false)
+    private val uiState: AtomicReference<CraftUIState> = AtomicReference(CraftUIState.IDLE)
+    private val asyncContext: AtomicReference<AsyncContext?> = AtomicReference(null)
 
     init {
         val designContext = CraftUIDesigner.Context(player = caller)
@@ -89,15 +95,10 @@ internal class CraftUI(
             event.player.openInventory(CraftUI(caller = event.player).inventory)
         }
 
-        const val RESULT_SLOT = 44
         const val MAKE_BUTTON = 35
 
         override fun title(context: CraftUIDesigner.Context): Component {
             return "Custom Crafter".toComponent()
-        }
-
-        override fun resultSlot(context: CraftUIDesigner.Context): CoordinateComponent {
-            return CoordinateComponent.fromIndex(RESULT_SLOT)
         }
 
         override fun makeButton(context: CraftUIDesigner.Context): Pair<CoordinateComponent, ItemStack> {
@@ -122,41 +123,40 @@ internal class CraftUI(
             }
             return (0..<54)
                 .filter { it % 9 >= 6 }
-                .minus(RESULT_SLOT)
                 .minus(MAKE_BUTTON)
                 .associate { CoordinateComponent.fromIndex(it) to blank }
         }
     }
 
     override fun onPlayerInventoryClick(clicked: Inventory, event: InventoryClickEvent) {
-        val currentItem: ItemStack = event.currentItem?.clone() ?: return
-        if (event.action != InventoryAction.MOVE_TO_OTHER_INVENTORY
-            || currentItem.type.isAir) {
-            return
-        }
+        when (event.action) {
+            InventoryAction.MOVE_TO_OTHER_INVENTORY -> {
+                // Shift+click from player inventory to CraftUI
+                val currentItem: ItemStack = event.currentItem?.clone() ?: return
+                if (currentItem.type.isAir) {
+                    return
+                }
+                if (uiState.get() != CraftUIState.IDLE) {
+                    event.isCancelled = true
+                    return
+                }
+                event.result = Event.Result.DENY
+                event.currentItem = ItemStack.empty()
+                val remaining: List<ItemStack> = event.inventory.addItem(currentItem).values.toList()
+                (event.whoClicked as Player).give(remaining)
+            }
 
-        event.result = Event.Result.DENY
-        event.currentItem = ItemStack.empty()
+            InventoryAction.COLLECT_TO_CURSOR -> {
+                // Double-click to collect items; can pull from CraftUI slots as well
+                if (uiState.get() != CraftUIState.IDLE) {
+                    event.isCancelled = true
+                }
+            }
 
-        val resultSlotItem: ItemStack = event.inventory.getItem(this.bakedDesigner.resultInt())?.clone()
-            ?: ItemStack.empty()
-
-        // pseudo
-        val stainedGlass: ItemStack = ItemStack.of(Material.BLACK_STAINED_GLASS_PANE).apply {
-            itemMeta = itemMeta.apply {
-                persistentDataContainer.set(
-                    NamespacedKey(CustomCrafter.getInstance(), "protect_result_slot"),
-                    PersistentDataType.STRING,
-                    UUID.randomUUID().toString()
-                )
+            else -> {
+                // Purely player-inventory operations; ignore
             }
         }
-        event.inventory.setItem(this.bakedDesigner.resultInt(), stainedGlass)
-
-        val remaining: List<ItemStack> = event.inventory.addItem(currentItem).values.toList()
-        // delete pseudo
-        event.inventory.setItem(this.bakedDesigner.resultInt(), resultSlotItem)
-        (event.whoClicked as Player).give(remaining)
     }
 
     override fun onClose(event: InventoryCloseEvent) {
@@ -164,65 +164,120 @@ internal class CraftUI(
         if (!this.dropOnClose.get()) {
             return
         }
-        val view: CraftView = this.toView()
+
         val player: Player = event.player as? Player ?: return
-        player.giveItems(saveLimit = true, *view.materials.values.toTypedArray(), view.result)
+
+        // Try to transition from any interruptible state to IDLE.
+        // Loop handles the race where state changes between read and CAS.
+        var interrupted = false
+        var current: CraftUIState = uiState.get()
+        while (current == CraftUIState.SEARCHING || current == CraftUIState.GENERATING_RESULTS) {
+            if (uiState.compareAndSet(current, CraftUIState.IDLE)) {
+                asyncContext.getAndSet(null)?.interrupt()
+                interrupted = true
+                break
+            }
+            current = uiState.get()
+        }
+
+        // GIVING means runAtEntity was already submitted; the atomic block will complete the craft.
+        // Materials are consumed there, so we must not return them here.
+        if (uiState.get() == CraftUIState.GIVING) {
+            return
+        }
+
+        if (interrupted) {
+            CraftInputInterruptEvent(player).callEvent()
+        }
+        player.giveItems(saveLimit = true, *toView().materials.values.toTypedArray())
     }
 
     override fun onClick(
         clicked: Inventory,
         event: InventoryClickEvent
     ) {
-        val clickedCoordinate = CoordinateComponent.fromIndex(event.rawSlot)
+        val clickedCoordinate: CoordinateComponent = CoordinateComponent.fromIndex(event.rawSlot)
 
         event.isCancelled = true
         when (clickedCoordinate) {
-            this.bakedDesigner.result -> {
-                if (event.action in setOf(
-                        InventoryAction.PLACE_ONE,
-                        InventoryAction.PLACE_ALL,
-                        InventoryAction.PLACE_SOME,
-                        InventoryAction.PLACE_FROM_BUNDLE
-                )) {
-                    return
-                }
-                event.isCancelled = false
-                return
-            }
-
             this.bakedDesigner.makeButton.first -> {
                 val view: CraftView = this.toView()
-                if (view.materials.values.none { i -> !i.isEmpty }) return
-
+                if (view.materials.values.none { i -> !i.isEmpty }) {
+                    return
+                }
                 asyncSearchHandler(event)
             }
 
             in bakedDesigner.craftSlots() -> {
-                event.isCancelled = false
+                val current: CraftUIState = uiState.get()
+                when (current) {
+                    CraftUIState.IDLE -> {
+                        event.isCancelled = false
+                    }
+
+                    CraftUIState.GIVING -> {
+                        // runAtEntity submitted; block to preserve atomicity
+                    }
+
+                    else -> {
+                        // SEARCHING or GENERATING_RESULTS: interrupt and pass the click through
+                        val player: Player = event.whoClicked as? Player ?: return
+                        if (uiState.compareAndSet(current, CraftUIState.IDLE)) {
+                            asyncContext.getAndSet(null)?.interrupt()
+                            CraftInputInterruptEvent(player).callEvent()
+                            event.isCancelled = false
+                        } else if (uiState.get() != CraftUIState.GIVING) {
+                            // CAS raced to IDLE (e.g., double-click edge case); allow
+                            event.isCancelled = false
+                        }
+                        // else: lost the race to GIVING → stay blocked
+                    }
+                }
             }
         }
     }
 
     private fun asyncSearchHandler(event: InventoryClickEvent) {
-        // called from the main thread (synced)
         val player: Player = (event.whoClicked as? Player) ?: return
         val shiftUsed: Boolean = event.isShiftClick
 
-        CompletableFuture.runAsync({
-            // Async
-            val result: Search.SearchResult = Search.asyncSearch(
-                crafterID = player.uniqueId,
-                view = this.toView(),
-                query = Search.SearchQuery.ASYNC_DEFAULT
-            ).get()
+        if (!uiState.compareAndSet(CraftUIState.IDLE, CraftUIState.SEARCHING)) {
+            PreventDoubleCraftEvent(player).callEvent()
+            return
+        }
 
-            if (CustomCrafterAPI.getUseMultipleResultCandidateFeature() && result.size() > 1) {
-                // AllCandidate Open on MainThread
-                openAllCandidateUI(result, shiftUsed, player)
-            } else if (result.customs().isNotEmpty()) {
-                giveCustomRecipeResults(result, shiftUsed, player)
-            } else if (result.vanilla() != null) {
-                giveVanillaRecipeResults(result, shiftUsed, player)
+        // Capture the view and create the search context on the main thread (current tick),
+        // before any slot interaction could occur in subsequent ticks.
+        val capturedView: CraftView = this.toView()
+        val searchCtx: AsyncContext = AsyncContext.ofTurnOff()
+        asyncContext.set(searchCtx)
+
+        CompletableFuture.runAsync({
+            try {
+                val result: Search.SearchResult = Search.asyncSearch(
+                    crafterID = player.uniqueId,
+                    view = capturedView,
+                    query = Search.SearchQuery.defaultModeOf(searchCtx)
+                ).get()
+
+                if (!uiState.compareAndSet(CraftUIState.SEARCHING, CraftUIState.GENERATING_RESULTS)) {
+                    asyncContext.set(null)
+                    return@runAsync
+                }
+                asyncContext.set(null)
+
+                if (CustomCrafterAPI.getUseMultipleResultCandidateFeature() && result.size() > 1) {
+                    openAllCandidateUI(result, shiftUsed, player)
+                } else if (result.customs().isNotEmpty()) {
+                    giveCustomRecipeResults(result, shiftUsed, player)
+                } else if (result.vanilla() != null) {
+                    giveVanillaRecipeResults(result, shiftUsed, player)
+                } else {
+                    uiState.set(CraftUIState.IDLE)
+                }
+            } catch (e: Exception) {
+                asyncContext.set(null)
+                uiState.set(CraftUIState.IDLE)
             }
         }, InternalAPI.executor)
     }
@@ -232,6 +287,8 @@ internal class CraftUI(
         shiftUsed: Boolean,
         player: Player
     ) {
+        // Release the state lock before transferring control to AllCandidateUI.
+        uiState.set(CraftUIState.IDLE)
         this.dropOnClose.set(false)
         val allUI = AllCandidateUI(
             view = this.toView(),
@@ -246,7 +303,6 @@ internal class CraftUI(
                 player.openInventory(allUI.inventory)
             }
         }.get()
-
     }
 
     private fun giveCustomRecipeResults(
@@ -254,7 +310,10 @@ internal class CraftUI(
         shiftUsed: Boolean,
         player: Player
     ) {
-        val (recipe: CRecipe, relate: MappedRelation) = result.customs().firstOrNull() ?: return
+        val (recipe: CRecipe, relate: MappedRelation) = result.customs().firstOrNull() ?: run {
+            uiState.set(CraftUIState.IDLE)
+            return
+        }
         val view: CraftView = this.toView()
         val amount: Int = recipe.getTimes(view.materials, relate, shiftUsed)
         val decrementedView: CraftView = view.clone().getDecremented(shiftUsed, recipe, relate)
@@ -263,19 +322,34 @@ internal class CraftUI(
             CreateCustomItemEvent(player, view, result, shiftUsed, isAsync = false).callEvent()
         }.get()
 
+        val resultCtx: AsyncContext = AsyncContext.ofTurnOff()
+        asyncContext.set(resultCtx)
+        val resultSupplierContext: ResultSupplier.Context = ResultSupplier.Context(
+            recipe, relate, view.materials, shiftUsed, amount, player.uniqueId,
+            ResultSupplier.Context.CallMode.CRAFT, asyncContext = resultCtx
+        )
+        val results: List<ItemStack> = recipe.asyncGetResults(resultSupplierContext).get()
+        asyncContext.set(null)
+
+        // Transition to GIVING. If interrupted between here and the GENERATING_RESULTS CAS, abort.
+        if (!uiState.compareAndSet(CraftUIState.GENERATING_RESULTS, CraftUIState.GIVING)) {
+            ResultItemGiveFailEvent(results, resultSupplierContext, true).callEvent()
+            return
+        }
+
+        if (!player.isOnline) {
+            uiState.set(CraftUIState.IDLE)
+            ResultItemGiveFailEvent(results, resultSupplierContext, true).callEvent()
+            return
+        }
+
+        // Decrement and give are in one atomic tick; no interaction can interleave here.
         InternalAPI.foliaLib.scheduler.runAtEntity(player) {
             decrementedView.materials.forEach { (c, item) ->
                 this.inventory.setItem(c.toIndex(), item)
             }
-        }.get()
-
-        val resultSupplierContext = ResultSupplier.Context(
-            recipe, relate, view.materials, shiftUsed, amount, player.uniqueId,false, asyncContext = AsyncContext.ofTurnOff()
-        )
-        val results: List<ItemStack> = recipe.asyncGetResults(resultSupplierContext).get()
-
-        InternalAPI.foliaLib.scheduler.runAtEntity(player) {
             player.giveItems(saveLimit = true, *results.toTypedArray())
+            uiState.set(CraftUIState.IDLE)
         }.get()
     }
 
@@ -286,19 +360,30 @@ internal class CraftUI(
     ) {
         val view: CraftView = this.toView()
         val min: Int = view.materials.values.minOf { it.amount }
-        val decrementAmount: Int = if (shiftUsed) min else 1
+        val decrementAmount: Int = if (shiftUsed) { min } else { 1 }
+        val item: ItemStack = result.vanilla()!!.result.clone().apply { this.amount *= decrementAmount }
+
+        if (!uiState.compareAndSet(CraftUIState.GENERATING_RESULTS, CraftUIState.GIVING)) {
+            return
+        }
+
+        if (!player.isOnline) {
+            uiState.set(CraftUIState.IDLE)
+            ResultItemGiveFailEvent(listOf(item), null, true).callEvent()
+            return
+        }
 
         InternalAPI.foliaLib.scheduler.runAtEntity(player) {
             bakedDesigner.craftSlots()
-                .filter { c -> this.inventory.getItem(c.toIndex())?.takeIf { item -> !item.type.isEmpty } != null }
+                .filter { c -> this.inventory.getItem(c.toIndex())?.takeIf { i -> !i.type.isEmpty } != null }
                 .forEach { c ->
-                    val newItem = this.inventory.getItem(c.toIndex())
-                    this.inventory.setItem(c.toIndex(), newItem?.asQuantity(newItem.amount - decrementAmount))
+                    val slot: ItemStack? = this.inventory.getItem(c.toIndex())
+                    this.inventory.setItem(c.toIndex(), slot?.asQuantity(slot.amount - decrementAmount))
                 }
-            val item: ItemStack = result.vanilla()!!.result.apply { this.amount *= decrementAmount }
             if (!item.type.isAir) {
                 player.giveItems(saveLimit = true, item)
             }
+            uiState.set(CraftUIState.IDLE)
         }.get()
     }
 
@@ -315,8 +400,6 @@ internal class CraftUI(
             materials[c] = item
         }
 
-        val result: ItemStack = this.inventory.getItem(this.bakedDesigner.resultInt())
-            ?: ItemStack.empty()
-        return CraftView(materials, result)
+        return CraftView(materials)
     }
 }
