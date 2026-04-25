@@ -245,42 +245,25 @@ object Search {
             }, InternalAPI.executor)
         }
 
-        var futures: List<CompletableFuture<Pair<CRecipe, MappedRelation>?>>
         if (query.searchMode == SearchQuery.SearchMode.ONLY_FIRST) {
             val findFirst: CompletableFuture<Pair<CRecipe, MappedRelation>?> = CompletableFuture()
-            tasks.forEach {
-                it.thenApply { pair ->
-                    if (pair != null) {
-                        if (findFirst.complete(pair)) {
-                            tasks.forEach { t -> t.cancel(true) }
-                            query.asyncContext?.interrupt()
-                        }
+            val derived = tasks.map { task ->
+                task.thenAccept { pair ->
+                    if (pair != null && findFirst.complete(pair)) {
+                        query.asyncContext?.interrupt()
                     }
                 }
             }
-
-            CompletableFuture.allOf(*tasks.toTypedArray()).thenRun {
-                if (!findFirst.isDone) {
-                    findFirst.complete(null)
-                }
+            CompletableFuture.allOf(*derived.toTypedArray()).thenRun {
+                findFirst.complete(null)
             }
-
             return findFirst.thenApply { result ->
                 SearchResult(vanilla, result?.let { listOf(it) } ?: emptyList())
             }
-        } else {
-            futures = recipes.mapNotNull { recipe ->
-                CompletableFuture.supplyAsync({
-                    when (recipe.type) {
-                        CRecipe.Type.SHAPED -> shaped(view, recipe, crafterID, query.asyncContext)
-                        CRecipe.Type.SHAPELESS -> shapeless(view, recipe, crafterID, query.asyncContext)
-                    }?.let { recipe to it }
-                }, InternalAPI.executor)
-            }
         }
 
-        return CompletableFuture.allOf(*futures.toTypedArray())
-            .thenApply { SearchResult(vanilla, futures.mapNotNull { it.join() }) }
+        return CompletableFuture.allOf(*tasks.toTypedArray())
+            .thenApply { SearchResult(vanilla, tasks.mapNotNull { it.join() }) }
     }
 
     /**

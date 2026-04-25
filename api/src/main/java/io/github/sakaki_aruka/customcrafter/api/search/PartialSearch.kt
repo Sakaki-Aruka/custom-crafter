@@ -237,16 +237,15 @@ object PartialSearch {
 
         if (searchQuery.searchMode == Search.SearchQuery.SearchMode.ONLY_FIRST) {
             val findFirst: CompletableFuture<List<PartialSearchResult>> = CompletableFuture()
-            tasks.forEach { t ->
-                t.thenApply { results ->
+            val derived = tasks.map { task ->
+                task.thenAccept { results ->
                     if (results.isNotEmpty() && findFirst.complete(results)) {
-                        tasks.forEach { it.cancel(true) }
                         searchQuery.asyncContext?.interrupt()
                     }
                 }
             }
-            CompletableFuture.allOf(*tasks.toTypedArray()).thenRun {
-                if (!findFirst.isDone) findFirst.complete(emptyList())
+            CompletableFuture.allOf(*derived.toTypedArray()).thenRun {
+                findFirst.complete(emptyList())
             }
             return findFirst
         }
