@@ -53,13 +53,13 @@ open class CMatterImpl @JvmOverloads constructor(
          *     candidate = setOf(Material.STONE, Material.COBBLESTONE),
          *     amount = 1,
          *     anyAmount = false,
-         *     predicates = null
+         *     predicates = defaultMatterPredicates()
          * )
          * ```
          *
          * @param[materials] Candidate materials
          * @return[CMatterImpl] Built matter
-         * @throws[IllegalStateException] Throws when [materials] is empty and contains invalid material
+         * @throws[IllegalStateException] Throws when [materials] is empty or contains invalid material
          */
         @JvmStatic
         fun of(vararg materials: Material): CMatterImpl {
@@ -74,9 +74,9 @@ open class CMatterImpl @JvmOverloads constructor(
         }
 
         /**
-         * returns single candidate [CMatterImpl].
+         * Returns single candidate [CMatterImpl].
          *
-         * its name is [material]'s name. `material.name`.
+         * Its name is [material]'s name. `material.name`.
          *
          * ```kotlin
          * // below 2 matters are same
@@ -87,11 +87,13 @@ open class CMatterImpl @JvmOverloads constructor(
          *     candidate = setOf(Material.STONE),
          *     amount = 1,
          *     anyAmount = false,
-         *     predicates = null
+         *     predicates = defaultMatterPredicates()
          * )
          * ```
          *
-         * @param[material] a candidate of this matter.
+         * @param[material] A candidate of this matter.
+         * @return[CMatterImpl] Built matter
+         * @throws[IllegalStateException] Throws when [material] is invalid
          */
         @JvmStatic
         fun single(material: Material): CMatterImpl = of(material)
@@ -114,7 +116,7 @@ open class CMatterImpl @JvmOverloads constructor(
          *
          * @param[materials] Candidate materials
          * @return[CMatterImpl] Built matter
-         * @throws[IllegalStateException] Throws when [materials] is empty and contains invalid material
+         * @throws[IllegalStateException] Throws when [materials] is empty or contains invalid material
          */
         @JvmStatic
         fun multi(vararg materials: Material): CMatterImpl = of(*materials)

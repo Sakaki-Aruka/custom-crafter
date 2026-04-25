@@ -60,12 +60,14 @@ object Converter {
     }
 
     /**
-     * Kotlin string extension. String to Component (net.kyori.adventure)
+     * Kotlin string extension. Deserializes a MiniMessage string to a [Component] (net.kyori.adventure).
      *
-     * Usage
      * ```kotlin
      * val component = "<aqua>This is a kyori component!".toComponent()
      * ```
+     *
+     * @return[Component] Deserialized component
+     * @since 5.0.0
      */
     fun String.toComponent(): Component = MiniMessage.miniMessage().deserialize(this)
 

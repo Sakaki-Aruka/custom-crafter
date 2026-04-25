@@ -17,7 +17,7 @@ import org.bukkit.inventory.ShapedRecipe
 import org.bukkit.inventory.ShapelessRecipe
 
 /**
- * Deprecated to use. Internal only.
+ * A [CRecipe] wrapper for vanilla [Recipe] instances. For internal use only; instantiation is restricted to internal code.
  */
 class CVanillaRecipe internal constructor(
     override val name: String,
@@ -28,6 +28,13 @@ class CVanillaRecipe internal constructor(
     val original: Recipe
 ): CRecipe {
     companion object {
+        /**
+         * Converts a vanilla [CraftingRecipe] to a [CVanillaRecipe].
+         *
+         * @param[recipe] A vanilla crafting recipe ([ShapedRecipe] or [ShapelessRecipe])
+         * @return[CVanillaRecipe] The converted recipe, or `null` if [recipe] is neither shaped nor shapeless
+         */
+        @JvmStatic
         fun fromVanilla(recipe: CraftingRecipe): CVanillaRecipe? {
             return when (recipe) {
                 is ShapedRecipe -> fromShaped(recipe)
@@ -43,6 +50,7 @@ class CVanillaRecipe internal constructor(
          * @return[CRecipe] A result CRecipe
          * @since 5.0.11
          */
+        @JvmStatic
         fun fromShaped(recipe: ShapedRecipe): CVanillaRecipe {
             return CVanillaRecipe(
                 recipe.key.namespace + recipe.key.key,
@@ -58,8 +66,9 @@ class CVanillaRecipe internal constructor(
          *
          * @param[recipe] A target shapeless recipe
          * @return[CRecipe] A result CRecipe
-         * @since[5.0.11]
+         * @since 5.0.11
          */
+        @JvmStatic
         fun fromShapeless(recipe: ShapelessRecipe): CVanillaRecipe {
             return CVanillaRecipe(
                 recipe.key.namespace + recipe.key.key,
@@ -129,6 +138,14 @@ class CVanillaRecipe internal constructor(
         }
     }
 
+    /**
+     * Builds a [MappedRelation] by matching this recipe's slots against the given [view] in index order.
+     *
+     * @param[view] The crafting grid snapshot to relate against
+     * @return[MappedRelation] Slot mapping between this recipe and the view
+     * @throws[IllegalArgumentException] If the non-air item count in [view] does not match this recipe's slot count,
+     *   or if the view spans more than 4 columns or 4 rows
+     */
     fun relateWith(view: CraftView): MappedRelation {
         val viewSize: Int = view.materials.filterNot { it.value.type.isAir }.count()
         if (viewSize != this.items.size) {
@@ -138,7 +155,7 @@ class CVanillaRecipe internal constructor(
         val dx: Int = view.materials.keys.maxOf { it.x } - view.materials.keys.minOf { it.x }
         val dy: Int = view.materials.keys.maxOf { it.y } - view.materials.keys.minOf { it.y }
         if (dx > 3 || dy > 3) {
-            throw IllegalArgumentException("")
+            throw IllegalArgumentException("view spans more than 4 columns or 4 rows. (dx: $dx, dy: $dy)")
         }
 
         return MappedRelation(
