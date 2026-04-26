@@ -151,7 +151,7 @@ val matter1 = CMatterImpl(
     name = "only-stone",
     candidate = setOf(Material.STONE, Material.COBBLESTONE),
     amount = 1,
-    mass = false,
+    anyAmount = false,
     predicates = CRecipeImpl.defaultMatterPredicates()
 )
 
@@ -159,11 +159,11 @@ val matter1 = CMatterImpl(
 val matter2 = CMatterImpl.of(Material.STONE, Material.COBBLESTONE)
 ```
 
-The default `CMatterImpl` has the fields `name`, `candidate`, `amount`, `mass`, and `predicates`, which work as follows:
+The default `CMatterImpl` has the fields `name`, `candidate`, `amount`, `anyAmount`, and `predicates`, which work as follows:
 - `name`: The name of the CMatter (rarely used; any value is fine)
 - `candidate`: The placed item's type must match one of the listed materials
 - `amount`: The placed item's count must be equal to or greater than this value
-- `mass`: When `true`, ignores `amount` and only requires 1 or more items; also affects bulk crafting quantity calculations.
+- `anyAmount`: When `true`, ignores `amount` and only requires 1 or more items; also affects bulk crafting quantity calculations.
   When `false`, follows the `amount` quantity specification.
 - `predicates`: Allows inserting custom inspection logic beyond the fields above. If even one predicate returns `false`, the entire inspection fails. By default, predicates for enchantments, potions, etc. are inserted.
 

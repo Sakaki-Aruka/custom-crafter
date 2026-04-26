@@ -16,7 +16,7 @@ open class CMatterImpl @JvmOverloads constructor(
     override val name: String,
     override val candidate: Set<Material>,
     override val amount: Int = 1,
-    override val mass: Boolean = false,
+    override val anyAmount: Boolean = false,
     override val predicates: Set<CMatterPredicate>? = defaultMatterPredicates()
 ) : CMatter
 ```
@@ -26,7 +26,7 @@ open class CMatterImpl @JvmOverloads constructor(
 | `name` | — | Identifier name for the CMatter. Duplicates are allowed but unique names are recommended |
 | `candidate` | — | The set of item types that are accepted |
 | `amount` | `1` | Minimum number of items required |
-| `mass` | `false` | When `true`, passes with 1 or more items regardless of count, and is excluded from bulk-crafting quantity calculations |
+| `anyAmount` | `false` | When `true`, passes with 1 or more items regardless of count, and is excluded from bulk-crafting quantity calculations |
 | `predicates` | `defaultMatterPredicates()` | Additional validation logic set. When omitted, the default checkers for enchantments, stored enchantments, and potions are applied |
 
 :::caution
@@ -46,7 +46,7 @@ All of them call `isValidMatter()` internally to perform validation.
 
 Accepts multiple `Material` values and returns a `CMatterImpl` with them as the `candidate`.
 The `name` is a string formed by joining each Material name with `-`.
-Created with `amount = 1`, `mass = false`, and `predicates = null`.
+Created with `amount = 1`, `anyAmount = false`, and `predicates = defaultMatterPredicates()`.
 
 ```kotlin
 // A CMatter that accepts stone or cobblestone
@@ -104,14 +104,14 @@ val stoneStack = CMatterImpl(
 )
 ```
 
-### mass = true (for non-stackable items)
+### anyAmount = true (for non-stackable items)
 
 ```kotlin
 // Exclude lava bucket from quantity calculations
 val lavaBucket = CMatterImpl(
     name = "lava-bucket",
     candidate = setOf(Material.LAVA_BUCKET),
-    mass = true
+    anyAmount = true
 )
 ```
 

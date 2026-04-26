@@ -17,7 +17,7 @@ open class CPotionMatterImpl @JvmOverloads constructor(
     override val candidate: Set<Material>,
     override val potionComponents: Set<CPotionComponent>,
     override val amount: Int = 1,
-    override val mass: Boolean = false,
+    override val anyAmount: Boolean = false,
     override val predicates: Set<CMatterPredicate>? = CMatterImpl.defaultMatterPredicates()
 ) : CPotionMatter
 ```
@@ -28,11 +28,11 @@ open class CPotionMatterImpl @JvmOverloads constructor(
 | `candidate` | — | The set of item types that are accepted |
 | `potionComponents` | — | The set of potion effect conditions required |
 | `amount` | `1` | Minimum number of items required |
-| `mass` | `false` | When `true`, excluded from quantity calculations |
+| `anyAmount` | `false` | When `true`, excluded from quantity calculations |
 | `predicates` | `defaultMatterPredicates()` | Additional validation logic set |
 
 :::note
-Potion-type items (`POTION`, `SPLASH_POTION`, `LINGERING_POTION`) cannot be stacked, so it is recommended to set `mass = true` to exclude them from quantity calculations.
+Potion-type items (`POTION`, `SPLASH_POTION`, `LINGERING_POTION`) cannot be stacked, so it is recommended to set `anyAmount = true` to exclude them from quantity calculations.
 :::
 
 ---
@@ -119,7 +119,7 @@ val glowingPotion = CPotionMatterImpl(
             strict = CPotionComponent.Strict.ONLY_EFFECT
         )
     ),
-    mass = true
+    anyAmount = true
 )
 ```
 
@@ -136,7 +136,7 @@ val swiftPotion = CPotionMatterImpl(
             strict = CPotionComponent.Strict.STRICT
         )
     ),
-    mass = true
+    anyAmount = true
 )
 ```
 
@@ -157,7 +157,7 @@ val comboPotion = CPotionMatterImpl(
             strict = CPotionComponent.Strict.ONLY_EFFECT
         )
     ),
-    mass = true
+    anyAmount = true
 )
 ```
 
@@ -189,6 +189,6 @@ class HealingPotionMatter(name: String) : CPotionMatterImpl(
             strict = CPotionComponent.Strict.ONLY_EFFECT
         )
     ),
-    mass = true
+    anyAmount = true
 )
 ```

@@ -10,7 +10,7 @@ It is invoked during recipe inspection and can perform checks using a variety of
 
 ## Role of each field
 
-This section covers the `candidate`, `mass`, and `predicates` fields of CMatter.
+This section covers the `candidate`, `anyAmount`, and `predicates` fields of CMatter.
 
 ### candidate
 
@@ -28,22 +28,22 @@ val onlyStone = CMatterImpl.of(Material.STONE)
 
 With a few exceptions, specifying zero elements or a `Material` where `Material.isAir == true` will be rejected during the recipe registration check.
 
-### mass
+### anyAmount
 
-`mass` is a somewhat special value. When set to `false` it has no effect on recipe crafting, but setting it to `true` changes several behaviours.
+`anyAmount` is a somewhat special value. When set to `false` it has no effect on recipe crafting, but setting it to `true` changes several behaviours.
 When `true`, the CMatter's quantity specification (`amount`) is ignored, and it also affects the quantity calculation at crafting time.
 The reason quantity is ignored is that this flag means "at least one item of this type needs to be present."
 "At least one" means that the count of items which pass all checks other than the quantity check for this CMatter must be 1 or more.
-Therefore, when calculating how many times the result-generating function should be called, items corresponding to a CMatter with `mass = true` are excluded from the calculation; instead, the smallest value obtained by dividing the count of the remaining items by their respective `amount` is used.
+Therefore, when calculating how many times the result-generating function should be called, items corresponding to a CMatter with `anyAmount = true` are excluded from the calculation; instead, the smallest value obtained by dividing the count of the remaining items by their respective `amount` is used.
 
 This property makes it easier to handle both stackable items and normally non-stackable items such as water buckets or potions together in the same recipe.
 
 ```kotlin
-val wetSponge = CMatterImpl.of(Material.WET_SPONGE) // mass = false
+val wetSponge = CMatterImpl.of(Material.WET_SPONGE) // anyAmount = false
 val lavaBucket = CMatterImpl(
     name = "lava bucket",
     candidate = setOf(Material.LAVA_BUCKET),
-    mass = true
+    anyAmount = true
 )
 
 val spongeDry = CRecipeImpl(
@@ -149,7 +149,7 @@ val efficientPickaxe = CEnchantMatterImpl(
     name = "efficient-pickaxe",
     candidate = setOf(Material.DIAMOND_PICKAXE),
     amount = 1,
-    mass = false,
+    anyAmount = false,
     predicates = null,
     enchantComponents = setOf(
         CEnchantComponent(
@@ -165,7 +165,7 @@ val durablePickaxe = CEnchantMatterImpl(
     name = "durable-pickaxe",
     candidate = setOf(Material.DIAMOND_PICKAXE),
     amount = 1,
-    mass = false,
+    anyAmount = false,
     predicates = null,
     enchantComponents = setOf(
         CEnchantComponent(
@@ -191,7 +191,7 @@ val efficiencyBook = CEnchantmentStoreMatterImpl(
     name = "efficiency-book",
     candidate = setOf(Material.ENCHANTED_BOOK),
     amount = 1,
-    mass = true,
+    anyAmount = true,
     predicates = null,
     storedEnchantComponents = setOf(
         CEnchantComponent(
@@ -214,7 +214,7 @@ val bothEnchant = CEnchantBothMatterImpl(
     name = "both-enchant",
     candidate = setOf(Material.DIAMOND_SWORD, Material.ENCHANTED_BOOK),
     amount = 1,
-    mass = false,
+    anyAmount = false,
     predicates = null,
     enchantComponents = setOf(
         CEnchantComponent(1, Enchantment.SHARPNESS, CEnchantComponent.Strict.ONLY_ENCHANT)
@@ -251,7 +251,7 @@ val glowingPotion = CPotionMatterImpl(
     name = "glowing-potion",
     candidate = setOf(Material.POTION, Material.SPLASH_POTION),
     amount = 1,
-    mass = true,
+    anyAmount = true,
     predicates = null,
     potionComponents = setOf(
         CPotionComponent(
@@ -266,7 +266,7 @@ val fireResistPotion = CPotionMatterImpl(
     name = "fire-resist-potion",
     candidate = setOf(Material.POTION),
     amount = 1,
-    mass = true,
+    anyAmount = true,
     predicates = null,
     potionComponents = setOf(
         CPotionComponent(

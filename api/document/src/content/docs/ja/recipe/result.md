@@ -45,7 +45,7 @@ fun interface ResultSupplier {
 
 ### calledTimes の計算
 
-`calledTimes` は、入力されたアイテムのうち `mass = false` な CMatter に対応するものを対象に、
+`calledTimes` は、入力されたアイテムのうち `anyAmount = false` な CMatter に対応するものを対象に、
 「入力個数 ÷ CMatter の amount」の最小値として計算されます。
 
 たとえばレシピが「石 2 個 + 金インゴット 1 個」を要求し、プレイヤーが「石 64 個 + 金インゴット 32 個」を入力して Shift 一括作成した場合：
@@ -125,7 +125,7 @@ val stone = CMatterImpl(
     name = "stone",
     candidate = setOf(Material.STONE),
     amount = 2,  // 石を 2 個要求
-    mass = false,
+    anyAmount = false,
     predicates = null
 )
 
