@@ -16,7 +16,7 @@ open class CMatterImpl @JvmOverloads constructor(
     override val name: String,
     override val candidate: Set<Material>,
     override val amount: Int = 1,
-    override val mass: Boolean = false,
+    override val anyAmount: Boolean = false,
     override val predicates: Set<CMatterPredicate>? = defaultMatterPredicates()
 ) : CMatter
 ```
@@ -26,7 +26,7 @@ open class CMatterImpl @JvmOverloads constructor(
 | `name` | — | CMatter の識別名。重複しても動作するが一意が推奨 |
 | `candidate` | — | 受け付けるアイテムの種類の集合 |
 | `amount` | `1` | 要求する最小個数 |
-| `mass` | `false` | `true` にすると個数を問わず 1 個以上で通過し、一括作成の個数計算から除外される |
+| `anyAmount` | `false` | `true` にすると個数を問わず 1 個以上で通過し、一括作成の個数計算から除外される |
 | `predicates` | `defaultMatterPredicates()` | 追加の検査ロジックセット。省略時はエンチャント・ストアドエンチャント・ポーションのデフォルトチェッカーが設定される |
 
 :::caution
@@ -46,7 +46,7 @@ open class CMatterImpl @JvmOverloads constructor(
 
 複数の `Material` を受け取り、それらを `candidate` とした `CMatterImpl` を返します。
 `name` は各 Material 名を `-` でつないだ文字列になります。
-`amount = 1`, `mass = false`, `predicates = null` で作成されます。
+`amount = 1`, `anyAmount = false`, `predicates = defaultMatterPredicates()` で作成されます。
 
 ```kotlin
 // 石または丸石を受け付ける CMatter
@@ -104,14 +104,14 @@ val stoneStack = CMatterImpl(
 )
 ```
 
-### mass = true (スタック不可アイテム向け)
+### anyAmount = true (スタック不可アイテム向け)
 
 ```kotlin
 // マグマバケツは個数計算に関与させない
 val lavaBucket = CMatterImpl(
     name = "lava-bucket",
     candidate = setOf(Material.LAVA_BUCKET),
-    mass = true
+    anyAmount = true
 )
 ```
 

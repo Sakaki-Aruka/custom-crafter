@@ -10,7 +10,7 @@ CMatter はインターフェースであり、利用する際は標準の実装
 
 ## 各フィールドの役割
 
-CMatter のフィールドのうち、 candidate, mass, predicates について解説します。  
+CMatter のフィールドのうち、 candidate, anyAmount, predicates について解説します。  
 
 ### candidate
 
@@ -28,22 +28,22 @@ val onlyStone = CMatterImpl.of(Material.STONE)
 
 一部の例外を除き、要素を 0 個にすることや `Material.isAir == true` になるようなアイテムの種類を指定した場合には、レシピ登録時のチェックで弾かれます。  
 
-### mass
+### anyAmount
 
-mass は少し特殊な値で、false に指定されている場合はレシピ作成に影響を及ぼしませんが、 true に設定するといくつかの挙動が変更されます。  
+anyAmount は少し特殊な値で、false に指定されている場合はレシピ作成に影響を及ぼしませんが、 true に設定するといくつかの挙動が変更されます。  
 true に設定すると、 CMatter の個数指定 (`amount`) を無視するようになり、アイテム作成時の個数計算にも影響を及ぼします。  
 個数指定を無視するというのは、この値が「1 つでもアイテムが存在していれば良いことを示すフラグ」であるためです。  
 1 つでも存在していれば良い、とは「CMatter の個数以外すべての検査を通過するアイテム」の個数が 1 以上であれば良いことを示します。  
-そのため、レシピの成果物を作成する関数の呼び出し回数を計算する際に、 mass = true が指定された CMatter に対応するアイテムの個数は考慮されず、それ以外のアイテムの個数を CMatter の個数指定で割った中の最も小さい値が使用されます。  
+そのため、レシピの成果物を作成する関数の呼び出し回数を計算する際に、 anyAmount = true が指定された CMatter に対応するアイテムの個数は考慮されず、それ以外のアイテムの個数を CMatter の個数指定で割った中の最も小さい値が使用されます。  
 
 この性質は、スタック可能なアイテムと水バケツやポーションなど通常ではスタック出来ないアイテムを同時に扱いやすくするものです。  
 
 ```kotlin
-val wetSponge = CMatterImpl.of(Material.WET_SPONGE) // mass = false
+val wetSponge = CMatterImpl.of(Material.WET_SPONGE) // anyAmount = false
 val lavaBucket = CMatterImpl(
     name = "lava bucket",
     candidate = setOf(Material.LAVA_BUCKET),
-    mass = true
+    anyAmount = true
 )
 
 val spongeDry = CRecipeImpl(
@@ -149,7 +149,7 @@ val efficientPickaxe = CEnchantMatterImpl(
     name = "efficient-pickaxe",
     candidate = setOf(Material.DIAMOND_PICKAXE),
     amount = 1,
-    mass = false,
+    anyAmount = false,
     predicates = null,
     enchantComponents = setOf(
         CEnchantComponent(
@@ -165,7 +165,7 @@ val durablePickaxe = CEnchantMatterImpl(
     name = "durable-pickaxe",
     candidate = setOf(Material.DIAMOND_PICKAXE),
     amount = 1,
-    mass = false,
+    anyAmount = false,
     predicates = null,
     enchantComponents = setOf(
         CEnchantComponent(
@@ -191,7 +191,7 @@ val efficiencyBook = CEnchantmentStoreMatterImpl(
     name = "efficiency-book",
     candidate = setOf(Material.ENCHANTED_BOOK),
     amount = 1,
-    mass = true,
+    anyAmount = true,
     predicates = null,
     storedEnchantComponents = setOf(
         CEnchantComponent(
@@ -214,7 +214,7 @@ val bothEnchant = CEnchantBothMatterImpl(
     name = "both-enchant",
     candidate = setOf(Material.DIAMOND_SWORD, Material.ENCHANTED_BOOK),
     amount = 1,
-    mass = false,
+    anyAmount = false,
     predicates = null,
     enchantComponents = setOf(
         CEnchantComponent(1, Enchantment.SHARPNESS, CEnchantComponent.Strict.ONLY_ENCHANT)
@@ -251,7 +251,7 @@ val glowingPotion = CPotionMatterImpl(
     name = "glowing-potion",
     candidate = setOf(Material.POTION, Material.SPLASH_POTION),
     amount = 1,
-    mass = true,
+    anyAmount = true,
     predicates = null,
     potionComponents = setOf(
         CPotionComponent(
@@ -266,7 +266,7 @@ val fireResistPotion = CPotionMatterImpl(
     name = "fire-resist-potion",
     candidate = setOf(Material.POTION),
     amount = 1,
-    mass = true,
+    anyAmount = true,
     predicates = null,
     potionComponents = setOf(
         CPotionComponent(

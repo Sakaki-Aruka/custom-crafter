@@ -12,7 +12,6 @@ title: エンチャント系 CMatter 実装
 | `CEnchantmentStoreMatterImpl` | アイテムに格納されたエンチャント (主にエンチャント本) |
 | `CEnchantBothMatterImpl` | 直接付与 + 格納の両方 |
 
-いずれも `CMatterImpl` のサブクラスではなく、それぞれ `CEnchantMatter` / `CEnchantmentStoreMatter` インターフェースを実装した独立したクラスです。
 `open class` として定義されているため、継承して拡張することもできます。
 
 ---
@@ -27,7 +26,7 @@ open class CEnchantMatterImpl @JvmOverloads constructor(
     override val candidate: Set<Material>,
     override val enchantComponents: Set<CEnchantComponent>,
     override val amount: Int = 1,
-    override val mass: Boolean = false,
+    override val anyAmount: Boolean = false,
     override val predicates: Set<CMatterPredicate>? = CMatterImpl.defaultMatterPredicates()
 ) : CEnchantMatter
 ```
@@ -38,7 +37,7 @@ open class CEnchantMatterImpl @JvmOverloads constructor(
 | `candidate` | — | 受け付けるアイテムの種類の集合 |
 | `enchantComponents` | — | 要求するエンチャントの条件セット |
 | `amount` | `1` | 要求する最小個数 |
-| `mass` | `false` | `true` にすると個数計算から除外される |
+| `anyAmount` | `false` | `true` にすると個数計算から除外される |
 | `predicates` | `defaultMatterPredicates()` | 追加の検査ロジックセット |
 
 ### DEFAULT_ENCHANT_CHECKER
@@ -126,7 +125,7 @@ open class CEnchantmentStoreMatterImpl @JvmOverloads constructor(
     override val candidate: Set<Material>,
     override val storedEnchantComponents: Set<CEnchantComponent>,
     override val amount: Int = 1,
-    override val mass: Boolean = false,
+    override val anyAmount: Boolean = false,
     override val predicates: Set<CMatterPredicate>? = CMatterImpl.defaultMatterPredicates()
 ) : CEnchantmentStoreMatter
 ```
@@ -160,7 +159,7 @@ val efficiencyBook = CEnchantmentStoreMatterImpl(
             strict = CEnchantComponent.Strict.STRICT
         )
     ),
-    mass = true  // バケツと同様にスタック不可なので mass = true が適切
+    anyAmount = true  // バケツと同様にスタック不可なので anyAmount = true が適切
 )
 
 // シャープネスが格納されたエンチャント本 (レベル問わず)
@@ -190,7 +189,7 @@ open class CEnchantBothMatterImpl @JvmOverloads constructor(
     override val enchantComponents: Set<CEnchantComponent>,
     override val storedEnchantComponents: Set<CEnchantComponent>,
     override val amount: Int = 1,
-    override val mass: Boolean = false,
+    override val anyAmount: Boolean = false,
     override val predicates: Set<CMatterPredicate>? = CMatterImpl.defaultMatterPredicates()
 ) : CEnchantMatter, CEnchantmentStoreMatter
 ```

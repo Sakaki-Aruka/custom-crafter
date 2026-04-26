@@ -95,6 +95,50 @@ val shapeless = CRecipeImpl.shapeless(
 )
 ```
 
+### Shaped Recipe Using String Layout
+
+`CoordinateComponent.recipeMapFromStringList()` lets you declare the recipe grid as a list of comma-separated strings, which is often easier to read than specifying each coordinate manually.
+
+```kotlin
+val gold = CMatterImpl.of(Material.GOLD_BLOCK)
+val apple = CMatterImpl.of(Material.APPLE)
+val result = ResultSupplier.timesSingle(ItemStack.of(Material.ENCHANTED_GOLDEN_APPLE))
+
+// g → gold block, a → apple, _ → empty slot (skipped)
+val items = CoordinateComponent.recipeMapFromStringList(
+    lines = listOf(
+        "g,g,g",
+        "g,a,g",
+        "g,g,g"
+    ),
+    map = mapOf("g" to gold, "a" to apple)
+)
+
+val recipe = CRecipeImpl(
+    name = "golden-apple",
+    items = items,
+    type = CRecipe.Type.SHAPED,
+    results = listOf(result)
+)
+```
+
+Alternatively, `CoordinateComponent.mapToRecipeMap()` takes the inverse form — mapping each `CMatter` to the set of coordinates it occupies:
+
+```kotlin
+val items = CoordinateComponent.mapToRecipeMap(
+    mapOf(
+        gold to setOf(
+            CoordinateComponent(0, 0), CoordinateComponent(1, 0), CoordinateComponent(2, 0),
+            CoordinateComponent(0, 1),                            CoordinateComponent(2, 1),
+            CoordinateComponent(0, 2), CoordinateComponent(1, 2), CoordinateComponent(2, 2)
+        ),
+        apple to setOf(CoordinateComponent(1, 1))
+    )
+)
+```
+
+---
+
 ### Using predicates for Restrictions
 
 ```kotlin

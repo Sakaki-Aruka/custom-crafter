@@ -12,7 +12,6 @@ The following three classes are provided as CMatter implementations for inspecti
 | `CEnchantmentStoreMatterImpl` | Enchantments stored in an item (primarily enchanted books) |
 | `CEnchantBothMatterImpl` | Both directly applied and stored enchantments |
 
-None of these are subclasses of `CMatterImpl`; each is an independent class implementing the `CEnchantMatter` / `CEnchantmentStoreMatter` interfaces respectively.
 They are defined as `open class`, so they can be extended through inheritance.
 
 ---
@@ -27,7 +26,7 @@ open class CEnchantMatterImpl @JvmOverloads constructor(
     override val candidate: Set<Material>,
     override val enchantComponents: Set<CEnchantComponent>,
     override val amount: Int = 1,
-    override val mass: Boolean = false,
+    override val anyAmount: Boolean = false,
     override val predicates: Set<CMatterPredicate>? = CMatterImpl.defaultMatterPredicates()
 ) : CEnchantMatter
 ```
@@ -38,7 +37,7 @@ open class CEnchantMatterImpl @JvmOverloads constructor(
 | `candidate` | — | The set of item types that are accepted |
 | `enchantComponents` | — | The set of enchantment conditions required |
 | `amount` | `1` | Minimum number of items required |
-| `mass` | `false` | When `true`, excluded from quantity calculations |
+| `anyAmount` | `false` | When `true`, excluded from quantity calculations |
 | `predicates` | `defaultMatterPredicates()` | Additional validation logic set |
 
 ### DEFAULT_ENCHANT_CHECKER
@@ -126,7 +125,7 @@ open class CEnchantmentStoreMatterImpl @JvmOverloads constructor(
     override val candidate: Set<Material>,
     override val storedEnchantComponents: Set<CEnchantComponent>,
     override val amount: Int = 1,
-    override val mass: Boolean = false,
+    override val anyAmount: Boolean = false,
     override val predicates: Set<CMatterPredicate>? = CMatterImpl.defaultMatterPredicates()
 ) : CEnchantmentStoreMatter
 ```
@@ -159,7 +158,7 @@ val efficiencyBook = CEnchantmentStoreMatterImpl(
             strict = CEnchantComponent.Strict.STRICT
         )
     ),
-    mass = true  // Non-stackable like buckets, so mass = true is appropriate
+    anyAmount = true  // Non-stackable like buckets, so anyAmount = true is appropriate
 )
 
 // Enchanted book storing Sharpness (any level)
@@ -189,7 +188,7 @@ open class CEnchantBothMatterImpl @JvmOverloads constructor(
     override val enchantComponents: Set<CEnchantComponent>,
     override val storedEnchantComponents: Set<CEnchantComponent>,
     override val amount: Int = 1,
-    override val mass: Boolean = false,
+    override val anyAmount: Boolean = false,
     override val predicates: Set<CMatterPredicate>? = CMatterImpl.defaultMatterPredicates()
 ) : CEnchantMatter, CEnchantmentStoreMatter
 ```

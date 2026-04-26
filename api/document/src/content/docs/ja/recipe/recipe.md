@@ -152,7 +152,7 @@ val matter1 = CMatterImpl(
     name = "only-stone",
     candidate = setOf(Material.STONE, Material.COBBLESTONE),
     amount = 1,
-    mass = false,
+    anyAmount = false,
     predicates = CRecipeImpl.defaultMatterPredicates()
 )
 
@@ -160,11 +160,11 @@ val matter1 = CMatterImpl(
 val matter2 = CMatterImpl.of(Material.STONE, Material.COBBLESTONE)
 ```
 
-デフォルト実装の CMatterImpl では name, candidate, amount, mass, predicates という要素を持ち、それぞれが以下のように働きます。
+デフォルト実装の CMatterImpl では name, candidate, amount, anyAmount, predicates という要素を持ち、それぞれが以下のように働きます。
 - name: CMatter の名前 (滅多に使用されないので適当で良い)
 - candidate: 入力されるアイテムの種類がここに列挙したものに当てはまるものであれば良い
 - amount: 入力されるアイテムの個数がここに指定された数以上であれば良い
-- mass: true が指定された場合は `amount` を無視し、個数が 1 以上であれば良く、一括作成時の個数計算に関与しない。
+- anyAmount: true が指定された場合は `amount` を無視し、個数が 1 以上であれば良く、一括作成時の個数計算に関与しない。
     false が指定されたときは `amount` の個数指定に従う
 - predicates: 上記以外の要素を用いた検査ロジックを挿入できる。1 つでも false を返すものがあれば検査全体が失敗とみなされる。デフォルトではエンチャント、ポーションなどの判定ロジックが挿入される
 

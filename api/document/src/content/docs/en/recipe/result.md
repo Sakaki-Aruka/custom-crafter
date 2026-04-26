@@ -44,7 +44,7 @@ You can use these values inside `ResultSupplier` to decide what items to produce
 
 ### Calculating calledTimes
 
-`calledTimes` is calculated as the minimum value of "input count ÷ CMatter's `amount`" across all items whose corresponding CMatter has `mass = false`.
+`calledTimes` is calculated as the minimum value of "input count ÷ CMatter's `amount`" across all items whose corresponding CMatter has `anyAmount = false`.
 
 For example, suppose a recipe requires "2 Stones + 1 Gold Ingot" and the player inputs "64 Stones + 32 Gold Ingots" using Shift bulk crafting:
 
@@ -122,7 +122,7 @@ val stone = CMatterImpl(
     name = "stone",
     candidate = setOf(Material.STONE),
     amount = 2,  // requires 2 stones
-    mass = false,
+    anyAmount = false,
     predicates = null
 )
 

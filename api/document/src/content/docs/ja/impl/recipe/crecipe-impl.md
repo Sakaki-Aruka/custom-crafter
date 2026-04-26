@@ -95,6 +95,50 @@ val shapeless = CRecipeImpl.shapeless(
 )
 ```
 
+### 文字列レイアウトを使った定形レシピ
+
+`CoordinateComponent.recipeMapFromStringList()` を使うと、クラフトグリッドをカンマ区切りの文字列リストで宣言できます。座標を一つずつ指定するより可読性が高くなります。
+
+```kotlin
+val gold = CMatterImpl.of(Material.GOLD_BLOCK)
+val apple = CMatterImpl.of(Material.APPLE)
+val result = ResultSupplier.timesSingle(ItemStack.of(Material.ENCHANTED_GOLDEN_APPLE))
+
+// g → 金ブロック, a → リンゴ, _ → 空スロット (スキップ)
+val items = CoordinateComponent.recipeMapFromStringList(
+    lines = listOf(
+        "g,g,g",
+        "g,a,g",
+        "g,g,g"
+    ),
+    map = mapOf("g" to gold, "a" to apple)
+)
+
+val recipe = CRecipeImpl(
+    name = "golden-apple",
+    items = items,
+    type = CRecipe.Type.SHAPED,
+    results = listOf(result)
+)
+```
+
+逆に、各 `CMatter` が占める座標のセットを渡す `CoordinateComponent.mapToRecipeMap()` も利用できます。
+
+```kotlin
+val items = CoordinateComponent.mapToRecipeMap(
+    mapOf(
+        gold to setOf(
+            CoordinateComponent(0, 0), CoordinateComponent(1, 0), CoordinateComponent(2, 0),
+            CoordinateComponent(0, 1),                            CoordinateComponent(2, 1),
+            CoordinateComponent(0, 2), CoordinateComponent(1, 2), CoordinateComponent(2, 2)
+        ),
+        apple to setOf(CoordinateComponent(1, 1))
+    )
+)
+```
+
+---
+
 ### predicates を使った制限
 
 ```kotlin

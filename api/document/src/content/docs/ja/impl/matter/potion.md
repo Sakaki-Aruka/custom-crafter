@@ -17,7 +17,7 @@ open class CPotionMatterImpl @JvmOverloads constructor(
     override val candidate: Set<Material>,
     override val potionComponents: Set<CPotionComponent>,
     override val amount: Int = 1,
-    override val mass: Boolean = false,
+    override val anyAmount: Boolean = false,
     override val predicates: Set<CMatterPredicate>? = CMatterImpl.defaultMatterPredicates()
 ) : CPotionMatter
 ```
@@ -28,12 +28,12 @@ open class CPotionMatterImpl @JvmOverloads constructor(
 | `candidate` | — | 受け付けるアイテムの種類の集合 |
 | `potionComponents` | — | 要求するポーション効果の条件セット |
 | `amount` | `1` | 要求する最小個数 |
-| `mass` | `false` | `true` にすると個数計算から除外される |
+| `anyAmount` | `false` | `true` にすると個数計算から除外される |
 | `predicates` | `defaultMatterPredicates()` | 追加の検査ロジックセット |
 
 :::note
 ポーション系アイテム (`POTION`, `SPLASH_POTION`, `LINGERING_POTION`) はスタックできないため、
-`mass = true` を指定して個数計算から除外することを推奨します。
+`anyAmount = true` を指定して個数計算から除外することを推奨します。
 :::
 
 ---
@@ -120,7 +120,7 @@ val glowingPotion = CPotionMatterImpl(
             strict = CPotionComponent.Strict.ONLY_EFFECT
         )
     ),
-    mass = true
+    anyAmount = true
 )
 ```
 
@@ -137,7 +137,7 @@ val swiftPotion = CPotionMatterImpl(
             strict = CPotionComponent.Strict.STRICT
         )
     ),
-    mass = true
+    anyAmount = true
 )
 ```
 
@@ -158,7 +158,7 @@ val comboPotion = CPotionMatterImpl(
             strict = CPotionComponent.Strict.ONLY_EFFECT
         )
     ),
-    mass = true
+    anyAmount = true
 )
 ```
 
@@ -190,6 +190,6 @@ class HealingPotionMatter(name: String) : CPotionMatterImpl(
             strict = CPotionComponent.Strict.ONLY_EFFECT
         )
     ),
-    mass = true
+    anyAmount = true
 )
 ```
