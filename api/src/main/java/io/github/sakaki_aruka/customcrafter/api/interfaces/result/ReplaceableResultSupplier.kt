@@ -13,7 +13,6 @@ import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeoutException
-import java.util.concurrent.atomic.AtomicReference
 
 /**
  * A subinterface of [ResultSupplier] that writes items back into the crafting UI slots
@@ -25,7 +24,7 @@ import java.util.concurrent.atomic.AtomicReference
  *
  * ## Execution flow
  * 1. [supply] is called on an executor thread (async).
- * 2. [replaceQueries] is invoked on the same executor thread to build the slot-to-item mapping.
+ * 2. [replaceQueries] is invoked on the calling thread, before the async dispatch, to build the slot-to-item mapping.
  * 3. All UI access (`getItem` / `setItem`) is dispatched to the entity's regional scheduler
  *    via a single `runAtEntity` call, ensuring thread safety for both Paper and Folia.
  * 4. After all slots are processed (or the timeout elapses), [replaceResultHandler] is
@@ -43,16 +42,6 @@ import java.util.concurrent.atomic.AtomicReference
  */
 interface ReplaceableResultSupplier: ResultSupplier {
 
-    companion object {
-        private fun allOf(state: ReplaceState): Map<CoordinateComponent, ReplaceState> {
-            return CoordinateComponent.squareFill(6).associateWith { state }
-        }
-
-        private fun filterInUiSlots(map: Map<CoordinateComponent, ItemStack>): Map<CoordinateComponent, ItemStack> {
-            return map.filter { (c, _) -> c.x in (0..<6) && c.y in (0..<6) }
-        }
-    }
-
     /**
      * Executes the slot write-back logic and always returns an empty list.
      *
@@ -67,47 +56,44 @@ interface ReplaceableResultSupplier: ResultSupplier {
     override fun supply(ctx: ResultSupplier.Context): List<ItemStack> {
         val replaceContext = Context(ctx)
         val results: MutableMap<CoordinateComponent, ReplaceState> = ConcurrentHashMap()
-        val usedQueries: AtomicReference<Map<CoordinateComponent, ItemStack>?> = AtomicReference(null)
+        val usedQueries: Map<CoordinateComponent, ItemStack> = this.replaceQueries(replaceContext)
         CompletableFuture.supplyAsync({
             val player: Player = Bukkit.getPlayer(ctx.crafterID)
-                ?: return@supplyAsync results.putAll(allOf(ReplaceState.PLAYER_OFFLINE))
-
-            usedQueries.set(this.replaceQueries(replaceContext))
-            val queries = usedQueries.get()!!
-
+                ?: return@supplyAsync results.putAll(usedQueries.keys.associateWith { ReplaceState.PLAYER_OFFLINE })
             try {
                 InternalAPI.foliaLib.scheduler.runAtEntity(player) {
-                    val ui = player.openInventory.topInventory
-                        .takeIf { it.holder is CraftUI }
-                    if (ui == null) {
-                        results.putAll(allOf(ReplaceState.UI_CLOSED))
-                        return@runAtEntity
-                    }
-                    for ((c, replacer) in filterInUiSlots(queries)) {
-                        val slotItem = ui.getItem(c.toIndex())
+                    val ui: CraftUI = player.openInventory.topInventory.holder
+                        ?.let { it as? CraftUI }
+                        ?: run {
+                            results.putAll(usedQueries.keys.associateWith { ReplaceState.UI_CLOSED })
+                            return@runAtEntity
+                        }
+                    for ((c, replacer) in usedQueries) {
+                        if (c !in ui.bakedDesigner.craftSlots()) {
+                            results[c] = ReplaceState.OUT_OF_SLOTS_AREA
+                            continue
+                        }
+                        val slotItem = ui.inventory.getItem(c.toIndex())
                         if (slotItem != null && !slotItem.isEmpty) {
                             results[c] = ReplaceState.ITEM_ALREADY_PLACED
                         } else {
-                            ui.setItem(c.toIndex(), replacer)
+                            ui.inventory.setItem(c.toIndex(), replacer)
                             results[c] = ReplaceState.SUCCESS
                         }
                     }
                 }.get(timeoutMilli(), TimeUnit.MILLISECONDS)
             } catch (_: TimeoutException) {
-                queries.keys.forEach { c -> results.putIfAbsent(c, ReplaceState.TIMEOUT) }
+                usedQueries.keys.forEach { c -> results.putIfAbsent(c, ReplaceState.TIMEOUT) }
             }
         }, InternalAPI.executor)
             .completeOnTimeout(Unit,this.timeoutMilli(), TimeUnit.MILLISECONDS)
             .thenRunAsync({
-                (CoordinateComponent.squareFill(6) - results.keys)
-                    .takeIf { it.isNotEmpty() }
-                    ?.let { remaining ->
-                        remaining.forEach { c ->
-                            results.putIfAbsent(c, if (usedQueries.get() == null) ReplaceState.UNKNOWN else ReplaceState.TIMEOUT)
-                        }
+                (usedQueries.keys - results.keys)
+                    .takeIf { remainingSlots -> remainingSlots.isNotEmpty() }
+                    ?.let { remainingSlots ->
+                        remainingSlots.forEach { c -> results[c] = ReplaceState.TIMEOUT }
                     }
-
-                this.replaceResultHandler(results, usedQueries.get(), replaceContext)
+                this.replaceResultHandler(results, usedQueries, replaceContext)
             }, InternalAPI.executor)
 
         return emptyList()
@@ -131,10 +117,11 @@ interface ReplaceableResultSupplier: ResultSupplier {
         /** The entity scheduler did not execute within [timeoutMilli] milliseconds. */
         TIMEOUT,
 
+        /** The target coordinate is not included in [io.github.sakaki_aruka.customcrafter.api.interfaces.ui.CraftUIDesigner.Baked.craftSlots]; the write-back was skipped. */
+        OUT_OF_SLOTS_AREA,
+
         /**
-         * The slot state is undetermined. This occurs when the overall [supply] operation
-         * timed out before [replaceQueries] returned (i.e. [replaceQueries] itself took
-         * longer than [timeoutMilli] milliseconds).
+         * Reserved for future use. Not set by the current implementation.
          */
         UNKNOWN,
 
@@ -183,11 +170,12 @@ interface ReplaceableResultSupplier: ResultSupplier {
     /**
      * Builds the mapping of crafting-grid slots to items that should be written back.
      *
-     * This function is called on an executor thread (async). Avoid accessing Bukkit API or
-     * game state directly; use the provided [ctx] instead.
+     * This function is called on the same thread that invoked [supply], before the async
+     * dispatch. Avoid accessing Bukkit API or game state directly; use the provided [ctx] instead.
      *
-     * Only coordinates within the 6×6 crafting grid (x in 0–5, y in 0–5) are processed;
-     * entries outside this range are silently ignored.
+     * Entries whose coordinates are not present in
+     * [io.github.sakaki_aruka.customcrafter.api.interfaces.ui.CraftUIDesigner.Baked.craftSlots]
+     * are recorded as [ReplaceState.OUT_OF_SLOTS_AREA] and skipped.
      *
      * @param[ctx] Context derived from the original [ResultSupplier.Context]
      * @return A map of [CoordinateComponent] to the [ItemStack] to place in that slot
@@ -202,15 +190,14 @@ interface ReplaceableResultSupplier: ResultSupplier {
      * or perform any post-craft side effects.
      *
      * @param[results] Per-slot outcome of the write-back operation.
-     *   Contains an entry for every coordinate in the 6×6 grid.
-     * @param[usedQueries] The map returned by [replaceQueries], or `null` if [replaceQueries]
-     *   did not complete before the overall timeout.
+     *   Contains an entry for every key in the map returned by [replaceQueries].
+     * @param[usedQueries] The map returned by [replaceQueries].
      * @param[usedContext] The [Context] that was passed to [replaceQueries]
      * @since 5.0.21
      */
     fun replaceResultHandler(
         results: Map<CoordinateComponent, ReplaceState>,
-        usedQueries: Map<CoordinateComponent, ItemStack>?,
+        usedQueries: Map<CoordinateComponent, ItemStack>,
         usedContext: Context
     )
 }
