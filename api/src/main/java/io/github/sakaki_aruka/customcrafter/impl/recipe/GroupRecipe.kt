@@ -44,14 +44,15 @@ import java.util.UUID
  *
  * ---
  *
- * GroupRecipe has to contains [GroupRecipe.recipePredicate] in [GroupRecipe.predicates].
+ * [GroupRecipe.recipePredicate] is always appended to [GroupRecipe.predicates] automatically,
+ * regardless of whether [predicates] is specified in the constructor.
  *
  * @param[name] Name of this recipe
  * @param[items] Item mapping
  * @param[groups] Air-containable context set. It can be empty.
- * @param[predicates] Predicates of this recipe. (default = `listOf(GroupRecipe.recipePredicate)`)
+ * @param[predicates] Additional predicates prepended before [recipePredicate]. Defaults to none.
+ *   [recipePredicate] is always included automatically and does not need to be added manually.
  * @param[results] [ResultSupplier] list
- * @param[type] Always be [CRecipe.Type.SHAPED]
  * @see[CRecipe]
  * @see[Matter]
  * @see[Context]
@@ -61,10 +62,11 @@ open class GroupRecipe @JvmOverloads constructor(
     override val name: String,
     override val items: Map<CoordinateComponent, CMatter>,
     val groups: Set<Context>,
-    override val predicates: List<CRecipePredicate>? = listOf(recipePredicate),
-    override val results: List<ResultSupplier>? = null,
-    override val type: CRecipe.Type = CRecipe.Type.SHAPED
+    predicates: List<CRecipePredicate>? = null,
+    override val results: List<ResultSupplier>? = null
 ): CRecipe, UnPartialSearchableRecipe {
+    override val predicates: List<CRecipePredicate> = (predicates ?: emptyList()) + recipePredicate
+    override val type: CRecipe.Type = CRecipe.Type.SHAPED
 
     companion object {
         /**
