@@ -156,6 +156,7 @@ class AdjacentRecipe @JvmOverloads constructor(
          * @return A [CRecipePredicate] implementing the direction constraint check.
          * @since 5.1.0
          */
+        @JvmStatic
         fun checker(relationType: RelationType): CRecipePredicate {
             return CRecipePredicate { context ->
                 passedPattern(relationType.offset(), context.input.materials.keys)
