@@ -177,11 +177,11 @@ object AdjacentRecipeTest {
     }
 
     @Test
-    fun bothFarApartPassTest() {
-        // (0,0) and (2,2): distance > 1, not neighbours — BOTH imposes no constraint so passes
+    fun bothFarApartFailTest() {
+        // (0,0) and (2,2): distance > 1, surround is empty for each item → fails regardless of RelationType
         val recipe = AdjacentRecipe("test", listOf(stone(), stone()), AdjacentRecipe.RelationType.BOTH)
         val ctx = checkerContext(recipe, setOf(CoordinateComponent(0, 0), CoordinateComponent(2, 2)))
-        assertTrue(AdjacentRecipe.checker(AdjacentRecipe.RelationType.BOTH).test(ctx))
+        assertFalse(AdjacentRecipe.checker(AdjacentRecipe.RelationType.BOTH).test(ctx))
     }
 
     // -------------------------------------------------------------------------

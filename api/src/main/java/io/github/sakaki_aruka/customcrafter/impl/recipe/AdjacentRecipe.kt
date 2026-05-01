@@ -168,14 +168,18 @@ class AdjacentRecipe @JvmOverloads constructor(
             target: Set<CoordinateComponent>
         ): Boolean {
             return target.all { c ->
-                val correctRange: Set<CoordinateComponent> = offsets.map { offset ->
-                    CoordinateComponent(c.x + offset.x, c.y + offset.y)
-                }.toSet()
+                val correctRange: Set<CoordinateComponent> = offsets
+                    .map { (dx, dy) -> CoordinateComponent(c.x + dx, c.y + dy) }
+                    .toSet()
 
                 val surround: Set<CoordinateComponent> = target
                     .filterNot { (x, y) -> x == c.x && y == c.y }
                     .filter { (x, y) -> x in (c.x - 1..c.x + 1) && y in (c.y - 1..c.y + 1) }
                     .toSet()
+
+                if (surround.isEmpty()) {
+                    return false
+                }
 
                 correctRange.containsAll(surround)
             }
