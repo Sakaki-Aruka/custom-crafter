@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <version>5.0.21</version>
+        <version>5.1.0</version>
         <groupId>io.github.sakaki-aruka</groupId>
         <artifactId>custom-crafter</artifactId>
     </parent>
@@ -148,7 +148,6 @@
                     <suppressedFiles>
                         <file>${project.basedir}/src/main/java/io/github/sakaki_aruka/customcrafter/internal</file>
                         <file>${project.basedir}/src/main/java/io/github/sakaki_aruka/customcrafter/CustomCrafter.java</file>
-                        <file>${project.basedir}/src/main/java/io/github/sakaki_aruka/customcrafter/impl/recipe/CVanillaRecipe.kt</file>
                     </suppressedFiles>
                     <includes>
                         <include>${project.basedir}/target/classes/Module.md</include>
