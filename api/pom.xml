@@ -146,8 +146,8 @@
                         </directory>
                     </sourceDirectories>
                     <suppressedFiles>
-                        <file>${project.basedir}/src/main/java/io/github/sakaki_aruka/customcrafter/internal</file>
-                        <file>${project.basedir}/src/main/java/io/github/sakaki_aruka/customcrafter/CustomCrafter.kt</file>
+                        <file>${project.basedir}/src/main/kotlin/io/github/sakaki_aruka/customcrafter/internal</file>
+                        <file>${project.basedir}/src/main/kotlin/io/github/sakaki_aruka/customcrafter/CustomCrafter.kt</file>
                     </suppressedFiles>
                     <includes>
                         <include>${project.basedir}/target/classes/Module.md</include>
