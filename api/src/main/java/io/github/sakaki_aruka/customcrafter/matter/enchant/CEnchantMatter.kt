@@ -1,6 +1,6 @@
-package io.github.sakaki_aruka.customcrafter.matter
+package io.github.sakaki_aruka.customcrafter.matter.enchant
 
-import io.github.sakaki_aruka.customcrafter.matter.enchant.CEnchantComponent
+import io.github.sakaki_aruka.customcrafter.matter.CMatter
 
 /**
  * This interface's implementing types will be subject to checks regarding enchantments when used as materials.

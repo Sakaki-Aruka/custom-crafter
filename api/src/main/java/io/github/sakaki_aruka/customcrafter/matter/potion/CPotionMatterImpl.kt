@@ -2,8 +2,6 @@ package io.github.sakaki_aruka.customcrafter.matter.potion
 
 import io.github.sakaki_aruka.customcrafter.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.matter.CMatterPredicate
-import io.github.sakaki_aruka.customcrafter.matter.potion.CPotionMatter
-import io.github.sakaki_aruka.customcrafter.matter.potion.CPotionComponent
 import io.github.sakaki_aruka.customcrafter.matter.CMatterImpl
 import org.bukkit.Material
 import org.bukkit.inventory.meta.PotionMeta

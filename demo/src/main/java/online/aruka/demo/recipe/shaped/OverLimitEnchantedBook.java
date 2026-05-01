@@ -114,8 +114,7 @@ public class OverLimitEnchantedBook {
                 items,
                 groups,
                 null,
-                List.of(supplier),
-                CRecipe.Type.SHAPED
+                List.of(supplier)
         );
     }
 }
