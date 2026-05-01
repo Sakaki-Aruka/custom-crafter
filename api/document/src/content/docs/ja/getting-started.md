@@ -34,6 +34,10 @@ CustomCrafterAPI 単体で提供される機能は以下のとおりになりま
 
 ### ライブラリとして
 
+:::tip
+ほとんどの更新において対応する下限のバージョンが変化することはないため、リリースされている最新バージョンの利用を推奨します。
+:::
+
 CustomCrafterAPI は MIT ライセンスのもと提供されています。  
 
 ライブラリとしての CustomCrafterAPI は [Maven Central](https://central.sonatype.com/artifact/io.github.sakaki-aruka/custom-crafter-api) から依存関係としてプラグインに組み込むことができます。  

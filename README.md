@@ -51,6 +51,8 @@ The jar file, which can be placed in the server's plugins directory, will be cre
 | 4.3 (Legacy)           | 1.21.3                       |
 | 4.2 (Legacy)           | 1.20.1 ~ 1.20.4              |
 
+> **💡 Tip:** The minimum compatible version requirement rarely changes between updates. Using the latest release is recommended.
+
 > **⚠️ Essential Warning:**
 > custom crafter **does not support running on Spigot/Bukkit servers**. Please ensure you run it on **PaperMC** or a PaperMC-fork.
 
