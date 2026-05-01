@@ -1,10 +1,10 @@
 package io.github.sakaki_aruka.customcrafter
 
-import io.github.sakaki_aruka.customcrafter.api.event.CustomCrafterAPIPropertiesChangeEvent
-import io.github.sakaki_aruka.customcrafter.api.event.RegisterCustomRecipeEvent
-import io.github.sakaki_aruka.customcrafter.api.event.UnregisterCustomRecipeEvent
-import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
-import io.github.sakaki_aruka.customcrafter.api.interfaces.ui.CraftUIDesigner
+import io.github.sakaki_aruka.customcrafter.event.CustomCrafterAPIPropertiesChangeEvent
+import io.github.sakaki_aruka.customcrafter.event.RegisterCustomRecipeEvent
+import io.github.sakaki_aruka.customcrafter.event.UnregisterCustomRecipeEvent
+import io.github.sakaki_aruka.customcrafter.recipe.CRecipe
+import io.github.sakaki_aruka.customcrafter.ui.CraftUIDesigner
 import io.github.sakaki_aruka.customcrafter.internal.gui.crafting.CraftUI
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage

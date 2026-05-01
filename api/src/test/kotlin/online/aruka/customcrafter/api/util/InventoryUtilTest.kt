@@ -1,6 +1,6 @@
 package online.aruka.customcrafter.api.util
 
-import io.github.sakaki_aruka.customcrafter.impl.util.InventoryUtil.giveItems
+import io.github.sakaki_aruka.customcrafter.util.InventoryUtil.giveItems
 import org.bukkit.Material
 import org.bukkit.entity.Item
 import org.bukkit.inventory.ItemStack

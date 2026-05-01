@@ -1,14 +1,14 @@
 package online.aruka.demo.recipe.shaped;
 
-import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CEnchantmentStoreMatter;
-import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter;
-import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe;
-import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier;
-import io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant.CEnchantComponent;
-import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent;
-import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl;
-import io.github.sakaki_aruka.customcrafter.impl.matter.enchant.CEnchantmentStoreMatterImpl;
-import io.github.sakaki_aruka.customcrafter.impl.recipe.GroupRecipe;
+import io.github.sakaki_aruka.customcrafter.matter.CEnchantmentStoreMatter;
+import io.github.sakaki_aruka.customcrafter.matter.CMatter;
+import io.github.sakaki_aruka.customcrafter.recipe.CRecipe;
+import io.github.sakaki_aruka.customcrafter.result.ResultSupplier;
+import io.github.sakaki_aruka.customcrafter.matter.enchant.CEnchantComponent;
+import io.github.sakaki_aruka.customcrafter.recipe.CoordinateComponent;
+import io.github.sakaki_aruka.customcrafter.matter.CMatterImpl;
+import io.github.sakaki_aruka.customcrafter.matter.enchant.CEnchantmentStoreMatterImpl;
+import io.github.sakaki_aruka.customcrafter.recipe.GroupRecipe;
 import kotlin.Pair;
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;

@@ -1,6 +1,6 @@
 package io.github.sakaki_aruka.customcrafter;
 
-import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe;
+import io.github.sakaki_aruka.customcrafter.recipe.CRecipe;
 import io.github.sakaki_aruka.customcrafter.internal.InternalAPI;
 import io.github.sakaki_aruka.customcrafter.internal.command.CC;
 import io.github.sakaki_aruka.customcrafter.internal.listener.InventoryClickListener;

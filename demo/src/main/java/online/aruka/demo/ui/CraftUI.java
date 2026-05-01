@@ -1,7 +1,7 @@
 package online.aruka.demo.ui;
 
-import io.github.sakaki_aruka.customcrafter.api.interfaces.ui.CraftUIDesigner;
-import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent;
+import io.github.sakaki_aruka.customcrafter.ui.CraftUIDesigner;
+import io.github.sakaki_aruka.customcrafter.recipe.CoordinateComponent;
 import kotlin.Pair;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;

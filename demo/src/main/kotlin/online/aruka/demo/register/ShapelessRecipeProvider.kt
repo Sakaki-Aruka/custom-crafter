@@ -1,11 +1,11 @@
 package online.aruka.demo.register
 
-import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
-import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatterPredicate
-import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
-import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
-import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
-import io.github.sakaki_aruka.customcrafter.impl.recipe.CRecipeImpl
+import io.github.sakaki_aruka.customcrafter.matter.CMatter
+import io.github.sakaki_aruka.customcrafter.matter.CMatterPredicate
+import io.github.sakaki_aruka.customcrafter.recipe.CRecipe
+import io.github.sakaki_aruka.customcrafter.result.ResultSupplier
+import io.github.sakaki_aruka.customcrafter.matter.CMatterImpl
+import io.github.sakaki_aruka.customcrafter.recipe.CRecipeImpl
 import online.aruka.demo.Demo
 import org.bukkit.Bukkit
 import org.bukkit.Material

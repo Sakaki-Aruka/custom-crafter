@@ -1,13 +1,13 @@
 package online.aruka.customcrafter.api.`object`
 
-import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
-import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier
-import io.github.sakaki_aruka.customcrafter.api.objects.AsyncContext
-import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelation
-import io.github.sakaki_aruka.customcrafter.api.objects.MappedRelationComponent
-import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
-import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
-import io.github.sakaki_aruka.customcrafter.impl.recipe.CRecipeImpl
+import io.github.sakaki_aruka.customcrafter.recipe.CRecipe
+import io.github.sakaki_aruka.customcrafter.result.ResultSupplier
+import io.github.sakaki_aruka.customcrafter.objects.AsyncContext
+import io.github.sakaki_aruka.customcrafter.objects.MappedRelation
+import io.github.sakaki_aruka.customcrafter.objects.MappedRelationComponent
+import io.github.sakaki_aruka.customcrafter.recipe.CoordinateComponent
+import io.github.sakaki_aruka.customcrafter.matter.CMatterImpl
+import io.github.sakaki_aruka.customcrafter.recipe.CRecipeImpl
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.junit.jupiter.api.AfterEach

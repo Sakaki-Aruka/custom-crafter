@@ -1,6 +1,6 @@
 package online.aruka.customcrafter.api.impl.matter
 
-import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
+import io.github.sakaki_aruka.customcrafter.matter.CMatterImpl
 import org.bukkit.Material
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach

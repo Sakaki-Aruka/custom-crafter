@@ -1,8 +1,8 @@
 package online.aruka.customcrafter.api.`object`
 
-import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
-import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
-import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
+import io.github.sakaki_aruka.customcrafter.matter.CMatter
+import io.github.sakaki_aruka.customcrafter.recipe.CoordinateComponent
+import io.github.sakaki_aruka.customcrafter.matter.CMatterImpl
 import org.bukkit.Material
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach

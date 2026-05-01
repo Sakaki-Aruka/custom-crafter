@@ -1,11 +1,11 @@
 package online.aruka.demo.recipe.shapeless;
 
 import com.destroystokyo.paper.MaterialTags;
-import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter;
-import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe;
-import io.github.sakaki_aruka.customcrafter.api.interfaces.result.ResultSupplier;
-import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl;
-import io.github.sakaki_aruka.customcrafter.impl.recipe.CRecipeImpl;
+import io.github.sakaki_aruka.customcrafter.matter.CMatter;
+import io.github.sakaki_aruka.customcrafter.recipe.CRecipe;
+import io.github.sakaki_aruka.customcrafter.result.ResultSupplier;
+import io.github.sakaki_aruka.customcrafter.matter.CMatterImpl;
+import io.github.sakaki_aruka.customcrafter.recipe.CRecipeImpl;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 

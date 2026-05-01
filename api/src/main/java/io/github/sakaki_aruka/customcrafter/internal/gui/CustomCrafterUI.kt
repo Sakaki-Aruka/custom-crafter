@@ -1,6 +1,6 @@
 package io.github.sakaki_aruka.customcrafter.internal.gui
 
-import io.github.sakaki_aruka.customcrafter.impl.util.Converter.toComponent
+import io.github.sakaki_aruka.customcrafter.util.Converter.toComponent
 import io.github.sakaki_aruka.customcrafter.internal.gui.crafting.CraftUI
 import org.bukkit.Bukkit
 import org.bukkit.Material
