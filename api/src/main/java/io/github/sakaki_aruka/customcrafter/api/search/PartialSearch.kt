@@ -54,7 +54,7 @@ object PartialSearch {
      * information derived from comparing the current [CraftView] against that recipe.
      * @since 5.0.21
      */
-    interface PartialSearchResult {
+    sealed interface PartialSearchResult {
         /** The candidate recipe that was evaluated. */
         val recipe: CRecipe
 
