@@ -85,6 +85,7 @@ export default defineConfig({
                                 'impl/recipe/crecipe-impl',
                                 'impl/recipe/group-recipe',
                                 'impl/recipe/cvanilla-recipe',
+                                'impl/recipe/adjacent-recipe',
                             ],
                         },
                     ],
