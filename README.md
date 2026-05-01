@@ -43,13 +43,15 @@ The jar file, which can be placed in the server's plugins directory, will be cre
 
 ## 🛠️ Supported Environments and Versions
 
-| Custom_Crafter Version | Paper Version        |
-|:-----------------------|:---------------------|
-| **5.0.21 (Latest)**    | **1.21.4 ~ 1.21.11** |
-| 5.0.13 ~ 5.0.21    | 1.21.4 ~ 1.21.11     |
-| 5.0.0 ~ 5.0.11         | 1.21.3               |
-| 4.3 (Legacy)           | 1.21.3               |
-| 4.2 (Legacy)           | 1.20.1 ~ 1.20.4      |
+| Custom_Crafter Version | Paper Version                |
+|:-----------------------|:-----------------------------|
+| **5.1.0 (Latest)**     | **1.21.4 ~ 1.21.11, 26.1.x** |
+| 5.0.13 ~ 5.0.21        | 1.21.4 ~ 1.21.11, 26.1.x     |
+| 5.0.0 ~ 5.0.11         | 1.21.3                       |
+| 4.3 (Legacy)           | 1.21.3                       |
+| 4.2 (Legacy)           | 1.20.1 ~ 1.20.4              |
+
+> **💡 Tip:** The minimum compatible version requirement rarely changes between updates. Using the latest release is recommended.
 
 > **⚠️ Essential Warning:**
 > custom crafter **does not support running on Spigot/Bukkit servers**. Please ensure you run it on **PaperMC** or a PaperMC-fork.
@@ -83,7 +85,7 @@ depend:
 
 ---
 
-Latest Version: 5.0.21 [Maven Central (versions)](https://central.sonatype.com/artifact/io.github.sakaki-aruka/custom-crafter-api/versions)  
+Latest Version: 5.1.0 [Maven Central (versions)](https://central.sonatype.com/artifact/io.github.sakaki-aruka/custom-crafter-api/versions)  
 
 When using the API, you must assume the CustomCrafter plugin will be present at runtime. Therefore, set the scope to **compile-time only**.  
 Also, if you are creating plugins in Kotlin, please set the Kotlin-stdlib dependency to "compile-time only".  
@@ -101,7 +103,7 @@ From Maven Central
 <dependency>
     <groupId>io.github.sakaki-aruka</groupId>
     <artifactId>custom-crafter-api</artifactId>
-    <version>5.0.21</version>
+    <version>5.1.0</version>
     <scope>provided</scope>
 </dependency>
 
@@ -121,7 +123,7 @@ From Maven Central
 ```groovy
 dependencies {
     // CustomCrafterAPI Dependency
-    compileOnly 'io.github.sakaki-aruka:custom-crafter-api:5.0.21'
+    compileOnly 'io.github.sakaki-aruka:custom-crafter-api:5.1.0'
     
     // kotlin-stdlib Dependency (If you needed)
     compileOnly 'org.jetbrains.kotlin:kotlin-stdlib:2.3.0'
@@ -135,7 +137,7 @@ dependencies {
 ```Kotlin
 dependencies {
     // CustomCrafterAPI Dependency
-    compileOnly("io.github.sakaki-aruka:custom-crafter-api:5.0.21")
+    compileOnly("io.github.sakaki-aruka:custom-crafter-api:5.1.0")
     
     // kotlin-stdlib Dependency (If you needed)
     compileOnly("org.jetbrains.kotlin:kotlin-stdlib:2.3.0")
@@ -176,7 +178,7 @@ Example code to check if the CustomCrafterAPI version your plugin depends on is 
  */
 class YourPlugin: JavaPlugin() {
     // Define the dependent API version as a constant
-    const val DEPEND_API_VERSION = "5.0.21"
+    const val DEPEND_API_VERSION = "5.1.0"
     
     @Override
     fun onEnable() {
@@ -213,7 +215,7 @@ val matter: CMatter = CMatterImpl(
     name = "test-matter",
     candidate = setOf(Material.STONE, Material.COBBLESTONE), // Stone or Cobblestone can be used
     amount = 1, // Required amount
-    mass = false, // true: consider stacking (usually false)
+    anyAmount = false, // true: consider stacking (usually false)
     predicates = null // Additional NBT or other conditions (usually null)
 )
 ```

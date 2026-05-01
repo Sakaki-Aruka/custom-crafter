@@ -34,6 +34,10 @@ The supported Minecraft version does not change across versions, so using the la
 
 ### As a library
 
+:::tip
+The minimum required API version rarely changes between updates. Using the latest release is recommended.
+:::
+
 CustomCrafterAPI is provided under the MIT license.
 
 CustomCrafterAPI as a library can be incorporated into your plugin as a dependency from [Maven Central](https://central.sonatype.com/artifact/io.github.sakaki-aruka/custom-crafter-api).

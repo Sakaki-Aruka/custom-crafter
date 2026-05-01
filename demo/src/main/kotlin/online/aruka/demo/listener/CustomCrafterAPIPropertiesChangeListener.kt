@@ -1,7 +1,7 @@
 package online.aruka.demo.listener
 
-import io.github.sakaki_aruka.customcrafter.api.event.CustomCrafterAPIPropertiesChangeEvent
-import io.github.sakaki_aruka.customcrafter.impl.util.Converter.toComponent
+import io.github.sakaki_aruka.customcrafter.event.CustomCrafterAPIPropertiesChangeEvent
+import io.github.sakaki_aruka.customcrafter.util.Converter.toComponent
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.event.EventHandler

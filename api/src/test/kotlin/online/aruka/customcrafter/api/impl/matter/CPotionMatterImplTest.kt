@@ -1,13 +1,13 @@
 package online.aruka.customcrafter.api.impl.matter
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
-import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatterPredicate
-import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
-import io.github.sakaki_aruka.customcrafter.api.objects.matter.potion.CPotionComponent
-import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
-import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
-import io.github.sakaki_aruka.customcrafter.impl.matter.potion.CPotionMatterImpl
-import io.github.sakaki_aruka.customcrafter.impl.recipe.CRecipeImpl
+import io.github.sakaki_aruka.customcrafter.matter.CMatterPredicate
+import io.github.sakaki_aruka.customcrafter.recipe.CRecipe
+import io.github.sakaki_aruka.customcrafter.matter.potion.CPotionComponent
+import io.github.sakaki_aruka.customcrafter.recipe.CoordinateComponent
+import io.github.sakaki_aruka.customcrafter.matter.CMatterImpl
+import io.github.sakaki_aruka.customcrafter.matter.potion.CPotionMatterImpl
+import io.github.sakaki_aruka.customcrafter.recipe.CRecipeImpl
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.PotionMeta

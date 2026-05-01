@@ -1,9 +1,9 @@
 package online.aruka.customcrafter.api
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
-import io.github.sakaki_aruka.customcrafter.api.interfaces.ui.CraftUIDesigner
-import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
-import io.github.sakaki_aruka.customcrafter.impl.util.Converter.toComponent
+import io.github.sakaki_aruka.customcrafter.ui.CraftUIDesigner
+import io.github.sakaki_aruka.customcrafter.recipe.CoordinateComponent
+import io.github.sakaki_aruka.customcrafter.util.Converter.toComponent
 import net.kyori.adventure.text.Component
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack

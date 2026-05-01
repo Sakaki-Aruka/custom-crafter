@@ -1,12 +1,12 @@
 package online.aruka.customcrafter.api.impl.recipe
 
-import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
-import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
-import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
-import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
-import io.github.sakaki_aruka.customcrafter.api.search.Search
-import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
-import io.github.sakaki_aruka.customcrafter.impl.recipe.GroupRecipe
+import io.github.sakaki_aruka.customcrafter.matter.CMatter
+import io.github.sakaki_aruka.customcrafter.recipe.CRecipe
+import io.github.sakaki_aruka.customcrafter.objects.CraftView
+import io.github.sakaki_aruka.customcrafter.recipe.CoordinateComponent
+import io.github.sakaki_aruka.customcrafter.search.Search
+import io.github.sakaki_aruka.customcrafter.matter.CMatterImpl
+import io.github.sakaki_aruka.customcrafter.recipe.GroupRecipe
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.junit.jupiter.api.AfterEach

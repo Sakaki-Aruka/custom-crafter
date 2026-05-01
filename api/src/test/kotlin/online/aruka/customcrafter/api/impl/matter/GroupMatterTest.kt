@@ -1,14 +1,14 @@
 package online.aruka.customcrafter.api.impl.matter
 
-import io.github.sakaki_aruka.customcrafter.api.interfaces.matter.CMatter
-import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
-import io.github.sakaki_aruka.customcrafter.api.objects.CraftView
-import io.github.sakaki_aruka.customcrafter.api.objects.matter.enchant.CEnchantComponent
-import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
-import io.github.sakaki_aruka.customcrafter.api.search.Search
-import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
-import io.github.sakaki_aruka.customcrafter.impl.matter.enchant.CEnchantmentStoreMatterImpl
-import io.github.sakaki_aruka.customcrafter.impl.recipe.GroupRecipe
+import io.github.sakaki_aruka.customcrafter.matter.CMatter
+import io.github.sakaki_aruka.customcrafter.recipe.CRecipe
+import io.github.sakaki_aruka.customcrafter.objects.CraftView
+import io.github.sakaki_aruka.customcrafter.matter.enchant.CEnchantComponent
+import io.github.sakaki_aruka.customcrafter.recipe.CoordinateComponent
+import io.github.sakaki_aruka.customcrafter.search.Search
+import io.github.sakaki_aruka.customcrafter.matter.CMatterImpl
+import io.github.sakaki_aruka.customcrafter.matter.enchant.CEnchantmentStoreMatterImpl
+import io.github.sakaki_aruka.customcrafter.recipe.GroupRecipe
 import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemStack

@@ -1,7 +1,7 @@
 package online.aruka.demo.listener;
 
-import io.github.sakaki_aruka.customcrafter.api.event.failure.CraftInputInterruptEvent;
-import io.github.sakaki_aruka.customcrafter.api.event.failure.PreventDoubleCraftEvent;
+import io.github.sakaki_aruka.customcrafter.event.failure.CraftInputInterruptEvent;
+import io.github.sakaki_aruka.customcrafter.event.failure.PreventDoubleCraftEvent;
 import online.aruka.demo.Demo;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;

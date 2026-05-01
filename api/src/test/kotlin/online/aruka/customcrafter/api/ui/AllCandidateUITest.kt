@@ -1,11 +1,11 @@
 package online.aruka.customcrafter.api.ui
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
-import io.github.sakaki_aruka.customcrafter.api.interfaces.recipe.CRecipe
-import io.github.sakaki_aruka.customcrafter.api.objects.recipe.CoordinateComponent
-import io.github.sakaki_aruka.customcrafter.api.search.Search
-import io.github.sakaki_aruka.customcrafter.impl.matter.CMatterImpl
-import io.github.sakaki_aruka.customcrafter.impl.recipe.CRecipeImpl
+import io.github.sakaki_aruka.customcrafter.recipe.CRecipe
+import io.github.sakaki_aruka.customcrafter.recipe.CoordinateComponent
+import io.github.sakaki_aruka.customcrafter.search.Search
+import io.github.sakaki_aruka.customcrafter.matter.CMatterImpl
+import io.github.sakaki_aruka.customcrafter.recipe.CRecipeImpl
 import io.github.sakaki_aruka.customcrafter.internal.gui.allcandidate.AllCandidateUI
 import io.github.sakaki_aruka.customcrafter.internal.gui.crafting.CraftUI
 import org.bukkit.Material
