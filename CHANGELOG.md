@@ -1,5 +1,21 @@
 # Changelog
 
+# 5.1.0
+
+## ⚠️ Breaking Changes
+
+* **[Package Rename]** Several packages have been significantly renamed and reorganized. Projects that reference specific package paths will require import updates.
+
+## ✨ New Features and Enhancements
+
+* **[New Feature]** Added `AdjacentRecipe`: a recipe that requires input items to be placed adjacent to one another — a weakly shape-constrained recipe type.
+* **[Enhancement]** Simplified constructors for several classes to reduce boilerplate in common use cases.
+
+## 🛠 Fix
+
+* Fixed an issue where item replacement after a craft did not work correctly when a customized crafting UI layout was applied.
+* Fixed a critical bug in shapeless recipe matching where a recipe slot with no valid candidates was silently skipped instead of causing the match to fail. This allowed invalid ingredient combinations to incorrectly succeed and prevented some inputs from being consumed.
+
 # 5.0.21
 
 ## ✨ New Features and Enhancements
