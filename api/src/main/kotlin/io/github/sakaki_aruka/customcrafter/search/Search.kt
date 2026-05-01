@@ -499,12 +499,16 @@ object Search {
             merged[k] = candidates
         }
 
+        val recipeSlotIndices: Set<Int> = recipe.items.keys.map { it.toIndex() }.toSet()
         val model = Model("ExactCoverProblem")
         val assignmentVars: MutableMap<Int, IntVar> = mutableMapOf()
         for ((key, possible) in merged) {
-            if (possible.isEmpty()) {
-                //return null
+            if (key !in recipeSlotIndices) {
                 continue
+            }
+
+            if (possible.isEmpty()) {
+                return null
             }
             val domainValues = possible.toIntArray()
             assignmentVars[key] = model.intVar("Key_$key", domainValues)

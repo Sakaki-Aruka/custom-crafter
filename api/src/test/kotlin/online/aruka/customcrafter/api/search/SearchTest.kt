@@ -631,4 +631,112 @@ internal object SearchTest {
 
         assertEquals(1000, all.size())
     }
+
+    // --- Shapeless: unsatisfied matter slot tests (regression for the `continue` bug) ---
+
+    @Test
+    fun shapelessGlowBerryMatchesCorrectInput() {
+        // Recipe: GLOWSTONE_DUST + SWEET_BERRIES → GLOW_BERRIES
+        val glowstone = CMatterImpl.single(Material.GLOWSTONE_DUST)
+        val berry = CMatterImpl.single(Material.SWEET_BERRIES)
+        val recipe = CRecipeImpl.shapeless("glow berry recipe", listOf(glowstone, berry))
+
+        val ui = CraftUI()
+        ui.inventory.setItem(0, ItemStack.of(Material.GLOWSTONE_DUST))
+        ui.inventory.setItem(1, ItemStack.of(Material.SWEET_BERRIES))
+
+        val result = Search.search(
+            crafterID = UUID.randomUUID(),
+            view = ui.toView(),
+            sourceRecipes = listOf(recipe)
+        )
+
+        assertEquals(1, result.customs().size)
+        assertEquals(2, result.customs().first().second.components.size)
+    }
+
+    @Test
+    fun shapelessGlowBerryDoesNotMatchWhenOneSlotUnsatisfied() {
+        // GLOW_BERRIES satisfies neither GLOWSTONE_DUST nor SWEET_BERRIES.
+        // The SWEET_BERRIES slot gets no valid candidate → must return no match.
+        val glowstone = CMatterImpl.single(Material.GLOWSTONE_DUST)
+        val berry = CMatterImpl.single(Material.SWEET_BERRIES)
+        val recipe = CRecipeImpl.shapeless("glow berry recipe", listOf(glowstone, berry))
+
+        val ui = CraftUI()
+        ui.inventory.setItem(0, ItemStack.of(Material.GLOWSTONE_DUST))
+        ui.inventory.setItem(1, ItemStack.of(Material.GLOW_BERRIES))
+
+        val result = Search.search(
+            crafterID = UUID.randomUUID(),
+            view = ui.toView(),
+            sourceRecipes = listOf(recipe)
+        )
+
+        assertEquals(0, result.customs().size)
+    }
+
+    @Test
+    fun shapelessDoesNotMatchWhenAllSlotsUnsatisfied() {
+        // Neither input satisfies any recipe matter.
+        val glowstone = CMatterImpl.single(Material.GLOWSTONE_DUST)
+        val berry = CMatterImpl.single(Material.SWEET_BERRIES)
+        val recipe = CRecipeImpl.shapeless("glow berry recipe", listOf(glowstone, berry))
+
+        val ui = CraftUI()
+        ui.inventory.setItem(0, ItemStack.of(Material.GLOW_BERRIES))
+        ui.inventory.setItem(1, ItemStack.of(Material.GLOW_BERRIES))
+
+        val result = Search.search(
+            crafterID = UUID.randomUUID(),
+            view = ui.toView(),
+            sourceRecipes = listOf(recipe)
+        )
+
+        assertEquals(0, result.customs().size)
+    }
+
+    @Test
+    fun shapelessDoesNotMatchWhenInputSwappedForNonCandidateMaterial() {
+        // SWEET_BERRIES + GLOW_BERRIES: GLOWSTONE_DUST slot has no valid candidate.
+        val glowstone = CMatterImpl.single(Material.GLOWSTONE_DUST)
+        val berry = CMatterImpl.single(Material.SWEET_BERRIES)
+        val recipe = CRecipeImpl.shapeless("glow berry recipe", listOf(glowstone, berry))
+
+        val ui = CraftUI()
+        ui.inventory.setItem(0, ItemStack.of(Material.SWEET_BERRIES))
+        ui.inventory.setItem(1, ItemStack.of(Material.GLOW_BERRIES))
+
+        val result = Search.search(
+            crafterID = UUID.randomUUID(),
+            view = ui.toView(),
+            sourceRecipes = listOf(recipe)
+        )
+
+        assertEquals(0, result.customs().size)
+    }
+
+    @Test
+    fun shapelessRelationContainsAllSlotsOnValidMatch() {
+        // Verify the MappedRelation maps every recipe slot, not a subset.
+        val slimeBall = CMatterImpl.single(Material.SLIME_BALL)
+        val sand = CMatterImpl.single(Material.SAND)
+        val gravel = CMatterImpl.single(Material.GRAVEL)
+        val recipe = CRecipeImpl.shapeless("3-matter recipe", listOf(slimeBall, sand, gravel))
+
+        val ui = CraftUI()
+        ui.inventory.setItem(0, ItemStack.of(Material.GRAVEL))
+        ui.inventory.setItem(1, ItemStack.of(Material.SLIME_BALL))
+        ui.inventory.setItem(2, ItemStack.of(Material.SAND))
+
+        val result = Search.search(
+            crafterID = UUID.randomUUID(),
+            view = ui.toView(),
+            sourceRecipes = listOf(recipe)
+        )
+
+        assertEquals(1, result.customs().size)
+        assertEquals(3, result.customs().first().second.components.size,
+            "All 3 recipe slots must appear in MappedRelation")
+    }
 }
