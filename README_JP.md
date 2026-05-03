@@ -282,14 +282,14 @@ val recipe: CRecipe = CRecipeImpl(
     items = mapOf(CoordinateComponent(0, 0) to matter), // 'matter' は 1.で作った CMatter
     containers = null, // 追加条件 (権限など)。不要なら null
     results = setOf(ResultSupplier.timesSingle(Material.STONE)), // 2.で作った ResultSupplier のセット
-    type = CRecipeType.NORMAL // 整形レシピ (Shaped Recipe)
+    type = CRecipe.Type.NORMAL // 整形レシピ (Shaped Recipe)
 )
 ```
 
 * `items`: クラフトグリッド内の座標 (`CoordinateComponent(x, y)`) と、そこに必要な素材 (`CMatter`) のマップ。
 * `type`: レシピの形状を指定します。
-    * `CRecipeType.NORMAL`: **整形レシピ** (Shaped Recipe)。`items` の座標が重要になります。
-    * `CRecipeType.AMORPHOUS`: **不定形レシピ** (Shapeless Recipe)。`items` の座標値は任意で構いません。😊
+    * `CRecipe.Type.NORMAL`: **整形レシピ** (Shaped Recipe)。`items` の座標が重要になります。
+    * `CRecipe.Type.AMORPHOUS`: **不定形レシピ** (Shapeless Recipe)。`items` の座標値は任意で構いません。😊
 
 ---
 

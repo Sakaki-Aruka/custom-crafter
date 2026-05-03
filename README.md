@@ -283,14 +283,14 @@ val recipe: CRecipe = CRecipeImpl(
     items = mapOf(CoordinateComponent(0, 0) to matter), // 'matter' is the CMatter created in step 1.
     containers = null, // Additional conditions (permissions, etc.). null if not needed.
     results = setOf(ResultSupplier.timesSingle(Material.STONE)), // A Set of ResultSuppliers created in step 2.
-    type = CRecipeType.NORMAL // Shaped Recipe
+    type = CRecipe.Type.NORMAL // Shaped Recipe
 )
 ```
 
 * `items`: A map of coordinates (`CoordinateComponent(x, y)`) and the required material (`CMatter`) in the crafting grid.
 * `type`: Specifies the recipe shape.
-    * `CRecipeType.NORMAL`: **Shaped Recipe**. The coordinates in `items` are crucial.
-    * `CRecipeType.AMORPHOUS`: **Shapeless Recipe**. The `CoordinateComponent` values in `items` can be arbitrary. 😊
+    * `CRecipe.Type.NORMAL`: **Shaped Recipe**. The coordinates in `items` are crucial.
+    * `CRecipe.Type.AMORPHOUS`: **Shapeless Recipe**. The `CoordinateComponent` values in `items` can be arbitrary. 😊
 
 ---
 
