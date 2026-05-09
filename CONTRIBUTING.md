@@ -68,11 +68,17 @@ A running server is not required.
 ```
 custom-crafter/
 ├── api/                    # Plugin JAR + public API library (primary module)
-│   ├── src/main/java/io/github/sakaki_aruka/customcrafter/
-│   │   ├── api/            # Public API — stable contracts for downstream plugins
-│   │   ├── impl/           # Default implementations — not part of the public API surface
+│   ├── src/main/kotlin/io/github/sakaki_aruka/customcrafter/
+│   │   ├── event/          # Custom Bukkit events — public API surface
+│   │   ├── matter/         # CMatter interfaces and implementations
+│   │   ├── objects/        # Public data objects (AsyncContext, CraftView, etc.)
+│   │   ├── recipe/         # CRecipe interfaces and implementations
+│   │   ├── result/         # ResultSupplier types
+│   │   ├── search/         # Search interfaces (PartialSearch, VanillaSearch)
+│   │   ├── ui/             # UI design API (CraftUIDesigner)
+│   │   ├── util/           # Utility helpers
 │   │   ├── internal/       # Internal plugin logic — excluded from KDoc, not for external use
-│   │   ├── CustomCrafter.java       # JavaPlugin entry point
+│   │   ├── CustomCrafter.kt         # JavaPlugin entry point
 │   │   └── CustomCrafterAPI.kt      # API singleton
 │   ├── document/           # Astro Starlight documentation site
 │   └── docs/               # Generated KDoc output (do not edit manually)
@@ -88,14 +94,18 @@ custom-crafter/
 
 | Package prefix | Purpose | Rules |
 |---|---|---|
-| `api.interfaces.*` | Public contracts (interfaces) | Add KDoc. Must not reference `internal.*`. |
-| `api.objects.*` | Public data objects | Add KDoc. Keep immutable where possible. |
-| `api.event.*` | Custom Bukkit events | Add KDoc. Extend `Event` or `Cancellable`. |
-| `impl.*` | Default implementations | May be changed or replaced without notice. No KDoc required. |
-| `internal.*` | Plugin internals (GUI, commands, scheduling) | Do not expose to `api.*`. Not documented. |
+| `event.*` | Custom Bukkit events | Add KDoc. Extend `Event` or `Cancellable`. |
+| `matter.*` | Material condition types (`CMatter` + `Impl` classes) | Add KDoc on interfaces. Keep `Impl` constructors stable. |
+| `objects.*` | Public data objects | Add KDoc. Keep immutable where possible. |
+| `recipe.*` | Recipe types (`CRecipe` + `Impl` classes) | Add KDoc on interfaces. |
+| `result.*` | Result supplier types | Add KDoc. |
+| `search.*` | Search interfaces | Add KDoc. Must not reference `internal.*`. |
+| `ui.*` | UI design API | Add KDoc. Must not reference `internal.*`. |
+| `util.*` | Utility helpers | No KDoc required. |
+| `internal.*` | Plugin internals (GUI, commands, scheduling) | Do not expose to any public package. Not documented. |
 
 **Key rules:**
-- Never reference `internal.*` from `api.*` or `impl.*`.
+- Never reference `internal.*` from any public package.
 - GUI classes (`internal.gui.*`) may not be instantiated directly by API consumers.
 - New public API additions must include KDoc with `@param`, `@return`, and `@since` tags.
 
@@ -105,9 +115,7 @@ custom-crafter/
 
 ### Language
 
-- Prefer **Kotlin** for new files. Java is accepted for files that extend Java classes where Kotlin
-  interop is awkward (e.g., the `CustomCrafter` JavaPlugin class).
-- Mixed-language files in the same package are fine.
+- Use **Kotlin** for all new files. The entire codebase (including `CustomCrafter.kt`) is written in Kotlin.
 
 ### PaperMC / Folia compatibility
 
