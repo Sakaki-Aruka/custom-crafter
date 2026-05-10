@@ -1,9 +1,7 @@
 package io.github.sakaki_aruka.customcrafter.matter.enchant
 
-import io.github.sakaki_aruka.customcrafter.matter.enchant.CEnchantMatter
 import io.github.sakaki_aruka.customcrafter.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.matter.CMatterPredicate
-import io.github.sakaki_aruka.customcrafter.matter.enchant.CEnchantComponent
 import io.github.sakaki_aruka.customcrafter.matter.CMatterImpl
 import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment

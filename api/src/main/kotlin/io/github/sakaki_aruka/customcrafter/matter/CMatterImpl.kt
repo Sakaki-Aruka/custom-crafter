@@ -1,7 +1,5 @@
 package io.github.sakaki_aruka.customcrafter.matter
 
-import io.github.sakaki_aruka.customcrafter.matter.CMatter
-import io.github.sakaki_aruka.customcrafter.matter.CMatterPredicate
 import io.github.sakaki_aruka.customcrafter.matter.enchant.CEnchantMatterImpl
 import io.github.sakaki_aruka.customcrafter.matter.enchant.CEnchantmentStoreMatterImpl
 import io.github.sakaki_aruka.customcrafter.matter.potion.CPotionMatterImpl

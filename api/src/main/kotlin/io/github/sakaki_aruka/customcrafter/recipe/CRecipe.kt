@@ -3,7 +3,6 @@ package io.github.sakaki_aruka.customcrafter.recipe
 import io.github.sakaki_aruka.customcrafter.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.objects.MappedRelation
-import io.github.sakaki_aruka.customcrafter.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
 import org.bukkit.inventory.ItemStack
 import java.util.concurrent.CompletableFuture

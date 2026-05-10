@@ -15,7 +15,6 @@ import org.junit.jupiter.api.assertThrows
 import org.mockbukkit.mockbukkit.MockBukkit
 import org.mockbukkit.mockbukkit.ServerMock
 import org.mockbukkit.mockbukkit.world.WorldMock
-import java.lang.IllegalArgumentException
 
 internal object CustomCrafterAPITest {
 

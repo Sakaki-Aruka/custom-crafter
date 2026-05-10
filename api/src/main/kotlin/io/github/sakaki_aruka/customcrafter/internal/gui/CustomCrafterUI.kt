@@ -2,7 +2,6 @@ package io.github.sakaki_aruka.customcrafter.internal.gui
 
 import io.github.sakaki_aruka.customcrafter.util.Converter.toComponent
 import io.github.sakaki_aruka.customcrafter.internal.gui.crafting.CraftUI
-import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent

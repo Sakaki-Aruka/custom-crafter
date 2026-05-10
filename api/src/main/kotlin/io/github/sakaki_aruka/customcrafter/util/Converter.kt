@@ -3,8 +3,6 @@ package io.github.sakaki_aruka.customcrafter.util
 import io.github.sakaki_aruka.customcrafter.recipe.CoordinateComponent
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
-import org.bukkit.inventory.Inventory
-import org.bukkit.inventory.ItemStack
 
 object Converter {
     /**

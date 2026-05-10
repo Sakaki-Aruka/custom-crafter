@@ -2,11 +2,7 @@ package io.github.sakaki_aruka.customcrafter.recipe
 
 import io.github.sakaki_aruka.customcrafter.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.matter.CMatterPredicate
-import io.github.sakaki_aruka.customcrafter.recipe.CRecipe
-import io.github.sakaki_aruka.customcrafter.recipe.CRecipePredicate
-import io.github.sakaki_aruka.customcrafter.recipe.UnPartialSearchableRecipe
 import io.github.sakaki_aruka.customcrafter.result.ResultSupplier
-import io.github.sakaki_aruka.customcrafter.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.matter.CMatterImpl
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack

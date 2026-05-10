@@ -1,9 +1,6 @@
 package io.github.sakaki_aruka.customcrafter.recipe
 
 import io.github.sakaki_aruka.customcrafter.matter.CMatter
-import io.github.sakaki_aruka.customcrafter.recipe.CRecipe
-import io.github.sakaki_aruka.customcrafter.recipe.CRecipePredicate
-import io.github.sakaki_aruka.customcrafter.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.result.ResultSupplier
 
 /**
