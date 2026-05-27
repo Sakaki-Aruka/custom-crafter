@@ -1,11 +1,11 @@
-package online.aruka.demo.ui;
+package online.aruka.custom_crafter.ui;
 
 import io.github.sakaki_aruka.customcrafter.ui.CraftUIDesigner;
 import io.github.sakaki_aruka.customcrafter.recipe.CoordinateComponent;
 import kotlin.Pair;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import online.aruka.demo.Demo;
+import online.aruka.custom_crafter.Demo;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemFlag;

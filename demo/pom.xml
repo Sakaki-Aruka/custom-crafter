@@ -5,6 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>custom-crafter-api-demo</artifactId>
+    <groupId>online.aruka.custom_crafter</groupId>
     <packaging>jar</packaging>
 
     <name>Custom Crafter API Impl Demo</name>

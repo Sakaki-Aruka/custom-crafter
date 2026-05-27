@@ -1,4 +1,4 @@
-package online.aruka.demo.listener
+package online.aruka.custom_crafter.listener
 
 import io.github.sakaki_aruka.customcrafter.event.CustomCrafterAPIPropertiesChangeEvent
 import io.github.sakaki_aruka.customcrafter.util.Converter.toComponent

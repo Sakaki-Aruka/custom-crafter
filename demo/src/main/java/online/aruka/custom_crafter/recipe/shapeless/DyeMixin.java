@@ -1,4 +1,4 @@
-package online.aruka.demo.recipe.shapeless;
+package online.aruka.custom_crafter.recipe.shapeless;
 
 import com.destroystokyo.paper.MaterialTags;
 import io.github.sakaki_aruka.customcrafter.matter.CMatter;

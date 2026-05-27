@@ -1,15 +1,15 @@
-package online.aruka.demo
+package online.aruka.custom_crafter
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
-import online.aruka.demo.listener.CraftFailureListener
-import online.aruka.demo.listener.CreateCustomItemListener
-import online.aruka.demo.listener.CustomCrafterAPIPropertiesChangeListener
-import online.aruka.demo.listener.CustomItemRegisteredListener
-import online.aruka.demo.recipe.shaped.OverLimitEnchantedBook
-import online.aruka.demo.recipe.shapeless.DyeMixin
-import online.aruka.demo.register.ShapedRecipeProvider
-import online.aruka.demo.register.ShapelessRecipeProvider
-import online.aruka.demo.ui.CraftUI
+import online.aruka.custom_crafter.listener.CraftFailureListener
+import online.aruka.custom_crafter.listener.CreateCustomItemListener
+import online.aruka.custom_crafter.listener.CustomCrafterAPIPropertiesChangeListener
+import online.aruka.custom_crafter.listener.CustomItemRegisteredListener
+import online.aruka.custom_crafter.recipe.shaped.OverLimitEnchantedBook
+import online.aruka.custom_crafter.recipe.shapeless.DyeMixin
+import online.aruka.custom_crafter.register.ShapedRecipeProvider
+import online.aruka.custom_crafter.register.ShapelessRecipeProvider
+import online.aruka.custom_crafter.ui.CraftUI
 import org.bukkit.Bukkit
 import org.bukkit.plugin.java.JavaPlugin
 
