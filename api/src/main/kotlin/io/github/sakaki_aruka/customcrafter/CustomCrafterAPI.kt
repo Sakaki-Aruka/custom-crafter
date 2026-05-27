@@ -17,19 +17,114 @@ import java.util.concurrent.atomic.AtomicReference
 
 object CustomCrafterAPI {
     /**
-     * Custom Crafter API version.
+     * Represents the release stage of the Custom Crafter API.
+     *
+     * Use [CustomCrafterAPI.VERSION_TYPE] to get the current release stage.
+     *
+     * | Value | Meaning |
+     * |-------|---------|
+     * | [ALPHA]  | Early stage. APIs may change significantly. |
+     * | [BETA]   | Feature-complete, but APIs may still change. |
+     * | [RC]     | Release candidate. No further API changes expected. |
+     * | [STABLE] | Production-ready. |
+     *
+     * ```kotlin
+     * if (CustomCrafterAPI.VERSION_TYPE != CustomCrafterAPI.VersionType.STABLE) {
+     *     logger.warning("CustomCrafter API is not a stable release: ${CustomCrafterAPI.VERSION_TYPE}")
+     * }
+     * ```
+     * @since 5.2.0
      */
-    const val API_VERSION: String = "5.1.0"
+    enum class VersionType(val type: String) {
+        /** Early development stage. APIs may change significantly. */
+        ALPHA("ALPHA"),
+        /** Feature-complete, but may contain bugs. APIs may still change. */
+        BETA("BETA"),
+        /** Release candidate. Stable enough for testing; no further API changes expected. */
+        RC("RC"),
+        /** Production-ready release. */
+        STABLE("STABLE")
+    }
 
     /**
-     * Custom Crafter API is stable or not.
+     * Major version number of the Custom Crafter API.
+     *
+     * Incremented when incompatible API changes are introduced.
+     *
+     * @see[MINOR_VERSION]
+     * @see[PATCH_VERSION]
+     * @see[API_VERSION]
+     * @since 5.2.0
      */
-    const val IS_STABLE: Boolean = false
+    const val MAJOR_VERSION = 5
 
     /**
-     * Custom Crafter API is beta or not.
+     * Minor version number of the Custom Crafter API.
+     *
+     * Incremented when new functionality is added in a backward-compatible manner.
+     *
+     * @see[MAJOR_VERSION]
+     * @see[PATCH_VERSION]
+     * @see[API_VERSION]
+     * @since 5.2.0
      */
-    const val IS_BETA: Boolean = true
+    const val MINOR_VERSION = 2
+
+    /**
+     * Patch version number of the Custom Crafter API.
+     *
+     * Incremented when backward-compatible bug fixes are made.
+     *
+     * @see[MAJOR_VERSION]
+     * @see[MINOR_VERSION]
+     * @see[API_VERSION]
+     * @since 5.2.0
+     */
+    const val PATCH_VERSION = 0
+
+    /**
+     * Custom Crafter API version string.
+     */
+    const val API_VERSION: String = "${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}"
+
+    /**
+     * CustomCrafterAPI version type
+     * @since 5.2.0
+     */
+    val VERSION_TYPE = VersionType.BETA
+
+    /**
+     * Checks full-compatibility
+     *
+     * This function will be removed in 6.0.0.
+     * Use [MAJOR_VERSION], [MINOR_VERSION], [PATCH_VERSION] for version comparison,
+     * and [VERSION_TYPE] to check the release stage.
+     *
+     * ```kotlin
+     * // Check Example in your plugin
+     * @Override
+     * fun onEnable() {
+     *     if (!CustomCrafterAPI.hasFullCompatibility("5.0.15")) {
+     *         println("This plugin has not full-compatibility with loaded CustomCrafter.")
+     *         println("Loaded Version: ${CustomCrafterAPI.API_VERSION}")
+     *         Bukkit.pluginManager.disablePlugin(this)
+     *         return
+     *     }
+     * }
+     * ```
+     *
+     * @param[version] CustomCrafter version string that is used by your plugin.
+     * @since 5.0.13
+     */
+    @JvmStatic
+    @Deprecated(
+        message = "Removal for 6.0.0. Use 'VersionType' and (MAJOR|MINOR|PATCH)_VERSION instead.",
+        replaceWith = ReplaceWith("MAJOR_VERSION"),
+        level = DeprecationLevel.WARNING
+    )
+    fun hasFullCompatibility(version: String): Boolean {
+        return version in setOf("5.2.0")
+    }
 
     /**
      * Custom Crafter API author names
@@ -257,30 +352,6 @@ object CustomCrafterAPI {
                 isAsync = calledAsync
             ).callEvent()
         }
-    }
-
-    /**
-     * Checks full-compatibility
-     *
-     * ```kotlin
-     * // Check Example in your plugin
-     * @Override
-     * fun onEnable() {
-     *     if (!CustomCrafterAPI.hasFullCompatibility("5.0.15")) {
-     *         println("This plugin has not full-compatibility with loaded CustomCrafter.")
-     *         println("Loaded Version: ${CustomCrafterAPI.API_VERSION}")
-     *         Bukkit.pluginManager.disablePlugin(this)
-     *         return
-     *     }
-     * }
-     * ```
-     *
-     * @param[version] CustomCrafter version string that is used by your plugin.
-     * @since 5.0.13
-     */
-    @JvmStatic
-    fun hasFullCompatibility(version: String): Boolean {
-        return version in setOf("5.1.0")
     }
 
 
