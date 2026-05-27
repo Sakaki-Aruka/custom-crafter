@@ -1,4 +1,4 @@
-package online.aruka.customcrafter.api.`object`
+package online.aruka.custom_crafter.api.`object`
 
 import io.github.sakaki_aruka.customcrafter.matter.CMatterImpl
 import org.bukkit.Material

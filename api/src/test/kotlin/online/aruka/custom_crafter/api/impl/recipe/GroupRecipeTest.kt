@@ -1,4 +1,4 @@
-package online.aruka.customcrafter.api.impl.recipe
+package online.aruka.custom_crafter.api.impl.recipe
 
 import io.github.sakaki_aruka.customcrafter.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.recipe.CRecipe

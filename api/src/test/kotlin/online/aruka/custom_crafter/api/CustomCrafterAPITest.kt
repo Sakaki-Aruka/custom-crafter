@@ -1,4 +1,4 @@
-package online.aruka.customcrafter.api
+package online.aruka.custom_crafter.api
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.ui.CraftUIDesigner

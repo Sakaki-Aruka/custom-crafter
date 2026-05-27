@@ -1,4 +1,4 @@
-package online.aruka.customcrafter.api.ui
+package online.aruka.custom_crafter.api.ui
 
 import io.github.sakaki_aruka.customcrafter.ui.CraftUIDesigner
 import io.github.sakaki_aruka.customcrafter.recipe.CoordinateComponent

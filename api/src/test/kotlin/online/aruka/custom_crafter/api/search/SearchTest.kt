@@ -1,4 +1,4 @@
-package online.aruka.customcrafter.api.search
+package online.aruka.custom_crafter.api.search
 
 import io.github.sakaki_aruka.customcrafter.matter.CMatterPredicate
 import io.github.sakaki_aruka.customcrafter.recipe.CRecipe
@@ -617,7 +617,7 @@ internal object SearchTest {
             crafterID = UUID.randomUUID(),
             view,
             sourceRecipes = list,
-            query = Search.SearchQuery(Search.SearchQuery.SearchMode.ONLY_FIRST, Search.SearchQuery.DEFAULT.vanillaSearchMode)
+            searchQuery = Search.SearchQuery(Search.SearchQuery.SearchMode.ONLY_FIRST, Search.SearchQuery.DEFAULT.vanillaSearchMode)
         ).get()
 
         assertEquals(1, onlyFirst.size())
@@ -626,7 +626,7 @@ internal object SearchTest {
             crafterID = UUID.randomUUID(),
             view = view,
             sourceRecipes = list,
-            query = Search.SearchQuery(Search.SearchQuery.SearchMode.ALL, Search.SearchQuery.DEFAULT.vanillaSearchMode)
+            searchQuery = Search.SearchQuery(Search.SearchQuery.SearchMode.ALL, Search.SearchQuery.DEFAULT.vanillaSearchMode)
         ).get()
 
         assertEquals(1000, all.size())

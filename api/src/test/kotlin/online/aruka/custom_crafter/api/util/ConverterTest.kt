@@ -1,4 +1,4 @@
-package online.aruka.customcrafter.api.util
+package online.aruka.custom_crafter.api.util
 
 import io.github.sakaki_aruka.customcrafter.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.util.Converter
