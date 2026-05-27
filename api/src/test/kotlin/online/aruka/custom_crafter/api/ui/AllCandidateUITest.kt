@@ -83,7 +83,7 @@ object AllCandidateUITest {
 
         val view = craftUI.toView()
         val result = Search.search(
-            crafterID = UUID.randomUUID(),
+            crafterId = UUID.randomUUID(),
             view = view
         )
 
@@ -127,7 +127,7 @@ object AllCandidateUITest {
 
         val view = craftUI.toView()
         val result = Search.search(
-            crafterID = UUID.randomUUID(),
+            crafterId = UUID.randomUUID(),
             view = view
         )
 
@@ -178,7 +178,7 @@ object AllCandidateUITest {
 
         val view = craftUI.toView()
         val result = Search.search(
-            crafterID = UUID.randomUUID(),
+            crafterId = UUID.randomUUID(),
             view = view
         )
 
@@ -223,7 +223,7 @@ object AllCandidateUITest {
 
         val view = craftUI.toView()
         val result = Search.search(
-            crafterID = UUID.randomUUID(),
+            crafterId = UUID.randomUUID(),
             view = view
         )
 
@@ -268,7 +268,7 @@ object AllCandidateUITest {
         }
         val view = craftUI.toView()
         val result = Search.search(
-            crafterID = UUID.randomUUID(),
+            crafterId = UUID.randomUUID(),
             view = view
         )
 
@@ -315,7 +315,7 @@ object AllCandidateUITest {
         val view = craftUI.toView()
 
         val result = Search.search(
-            crafterID = UUID.randomUUID(),
+            crafterId = UUID.randomUUID(),
             view = view
         )
 
@@ -353,7 +353,7 @@ object AllCandidateUITest {
             craftUI.inventory.setItem(c.toIndex(), ItemStack(Material.STONE))
         }
         val view = craftUI.toView()
-        val result = Search.search(crafterID = UUID.randomUUID(), view = view)
+        val result = Search.search(crafterId = UUID.randomUUID(), view = view)
 
         val allCandidateUI = AllCandidateUI(
             view = view,
@@ -376,7 +376,7 @@ object AllCandidateUITest {
             craftUI.inventory.setItem(c.toIndex(), ItemStack(Material.STONE))
         }
         val view = craftUI.toView()
-        val result = Search.search(crafterID = UUID.randomUUID(), view = view)
+        val result = Search.search(crafterId = UUID.randomUUID(), view = view)
 
         val allCandidateUI = AllCandidateUI(
             view = view,
@@ -404,7 +404,7 @@ object AllCandidateUITest {
             craftUI.inventory.setItem(c.toIndex(), ItemStack(Material.STONE))
         }
         val view = craftUI.toView()
-        val result = Search.search(crafterID = UUID.randomUUID(), view = view)
+        val result = Search.search(crafterId = UUID.randomUUID(), view = view)
         assertEquals(91, result.size())
 
         val allCandidateUI = AllCandidateUI(
@@ -427,7 +427,7 @@ object AllCandidateUITest {
             craftUI.inventory.setItem(c.toIndex(), ItemStack(Material.STONE))
         }
         val view = craftUI.toView()
-        val result = Search.search(crafterID = UUID.randomUUID(), view = view)
+        val result = Search.search(crafterId = UUID.randomUUID(), view = view)
 
         val allCandidateUI = AllCandidateUI(
             view = view,
@@ -453,7 +453,7 @@ object AllCandidateUITest {
             craftUI.inventory.setItem(c.toIndex(), ItemStack(Material.STONE))
         }
         val view = craftUI.toView()
-        val result = Search.search(crafterID = UUID.randomUUID(), view = view)
+        val result = Search.search(crafterId = UUID.randomUUID(), view = view)
 
         val allCandidateUI = AllCandidateUI(
             view = view,
@@ -487,7 +487,7 @@ object AllCandidateUITest {
             craftUI.inventory.setItem(c.toIndex(), ItemStack(Material.STONE))
         }
         val view = craftUI.toView()
-        val result = Search.search(crafterID = UUID.randomUUID(), view = view)
+        val result = Search.search(crafterId = UUID.randomUUID(), view = view)
 
         val allCandidateUI = AllCandidateUI(
             view = view,
@@ -520,7 +520,7 @@ object AllCandidateUITest {
             craftUI.inventory.setItem(c.toIndex(), ItemStack(Material.STONE))
         }
         val view = craftUI.toView()
-        val result = Search.search(crafterID = UUID.randomUUID(), view = view)
+        val result = Search.search(crafterId = UUID.randomUUID(), view = view)
 
         val allCandidateUI = AllCandidateUI(
             view = view,
@@ -554,7 +554,7 @@ object AllCandidateUITest {
             craftUI.inventory.setItem(c.toIndex(), ItemStack(Material.STONE))
         }
         val view = craftUI.toView()
-        val result = Search.search(crafterID = UUID.randomUUID(), view = view)
+        val result = Search.search(crafterId = UUID.randomUUID(), view = view)
 
         val allCandidateUI = AllCandidateUI(
             view = view,
@@ -578,7 +578,7 @@ object AllCandidateUITest {
             craftUI.inventory.setItem(c.toIndex(), ItemStack(Material.STONE))
         }
         val view = craftUI.toView()
-        val result = Search.search(crafterID = UUID.randomUUID(), view = view)
+        val result = Search.search(crafterId = UUID.randomUUID(), view = view)
 
         val allCandidateUI = AllCandidateUI(
             view = view,
@@ -608,7 +608,7 @@ object AllCandidateUITest {
             craftUI.inventory.setItem(c.toIndex(), ItemStack(Material.STONE))
         }
         val view = craftUI.toView()
-        val result = Search.search(crafterID = UUID.randomUUID(), view = view)
+        val result = Search.search(crafterId = UUID.randomUUID(), view = view)
         assertEquals(45, result.size())
 
         val allCandidateUI = AllCandidateUI(
@@ -641,7 +641,7 @@ object AllCandidateUITest {
             craftUI.inventory.setItem(c.toIndex(), ItemStack(Material.STONE))
         }
         val view = craftUI.toView()
-        val result = Search.search(crafterID = UUID.randomUUID(), view = view)
+        val result = Search.search(crafterId = UUID.randomUUID(), view = view)
         assertEquals(1, result.size())
 
         val allCandidateUI = AllCandidateUI(

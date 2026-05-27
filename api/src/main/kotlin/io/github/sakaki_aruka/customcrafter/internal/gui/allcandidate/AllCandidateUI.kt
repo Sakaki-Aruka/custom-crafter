@@ -71,7 +71,7 @@ internal class AllCandidateUI(
                         shiftClicked = useShift,
                         calledTimes = 1,
                         callMode = ResultSupplier.Context.CallMode.ICON,
-                        crafterID = this.player.uniqueId,
+                        crafterId = this.player.uniqueId,
                         asyncContext = iconGeneratorAsyncContext.get()
                     )
 
@@ -250,7 +250,7 @@ internal class AllCandidateUI(
                         shiftClicked = event.isShiftClick,
                         calledTimes = recipe.getTimes(view.materials, relation, event.isShiftClick),
                         callMode = ResultSupplier.Context.CallMode.CRAFT,
-                        crafterID = player.uniqueId,
+                        crafterId = player.uniqueId,
                         asyncContext = AsyncContext.ofTurnOff()
                     )
                     val results: List<ItemStack> = recipe.asyncGetResults(resultSupplierContext).get()

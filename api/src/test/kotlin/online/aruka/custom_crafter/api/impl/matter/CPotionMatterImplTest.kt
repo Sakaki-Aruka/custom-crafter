@@ -54,7 +54,7 @@ object CPotionMatterImplTest {
             input = ItemStack.empty(),
             mapped = map,
             recipe = recipe,
-            crafterID = UUID.randomUUID()
+            crafterId = UUID.randomUUID()
         )
 
         assertTrue(CPotionMatterImpl.DEFAULT_POTION_CHECKER.test(context))
@@ -75,7 +75,7 @@ object CPotionMatterImplTest {
             input = ItemStack.of(Material.DIRT),
             mapped = map,
             recipe = recipe,
-            crafterID = UUID.randomUUID()
+            crafterId = UUID.randomUUID()
         )
 
         assertTrue(CPotionMatterImpl.DEFAULT_POTION_CHECKER.test(context))
@@ -96,7 +96,7 @@ object CPotionMatterImplTest {
             input = ItemStack.of(Material.DIRT),
             mapped = map,
             recipe = recipe,
-            crafterID = UUID.randomUUID()
+            crafterId = UUID.randomUUID()
         )
 
         assertTrue(CPotionMatterImpl.DEFAULT_POTION_CHECKER.test(context))
@@ -119,7 +119,7 @@ object CPotionMatterImplTest {
             input = ItemStack.of(Material.DIRT),
             mapped = map,
             recipe = recipe,
-            crafterID = UUID.randomUUID()
+            crafterId = UUID.randomUUID()
         )
 
         assertFalse(CPotionMatterImpl.DEFAULT_POTION_CHECKER.test(context))
@@ -155,7 +155,7 @@ object CPotionMatterImplTest {
             input = lv1,
             mapped = map1,
             recipe = recipe,
-            crafterID = UUID.randomUUID()
+            crafterId = UUID.randomUUID()
         )
 
         val context3 = CMatterPredicate.Context(
@@ -164,7 +164,7 @@ object CPotionMatterImplTest {
             input = lv3,
             mapped = map3,
             recipe = recipe,
-            crafterID = UUID.randomUUID()
+            crafterId = UUID.randomUUID()
         )
 
         assertTrue(CPotionMatterImpl.DEFAULT_POTION_CHECKER.test(context1))
@@ -201,7 +201,7 @@ object CPotionMatterImplTest {
             input = lv1,
             mapped = map1,
             recipe = recipe,
-            crafterID = UUID.randomUUID()
+            crafterId = UUID.randomUUID()
         )
 
         val context3 = CMatterPredicate.Context(
@@ -210,7 +210,7 @@ object CPotionMatterImplTest {
             input = lv3,
             mapped = map3,
             recipe = recipe,
-            crafterID = UUID.randomUUID()
+            crafterId = UUID.randomUUID()
         )
 
         assertTrue(CPotionMatterImpl.DEFAULT_POTION_CHECKER.test(context1))

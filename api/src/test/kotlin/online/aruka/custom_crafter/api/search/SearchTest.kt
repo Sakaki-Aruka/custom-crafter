@@ -73,7 +73,7 @@ internal object SearchTest {
         }
 
         val result = Search.search(
-            crafterID = UUID.randomUUID(),
+            crafterId = UUID.randomUUID(),
             view = ui.toView(),
             sourceRecipes = listOf(recipe)
         )
@@ -88,7 +88,7 @@ internal object SearchTest {
         }
 
         val result2 = Search.search(
-            crafterID = UUID.randomUUID(),
+            crafterId = UUID.randomUUID(),
             view = ui.toView(),
             sourceRecipes = listOf(recipe)
         )
@@ -102,7 +102,7 @@ internal object SearchTest {
         ui.inventory.setItem(0, ItemStack(Material.STONE))
 
         val result = Search.search(
-            crafterID = UUID.randomUUID(),
+            crafterId = UUID.randomUUID(),
             view = ui.toView()
         )
 
@@ -126,7 +126,7 @@ internal object SearchTest {
         }
 
         val result = Search.search(
-            crafterID = UUID.randomUUID(),
+            crafterId = UUID.randomUUID(),
             view = ui.toView(),
             sourceRecipes = listOf(recipe)
         )
@@ -157,7 +157,7 @@ internal object SearchTest {
         ui.inventory.setItem(1, ItemStack(Material.LAVA_BUCKET))
 
         val result = Search.search(
-            crafterID = UUID.randomUUID(),
+            crafterId = UUID.randomUUID(),
             view = ui.toView(),
             sourceRecipes = listOf(recipe)
         )
@@ -190,7 +190,7 @@ internal object SearchTest {
         ui.inventory.setItem(0, ItemStack.of(Material.COBBLESTONE))
 
         val result = Search.search(
-            crafterID = UUID.randomUUID(),
+            crafterId = UUID.randomUUID(),
             view = ui.toView(),
             sourceRecipes = listOf(recipe)
         )
@@ -235,7 +235,7 @@ internal object SearchTest {
         ui.inventory.setItem(2, lv4Stone)
 
         val result = Search.search(
-            crafterID = UUID.randomUUID(),
+            crafterId = UUID.randomUUID(),
             view = ui.toView(),
             sourceRecipes = listOf(recipe)
         )
@@ -280,7 +280,7 @@ internal object SearchTest {
         ui.inventory.setItem(2, lv4)
 
         val result = Search.search(
-            crafterID = UUID.randomUUID(),
+            crafterId = UUID.randomUUID(),
             view = ui.toView(),
             sourceRecipes = listOf(recipe)
         )
@@ -328,7 +328,7 @@ internal object SearchTest {
         ui.inventory.setItem(2, lv4)
 
         val result = Search.search(
-            crafterID = UUID.randomUUID(),
+            crafterId = UUID.randomUUID(),
             view = ui.toView(),
             sourceRecipes = listOf(recipe)
         )
@@ -346,7 +346,7 @@ internal object SearchTest {
         val matter = CMatterImpl(
             name = "",
             candidate = setOf(Material.GRAVEL),
-            predicates = setOf(CMatterPredicate { ctx -> ctx.crafterID == NotchID })
+            predicates = setOf(CMatterPredicate { ctx -> ctx.crafterId == NotchID })
         )
         val recipe = CRecipeImpl(
             name = "",
@@ -367,7 +367,7 @@ internal object SearchTest {
         ui.inventory.setItem(10, gravel)
 
         val result = Search.search(
-            crafterID = emptyID,
+            crafterId = emptyID,
             view = ui.toView(),
             sourceRecipes = listOf(recipe)
         )
@@ -402,7 +402,7 @@ internal object SearchTest {
         ui.inventory.setItem(2, stone)
 
         val result = Search.search(
-            crafterID = UUID.randomUUID(),
+            crafterId = UUID.randomUUID(),
             view = ui.toView(),
             sourceRecipes = listOf(recipe)
         )
@@ -456,7 +456,7 @@ internal object SearchTest {
         ui.inventory.setItem(46, input2)
 
         val result = Search.search(
-            crafterID = UUID.randomUUID(),
+            crafterId = UUID.randomUUID(),
             view = ui.toView(),
             sourceRecipes = listOf(recipe)
         )
@@ -560,7 +560,7 @@ internal object SearchTest {
             materials = CoordinateComponent.squareFill(6).associateWith { ItemStack.of(Material.STONE) },
         )
 
-        val future: CompletableFuture<Search.SearchResult> = Search.asyncSearch(crafterID = UUID.randomUUID(), view, sourceRecipes = listOf(recipe))
+        val future: CompletableFuture<Search.SearchResult> = Search.asyncSearch(crafterId = UUID.randomUUID(), view, sourceRecipes = listOf(recipe))
         val result = future.get()
 
         assertEquals(1, result.size())
@@ -588,7 +588,7 @@ internal object SearchTest {
         val times = 1000
         val list = (0..<times).map { recipe }
 
-        val future: CompletableFuture<Search.SearchResult> = Search.asyncSearch(crafterID = UUID.randomUUID(), view, sourceRecipes = list)
+        val future: CompletableFuture<Search.SearchResult> = Search.asyncSearch(crafterId = UUID.randomUUID(), view, sourceRecipes = list)
         var result: Search.SearchResult
 
         println("time: ${measureTimeMillis { result = future.get() }} ms")
@@ -614,7 +614,7 @@ internal object SearchTest {
         val list = List(times) { recipe }
 
         val onlyFirst = Search.asyncSearch(
-            crafterID = UUID.randomUUID(),
+            crafterId = UUID.randomUUID(),
             view,
             sourceRecipes = list,
             searchQuery = Search.SearchQuery(Search.SearchQuery.SearchMode.ONLY_FIRST, Search.SearchQuery.DEFAULT.vanillaSearchMode)
@@ -623,7 +623,7 @@ internal object SearchTest {
         assertEquals(1, onlyFirst.size())
 
         val all = Search.asyncSearch(
-            crafterID = UUID.randomUUID(),
+            crafterId = UUID.randomUUID(),
             view = view,
             sourceRecipes = list,
             searchQuery = Search.SearchQuery(Search.SearchQuery.SearchMode.ALL, Search.SearchQuery.DEFAULT.vanillaSearchMode)
@@ -646,7 +646,7 @@ internal object SearchTest {
         ui.inventory.setItem(1, ItemStack.of(Material.SWEET_BERRIES))
 
         val result = Search.search(
-            crafterID = UUID.randomUUID(),
+            crafterId = UUID.randomUUID(),
             view = ui.toView(),
             sourceRecipes = listOf(recipe)
         )
@@ -668,7 +668,7 @@ internal object SearchTest {
         ui.inventory.setItem(1, ItemStack.of(Material.GLOW_BERRIES))
 
         val result = Search.search(
-            crafterID = UUID.randomUUID(),
+            crafterId = UUID.randomUUID(),
             view = ui.toView(),
             sourceRecipes = listOf(recipe)
         )
@@ -688,7 +688,7 @@ internal object SearchTest {
         ui.inventory.setItem(1, ItemStack.of(Material.GLOW_BERRIES))
 
         val result = Search.search(
-            crafterID = UUID.randomUUID(),
+            crafterId = UUID.randomUUID(),
             view = ui.toView(),
             sourceRecipes = listOf(recipe)
         )
@@ -708,7 +708,7 @@ internal object SearchTest {
         ui.inventory.setItem(1, ItemStack.of(Material.GLOW_BERRIES))
 
         val result = Search.search(
-            crafterID = UUID.randomUUID(),
+            crafterId = UUID.randomUUID(),
             view = ui.toView(),
             sourceRecipes = listOf(recipe)
         )
@@ -730,7 +730,7 @@ internal object SearchTest {
         ui.inventory.setItem(2, ItemStack.of(Material.SAND))
 
         val result = Search.search(
-            crafterID = UUID.randomUUID(),
+            crafterId = UUID.randomUUID(),
             view = ui.toView(),
             sourceRecipes = listOf(recipe)
         )

@@ -205,9 +205,9 @@ object Search {
      *
      * Since almost all processing in this search is done asynchronously, exceptions will occur when accessing the world or entities (due to Bukkit API's asynchronous processing limitations).
      *
-     * @param[crafterID] Crafter UUID
+     * @param[crafterId] Crafter UUID
      * @param[view] View of input slots
-     * @param[query] Query of searching (since 5.0.20)
+     * @param[searchQuery] Query of searching (since 5.0.20)
      * @param[sourceRecipes] Search target recipes (default = [CustomCrafterAPI.getRecipes])
      * @return[CompletableFuture] Future task of a search result
      * @throws[IllegalArgumentException] If [view] materials is empty or size exceeds 36
@@ -216,16 +216,16 @@ object Search {
     @JvmStatic
     @JvmOverloads
     fun asyncSearch(
-        crafterID: UUID,
+        crafterId: UUID,
         view: CraftView,
-        query: SearchQuery = SearchQuery.ASYNC_DEFAULT,
+        searchQuery: SearchQuery = SearchQuery.ASYNC_DEFAULT,
         sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes()
     ): CompletableFuture<SearchResult> {
         if (view.materials.isEmpty() || view.materials.size > 36) {
             throw IllegalArgumentException("'view#materials' size must be in range of 1 to 36. (current: ${view.materials.size})")
         }
 
-        val world: World = Bukkit.getPlayer(crafterID)
+        val world: World = Bukkit.getPlayer(crafterId)
             ?.world
             ?: Bukkit.getWorlds().first()
         val vanilla: Recipe? = VanillaSearch.search(world, view)
@@ -239,18 +239,18 @@ object Search {
         val tasks = recipes.map { recipe ->
             CompletableFuture.supplyAsync({
                 when (recipe.type) {
-                    CRecipe.Type.SHAPED -> shaped(view, recipe, crafterID, query.asyncContext)
-                    CRecipe.Type.SHAPELESS -> shapeless(view, recipe, crafterID, query.asyncContext)
+                    CRecipe.Type.SHAPED -> shaped(view, recipe, crafterId, searchQuery.asyncContext)
+                    CRecipe.Type.SHAPELESS -> shapeless(view, recipe, crafterId, searchQuery.asyncContext)
                 }?.let { mapped -> recipe to mapped }
             }, InternalAPI.executor)
         }
 
-        if (query.searchMode == SearchQuery.SearchMode.ONLY_FIRST) {
+        if (searchQuery.searchMode == SearchQuery.SearchMode.ONLY_FIRST) {
             val findFirst: CompletableFuture<Pair<CRecipe, MappedRelation>?> = CompletableFuture()
             val derived = tasks.map { task ->
                 task.thenAccept { pair ->
                     if (pair != null && findFirst.complete(pair)) {
-                        query.asyncContext?.interrupt()
+                        searchQuery.asyncContext?.interrupt()
                     }
                 }
             }
@@ -271,7 +271,7 @@ object Search {
      *
      * If there are many recipes to search or if recipes with complex search conditions exist, it may cause delays in the server's game loop and a decrease in TPS.
      *
-     * @param[crafterID] a crafter's UUID
+     * @param[crafterId] a crafter's UUID
      * @param[view] input crafting gui's view
      * @param[searchQuery] Query that controls search behaviour (search mode and vanilla search mode). (default = [SearchQuery.DEFAULT])
      * @param[sourceRecipes] A list of searched recipes. (default = CustomCrafterAPI.getRecipes() / since 5.0.10)
@@ -281,7 +281,7 @@ object Search {
     @JvmStatic
     @JvmOverloads
     fun search(
-        crafterID: UUID,
+        crafterId: UUID,
         view: CraftView,
         searchQuery: SearchQuery = SearchQuery.DEFAULT,
         sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes(),
@@ -294,8 +294,8 @@ object Search {
         val customs: MutableList<Pair<CRecipe, MappedRelation>> = mutableListOf()
         for (recipe in sourceRecipes.filter { r -> mapped.size in r.requiresInputItemAmountMin()..r.requiresInputItemAmountMax() }) {
             when (recipe.type) {
-                CRecipe.Type.SHAPED -> shaped(view, recipe, crafterID)
-                CRecipe.Type.SHAPELESS -> shapeless(view, recipe, crafterID)
+                CRecipe.Type.SHAPED -> shaped(view, recipe, crafterId)
+                CRecipe.Type.SHAPELESS -> shapeless(view, recipe, crafterId)
             }?.let { customs.add(recipe to it) }
 
             if (searchQuery.searchMode == SearchQuery.SearchMode.ONLY_FIRST && customs.isNotEmpty()) {
@@ -306,7 +306,7 @@ object Search {
         val vanilla: Recipe? =
             if (searchQuery.vanillaSearchMode != SearchQuery.VanillaSearchMode.FORCE && customs.isNotEmpty()) null
             else {
-                val world: World = Bukkit.getPlayer(crafterID)
+                val world: World = Bukkit.getPlayer(crafterId)
                     ?.world
                     ?: Bukkit.getWorlds().first()
                 VanillaSearch.search(world, view)
@@ -318,7 +318,7 @@ object Search {
     private fun shaped(
         view: CraftView,
         recipe: CRecipe,
-        crafterID: UUID,
+        crafterId: UUID,
         asyncContext: AsyncContext? = null
     ): MappedRelation? {
         if (recipe.items.size < view.materials.size) {
@@ -346,7 +346,7 @@ object Search {
                 }
             }
 
-            val matterPredicateContext = CMatterPredicate.Context(recipeCoordinate, matter, input, view.materials, recipe, crafterID,
+            val matterPredicateContext = CMatterPredicate.Context(recipeCoordinate, matter, input, view.materials, recipe, crafterId,
                 asyncContext = asyncContext
             )
             if (!matter.predicatesResult(matterPredicateContext)) {
@@ -357,7 +357,7 @@ object Search {
 
         val relation = MappedRelation(components)
 
-        val recipePredicateContext = CRecipePredicate.Context(view, crafterID, recipe, relation, asyncContext)
+        val recipePredicateContext = CRecipePredicate.Context(view, crafterId, recipe, relation, asyncContext)
         if (!recipe.getRecipePredicateResults(recipePredicateContext)) {
             return null
         }
@@ -398,7 +398,7 @@ object Search {
     private fun getShapelessMatterPredicatesCheckResult(
         input: Map<CoordinateComponent, ItemStack>,
         recipe: CRecipe,
-        crafterID: UUID,
+        crafterId: UUID,
         //isAsync: Boolean = false
         asyncContext: AsyncContext? = null
     ): Map<Int, Set<Triple<Int, Boolean, Boolean>>> {
@@ -416,7 +416,7 @@ object Search {
             val set: MutableSet<Triple<Int, Boolean, Boolean>> = mutableSetOf()
             for ((i, item) in input.entries) {
                 if (matter.hasPredicates()) {
-                    val ctx = CMatterPredicate.Context(r, matter, item, input, recipe, crafterID, asyncContext)
+                    val ctx = CMatterPredicate.Context(r, matter, item, input, recipe, crafterId, asyncContext)
                     set.add(Triple(i.toIndex(), true, matter.predicatesResult(ctx)))
                 }
             }
@@ -458,7 +458,7 @@ object Search {
     private fun shapeless(
         view: CraftView,
         recipe: CRecipe,
-        crafterID: UUID,
+        crafterId: UUID,
         asyncContext: AsyncContext? = null
     ): MappedRelation? {
 
@@ -476,7 +476,7 @@ object Search {
         }
 
         addResults(getShapelessCandidateCheckResult(view.materials, recipe))
-        addResults(getShapelessMatterPredicatesCheckResult(view.materials, recipe, crafterID, asyncContext))
+        addResults(getShapelessMatterPredicatesCheckResult(view.materials, recipe, crafterId, asyncContext))
         addResults(getShapelessAmountCheckResult(view.materials, recipe))
 
         val merged: MutableMap<Int, MutableSet<Int>> = mutableMapOf()
@@ -540,7 +540,7 @@ object Search {
         }
 
         val relation = MappedRelation(relationComponents)
-        val recipePredicateContext = CRecipePredicate.Context(view, crafterID, recipe, relation, asyncContext)
+        val recipePredicateContext = CRecipePredicate.Context(view, crafterId, recipe, relation, asyncContext)
         if (!recipe.getRecipePredicateResults(recipePredicateContext)) {
             return null
         }

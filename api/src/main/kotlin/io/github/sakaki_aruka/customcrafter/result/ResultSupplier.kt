@@ -70,7 +70,7 @@ fun interface ResultSupplier {
      * This class contains ResultSupplier parameters.
      *
      * @param[recipe] A CRecipe instance what contains this
-     * @param[crafterID] Crafter UUID
+     * @param[crafterId] Crafter UUID
      * @param[relation] Coordinate mapping between a [CRecipe] and an input Inventory
      * @param[mapped] Coordinates and input items mapping
      * @param[shiftClicked] Shift-clicked or not
@@ -84,7 +84,7 @@ fun interface ResultSupplier {
         val mapped: Map<CoordinateComponent, ItemStack>,
         val shiftClicked: Boolean,
         val calledTimes: Int,
-        val crafterID: UUID,
+        val crafterId: UUID,
         val callMode: CallMode,
         val asyncContext: AsyncContext? = null
     ) {
@@ -110,7 +110,7 @@ fun interface ResultSupplier {
          * @since 5.0.20
          */
         fun copyWith(asyncContext: AsyncContext? = null): Context {
-            return Context(recipe, relation, mapped, shiftClicked, calledTimes, crafterID, callMode, asyncContext)
+            return Context(recipe, relation, mapped, shiftClicked, calledTimes, crafterId, callMode, asyncContext)
         }
 
         /**

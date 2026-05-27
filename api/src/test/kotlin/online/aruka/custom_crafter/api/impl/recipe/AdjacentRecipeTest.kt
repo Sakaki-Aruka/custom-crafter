@@ -43,7 +43,7 @@ object AdjacentRecipeTest {
         coordinates: Set<CoordinateComponent>
     ): CRecipePredicate.Context = CRecipePredicate.Context(
         input = CraftView(coordinates.associateWith { ItemStack.of(Material.STONE) }),
-        crafterID = UUID.randomUUID(),
+        crafterId = UUID.randomUUID(),
         recipe = recipe,
         relation = MappedRelation(emptySet())
     )

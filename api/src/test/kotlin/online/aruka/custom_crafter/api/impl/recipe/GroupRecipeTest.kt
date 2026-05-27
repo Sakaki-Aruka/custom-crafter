@@ -272,7 +272,7 @@ object GroupRecipeTest {
         )
 
         val result = Search.search(
-            crafterID = UUID.randomUUID(),
+            crafterId = UUID.randomUUID(),
             view = view,
             sourceRecipes = listOf(recipe)
         )
@@ -294,7 +294,7 @@ object GroupRecipeTest {
         )
 
         val result = Search.search(
-            crafterID = UUID.randomUUID(),
+            crafterId = UUID.randomUUID(),
             view = view,
             sourceRecipes = listOf(recipe)
         )
@@ -322,7 +322,7 @@ object GroupRecipeTest {
         )
 
         val result = Search.search(
-            crafterID = UUID.randomUUID(),
+            crafterId = UUID.randomUUID(),
             view = view,
             sourceRecipes = listOf(recipe)
         )
@@ -350,7 +350,7 @@ object GroupRecipeTest {
         )
 
         val result = Search.search(
-            crafterID = UUID.randomUUID(),
+            crafterId = UUID.randomUUID(),
             view = view,
             sourceRecipes = listOf(recipe)
         )

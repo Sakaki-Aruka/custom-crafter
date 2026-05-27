@@ -147,7 +147,7 @@ object GroupMatterTest {
         )
 
         val result = Search.search(
-            crafterID = UUID.randomUUID(),
+            crafterId = UUID.randomUUID(),
             view = view,
             sourceRecipes = listOf(recipe)
         )
@@ -197,7 +197,7 @@ object GroupMatterTest {
         )
 
         val result = Search.search(
-            crafterID = UUID.randomUUID(),
+            crafterId = UUID.randomUUID(),
             view = view,
             sourceRecipes = listOf(recipe),
             searchQuery = Search.SearchQuery(

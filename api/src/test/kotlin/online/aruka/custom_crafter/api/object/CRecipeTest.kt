@@ -190,7 +190,7 @@ object CRecipeTest {
             mapped = mapOf(CoordinateComponent(0, 0) to ItemStack.of(Material.COBBLESTONE)),
             shiftClicked = false,
             calledTimes = 1,
-            crafterID = UUID.randomUUID(),
+            crafterId = UUID.randomUUID(),
             callMode = ResultSupplier.Context.CallMode.CRAFT,
             asyncContext = AsyncContext.ofTurnOff()
         )

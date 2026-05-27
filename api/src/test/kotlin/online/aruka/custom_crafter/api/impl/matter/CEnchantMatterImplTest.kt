@@ -52,7 +52,7 @@ object CEnchantMatterImplTest {
             input = ItemStack.empty(),
             mapped = map,
             recipe = recipe,
-            crafterID = UUID.randomUUID()
+            crafterId = UUID.randomUUID()
         )
 
         assertTrue(CEnchantMatterImpl.DEFAULT_ENCHANT_CHECKER.test(context))
@@ -73,7 +73,7 @@ object CEnchantMatterImplTest {
             input = ItemStack.of(Material.DIRT),
             mapped = map,
             recipe = recipe,
-            crafterID = UUID.randomUUID()
+            crafterId = UUID.randomUUID()
         )
 
         assertTrue(CEnchantMatterImpl.DEFAULT_ENCHANT_CHECKER.test(context))
@@ -94,7 +94,7 @@ object CEnchantMatterImplTest {
             input = ItemStack.of(Material.DIRT),
             mapped = map,
             recipe = recipe,
-            crafterID = UUID.randomUUID()
+            crafterId = UUID.randomUUID()
         )
 
         assertTrue(CEnchantMatterImpl.DEFAULT_ENCHANT_CHECKER.test(context))
@@ -122,7 +122,7 @@ object CEnchantMatterImplTest {
             input = ItemStack.of(Material.DIRT),
             mapped = map,
             recipe = recipe,
-            crafterID = UUID.randomUUID()
+            crafterId = UUID.randomUUID()
         )
 
         assertFalse(CEnchantMatterImpl.DEFAULT_ENCHANT_CHECKER.test(context))

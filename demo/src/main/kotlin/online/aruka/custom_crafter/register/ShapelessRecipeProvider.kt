@@ -81,7 +81,7 @@ object ShapelessRecipeProvider {
             }
 
             Bukkit.getScheduler().runTask(Demo.plugin) { _ ->
-                Bukkit.getPlayer(ctx.crafterID)?.addPotionEffects(effects)
+                Bukkit.getPlayer(ctx.crafterId)?.addPotionEffects(effects)
             }
 
             emptyList()

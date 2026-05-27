@@ -255,9 +255,9 @@ internal class CraftUI(
         CompletableFuture.runAsync({
             try {
                 val result: Search.SearchResult = Search.asyncSearch(
-                    crafterID = player.uniqueId,
+                    crafterId = player.uniqueId,
                     view = capturedView,
-                    query = Search.SearchQuery.defaultModeOf(searchCtx)
+                    searchQuery = Search.SearchQuery.defaultModeOf(searchCtx)
                 ).get()
 
                 if (!uiState.compareAndSet(CraftUIState.SEARCHING, CraftUIState.GENERATING_RESULTS)) {
