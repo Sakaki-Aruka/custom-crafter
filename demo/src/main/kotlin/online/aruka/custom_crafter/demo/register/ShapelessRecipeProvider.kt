@@ -1,4 +1,4 @@
-package online.aruka.custom_crafter.register
+package online.aruka.custom_crafter.demo.register
 
 import io.github.sakaki_aruka.customcrafter.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.matter.CMatterPredicate
@@ -6,7 +6,7 @@ import io.github.sakaki_aruka.customcrafter.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.matter.CMatterImpl
 import io.github.sakaki_aruka.customcrafter.recipe.CRecipeImpl
-import online.aruka.custom_crafter.Demo
+import online.aruka.custom_crafter.demo.Demo
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.NamespacedKey

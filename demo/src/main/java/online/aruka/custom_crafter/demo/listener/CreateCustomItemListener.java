@@ -1,11 +1,11 @@
-package online.aruka.custom_crafter.listener;
+package online.aruka.custom_crafter.demo.listener;
 
 import io.github.sakaki_aruka.customcrafter.event.CreateCustomItemEvent;
 import io.github.sakaki_aruka.customcrafter.recipe.CRecipe;
 import io.github.sakaki_aruka.customcrafter.objects.MappedRelation;
 import io.github.sakaki_aruka.customcrafter.search.Search;
 import kotlin.Pair;
-import online.aruka.custom_crafter.Demo;
+import online.aruka.custom_crafter.demo.Demo;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 

@@ -1,4 +1,4 @@
-package online.aruka.custom_crafter.recipe.shaped;
+package online.aruka.custom_crafter.demo.recipe.shaped;
 
 import io.github.sakaki_aruka.customcrafter.matter.enchant.CEnchantmentStoreMatter;
 import io.github.sakaki_aruka.customcrafter.matter.CMatter;
