@@ -53,24 +53,13 @@ object AllCandidateUITest {
 
         val matter = CMatterImpl.single(Material.STONE)
         val items = CoordinateComponent.square(3).associateWith { _ -> matter }
-        val recipe = CRecipeImpl(
-            name = "",
-            items = items,
-            type = CRecipe.Type.SHAPED
-        )
-        repeat(50) {
-            CustomCrafterAPI.registerRecipe(recipe)
-        }
+        val recipes: List<CRecipe> = (0..<50).map { t -> CRecipeImpl(name = t.toString(), items = items, type = CRecipe.Type.SHAPED) }
+        CustomCrafterAPI.registerRecipe(recipes = recipes, plugin = MockBukkit.createMockPlugin(), nameStrictLevel = CustomCrafterAPI.NameStrictLevel.NOTHING)
     }
 
     @AfterEach
     fun tearDown() {
-
-        val recipes = CustomCrafterAPI.getRecipes()
-        recipes.forEach { recipe ->
-            CustomCrafterAPI.unregisterRecipe(recipe)
-        }
-
+        CustomCrafterAPI.unregisterAllRecipes()
         MockBukkit.unmock()
     }
 
@@ -396,8 +385,8 @@ object AllCandidateUITest {
     fun pageContentsAtMiddlePageHasBothButtonsTest() {
         val matter = CMatterImpl.single(Material.STONE)
         val items = CoordinateComponent.square(3).associateWith { _ -> matter }
-        val extraRecipe = CRecipeImpl("", items, CRecipe.Type.SHAPED)
-        repeat(41) { CustomCrafterAPI.registerRecipe(extraRecipe) }
+        val extraRecipes = (0..<41).map { t -> CRecipeImpl("ex-$t", items, CRecipe.Type.SHAPED) }
+        CustomCrafterAPI.registerRecipe(recipes = extraRecipes, MockBukkit.createMockPlugin())
 
         val craftUI = CraftUI()
         CoordinateComponent.square(3).forEach { c ->
@@ -600,8 +589,8 @@ object AllCandidateUITest {
         CustomCrafterAPI.unregisterAllRecipes()
         val matter = CMatterImpl.single(Material.STONE)
         val items = CoordinateComponent.square(3).associateWith { _ -> matter }
-        val recipe = CRecipeImpl("", items, CRecipe.Type.SHAPED)
-        repeat(45) { CustomCrafterAPI.registerRecipe(recipe) }
+        val recipes = (0..<45).map { t -> CRecipeImpl(t.toString(), items, CRecipe.Type.SHAPED) }
+        CustomCrafterAPI.registerRecipe(recipes, MockBukkit.createMockPlugin())
 
         val craftUI = CraftUI()
         CoordinateComponent.square(3).forEach { c ->
@@ -634,7 +623,7 @@ object AllCandidateUITest {
         val matter = CMatterImpl.single(Material.STONE)
         val items = CoordinateComponent.square(3).associateWith { _ -> matter }
         val recipe = CRecipeImpl("", items, CRecipe.Type.SHAPED)
-        CustomCrafterAPI.registerRecipe(recipe)
+        CustomCrafterAPI.registerRecipe(listOf(recipe), MockBukkit.createMockPlugin())
 
         val craftUI = CraftUI()
         CoordinateComponent.square(3).forEach { c ->

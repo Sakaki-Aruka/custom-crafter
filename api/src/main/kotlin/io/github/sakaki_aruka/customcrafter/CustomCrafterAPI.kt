@@ -11,6 +11,10 @@ import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
+import org.bukkit.plugin.java.JavaPlugin
+import java.util.Collections
+import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
@@ -485,6 +489,111 @@ object CustomCrafterAPI {
     }
 
 
+    enum class NameStrictLevel(private val priority: Int) {
+        NOTHING(3),
+        WEAK(2),
+        STRICT(1);
+
+        companion object {
+            @JvmStatic
+            fun contains(level: NameStrictLevel, targets: Set<String>, sources: Set<String>): Boolean {
+                // TODO: change to normal class method, reduce STRICT level loop
+                return when (level) {
+                    NOTHING -> false
+                    WEAK -> targets.any { t -> sources.contains(t) }
+                    STRICT -> targets.any { t -> sources.any { s -> level.matches(t, s) } }
+                }
+            }
+        }
+
+        fun tryChange(tryValue: NameStrictLevel): NameStrictLevel {
+            return if (this.priority > tryValue.priority) {
+                tryValue
+            } else {
+                this
+            }
+        }
+
+        fun matches(target: String, pattern: String): Boolean {
+            return when (this) {
+                NOTHING -> false
+                WEAK -> target == pattern
+                STRICT -> target.filterNot { it.isWhitespace() } == pattern.filterNot { it.isWhitespace() }
+            }
+        }
+
+        fun hasDuplicate(target: List<String>): Boolean {
+            if (this == NOTHING) {
+                return false
+            }
+
+            if (target.size != target.toSet().size) {
+                return true
+            }
+            if (this == WEAK) {
+                return false
+            }
+
+            val spaceRemoved: List<String> = target.map { str ->
+                str.filterNot { it.isWhitespace() }
+            }
+            return target.size != spaceRemoved.toSet().size
+        }
+    }
+
+    internal class CRecipeWrapper(
+        val recipe: CRecipe,
+        val pluginJarFileHash: Int,
+        val id: UUID = UUID.randomUUID()
+    )
+
+    private val recipes: ConcurrentHashMap<String, MutableList<CRecipeWrapper>> = ConcurrentHashMap()
+
+    @JvmStatic
+    fun getRegisteredRecipeNames(): Set<String> {
+        return recipes.keys
+    }
+
+    @JvmStatic
+    fun getRegisteredRecipeFromName(filter: (String) -> Boolean): List<CRecipe> {
+        return recipes.entries.filter { (name, _) -> filter(name) }
+            .flatMap { (_, list) -> list }
+            .map { it.recipe }
+    }
+
+    @JvmStatic
+    fun getRegisteredRecipeFromName(recipeName: String): List<CRecipe> {
+        return getRegisteredRecipeFromName { name -> name == recipeName }
+    }
+
+    @JvmStatic
+    fun getRegisteredRecipeFromPlugin(plugin: JavaPlugin): List<CRecipe> {
+        return recipes.entries.flatMap { (_, list) -> list }
+            .filter { it.pluginJarFileHash == plugin.hashCode() }
+            .map { it.recipe }
+    }
+
+    @JvmField
+    val DEFAULT_RECIPE_NAME_STRICT_LEVEL = NameStrictLevel.NOTHING
+    private var recipeNameStrictLevel: AtomicReference<NameStrictLevel> = AtomicReference(DEFAULT_RECIPE_NAME_STRICT_LEVEL)
+
+    @JvmStatic
+    fun getRecipeNameStrictLevel(): NameStrictLevel = recipeNameStrictLevel.get()
+
+    @JvmStatic
+    @JvmOverloads
+    fun setRecipeNameStrictLevel(level: NameStrictLevel, calledAsync: Boolean = false) {
+        val oldValue = recipeNameStrictLevel.getAndSet(level.tryChange(level))
+        if (level != oldValue) {
+            CustomCrafterAPIPropertiesChangeEvent(
+                propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.RECIPE_NAME_STRICT_LEVEL.name,
+                oldValue = CustomCrafterAPIPropertiesChangeEvent.Property(oldValue),
+                newValue = CustomCrafterAPIPropertiesChangeEvent.Property(level),
+                isAsync = calledAsync
+            ).callEvent()
+        }
+    }
+
     /**
      * returns an IMMUTABLE list what contains all registered recipes.
      *
@@ -494,23 +603,30 @@ object CustomCrafterAPI {
      */
     @JvmStatic
     fun getRecipes(): List<CRecipe> {
-        return synchronized(CustomCrafter.RECIPES) {
-            CustomCrafter.RECIPES.toList()
+        return synchronized(recipes) {
+            this.recipes.values.flatten().map { it.recipe }
         }
     }
 
     /**
      * registers a provided recipe and calls [RegisterCustomRecipeEvent].
      *
-     * if a called event is cancelled, always fail to register recipe.
-     *
-     * in normally, a result of `RECIPES.add(recipe)`.
-     *
      * @param[recipes] a recipe what you want to register.
      * @throws[IllegalStateException] Calls when the specified recipe is invalid
      */
     @JvmStatic
-    fun registerRecipe(vararg recipes: CRecipe): Boolean {
+    @JvmOverloads
+    fun registerRecipe(
+        recipes: List<CRecipe>,
+        plugin: JavaPlugin = CustomCrafter.getInstance(),
+        nameStrictLevel: NameStrictLevel = getRecipeNameStrictLevel()
+    ) {
+        if (recipes.isEmpty()) {
+            return
+        }
+        if (nameStrictLevel.hasDuplicate(recipes.map { it.name })) {
+            throw IllegalArgumentException("Duplicated name found. (current strict level: ${getRecipeNameStrictLevel().name})")
+        }
         if (recipes.any { it.isValidRecipe().isFailure }) {
             val builder = StringBuilder()
             builder.append(System.lineSeparator())
@@ -523,52 +639,74 @@ object CustomCrafterAPI {
             }
             throw IllegalStateException(builder.toString())
         }
-        if (!RegisterCustomRecipeEvent(recipes.toList()).callEvent()) {
-            return false
+
+        synchronized(this.recipes) {
+            if (NameStrictLevel.contains(nameStrictLevel, this.recipes.keys, recipes.map { it.name }.toSet())) {
+                throw IllegalArgumentException("Duplicated name found. (current strict level: ${getRecipeNameStrictLevel().name}")
+            }
+            for (r in recipes) {
+                val wrapper = CRecipeWrapper(r, plugin.hashCode())
+                this.recipes[r.name]?.add(wrapper)
+                    ?: run { this.recipes[r.name] = Collections.synchronizedList(mutableListOf(wrapper)) }
+            }
         }
-        return synchronized(CustomCrafter.RECIPES) {
-            CustomCrafter.RECIPES.addAll(recipes)
-        }
+
+        RegisterCustomRecipeEvent(recipes.toList()).callEvent()
     }
 
-    /**
-     * unregisters a provided recipe and calls [UnregisterCustomRecipeEvent].
-     *
-     * if a called event is cancelled, always fail to unregister recipe.
-     *
-     * in normally, a result of `RECIPES.remove(recipe)`
-     *
-     * @param[recipes] a recipe what you want to unregister.
-     */
     @JvmStatic
-    fun unregisterRecipe(vararg recipes: CRecipe): Boolean {
-        val event = UnregisterCustomRecipeEvent(recipes.toList())
-        Bukkit.getPluginManager().callEvent(event)
-        if (event.isCancelled) {
-            return false
+    @JvmOverloads
+    fun unregisterRecipe(name: String? = null, plugin: JavaPlugin? = CustomCrafter.getInstance()) {
+        if (name == null && plugin == null) {
+            unregisterAllRecipes()
+            return
         }
-        return synchronized(CustomCrafter.RECIPES) {
-            CustomCrafter.RECIPES.removeAll(recipes)
+
+        // TODO: fire UnregisterCustomRecipeEvent
+
+        if (name != null) {
+            if (plugin != null) {
+                synchronized(recipes) {
+                    recipes.forEach(Long.MAX_VALUE) { n, list ->
+                        if (name == n) {
+                            list.removeIf { it.pluginJarFileHash == plugin.hashCode() }
+                        }
+                        if (list.isEmpty()) {
+                            recipes.remove(name)
+                        }
+                    }
+                }
+            } else {
+                synchronized(recipes) {
+                    recipes.remove(name)
+                }
+            }
+        } else {
+            // name is null = plugin hashcode filter
+            synchronized(recipes) {
+                recipes.forEach(Long.MAX_VALUE) { n, list ->
+                    list.removeIf { it.pluginJarFileHash == plugin.hashCode() }
+                    if (list.isEmpty()) {
+                        recipes.remove(n)
+                    }
+                }
+            }
         }
     }
 
     /**
      * Unregisters all registered recipes.
      *
-     * @return[Boolean] Unregistering successful or failed
      * @since 5.0.16
      */
     @JvmStatic
-    fun unregisterAllRecipes(): Boolean {
-        val event = UnregisterCustomRecipeEvent(getRecipes())
-        Bukkit.getPluginManager().callEvent(event)
-        if (event.isCancelled) {
-            return false
+    fun unregisterAllRecipes() {
+        val removedRecipes: MutableList<CRecipe> = mutableListOf()
+        synchronized(recipes) {
+            recipes.forEach { (_, wrappers) -> removedRecipes.addAll(wrappers.map { it.recipe }) }
+            recipes.clear()
         }
-        synchronized(CustomCrafter.RECIPES) {
-            CustomCrafter.RECIPES.clear()
-        }
-        return true
+        UnregisterCustomRecipeEvent(removedRecipes).callEvent()
     }
 
     /**

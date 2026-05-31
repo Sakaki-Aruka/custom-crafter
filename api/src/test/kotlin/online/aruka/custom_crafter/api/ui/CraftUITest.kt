@@ -52,14 +52,8 @@ internal object CraftUITest {
 
         val matter = CMatterImpl.single(Material.STONE)
         val items = CoordinateComponent.square(3).associateWith { _ -> matter }
-        val recipe = CRecipeImpl(
-            name = "",
-            items = items,
-            type = CRecipe.Type.SHAPED
-        )
-        repeat(50) {
-            CustomCrafterAPI.registerRecipe(recipe)
-        }
+        val recipes = (0..<50).map { t -> CRecipeImpl(t.toString(), items, CRecipe.Type.SHAPED) }
+        CustomCrafterAPI.registerRecipe(recipes, plugin = MockBukkit.createMockPlugin())
     }
 
     @AfterEach

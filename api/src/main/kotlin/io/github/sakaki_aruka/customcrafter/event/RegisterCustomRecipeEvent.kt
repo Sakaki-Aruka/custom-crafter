@@ -12,7 +12,7 @@ import org.bukkit.event.HandlerList
  */
 class RegisterCustomRecipeEvent(
     val recipes: List<CRecipe>
-): Event(), Cancellable {
+): Event() {
     companion object {
         @JvmField
         val HANDLER_LIST: HandlerList = HandlerList()
@@ -20,10 +20,5 @@ class RegisterCustomRecipeEvent(
         @JvmStatic
         fun getHandlerList() = HANDLER_LIST
     }
-    private var cancelled: Boolean = false
     override fun getHandlers(): HandlerList = HANDLER_LIST
-    override fun isCancelled(): Boolean = cancelled
-    override fun setCancelled(p0: Boolean) {
-        cancelled = p0
-    }
 }
