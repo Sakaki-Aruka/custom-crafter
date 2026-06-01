@@ -15,6 +15,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import org.mockbukkit.mockbukkit.MockBukkit
 import org.mockbukkit.mockbukkit.ServerMock
@@ -156,6 +157,40 @@ internal object CustomCrafterAPITest {
         )
         val recipes: List<CRecipe> = (0..<50).map { t -> CRecipeImpl(t.toString(), items, CRecipe.Type.SHAPED) }
         CustomCrafterAPI.registerRecipe(recipes, plugin)
+    }
+
+    @Test
+    fun registerRecipeTest() {
+        registerFiftyRecipes()
+        assertEquals(50, CustomCrafterAPI.getRecipes().size)
+        CustomCrafterAPI.unregisterAllRecipes()
+    }
+
+    @Test
+    fun ignoreDuplicatedNamedRecipes() {
+        val items: Map<CoordinateComponent, CMatter> = mapOf(
+            CoordinateComponent(0, 0) to CMatterImpl.of(Material.STONE)
+        )
+        val same0 = CRecipeImpl("0", items, CRecipe.Type.SHAPED)
+        val same1 = CRecipeImpl("0", items, CRecipe.Type.SHAPED)
+
+        val space0 = CRecipeImpl("abc", items, CRecipe.Type.SHAPED)
+        val space1 = CRecipeImpl("a b c", items, CRecipe.Type.SHAPED)
+
+        CustomCrafterAPI.setRecipeNameStrictLevel(CustomCrafterAPI.NameStrictLevel.NOTHING)
+        assertDoesNotThrow { CustomCrafterAPI.registerRecipe(listOf(same0, same1), plugin) }
+        assertDoesNotThrow { CustomCrafterAPI.registerRecipe(listOf(space0, space1), plugin) }
+        CustomCrafterAPI.unregisterAllRecipes()
+
+        CustomCrafterAPI.setRecipeNameStrictLevel(CustomCrafterAPI.NameStrictLevel.WEAK)
+        assertThrows<IllegalArgumentException> { CustomCrafterAPI.registerRecipe(listOf(same0, same1), plugin) }
+        assertDoesNotThrow { CustomCrafterAPI.registerRecipe(listOf(space0, space1), plugin) }
+        CustomCrafterAPI.unregisterAllRecipes()
+
+        CustomCrafterAPI.setRecipeNameStrictLevel(CustomCrafterAPI.NameStrictLevel.STRICT)
+        assertThrows<IllegalArgumentException> { CustomCrafterAPI.registerRecipe(listOf(same0, same1), plugin) }
+        assertThrows<IllegalArgumentException> { CustomCrafterAPI.registerRecipe(listOf(space0, space1), plugin) }
+        CustomCrafterAPI.unregisterAllRecipes()
     }
 
     @Test

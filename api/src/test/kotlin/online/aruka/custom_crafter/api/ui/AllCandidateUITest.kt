@@ -54,7 +54,7 @@ object AllCandidateUITest {
         val matter = CMatterImpl.single(Material.STONE)
         val items = CoordinateComponent.square(3).associateWith { _ -> matter }
         val recipes: List<CRecipe> = (0..<50).map { t -> CRecipeImpl(name = t.toString(), items = items, type = CRecipe.Type.SHAPED) }
-        CustomCrafterAPI.registerRecipe(recipes = recipes, plugin = MockBukkit.createMockPlugin(), nameStrictLevel = CustomCrafterAPI.NameStrictLevel.NOTHING)
+        CustomCrafterAPI.registerRecipe(recipes = recipes, plugin = MockBukkit.createMockPlugin())
     }
 
     @AfterEach

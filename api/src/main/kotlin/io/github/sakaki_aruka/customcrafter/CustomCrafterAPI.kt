@@ -620,13 +620,12 @@ object CustomCrafterAPI {
     fun registerRecipe(
         recipes: List<CRecipe>,
         plugin: JavaPlugin = CustomCrafter.getInstance(),
-        nameStrictLevel: NameStrictLevel = getRecipeNameStrictLevel()
     ) {
         if (recipes.isEmpty()) {
             return
         }
-        if (nameStrictLevel.hasDuplicate(recipes.map { it.name })) {
-            throw IllegalArgumentException("Duplicated name found. (current strict level: ${getRecipeNameStrictLevel().name})")
+        if (getRecipeNameStrictLevel().hasDuplicate(recipes.map { it.name })) {
+            throw IllegalArgumentException("'recipes' has duplicated name recipes. (current strict level: ${getRecipeNameStrictLevel().name})")
         }
         if (recipes.any { it.isValidRecipe().isFailure }) {
             val builder = StringBuilder()
@@ -642,7 +641,7 @@ object CustomCrafterAPI {
         }
 
         synchronized(this.recipes) {
-            if (nameStrictLevel.contains(this.recipes.keys, recipes.map { it.name }.toSet())) {
+            if (getRecipeNameStrictLevel().contains(this.recipes.keys, recipes.map { it.name }.toSet())) {
                 throw IllegalArgumentException("Duplicated name found. (current strict level: ${getRecipeNameStrictLevel().name}")
             }
             for (r in recipes) {
