@@ -657,41 +657,37 @@ object CustomCrafterAPI {
     @JvmStatic
     @JvmOverloads
     fun unregisterRecipe(name: String? = null, plugin: JavaPlugin? = CustomCrafter.getInstance()) {
+        val unregisteredRecipes: MutableList<CRecipe> = mutableListOf()
+
         if (name == null && plugin == null) {
             unregisterAllRecipes()
             return
         }
 
-        // TODO: fire UnregisterCustomRecipeEvent
-
-        if (name != null) {
-            if (plugin != null) {
-                synchronized(recipes) {
-                    recipes.forEach(Long.MAX_VALUE) { n, list ->
-                        if (name == n) {
-                            list.removeIf { it.pluginJarFileHash == plugin.hashCode() }
-                        }
-                        if (list.isEmpty()) {
-                            recipes.remove(name)
-                        }
-                    }
-                }
-            } else {
-                synchronized(recipes) {
-                    recipes.remove(name)
-                }
-            }
-        } else {
-            // name is null = plugin hashcode filter
+        if (plugin != null) {
             synchronized(recipes) {
                 recipes.forEach(Long.MAX_VALUE) { n, list ->
-                    list.removeIf { it.pluginJarFileHash == plugin.hashCode() }
+                    val removeTargets: List<CRecipeWrapper> = list.filter { wrapper ->
+                        wrapper.pluginJarFileHash == plugin.hashCode() && (name?.equals(n) ?: true)
+                    }
+                    list.removeAll(removeTargets)
+                    unregisteredRecipes.addAll(removeTargets.map { it.recipe })
                     if (list.isEmpty()) {
                         recipes.remove(n)
                     }
                 }
             }
+            UnregisterCustomRecipeEvent(unregisteredRecipes.toList()).callEvent()
+            return
         }
+
+        // name only filter
+        synchronized(recipes) {
+            recipes.remove(name)?.let { list ->
+                unregisteredRecipes.addAll(list.map { wrapper -> wrapper.recipe })
+            }
+        }
+        UnregisterCustomRecipeEvent(unregisteredRecipes.toList()).callEvent()
     }
 
     /**
