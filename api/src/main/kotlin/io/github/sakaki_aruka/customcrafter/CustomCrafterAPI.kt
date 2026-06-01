@@ -494,14 +494,15 @@ object CustomCrafterAPI {
         WEAK(2),
         STRICT(1);
 
-        companion object {
-            @JvmStatic
-            fun contains(level: NameStrictLevel, targets: Set<String>, sources: Set<String>): Boolean {
-                // TODO: change to normal class method, reduce STRICT level loop
-                return when (level) {
-                    NOTHING -> false
-                    WEAK -> targets.any { t -> sources.contains(t) }
-                    STRICT -> targets.any { t -> sources.any { s -> level.matches(t, s) } }
+        fun contains(targets: Set<String>, sources: Set<String>): Boolean {
+            return when (this) {
+                NOTHING -> false
+                WEAK -> targets.any { sources.contains(it) }
+                STRICT -> {
+                    fun removeSpaces(set: Set<String>): Set<String> {
+                        return set.map { entry -> entry.filterNot { c -> c.isWhitespace() } }.toSet()
+                    }
+                    removeSpaces(targets).any { e -> removeSpaces(sources).contains(e) }
                 }
             }
         }
@@ -641,7 +642,7 @@ object CustomCrafterAPI {
         }
 
         synchronized(this.recipes) {
-            if (NameStrictLevel.contains(nameStrictLevel, this.recipes.keys, recipes.map { it.name }.toSet())) {
+            if (nameStrictLevel.contains(this.recipes.keys, recipes.map { it.name }.toSet())) {
                 throw IllegalArgumentException("Duplicated name found. (current strict level: ${getRecipeNameStrictLevel().name}")
             }
             for (r in recipes) {

@@ -113,21 +113,22 @@ internal object CustomCrafterAPITest {
 
     @Test
     fun nameStrictLevelContainsTest() {
-        assertFalse(
-            CustomCrafterAPI.NameStrictLevel.contains(
-                CustomCrafterAPI.NameStrictLevel.NOTHING,
-                targets = setOf("abc"),
-                sources = setOf("a b c")
-            )
-        )
+        val target = setOf("abc")
+        val source1 = setOf("abc")
+        val source2 = setOf("a b c")
+        val source3 = setOf("ABC")
 
-        assertFalse(
-            CustomCrafterAPI.NameStrictLevel.contains(
-                CustomCrafterAPI.NameStrictLevel.WEAK,
-                targets = setOf("abc"),
-                sources = setOf("a b c")
-            )
-        )
+        assertFalse(CustomCrafterAPI.NameStrictLevel.NOTHING.contains(target, source1))
+        assertFalse(CustomCrafterAPI.NameStrictLevel.NOTHING.contains(target, source2))
+        assertFalse(CustomCrafterAPI.NameStrictLevel.NOTHING.contains(target, source3))
+
+        assertTrue(CustomCrafterAPI.NameStrictLevel.WEAK.contains(target, source1))
+        assertFalse(CustomCrafterAPI.NameStrictLevel.WEAK.contains(target, source2))
+        assertFalse(CustomCrafterAPI.NameStrictLevel.WEAK.contains(target, source3))
+
+        assertTrue(CustomCrafterAPI.NameStrictLevel.STRICT.contains(target, source1))
+        assertTrue(CustomCrafterAPI.NameStrictLevel.STRICT.contains(target, source2))
+        assertFalse(CustomCrafterAPI.NameStrictLevel.STRICT.contains(target, source3))
     }
 
     @Test
