@@ -225,6 +225,15 @@ object CoordinateComponentTest {
     }
 
     @Test
+    fun shapeStringTest() {
+        val components = CoordinateComponent.squareFill(2)
+        assertEquals(
+            "##" + System.lineSeparator() + "##",
+            CoordinateComponent.getComponentsShapeString(components)
+        )
+    }
+
+    @Test
     fun mapToRecipeMapDetectEmptyTest() {
         val source: Map<CMatter, Set<CoordinateComponent>> = emptyMap()
         assertTrue(CoordinateComponent.mapToRecipeMap(source).isEmpty())

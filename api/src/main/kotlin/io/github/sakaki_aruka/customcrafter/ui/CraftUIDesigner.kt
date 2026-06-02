@@ -1,7 +1,6 @@
 package io.github.sakaki_aruka.customcrafter.ui
 
 import io.github.sakaki_aruka.customcrafter.recipe.CoordinateComponent
-import io.github.sakaki_aruka.customcrafter.util.Converter
 import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
@@ -108,7 +107,7 @@ interface CraftUIDesigner {
                         Current Coordinates: ('_': Blank, Result or MakeButton Slots, '#': Craft Slots)
                     """.trimIndent()
                             + System.lineSeparator()
-                            + Converter.getComponentsShapeString(
+                            + CoordinateComponent.getComponentsShapeString(
                         (0..<54).map { CoordinateComponent.fromIndex(it) }
                             .minus(craftSlots.toSet()))
                 ))
