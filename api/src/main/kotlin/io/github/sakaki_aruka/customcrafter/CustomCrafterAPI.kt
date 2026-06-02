@@ -584,7 +584,7 @@ object CustomCrafterAPI {
     @JvmStatic
     @JvmOverloads
     fun setRecipeNameStrictLevel(level: NameStrictLevel, calledAsync: Boolean = false) {
-        val oldValue = recipeNameStrictLevel.getAndSet(level.tryChange(level))
+        val oldValue = recipeNameStrictLevel.getAndSet(recipeNameStrictLevel.get().tryChange(level))
         if (level != oldValue) {
             CustomCrafterAPIPropertiesChangeEvent(
                 propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.RECIPE_NAME_STRICT_LEVEL.name,
@@ -651,7 +651,7 @@ object CustomCrafterAPI {
             }
         }
 
-        RegisterCustomRecipeEvent(recipes.toList()).callEvent()
+        RegisterCustomRecipeEvent(recipes.toList(), plugin.pluginMeta).callEvent()
     }
 
     @JvmStatic
