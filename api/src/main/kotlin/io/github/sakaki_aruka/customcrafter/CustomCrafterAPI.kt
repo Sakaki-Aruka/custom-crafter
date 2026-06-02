@@ -12,6 +12,7 @@ import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
+import org.jetbrains.annotations.VisibleForTesting
 import java.util.Collections
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
@@ -581,15 +582,21 @@ object CustomCrafterAPI {
     @JvmStatic
     fun getRecipeNameStrictLevel(): NameStrictLevel = recipeNameStrictLevel.get()
 
+    @VisibleForTesting
+    internal fun setRecipeNameStrictLevelDefault() {
+        recipeNameStrictLevel.set(DEFAULT_RECIPE_NAME_STRICT_LEVEL)
+    }
+
     @JvmStatic
     @JvmOverloads
     fun setRecipeNameStrictLevel(level: NameStrictLevel, calledAsync: Boolean = false) {
-        val oldValue = recipeNameStrictLevel.getAndSet(recipeNameStrictLevel.get().tryChange(level))
-        if (level != oldValue) {
+        val newLevel = recipeNameStrictLevel.get().tryChange(level)
+        val oldValue = recipeNameStrictLevel.getAndSet(newLevel)
+        if (newLevel != oldValue) {
             CustomCrafterAPIPropertiesChangeEvent(
                 propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.RECIPE_NAME_STRICT_LEVEL.name,
                 oldValue = CustomCrafterAPIPropertiesChangeEvent.Property(oldValue),
-                newValue = CustomCrafterAPIPropertiesChangeEvent.Property(level),
+                newValue = CustomCrafterAPIPropertiesChangeEvent.Property(newLevel),
                 isAsync = calledAsync
             ).callEvent()
         }

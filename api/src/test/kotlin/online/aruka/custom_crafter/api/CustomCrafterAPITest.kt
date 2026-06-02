@@ -191,6 +191,7 @@ internal object CustomCrafterAPITest {
         assertThrows<IllegalArgumentException> { CustomCrafterAPI.registerRecipe(listOf(same0, same1), plugin) }
         assertThrows<IllegalArgumentException> { CustomCrafterAPI.registerRecipe(listOf(space0, space1), plugin) }
         CustomCrafterAPI.unregisterAllRecipes()
+        CustomCrafterAPI.setRecipeNameStrictLevelDefault()
     }
 
     @Test
