@@ -1,5 +1,23 @@
 # Changelog
 
+# 5.2.0
+
+## ⚠️ Breaking Changes
+
+* The method for resetting `CustomCrafterAPI` properties to their default values has changed.
+* `hasFullCompatibility()` has been deprecated. Use `MAJOR_VERSION`, `MINOR_VERSION`, `PATCH_VERSION`, and `VERSION_TYPE` instead.
+* Several utility functions have been made private or relocated.
+* Passing a plugin instance when registering recipes is now recommended.
+* Several events are now non-cancellable.
+
+## ✨ New Features and Enhancements
+
+* **[New Feature]** Added `AllCandidateUIDesigner`: the AllCandidateUI appearance can now be customized.
+* **[New Feature]** Added `NameStrictLevel`: recipe registration can now be restricted to prevent duplicate names.
+* **[Enhancement]** Version information is now more accessible via `MAJOR_VERSION`, `MINOR_VERSION`, `PATCH_VERSION`, and `VERSION_TYPE`.
+* **[Enhancement]** Recipe registration and deregistration APIs have been improved; recipes can now be filtered by registering plugin.
+* **[Enhancement]** Added default implementations to `CraftUIDesigner`, reducing boilerplate for partial customization.
+
 # 5.1.0
 
 ## ⚠️ Breaking Changes
