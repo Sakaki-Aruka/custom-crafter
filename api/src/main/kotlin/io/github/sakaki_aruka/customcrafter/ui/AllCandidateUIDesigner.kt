@@ -11,26 +11,57 @@ import org.bukkit.inventory.ItemStack
 import java.util.UUID
 
 /**
- * 全候補表示機能 UI (AllCandidateUI) をカスタマイズするためのインターフェース。
- * すべてのメソッドにデフォルト実装が存在するため、最低限必要なものだけをカスタマイズしてほかはデフォルトの設定を利用できる。
- * 実際には、 bake で Context を受け取って、値がすべて固定された Baked のインスタンスを作成してそれが利用される。
- * 作成された Baked の各メソッドが矛盾する値や範囲外の値を持つとき、バリデーションで弾かれ、すべてがデフォルト値の Baked インスタンスが利用される。
+ * Interface for customizing the AllCandidateUI, which displays all craft recipe candidates.
+ *
+ * All methods have default implementations, so only the parts that need customization must be overridden;
+ * the rest fall back to the default behavior.
+ *
+ * Internally, [bake] receives a [Context] and produces a [Baked] instance with all values resolved.
+ * If the resulting [Baked] fails validation (contradictory or out-of-range values),
+ * a [Baked] built entirely from default values is used instead.
+ *
  *
  * @see[bake]
  * @see[Baked]
  * @since 5.2.0
  */
 interface AllCandidateUIDesigner {
+    /**
+     * Returns the title [Component] of the AllCandidateUI inventory.
+     * @param[context] Context provided at bake time
+     * @return[Component] inventory title component
+     * @since 5.2.0
+     */
     fun title(context: Context): Component = "All Candidate".toComponent()
 
+    /**
+     * Returns the slot coordinate and icon item for the previous-page button.
+     *
+     * The `Pair` used here is a Kotlin class, but can also be constructed from Java as `new Pair<>(element1, element2)`.
+     * @param[context] Context provided at bake time
+     * @return[Pair] slot coordinate and icon item for the previous-page button
+     * @since 5.2.0
+     */
     fun previousPageButton(context: Context): Pair<CoordinateComponent, ItemStack> {
         return CoordinateComponent.fromIndex(45) to CustomCrafterUI.PREVIOUS_BUTTON
     }
 
+    /**
+     * Returns the slot coordinate and icon item for the next-page button.
+     * @param[context] Context provided at bake time
+     * @return[Pair] slot coordinate and icon item for the next-page button
+     * @since 5.2.0
+     */
     fun nextPageButton(context: Context): Pair<CoordinateComponent, ItemStack> {
         return CoordinateComponent.fromIndex(53) to CustomCrafterUI.NEXT_BUTTON
     }
 
+    /**
+     * Returns the slot coordinate and icon item for the button that navigates back to the CraftUI.
+     * @param[context] Context provided at bake time
+     * @return[Pair] slot coordinate and icon item for the back-to-CraftUI button
+     * @since 5.2.0
+     */
     fun backToCraftUIButton(context: Context): Pair<CoordinateComponent, ItemStack> {
         val button = ItemStack.of(Material.CRAFTING_TABLE).apply {
             itemMeta = itemMeta.apply {
@@ -40,10 +71,28 @@ interface AllCandidateUIDesigner {
         return CoordinateComponent.fromIndex(49) to button
     }
 
+    /**
+     * Returns the set of slot coordinates where recipe icons can be placed.
+     *
+     * The set size must be between 1 and 51 inclusive (total inventory slots minus the 3 button slots),
+     * and must not include any coordinate occupied by a button.
+     *
+     * For example, if 45 recipes are available but this method returns a set of 30 slots,
+     * the AllCandidateUI will paginate across 2 pages.
+     * @param[context] Context provided at bake time
+     * @return[Set] set of slot coordinates available for recipe icons
+     * @since 5.2.0
+     */
     fun recipeSlots(context: Context): Set<CoordinateComponent> {
         return (0..<45).map { CoordinateComponent.fromIndex(it) }.toSet()
     }
 
+    /**
+     * Returns the icon item shown in recipe slots where the recipe cannot produce a displayable item.
+     * @param[context] Context provided at bake time
+     * @return[ItemStack] placeholder icon item for non-displayable recipes
+     * @since 5.2.0
+     */
     fun noDisplayableItem(context: Context): ItemStack {
         val item = ItemStack.of(Material.COMMAND_BLOCK)
         item.editMeta { meta ->
@@ -52,6 +101,14 @@ interface AllCandidateUIDesigner {
         return item
     }
 
+    /**
+     * Returns a lambda that produces a placeholder icon for recipe slots whose result item has not yet been generated.
+     *
+     * The lambda receives the [CRecipe] being displayed and returns the icon [ItemStack] to show in its slot.
+     * @param[context] Context provided at bake time
+     * @return[(CRecipe) -> ItemStack] factory that builds a placeholder icon for the given recipe
+     * @since 5.2.0
+     */
     fun ungeneratedIconPlaceholderItem(context: Context): (CRecipe) -> ItemStack {
         return { recipe ->
             val item = ItemStack.of(Material.BARRIER)
@@ -67,6 +124,10 @@ interface AllCandidateUIDesigner {
     }
 
     companion object {
+        /**
+         * Default AllCandidateUIDesigner
+         * @since 5.2.0
+         */
         @JvmField
         val DEFAULT = object : AllCandidateUIDesigner {}
 
@@ -78,13 +139,14 @@ interface AllCandidateUIDesigner {
         val BAKED_DEFAULT = DEFAULT.bakeWithEmptyContext()
 
         /**
-         * Bakes AllCandidateUIDesigner values with a given context.
-         * 実際には非同期環境で実行され、 50 ミリ秒以内に値を返せなければデフォルトの値が利用されます。
+         * Bakes this designer's values with the given context into an immutable [Baked] instance.
          *
-         * Java から呼び出す際は AllCandidateUIDesignerKt.bake を呼び出す必要があります。
+         * Executed in an asynchronous context internally; if values cannot be produced within 50 milliseconds,
+         * the default values are used instead.
          *
-         * @param[context] Context to create a user specified ui designer
-         * @return[Baked] Unmodifiable ui designer
+         * When calling from Java, invoke `AllCandidateUIDesignerKt.bake` instead.
+         * @param[context] Context used to resolve designer values
+         * @return[Baked] Immutable snapshot of the resolved designer values
          * @since 5.2.0
          */
         fun AllCandidateUIDesigner.bake(context: Context): Baked {
@@ -99,16 +161,35 @@ interface AllCandidateUIDesigner {
             )
         }
 
+        /**
+         * Bakes a context with [Context.emptyContext].
+         * Shorthand of `.bake(Context.emptyContext)`
+         * @see[Context.emptyContext]
+         * @return[Baked] Immutable snapshot of the resolved designer values
+         */
         fun AllCandidateUIDesigner.bakeWithEmptyContext(): Baked {
             return this.bake(Context.emptyContext())
         }
     }
 
+    /**
+     * Context provided when baking an [AllCandidateUIDesigner] into a fixed-value [Baked] instance.
+     * @param[searchResult] The search result available at bake time
+     * @param[crafterId] UUID of the player viewing the AllCandidateUI
+     * @since 5.2.0
+     */
     data class Context(
         val searchResult: Search.SearchResult,
         val crafterId: UUID
     ) {
         companion object {
+            /**
+             * Returns a context with an empty search result and a random UUID.
+             *
+             * Used for validation baking when no real context is available.
+             * @return[Context] minimal context with no search result and a random player UUID
+             * @since 5.2.0
+             */
             @JvmStatic
             fun emptyContext(): Context {
                 return Context(Search.SearchResult.EMPTY, UUID.randomUUID())
@@ -116,6 +197,13 @@ interface AllCandidateUIDesigner {
         }
     }
 
+    /**
+     * An immutable snapshot of a resolved [AllCandidateUIDesigner] with all values fixed at bake time.
+     *
+     * Obtained by calling [bake] or [bakeWithEmptyContext]. If any value fails [isValid],
+     * the system falls back to a [Baked] built entirely from the [DEFAULT] designer.
+     * @since 5.2.0
+     */
     class Baked(
         val title: Component,
         val recipeSlots: Set<CoordinateComponent>,
@@ -141,6 +229,15 @@ interface AllCandidateUIDesigner {
             }
         }
 
+        /**
+         * Validates this [Baked] instance and returns the result.
+         *
+         * Returns [Result.success] if all values are consistent and within the valid range,
+         * or [Result.failure] containing an [IllegalStateException] that describes the first violation found.
+         * Use `isSuccess` / `isFailure` on the returned [Result] to check the outcome.
+         * @return[Result] success if valid; failure with a descriptive exception if not
+         * @since 5.2.0
+         */
         fun isValid(): Result<Unit> {
             if (recipeSlots.isEmpty() || recipeSlots.size > (54 - 3)) {
                 return Result.failure(IllegalStateException("'recipeSlots' size must be in range of 1 to 51. (current: ${recipeSlots.size})"))
@@ -179,6 +276,15 @@ interface AllCandidateUIDesigner {
             return Result.success(Unit)
         }
 
+        /**
+         * Returns the placeholder icon displayed for [recipe] until its result item has been generated.
+         *
+         * If the item produced by [ungeneratedIconPlaceholderItem] is not displayable
+         * (empty, zero amount, or non-item material), the default placeholder from [BAKED_DEFAULT] is used instead.
+         * @param[recipe] The recipe whose result item has not yet been generated
+         * @return[ItemStack] placeholder icon item to display in the UI slot
+         * @since 5.2.0
+         */
         fun ungeneratedIcon(recipe: CRecipe): ItemStack {
             return this.ungeneratedIconPlaceholderItem(recipe)
                 .takeUnless { it.isEmpty || it.amount < 1 || !it.type.isItem }
