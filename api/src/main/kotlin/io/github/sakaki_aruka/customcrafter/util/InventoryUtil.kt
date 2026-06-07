@@ -13,7 +13,7 @@ object InventoryUtil {
         saveLimit: Boolean = true,
         vararg items: ItemStack
     ) {
-        items.forEach { item: ItemStack ->
+        items.filterNot { it.isEmpty || it.amount < 1 }.forEach { item: ItemStack ->
             if (item.amount <= item.type.maxStackSize || !saveLimit) {
                 addToInventory(item, this)
             } else {
@@ -23,7 +23,10 @@ object InventoryUtil {
                 repeat(q) {
                     addToInventory(one.asQuantity(item.type.maxStackSize), this)
                 }
-                addToInventory(one.asQuantity(r), this)
+
+                if (r > 0) {
+                    addToInventory(one.asQuantity(r), this)
+                }
             }
         }
     }
