@@ -5,16 +5,10 @@ import io.github.sakaki_aruka.customcrafter.event.RegisterCustomRecipeEvent
 import io.github.sakaki_aruka.customcrafter.event.UnregisterCustomRecipeEvent
 import io.github.sakaki_aruka.customcrafter.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.ui.CraftUIDesigner
-import io.github.sakaki_aruka.customcrafter.internal.gui.crafting.CraftUI
 import io.github.sakaki_aruka.customcrafter.ui.AllCandidateUIDesigner
-import io.github.sakaki_aruka.customcrafter.ui.AllCandidateUIDesigner.Companion.bake
 import io.github.sakaki_aruka.customcrafter.ui.AllCandidateUIDesigner.Companion.bakeWithEmptyContext
 import io.github.sakaki_aruka.customcrafter.ui.CraftUIDesigner.Companion.bake
-import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.minimessage.MiniMessage
-import org.bukkit.Bukkit
 import org.bukkit.Material
-import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
 import org.jetbrains.annotations.VisibleForTesting
 import java.util.Collections
@@ -97,7 +91,8 @@ object CustomCrafterAPI {
     const val API_VERSION: String = "${MAJOR_VERSION}.${MINOR_VERSION}.${PATCH_VERSION}"
 
     /**
-     * CustomCrafterAPI version type
+     * Release stage of the Custom Crafter API.
+     * @see[VersionType]
      * @since 5.2.0
      */
     val VERSION_TYPE = VersionType.BETA
@@ -136,7 +131,7 @@ object CustomCrafterAPI {
     }
 
     /**
-     * Custom Crafter API author names
+     * Author names of the Custom Crafter API.
      */
     @JvmField
     val AUTHORS: Set<String> = setOf("Sakaki-Aruka")
@@ -147,8 +142,12 @@ object CustomCrafterAPI {
      */
     private var RESULT_GIVE_CANCEL: AtomicBoolean = AtomicBoolean(false)
 
-    @JvmField
-    val DEFAULT_RESULT_GIVE_CANCEL = false
+    /**
+     * Default value of result-give-cancel feature.
+     * @see[setResultGiveCancel]
+     * @since 5.2.0
+     */
+    const val DEFAULT_RESULT_GIVE_CANCEL = false
 
     /**
      * Returns a boolean value that means the Custom Crafter API give result items to players or not.
@@ -188,6 +187,11 @@ object CustomCrafterAPI {
      */
     private var BASE_BLOCK: AtomicReference<Material> = AtomicReference(Material.GOLD_BLOCK)
 
+    /**
+     * Default value of base-block.
+     * @see[setBaseBlock]
+     * @since 5.2.0
+     */
     @JvmField
     val DEFAULT_BASE_BLOCK = Material.GOLD_BLOCK
 
@@ -236,7 +240,12 @@ object CustomCrafterAPI {
      */
     private var USE_MULTIPLE_RESULT_CANDIDATE_FEATURE: AtomicBoolean = AtomicBoolean(false)
 
-    val DEFAULT_USE_MULTIPLE_RESULT_CANDIDATE_FEATURE = false
+    /**
+     * Default value of use-multiple-result-candidate feature.
+     * @see[setUseMultipleResultCandidateFeature]
+     * @since 5.2.0
+     */
+    const val DEFAULT_USE_MULTIPLE_RESULT_CANDIDATE_FEATURE = false
 
     /**
      * Returns a boolean value that means 'multiple result candidate' feature enabled or not.
@@ -274,8 +283,12 @@ object CustomCrafterAPI {
 
     private var USE_CUSTOM_CRAFT_UI = AtomicBoolean(true)
 
-    @JvmField
-    val DEFAULT_USE_CUSTOM_CRAFT_UI = true
+    /**
+     * Default value of use-custom-craft-ui
+     * @see[setUseCustomCraftUI]
+     * @since 5.2.0
+     */
+    const val DEFAULT_USE_CUSTOM_CRAFT_UI = true
 
     /**
      * Returns a boolean value that means 'Custom Craft UI open' enabled or not.
@@ -312,8 +325,12 @@ object CustomCrafterAPI {
      */
     private var BASE_BLOCK_SIDE = AtomicInteger(3)
 
-    @JvmField
-    val DEFAULT_BASE_BLOCK_SIDE = 3
+    /**
+     * Default value of base-block-side
+     * @see[setBaseBlockSideSize]
+     * @since 5.2.0
+     */
+    const val DEFAULT_BASE_BLOCK_SIDE = 3
 
     /**
      * Sets base block's side size.
@@ -343,9 +360,11 @@ object CustomCrafterAPI {
     }
 
     /**
-     * get base block's side size.
+     * Gets the base block's side size.
      *
-     * @return[Int] size
+     * @return[Int] current side size
+     * @see[DEFAULT_BASE_BLOCK_SIDE]
+     * @see[setBaseBlockSideSize]
      */
     @JvmStatic
     fun getBaseBlockSideSize(): Int = BASE_BLOCK_SIDE.get()
@@ -353,6 +372,11 @@ object CustomCrafterAPI {
 
     private val CRAFT_UI_DESIGNER: AtomicReference<CraftUIDesigner> = AtomicReference(CraftUIDesigner.DEFAULT)
 
+    /**
+     * Default value of craft-ui-designer.
+     * @see[setCraftUIDesigner]
+     * @since 5.2.0
+     */
     @JvmField
     val DEFAULT_CRAFT_UI_DESIGNER = CraftUIDesigner.DEFAULT
 
@@ -387,11 +411,31 @@ object CustomCrafterAPI {
     }
 
 
+    /**
+     * Restriction level for recipe name duplication, applied during recipe registration.
+     *
+     * Introduced to prevent confusion when multiple recipes are displayed simultaneously.
+     *
+     * - [NOTHING]: No restriction.
+     * - [WEAK]: A recipe cannot be registered if an existing recipe has an exactly matching name.
+     * - [STRICT]: A recipe cannot be registered if its name, with all whitespace removed, matches an existing recipe name.
+     *
+     * @since 5.2.0
+     */
     enum class NameStrictLevel(private val priority: Int) {
         NOTHING(3),
         WEAK(2),
         STRICT(1);
 
+        /**
+         * Returns whether [targets] contains any element from [sources],
+         * evaluated at the level on which this method is called.
+         *
+         * @param[targets] Set of strings to check against
+         * @param[sources] Set of strings to look for
+         * @return[Boolean] `true` if any element of [sources] is matched in [targets] under this level
+         * @since 5.2.0
+         */
         fun contains(targets: Set<String>, sources: Set<String>): Boolean {
             return when (this) {
                 NOTHING -> false
@@ -405,6 +449,15 @@ object CustomCrafterAPI {
             }
         }
 
+        /**
+         * Used by [CustomCrafterAPI.setRecipeNameStrictLevel] to determine whether the level
+         * can be changed from the current level to [tryValue].
+         * The level can only move in the stricter direction; loosening is not allowed.
+         *
+         * @param[tryValue] The target level to attempt to change to
+         * @return[NameStrictLevel] [tryValue] if the change is permitted, or the current level if not
+         * @since 5.2.0
+         */
         fun tryChange(tryValue: NameStrictLevel): NameStrictLevel {
             return if (this.priority > tryValue.priority) {
                 tryValue
@@ -413,6 +466,13 @@ object CustomCrafterAPI {
             }
         }
 
+        /**
+         * Returns whether [pattern] matches [target], evaluated at the level on which this method is called.
+         * @param[target] The string to test
+         * @param[pattern] The string to match against
+         * @return[Boolean] `true` if [pattern] matches [target] under this level
+         * @since 5.2.0
+         */
         fun matches(target: String, pattern: String): Boolean {
             return when (this) {
                 NOTHING -> false
@@ -421,6 +481,13 @@ object CustomCrafterAPI {
             }
         }
 
+        /**
+         * Returns whether [target] contains duplicate names according to this level.
+         *
+         * @param[target] List of strings to check for duplicates
+         * @return[Boolean] `true` if any duplicates are detected under this level
+         * @since 5.2.0
+         */
         fun hasDuplicate(target: List<String>): Boolean {
             if (this == NOTHING) {
                 return false
@@ -448,11 +515,22 @@ object CustomCrafterAPI {
 
     private val recipes: ConcurrentHashMap<String, MutableList<CRecipeWrapper>> = ConcurrentHashMap()
 
+    /**
+     * Returns a set of all registered recipe names.
+     * @return[Set] set of registered recipe names (`Set<String>`)
+     * @since 5.2.0
+     */
     @JvmStatic
     fun getRegisteredRecipeNames(): Set<String> {
         return recipes.keys
     }
 
+    /**
+     * Returns registered recipes whose names satisfy the given filter predicate.
+     * @param[filter] Predicate applied to each recipe name; matching recipes are included
+     * @return[List] list of matched recipes (`List<CRecipe>`)
+     * @since 5.2.0
+     */
     @JvmStatic
     fun getRegisteredRecipeFromName(filter: (String) -> Boolean): List<CRecipe> {
         return recipes.entries.filter { (name, _) -> filter(name) }
@@ -460,11 +538,23 @@ object CustomCrafterAPI {
             .map { it.recipe }
     }
 
+    /**
+     * Returns registered recipes whose names exactly match the given string.
+     * @param[recipeName] Exact recipe name to search for
+     * @return[List] list of matched recipes (`List<CRecipe>`)
+     * @since 5.2.0
+     */
     @JvmStatic
     fun getRegisteredRecipeFromName(recipeName: String): List<CRecipe> {
         return getRegisteredRecipeFromName { name -> name == recipeName }
     }
 
+    /**
+     * Returns recipes that are registered by given plugin instance.
+     * @param[plugin] Search plugin instance
+     * @return[List] list of matched recipes (`List<CRecipe>`)
+     * @since 5.2.0
+     */
     @JvmStatic
     fun getRegisteredRecipeFromPlugin(plugin: JavaPlugin): List<CRecipe> {
         return recipes.entries.flatMap { (_, list) -> list }
@@ -472,10 +562,21 @@ object CustomCrafterAPI {
             .map { it.recipe }
     }
 
+
+    /**
+     * Default value of recipe-name-strict-level.
+     * @see[setRecipeNameStrictLevel]
+     * @since 5.2.0
+     */
     @JvmField
     val DEFAULT_RECIPE_NAME_STRICT_LEVEL = NameStrictLevel.NOTHING
     private var recipeNameStrictLevel: AtomicReference<NameStrictLevel> = AtomicReference(DEFAULT_RECIPE_NAME_STRICT_LEVEL)
 
+    /**
+     * Returns current recipe-name-strict-level
+     * @return[NameStrictLevel] current level
+     * @since 5.2.0
+     */
     @JvmStatic
     fun getRecipeNameStrictLevel(): NameStrictLevel = recipeNameStrictLevel.get()
 
@@ -484,6 +585,15 @@ object CustomCrafterAPI {
         recipeNameStrictLevel.set(DEFAULT_RECIPE_NAME_STRICT_LEVEL)
     }
 
+    /**
+     * Sets the recipe name strict level.
+     *
+     * The level can only change in the stricter direction; loosening is not permitted.
+     * @param[level] Target strict level to apply
+     * @param[calledAsync] Called from async processing or not. (Default = false)
+     * @see[NameStrictLevel]
+     * @since 5.2.0
+     */
     @JvmStatic
     @JvmOverloads
     fun setRecipeNameStrictLevel(level: NameStrictLevel, calledAsync: Boolean = false) {
@@ -500,11 +610,10 @@ object CustomCrafterAPI {
     }
 
     /**
-     * returns an IMMUTABLE list what contains all registered recipes.
+     * Returns an immutable list of all registered recipes.
      *
-     * NOTICE: it is immutable, so you cannot modify its components.
-     *
-     * @return[List]<[CRecipe]> recipes list
+     * The returned list cannot be modified.
+     * @return[List]<[CRecipe]> immutable list of all registered recipes
      */
     @JvmStatic
     fun getRecipes(): List<CRecipe> {
@@ -514,10 +623,12 @@ object CustomCrafterAPI {
     }
 
     /**
-     * registers a provided recipe and calls [RegisterCustomRecipeEvent].
+     * Registers the provided recipes and fires [RegisterCustomRecipeEvent].
      *
-     * @param[recipes] a recipe what you want to register.
-     * @throws[IllegalStateException] Calls when the specified recipe is invalid
+     * @param[recipes] Recipes to register
+     * @param[plugin] Plugin instance registering the recipes
+     * @throws[IllegalArgumentException] if [recipes] contains duplicate names under the current strict level
+     * @throws[IllegalStateException] if any recipe in [recipes] is invalid
      */
     @JvmStatic
     @JvmOverloads
@@ -558,6 +669,15 @@ object CustomCrafterAPI {
         RegisterCustomRecipeEvent(recipes.toList(), plugin.pluginMeta).callEvent()
     }
 
+    /**
+     * Unregisters recipes that match the specified conditions.
+     *
+     * If both [name] and [plugin] are `null`, all registered recipes are unregistered.
+     * @param[name] Target recipe name to filter by. If `null`, name is not used as a filter.
+     * @param[plugin] Plugin instance to filter by registering plugin.
+     *   Defaults to [CustomCrafter.getInstance], targeting recipes registered without an explicit plugin.
+     *   Pass `null` to exclude the plugin from the filter criteria.
+     */
     @JvmStatic
     @JvmOverloads
     fun unregisterRecipe(name: String? = null, plugin: JavaPlugin? = CustomCrafter.getInstance()) {
@@ -611,12 +731,30 @@ object CustomCrafterAPI {
 
     private val allCandidateUIDesigner: AtomicReference<AllCandidateUIDesigner> = AtomicReference(AllCandidateUIDesigner.DEFAULT)
 
+    /**
+     * Default value of AllCandidateUIDesigner
+     * @see[setAllCandidateUIDesigner]
+     * @since 5.2.0
+     */
     @JvmField
     val DEFAULT_ALL_CANDIDATE_UI_DESIGNER = AllCandidateUIDesigner.DEFAULT
 
+    /**
+     * Returns current [AllCandidateUIDesigner]
+     * @return[AllCandidateUIDesigner] current designer
+     * @since 5.2.0
+     */
     @JvmStatic
     fun getAllCandidateUIDesigner(): AllCandidateUIDesigner = allCandidateUIDesigner.get()
 
+    /**
+     * Sets the [AllCandidateUIDesigner].
+     *
+     * Throws an exception if the [AllCandidateUIDesigner.Baked] produced by calling
+     * [AllCandidateUIDesigner.bakeWithEmptyContext] on [designer] fails [AllCandidateUIDesigner.Baked.isValid].
+     * @param[designer] The new designer to set
+     * @since 5.2.0
+     */
     @JvmStatic
     fun setAllCandidateUIDesigner(designer: AllCandidateUIDesigner) {
         val validationResult = designer.bakeWithEmptyContext().isValid()
