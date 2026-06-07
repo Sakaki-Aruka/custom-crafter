@@ -34,7 +34,7 @@ import org.bukkit.event.HandlerList
  * public class PropertiesChangeListener implements Listener {
  *     @EventHandler
  *     public void <T> onChange(CustomCrafterAPIPropertiesChangeEvent<T> event) {
- *         String baseKey = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.Companion.BASE_BLOCK;
+ *         String baseKey = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK;
  *         if (!event.getPropertyName().equals(baseKey.getName())) {
  *             return;
  *         }
@@ -42,7 +42,7 @@ import org.bukkit.event.HandlerList
  *         if (baseTypeOld == null) {
  *             return;
  *         }
- *         CustomCrafterAPI.INSTANCE.setBaseBlock(baseTypeOld);
+ *         CustomCrafterAPI.setBaseBlock(baseTypeOld);
  *         System.out.println("I rejected new setting... Hahaha!!!");
  *     }
  * }
