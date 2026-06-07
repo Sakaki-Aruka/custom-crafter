@@ -360,7 +360,7 @@ internal object CraftUITest {
             )
             assertFalse(CraftUI.isTrigger(event))
         } finally {
-            CustomCrafterAPI.setUseCustomCraftUIDefault()
+            CustomCrafterAPI.setUseCustomCraftUI(CustomCrafterAPI.DEFAULT_USE_CUSTOM_CRAFT_UI)
         }
     }
 

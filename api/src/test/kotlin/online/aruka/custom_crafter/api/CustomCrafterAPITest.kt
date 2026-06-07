@@ -50,7 +50,7 @@ internal object CustomCrafterAPITest {
         CustomCrafterAPI.setBaseBlockSideSize(5)
         assertTrue(CustomCrafterAPI.getBaseBlockSideSize() == 5)
 
-        CustomCrafterAPI.setBaseBlockSideSizeDefault()
+        CustomCrafterAPI.setBaseBlockSideSize(CustomCrafterAPI.DEFAULT_BASE_BLOCK_SIDE)
         assertTrue(CustomCrafterAPI.getBaseBlockSideSize() == 3)
     }
 
@@ -67,7 +67,7 @@ internal object CustomCrafterAPITest {
         CustomCrafterAPI.setBaseBlock(Material.DIAMOND_BLOCK)
         assertTrue(CustomCrafterAPI.getBaseBlock() == Material.DIAMOND_BLOCK)
 
-        CustomCrafterAPI.setBaseBlockDefault()
+        CustomCrafterAPI.setBaseBlock(CustomCrafterAPI.DEFAULT_BASE_BLOCK)
         assertTrue(CustomCrafterAPI.getBaseBlock() == Material.GOLD_BLOCK)
     }
 
@@ -97,7 +97,7 @@ internal object CustomCrafterAPITest {
             .containsAll(CustomCrafterAPI.getCraftUIDesigner().blankSlots(nullContext).keys)
         )
 
-        CustomCrafterAPI.setCraftUIDesignerDefault()
+        CustomCrafterAPI.setCraftUIDesigner(CustomCrafterAPI.DEFAULT_CRAFT_UI_DESIGNER)
     }
 
     @Test
