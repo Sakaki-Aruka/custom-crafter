@@ -1,6 +1,7 @@
 package io.github.sakaki_aruka.customcrafter.event
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
+import io.github.sakaki_aruka.customcrafter.ui.AllCandidateUIDesigner
 import io.github.sakaki_aruka.customcrafter.ui.CraftUIDesigner
 import org.bukkit.Material
 import org.bukkit.event.Event
@@ -111,6 +112,8 @@ class CustomCrafterAPIPropertiesChangeEvent<T> (
             val BASE_BLOCK_SIDE = PropertyKey<Int>("BASE_BLOCK_SIDE")
             @JvmField
             val CRAFT_UI_DESIGNER = PropertyKey<CraftUIDesigner>("CRAFT_UI_DESIGNER")
+            @JvmField
+            val ALL_CANDIDATE_UI_DESIGNER = PropertyKey<AllCandidateUIDesigner>("ALL_CANDIDATE_UI_DESIGNER")
             @JvmField
             val RECIPE_NAME_STRICT_LEVEL = PropertyKey<CustomCrafterAPI.NameStrictLevel>("RECIPE_NAME_STRICT_LEVEL")
         }

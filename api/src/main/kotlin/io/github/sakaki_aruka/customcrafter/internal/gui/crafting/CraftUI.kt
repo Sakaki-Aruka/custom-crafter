@@ -19,6 +19,7 @@ import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
 import io.github.sakaki_aruka.customcrafter.internal.gui.CraftUIState
 import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterUI
 import io.github.sakaki_aruka.customcrafter.internal.gui.allcandidate.AllCandidateUI
+import io.github.sakaki_aruka.customcrafter.ui.CraftUIDesigner.Companion.bake
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -54,7 +55,7 @@ internal class CraftUI(
 
     init {
         val designContext = CraftUIDesigner.Context(player = caller)
-        bakedDesigner = baked ?: CraftUIDesigner.bake(CustomCrafterAPI.getCraftUIDesigner(), designContext)
+        bakedDesigner = baked ?: CustomCrafterAPI.getCraftUIDesigner().bake(designContext)
 
         bakedDesigner.isValid().exceptionOrNull()?.let { throw it }
 
@@ -361,7 +362,8 @@ internal class CraftUI(
         val view: CraftView = this.toView()
         val min: Int = view.materials.values.minOf { it.amount }
         val decrementAmount: Int = if (shiftUsed) { min } else { 1 }
-        val item: ItemStack = result.vanilla()!!.result.clone().apply { this.amount *= decrementAmount }
+        val item: ItemStack = result.vanilla()?.let { it.result.clone().apply { this.amount *= decrementAmount }}
+            ?: return
 
         if (!uiState.compareAndSet(CraftUIState.GENERATING_RESULTS, CraftUIState.GIVING)) {
             return

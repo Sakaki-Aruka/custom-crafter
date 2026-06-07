@@ -2,6 +2,7 @@ package online.aruka.custom_crafter.api.ui
 
 import io.github.sakaki_aruka.customcrafter.ui.CraftUIDesigner
 import io.github.sakaki_aruka.customcrafter.recipe.CoordinateComponent
+import io.github.sakaki_aruka.customcrafter.ui.CraftUIDesigner.Companion.bake
 import io.github.sakaki_aruka.customcrafter.util.Converter.toComponent
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
@@ -34,7 +35,7 @@ object CraftUIDesignerTest {
 
     @Test
     fun bakedDesignerCraftSlotsTest() {
-        val anonymous = object: CraftUIDesigner {
+        val anonymous: CraftUIDesigner = object: CraftUIDesigner {
             override fun blankSlots(context: CraftUIDesigner.Context): Map<CoordinateComponent, ItemStack> {
                 val blank = ItemStack.of(Material.STONE)
                 return (0..<54).filter { it % 9 > 5 }
@@ -53,10 +54,10 @@ object CraftUIDesignerTest {
 
         assertTrue(
             (0..<54).filter { it % 9 < 6 }.map { CoordinateComponent.fromIndex(it) }.toSet()
-                .containsAll(CraftUIDesigner.bake(anonymous, CraftUIDesigner.Context()).craftSlots())
+                .containsAll(anonymous.bake(CraftUIDesigner.Context()).craftSlots())
         )
 
-        assertTrue(CraftUIDesigner.bake(anonymous, CraftUIDesigner.Context()).isValid().isSuccess)
+        assertTrue(anonymous.bake(CraftUIDesigner.Context()).isValid().isSuccess)
     }
 
     @Test
