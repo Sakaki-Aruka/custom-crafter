@@ -32,18 +32,22 @@ class Demo : JavaPlugin() {
         Bukkit.getPluginManager().registerEvents(CraftFailureListener(), this)
 
         // register shaped recipes
-        CustomCrafterAPI.registerRecipe(ShapedRecipeProvider.enchantedGoldenApple())
-        CustomCrafterAPI.registerRecipe(ShapedRecipeProvider.wateredBottles())
-        CustomCrafterAPI.registerRecipe(ShapedRecipeProvider.moreWateredBottles())
-        CustomCrafterAPI.registerRecipe(ShapedRecipeProvider.infinityIronBlockCore())
-        CustomCrafterAPI.registerRecipe(ShapedRecipeProvider.infinityIronBlock())
-        CustomCrafterAPI.registerRecipe(OverLimitEnchantedBook.onlyEfficiency())
+        CustomCrafterAPI.registerRecipe(listOf(
+            ShapedRecipeProvider.enchantedGoldenApple(),
+            ShapedRecipeProvider.wateredBottles(),
+            ShapedRecipeProvider.moreWateredBottles(),
+            ShapedRecipeProvider.infinityIronBlockCore(),
+            ShapedRecipeProvider.infinityIronBlock(),
+            OverLimitEnchantedBook.onlyEfficiency()
+        ), plugin)
 
         // register shapeless recipes
-        CustomCrafterAPI.registerRecipe(ShapelessRecipeProvider.glowBerry())
-        CustomCrafterAPI.registerRecipe(ShapelessRecipeProvider.infinityIronBlockExtract())
-        CustomCrafterAPI.registerRecipe(ShapelessRecipeProvider.extractPotion())
-        CustomCrafterAPI.registerRecipe(DyeMixin.mixWithoutBlack())
+        CustomCrafterAPI.registerRecipe(listOf(
+            ShapelessRecipeProvider.glowBerry(),
+            ShapelessRecipeProvider.infinityIronBlockExtract(),
+            ShapelessRecipeProvider.extractPotion(),
+            DyeMixin.mixWithoutBlack()
+        ), plugin)
 
         CustomCrafterAPI.setCraftUIDesigner(CraftUI())
     }

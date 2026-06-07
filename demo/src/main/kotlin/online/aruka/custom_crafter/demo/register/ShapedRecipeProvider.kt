@@ -8,7 +8,7 @@ import io.github.sakaki_aruka.customcrafter.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.matter.CMatterImpl
 import io.github.sakaki_aruka.customcrafter.recipe.CRecipeImpl
 import io.github.sakaki_aruka.customcrafter.recipe.GroupRecipe
-import io.github.sakaki_aruka.customcrafter.util.Converter.toComponent
+import net.kyori.adventure.text.minimessage.MiniMessage
 import online.aruka.custom_crafter.demo.Demo
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
@@ -144,8 +144,9 @@ object ShapedRecipeProvider {
                     PersistentDataType.INTEGER,
                     totalIronBlockAmount
                 )
-                meta.displayName("Infinity Iron Block".toComponent())
-                meta.lore(listOf("<green>Contained Iron Block:<white> $totalIronBlockAmount".toComponent()))
+                meta.displayName(MiniMessage.miniMessage().deserialize("Infinity Iron Block"))
+                meta.lore(listOf(
+                    MiniMessage.miniMessage().deserialize("<green>Contained Iron Block:<white> $totalIronBlockAmount")))
             }
             listOf(core)
         }
@@ -252,7 +253,8 @@ object ShapedRecipeProvider {
                     newValue
                 )
 
-                meta.lore(listOf("<green>Contained Iron Block: <white>$newValue".toComponent()))
+                meta.lore(listOf(
+                    MiniMessage.miniMessage().deserialize("<green>Contained Iron Block: <white>$newValue")))
             }
 
             result.add(core.asOne())
