@@ -61,7 +61,6 @@ export default defineConfig({
                     label: 'Utilities',
                     translations: { ja: 'ユーティリティ' },
                     items: [
-                        'util/converter',
                         'util/inventory-util',
                     ],
                 },

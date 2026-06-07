@@ -37,7 +37,7 @@ fun interface ResultSupplier {
 | `mapped` | `Map<CoordinateComponent, ItemStack>` | 実際のアイテム配置 |
 | `shiftClicked` | `Boolean` | 一括作成モードであるか (Shift キーが押下されているか) |
 | `calledTimes` | `Int` | 作成回数 (一括作成時は作成可能な最大個数) |
-| `crafterID` | `UUID` | クラフトを実行したプレイヤーの UUID |
+| `crafterId` | `UUID` | クラフトを実行したプレイヤーの UUID |
 | `callMode` | `CallMode` | 実際のクラフト (`CRAFT`) か、表示用のアイコン生成呼び出し (`ICON`、例: AllCandidateUI) かを示す |
 | `asyncContext` | `AsyncContext?` | 非同期実行時用コンテキスト。同期実行時は `null` |
 
@@ -74,7 +74,7 @@ val result = ResultSupplier { ctx ->
         return@ResultSupplier listOf(ItemStack.of(Material.DIAMOND))
     }
     // 実際のクラフト時のみデータベースを更新する
-    MyDatabase.recordCraft(ctx.crafterID)
+    MyDatabase.recordCraft(ctx.crafterId)
     listOf(ItemStack.of(Material.DIAMOND))
 }
 ```
@@ -97,8 +97,8 @@ val asyncAwareResult = ResultSupplier { ctx ->
             return@ResultSupplier emptyList()
         }
         // 非同期では BukkitAPI のワールドアクセス不可
-        // ctx.crafterID を使ってデータを取得する
-        val data = MyDatabase.fetchData(ctx.crafterID)
+        // ctx.crafterId を使ってデータを取得する
+        val data = MyDatabase.fetchData(ctx.crafterId)
         return@ResultSupplier listOf(ItemStack.of(data.material))
     }
     // 同期実行時は通常処理
@@ -151,7 +151,7 @@ val recipe = CRecipeImpl(
 val customResult = ResultSupplier { ctx ->
     // 特定プレイヤーには特別なアイテムを返す
     val specialPlayer = UUID.fromString("069a79f4-44e9-4726-a5be-fca90e38aaf5")
-    if (ctx.crafterID == specialPlayer) {
+    if (ctx.crafterId == specialPlayer) {
         return@ResultSupplier listOf(ItemStack.of(Material.ENCHANTED_GOLDEN_APPLE))
     }
     listOf(ItemStack.of(Material.GOLDEN_APPLE))
@@ -214,7 +214,7 @@ class EmptyBucketReplacer : ReplaceableResultSupplier {
         val failed = results.filter { (_, state) -> !state.isSuccess() }
         if (failed.isNotEmpty()) {
             // フォールバック: 配置できなかったアイテムをプレイヤーに渡す
-            val player = Bukkit.getPlayer(usedContext.crafterID) ?: return
+            val player = Bukkit.getPlayer(usedContext.crafterId) ?: return
             failed.keys.forEach { coord ->
                 usedQueries?.get(coord)?.let { player.inventory.addItem(it) }
             }

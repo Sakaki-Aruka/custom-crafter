@@ -36,7 +36,7 @@ As noted above, the context provides a variety of state:
 | `mapped` | `Map<CoordinateComponent, ItemStack>` | The actual item arrangement |
 | `shiftClicked` | `Boolean` | Whether bulk crafting mode is active (i.e., whether the Shift key was held) |
 | `calledTimes` | `Int` | The number of crafts (if in bulk crafting mode, the maximum craftable quantity) |
-| `crafterID` | `UUID` | The UUID of the player who performed the craft |
+| `crafterId` | `UUID` | The UUID of the player who performed the craft |
 | `callMode` | `CallMode` | Whether this call is a real craft (`CRAFT`) or an icon-generation call for display purposes (`ICON`, e.g. in AllCandidateUI) |
 | `asyncContext` | `AsyncContext?` | Context for async execution; `null` during synchronous execution |
 
@@ -72,7 +72,7 @@ val result = ResultSupplier { ctx ->
         return@ResultSupplier listOf(ItemStack.of(Material.DIAMOND))
     }
     // Update the database only during actual crafting
-    MyDatabase.recordCraft(ctx.crafterID)
+    MyDatabase.recordCraft(ctx.crafterId)
     listOf(ItemStack.of(Material.DIAMOND))
 }
 ```
@@ -94,8 +94,8 @@ val asyncAwareResult = ResultSupplier { ctx ->
             return@ResultSupplier emptyList()
         }
         // BukkitAPI world access is not permitted in async threads
-        // Use ctx.crafterID to fetch data instead
-        val data = MyDatabase.fetchData(ctx.crafterID)
+        // Use ctx.crafterId to fetch data instead
+        val data = MyDatabase.fetchData(ctx.crafterId)
         return@ResultSupplier listOf(ItemStack.of(data.material))
     }
     // Normal processing during synchronous execution
@@ -148,7 +148,7 @@ An example that changes the returned item based on the player's UUID.
 val customResult = ResultSupplier { ctx ->
     // Return a special item to a specific player
     val specialPlayer = UUID.fromString("069a79f4-44e9-4726-a5be-fca90e38aaf5")
-    if (ctx.crafterID == specialPlayer) {
+    if (ctx.crafterId == specialPlayer) {
         return@ResultSupplier listOf(ItemStack.of(Material.ENCHANTED_GOLDEN_APPLE))
     }
     listOf(ItemStack.of(Material.GOLDEN_APPLE))
@@ -211,7 +211,7 @@ class EmptyBucketReplacer : ReplaceableResultSupplier {
         val failed = results.filter { (_, state) -> !state.isSuccess() }
         if (failed.isNotEmpty()) {
             // Fall back: give the player the items that could not be placed
-            val player = Bukkit.getPlayer(usedContext.crafterID) ?: return
+            val player = Bukkit.getPlayer(usedContext.crafterId) ?: return
             failed.keys.forEach { coord ->
                 usedQueries?.get(coord)?.let { player.inventory.addItem(it) }
             }

@@ -112,13 +112,19 @@ val items = CoordinateComponent.recipeMapFromStringList(lines, map)
 // (0,0)〜(2,2) の 9 スロットが stone、(1,1) だけ apple になる
 ```
 
-空スロットを含む場合はカンマの間を空にします。
+カンマの間が空文字、もしくはマッピングに登録されていない文字の場合は空として扱います。  
 
 ```kotlin
 val lines = listOf(
     "s,s",
     ",s"   // (0,1) はスキップ
 )
+
+val lines2 = listOf(
+    "s,s",
+    "_,s" // (0, 1) はスキップ ("_" が登録されていない場合のみ)
+)
+
 ```
 
 #### `mapToRecipeMap(source)` — CMatter 主体のマッピングから変換

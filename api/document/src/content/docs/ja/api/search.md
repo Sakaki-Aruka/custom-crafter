@@ -15,8 +15,7 @@ title: Search API
 
 ```kotlin
 data class CraftView(
-    val materials: Map<CoordinateComponent, ItemStack>, // 入力されたアイテムの配置
-    val result: ItemStack                               // 成果物スロットのアイテム
+    val materials: Map<CoordinateComponent, ItemStack> // 入力されたアイテムの配置
 )
 ```
 
@@ -25,8 +24,7 @@ data class CraftView(
 ```kotlin
 // 石を (0,0) に配置した CraftView を作成する例
 val view = CraftView(
-    materials = mapOf(CoordinateComponent(0, 0) to ItemStack.of(Material.STONE)),
-    result = ItemStack.empty()
+    materials = mapOf(CoordinateComponent(0, 0) to ItemStack.of(Material.STONE))
 )
 ```
 
@@ -36,7 +34,7 @@ val view = CraftView(
 
 ```kotlin
 fun search(
-    crafterID: UUID,
+    crafterId: UUID,
     view: CraftView,
     searchQuery: SearchQuery = SearchQuery.DEFAULT,
     sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes()
@@ -49,7 +47,7 @@ fun search(
 
 | 引数 | 概要 |
 |------|------|
-| `crafterID` | クラフトを実行するプレイヤーの UUID |
+| `crafterId` | クラフトを実行するプレイヤーの UUID |
 | `view` | 入力されたアイテムの配置 |
 | `searchQuery` | 検索動作（検索モードおよびバニラ検索モード）を制御する。デフォルトは `SearchQuery.DEFAULT` |
 | `sourceRecipes` | 検索対象のレシピリスト (デフォルトは登録済み全レシピ) |
@@ -58,7 +56,6 @@ fun search(
 val player: Player = /* ... */
 val view = CraftView(
     materials = mapOf(CoordinateComponent(0, 0) to ItemStack.of(Material.STONE)),
-    result = ItemStack.empty()
 )
 
 val result: Search.SearchResult = Search.search(player.uniqueId, view)
@@ -70,7 +67,7 @@ val result: Search.SearchResult = Search.search(player.uniqueId, view)
 
 ```kotlin
 fun asyncSearch(
-    crafterID: UUID,
+    crafterId: UUID,
     view: CraftView,
     query: SearchQuery = SearchQuery.ASYNC_DEFAULT,
     sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes()
@@ -83,14 +80,13 @@ CustomCrafterAPI の標準クラフト画面および全候補表示機能では
 
 :::caution
 非同期スレッドでは BukkitAPI のワールドやエンティティへのアクセスができません。
-`ResultSupplier` や `CMatterPredicate` の中でプレイヤー情報などにアクセスする場合は、`asyncContext.isAsync()` で非同期かどうかを確認してください。
+`ResultSupplier` や `CMatterPredicate` の中でプレイヤー情報などにアクセスする場合は、`ctx.isAsync()` で非同期かどうかを確認してください。
 :::
 
 ```kotlin
 val player: Player = /* ... */
 val view = CraftView(
     materials = mapOf(CoordinateComponent(0, 0) to ItemStack.of(Material.STONE)),
-    result = ItemStack.empty()
 )
 
 val future: CompletableFuture<Search.SearchResult> = Search.asyncSearch(player.uniqueId, view)
@@ -194,7 +190,6 @@ val view = CraftView(
     materials = CoordinateComponent.squareFill(3)
         .filter { it.x < 3 && it.y < 3 }
         .associate { it to ItemStack.of(Material.COBBLESTONE) },
-    result = ItemStack.empty()
 )
 val vanillaRecipe: Recipe? = VanillaSearch.search(Bukkit.getWorlds().first(), view)
 vanillaRecipe?.let { println("結果アイテム: ${it.result.type}") }
@@ -271,7 +266,6 @@ fun asyncPartialSearch(
 val player: Player = /* ... */
 val view = CraftView(
     materials = mapOf(CoordinateComponent(0, 0) to ItemStack.of(Material.STONE)),
-    result = ItemStack.empty()
 )
 
 PartialSearch.asyncPartialSearch(player.uniqueId, view).thenAccept { results ->
