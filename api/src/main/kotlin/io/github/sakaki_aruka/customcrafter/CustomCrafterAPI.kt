@@ -6,6 +6,10 @@ import io.github.sakaki_aruka.customcrafter.event.UnregisterCustomRecipeEvent
 import io.github.sakaki_aruka.customcrafter.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.ui.CraftUIDesigner
 import io.github.sakaki_aruka.customcrafter.internal.gui.crafting.CraftUI
+import io.github.sakaki_aruka.customcrafter.ui.AllCandidateUIDesigner
+import io.github.sakaki_aruka.customcrafter.ui.AllCandidateUIDesigner.Companion.bake
+import io.github.sakaki_aruka.customcrafter.ui.AllCandidateUIDesigner.Companion.bakeWithEmptyContext
+import io.github.sakaki_aruka.customcrafter.ui.CraftUIDesigner.Companion.bake
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
@@ -419,7 +423,7 @@ object CustomCrafterAPI {
     }
 
 
-    private var CRAFT_UI_DESIGNER: AtomicReference<CraftUIDesigner> = AtomicReference(CraftUI)
+    private val CRAFT_UI_DESIGNER: AtomicReference<CraftUIDesigner> = AtomicReference(CraftUIDesigner.DEFAULT)
     /**
      * Returns a current CraftUI designer.
      * @return[CraftUIDesigner]
@@ -438,7 +442,7 @@ object CustomCrafterAPI {
     @JvmOverloads
     fun setCraftUIDesigner(designer: CraftUIDesigner, calledAsync: Boolean = false) {
         val nullContext = CraftUIDesigner.Context(player = null)
-        val baked: CraftUIDesigner.Baked = CraftUIDesigner.bake(designer, nullContext)
+        val baked: CraftUIDesigner.Baked = designer.bake(nullContext)
         baked.isValid().exceptionOrNull()?.let { throw it }
 
         val currentValue: CraftUIDesigner = CRAFT_UI_DESIGNER.getAndSet(designer)
@@ -466,29 +470,6 @@ object CustomCrafterAPI {
             isAsync = calledAsync
         ).callEvent()
     }
-
-    /**
-     * An item that is used for an all-candidates-menu's not displayable items slot.
-     *
-     * To get, use [getAllCandidateNotDisplayableItem].
-     *
-     * To set, use [setAllCandidateNotDisplayableItem].
-     *
-     * @suppress
-     * @since 5.0.9
-     */
-    internal var ALL_CANDIDATE_NO_DISPLAYABLE_ITEM = defaultAllCandidateNotDisplayableItems()
-
-    /**
-     * used for All Candidate feature (not displayable item lore generator)
-     *
-     * @suppress
-     * @since 5.0.9
-     */
-    internal var ALL_CANDIDATE_NO_DISPLAYABLE_ITEM_LORE_SUPPLIER: (String) -> List<Component>? = { recipeName ->
-        listOf(MiniMessage.miniMessage().deserialize("<white>Recipe Name: $recipeName"))
-    }
-
 
     enum class NameStrictLevel(private val priority: Int) {
         NOTHING(3),
@@ -712,67 +693,25 @@ object CustomCrafterAPI {
         UnregisterCustomRecipeEvent(removedRecipes).callEvent()
     }
 
-    /**
-     * Get an item that is used for an all-candidates-menu's not displayable items slot.
-     * @return[ItemStack] An item what is displayed when no displayable items on all-candidates-menu.
-     * @since 5.0.9
-     */
-    @JvmStatic
-    fun getAllCandidateNotDisplayableItem() = synchronized(ALL_CANDIDATE_NO_DISPLAYABLE_ITEM) {
-        ALL_CANDIDATE_NO_DISPLAYABLE_ITEM
-    }
+    private val allCandidateUIDesigner: AtomicReference<AllCandidateUIDesigner> = AtomicReference(AllCandidateUIDesigner.DEFAULT)
 
-    /**
-     * Set an item that is used for an all-candidates-menu's not displayable items slot.
-     * If the specified items material is not `Material#isItem`, this throws Errors.
-     *
-     * `loreSupplier` must receive a recipe-name and return a lore-list.
-     *
-     * A default loreSupplier is
-     * ```
-     * // This is a very simple lore supplier.
-     * val supplier: (String) -> List<Component>? = { recipeName ->
-     *         listOf(MiniMessage.miniMessage().deserialize("<white>Recipe Name: $recipeName"))
-     *     }
-     * ```
-     * If this receives "Janssons frestelse", returns a white character component is "Recipe Name: Janssons frestelse".
-     *
-     * And also, you can set null to this.
-     * If you did, an all-candidates-menu's not displayable item does not show lore.
-     *
-     *
-     * @param[item] an item
-     * @param[loreSupplier] a lore supplier
-     * @throws[IllegalArgumentException] If the provided items material is not `Material#isItem`, thrown.
-     * @since 5.0.9
-     */
-    @JvmStatic
-    fun setAllCandidateNotDisplayableItem(
-        item: ItemStack,
-        loreSupplier: (String) -> List<Component>?
-    ) {
-        if (!item.type.isItem) {
-            throw IllegalArgumentException("'item' material must be 'Material#isItem'.")
-        }
-        synchronized(ALL_CANDIDATE_NO_DISPLAYABLE_ITEM) {
-            ALL_CANDIDATE_NO_DISPLAYABLE_ITEM = item
-        }
-        synchronized(ALL_CANDIDATE_NO_DISPLAYABLE_ITEM_LORE_SUPPLIER) {
-            ALL_CANDIDATE_NO_DISPLAYABLE_ITEM_LORE_SUPPLIER = loreSupplier
-        }
-    }
+    @JvmField
+    val DEFAULT_ALL_CANDIDATE_UI_DESIGNER = AllCandidateUIDesigner.DEFAULT
 
-    /**
-     * Get an item that is used for an all-candidates-menu's not displayable items slot in default.
-     * @return[ItemStack] an item
-     * @since 5.0.9
-     */
     @JvmStatic
-    fun defaultAllCandidateNotDisplayableItems(): ItemStack {
-        val item = ItemStack(Material.COMMAND_BLOCK)
-        item.editMeta { meta ->
-            meta.displayName(MiniMessage.miniMessage().deserialize("<red>Not Displayable Item"))
+    fun getAllCandidateUIDesigner(): AllCandidateUIDesigner = allCandidateUIDesigner.get()
+
+    @JvmStatic
+    fun setAllCandidateUIDesigner(designer: AllCandidateUIDesigner) {
+        val validationResult = designer.bakeWithEmptyContext().isValid()
+        if (validationResult.isFailure) {
+            validationResult.exceptionOrNull()?.let { throw it }
         }
-        return item
+        val oldDesigner = allCandidateUIDesigner.getAndSet(designer)
+        CustomCrafterAPIPropertiesChangeEvent(
+            propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.ALL_CANDIDATE_UI_DESIGNER.name,
+            oldValue = CustomCrafterAPIPropertiesChangeEvent.Property(oldDesigner),
+            newValue = CustomCrafterAPIPropertiesChangeEvent.Property(designer)
+        ).callEvent()
     }
 }

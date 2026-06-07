@@ -8,6 +8,7 @@ import io.github.sakaki_aruka.customcrafter.matter.CMatterImpl
 import io.github.sakaki_aruka.customcrafter.recipe.CRecipeImpl
 import io.github.sakaki_aruka.customcrafter.internal.gui.allcandidate.AllCandidateUI
 import io.github.sakaki_aruka.customcrafter.internal.gui.crafting.CraftUI
+import io.github.sakaki_aruka.customcrafter.ui.AllCandidateUIDesigner
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
@@ -113,6 +114,7 @@ object AllCandidateUITest {
         CoordinateComponent.square(3).forEach { c ->
             craftUI.inventory.setItem(c.toIndex(), ItemStack(Material.STONE))
         }
+        CustomCrafterAPI.setAllCandidateUIDesigner(AllCandidateUIDesigner.DEFAULT)
 
         val view = craftUI.toView()
         val result = Search.search(
@@ -143,7 +145,7 @@ object AllCandidateUITest {
         val clickEvent = InventoryClickEvent(
             player.openInventory,
             InventoryType.SlotType.CONTAINER,
-            AllCandidateUI.NEXT,
+            AllCandidateUIDesigner.BAKED_DEFAULT.nextPageButton.first.toIndex(),
             ClickType.SHIFT_RIGHT,
             InventoryAction.NOTHING
         )
@@ -209,6 +211,7 @@ object AllCandidateUITest {
         CoordinateComponent.square(3).forEach { c ->
             craftUI.inventory.setItem(c.toIndex(), ItemStack(Material.STONE))
         }
+        CustomCrafterAPI.setAllCandidateUIDesigner(AllCandidateUIDesigner.DEFAULT)
 
         val view = craftUI.toView()
         val result = Search.search(
@@ -234,7 +237,7 @@ object AllCandidateUITest {
         val clickEvent = InventoryClickEvent(
             player.openInventory,
             InventoryType.SlotType.CONTAINER,
-            AllCandidateUI.PREVIOUS,
+            AllCandidateUIDesigner.BAKED_DEFAULT.previousPageButton.first.toIndex(),
             ClickType.SHIFT_RIGHT,
             InventoryAction.NOTHING
         )
@@ -262,6 +265,7 @@ object AllCandidateUITest {
         )
 
         assertEquals(50, result.size())
+        CustomCrafterAPI.setAllCandidateUIDesigner(AllCandidateUIDesigner.DEFAULT)
 
         val allCandidateUI = AllCandidateUI(
             view = view,
@@ -273,13 +277,14 @@ object AllCandidateUITest {
 
         player.openInventory(allCandidateUI.inventory)
         assertEquals(0, allCandidateUI.currentPage.get())
-        assertTrue(allCandidateUI.inventory.getItem(AllCandidateUI.BACK_TO_CRAFT) != null)
-        assertTrue(allCandidateUI.inventory.getItem(AllCandidateUI.BACK_TO_CRAFT)!!.isSimilar(AllCandidateUI.BACK_TO_CRAFT_BUTTON))
+        assertTrue(allCandidateUI.inventory.getItem(AllCandidateUIDesigner.BAKED_DEFAULT.backToCraftUIButton.first.toIndex()) != null)
+        assertTrue(allCandidateUI.inventory.getItem(AllCandidateUIDesigner.BAKED_DEFAULT.backToCraftUIButton.first.toIndex())!!.isSimilar(
+            AllCandidateUIDesigner.BAKED_DEFAULT.backToCraftUIButton.second))
 
         val clickEvent = InventoryClickEvent(
             player.openInventory,
             InventoryType.SlotType.CONTAINER,
-            AllCandidateUI.BACK_TO_CRAFT,
+            AllCandidateUIDesigner.BAKED_DEFAULT.backToCraftUIButton.first.toIndex(),
             ClickType.SHIFT_RIGHT,
             InventoryAction.NOTHING
         )
@@ -302,6 +307,7 @@ object AllCandidateUITest {
             craftUI.inventory.setItem(c.toIndex(), ItemStack(Material.STONE))
         }
         val view = craftUI.toView()
+        CustomCrafterAPI.setAllCandidateUIDesigner(AllCandidateUIDesigner.DEFAULT)
 
         val result = Search.search(
             crafterId = UUID.randomUUID(),
@@ -321,7 +327,7 @@ object AllCandidateUITest {
         val clickEvent = InventoryClickEvent(
             player.openInventory,
             InventoryType.SlotType.CONTAINER,
-            AllCandidateUI.BACK_TO_CRAFT,
+            AllCandidateUIDesigner.BAKED_DEFAULT.backToCraftUIButton.first.toIndex(),
             ClickType.SHIFT_RIGHT,
             InventoryAction.NOTHING
         )
@@ -344,6 +350,8 @@ object AllCandidateUITest {
         val view = craftUI.toView()
         val result = Search.search(crafterId = UUID.randomUUID(), view = view)
 
+        CustomCrafterAPI.setAllCandidateUIDesigner(AllCandidateUIDesigner.DEFAULT)
+
         val allCandidateUI = AllCandidateUI(
             view = view,
             player = server.getPlayer(0),
@@ -353,9 +361,9 @@ object AllCandidateUITest {
         )
 
         val page0 = allCandidateUI.pageContentsAt(0)
-        assertFalse(page0.containsKey(AllCandidateUI.PREVIOUS))
-        assertTrue(page0.containsKey(AllCandidateUI.NEXT))
-        assertTrue(page0.containsKey(AllCandidateUI.BACK_TO_CRAFT))
+        assertFalse(page0.containsKey(AllCandidateUIDesigner.BAKED_DEFAULT.previousPageButton.first.toIndex()))
+        assertTrue(page0.containsKey(AllCandidateUIDesigner.BAKED_DEFAULT.nextPageButton.first.toIndex()))
+        assertTrue(page0.containsKey(AllCandidateUIDesigner.BAKED_DEFAULT.backToCraftUIButton.first.toIndex()))
     }
 
     @Test
@@ -367,6 +375,8 @@ object AllCandidateUITest {
         val view = craftUI.toView()
         val result = Search.search(crafterId = UUID.randomUUID(), view = view)
 
+        CustomCrafterAPI.setAllCandidateUIDesigner(AllCandidateUIDesigner.DEFAULT)
+
         val allCandidateUI = AllCandidateUI(
             view = view,
             player = server.getPlayer(0),
@@ -376,9 +386,9 @@ object AllCandidateUITest {
         )
 
         val page1 = allCandidateUI.pageContentsAt(1)
-        assertTrue(page1.containsKey(AllCandidateUI.PREVIOUS))
-        assertFalse(page1.containsKey(AllCandidateUI.NEXT))
-        assertTrue(page1.containsKey(AllCandidateUI.BACK_TO_CRAFT))
+        assertTrue(page1.containsKey(AllCandidateUIDesigner.BAKED_DEFAULT.previousPageButton.first.toIndex()))
+        assertFalse(page1.containsKey(AllCandidateUIDesigner.BAKED_DEFAULT.nextPageButton.first.toIndex()))
+        assertTrue(page1.containsKey(AllCandidateUIDesigner.BAKED_DEFAULT.backToCraftUIButton.first.toIndex()))
     }
 
     @Test
@@ -387,6 +397,7 @@ object AllCandidateUITest {
         val items = CoordinateComponent.square(3).associateWith { _ -> matter }
         val extraRecipes = (0..<41).map { t -> CRecipeImpl("ex-$t", items, CRecipe.Type.SHAPED) }
         CustomCrafterAPI.registerRecipe(recipes = extraRecipes, MockBukkit.createMockPlugin())
+        CustomCrafterAPI.setAllCandidateUIDesigner(AllCandidateUIDesigner.DEFAULT)
 
         val craftUI = CraftUI()
         CoordinateComponent.square(3).forEach { c ->
@@ -405,8 +416,9 @@ object AllCandidateUITest {
         )
 
         val page1 = allCandidateUI.pageContentsAt(1)
-        assertTrue(page1.containsKey(AllCandidateUI.PREVIOUS))
-        assertTrue(page1.containsKey(AllCandidateUI.NEXT))
+        assertTrue(page1.containsKey(AllCandidateUIDesigner.BAKED_DEFAULT.previousPageButton.first.toIndex()))
+        assertTrue(page1.containsKey(AllCandidateUIDesigner.BAKED_DEFAULT.nextPageButton.first.toIndex()))
+        assertTrue(page1.containsKey(AllCandidateUIDesigner.BAKED_DEFAULT.backToCraftUIButton.first.toIndex()))
     }
 
     @Test
@@ -443,6 +455,7 @@ object AllCandidateUITest {
         }
         val view = craftUI.toView()
         val result = Search.search(crafterId = UUID.randomUUID(), view = view)
+        CustomCrafterAPI.setAllCandidateUIDesigner(AllCandidateUIDesigner.DEFAULT)
 
         val allCandidateUI = AllCandidateUI(
             view = view,
@@ -459,7 +472,7 @@ object AllCandidateUITest {
         val event = InventoryClickEvent(
             player.openInventory,
             InventoryType.SlotType.CONTAINER,
-            AllCandidateUI.NEXT,
+            AllCandidateUIDesigner.BAKED_DEFAULT.nextPageButton.first.toIndex(),
             ClickType.LEFT,
             InventoryAction.NOTHING
         )
@@ -477,6 +490,7 @@ object AllCandidateUITest {
         }
         val view = craftUI.toView()
         val result = Search.search(crafterId = UUID.randomUUID(), view = view)
+        CustomCrafterAPI.setAllCandidateUIDesigner(AllCandidateUIDesigner.DEFAULT)
 
         val allCandidateUI = AllCandidateUI(
             view = view,
@@ -492,7 +506,7 @@ object AllCandidateUITest {
         val event = InventoryClickEvent(
             player.openInventory,
             InventoryType.SlotType.CONTAINER,
-            AllCandidateUI.PREVIOUS,
+            AllCandidateUIDesigner.BAKED_DEFAULT.previousPageButton.first.toIndex(),
             ClickType.LEFT,
             InventoryAction.NOTHING
         )
@@ -599,6 +613,7 @@ object AllCandidateUITest {
         val view = craftUI.toView()
         val result = Search.search(crafterId = UUID.randomUUID(), view = view)
         assertEquals(45, result.size())
+        CustomCrafterAPI.setAllCandidateUIDesigner(AllCandidateUIDesigner.DEFAULT)
 
         val allCandidateUI = AllCandidateUI(
             view = view,
@@ -612,9 +627,9 @@ object AllCandidateUITest {
         assertFalse(allCandidateUI.canFlipBackPage())
 
         val page0 = allCandidateUI.pageContentsAt(0)
-        assertFalse(page0.containsKey(AllCandidateUI.NEXT))
-        assertFalse(page0.containsKey(AllCandidateUI.PREVIOUS))
-        assertTrue(page0.containsKey(AllCandidateUI.BACK_TO_CRAFT))
+        assertFalse(page0.containsKey(AllCandidateUIDesigner.BAKED_DEFAULT.nextPageButton.first.toIndex()))
+        assertFalse(page0.containsKey(AllCandidateUIDesigner.BAKED_DEFAULT.previousPageButton.first.toIndex()))
+        assertTrue(page0.containsKey(AllCandidateUIDesigner.BAKED_DEFAULT.backToCraftUIButton.first.toIndex()))
     }
 
     @Test
@@ -632,6 +647,7 @@ object AllCandidateUITest {
         val view = craftUI.toView()
         val result = Search.search(crafterId = UUID.randomUUID(), view = view)
         assertEquals(1, result.size())
+        CustomCrafterAPI.setAllCandidateUIDesigner(AllCandidateUIDesigner.DEFAULT)
 
         val allCandidateUI = AllCandidateUI(
             view = view,
@@ -645,8 +661,9 @@ object AllCandidateUITest {
         assertFalse(allCandidateUI.canFlipBackPage())
 
         val page0 = allCandidateUI.pageContentsAt(0)
-        assertFalse(page0.containsKey(AllCandidateUI.NEXT))
-        assertFalse(page0.containsKey(AllCandidateUI.PREVIOUS))
+        assertFalse(page0.containsKey(AllCandidateUIDesigner.BAKED_DEFAULT.nextPageButton.first.toIndex()))
+        assertFalse(page0.containsKey(AllCandidateUIDesigner.BAKED_DEFAULT.previousPageButton.first.toIndex()))
+        assertTrue(page0.containsKey(AllCandidateUIDesigner.BAKED_DEFAULT.backToCraftUIButton.first.toIndex()))
         assertEquals(1, (0..<45).count { page0.containsKey(it) })
     }
 }
