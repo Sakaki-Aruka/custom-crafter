@@ -11,11 +11,13 @@ import org.bukkit.event.HandlerList
  *
  * @param[recipes] registered recipe.
  * @param[registeredBy] A plugin metadata that registered recipes.
+ * @param[isAsync] Called from async or not (since 5.2.0)
  */
 class RegisterCustomRecipeEvent(
     val recipes: List<CRecipe>,
-    private val registeredBy: PluginMeta
-): Event() {
+    private val registeredBy: PluginMeta,
+    isAsync: Boolean
+): Event(isAsync) {
     companion object {
         @JvmField
         val HANDLER_LIST: HandlerList = HandlerList()

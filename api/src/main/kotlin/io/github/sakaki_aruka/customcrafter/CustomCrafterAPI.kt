@@ -627,6 +627,7 @@ object CustomCrafterAPI {
      *
      * @param[recipes] Recipes to register
      * @param[plugin] Plugin instance registering the recipes
+     * @param[calledAsync] Called from async processing or not. (Default = false)
      * @throws[IllegalArgumentException] if [recipes] contains duplicate names under the current strict level
      * @throws[IllegalStateException] if any recipe in [recipes] is invalid
      */
@@ -635,6 +636,7 @@ object CustomCrafterAPI {
     fun registerRecipe(
         recipes: List<CRecipe>,
         plugin: JavaPlugin = CustomCrafter.getInstance(),
+        calledAsync: Boolean = false
     ) {
         if (recipes.isEmpty()) {
             return
@@ -666,7 +668,7 @@ object CustomCrafterAPI {
             }
         }
 
-        RegisterCustomRecipeEvent(recipes.toList(), plugin.pluginMeta).callEvent()
+        RegisterCustomRecipeEvent(recipes.toList(), plugin.pluginMeta, calledAsync).callEvent()
     }
 
     /**
@@ -677,10 +679,15 @@ object CustomCrafterAPI {
      * @param[plugin] Plugin instance to filter by registering plugin.
      *   Defaults to [CustomCrafter.getInstance], targeting recipes registered without an explicit plugin.
      *   Pass `null` to exclude the plugin from the filter criteria.
+     * @param[calledAsync] Called from async processing or not. (Default = false)
      */
     @JvmStatic
     @JvmOverloads
-    fun unregisterRecipe(name: String? = null, plugin: JavaPlugin? = CustomCrafter.getInstance()) {
+    fun unregisterRecipe(
+        name: String? = null,
+        plugin: JavaPlugin? = CustomCrafter.getInstance(),
+        calledAsync: Boolean = false
+    ) {
         val unregisteredRecipes: MutableList<CRecipe> = mutableListOf()
 
         if (name == null && plugin == null) {
@@ -701,7 +708,7 @@ object CustomCrafterAPI {
                     }
                 }
             }
-            UnregisterCustomRecipeEvent(unregisteredRecipes.toList()).callEvent()
+            UnregisterCustomRecipeEvent(unregisteredRecipes.toList(), calledAsync).callEvent()
             return
         }
 
@@ -711,22 +718,23 @@ object CustomCrafterAPI {
                 unregisteredRecipes.addAll(list.map { wrapper -> wrapper.recipe })
             }
         }
-        UnregisterCustomRecipeEvent(unregisteredRecipes.toList()).callEvent()
+        UnregisterCustomRecipeEvent(unregisteredRecipes.toList(), calledAsync).callEvent()
     }
 
     /**
      * Unregisters all registered recipes.
      *
+     * @param[calledAsync] Called from async processing or not. (Default = false)
      * @since 5.0.16
      */
     @JvmStatic
-    fun unregisterAllRecipes() {
+    fun unregisterAllRecipes(calledAsync: Boolean = false) {
         val removedRecipes: MutableList<CRecipe> = mutableListOf()
         synchronized(recipes) {
             recipes.forEach { (_, wrappers) -> removedRecipes.addAll(wrappers.map { it.recipe }) }
             recipes.clear()
         }
-        UnregisterCustomRecipeEvent(removedRecipes).callEvent()
+        UnregisterCustomRecipeEvent(removedRecipes, calledAsync).callEvent()
     }
 
     private val allCandidateUIDesigner: AtomicReference<AllCandidateUIDesigner> = AtomicReference(AllCandidateUIDesigner.DEFAULT)

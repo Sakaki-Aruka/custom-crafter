@@ -8,10 +8,12 @@ import org.bukkit.event.HandlerList
  * Called when a recipe unregistered.
  *
  * @param[recipes] registered recipe.
+ * @param[isAsync] Called from async or not (since 5.2.0)
  */
 class UnregisterCustomRecipeEvent(
-    val recipes: List<CRecipe>
-): Event() {
+    val recipes: List<CRecipe>,
+    isAsync: Boolean
+): Event(isAsync) {
     companion object {
         @JvmField
         val HANDLER_LIST: HandlerList = HandlerList()
