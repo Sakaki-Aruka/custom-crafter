@@ -15,6 +15,8 @@ There are three customizable elements:
 | `makeButton(context)` | Slot coordinates and icon item for the craft button |
 | `blankSlots(context)` | Mapping of non-clickable decorative slot coordinates to their icon items |
 
+All methods have default implementations, so you only need to override the ones you want to customize.
+
 All methods receive a `CraftUIDesigner.Context`, so you can reference `context.player` to return a different design for each player.
 
 :::note
@@ -26,7 +28,7 @@ The craft slots (6×6) must occupy the 36 cells that are not the craft button or
 
 ## Default Implementation
 
-To reset the configuration, call `CustomCrafterAPI.setCraftUIDesignerDefault()`.
+To reset the configuration, call `CustomCrafterAPI.setCraftUIDesigner(CustomCrafterAPI.DEFAULT_CRAFT_UI_DESIGNER)`.
 
 The default layout is as follows:
 - Craft button: index `35` (anvil icon)
@@ -111,7 +113,7 @@ class MyPlugin : JavaPlugin() {
 
     override fun onDisable() {
         // Reset to default to avoid affecting other plugins
-        CustomCrafterAPI.setCraftUIDesignerDefault()
+        CustomCrafterAPI.setCraftUIDesigner(CustomCrafterAPI.DEFAULT_CRAFT_UI_DESIGNER)
     }
 }
 ```
@@ -124,7 +126,7 @@ class MyPlugin : JavaPlugin() {
 
 ```kotlin
 val context = CraftUIDesigner.Context(player = null)
-val baked: CraftUIDesigner.Baked = CraftUIDesigner.bake(myDesigner, context)
+val baked: CraftUIDesigner.Baked = myDesigner.bake(context)
 ```
 
 The main methods provided by `Baked` are as follows:
@@ -136,6 +138,6 @@ The main methods provided by `Baked` are as follows:
 | `isValid()` | Validates whether the craft slots form a 6×6 square |
 
 :::note
-When `setCraftUIDesigner` is called, `CraftUIDesigner.bake(designer, Context(null))` is executed internally and an `isValid()` check is performed.
+When `setCraftUIDesigner` is called, `designer.bake(Context(player = null))` is executed internally and an `isValid()` check is performed.
 If the craft slots do not form a 6×6 square of 36 slots, an exception is thrown and the designer registration fails.
 :::

@@ -30,7 +30,7 @@ When `saveLimit = true`, if the item count exceeds the maximum stack size for th
 ### Usage Example
 
 ```kotlin
-import io.github.sakaki_aruka.customcrafter.impl.util.InventoryUtil.giveItems
+import io.github.sakaki_aruka.customcrafter.util.InventoryUtil.giveItems
 
 // Give the player 64 diamonds
 player.giveItems(ItemStack.of(Material.DIAMOND, 64))

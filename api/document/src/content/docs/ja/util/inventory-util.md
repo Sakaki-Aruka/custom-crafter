@@ -30,7 +30,7 @@ fun Player.giveItems(
 ### 使用例
 
 ```kotlin
-import io.github.sakaki_aruka.customcrafter.impl.util.InventoryUtil.giveItems
+import io.github.sakaki_aruka.customcrafter.util.InventoryUtil.giveItems
 
 // ダイヤモンド 64 個をプレイヤーに付与する
 player.giveItems(ItemStack.of(Material.DIAMOND, 64))
