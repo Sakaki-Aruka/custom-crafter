@@ -188,7 +188,8 @@ val customResult = ResultSupplier { ctx ->
 | `UI_CLOSED` | 書き戻し前に CraftUI が閉じられた |
 | `PLAYER_OFFLINE` | `supply()` 呼び出し時にプレイヤーがオフラインだった |
 | `TIMEOUT` | `timeoutMilli()` ミリ秒以内にエンティティスケジューラが実行されなかった |
-| `UNKNOWN` | `replaceQueries()` の完了前にタイムアウトした |
+| `OUT_OF_SLOTS_AREA` | 対象の座標が `CraftUIDesigner.Baked.craftSlots` で定義されたクラフトスロット外のため書き戻しをスキップした |
+| `UNKNOWN` | 将来の利用のために予約されており、現在の実装では設定されない |
 
 ### timeoutMilli()
 
