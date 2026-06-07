@@ -53,6 +53,7 @@ jobs:
           TAG_NAME: ${{ steps.get_version.outputs.VERSION }}
         run: |
           mvn -pl api clean install -ntp && mvn -pl demo clean package -ntp
+          mv demo/target/demo-$TAG_NAME.jar demo/target/custom-crafter-api-demo-$TAG_NAME.jar
           
           cat <<EOF > release-note
           **This release is accompanied by two attached files.**  
