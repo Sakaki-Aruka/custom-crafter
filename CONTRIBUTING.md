@@ -75,7 +75,7 @@ custom-crafter/
 │   │   ├── recipe/         # CRecipe interfaces and implementations
 │   │   ├── result/         # ResultSupplier types
 │   │   ├── search/         # Search interfaces (PartialSearch, VanillaSearch)
-│   │   ├── ui/             # UI design API (CraftUIDesigner)
+│   │   ├── ui/             # UI design API (*UIDesigner)
 │   │   ├── util/           # Utility helpers
 │   │   ├── internal/       # Internal plugin logic — excluded from KDoc, not for external use
 │   │   ├── CustomCrafter.kt         # JavaPlugin entry point

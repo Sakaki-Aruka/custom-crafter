@@ -185,7 +185,8 @@ Each slot's outcome is reported as a `ReplaceState` value:
 | `UI_CLOSED` | The CraftUI was closed before write-back could complete |
 | `PLAYER_OFFLINE` | The player was offline when `supply()` was called |
 | `TIMEOUT` | The entity scheduler did not execute within `timeoutMilli()` milliseconds |
-| `UNKNOWN` | The operation timed out before `replaceQueries()` returned |
+| `OUT_OF_SLOTS_AREA` | The target coordinate is outside the craft slots defined by `CraftUIDesigner.Baked.craftSlots`; the write-back was skipped |
+| `UNKNOWN` | Reserved for future use; not set by the current implementation |
 
 ### timeoutMilli()
 

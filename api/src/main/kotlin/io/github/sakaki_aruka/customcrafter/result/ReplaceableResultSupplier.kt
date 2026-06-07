@@ -58,7 +58,7 @@ interface ReplaceableResultSupplier: ResultSupplier {
         val results: MutableMap<CoordinateComponent, ReplaceState> = ConcurrentHashMap()
         val usedQueries: Map<CoordinateComponent, ItemStack> = this.replaceQueries(replaceContext)
         CompletableFuture.supplyAsync({
-            val player: Player = Bukkit.getPlayer(ctx.crafterID)
+            val player: Player = Bukkit.getPlayer(ctx.crafterId)
                 ?: return@supplyAsync results.putAll(usedQueries.keys.associateWith { ReplaceState.PLAYER_OFFLINE })
             try {
                 InternalAPI.foliaLib.scheduler.runAtEntity(player) {
@@ -150,7 +150,7 @@ interface ReplaceableResultSupplier: ResultSupplier {
         val mapped: Map<CoordinateComponent, ItemStack> = sourceContext.mapped
         val shiftClicked: Boolean = sourceContext.shiftClicked
         val calledTimes: Int = sourceContext.calledTimes
-        val crafterID: UUID = sourceContext.crafterID
+        val crafterId: UUID = sourceContext.crafterId
         val callMode: ResultSupplier.Context.CallMode = sourceContext.callMode
     }
 

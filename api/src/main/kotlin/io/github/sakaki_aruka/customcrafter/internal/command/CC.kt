@@ -21,8 +21,7 @@ internal object CC {
      * - Get Part
      * Format: "${ELEMENT_NAME}: ${ELEMENT_VALUE}"
      *   - API_VERSION
-     *   - IS_STABLE
-     *   - IS_BETA
+     *   - RELEASE_STAGE
      *   - AUTHORS
      *   - RESULT_GIVE_CANCEL
      *   - BASE_BLOCK
@@ -53,14 +52,9 @@ internal object CC {
                 ctx.msg("API_VERSION: ${CustomCrafterAPI.API_VERSION}")
                 return@executes SINGLE_SUCCESS
             }
-        ).then(Commands.literal("is-stable")
+        ).then(Commands.literal("release-stage")
             .executes { ctx ->
-                ctx.msg("IS_STABLE: ${CustomCrafterAPI.IS_STABLE}")
-                return@executes SINGLE_SUCCESS
-            }
-        ).then(Commands.literal("is-beta")
-            .executes { ctx ->
-                ctx.msg("IS_BETA: ${CustomCrafterAPI.IS_BETA}")
+                ctx.msg("RELEASE_STAGE: ${CustomCrafterAPI.VERSION_TYPE.type}")
                 return@executes SINGLE_SUCCESS
             }
         ).then(Commands.literal("authors")

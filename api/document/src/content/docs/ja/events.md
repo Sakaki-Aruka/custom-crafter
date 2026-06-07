@@ -151,6 +151,32 @@ class PropertiesChangeListener : Listener {
 
 ---
 
+### 実装例: 複数プロパティをまとめて監視する
+
+```kotlin
+class AllPropertiesChangeListener : Listener {
+    @EventHandler
+    fun <T> onPropertiesChange(event: CustomCrafterAPIPropertiesChangeEvent<T>) {
+        when (event.propertyName) {
+            CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK.propertyName -> {
+                val newValue = event.newValue.getOrNull(
+                    CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK
+                )
+                println("ベースブロック変更: $newValue")
+            }
+            CustomCrafterAPIPropertiesChangeEvent.PropertyKey.USE_CUSTOM_CRAFT_UI.propertyName -> {
+                val newValue = event.newValue.getOrNull(
+                    CustomCrafterAPIPropertiesChangeEvent.PropertyKey.USE_CUSTOM_CRAFT_UI
+                )
+                println("カスタム UI 有効化: $newValue")
+            }
+        }
+    }
+}
+```
+
+---
+
 ## CraftInputInterruptEvent
 
 クラフト処理（レシピ検索または成果物生成）が進行中に、プレイヤーが入力スロットを操作したり CraftUI を閉じたりして、処理が中断されたときに発火します。
@@ -193,26 +219,30 @@ class PreventDoubleCraftListener : Listener {
 
 ---
 
-### 実装例: 複数プロパティをまとめて監視する
+## ResultItemGiveFailEvent
+
+CustomCrafterAPI がプレイヤーへの成果物アイテムの付与に 1 件以上失敗したとき（例: インベントリが満杯のとき）に発火します。
+このイベントはキャンセル不可です。
+
+`getResultsIfNotObtained()` で未付与アイテムを取得して、自前の配布処理を行えます。
+一度取得した後は `getResultsIfNotObtained()` が `null` を返すようになります。
+
+| プロパティ / メソッド | 型 | 概要 |
+|------------|-----|------|
+| `usedSupplierContext` | `ResultSupplier.Context?` | アイテムを生成した `ResultSupplier` のコンテキスト。取得できない場合は `null` |
+| `getResultsIfNotObtained()` | `List<ItemStack>?` | 未配布アイテムを返しつつ取得済みとしてマークする。すでに取得済みの場合は `null` |
+| `isResultObtained()` | `Boolean` | アイテムがすでに取得済みかどうかを返す |
 
 ```kotlin
-class AllPropertiesChangeListener : Listener {
+class ResultGiveFailListener : Listener {
     @EventHandler
-    fun <T> onPropertiesChange(event: CustomCrafterAPIPropertiesChangeEvent<T>) {
-        when (event.propertyName) {
-            CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK.propertyName -> {
-                val newValue = event.newValue.getOrNull(
-                    CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK
-                )
-                println("ベースブロック変更: $newValue")
-            }
-            CustomCrafterAPIPropertiesChangeEvent.PropertyKey.USE_CUSTOM_CRAFT_UI.propertyName -> {
-                val newValue = event.newValue.getOrNull(
-                    CustomCrafterAPIPropertiesChangeEvent.PropertyKey.USE_CUSTOM_CRAFT_UI
-                )
-                println("カスタム UI 有効化: $newValue")
-            }
-        }
+    fun onResultGiveFail(event: ResultItemGiveFailEvent) {
+        val items: List<ItemStack> = event.getResultsIfNotObtained() ?: return
+
+        // フォールバック: プレイヤーの場所にアイテムをドロップする
+        val player = event.usedSupplierContext?.crafterID
+            ?.let { Bukkit.getPlayer(it) } ?: return
+        items.forEach { player.world.dropItemNaturally(player.location, it) }
     }
 }
 ```

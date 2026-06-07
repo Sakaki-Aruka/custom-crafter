@@ -1,6 +1,7 @@
 package io.github.sakaki_aruka.customcrafter.event
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
+import io.github.sakaki_aruka.customcrafter.ui.AllCandidateUIDesigner
 import io.github.sakaki_aruka.customcrafter.ui.CraftUIDesigner
 import org.bukkit.Material
 import org.bukkit.event.Event
@@ -33,7 +34,7 @@ import org.bukkit.event.HandlerList
  * public class PropertiesChangeListener implements Listener {
  *     @EventHandler
  *     public void <T> onChange(CustomCrafterAPIPropertiesChangeEvent<T> event) {
- *         String baseKey = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.Companion.BASE_BLOCK;
+ *         String baseKey = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK;
  *         if (!event.getPropertyName().equals(baseKey.getName())) {
  *             return;
  *         }
@@ -41,7 +42,7 @@ import org.bukkit.event.HandlerList
  *         if (baseTypeOld == null) {
  *             return;
  *         }
- *         CustomCrafterAPI.INSTANCE.setBaseBlock(baseTypeOld);
+ *         CustomCrafterAPI.setBaseBlock(baseTypeOld);
  *         System.out.println("I rejected new setting... Hahaha!!!");
  *     }
  * }
@@ -111,6 +112,10 @@ class CustomCrafterAPIPropertiesChangeEvent<T> (
             val BASE_BLOCK_SIDE = PropertyKey<Int>("BASE_BLOCK_SIDE")
             @JvmField
             val CRAFT_UI_DESIGNER = PropertyKey<CraftUIDesigner>("CRAFT_UI_DESIGNER")
+            @JvmField
+            val ALL_CANDIDATE_UI_DESIGNER = PropertyKey<AllCandidateUIDesigner>("ALL_CANDIDATE_UI_DESIGNER")
+            @JvmField
+            val RECIPE_NAME_STRICT_LEVEL = PropertyKey<CustomCrafterAPI.NameStrictLevel>("RECIPE_NAME_STRICT_LEVEL")
         }
     }
 

@@ -1,11 +1,15 @@
 package io.github.sakaki_aruka.customcrafter.ui
 
 import io.github.sakaki_aruka.customcrafter.recipe.CoordinateComponent
-import io.github.sakaki_aruka.customcrafter.util.Converter
+import io.github.sakaki_aruka.customcrafter.util.Converter.toComponent
 import net.kyori.adventure.text.Component
+import org.bukkit.Material
+import org.bukkit.NamespacedKey
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
+import org.bukkit.persistence.PersistentDataType
+import java.util.UUID
 
 /**
  * UI builder for CraftUI
@@ -20,7 +24,9 @@ interface CraftUIDesigner {
      * @return[Component] Component of UI title (net.kyori.adventure)
      * @since 5.0.16
      */
-    fun title(context: Context): Component
+    fun title(context: Context): Component {
+        return "Custom Crafter".toComponent()
+    }
 
     /**
      * Make button slot coordinate and make button item (icon)
@@ -28,7 +34,16 @@ interface CraftUIDesigner {
      * @return[Pair] Pair of coordinate and item
      * @since 5.0.16
      */
-    fun makeButton(context: Context): Pair<CoordinateComponent, ItemStack>
+    fun makeButton(context: Context): Pair<CoordinateComponent, ItemStack> {
+        return Pair(
+            CoordinateComponent.fromIndex(DEFAULT_MAKE_BUTTON),
+            ItemStack.of(Material.ANVIL).apply {
+                itemMeta = itemMeta.apply {
+                    customName("Making items".toComponent())
+                }
+            }
+        )
+    }
 
     /**
      * Blank slots coordinates and those item(icon)s
@@ -36,14 +51,67 @@ interface CraftUIDesigner {
      * @return[Map] Relation of coordinate and item
      * @since 5.0.16
      */
-    fun blankSlots(context: Context): Map<CoordinateComponent, ItemStack>
+    fun blankSlots(context: Context): Map<CoordinateComponent, ItemStack> {
+        val blank = ItemStack.of(Material.BLACK_STAINED_GLASS_PANE).apply {
+            itemMeta = itemMeta.apply {
+                displayName(Component.empty())
+
+                // An additional datum to prevent accidental menu operation
+                persistentDataContainer.set(
+                    NamespacedKey("custom_crafter", UUID.randomUUID().toString()),
+                    PersistentDataType.STRING,
+                    UUID.randomUUID().toString()
+                )
+            }
+        }
+
+        return (0..<54)
+            .filter { it % 9 >= 6 }
+            .minus(DEFAULT_MAKE_BUTTON)
+            .associate { CoordinateComponent.fromIndex(it) to blank }
+    }
+
+
+    companion object {
+        const val DEFAULT_MAKE_BUTTON = 35
+
+        val DEFAULT: CraftUIDesigner = object : CraftUIDesigner {}
+
+        /**
+         * Bake a designer with specified context.
+         * @param[context] Context for baking
+         * @return[Baked] Baked designer
+         * @since 5.0.16
+         */
+        fun CraftUIDesigner.bake(context: Context): Baked {
+            return Baked(
+                title = this.title(context),
+                makeButton = this.makeButton(context),
+                blankSlots = this.blankSlots(context)
+            )
+        }
+
+        /**
+         * Bake with [Context.NULL_CONTEXT]
+         * @return[Baked] Baked designer
+         * @since 5.2.0
+         */
+        fun CraftUIDesigner.bakeWithNullContext(): Baked {
+            return this.bake(Context.NULL_CONTEXT)
+        }
+    }
 
     /**
      * Context for [CraftUIDesigner].
      * @param[player] UI opener or null
      * @since 5.0.16
      */
-    data class Context (val player: Player? = null)
+    data class Context (val player: Player? = null) {
+        companion object {
+            @JvmField
+            val NULL_CONTEXT = Context()
+        }
+    }
 
     /**
      * BakedDesigner: An immutable CraftUIDesigner with a set (baked) value.
@@ -108,7 +176,7 @@ interface CraftUIDesigner {
                         Current Coordinates: ('_': Blank, Result or MakeButton Slots, '#': Craft Slots)
                     """.trimIndent()
                             + System.lineSeparator()
-                            + Converter.getComponentsShapeString(
+                            + CoordinateComponent.getComponentsShapeString(
                         (0..<54).map { CoordinateComponent.fromIndex(it) }
                             .minus(craftSlots.toSet()))
                 ))
@@ -119,26 +187,6 @@ interface CraftUIDesigner {
             }
 
             return Result.success(Unit)
-        }
-    }
-
-    companion object {
-        /**
-         * Bake a specified designer
-         * @param[designer] UI designer
-         * @param[context] Context for baking
-         * @return[Baked] Baked designer
-         * @since 5.0.16
-         */
-        fun bake(
-            designer: CraftUIDesigner,
-            context: Context
-        ): Baked {
-            return Baked(
-                title = designer.title(context),
-                makeButton = designer.makeButton(context),
-                blankSlots = designer.blankSlots(context)
-            )
         }
     }
 }

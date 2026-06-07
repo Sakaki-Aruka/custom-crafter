@@ -248,5 +248,57 @@ data class CoordinateComponent(
             }
             return result.toMap()
         }
+
+        /**
+         * ※ This is a high cost function.
+         *
+         * ```kotlin
+         * val list = CoordinateComponent.squareFill(3)
+         * println(Converter.getComponentsShapeString(list))
+         * // -> OUTPUT
+         * // ###
+         * // ###
+         * // ###
+         * ```
+         *
+         * ```kotlin
+         * val list = CoordinateComponent.square(3)
+         * println(Converter.getComponentsShapeString(list))
+         * // -> OUTPUT
+         * // ###
+         * // #_#
+         * // ###
+         * ```
+         *
+         * @param[list] List of coordinates
+         * @param[existsSlotChar] This is a char what is used on coordinate exists. Default = `#`.
+         * @param[notExistsSlotChar] This is a char what is used on coordinate NOT exists. Default = `_`.
+         * @return[String] Shape
+         * @since 5.0.16
+         */
+        @JvmStatic
+        @JvmOverloads
+        fun getComponentsShapeString(
+            list: Collection<CoordinateComponent>,
+            existsSlotChar: Char = '#',
+            notExistsSlotChar: Char = '_'
+        ): String {
+            val minX = list.minOf { it.x }
+            val minY = list.minOf { it.y }
+            val maxX = list.maxOf { it.x }
+            val maxY = list.maxOf { it.y }
+
+            val builder = StringBuilder()
+            (minY..maxY).forEach { y ->
+                (minX..maxX).forEach { x ->
+                    builder.append(
+                        if (list.contains(CoordinateComponent(x, y))) existsSlotChar
+                        else notExistsSlotChar
+                    )
+                }
+                if (y != maxY) builder.append(System.lineSeparator())
+            }
+            return builder.toString()
+        }
     }
 }

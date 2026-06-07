@@ -17,7 +17,7 @@ fun interface CRecipePredicate {
      * Context for [CRecipePredicate]
      *
      * @param[input] Inspection target
-     * @param[crafterID] Crafter UUID
+     * @param[crafterId] Crafter UUID
      * @param[recipe] Recipe
      * @param[relation] Pre-result of inspection
      * @param[asyncContext] Async context (since 5.0.20). When non-null, [test] implementations should periodically check [AsyncContext.isInterrupted] and return early if true.
@@ -25,7 +25,7 @@ fun interface CRecipePredicate {
      */
     class Context @JvmOverloads constructor(
         val input: CraftView,
-        val crafterID: UUID,
+        val crafterId: UUID,
         val recipe: CRecipe,
         val relation: MappedRelation,
         val asyncContext: AsyncContext? = null
@@ -58,7 +58,7 @@ fun interface CRecipePredicate {
          */
         fun copyWith(asyncContext: AsyncContext? = null): Context {
             val newAsyncContext = asyncContext ?: this.asyncContext
-            return Context(input, crafterID, recipe, relation, newAsyncContext)
+            return Context(input, crafterId, recipe, relation, newAsyncContext)
         }
     }
 

@@ -38,8 +38,7 @@ val view = CraftView(
 fun search(
     crafterID: UUID,
     view: CraftView,
-    forceSearchVanillaRecipe: Boolean = true,
-    onlyFirst: Boolean = false,
+    searchQuery: SearchQuery = SearchQuery.DEFAULT,
     sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes()
 ): SearchResult
 ```
@@ -52,8 +51,7 @@ In such cases, using `asyncSearch` (described below) is recommended.
 |----------|-------------|
 | `crafterID` | The UUID of the player performing the craft |
 | `view` | The arrangement of input items |
-| `forceSearchVanillaRecipe` | When `true`, always searches vanilla recipes. When `false` and a custom recipe is found, vanilla is not searched |
-| `onlyFirst` | When `true`, returns only the first matching custom recipe |
+| `searchQuery` | Controls search behavior (search mode and vanilla search mode). Defaults to `SearchQuery.DEFAULT` |
 | `sourceRecipes` | The list of recipes to search (defaults to all registered recipes) |
 
 ```kotlin
@@ -141,11 +139,21 @@ val query = Search.SearchQuery(
 val future = Search.asyncSearch(player.uniqueId, view, query)
 ```
 
+### Predefined query constants
+
+| Constant / Method | Description |
+|---|---|
+| `SearchQuery.DEFAULT` | Default query for `search()`: `SearchMode.ALL`, `VanillaSearchMode.IF_CUSTOMS_NOT_FOUND`, no async context |
+| `SearchQuery.ASYNC_DEFAULT` | Default query for `asyncSearch()`: same as `DEFAULT` but with an async context enabled |
+| `SearchQuery.defaultModeOf(asyncContext)` | Returns a query with the same search and vanilla modes as `DEFAULT`, but with the supplied `asyncContext` |
+
 ---
 
 ## SearchResult
 
 `SearchResult` is the class that holds the search results.
+
+`SearchResult.EMPTY` is a pre-built constant representing an empty result (no vanilla recipe, no custom recipes).
 
 | Method | Return type | Description |
 |--------|-------------|-------------|
@@ -153,6 +161,7 @@ val future = Search.asyncSearch(player.uniqueId, view, query)
 | `customs()` | `List<Pair<CRecipe, MappedRelation>>` | The list of matching custom recipes and their coordinate mappings |
 | `size()` | `Int` | The total number of matches across vanilla and custom recipes |
 | `getMergedResults()` | `List<Pair<CRecipe, MappedRelation?>>` | A combined list of vanilla and custom results. The vanilla entry has `null` for `MappedRelation` |
+| `getMergedResults(view)` | `List<Pair<CRecipe, MappedRelation>>` | A combined list of vanilla and custom results, with the vanilla recipe's `MappedRelation` computed against `view`. All entries carry a concrete relation |
 
 ```kotlin
 val result: Search.SearchResult = Search.search(player.uniqueId, view)
@@ -245,6 +254,17 @@ Each entry in the returned list implements `PartialSearchResult`:
 
 `PartialShapedResult` is returned for shaped recipes and includes a `relation: MappedRelation`.
 `PartialShapelessResult` is returned for shapeless recipes and exposes `weakRelations()` — a matter-keyed map of compatible input slots.
+
+### MatchState
+
+| Value | Description |
+|-------|-------------|
+| `ALL` | Every required recipe slot is covered by a corresponding input item |
+| `PARTIAL_NOT_ENOUGH` | One or more required recipe slots have no matching input item |
+
+| Method | Return type | Description |
+|--------|-------------|-------------|
+| `isPartialMatch()` | `Boolean` | Returns `true` when this state is not `ALL` |
 
 ### Example
 

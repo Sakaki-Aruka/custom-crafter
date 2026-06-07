@@ -35,7 +35,7 @@ fun interface CMatterPredicate {
      * @param[input] Inspection target
      * @param[mapped] User input items mapping
      * @param[recipe] A CRecipe what contains a CMatterPredicate who receives this
-     * @param[crafterID] Crafter UUID
+     * @param[crafterId] Crafter UUID
      * @param[asyncContext] Async context. When non-null, [test] implementations should periodically check [AsyncContext.isInterrupted] and return early if true.
      * @see[CMatterPredicate]
      */
@@ -45,7 +45,7 @@ fun interface CMatterPredicate {
         val input: ItemStack,
         val mapped: Map<CoordinateComponent, ItemStack>,
         val recipe: CRecipe,
-        val crafterID: UUID,
+        val crafterId: UUID,
         val asyncContext: AsyncContext? = null
     ) {
         /**
@@ -85,7 +85,7 @@ fun interface CMatterPredicate {
                 input = this.input,
                 mapped = this.mapped,
                 recipe = this.recipe,
-                crafterID = this.crafterID,
+                crafterId = this.crafterId,
                 asyncContext = asyncContext
             )
         }

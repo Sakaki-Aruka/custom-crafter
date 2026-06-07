@@ -193,6 +193,36 @@ class PreventDoubleCraftListener : Listener {
 
 ---
 
+## ResultItemGiveFailEvent
+
+Fired when CustomCrafterAPI fails to deliver one or more result items to the player (for example, when the player's inventory is full).
+This event is not cancellable.
+
+Use `getResultsIfNotObtained()` to claim the remaining items and handle delivery yourself.
+Once claimed, subsequent calls to `getResultsIfNotObtained()` return `null`.
+
+| Property / Method | Type | Description |
+|------------|-----|------|
+| `usedSupplierContext` | `ResultSupplier.Context?` | The context used by the `ResultSupplier` that produced the items; `null` if unavailable |
+| `getResultsIfNotObtained()` | `List<ItemStack>?` | Returns the undistributed items and marks them as obtained. Returns `null` if already claimed |
+| `isResultObtained()` | `Boolean` | Returns whether the items have already been claimed |
+
+```kotlin
+class ResultGiveFailListener : Listener {
+    @EventHandler
+    fun onResultGiveFail(event: ResultItemGiveFailEvent) {
+        val items: List<ItemStack> = event.getResultsIfNotObtained() ?: return
+
+        // Fall back: drop items at the player's location
+        val player = event.usedSupplierContext?.crafterID
+            ?.let { Bukkit.getPlayer(it) } ?: return
+        items.forEach { player.world.dropItemNaturally(player.location, it) }
+    }
+}
+```
+
+---
+
 ### Example: Monitoring Multiple Properties Together
 
 ```kotlin

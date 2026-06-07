@@ -14,11 +14,20 @@ import java.util.UUID
 fun interface ResultSupplier {
     /**
      * Supplies result items.
+     *
+     * Implementations should respect [Context.callMode].
+     * This value distinguishes whether the call is for delivering items to the player ([Context.CallMode.CRAFT])
+     * or for generating a display icon only ([Context.CallMode.ICON]).
+     * The two modes have entirely different requirements; for [Context.CallMode.ICON] calls, prefer returning
+     * a fixed item or one that requires only lightweight computation, as the result is never given to the player.
+     * However, even in [Context.CallMode.ICON] mode, ensure the returned item is distinguishable from those of other recipes.
+     *
      * If [Context.asyncContext] is non-null, periodically check [AsyncContext.isInterrupted] and return early when true to support cooperative cancellation.
      *
      * When [Context.isAsync] returns `true`, this method is invoked off the main thread.
      * Avoid calling Bukkit API that requires the main thread directly; use a scheduler (e.g. FoliaLib) if main-thread access is needed.
      *
+     * @see[Context.CallMode]
      * @param[ctx] Context of supply
      * @return[List] Result items
      */
@@ -69,8 +78,9 @@ fun interface ResultSupplier {
     /**
      * This class contains ResultSupplier parameters.
      *
+     * @ses[CallMode]
      * @param[recipe] A CRecipe instance what contains this
-     * @param[crafterID] Crafter UUID
+     * @param[crafterId] Crafter UUID
      * @param[relation] Coordinate mapping between a [CRecipe] and an input Inventory
      * @param[mapped] Coordinates and input items mapping
      * @param[shiftClicked] Shift-clicked or not
@@ -84,7 +94,7 @@ fun interface ResultSupplier {
         val mapped: Map<CoordinateComponent, ItemStack>,
         val shiftClicked: Boolean,
         val calledTimes: Int,
-        val crafterID: UUID,
+        val crafterId: UUID,
         val callMode: CallMode,
         val asyncContext: AsyncContext? = null
     ) {
@@ -110,7 +120,7 @@ fun interface ResultSupplier {
          * @since 5.0.20
          */
         fun copyWith(asyncContext: AsyncContext? = null): Context {
-            return Context(recipe, relation, mapped, shiftClicked, calledTimes, crafterID, callMode, asyncContext)
+            return Context(recipe, relation, mapped, shiftClicked, calledTimes, crafterId, callMode, asyncContext)
         }
 
         /**

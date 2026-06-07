@@ -38,8 +38,7 @@ val view = CraftView(
 fun search(
     crafterID: UUID,
     view: CraftView,
-    forceSearchVanillaRecipe: Boolean = true,
-    onlyFirst: Boolean = false,
+    searchQuery: SearchQuery = SearchQuery.DEFAULT,
     sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes()
 ): SearchResult
 ```
@@ -52,8 +51,7 @@ fun search(
 |------|------|
 | `crafterID` | クラフトを実行するプレイヤーの UUID |
 | `view` | 入力されたアイテムの配置 |
-| `forceSearchVanillaRecipe` | `true` の場合は常にバニラレシピを検索する。`false` かつカスタムレシピが見つかった場合はバニラを検索しない |
-| `onlyFirst` | `true` にすると最初に合致したカスタムレシピのみ返す |
+| `searchQuery` | 検索動作（検索モードおよびバニラ検索モード）を制御する。デフォルトは `SearchQuery.DEFAULT` |
 | `sourceRecipes` | 検索対象のレシピリスト (デフォルトは登録済み全レシピ) |
 
 ```kotlin
@@ -141,11 +139,21 @@ val query = Search.SearchQuery(
 val future = Search.asyncSearch(player.uniqueId, view, query)
 ```
 
+### 定義済みクエリ定数
+
+| 定数 / メソッド | 概要 |
+|---|---|
+| `SearchQuery.DEFAULT` | `search()` 用デフォルトクエリ: `SearchMode.ALL`、`VanillaSearchMode.IF_CUSTOMS_NOT_FOUND`、非同期コンテキストなし |
+| `SearchQuery.ASYNC_DEFAULT` | `asyncSearch()` 用デフォルトクエリ: `DEFAULT` と同じ設定で非同期コンテキストを有効化したもの |
+| `SearchQuery.defaultModeOf(asyncContext)` | `DEFAULT` と同じ検索モードおよびバニラ検索モードを持ち、指定した `asyncContext` を使用するクエリを返す |
+
 ---
 
 ## SearchResult
 
 `SearchResult` は検索結果を保持するクラスです。
+
+`SearchResult.EMPTY` はバニラ・カスタムともに結果なしを表す定義済み定数です。
 
 | メソッド | 返り値 | 概要 |
 |----------|--------|------|
@@ -153,6 +161,7 @@ val future = Search.asyncSearch(player.uniqueId, view, query)
 | `customs()` | `List<Pair<CRecipe, MappedRelation>>` | 合致したカスタムレシピとその座標対応のリスト |
 | `size()` | `Int` | バニラとカスタムの合計合致数 |
 | `getMergedResults()` | `List<Pair<CRecipe, MappedRelation?>>` | バニラ・カスタムをまとめたリスト。バニラは `MappedRelation` が `null` になる |
+| `getMergedResults(view)` | `List<Pair<CRecipe, MappedRelation>>` | バニラ・カスタムをまとめたリスト。バニラレシピの `MappedRelation` は `view` を元に算出され、すべての要素が具体的な関係を持つ |
 
 ```kotlin
 val result: Search.SearchResult = Search.search(player.uniqueId, view)
@@ -244,6 +253,17 @@ fun asyncPartialSearch(
 
 定形レシピの場合は `PartialShapedResult` が返され、`relation: MappedRelation` を持ちます。
 不定形レシピの場合は `PartialShapelessResult` が返され、Matter をキーとした候補入力スロットのマッピング `weakRelations()` を持ちます。
+
+### MatchState
+
+| 値 | 概要 |
+|----|------|
+| `ALL` | すべてのレシピスロットが対応する入力アイテムで満たされている |
+| `PARTIAL_NOT_ENOUGH` | 対応する入力アイテムがないレシピスロットが 1 つ以上ある |
+
+| メソッド | 戻り値型 | 概要 |
+|--------|---------|------|
+| `isPartialMatch()` | `Boolean` | このステートが `ALL` でない場合に `true` を返す |
 
 ### 実装例
 

@@ -16,6 +16,8 @@ import io.github.sakaki_aruka.customcrafter.util.InventoryUtil.giveItems
 import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
 import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterUI
 import io.github.sakaki_aruka.customcrafter.internal.gui.crafting.CraftUI
+import io.github.sakaki_aruka.customcrafter.ui.AllCandidateUIDesigner
+import io.github.sakaki_aruka.customcrafter.ui.AllCandidateUIDesigner.Companion.bake
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -26,6 +28,7 @@ import org.bukkit.inventory.InventoryHolder
 import org.bukkit.inventory.ItemStack
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
@@ -39,27 +42,39 @@ internal class AllCandidateUI(
     private val bakedCraftUIDesigner: CraftUIDesigner.Baked,
     private val dropOnClose: AtomicBoolean = AtomicBoolean(true)
 ) : CustomCrafterUI.Pageable, InventoryHolder {
-    private val inventory: Inventory = Bukkit.createInventory(
-        this,
-        54,
-        "All Candidate".toComponent()
-    )
     private val isClosed: AtomicBoolean = AtomicBoolean(false)
     private val iconGeneratorAsyncContext: AtomicReference<AsyncContext> = AtomicReference(AsyncContext.ofTurnOff())
     private val pages: ConcurrentHashMap<Int, ConcurrentHashMap<Int, Pair<ItemStack, CRecipe>>> = ConcurrentHashMap()
+    private val bakedAllCandidateUIDesigner: AllCandidateUIDesigner.Baked =
+        CompletableFuture.supplyAsync({
+            CustomCrafterAPI.getAllCandidateUIDesigner()
+                .bake(AllCandidateUIDesigner.Context(result, player.uniqueId))
+        }, InternalAPI.executor)
+            .completeOnTimeout(AllCandidateUIDesigner.BAKED_DEFAULT, 50, TimeUnit.MILLISECONDS)
+            .get()
+            .let {
+                if (it.isValid().isFailure) AllCandidateUIDesigner.BAKED_DEFAULT
+                else it
+            }
+
+    private val inventory: Inventory = Bukkit.createInventory(
+        this,
+        54,
+        bakedAllCandidateUIDesigner.title
+    )
 
     init {
-        val chunked = this.result.getMergedResults().chunked(45)
+        val chunked = this.result.getMergedResults().chunked(bakedAllCandidateUIDesigner.recipeSlots.size)
         chunked.withIndex().forEach { (pageIndex, list) ->
             val pageMap = ConcurrentHashMap<Int, Pair<ItemStack, CRecipe>>()
             pages[pageIndex] = pageMap
-            list.withIndex().forEach { (slotIndex, pair) ->
+            list.zip(bakedAllCandidateUIDesigner.recipeSlots).forEach { (pair, slotComponent) ->
                 val (recipe, relation: MappedRelation?) = pair
-                pageMap[slotIndex] = ungeneratedItem(recipe.name) to recipe
+                pageMap[slotComponent.toIndex()] = bakedAllCandidateUIDesigner.ungeneratedIcon(recipe) to recipe
 
                 CompletableFuture.runAsync({
                     if (recipe is CVanillaRecipe) {
-                        pages[pageIndex]?.put(slotIndex, recipe.original.result to recipe)
+                        pages[pageIndex]?.put(slotComponent.toIndex(), recipe.original.result to recipe)
                         iconsUpdate(pageIndex)
                         return@runAsync
                     }
@@ -71,17 +86,15 @@ internal class AllCandidateUI(
                         shiftClicked = useShift,
                         calledTimes = 1,
                         callMode = ResultSupplier.Context.CallMode.ICON,
-                        crafterID = this.player.uniqueId,
+                        crafterId = this.player.uniqueId,
                         asyncContext = iconGeneratorAsyncContext.get()
                     )
 
-                    pages[pageIndex]?.put(
-                        slotIndex,
-                        Pair(recipe.asyncGetResults(context).get().firstOrNull()
-                            ?: replaceRecipeNameTemplate(CustomCrafterAPI.ALL_CANDIDATE_NO_DISPLAYABLE_ITEM, recipe.name),
-                            recipe
-                        )
-                    )
+                    val icon: ItemStack = recipe.asyncGetResults(context).get().firstOrNull()
+                        ?: bakedAllCandidateUIDesigner.noDisplayableItem
+
+                    pages[pageIndex]?.put(slotComponent.toIndex(), icon to recipe)
+
                     iconsUpdate(pageIndex)
 
                 }, InternalAPI.executor)
@@ -112,28 +125,6 @@ internal class AllCandidateUI(
         }.get()
     }
 
-    companion object {
-        const val NEXT = 53
-        const val PREVIOUS = 45
-        const val BACK_TO_CRAFT = 49
-
-        val BACK_TO_CRAFT_BUTTON = ItemStack.of(Material.CRAFTING_TABLE).apply {
-            itemMeta = itemMeta.apply {
-                displayName("<b>BACK TO CRAFT".toComponent())
-            }
-        }
-
-        fun ungeneratedItem(recipeName: String): ItemStack = ItemStack.of(Material.BARRIER).apply {
-            itemMeta = itemMeta.apply {
-                displayName("UN-GENERATED".toComponent())
-                lore(listOf(
-                    "<white>Recipe Name: <b>$recipeName</b>".toComponent(),
-                    "<white>Items for this recipe have not been created yet.".toComponent()
-                ))
-            }
-        }
-    }
-
     fun pageContentsAt(pageNumber: Int): Map<Int, ItemStack> {
         if (pageNumber !in (0..<pages.size)) {
             throw IllegalArgumentException("'pageNumber' must be in range of 0 ~ ${pages.size - 1}.")
@@ -143,14 +134,17 @@ internal class AllCandidateUI(
             ?.let { map -> map.entries.associate { (index, pair) -> index to pair.first }.toMutableMap() }
             ?: return emptyMap()
 
-        page[BACK_TO_CRAFT] = BACK_TO_CRAFT_BUTTON
+        val (backToCraftSlot, backToCraftItem) = this.bakedAllCandidateUIDesigner.backToCraftUIButton
+        page[backToCraftSlot.toIndex()] = backToCraftItem
 
         if (pageNumber > 0) {
-            page[PREVIOUS] = CustomCrafterUI.PREVIOUS_BUTTON
+            val (previousButtonSlot, previousButtonItem) = this.bakedAllCandidateUIDesigner.previousPageButton
+            page[previousButtonSlot.toIndex()] = previousButtonItem
         }
 
         if (pageNumber < pages.size - 1) {
-            page[NEXT] = CustomCrafterUI.NEXT_BUTTON
+            val (nextButtonSlot, nextButtonItem) = this.bakedAllCandidateUIDesigner.nextPageButton
+            page[nextButtonSlot.toIndex()] = nextButtonItem
         }
         return page.toMap()
     }
@@ -197,15 +191,15 @@ internal class AllCandidateUI(
         event.isCancelled = true
         when (event.rawSlot) {
 
-            PREVIOUS -> if (canFlipBackPage()) {
+            this.bakedAllCandidateUIDesigner.previousPageButton.first.toIndex() -> if (canFlipBackPage()) {
                 flipBackPage()
             }
 
-            NEXT -> if (canFlipPage()) {
+            this.bakedAllCandidateUIDesigner.nextPageButton.first.toIndex() -> if (canFlipPage()) {
                 flipPage()
             }
 
-            BACK_TO_CRAFT -> {
+            this.bakedAllCandidateUIDesigner.backToCraftUIButton.first.toIndex() -> {
                 val craftUI = CraftUI(
                     caller = event.whoClicked as? Player,
                     baked = this.bakedCraftUIDesigner
@@ -219,11 +213,7 @@ internal class AllCandidateUI(
                 return
             }
 
-            in PREVIOUS + 1..<NEXT -> {
-                return
-            }
-
-            else -> {
+            in this.bakedAllCandidateUIDesigner.recipeSlotsIndex -> {
                 if (event.currentItem == null) {
                     return
                 }
@@ -250,7 +240,7 @@ internal class AllCandidateUI(
                         shiftClicked = event.isShiftClick,
                         calledTimes = recipe.getTimes(view.materials, relation, event.isShiftClick),
                         callMode = ResultSupplier.Context.CallMode.CRAFT,
-                        crafterID = player.uniqueId,
+                        crafterId = player.uniqueId,
                         asyncContext = AsyncContext.ofTurnOff()
                     )
                     val results: List<ItemStack> = recipe.asyncGetResults(resultSupplierContext).get()
@@ -271,7 +261,7 @@ internal class AllCandidateUI(
                 this.view = this.view.getDecremented(
                     shiftUsed = event.isShiftClick,
                     recipe = recipe,
-                    relations = mappedRelation!!,
+                    relations = relation,
                 )
 
                 val craftUI = CraftUI(
@@ -288,13 +278,4 @@ internal class AllCandidateUI(
     }
 
     override fun getInventory(): Inventory = this.inventory
-
-    private fun replaceRecipeNameTemplate(
-        item: ItemStack,
-        name: String
-    ): ItemStack {
-        val clone: ItemStack = item.clone()
-        clone.lore(CustomCrafterAPI.ALL_CANDIDATE_NO_DISPLAYABLE_ITEM_LORE_SUPPLIER(name))
-        return clone
-    }
 }
