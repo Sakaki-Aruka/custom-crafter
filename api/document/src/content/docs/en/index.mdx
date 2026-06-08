@@ -14,6 +14,8 @@ hero:
       variant: minimal
 ---
 
+import { LinkCard, CardGrid } from '@astrojs/starlight/components';
+
 ## What is CustomCrafterAPI
 
 CustomCrafterAPI is a foundation plugin for Minecraft plugin developers to add **custom crafting recipes from 1×1 up to 6×6 in size** to their servers.
@@ -48,11 +50,11 @@ Always verify that the version you depend on is compatible with the CustomCrafte
 
 Download the latest release or add it as a dependency from the following sources:
 
-| Source | Purpose |
-|--------|---------|
-| [Modrinth](https://modrinth.com/plugin/custom-crafter-api/versions) | Download the plugin jar |
-| [GitHub Releases](https://github.com/Sakaki-Aruka/custom-crafter/releases) | Download the plugin jar |
-| [Maven Central](https://central.sonatype.com/artifact/io.github.sakaki-aruka/custom-crafter-api) | Add as a library dependency |
+<CardGrid>
+  <LinkCard title="Modrinth" href="https://modrinth.com/plugin/custom-crafter-api/versions" description="Download the plugin jar" />
+  <LinkCard title="GitHub Releases" href="https://github.com/Sakaki-Aruka/custom-crafter/releases" description="Download the plugin jar" />
+  <LinkCard title="Maven Central" href="https://central.sonatype.com/artifact/io.github.sakaki-aruka/custom-crafter-api" description="Add as a library dependency" />
+</CardGrid>
 
 Use the `provided` scope in Maven or `compileOnly` in Gradle.
 
@@ -60,11 +62,14 @@ Use the `provided` scope in Maven or `compileOnly` in Gradle.
 
 ## Documentation Overview
 
-| Page | Contents |
-|------|---------|
-| [Getting Started](/en/getting-started/) | Installation and core concepts |
-| [CustomCrafterAPI Object](/en/api/customcrafter-api/) | Recipe registration, removal, and settings |
-| [Search API](/en/api/search/) | Recipe search and async search |
-| [Recipe](/en/recipe/recipe/) | How to use CMatter, CRecipe, and ResultSupplier |
-| [Implementations](/en/impl/matter/cmatter-impl/) | Detailed reference for standard implementation classes |
-| [Events](/en/events/) | Events fired by CustomCrafterAPI |
+<CardGrid>
+  <LinkCard title="Getting Started" href="/en/getting-started/" description="Installation and core concepts" />
+  <LinkCard title="CustomCrafterAPI" href="/en/api/customcrafter-api/" description="Recipe registration, removal, and settings" />
+  <LinkCard title="Search API" href="/en/api/search/" description="Recipe search and async search" />
+  <LinkCard title="Recipe" href="/en/recipe/recipe/" description="How to use CMatter, CRecipe, and ResultSupplier" />
+  <LinkCard title="Extra" href="/en/extra/craftui-designer/" description="CraftUIDesigner, AllCandidateUIDesigner, CoordinateComponent" />
+  <LinkCard title="Events" href="/en/events/" description="Events fired by CustomCrafterAPI" />
+  <LinkCard title="Objects" href="/en/objects/async-context/" description="Data classes such as AsyncContext, CraftView, and MappedRelation" />
+  <LinkCard title="Utilities" href="/en/util/inventory-util/" description="Utility classes such as InventoryUtil" />
+  <LinkCard title="Implementations" href="/en/impl/matter/cmatter-impl/" description="Detailed reference for standard implementation classes" />
+</CardGrid>

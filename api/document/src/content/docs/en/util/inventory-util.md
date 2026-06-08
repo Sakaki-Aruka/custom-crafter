@@ -49,7 +49,7 @@ val supplier = ResultSupplier { ctx ->
         return@ResultSupplier listOf(ItemStack.of(Material.DIAMOND))
     }
     // During sync execution, items can also be given directly to the inventory
-    val player = Bukkit.getPlayer(ctx.crafterID)
+    val player = Bukkit.getPlayer(ctx.crafterId)
     player?.giveItems(ItemStack.of(Material.EXPERIENCE_BOTTLE, 16))
     emptyList()
 }

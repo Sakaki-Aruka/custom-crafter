@@ -23,9 +23,10 @@ title: AllCandidateUIDesigner について
 すべてのメソッドは `AllCandidateUIDesigner.Context` を受け取り、`context.searchResult` と `context.crafterId` を参照できます。
 
 :::note
-CustomCrafterAPI が管理するインベントリ (54 スロット) のスロット番号は `CoordinateComponent.toIndex()` と `CoordinateComponent.fromIndex(index)` で相互変換できます。
-`recipeSlots` の集合は 1 以上 51 以下の要素数を持ち、ボタン座標と重複してはいけません。
-たとえばレシピが 45 件あり `recipeSlots` が 30 スロットを返す場合、AllCandidateUI は 2 ページにわたって表示されます。
+`recipeSlots` の集合は 1 以上 51 以下の要素数を持ち、ボタン座標と重複してはいけません。  
+:::
+:::note
+レシピが 45 件あり `recipeSlots` が 30 スロットを返す場合、AllCandidateUI は 2 ページにわたって表示されます。
 :::
 
 ---

@@ -4,7 +4,7 @@ title: About recipe
 
 ## Recipes in CustomCrafterAPI
 
-As written on the [Getting Started page](/ja/getting-started/), recipes in CustomCrafterAPI are entirely separate from Minecraft's standard recipe system and are composed of completely different components.
+As written on the [Getting Started page](/en/getting-started/), recipes in CustomCrafterAPI are entirely separate from Minecraft's standard recipe system and are composed of completely different components.
 
 The fields of `CRecipe` are defined as follows:
 ```kotlin
@@ -22,6 +22,11 @@ interface CRecipe {
 ## name
 `name` is the recipe's identifier and is used in features such as the "show all matching recipes" display and the registered recipe list command.
 It is recommended to use a name that is unique across all registered recipes and easy for users to recognise.
+
+:::note
+From version 5.2.0, the recipe name can be used as a restriction during recipe registration.
+Since it may become impossible to register recipes with duplicate names, using a unique name is now strongly recommended.
+:::
 
 ## items
 `items` represents the item arrangement: a mapping of `CoordinateComponent` (which denotes a position on the recipe grid) to `CMatter` (which defines the required item at that position).
@@ -50,93 +55,7 @@ is sufficient. With this specification, placing items at:
 ```
 will also pass the check, since it is the same shape.
 
-### CoordinateComponent factory methods
-
-`CoordinateComponent` provides factory methods to efficiently generate sets of coordinates.
-
-#### `squareFill(size, dx, dy)` — fill a square
-
-Returns the full set of coordinates that fills a square of the specified size.
-
-```kotlin
-// Generate fill coordinates for a 3×3 square
-CoordinateComponent.squareFill(3)
-// → (0,0) (1,0) (2,0)
-//   (0,1) (1,1) (2,1)
-//   (0,2) (1,2) (2,2)
-
-// Specify an offset to start at (1,1)
-CoordinateComponent.squareFill(3, dx = 1, dy = 1)
-```
-
-#### `square(size, dx, dy)` — square outline
-
-Returns only the perimeter coordinates of a square of the specified size (interior not included).
-
-```kotlin
-// Generate outline coordinates for a 3×3 square
-CoordinateComponent.square(3)
-// → (0,0) (1,0) (2,0)
-//   (0,1)       (2,1)
-//   (0,2) (1,2) (2,2)
-```
-
-#### `getN(n)` — first N coordinates
-
-Returns a list of N coordinates starting from the top-left. Primarily used when building `items` for shapeless recipes.
-
-```kotlin
-// Get coordinates for 3 slots
-CoordinateComponent.getN(3)
-// → [(0,0), (1,0), (2,0)]
-```
-
-#### `recipeMapFromStringList(lines, map)` — convert from a list of strings
-
-Generates an `items` map in bulk from a comma-separated list of strings and a character-to-CMatter mapping.
-Empty elements in a slot are skipped. Both row count and column count can be up to 6.
-
-```kotlin
-val stone = CMatterImpl.of(Material.STONE)
-val apple = CMatterImpl.of(Material.APPLE)
-
-val lines = listOf(
-    "s,s,s",
-    "s,a,s",
-    "s,s,s"
-)
-val map = mapOf("s" to stone, "a" to apple)
-
-val items = CoordinateComponent.recipeMapFromStringList(lines, map)
-// The 9 slots from (0,0) to (2,2) become stone, with (1,1) being apple
-```
-
-To include empty slots, leave the entry between commas blank.
-
-```kotlin
-val lines = listOf(
-    "s,s",
-    ",s"   // (0,1) is skipped
-)
-```
-
-#### `mapToRecipeMap(source)` — convert from a CMatter-keyed mapping
-
-Generates `items` from a reverse mapping of `CMatter → Set<CoordinateComponent>`.
-This reduces the amount of code needed when assigning the same CMatter to multiple slots.
-
-```kotlin
-val gold = CMatterImpl.of(Material.GOLD_BLOCK)
-val apple = CMatterImpl.of(Material.APPLE)
-
-val source = mapOf(
-    gold to CoordinateComponent.squareFill(3).minus(CoordinateComponent(1, 1)),
-    apple to setOf(CoordinateComponent(1, 1))
-)
-
-val items = CoordinateComponent.mapToRecipeMap(source)
-// The border of the 3×3 square is gold; the centre (1,1) is apple
-```
+`CoordinateComponent` provides factory methods for efficiently generating sets of coordinates. For details, see the [CoordinateComponent page](/en/extra/coordinate-component/).
 
 ---
 
@@ -272,14 +191,15 @@ CustomCrafterAPI.registerRecipe(recipe)
 If even one predicate returns `false`, the recipe containing it is excluded from crafting candidates.
 Set this to `null` if you do not need this feature.
 
+:::note
+For details, see the [CRecipePredicate page](/en/recipe/predicate/).
+:::
+
 ## results (Nullable)
 `results` holds lambdas that generate the items (result items) to give the player when the recipe matches their input.
 In addition to generating result items, you can also use this as a function executed at crafting time — for example, to grant a buff or execute a database query.
 Like `predicates`, set this to `null` if you do not need it.
 
----
-
 :::note
-- For `CRecipePredicate` (held by `predicates`), see the [CRecipePredicate page](/ja/recipe/predicate/).
-- For `ResultSupplier` (held by `results`), see the [Result items page](/ja/recipe/result/).
+For details, see the [Result items page](/en/recipe/result/).
 :::

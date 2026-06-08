@@ -41,7 +41,7 @@ export default defineConfig({
                 {
                     label: 'Extra',
                     translations: { ja: '追加要素' },
-                    items: ['extra/craftui-designer'],
+                    items: ['extra/craftui-designer', 'extra/allcandidateui-designer'],
                 },
                 {
                     label: 'Events',
@@ -55,6 +55,7 @@ export default defineConfig({
                         'objects/async-context',
                         'objects/craft-view',
                         'objects/mapped-relation',
+                        'extra/coordinate-component',
                     ],
                 },
                 {

@@ -115,11 +115,17 @@ val vanillaRecipes: List<CVanillaRecipe> = Bukkit.recipeIterator().asSequence()
     .toList()
 
 // Asynchronous partial search against vanilla recipes
-val result: PartialSearch.PartialSearchResult = PartialSearch.asyncPartialSearch(
-    recipes = vanillaRecipes,
+// asyncPartialSearch returns a CompletableFuture — register a callback with thenAccept
+// (.get() can also be used to retrieve the value directly on an async thread)
+PartialSearch.asyncPartialSearch(
+    crafterId = player.uniqueId,
     view = currentView,
-    query = SearchQuery(asyncContext = ctx)
-).await()
+    sourceRecipes = vanillaRecipes
+).thenAccept { results: List<PartialSearch.PartialSearchResult> ->
+    results.forEach { result ->
+        println("partial match: ${result.recipe.name}, state: ${result.state()}")
+    }
+}
 ```
 
 :::note

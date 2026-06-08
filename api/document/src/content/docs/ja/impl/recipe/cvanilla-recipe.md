@@ -115,11 +115,17 @@ val vanillaRecipes: List<CVanillaRecipe> = Bukkit.recipeIterator().asSequence()
     .toList()
 
 // バニラレシピに対して非同期で部分一致検索
-val result: PartialSearch.PartialSearchResult = PartialSearch.asyncPartialSearch(
-    recipes = vanillaRecipes,
+// asyncPartialSearch は CompletableFuture を返すため、thenAccept でコールバックを登録する
+// (非同期スレッド上で .get() を使って値を直接取得することもできる)
+PartialSearch.asyncPartialSearch(
+    crafterId = player.uniqueId,
     view = currentView,
-    query = SearchQuery(asyncContext = ctx)
-).await()
+    sourceRecipes = vanillaRecipes
+).thenAccept { results: List<PartialSearch.PartialSearchResult> ->
+    results.forEach { result ->
+        println("部分一致: ${result.recipe.name}, 状態: ${result.state()}")
+    }
+}
 ```
 
 :::note

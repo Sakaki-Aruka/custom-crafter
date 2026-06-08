@@ -23,8 +23,9 @@ All methods have default implementations, so only the parts that need customizat
 All methods receive an `AllCandidateUIDesigner.Context` that exposes `context.searchResult` and `context.crafterId`.
 
 :::note
-Slot numbers in the inventory managed by CustomCrafterAPI (54 slots) can be converted to and from indices using `CoordinateComponent.toIndex()` and `CoordinateComponent.fromIndex(index)`.
 The `recipeSlots` set must contain between 1 and 51 elements and must not overlap with any button coordinate.
+:::
+:::note
 If 45 recipes are available but `recipeSlots` returns 30 slots, the AllCandidateUI will paginate across 2 pages.
 :::
 

@@ -101,8 +101,10 @@ CustomCrafterAPI.setCraftUIDesigner(myDesigner)
 ```kotlin
 class MyPlugin : JavaPlugin() {
     override fun onEnable() {
-        if (!CustomCrafterAPI.hasFullCompatibility("5.0.20")) {
-            logger.warning("CustomCrafterAPI のバージョンが互換性を持ちません。")
+        // MAJOR_VERSION / MINOR_VERSION で必要バージョン (5.2.0 以上) を直接比較する
+        if (CustomCrafterAPI.MAJOR_VERSION < 5 ||
+            (CustomCrafterAPI.MAJOR_VERSION == 5 && CustomCrafterAPI.MINOR_VERSION < 2)) {
+            logger.warning("CustomCrafterAPI 5.2.0 以上が必要です。(現在: ${CustomCrafterAPI.API_VERSION})")
             server.pluginManager.disablePlugin(this)
             return
         }

@@ -240,7 +240,7 @@ class ResultGiveFailListener : Listener {
         val items: List<ItemStack> = event.getResultsIfNotObtained() ?: return
 
         // Fall back: drop items at the player's location
-        val player = event.usedSupplierContext?.crafterID
+        val player = event.usedSupplierContext?.crafterId
             ?.let { Bukkit.getPlayer(it) } ?: return
         items.forEach { player.world.dropItemNaturally(player.location, it) }
     }

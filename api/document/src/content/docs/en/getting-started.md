@@ -83,12 +83,12 @@ As introduced in the section above, CustomCrafterAPI provides mechanisms that ca
 Using them, you can set fine-grained conditions on recipe searches and customize the crafting screen on a per-player basis.
 
 The representative additional elements are as follows:
-- [`CMatterPredicate`](/ja/recipe/matter/#predicates) — Adds arbitrary validation logic for items in individual slots
-- [`CRecipePredicate`](/ja/recipe/predicate/) — Adds validation targeting the entire recipe, including player information
-- [`CraftUIDesigner`](/ja/extra/craftui-designer/) — Customizes the crafting UI title and slot layout
+- [`CMatterPredicate`](/en/recipe/matter/#predicates) — Adds arbitrary validation logic for items in individual slots
+- [`CRecipePredicate`](/en/recipe/predicate/) — Adds validation targeting the entire recipe, including player information
+- [`CraftUIDesigner`](/en/extra/craftui-designer/) — Customizes the crafting UI title and slot layout
 
 ## Events
 In addition to recipes, CustomCrafterAPI fires several events, including one that notifies you when an item has been crafted.
 Since these are classes that implement Bukkit's `Event`, they can be listened to and handled in the same way as standard Minecraft event listeners.
 
-See the [Events page](/ja/events/) for details.
+See the [Events page](/en/events/) for details.
