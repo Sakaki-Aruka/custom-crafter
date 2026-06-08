@@ -24,7 +24,7 @@ The context passed to the `test` function has the following fields:
 | Field | Type | Description |
 |-------|------|-------------|
 | `input` | `CraftView` | The input state of the crafting UI (item arrangement, result slot) |
-| `crafterID` | `UUID` | The UUID of the player who performed the craft |
+| `crafterId` | `UUID` | The UUID of the player who performed the craft |
 | `recipe` | `CRecipe` | The recipe being inspected |
 | `relation` | `MappedRelation` | The mapping between recipe coordinates and input slot coordinates (generated after CMatter inspections pass) |
 | `asyncContext` | `AsyncContext?` | Context for async execution; `null` during synchronous execution (available from 5.0.20 onwards) |
@@ -40,7 +40,7 @@ Also, because access to BukkitAPI worlds and entities is not permitted on asynch
 
 ```kotlin
 val onlyAdminPredicate = CRecipePredicate { ctx ->
-    val player = Bukkit.getPlayer(ctx.crafterID) ?: return@CRecipePredicate false
+    val player = Bukkit.getPlayer(ctx.crafterId) ?: return@CRecipePredicate false
     player.isOp
 }
 
@@ -64,7 +64,7 @@ val externalCheckPredicate = CRecipePredicate { ctx ->
 
     // BukkitAPI access is not permitted on async threads
     // Example of querying the database using UUID
-    val hasPermission: Boolean = MyDatabase.hasPermission(ctx.crafterID, "special-recipe")
+    val hasPermission: Boolean = MyDatabase.hasPermission(ctx.crafterId, "special-recipe")
     hasPermission
 }
 ```

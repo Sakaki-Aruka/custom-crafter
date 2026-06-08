@@ -39,7 +39,7 @@ data class MappedRelationComponent(
 | コンテキスト | フィールド名 |
 |-------------|-------------|
 | `ResultSupplier.Context` | `relation` |
-| `CRecipePredicate.Context` | `relations` |
+| `CRecipePredicate.Context` | `relation` |
 | `SearchResult` | `relation` (取得メソッド経由) |
 
 ---

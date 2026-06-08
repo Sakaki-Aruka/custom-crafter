@@ -24,7 +24,7 @@ fun interface CRecipePredicate {
 | フィールド | 型 | 概要 |
 |------------|-----|------|
 | `input` | `CraftView` | クラフト UI の入力状態 (アイテム配置・成果物スロット) |
-| `crafterID` | `UUID` | クラフトを実行したプレイヤーの UUID |
+| `crafterId` | `UUID` | クラフトを実行したプレイヤーの UUID |
 | `recipe` | `CRecipe` | 検査対象のレシピ |
 | `relation` | `MappedRelation` | レシピ座標と入力スロット座標の対応関係 (CMatter の検査通過後に生成される) |
 | `asyncContext` | `AsyncContext?` | 非同期実行時のコンテキスト。同期実行時は `null` (5.0.20 以降) |
@@ -40,7 +40,7 @@ fun interface CRecipePredicate {
 
 ```kotlin
 val onlyAdminPredicate = CRecipePredicate { ctx ->
-    val player = Bukkit.getPlayer(ctx.crafterID) ?: return@CRecipePredicate false
+    val player = Bukkit.getPlayer(ctx.crafterId) ?: return@CRecipePredicate false
     player.isOp
 }
 
@@ -64,7 +64,7 @@ val externalCheckPredicate = CRecipePredicate { ctx ->
 
     // 非同期スレッドでの BukkitAPI アクセスは不可
     // ここでは UUID を使ってデータベースを参照する例
-    val hasPermission: Boolean = MyDatabase.hasPermission(ctx.crafterID, "special-recipe")
+    val hasPermission: Boolean = MyDatabase.hasPermission(ctx.crafterId, "special-recipe")
     hasPermission
 }
 ```

@@ -3,12 +3,13 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 
 const base = process.env.DEPLOY_BASE ?? '';
-const site = (process.env.DEPLOY_SITE ?? 'http://localhost:4321') + base;
+const site = process.env.DEPLOY_SITE ?? 'http://localhost:4321';
 
 // https://astro.build/config
 export default defineConfig({
 	site,
 	base,
+	trailingSlash: 'always',
 	integrations: [
 		starlight({
 			title: 'CustomCrafterAPI documents',
@@ -41,7 +42,7 @@ export default defineConfig({
                 {
                     label: 'Extra',
                     translations: { ja: '追加要素' },
-                    items: ['extra/craftui-designer'],
+                    items: ['extra/craftui-designer', 'extra/allcandidateui-designer'],
                 },
                 {
                     label: 'Events',
@@ -55,13 +56,13 @@ export default defineConfig({
                         'objects/async-context',
                         'objects/craft-view',
                         'objects/mapped-relation',
+                        'extra/coordinate-component',
                     ],
                 },
                 {
                     label: 'Utilities',
                     translations: { ja: 'ユーティリティ' },
                     items: [
-                        'util/converter',
                         'util/inventory-util',
                     ],
                 },

@@ -12,11 +12,14 @@ These can be listened to and handled in the same way as ordinary Bukkit events.
 ## RegisterCustomRecipeEvent
 
 Fired when a recipe is about to be registered via `CustomCrafterAPI.registerRecipe()`.
-Implements `Cancellable`; cancelling the event causes the recipe registration to fail.
 
 | Property | Type | Description |
 |------------|-----|------|
 | `recipes` | `List<CRecipe>` | The list of recipes that are about to be registered |
+| `isAsync` | `Boolean` | Whether the call originated from an asynchronous thread (since 5.2.0) |
+
+Calling `registererMeta()` returns the `PluginMeta` of the plugin that registered the recipes.
+Returns `null` if the registration was performed by CustomCrafterAPI itself (since 5.2.0).
 
 ```kotlin
 class RecipeRegisterListener : Listener {
@@ -26,10 +29,10 @@ class RecipeRegisterListener : Listener {
             println("Recipe registered: ${recipe.name}")
         }
 
-        // Example: cancel registration of recipes whose name starts with "forbidden-"
-        if (event.recipes.any { it.name.startsWith("forbidden-") }) {
-            event.isCancelled = true
-            println("Registration cancelled.")
+        // Example: check which plugin registered the recipes
+        val registerer = event.registererMeta()
+        if (registerer != null) {
+            println("Registered by: ${registerer.name}")
         }
     }
 }
@@ -40,11 +43,11 @@ class RecipeRegisterListener : Listener {
 ## UnregisterCustomRecipeEvent
 
 Fired when a recipe is about to be unregistered via `CustomCrafterAPI.unregisterRecipe()` or `CustomCrafterAPI.unregisterAllRecipes()`.
-Implements `Cancellable`; cancelling the event causes the recipe unregistration to fail.
 
 | Property | Type | Description |
 |------------|-----|------|
 | `recipes` | `List<CRecipe>` | The list of recipes that are about to be unregistered |
+| `isAsync` | `Boolean` | Whether the call originated from an asynchronous thread (since 5.2.0) |
 
 ```kotlin
 class RecipeUnregisterListener : Listener {
@@ -52,11 +55,6 @@ class RecipeUnregisterListener : Listener {
     fun onUnregister(event: UnregisterCustomRecipeEvent) {
         event.recipes.forEach { recipe ->
             println("Recipe unregistered: ${recipe.name}")
-        }
-
-        // Example: prevent a specific recipe from being unregistered
-        if (event.recipes.any { it.name == "protected-recipe" }) {
-            event.isCancelled = true
         }
     }
 }
@@ -116,7 +114,7 @@ To extract a value from `Property<T>` in a type-safe manner, use `PropertyKey<T>
 
 ```kotlin
 val key = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK
-val value: Material? = property.getOrNull(key)
+val value: Material? = event.newValue.getOrNull(key)
 ```
 
 The predefined `PropertyKey` values are as follows:
@@ -129,6 +127,8 @@ The predefined `PropertyKey` values are as follows:
 | `USE_CUSTOM_CRAFT_UI` | `Boolean` | UseCustomCraftUI |
 | `BASE_BLOCK_SIDE` | `Int` | BaseBlockSide |
 | `CRAFT_UI_DESIGNER` | `CraftUIDesigner` | CraftUIDesigner |
+| `ALL_CANDIDATE_UI_DESIGNER` | `AllCandidateUIDesigner` | AllCandidateUIDesigner |
+| `RECIPE_NAME_STRICT_LEVEL` | `CustomCrafterAPI.NameStrictLevel` | RecipeNameStrictLevel |
 
 ### Example: Detecting a Base Block Change
 
@@ -139,12 +139,38 @@ class PropertiesChangeListener : Listener {
         val key = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK
 
         // Filter to only the relevant event by property name
-        if (event.propertyName != key.propertyName) return
+        if (event.propertyName != key.name) return
 
         val oldBlock: Material = event.oldValue.getOrNull(key) ?: return
         val newBlock: Material = event.newValue.getOrNull(key) ?: return
 
         println("Base block changed from ${oldBlock.name} to ${newBlock.name}.")
+    }
+}
+```
+
+---
+
+### Example: Monitoring Multiple Properties Together
+
+```kotlin
+class AllPropertiesChangeListener : Listener {
+    @EventHandler
+    fun <T> onPropertiesChange(event: CustomCrafterAPIPropertiesChangeEvent<T>) {
+        when (event.propertyName) {
+            CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK.name -> {
+                val newValue = event.newValue.getOrNull(
+                    CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK
+                )
+                println("Base block changed: $newValue")
+            }
+            CustomCrafterAPIPropertiesChangeEvent.PropertyKey.USE_CUSTOM_CRAFT_UI.name -> {
+                val newValue = event.newValue.getOrNull(
+                    CustomCrafterAPIPropertiesChangeEvent.PropertyKey.USE_CUSTOM_CRAFT_UI
+                )
+                println("Custom UI enabled: $newValue")
+            }
+        }
     }
 }
 ```
@@ -214,35 +240,9 @@ class ResultGiveFailListener : Listener {
         val items: List<ItemStack> = event.getResultsIfNotObtained() ?: return
 
         // Fall back: drop items at the player's location
-        val player = event.usedSupplierContext?.crafterID
+        val player = event.usedSupplierContext?.crafterId
             ?.let { Bukkit.getPlayer(it) } ?: return
         items.forEach { player.world.dropItemNaturally(player.location, it) }
-    }
-}
-```
-
----
-
-### Example: Monitoring Multiple Properties Together
-
-```kotlin
-class AllPropertiesChangeListener : Listener {
-    @EventHandler
-    fun <T> onPropertiesChange(event: CustomCrafterAPIPropertiesChangeEvent<T>) {
-        when (event.propertyName) {
-            CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK.propertyName -> {
-                val newValue = event.newValue.getOrNull(
-                    CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK
-                )
-                println("Base block changed: $newValue")
-            }
-            CustomCrafterAPIPropertiesChangeEvent.PropertyKey.USE_CUSTOM_CRAFT_UI.propertyName -> {
-                val newValue = event.newValue.getOrNull(
-                    CustomCrafterAPIPropertiesChangeEvent.PropertyKey.USE_CUSTOM_CRAFT_UI
-                )
-                println("Custom UI enabled: $newValue")
-            }
-        }
     }
 }
 ```

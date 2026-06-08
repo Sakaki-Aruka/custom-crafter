@@ -61,7 +61,7 @@ val supplier = ResultSupplier { ctx ->
             return@ResultSupplier emptyList()
         }
 
-        val data = MyDatabase.fetchData(ctx.crafterID)
+        val data = MyDatabase.fetchData(ctx.crafterId)
 
         // Also check between multiple steps
         if (asyncCtx.isInterrupted()) {
@@ -80,7 +80,7 @@ val supplier = ResultSupplier { ctx ->
 ```kotlin
 val predicate = CMatterPredicate { ctx ->
     // Check whether running asynchronously
-    if (ctx.isAsync) {
+    if (ctx.isAsync()) {
         val asyncCtx = ctx.asyncContext ?: return@CMatterPredicate false
         if (asyncCtx.isInterrupted()) {
             return@CMatterPredicate false
@@ -93,5 +93,5 @@ val predicate = CMatterPredicate { ctx ->
 
 :::caution
 Accessing Bukkit API worlds and entities on an async thread is not safe.
-Operations such as giving items to a player or obtaining coordinates should be done on the sync thread, or handled after the fact via a UUID such as `ctx.crafterID`.
+Operations such as giving items to a player or obtaining coordinates should be done on the sync thread, or handled after the fact via a UUID such as `ctx.crafterId`.
 :::

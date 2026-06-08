@@ -30,7 +30,7 @@ fun Player.giveItems(
 ### 使用例
 
 ```kotlin
-import io.github.sakaki_aruka.customcrafter.impl.util.InventoryUtil.giveItems
+import io.github.sakaki_aruka.customcrafter.util.InventoryUtil.giveItems
 
 // ダイヤモンド 64 個をプレイヤーに付与する
 player.giveItems(ItemStack.of(Material.DIAMOND, 64))
@@ -49,7 +49,7 @@ val supplier = ResultSupplier { ctx ->
         return@ResultSupplier listOf(ItemStack.of(Material.DIAMOND))
     }
     // 同期時はインベントリへ直接付与することも可能
-    val player = Bukkit.getPlayer(ctx.crafterID)
+    val player = Bukkit.getPlayer(ctx.crafterId)
     player?.giveItems(ItemStack.of(Material.EXPERIENCE_BOTTLE, 16))
     emptyList()
 }

@@ -61,7 +61,7 @@ val supplier = ResultSupplier { ctx ->
             return@ResultSupplier emptyList()
         }
 
-        val data = MyDatabase.fetchData(ctx.crafterID)
+        val data = MyDatabase.fetchData(ctx.crafterId)
 
         // 複数ステップある場合は処理の間にも確認する
         if (asyncCtx.isInterrupted()) {
@@ -80,7 +80,7 @@ val supplier = ResultSupplier { ctx ->
 ```kotlin
 val predicate = CMatterPredicate { ctx ->
     // 非同期実行中かどうかを確認
-    if (ctx.isAsync) {
+    if (ctx.isAsync()) {
         val asyncCtx = ctx.asyncContext ?: return@CMatterPredicate false
         if (asyncCtx.isInterrupted()) {
             return@CMatterPredicate false
@@ -93,5 +93,5 @@ val predicate = CMatterPredicate { ctx ->
 
 :::caution
 非同期スレッド上では BukkitAPI のワールド・エンティティへのアクセスが安全ではありません。
-プレイヤーへのアイテム付与や座標取得などは同期スレッドで行うか、`ctx.crafterID` などの UUID を経由して後処理してください。
+プレイヤーへのアイテム付与や座標取得などは同期スレッドで行うか、`ctx.crafterId` などの UUID を経由して後処理してください。
 :::

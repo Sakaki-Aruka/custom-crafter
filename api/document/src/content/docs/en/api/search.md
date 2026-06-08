@@ -15,8 +15,7 @@ It matches the input item arrangement against registered recipes and returns the
 
 ```kotlin
 data class CraftView(
-    val materials: Map<CoordinateComponent, ItemStack>, // arrangement of items placed by the player
-    val result: ItemStack                               // item in the result slot
+    val materials: Map<CoordinateComponent, ItemStack> // arrangement of items placed by the player
 )
 ```
 
@@ -25,8 +24,7 @@ The size of `materials` must be between 1 and 36 inclusive. Otherwise, `Search.s
 ```kotlin
 // Example: create a CraftView with stone placed at (0,0)
 val view = CraftView(
-    materials = mapOf(CoordinateComponent(0, 0) to ItemStack.of(Material.STONE)),
-    result = ItemStack.empty()
+    materials = mapOf(CoordinateComponent(0, 0) to ItemStack.of(Material.STONE))
 )
 ```
 
@@ -36,7 +34,7 @@ val view = CraftView(
 
 ```kotlin
 fun search(
-    crafterID: UUID,
+    crafterId: UUID,
     view: CraftView,
     searchQuery: SearchQuery = SearchQuery.DEFAULT,
     sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes()
@@ -49,7 +47,7 @@ In such cases, using `asyncSearch` (described below) is recommended.
 
 | Argument | Description |
 |----------|-------------|
-| `crafterID` | The UUID of the player performing the craft |
+| `crafterId` | The UUID of the player performing the craft |
 | `view` | The arrangement of input items |
 | `searchQuery` | Controls search behavior (search mode and vanilla search mode). Defaults to `SearchQuery.DEFAULT` |
 | `sourceRecipes` | The list of recipes to search (defaults to all registered recipes) |
@@ -58,7 +56,6 @@ In such cases, using `asyncSearch` (described below) is recommended.
 val player: Player = /* ... */
 val view = CraftView(
     materials = mapOf(CoordinateComponent(0, 0) to ItemStack.of(Material.STONE)),
-    result = ItemStack.empty()
 )
 
 val result: Search.SearchResult = Search.search(player.uniqueId, view)
@@ -70,7 +67,7 @@ val result: Search.SearchResult = Search.search(player.uniqueId, view)
 
 ```kotlin
 fun asyncSearch(
-    crafterID: UUID,
+    crafterId: UUID,
     view: CraftView,
     query: SearchQuery = SearchQuery.ASYNC_DEFAULT,
     sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes()
@@ -83,14 +80,13 @@ This method is used internally by CustomCrafterAPI's standard crafting screen an
 
 :::caution
 Asynchronous threads cannot access BukkitAPI worlds or entities.
-When accessing player information inside `ResultSupplier` or `CMatterPredicate`, use `asyncContext.isAsync()` to check whether the context is asynchronous.
+When accessing player information inside `ResultSupplier` or `CMatterPredicate`, use `ctx.isAsync()` to check whether the context is asynchronous.
 :::
 
 ```kotlin
 val player: Player = /* ... */
 val view = CraftView(
     materials = mapOf(CoordinateComponent(0, 0) to ItemStack.of(Material.STONE)),
-    result = ItemStack.empty()
 )
 
 val future: CompletableFuture<Search.SearchResult> = Search.asyncSearch(player.uniqueId, view)
@@ -194,7 +190,6 @@ val view = CraftView(
     materials = CoordinateComponent.squareFill(3)
         .filter { it.x < 3 && it.y < 3 }
         .associate { it to ItemStack.of(Material.COBBLESTONE) },
-    result = ItemStack.empty()
 )
 val vanillaRecipe: Recipe? = VanillaSearch.search(Bukkit.getWorlds().first(), view)
 vanillaRecipe?.let { println("Result item: ${it.result.type}") }
@@ -272,7 +267,6 @@ Each entry in the returned list implements `PartialSearchResult`:
 val player: Player = /* ... */
 val view = CraftView(
     materials = mapOf(CoordinateComponent(0, 0) to ItemStack.of(Material.STONE)),
-    result = ItemStack.empty()
 )
 
 PartialSearch.asyncPartialSearch(player.uniqueId, view).thenAccept { results ->

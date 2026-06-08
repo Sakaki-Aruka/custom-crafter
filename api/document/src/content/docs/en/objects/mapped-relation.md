@@ -39,7 +39,7 @@ data class MappedRelationComponent(
 | Context | Field Name |
 |---------|-----------|
 | `ResultSupplier.Context` | `relation` |
-| `CRecipePredicate.Context` | `relations` |
+| `CRecipePredicate.Context` | `relation` |
 | `SearchResult` | `relation` (via getter method) |
 
 ---
