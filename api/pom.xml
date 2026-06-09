@@ -155,6 +155,25 @@
                         <include>${project.basedir}/target/classes/Module.md</include>
 <!--                        <include>${project.basedir}/Module.md</include>-->
                     </includes>
+                    <!-- Disable Dokka's built-in JDK and stdlib links so that only the explicit
+                         versions below (Java 21, Kotlin 2.3.0) are used instead of the
+                         version-indeterminate defaults Dokka would otherwise inject. -->
+                    <noJdkLink>true</noJdkLink>
+                    <noStdlibLink>true</noStdlibLink>
+                    <externalDocumentationLinks>
+                        <link>
+                            <url>https://docs.oracle.com/en/java/javase/21/docs/api/</url>
+                            <packageListUrl>https://docs.oracle.com/en/java/javase/21/docs/api/element-list</packageListUrl>
+                        </link>
+                        <link>
+                            <url>https://kotlinlang.org/api/core/kotlin-stdlib/</url>
+                            <packageListUrl>https://kotlinlang.org/api/core/kotlin-stdlib/package-list</packageListUrl>
+                        </link>
+                        <link>
+                            <url>https://jd.papermc.io/paper/1.21.4/</url>
+                            <packageListUrl>https://jd.papermc.io/paper/1.21.4/element-list</packageListUrl>
+                        </link>
+                    </externalDocumentationLinks>
                 </configuration>
             </plugin>
             <plugin>
