@@ -1,0 +1,45 @@
+$dokka.format:javadoc-v1
+$dokka.linkExtension:html
+$dokka.location:io.github.sakaki_aruka.customcrafter.event/CustomCrafterAPIPropertiesChangeEvent.Property///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/event/CustomCrafterAPIPropertiesChangeEvent.Property.html
+$dokka.location:io.github.sakaki_aruka.customcrafter.event/CustomCrafterAPIPropertiesChangeEvent.PropertyKey///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/event/CustomCrafterAPIPropertiesChangeEvent.PropertyKey.html
+$dokka.location:io.github.sakaki_aruka.customcrafter.matter.enchant/CEnchantComponent.Strict///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/matter/enchant/CEnchantComponent.Strict.html
+$dokka.location:io.github.sakaki_aruka.customcrafter.matter.potion/CPotionComponent.Strict///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/matter/potion/CPotionComponent.Strict.html
+$dokka.location:io.github.sakaki_aruka.customcrafter.matter/CMatterPredicate.Context///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/matter/CMatterPredicate.Context.html
+$dokka.location:io.github.sakaki_aruka.customcrafter.recipe/AdjacentRecipe.RelationType///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/recipe/AdjacentRecipe.RelationType.html
+$dokka.location:io.github.sakaki_aruka.customcrafter.recipe/CRecipe.Type///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/recipe/CRecipe.Type.html
+$dokka.location:io.github.sakaki_aruka.customcrafter.recipe/CRecipePredicate.Context///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/recipe/CRecipePredicate.Context.html
+$dokka.location:io.github.sakaki_aruka.customcrafter.recipe/GroupRecipe.Context///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/recipe/GroupRecipe.Context.html
+$dokka.location:io.github.sakaki_aruka.customcrafter.recipe/GroupRecipe.Matter///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/recipe/GroupRecipe.Matter.html
+$dokka.location:io.github.sakaki_aruka.customcrafter.result/ReplaceableResultSupplier.Context///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/result/ReplaceableResultSupplier.Context.html
+$dokka.location:io.github.sakaki_aruka.customcrafter.result/ReplaceableResultSupplier.ReplaceState///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/result/ReplaceableResultSupplier.ReplaceState.html
+$dokka.location:io.github.sakaki_aruka.customcrafter.result/ResultSupplier.Companion///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/result/ResultSupplier.Companion.html
+$dokka.location:io.github.sakaki_aruka.customcrafter.result/ResultSupplier.Context.CallMode///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/result/ResultSupplier.Context.CallMode.html
+$dokka.location:io.github.sakaki_aruka.customcrafter.result/ResultSupplier.Context///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/result/ResultSupplier.Context.html
+$dokka.location:io.github.sakaki_aruka.customcrafter.search/PartialSearch.MatchState///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/search/PartialSearch.MatchState.html
+$dokka.location:io.github.sakaki_aruka.customcrafter.search/PartialSearch.PartialSearchResult///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/search/PartialSearch.PartialSearchResult.html
+$dokka.location:io.github.sakaki_aruka.customcrafter.search/PartialSearch.PartialShapedResult///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/search/PartialSearch.PartialShapedResult.html
+$dokka.location:io.github.sakaki_aruka.customcrafter.search/PartialSearch.PartialShapelessResult///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/search/PartialSearch.PartialShapelessResult.html
+$dokka.location:io.github.sakaki_aruka.customcrafter.search/Search.SearchQuery.SearchMode///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/search/Search.SearchQuery.SearchMode.html
+$dokka.location:io.github.sakaki_aruka.customcrafter.search/Search.SearchQuery.VanillaSearchMode///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/search/Search.SearchQuery.VanillaSearchMode.html
+$dokka.location:io.github.sakaki_aruka.customcrafter.search/Search.SearchQuery///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/search/Search.SearchQuery.html
+$dokka.location:io.github.sakaki_aruka.customcrafter.search/Search.SearchResult///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/search/Search.SearchResult.html
+$dokka.location:io.github.sakaki_aruka.customcrafter.ui/AllCandidateUIDesigner.Baked///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/ui/AllCandidateUIDesigner.Baked.html
+$dokka.location:io.github.sakaki_aruka.customcrafter.ui/AllCandidateUIDesigner.Companion///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/ui/AllCandidateUIDesigner.Companion.html
+$dokka.location:io.github.sakaki_aruka.customcrafter.ui/AllCandidateUIDesigner.Context///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/ui/AllCandidateUIDesigner.Context.html
+$dokka.location:io.github.sakaki_aruka.customcrafter.ui/CraftUIDesigner.Baked///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/ui/CraftUIDesigner.Baked.html
+$dokka.location:io.github.sakaki_aruka.customcrafter.ui/CraftUIDesigner.Companion///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/ui/CraftUIDesigner.Companion.html
+$dokka.location:io.github.sakaki_aruka.customcrafter.ui/CraftUIDesigner.Context///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/ui/CraftUIDesigner.Context.html
+$dokka.location:io.github.sakaki_aruka.customcrafter/CustomCrafterAPI.NameStrictLevel///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/CustomCrafterAPI.NameStrictLevel.html
+$dokka.location:io.github.sakaki_aruka.customcrafter/CustomCrafterAPI.VersionType///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/CustomCrafterAPI.VersionType.html
+io.github.sakaki_aruka.customcrafter
+io.github.sakaki_aruka.customcrafter.event
+io.github.sakaki_aruka.customcrafter.event.failure
+io.github.sakaki_aruka.customcrafter.matter
+io.github.sakaki_aruka.customcrafter.matter.enchant
+io.github.sakaki_aruka.customcrafter.matter.potion
+io.github.sakaki_aruka.customcrafter.objects
+io.github.sakaki_aruka.customcrafter.recipe
+io.github.sakaki_aruka.customcrafter.result
+io.github.sakaki_aruka.customcrafter.search
+io.github.sakaki_aruka.customcrafter.ui
+io.github.sakaki_aruka.customcrafter.util

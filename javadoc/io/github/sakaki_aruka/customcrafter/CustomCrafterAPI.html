@@ -1,0 +1,2062 @@
+<!DOCTYPE HTML>
+<!-- NewPage -->
+<html lang="en"><head>
+    <title>CustomCrafterAPI </title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="dc.created" content="2020-03-25">
+    <link rel="stylesheet" type="text/css" href="../../../../stylesheet.css" title="Style">
+    <link rel="stylesheet" type="text/css" href="../../../../dokka-javadoc-stylesheet.css" title="Style">
+    <link rel="stylesheet" type="text/css" href="../../../../jquery/jquery-ui.css" title="Style">
+    <script type="text/javascript" src="../../../../jquery/jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="../../../../jquery/jquery-migrate-3.4.0.min.js"></script>
+    <script type="text/javascript" src="../../../../jquery/jquery-ui.js"></script>
+
+    <script type="text/javascript" src="../../../../search.js"></script>
+    <script async type="text/javascript" src="../../../../module-search-index.js"></script>
+    <script async type="text/javascript" src="../../../../package-search-index.js"></script>
+    <script async type="text/javascript" src="../../../../type-search-index.js"></script>
+    <script async type="text/javascript" src="../../../../member-search-index.js"></script>
+    <script async type="text/javascript" src="../../../../tag-search-index.js"></script>
+</head><body>
+<script type="text/javascript">
+var pathtoroot = "../../../../";
+</script>
+<noscript>
+    <div>JavaScript is disabled on your browser.</div>
+</noscript><header role="banner">
+    <nav role="navigation">
+        <div class="fixedNav">
+            <!-- ========= START OF TOP NAVBAR ======= -->
+            <div class="topNav"><a id="navbar.top">
+                <!--   -->
+            </a>
+                <div class="skipNav"><a href="#skip.navbar.top" title="Skip navigation links">Skip navigation links</a>
+                </div>
+                <a id="navbar.top.firstrow">
+                    <!--   -->
+                </a>
+                <ul class="navList" title="Navigation">
+    <li><a href="../../../../index.html">Overview</a></li>
+    
+    <li><a href="package-summary.html">Package</a></li>
+    
+    <li>Class</li>
+    
+    <li><a href="package-tree.html">Tree</a></li>
+    
+    <li><a href="../../../../deprecated.html">Deprecated</a></li>
+    <li><a href="../../../../index-files/index-1.html">Index</a></li>
+    <li>Help</li>
+</ul></div>
+            <div class="subNav">
+<ul class="navList" id="allclasses_navbar_top" style="display: block;">
+    <li><a href="../../../../allclasses.html">All&nbsp;Classes</a></li>
+</ul>
+
+<ul class="navListSearch">
+<li><label for="search">SEARCH:</label>
+<input type="text" id="search" value="search" class="ui-autocomplete-input" autocomplete="off" placeholder="Search">
+<input type="reset" id="reset" value="reset">
+</li>
+</ul>
+<div>
+<script type="text/javascript"><!--
+  allClassesLink = document.getElementById("allclasses_navbar_top");
+  if(window==top) {
+    allClassesLink.style.display = "block";
+  }
+  else {
+    allClassesLink.style.display = "none";
+  }
+  //-->
+</script>
+<noscript>
+<div>JavaScript is disabled on your browser.</div>
+</noscript>
+</div>
+<a id="skip.navbar.top">
+<!--   -->
+</a></div><!-- ========= END OF TOP NAVBAR ========= -->
+        </div>
+        <div class="navPadding">&nbsp;</div>
+        <script type="text/javascript"><!--
+        $('.navPadding').css('padding-top', $('.fixedNav').css("height"));
+        //-->
+        </script>
+    </nav>
+</header>
+
+<main role="main">
+    <div class="header">
+        <div class="subTitle"><span class="packageLabelInType">Package</span>&nbsp;<a href="package-summary.html">io.github.sakaki_aruka.customcrafter</a></div>
+        <h2 title="Object CustomCrafterAPI" class="title">Object CustomCrafterAPI</h2>
+    </div>
+    <div class="contentContainer">
+        <!-- <ul class="inheritance">
+            <li>java.lang.Object</li>
+            <li>
+                <ul class="inheritance">
+                    <li>adaptation.Adaptation</li>
+                </ul>
+            </li>
+        </ul> TODO inheritance tree -->
+        <div class="description">
+            <ul class="blockList">
+                <li class="blockList">
+                    
+                    <dl>
+                        <dt>All Implemented Interfaces:</dt>
+                        <dd>
+                            
+                        </dd>
+                    </dl>
+                    
+                    <hr>
+                    <pre class="wrap-overflow">
+
+public class <span class="typeNameLabel"><a href=CustomCrafterAPI.html>CustomCrafterAPI</a></span>
+
+                    </pre>
+                    <div class="block"></div>
+
+                    <dl>
+
+                    
+
+                    
+
+                    </dl>
+                </li>
+            </ul>
+        </div>
+        <div class="summary">
+            <ul class="blockList">
+                <li class="blockList">
+                <!-- ======== NESTED CLASS SUMMARY ======== -->
+                    
+                    <section role="region">
+                        <ul class="blockList">
+                            <li class="blockList"><a id="nested.class.summary">
+                                <!--   -->
+                            </a>
+                                <h3>Nested Class Summary</h3>
+                                <div class="memberSummary">
+                                    <table>
+                                        <caption><span>Nested Classes</span><span class="tabEnd">&nbsp;</span></caption>
+                                        <tr>
+                                            <th class="colFirst" scope="col">Modifier and Type</th>
+                                            <th class="colSecond" scope="col">Class</th>
+                                            <th class="colLast" scope="col">Description</th>
+                                        </tr>
+                                        
+                                        <tr class="altColor">
+                                            <td class="colFirst"><code>public enum</code></td>
+                                            <th class="colSecond" scope="row"><code><a href="CustomCrafterAPI.VersionType.html">CustomCrafterAPI.VersionType</a></span></code>
+                                            </th>
+                                            <td class="colLast"><p>Represents the release stage of the Custom Crafter API.</p><p>Use <a href=CustomCrafterAPI.html#VERSION_TYPE>CustomCrafterAPI.VERSION_TYPE</a> to get the current release stage.</p><pre><code>if (CustomCrafterAPI.VERSION_TYPE != CustomCrafterAPI.VersionType.STABLE) {
+    logger.warning(&quot;CustomCrafter API is not a stable release: ${CustomCrafterAPI.VERSION_TYPE}&quot;)
+}</code></pre></td>
+                                        </tr>
+                                        
+                                        <tr class="rowColor">
+                                            <td class="colFirst"><code>public enum</code></td>
+                                            <th class="colSecond" scope="row"><code><a href="CustomCrafterAPI.NameStrictLevel.html">CustomCrafterAPI.NameStrictLevel</a></span></code>
+                                            </th>
+                                            <td class="colLast"><p>Restriction level for recipe name duplication, applied during recipe registration.</p><p>Introduced to prevent confusion when multiple recipes are displayed simultaneously.</p><ul><li><p><a href=CustomCrafterAPI.NameStrictLevel.html#NOTHING>NOTHING</a>: No restriction.</p></li><li><p><a href=CustomCrafterAPI.NameStrictLevel.html#WEAK>WEAK</a>: A recipe cannot be registered if an existing recipe has an exactly matching name.</p></li><li><p><a href=CustomCrafterAPI.NameStrictLevel.html#STRICT>STRICT</a>: A recipe cannot be registered if its name, with all whitespace removed, matches an existing recipe name.</p></li></ul></td>
+                                        </tr>
+                                        
+                                    </table>
+                                </div>
+                            </li>
+                        </ul>
+                    </section>
+                    
+                    <!-- =========== FIELD SUMMARY =========== -->
+                    
+                    <section role="region">
+                        <ul class="blockList">
+                            <li class="blockList"><a id="field.summary">
+                                <!--   -->
+                            </a>
+                                <h3>Field Summary</h3>
+                                <div class="memberSummary">
+                                    <table>
+                                        <caption><span>Fields</span><span class="tabEnd">&nbsp;</span></caption>
+                                        <tr>
+                                            <th class="colFirst" scope="col">Modifier and Type</th>
+                                            <th class="colSecond" scope="col">Field</th>
+                                            <th class="colLast" scope="col">Description</th>
+                                        </tr>
+                                        
+                                        <tr class="altColor">
+                                            <td class="colFirst"><code>public final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Integer.html>Integer</a></code></td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#MAJOR_VERSION>MAJOR_VERSION</a></code></th>
+                                            <td class="colLast"></td>
+                                        </tr>
+                                        
+                                        <tr class="rowColor">
+                                            <td class="colFirst"><code>public final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Integer.html>Integer</a></code></td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#MINOR_VERSION>MINOR_VERSION</a></code></th>
+                                            <td class="colLast"></td>
+                                        </tr>
+                                        
+                                        <tr class="altColor">
+                                            <td class="colFirst"><code>public final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Integer.html>Integer</a></code></td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#PATCH_VERSION>PATCH_VERSION</a></code></th>
+                                            <td class="colLast"></td>
+                                        </tr>
+                                        
+                                        <tr class="rowColor">
+                                            <td class="colFirst"><code>public final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html>String</a></code></td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#API_VERSION>API_VERSION</a></code></th>
+                                            <td class="colLast"></td>
+                                        </tr>
+                                        
+                                        <tr class="altColor">
+                                            <td class="colFirst"><code>private final <a href=CustomCrafterAPI.VersionType.html>CustomCrafterAPI.VersionType</a></code></td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#VERSION_TYPE>VERSION_TYPE</a></code></th>
+                                            <td class="colLast"></td>
+                                        </tr>
+                                        
+                                        <tr class="rowColor">
+                                            <td class="colFirst"><code>public final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html>Set</a>&lt;<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html>String</a>&gt;</code></td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#AUTHORS>AUTHORS</a></code></th>
+                                            <td class="colLast"></td>
+                                        </tr>
+                                        
+                                        <tr class="altColor">
+                                            <td class="colFirst"><code>public final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a></code></td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#DEFAULT_RESULT_GIVE_CANCEL>DEFAULT_RESULT_GIVE_CANCEL</a></code></th>
+                                            <td class="colLast"></td>
+                                        </tr>
+                                        
+                                        <tr class="rowColor">
+                                            <td class="colFirst"><code>public final static <a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/Material.html>Material</a></code></td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#DEFAULT_BASE_BLOCK>DEFAULT_BASE_BLOCK</a></code></th>
+                                            <td class="colLast"></td>
+                                        </tr>
+                                        
+                                        <tr class="altColor">
+                                            <td class="colFirst"><code>public final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a></code></td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#DEFAULT_USE_MULTIPLE_RESULT_CANDIDATE_FEATURE>DEFAULT_USE_MULTIPLE_RESULT_CANDIDATE_FEATURE</a></code></th>
+                                            <td class="colLast"></td>
+                                        </tr>
+                                        
+                                        <tr class="rowColor">
+                                            <td class="colFirst"><code>public final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a></code></td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#DEFAULT_USE_CUSTOM_CRAFT_UI>DEFAULT_USE_CUSTOM_CRAFT_UI</a></code></th>
+                                            <td class="colLast"></td>
+                                        </tr>
+                                        
+                                        <tr class="altColor">
+                                            <td class="colFirst"><code>public final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Integer.html>Integer</a></code></td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#DEFAULT_BASE_BLOCK_SIDE>DEFAULT_BASE_BLOCK_SIDE</a></code></th>
+                                            <td class="colLast"></td>
+                                        </tr>
+                                        
+                                        <tr class="rowColor">
+                                            <td class="colFirst"><code>public final static <a href=ui/CraftUIDesigner.html>CraftUIDesigner</a></code></td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#DEFAULT_CRAFT_UI_DESIGNER>DEFAULT_CRAFT_UI_DESIGNER</a></code></th>
+                                            <td class="colLast"></td>
+                                        </tr>
+                                        
+                                        <tr class="altColor">
+                                            <td class="colFirst"><code>public final static <a href=CustomCrafterAPI.NameStrictLevel.html>CustomCrafterAPI.NameStrictLevel</a></code></td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#DEFAULT_RECIPE_NAME_STRICT_LEVEL>DEFAULT_RECIPE_NAME_STRICT_LEVEL</a></code></th>
+                                            <td class="colLast"></td>
+                                        </tr>
+                                        
+                                        <tr class="rowColor">
+                                            <td class="colFirst"><code>public final static <a href=ui/AllCandidateUIDesigner.html>AllCandidateUIDesigner</a></code></td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#DEFAULT_ALL_CANDIDATE_UI_DESIGNER>DEFAULT_ALL_CANDIDATE_UI_DESIGNER</a></code></th>
+                                            <td class="colLast"></td>
+                                        </tr>
+                                        
+                                        <tr class="altColor">
+                                            <td class="colFirst"><code>public final static <a href=CustomCrafterAPI.html>CustomCrafterAPI</a></code></td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#INSTANCE>INSTANCE</a></code></th>
+                                            <td class="colLast"></td>
+                                        </tr>
+                                        
+                                    </table>
+                                </div>
+                            </li>
+                        </ul>
+                    </section>
+                    
+                    <!-- ======== CONSTRUCTOR SUMMARY ======== -->
+                    
+                    <section role="region">
+                        <ul class="blockList">
+                            <li class="blockList"><a id="constructor.summary">
+                                <!--   -->
+                            </a>
+                                <h3>Constructor Summary</h3>
+                                <div class="memberSummary">
+                                    <table>
+                                        <caption><span>Constructors</span><span class="tabEnd">&nbsp;</span></caption>
+                                        <tbody>
+                                        <tr>
+                                            <th class="colFirst" scope="col">Constructor</th>
+                                            <th class="colLast" scope="col">Description</th>
+                                        </tr>
+
+                                        
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </li>
+                        </ul>
+                    </section>
+                    
+                    <!-- =========== ENUM CONSTANT SUMMARY =========== -->
+                    
+                    <section role="region">
+                        <ul class="blockList">
+                            <li class="blockList"><a id="enum.constant.summary">
+                                <!--   -->
+                            </a>
+                                <h3>Enum Constant Summary</h3>
+                                <table class="memberSummary">
+                                    <caption><span>Enum Constants</span><span class="tabEnd">&nbsp;</span></caption>
+                                    <tr>
+                                        <th class="colFirst" scope="col">Enum Constant</th>
+                                        <th class="colLast" scope="col">Description</th>
+                                    </tr>
+                                    
+                                </table>
+                            </li>
+                        </ul>
+                    </section>
+                    
+                    <!-- ========== METHOD SUMMARY =========== -->
+                    
+                    <section role="region">
+                        <ul class="blockList">
+                            <li class="blockList"><a id="method.summary">
+                                <!--   -->
+                            </a>
+                                <h3>Method Summary</h3>
+                                <div class="memberSummary">
+                                    <div role="tablist" aria-orientation="horizontal">
+                                        <button role="tab" aria-selected="true" aria-controls="memberSummary_tabpanel" tabindex="0" onkeydown="switchTab(event)" id="t0" class="activeTableTab">All Methods</button>
+                                        <!-- TODO: Instance and Concrete Methods #1118 -->
+                                    </div>
+                                    <div id="memberSummary_tabpanel" role="tabpanel">
+                                    <table aria-labelledby="t0">
+                                        <tr>
+                                            <th class="colFirst" scope="col">Modifier and Type</th>
+                                            <th class="colSecond" scope="col">Method</th>
+                                            <th class="colLast" scope="col">Description</th>
+                                        </tr>
+                                        
+                                        <tr id="i0" class="altColor">
+                                            <td class="colFirst"><code>final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#hasFullCompatibility(java.lang.String)>hasFullCompatibility</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html>String</a> version) </code>
+                                            </th>
+                                            <td class="colLast">Checks full-compatibilityThis function will be removed in 6.0.0.</td>
+                                        </tr>
+                                        
+                                        <tr id="i1" class="rowColor">
+                                            <td class="colFirst"><code>final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#getResultGiveCancel()>getResultGiveCancel</a>() </code>
+                                            </th>
+                                            <td class="colLast">Returns a boolean value that means the Custom Crafter API give result items to players or not.</td>
+                                        </tr>
+                                        
+                                        <tr id="i2" class="altColor">
+                                            <td class="colFirst"><code>final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#setResultGiveCancel(java.lang.Boolean,java.lang.Boolean)>setResultGiveCancel</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> v, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> calledAsync) </code>
+                                            </th>
+                                            <td class="colLast">Sets a boolean value that means the Custom Crafter API give result items to players or not.</td>
+                                        </tr>
+                                        
+                                        <tr id="i3" class="rowColor">
+                                            <td class="colFirst"><code>final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#setResultGiveCancel(java.lang.Boolean,java.lang.Boolean)>setResultGiveCancel</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> v) </code>
+                                            </th>
+                                            <td class="colLast">Sets a boolean value that means the Custom Crafter API give result items to players or not.</td>
+                                        </tr>
+                                        
+                                        <tr id="i4" class="altColor">
+                                            <td class="colFirst"><code>final static <a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/Material.html>Material</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#getBaseBlock()>getBaseBlock</a>() </code>
+                                            </th>
+                                            <td class="colLast">Gets a base block type.</td>
+                                        </tr>
+                                        
+                                        <tr id="i5" class="rowColor">
+                                            <td class="colFirst"><code>final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#setBaseBlock(org.bukkit.Material,java.lang.Boolean)>setBaseBlock</a>(<a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/Material.html>Material</a> type, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> calledAsync) </code>
+                                            </th>
+                                            <td class="colLast">Sets base block with given material.</td>
+                                        </tr>
+                                        
+                                        <tr id="i6" class="altColor">
+                                            <td class="colFirst"><code>final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#setBaseBlock(org.bukkit.Material,java.lang.Boolean)>setBaseBlock</a>(<a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/Material.html>Material</a> type) </code>
+                                            </th>
+                                            <td class="colLast">Sets base block with given material.</td>
+                                        </tr>
+                                        
+                                        <tr id="i7" class="rowColor">
+                                            <td class="colFirst"><code>final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#getUseMultipleResultCandidateFeature()>getUseMultipleResultCandidateFeature</a>() </code>
+                                            </th>
+                                            <td class="colLast">Returns a boolean value that means 'multiple result candidate' feature enabled or not.</td>
+                                        </tr>
+                                        
+                                        <tr id="i8" class="altColor">
+                                            <td class="colFirst"><code>final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#setUseMultipleResultCandidateFeature(java.lang.Boolean,java.lang.Boolean)>setUseMultipleResultCandidateFeature</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> v, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> calledAsync) </code>
+                                            </th>
+                                            <td class="colLast">Sets 'multiple result candidate' feature enables or not.</td>
+                                        </tr>
+                                        
+                                        <tr id="i9" class="rowColor">
+                                            <td class="colFirst"><code>final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#setUseMultipleResultCandidateFeature(java.lang.Boolean,java.lang.Boolean)>setUseMultipleResultCandidateFeature</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> v) </code>
+                                            </th>
+                                            <td class="colLast">Sets 'multiple result candidate' feature enables or not.</td>
+                                        </tr>
+                                        
+                                        <tr id="i10" class="altColor">
+                                            <td class="colFirst"><code>final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#getUseCustomCraftUI()>getUseCustomCraftUI</a>() </code>
+                                            </th>
+                                            <td class="colLast">Returns a boolean value that means 'Custom Craft UI open' enabled or not.</td>
+                                        </tr>
+                                        
+                                        <tr id="i11" class="rowColor">
+                                            <td class="colFirst"><code>final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#setUseCustomCraftUI(java.lang.Boolean,java.lang.Boolean)>setUseCustomCraftUI</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> v, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> calledAsync) </code>
+                                            </th>
+                                            <td class="colLast">Sets 'Custom Craft UI open' enables or not.</td>
+                                        </tr>
+                                        
+                                        <tr id="i12" class="altColor">
+                                            <td class="colFirst"><code>final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#setUseCustomCraftUI(java.lang.Boolean,java.lang.Boolean)>setUseCustomCraftUI</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> v) </code>
+                                            </th>
+                                            <td class="colLast">Sets 'Custom Craft UI open' enables or not.</td>
+                                        </tr>
+                                        
+                                        <tr id="i13" class="rowColor">
+                                            <td class="colFirst"><code>final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#setBaseBlockSideSize(java.lang.Integer,java.lang.Boolean)>setBaseBlockSideSize</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Integer.html>Integer</a> size, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> calledAsync) </code>
+                                            </th>
+                                            <td class="colLast">Sets base block's side size.</td>
+                                        </tr>
+                                        
+                                        <tr id="i14" class="altColor">
+                                            <td class="colFirst"><code>final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#setBaseBlockSideSize(java.lang.Integer,java.lang.Boolean)>setBaseBlockSideSize</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Integer.html>Integer</a> size) </code>
+                                            </th>
+                                            <td class="colLast">Sets base block's side size.</td>
+                                        </tr>
+                                        
+                                        <tr id="i15" class="rowColor">
+                                            <td class="colFirst"><code>final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Integer.html>Integer</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#getBaseBlockSideSize()>getBaseBlockSideSize</a>() </code>
+                                            </th>
+                                            <td class="colLast">Gets the base block's side size.</td>
+                                        </tr>
+                                        
+                                        <tr id="i16" class="altColor">
+                                            <td class="colFirst"><code>final static <a href=ui/CraftUIDesigner.html>CraftUIDesigner</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#getCraftUIDesigner()>getCraftUIDesigner</a>() </code>
+                                            </th>
+                                            <td class="colLast">Returns a current CraftUI designer.</td>
+                                        </tr>
+                                        
+                                        <tr id="i17" class="rowColor">
+                                            <td class="colFirst"><code>final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#setCraftUIDesigner(io.github.sakaki_aruka.customcrafter.ui.CraftUIDesigner,java.lang.Boolean)>setCraftUIDesigner</a>(<a href=ui/CraftUIDesigner.html>CraftUIDesigner</a> designer, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> calledAsync) </code>
+                                            </th>
+                                            <td class="colLast">Sets a new CraftUI designer if a specified is valid.</td>
+                                        </tr>
+                                        
+                                        <tr id="i18" class="altColor">
+                                            <td class="colFirst"><code>final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#setCraftUIDesigner(io.github.sakaki_aruka.customcrafter.ui.CraftUIDesigner,java.lang.Boolean)>setCraftUIDesigner</a>(<a href=ui/CraftUIDesigner.html>CraftUIDesigner</a> designer) </code>
+                                            </th>
+                                            <td class="colLast">Sets a new CraftUI designer if a specified is valid.</td>
+                                        </tr>
+                                        
+                                        <tr id="i19" class="rowColor">
+                                            <td class="colFirst"><code>final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html>Set</a>&lt;<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html>String</a>&gt;</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#getRegisteredRecipeNames()>getRegisteredRecipeNames</a>() </code>
+                                            </th>
+                                            <td class="colLast">Returns a set of all registered recipe names.</td>
+                                        </tr>
+                                        
+                                        <tr id="i20" class="altColor">
+                                            <td class="colFirst"><code>final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=recipe/CRecipe.html>CRecipe</a>&gt;</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#getRegisteredRecipeFromName(kotlin.jvm.functions.Function1)>getRegisteredRecipeFromName</a>(Function1&lt;<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html>String</a>, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a>&gt; filter) </code>
+                                            </th>
+                                            <td class="colLast">Returns registered recipes whose names satisfy the given filter predicate.</td>
+                                        </tr>
+                                        
+                                        <tr id="i21" class="rowColor">
+                                            <td class="colFirst"><code>final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=recipe/CRecipe.html>CRecipe</a>&gt;</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#getRegisteredRecipeFromName(java.lang.String)>getRegisteredRecipeFromName</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html>String</a> recipeName) </code>
+                                            </th>
+                                            <td class="colLast">Returns registered recipes whose names exactly match the given string.</td>
+                                        </tr>
+                                        
+                                        <tr id="i22" class="altColor">
+                                            <td class="colFirst"><code>final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=recipe/CRecipe.html>CRecipe</a>&gt;</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#getRegisteredRecipeFromPlugin(org.bukkit.plugin.java.JavaPlugin)>getRegisteredRecipeFromPlugin</a>(<a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/plugin/java/JavaPlugin.html>JavaPlugin</a> plugin) </code>
+                                            </th>
+                                            <td class="colLast">Returns recipes that are registered by given plugin instance.</td>
+                                        </tr>
+                                        
+                                        <tr id="i23" class="rowColor">
+                                            <td class="colFirst"><code>final static <a href=CustomCrafterAPI.NameStrictLevel.html>CustomCrafterAPI.NameStrictLevel</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#getRecipeNameStrictLevel()>getRecipeNameStrictLevel</a>() </code>
+                                            </th>
+                                            <td class="colLast">Returns current recipe-name-strict-level</td>
+                                        </tr>
+                                        
+                                        <tr id="i24" class="altColor">
+                                            <td class="colFirst"><code>final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#setRecipeNameStrictLevel(io.github.sakaki_aruka.customcrafter.CustomCrafterAPI.NameStrictLevel,java.lang.Boolean)>setRecipeNameStrictLevel</a>(<a href=CustomCrafterAPI.NameStrictLevel.html>CustomCrafterAPI.NameStrictLevel</a> level, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> calledAsync) </code>
+                                            </th>
+                                            <td class="colLast">Sets the recipe name strict level.</td>
+                                        </tr>
+                                        
+                                        <tr id="i25" class="rowColor">
+                                            <td class="colFirst"><code>final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#setRecipeNameStrictLevel(io.github.sakaki_aruka.customcrafter.CustomCrafterAPI.NameStrictLevel,java.lang.Boolean)>setRecipeNameStrictLevel</a>(<a href=CustomCrafterAPI.NameStrictLevel.html>CustomCrafterAPI.NameStrictLevel</a> level) </code>
+                                            </th>
+                                            <td class="colLast">Sets the recipe name strict level.</td>
+                                        </tr>
+                                        
+                                        <tr id="i26" class="altColor">
+                                            <td class="colFirst"><code>final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=recipe/CRecipe.html>CRecipe</a>&gt;</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#getRecipes()>getRecipes</a>() </code>
+                                            </th>
+                                            <td class="colLast">Returns an immutable list of all registered recipes.</td>
+                                        </tr>
+                                        
+                                        <tr id="i27" class="rowColor">
+                                            <td class="colFirst"><code>final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#registerRecipe(java.util.List,org.bukkit.plugin.java.JavaPlugin,java.lang.Boolean)>registerRecipe</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=recipe/CRecipe.html>CRecipe</a>&gt; recipes, <a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/plugin/java/JavaPlugin.html>JavaPlugin</a> plugin, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> calledAsync) </code>
+                                            </th>
+                                            <td class="colLast">Registers the provided recipes and fires <a href=event/RegisterCustomRecipeEvent.html>RegisterCustomRecipeEvent</a>.</td>
+                                        </tr>
+                                        
+                                        <tr id="i28" class="altColor">
+                                            <td class="colFirst"><code>final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#registerRecipe(java.util.List,org.bukkit.plugin.java.JavaPlugin,java.lang.Boolean)>registerRecipe</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=recipe/CRecipe.html>CRecipe</a>&gt; recipes, <a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/plugin/java/JavaPlugin.html>JavaPlugin</a> plugin) </code>
+                                            </th>
+                                            <td class="colLast">Registers the provided recipes and fires <a href=event/RegisterCustomRecipeEvent.html>RegisterCustomRecipeEvent</a>.</td>
+                                        </tr>
+                                        
+                                        <tr id="i29" class="rowColor">
+                                            <td class="colFirst"><code>final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#registerRecipe(java.util.List,org.bukkit.plugin.java.JavaPlugin,java.lang.Boolean)>registerRecipe</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=recipe/CRecipe.html>CRecipe</a>&gt; recipes) </code>
+                                            </th>
+                                            <td class="colLast">Registers the provided recipes and fires <a href=event/RegisterCustomRecipeEvent.html>RegisterCustomRecipeEvent</a>.</td>
+                                        </tr>
+                                        
+                                        <tr id="i30" class="altColor">
+                                            <td class="colFirst"><code>final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#unregisterRecipe(java.lang.String,org.bukkit.plugin.java.JavaPlugin,java.lang.Boolean)>unregisterRecipe</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html>String</a> name, <a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/plugin/java/JavaPlugin.html>JavaPlugin</a> plugin, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> calledAsync) </code>
+                                            </th>
+                                            <td class="colLast">Unregisters recipes that match the specified conditions.</td>
+                                        </tr>
+                                        
+                                        <tr id="i31" class="rowColor">
+                                            <td class="colFirst"><code>final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#unregisterRecipe(java.lang.String,org.bukkit.plugin.java.JavaPlugin,java.lang.Boolean)>unregisterRecipe</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html>String</a> name, <a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/plugin/java/JavaPlugin.html>JavaPlugin</a> plugin) </code>
+                                            </th>
+                                            <td class="colLast">Unregisters recipes that match the specified conditions.</td>
+                                        </tr>
+                                        
+                                        <tr id="i32" class="altColor">
+                                            <td class="colFirst"><code>final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#unregisterRecipe(java.lang.String,org.bukkit.plugin.java.JavaPlugin,java.lang.Boolean)>unregisterRecipe</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html>String</a> name) </code>
+                                            </th>
+                                            <td class="colLast">Unregisters recipes that match the specified conditions.</td>
+                                        </tr>
+                                        
+                                        <tr id="i33" class="rowColor">
+                                            <td class="colFirst"><code>final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#unregisterRecipe(java.lang.String,org.bukkit.plugin.java.JavaPlugin,java.lang.Boolean)>unregisterRecipe</a>() </code>
+                                            </th>
+                                            <td class="colLast">Unregisters recipes that match the specified conditions.</td>
+                                        </tr>
+                                        
+                                        <tr id="i34" class="altColor">
+                                            <td class="colFirst"><code>final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#unregisterAllRecipes(java.lang.Boolean)>unregisterAllRecipes</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> calledAsync) </code>
+                                            </th>
+                                            <td class="colLast">Unregisters all registered recipes.</td>
+                                        </tr>
+                                        
+                                        <tr id="i35" class="rowColor">
+                                            <td class="colFirst"><code>final static <a href=ui/AllCandidateUIDesigner.html>AllCandidateUIDesigner</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#getAllCandidateUIDesigner()>getAllCandidateUIDesigner</a>() </code>
+                                            </th>
+                                            <td class="colLast">Returns current <a href=ui/AllCandidateUIDesigner.html>AllCandidateUIDesigner</a></td>
+                                        </tr>
+                                        
+                                        <tr id="i36" class="altColor">
+                                            <td class="colFirst"><code>final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#setAllCandidateUIDesigner(io.github.sakaki_aruka.customcrafter.ui.AllCandidateUIDesigner)>setAllCandidateUIDesigner</a>(<a href=ui/AllCandidateUIDesigner.html>AllCandidateUIDesigner</a> designer) </code>
+                                            </th>
+                                            <td class="colLast">Sets the <a href=ui/AllCandidateUIDesigner.html>AllCandidateUIDesigner</a>.</td>
+                                        </tr>
+                                        
+                                        <tr id="i37" class="rowColor">
+                                            <td class="colFirst"><code>final <a href=CustomCrafterAPI.VersionType.html>CustomCrafterAPI.VersionType</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=CustomCrafterAPI.html#getVERSION_TYPE()>getVERSION_TYPE</a>() </code>
+                                            </th>
+                                            <td class="colLast">Release stage of the Custom Crafter API.</td>
+                                        </tr>
+                                        
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <ul class="blockList">
+                                
+                                    <li class="blockList"><a id="methods.inherited.from.class.java.lang.Object">
+                                        <!--   -->
+                                    </a>
+                                        <h3>Methods inherited from class&nbsp;java.lang.Object</h3>
+                                        <code>clone, equals, finalize, getClass, hashCode, notify, notifyAll, toString,
+                                            wait, wait, wait</code></li>
+                                </ul>
+                            </li>
+                        </ul>
+                    </section>
+                    
+                </li>
+            </ul>
+        </div>
+        <div class="details">
+            <ul class="blockList">
+                <li class="blockList">
+                    <!-- ========= CONSTRUCTOR DETAIL ======== -->
+                    
+                    <section role="region">
+                        <ul class="blockList">
+                            <li class="blockList"><a id="constructor.detail">
+                                <!--   -->
+                            </a>
+                                <h3>Constructor Detail</h3>
+                                
+                            </li>
+                        </ul>
+                    </section>
+                    
+                    <!-- ============ METHOD DETAIL ========== -->
+                    
+                    <section role="region">
+                        <ul class="blockList">
+                            <li class="blockList"><a id="method.detail">
+                                <!--   -->
+                            </a>
+                                <h3>Method Detail</h3>
+                                
+                                <a id="hasFullCompatibility(java.lang.String)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>hasFullCompatibility</h4>
+                                        <pre class="methodSignature">@<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-deprecated/index.html>Deprecated</a>(message = &quot;Removal for 6.0.0. Use 'VersionType' and (MAJOR|MINOR|PATCH)_VERSION instead.&quot;, replaceWith = @<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-replace-with/index.html>ReplaceWith</a>(expression = &quot;MAJOR_VERSION&quot;), level = <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-deprecation-level/-w-a-r-n-i-n-g/index.html>DeprecationLevel.WARNING</a>) final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> <a href=CustomCrafterAPI.html#hasFullCompatibility(java.lang.String)>hasFullCompatibility</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html>String</a> version)</pre>
+                                        <div class="block"><p>Checks full-compatibility</p><p>This function will be removed in 6.0.0. Use <a href=CustomCrafterAPI.html#MAJOR_VERSION>MAJOR_VERSION</a>, <a href=CustomCrafterAPI.html#MINOR_VERSION>MINOR_VERSION</a>, <a href=CustomCrafterAPI.html#PATCH_VERSION>PATCH_VERSION</a> for version comparison, and <a href=CustomCrafterAPI.html#VERSION_TYPE>VERSION_TYPE</a> to check the release stage.</p><pre><code>// Check Example in your plugin
+@Override
+fun onEnable() {
+    if (!CustomCrafterAPI.hasFullCompatibility(&quot;5.0.15&quot;)) {
+        println(&quot;This plugin has not full-compatibility with loaded CustomCrafter.&quot;)
+        println(&quot;Loaded Version: ${CustomCrafterAPI.API_VERSION}&quot;)
+        Bukkit.pluginManager.disablePlugin(this)
+        return
+    }
+}</code></pre></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>version</code> - CustomCrafter version string that is used by your plugin.</dd>
+                                            
+                                            
+                                        
+
+                                        
+
+                                        
+                                            <dt><span class="sinceLabel">Since:</span></dt>
+                                            
+                                                <dd><p>5.0.13</p></dd>
+                                            
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="getResultGiveCancel()">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>getResultGiveCancel</h4>
+                                        <pre class="methodSignature"> final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> <a href=CustomCrafterAPI.html#getResultGiveCancel()>getResultGiveCancel</a>()</pre>
+                                        <div class="block"><p>Returns a boolean value that means the Custom Crafter API give result items to players or not.</p></div>
+
+                                        <dl>
+
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p><a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html>Boolean</a> Give or not</p></dd>
+                                        
+
+                                        
+                                            <dt><span class="sinceLabel">Since:</span></dt>
+                                            
+                                                <dd><p>5.0.11</p></dd>
+                                            
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="setResultGiveCancel(java.lang.Boolean,java.lang.Boolean)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>setResultGiveCancel</h4>
+                                        <pre class="methodSignature">@<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-overloads/index.html>JvmOverloads</a>() final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a> <a href=CustomCrafterAPI.html#setResultGiveCancel(java.lang.Boolean,java.lang.Boolean)>setResultGiveCancel</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> v, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> calledAsync)</pre>
+                                        <div class="block"><p>Sets a boolean value that means the Custom Crafter API give result items to players or not.</p><p>You have to set this to true if you want to give result items processing in your plugin.</p><p>Default = <code>false</code></p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>v</code> - Give or not</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>calledAsync</code> - Called from async processing or not.</dd>
+                                            
+                                            
+                                        
+
+                                        
+
+                                        
+                                            <dt><span class="sinceLabel">Since:</span></dt>
+                                            
+                                                <dd><p>5.0.11</p></dd>
+                                            
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="setResultGiveCancel(java.lang.Boolean)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>setResultGiveCancel</h4>
+                                        <pre class="methodSignature">@<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-overloads/index.html>JvmOverloads</a>() final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a> <a href=CustomCrafterAPI.html#setResultGiveCancel(java.lang.Boolean,java.lang.Boolean)>setResultGiveCancel</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> v)</pre>
+                                        <div class="block"><p>Sets a boolean value that means the Custom Crafter API give result items to players or not.</p><p>You have to set this to true if you want to give result items processing in your plugin.</p><p>Default = <code>false</code></p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>v</code> - Give or not</dd>
+                                            
+                                            
+                                        
+
+                                        
+
+                                        
+                                            <dt><span class="sinceLabel">Since:</span></dt>
+                                            
+                                                <dd><p>5.0.11</p></dd>
+                                            
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="getBaseBlock()">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>getBaseBlock</h4>
+                                        <pre class="methodSignature"> final static <a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/Material.html>Material</a> <a href=CustomCrafterAPI.html#getBaseBlock()>getBaseBlock</a>()</pre>
+                                        <div class="block"><p>Gets a base block type.</p></div>
+
+                                        <dl>
+
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p><a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/Material.html>Material</a> base block type</p></dd>
+                                        
+
+                                        
+                                            <dt><span class="sinceLabel">Since:</span></dt>
+                                            
+                                                <dd><p>5.0.9</p></dd>
+                                            
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="setBaseBlock(org.bukkit.Material,java.lang.Boolean)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>setBaseBlock</h4>
+                                        <pre class="methodSignature">@<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-overloads/index.html>JvmOverloads</a>() final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a> <a href=CustomCrafterAPI.html#setBaseBlock(org.bukkit.Material,java.lang.Boolean)>setBaseBlock</a>(<a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/Material.html>Material</a> type, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> calledAsync)</pre>
+                                        <div class="block"><p>Sets base block with given material.</p><p>If a given material is not a block type, throws <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-illegal-argument-exception/index.html>IllegalArgumentException</a>.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>type</code> - base block type</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>calledAsync</code> - Called from async processing or not.</dd>
+                                            
+                                            
+                                        
+
+                                        
+
+                                        
+                                            <dt><span class="sinceLabel">Since:</span></dt>
+                                            
+                                                <dd><p>5.0.9</p></dd>
+                                            
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="setBaseBlock(org.bukkit.Material)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>setBaseBlock</h4>
+                                        <pre class="methodSignature">@<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-overloads/index.html>JvmOverloads</a>() final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a> <a href=CustomCrafterAPI.html#setBaseBlock(org.bukkit.Material,java.lang.Boolean)>setBaseBlock</a>(<a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/Material.html>Material</a> type)</pre>
+                                        <div class="block"><p>Sets base block with given material.</p><p>If a given material is not a block type, throws <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-illegal-argument-exception/index.html>IllegalArgumentException</a>.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>type</code> - base block type</dd>
+                                            
+                                            
+                                        
+
+                                        
+
+                                        
+                                            <dt><span class="sinceLabel">Since:</span></dt>
+                                            
+                                                <dd><p>5.0.9</p></dd>
+                                            
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="getUseMultipleResultCandidateFeature()">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>getUseMultipleResultCandidateFeature</h4>
+                                        <pre class="methodSignature"> final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> <a href=CustomCrafterAPI.html#getUseMultipleResultCandidateFeature()>getUseMultipleResultCandidateFeature</a>()</pre>
+                                        <div class="block"><p>Returns a boolean value that means 'multiple result candidate' feature enabled or not.</p><ul><li><p><code>true</code>: If the system gets some result candidates, shows all candidates to a player.</p></li><li><p><code>false</code>: The API provides only a first matched item. (no prompt)</p></li></ul></div>
+
+                                        <dl>
+
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p><a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html>Boolean</a> Enabled or not</p></dd>
+                                        
+
+                                        
+                                            <dt><span class="sinceLabel">Since:</span></dt>
+                                            
+                                                <dd><p>5.0.11 (original 5.0.8)</p></dd>
+                                            
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="setUseMultipleResultCandidateFeature(java.lang.Boolean,java.lang.Boolean)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>setUseMultipleResultCandidateFeature</h4>
+                                        <pre class="methodSignature">@<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-overloads/index.html>JvmOverloads</a>() final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a> <a href=CustomCrafterAPI.html#setUseMultipleResultCandidateFeature(java.lang.Boolean,java.lang.Boolean)>setUseMultipleResultCandidateFeature</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> v, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> calledAsync)</pre>
+                                        <div class="block"><p>Sets 'multiple result candidate' feature enables or not.</p><ul><li><p><code>true</code>: If the system gets some result candidates, shows all candidates to a player.</p></li><li><p><code>false</code>: The API provides only a first matched item. (no prompt)</p></li></ul></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>v</code> - Multiple result candidate feature enable or not</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>calledAsync</code> - Called from async processing or not.</dd>
+                                            
+                                            
+                                        
+
+                                        
+
+                                        
+                                            <dt><span class="sinceLabel">Since:</span></dt>
+                                            
+                                                <dd><p>5.0.11 (original 5.0.8)</p></dd>
+                                            
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="setUseMultipleResultCandidateFeature(java.lang.Boolean)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>setUseMultipleResultCandidateFeature</h4>
+                                        <pre class="methodSignature">@<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-overloads/index.html>JvmOverloads</a>() final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a> <a href=CustomCrafterAPI.html#setUseMultipleResultCandidateFeature(java.lang.Boolean,java.lang.Boolean)>setUseMultipleResultCandidateFeature</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> v)</pre>
+                                        <div class="block"><p>Sets 'multiple result candidate' feature enables or not.</p><ul><li><p><code>true</code>: If the system gets some result candidates, shows all candidates to a player.</p></li><li><p><code>false</code>: The API provides only a first matched item. (no prompt)</p></li></ul></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>v</code> - Multiple result candidate feature enable or not</dd>
+                                            
+                                            
+                                        
+
+                                        
+
+                                        
+                                            <dt><span class="sinceLabel">Since:</span></dt>
+                                            
+                                                <dd><p>5.0.11 (original 5.0.8)</p></dd>
+                                            
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="getUseCustomCraftUI()">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>getUseCustomCraftUI</h4>
+                                        <pre class="methodSignature"> final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> <a href=CustomCrafterAPI.html#getUseCustomCraftUI()>getUseCustomCraftUI</a>()</pre>
+                                        <div class="block"><p>Returns a boolean value that means 'Custom Craft UI open' enabled or not.</p></div>
+
+                                        <dl>
+
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p><a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html>Boolean</a> Enabled or not</p></dd>
+                                        
+
+                                        
+                                            <dt><span class="sinceLabel">Since:</span></dt>
+                                            
+                                                <dd><p>5.0.13-1</p></dd>
+                                            
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="setUseCustomCraftUI(java.lang.Boolean,java.lang.Boolean)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>setUseCustomCraftUI</h4>
+                                        <pre class="methodSignature">@<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-overloads/index.html>JvmOverloads</a>() final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a> <a href=CustomCrafterAPI.html#setUseCustomCraftUI(java.lang.Boolean,java.lang.Boolean)>setUseCustomCraftUI</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> v, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> calledAsync)</pre>
+                                        <div class="block"><p>Sets 'Custom Craft UI open' enables or not.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>v</code> - Enable or not</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>calledAsync</code> - Called from async processing or not.</dd>
+                                            
+                                            
+                                        
+
+                                        
+
+                                        
+                                            <dt><span class="sinceLabel">Since:</span></dt>
+                                            
+                                                <dd><p>5.0.13-1</p></dd>
+                                            
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="setUseCustomCraftUI(java.lang.Boolean)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>setUseCustomCraftUI</h4>
+                                        <pre class="methodSignature">@<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-overloads/index.html>JvmOverloads</a>() final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a> <a href=CustomCrafterAPI.html#setUseCustomCraftUI(java.lang.Boolean,java.lang.Boolean)>setUseCustomCraftUI</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> v)</pre>
+                                        <div class="block"><p>Sets 'Custom Craft UI open' enables or not.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>v</code> - Enable or not</dd>
+                                            
+                                            
+                                        
+
+                                        
+
+                                        
+                                            <dt><span class="sinceLabel">Since:</span></dt>
+                                            
+                                                <dd><p>5.0.13-1</p></dd>
+                                            
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="setBaseBlockSideSize(java.lang.Integer,java.lang.Boolean)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>setBaseBlockSideSize</h4>
+                                        <pre class="methodSignature">@<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-overloads/index.html>JvmOverloads</a>() final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> <a href=CustomCrafterAPI.html#setBaseBlockSideSize(java.lang.Integer,java.lang.Boolean)>setBaseBlockSideSize</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Integer.html>Integer</a> size, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> calledAsync)</pre>
+                                        <div class="block"><p>Sets base block's side size.</p><p>Default size = 3.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>size</code> - Must be an odd number and 3 or greater.</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>calledAsync</code> - Called from async processing or not.</dd>
+                                            
+                                            
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p><a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html>Boolean</a> <code>true</code> if the value was changed successfully, <code>false</code> if <a href=CustomCrafterAPI.html#setBaseBlockSideSize(java.lang.Integer,java.lang.Boolean)>size</a> is invalid.</p></dd>
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="setBaseBlockSideSize(java.lang.Integer)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>setBaseBlockSideSize</h4>
+                                        <pre class="methodSignature">@<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-overloads/index.html>JvmOverloads</a>() final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> <a href=CustomCrafterAPI.html#setBaseBlockSideSize(java.lang.Integer,java.lang.Boolean)>setBaseBlockSideSize</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Integer.html>Integer</a> size)</pre>
+                                        <div class="block"><p>Sets base block's side size.</p><p>Default size = 3.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>size</code> - Must be an odd number and 3 or greater.</dd>
+                                            
+                                            
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p><a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-boolean/index.html>Boolean</a> <code>true</code> if the value was changed successfully, <code>false</code> if <a href=CustomCrafterAPI.html#setBaseBlockSideSize(java.lang.Integer,java.lang.Boolean)>size</a> is invalid.</p></dd>
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="getBaseBlockSideSize()">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>getBaseBlockSideSize</h4>
+                                        <pre class="methodSignature"> final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Integer.html>Integer</a> <a href=CustomCrafterAPI.html#getBaseBlockSideSize()>getBaseBlockSideSize</a>()</pre>
+                                        <div class="block"><p>Gets the base block's side size.</p></div>
+
+                                        <dl>
+
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p><a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-int/index.html>Int</a> current side size</p></dd>
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="getCraftUIDesigner()">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>getCraftUIDesigner</h4>
+                                        <pre class="methodSignature"> final static <a href=ui/CraftUIDesigner.html>CraftUIDesigner</a> <a href=CustomCrafterAPI.html#getCraftUIDesigner()>getCraftUIDesigner</a>()</pre>
+                                        <div class="block"><p>Returns a current CraftUI designer.</p></div>
+
+                                        <dl>
+
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p><a href=ui/CraftUIDesigner.html>CraftUIDesigner</a></p></dd>
+                                        
+
+                                        
+                                            <dt><span class="sinceLabel">Since:</span></dt>
+                                            
+                                                <dd><p>5.0.16</p></dd>
+                                            
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="setCraftUIDesigner(io.github.sakaki_aruka.customcrafter.ui.CraftUIDesigner,java.lang.Boolean)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>setCraftUIDesigner</h4>
+                                        <pre class="methodSignature">@<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-overloads/index.html>JvmOverloads</a>() final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a> <a href=CustomCrafterAPI.html#setCraftUIDesigner(io.github.sakaki_aruka.customcrafter.ui.CraftUIDesigner,java.lang.Boolean)>setCraftUIDesigner</a>(<a href=ui/CraftUIDesigner.html>CraftUIDesigner</a> designer, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> calledAsync)</pre>
+                                        <div class="block"><p>Sets a new CraftUI designer if a specified is valid.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>designer</code> - New CraftUI designer</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>calledAsync</code> - Called from async processing or not.</dd>
+                                            
+                                            
+                                        
+
+                                        
+
+                                        
+                                            <dt><span class="sinceLabel">Since:</span></dt>
+                                            
+                                                <dd><p>5.0.16</p></dd>
+                                            
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="setCraftUIDesigner(io.github.sakaki_aruka.customcrafter.ui.CraftUIDesigner)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>setCraftUIDesigner</h4>
+                                        <pre class="methodSignature">@<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-overloads/index.html>JvmOverloads</a>() final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a> <a href=CustomCrafterAPI.html#setCraftUIDesigner(io.github.sakaki_aruka.customcrafter.ui.CraftUIDesigner,java.lang.Boolean)>setCraftUIDesigner</a>(<a href=ui/CraftUIDesigner.html>CraftUIDesigner</a> designer)</pre>
+                                        <div class="block"><p>Sets a new CraftUI designer if a specified is valid.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>designer</code> - New CraftUI designer</dd>
+                                            
+                                            
+                                        
+
+                                        
+
+                                        
+                                            <dt><span class="sinceLabel">Since:</span></dt>
+                                            
+                                                <dd><p>5.0.16</p></dd>
+                                            
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="getRegisteredRecipeNames()">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>getRegisteredRecipeNames</h4>
+                                        <pre class="methodSignature"> final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html>Set</a>&lt;<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html>String</a>&gt; <a href=CustomCrafterAPI.html#getRegisteredRecipeNames()>getRegisteredRecipeNames</a>()</pre>
+                                        <div class="block"><p>Returns a set of all registered recipe names.</p></div>
+
+                                        <dl>
+
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p><a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-set/index.html>Set</a> set of registered recipe names (<code>Set&lt;String&gt;</code>)</p></dd>
+                                        
+
+                                        
+                                            <dt><span class="sinceLabel">Since:</span></dt>
+                                            
+                                                <dd><p>5.2.0</p></dd>
+                                            
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="getRegisteredRecipeFromName(kotlin.jvm.functions.Function1)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>getRegisteredRecipeFromName</h4>
+                                        <pre class="methodSignature"> final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=recipe/CRecipe.html>CRecipe</a>&gt; <a href=CustomCrafterAPI.html#getRegisteredRecipeFromName(kotlin.jvm.functions.Function1)>getRegisteredRecipeFromName</a>(Function1&lt;<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html>String</a>, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a>&gt; filter)</pre>
+                                        <div class="block"><p>Returns registered recipes whose names satisfy the given filter predicate.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>filter</code> - Predicate applied to each recipe name; matching recipes are included</dd>
+                                            
+                                            
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p><a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html>List</a> list of matched recipes (<code>List&lt;CRecipe&gt;</code>)</p></dd>
+                                        
+
+                                        
+                                            <dt><span class="sinceLabel">Since:</span></dt>
+                                            
+                                                <dd><p>5.2.0</p></dd>
+                                            
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="getRegisteredRecipeFromName(java.lang.String)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>getRegisteredRecipeFromName</h4>
+                                        <pre class="methodSignature"> final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=recipe/CRecipe.html>CRecipe</a>&gt; <a href=CustomCrafterAPI.html#getRegisteredRecipeFromName(java.lang.String)>getRegisteredRecipeFromName</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html>String</a> recipeName)</pre>
+                                        <div class="block"><p>Returns registered recipes whose names exactly match the given string.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>recipeName</code> - Exact recipe name to search for</dd>
+                                            
+                                            
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p><a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html>List</a> list of matched recipes (<code>List&lt;CRecipe&gt;</code>)</p></dd>
+                                        
+
+                                        
+                                            <dt><span class="sinceLabel">Since:</span></dt>
+                                            
+                                                <dd><p>5.2.0</p></dd>
+                                            
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="getRegisteredRecipeFromPlugin(org.bukkit.plugin.java.JavaPlugin)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>getRegisteredRecipeFromPlugin</h4>
+                                        <pre class="methodSignature"> final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=recipe/CRecipe.html>CRecipe</a>&gt; <a href=CustomCrafterAPI.html#getRegisteredRecipeFromPlugin(org.bukkit.plugin.java.JavaPlugin)>getRegisteredRecipeFromPlugin</a>(<a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/plugin/java/JavaPlugin.html>JavaPlugin</a> plugin)</pre>
+                                        <div class="block"><p>Returns recipes that are registered by given plugin instance.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>plugin</code> - Search plugin instance</dd>
+                                            
+                                            
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p><a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html>List</a> list of matched recipes (<code>List&lt;CRecipe&gt;</code>)</p></dd>
+                                        
+
+                                        
+                                            <dt><span class="sinceLabel">Since:</span></dt>
+                                            
+                                                <dd><p>5.2.0</p></dd>
+                                            
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="getRecipeNameStrictLevel()">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>getRecipeNameStrictLevel</h4>
+                                        <pre class="methodSignature"> final static <a href=CustomCrafterAPI.NameStrictLevel.html>CustomCrafterAPI.NameStrictLevel</a> <a href=CustomCrafterAPI.html#getRecipeNameStrictLevel()>getRecipeNameStrictLevel</a>()</pre>
+                                        <div class="block"><p>Returns current recipe-name-strict-level</p></div>
+
+                                        <dl>
+
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p><a href=CustomCrafterAPI.NameStrictLevel.html>NameStrictLevel</a> current level</p></dd>
+                                        
+
+                                        
+                                            <dt><span class="sinceLabel">Since:</span></dt>
+                                            
+                                                <dd><p>5.2.0</p></dd>
+                                            
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="setRecipeNameStrictLevel(io.github.sakaki_aruka.customcrafter.CustomCrafterAPI.NameStrictLevel,java.lang.Boolean)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>setRecipeNameStrictLevel</h4>
+                                        <pre class="methodSignature">@<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-overloads/index.html>JvmOverloads</a>() final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a> <a href=CustomCrafterAPI.html#setRecipeNameStrictLevel(io.github.sakaki_aruka.customcrafter.CustomCrafterAPI.NameStrictLevel,java.lang.Boolean)>setRecipeNameStrictLevel</a>(<a href=CustomCrafterAPI.NameStrictLevel.html>CustomCrafterAPI.NameStrictLevel</a> level, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> calledAsync)</pre>
+                                        <div class="block"><p>Sets the recipe name strict level.</p><p>The level can only change in the stricter direction; loosening is not permitted.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>level</code> - Target strict level to apply</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>calledAsync</code> - Called from async processing or not.</dd>
+                                            
+                                            
+                                        
+
+                                        
+
+                                        
+                                            <dt><span class="sinceLabel">Since:</span></dt>
+                                            
+                                                <dd><p>5.2.0</p></dd>
+                                            
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="setRecipeNameStrictLevel(io.github.sakaki_aruka.customcrafter.CustomCrafterAPI.NameStrictLevel)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>setRecipeNameStrictLevel</h4>
+                                        <pre class="methodSignature">@<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-overloads/index.html>JvmOverloads</a>() final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a> <a href=CustomCrafterAPI.html#setRecipeNameStrictLevel(io.github.sakaki_aruka.customcrafter.CustomCrafterAPI.NameStrictLevel,java.lang.Boolean)>setRecipeNameStrictLevel</a>(<a href=CustomCrafterAPI.NameStrictLevel.html>CustomCrafterAPI.NameStrictLevel</a> level)</pre>
+                                        <div class="block"><p>Sets the recipe name strict level.</p><p>The level can only change in the stricter direction; loosening is not permitted.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>level</code> - Target strict level to apply</dd>
+                                            
+                                            
+                                        
+
+                                        
+
+                                        
+                                            <dt><span class="sinceLabel">Since:</span></dt>
+                                            
+                                                <dd><p>5.2.0</p></dd>
+                                            
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="getRecipes()">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>getRecipes</h4>
+                                        <pre class="methodSignature"> final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=recipe/CRecipe.html>CRecipe</a>&gt; <a href=CustomCrafterAPI.html#getRecipes()>getRecipes</a>()</pre>
+                                        <div class="block"><p>Returns an immutable list of all registered recipes.</p><p>The returned list cannot be modified.</p></div>
+
+                                        <dl>
+
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p><a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html>List</a>&lt;<a href=recipe/CRecipe.html>CRecipe</a>&gt; immutable list of all registered recipes</p></dd>
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="registerRecipe(java.util.List,org.bukkit.plugin.java.JavaPlugin,java.lang.Boolean)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>registerRecipe</h4>
+                                        <pre class="methodSignature">@<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-overloads/index.html>JvmOverloads</a>() final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a> <a href=CustomCrafterAPI.html#registerRecipe(java.util.List,org.bukkit.plugin.java.JavaPlugin,java.lang.Boolean)>registerRecipe</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=recipe/CRecipe.html>CRecipe</a>&gt; recipes, <a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/plugin/java/JavaPlugin.html>JavaPlugin</a> plugin, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> calledAsync)</pre>
+                                        <div class="block"><p>Registers the provided recipes and fires <a href=event/RegisterCustomRecipeEvent.html>RegisterCustomRecipeEvent</a>.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>recipes</code> - Recipes to register</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>plugin</code> - Plugin instance registering the recipes</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>calledAsync</code> - Called from async processing or not.</dd>
+                                            
+                                            
+                                        
+
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="registerRecipe(java.util.List,org.bukkit.plugin.java.JavaPlugin)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>registerRecipe</h4>
+                                        <pre class="methodSignature">@<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-overloads/index.html>JvmOverloads</a>() final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a> <a href=CustomCrafterAPI.html#registerRecipe(java.util.List,org.bukkit.plugin.java.JavaPlugin,java.lang.Boolean)>registerRecipe</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=recipe/CRecipe.html>CRecipe</a>&gt; recipes, <a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/plugin/java/JavaPlugin.html>JavaPlugin</a> plugin)</pre>
+                                        <div class="block"><p>Registers the provided recipes and fires <a href=event/RegisterCustomRecipeEvent.html>RegisterCustomRecipeEvent</a>.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>recipes</code> - Recipes to register</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>plugin</code> - Plugin instance registering the recipes</dd>
+                                            
+                                            
+                                        
+
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="registerRecipe(java.util.List)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>registerRecipe</h4>
+                                        <pre class="methodSignature">@<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-overloads/index.html>JvmOverloads</a>() final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a> <a href=CustomCrafterAPI.html#registerRecipe(java.util.List,org.bukkit.plugin.java.JavaPlugin,java.lang.Boolean)>registerRecipe</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=recipe/CRecipe.html>CRecipe</a>&gt; recipes)</pre>
+                                        <div class="block"><p>Registers the provided recipes and fires <a href=event/RegisterCustomRecipeEvent.html>RegisterCustomRecipeEvent</a>.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>recipes</code> - Recipes to register</dd>
+                                            
+                                            
+                                        
+
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="unregisterRecipe(java.lang.String,org.bukkit.plugin.java.JavaPlugin,java.lang.Boolean)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>unregisterRecipe</h4>
+                                        <pre class="methodSignature">@<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-overloads/index.html>JvmOverloads</a>() final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a> <a href=CustomCrafterAPI.html#unregisterRecipe(java.lang.String,org.bukkit.plugin.java.JavaPlugin,java.lang.Boolean)>unregisterRecipe</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html>String</a> name, <a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/plugin/java/JavaPlugin.html>JavaPlugin</a> plugin, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> calledAsync)</pre>
+                                        <div class="block"><p>Unregisters recipes that match the specified conditions.</p><p>If both <a href=CustomCrafterAPI.html#unregisterRecipe(java.lang.String,org.bukkit.plugin.java.JavaPlugin,java.lang.Boolean)>name</a> and <a href=CustomCrafterAPI.html#unregisterRecipe(java.lang.String,org.bukkit.plugin.java.JavaPlugin,java.lang.Boolean)>plugin</a> are <code>null</code>, all registered recipes are unregistered.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>name</code> - Target recipe name to filter by.</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>plugin</code> - Plugin instance to filter by registering plugin.</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>calledAsync</code> - Called from async processing or not.</dd>
+                                            
+                                            
+                                        
+
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="unregisterRecipe(java.lang.String,org.bukkit.plugin.java.JavaPlugin)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>unregisterRecipe</h4>
+                                        <pre class="methodSignature">@<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-overloads/index.html>JvmOverloads</a>() final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a> <a href=CustomCrafterAPI.html#unregisterRecipe(java.lang.String,org.bukkit.plugin.java.JavaPlugin,java.lang.Boolean)>unregisterRecipe</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html>String</a> name, <a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/plugin/java/JavaPlugin.html>JavaPlugin</a> plugin)</pre>
+                                        <div class="block"><p>Unregisters recipes that match the specified conditions.</p><p>If both <a href=CustomCrafterAPI.html#unregisterRecipe(java.lang.String,org.bukkit.plugin.java.JavaPlugin,java.lang.Boolean)>name</a> and <a href=CustomCrafterAPI.html#unregisterRecipe(java.lang.String,org.bukkit.plugin.java.JavaPlugin,java.lang.Boolean)>plugin</a> are <code>null</code>, all registered recipes are unregistered.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>name</code> - Target recipe name to filter by.</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>plugin</code> - Plugin instance to filter by registering plugin.</dd>
+                                            
+                                            
+                                        
+
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="unregisterRecipe(java.lang.String)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>unregisterRecipe</h4>
+                                        <pre class="methodSignature">@<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-overloads/index.html>JvmOverloads</a>() final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a> <a href=CustomCrafterAPI.html#unregisterRecipe(java.lang.String,org.bukkit.plugin.java.JavaPlugin,java.lang.Boolean)>unregisterRecipe</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html>String</a> name)</pre>
+                                        <div class="block"><p>Unregisters recipes that match the specified conditions.</p><p>If both <a href=CustomCrafterAPI.html#unregisterRecipe(java.lang.String,org.bukkit.plugin.java.JavaPlugin,java.lang.Boolean)>name</a> and <a href=CustomCrafterAPI.html#unregisterRecipe(java.lang.String,org.bukkit.plugin.java.JavaPlugin,java.lang.Boolean)>plugin</a> are <code>null</code>, all registered recipes are unregistered.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>name</code> - Target recipe name to filter by.</dd>
+                                            
+                                            
+                                        
+
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="unregisterRecipe()">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>unregisterRecipe</h4>
+                                        <pre class="methodSignature">@<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-overloads/index.html>JvmOverloads</a>() final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a> <a href=CustomCrafterAPI.html#unregisterRecipe(java.lang.String,org.bukkit.plugin.java.JavaPlugin,java.lang.Boolean)>unregisterRecipe</a>()</pre>
+                                        <div class="block"><p>Unregisters recipes that match the specified conditions.</p><p>If both <a href=CustomCrafterAPI.html#unregisterRecipe(java.lang.String,org.bukkit.plugin.java.JavaPlugin,java.lang.Boolean)>name</a> and <a href=CustomCrafterAPI.html#unregisterRecipe(java.lang.String,org.bukkit.plugin.java.JavaPlugin,java.lang.Boolean)>plugin</a> are <code>null</code>, all registered recipes are unregistered.</p></div>
+
+                                        <dl>
+
+                                        
+
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="unregisterAllRecipes(java.lang.Boolean)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>unregisterAllRecipes</h4>
+                                        <pre class="methodSignature"> final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a> <a href=CustomCrafterAPI.html#unregisterAllRecipes(java.lang.Boolean)>unregisterAllRecipes</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> calledAsync)</pre>
+                                        <div class="block"><p>Unregisters all registered recipes.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>calledAsync</code> - Called from async processing or not.</dd>
+                                            
+                                            
+                                        
+
+                                        
+
+                                        
+                                            <dt><span class="sinceLabel">Since:</span></dt>
+                                            
+                                                <dd><p>5.0.16</p></dd>
+                                            
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="getAllCandidateUIDesigner()">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>getAllCandidateUIDesigner</h4>
+                                        <pre class="methodSignature"> final static <a href=ui/AllCandidateUIDesigner.html>AllCandidateUIDesigner</a> <a href=CustomCrafterAPI.html#getAllCandidateUIDesigner()>getAllCandidateUIDesigner</a>()</pre>
+                                        <div class="block"><p>Returns current <a href=ui/AllCandidateUIDesigner.html>AllCandidateUIDesigner</a></p></div>
+
+                                        <dl>
+
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p><a href=ui/AllCandidateUIDesigner.html>AllCandidateUIDesigner</a> current designer</p></dd>
+                                        
+
+                                        
+                                            <dt><span class="sinceLabel">Since:</span></dt>
+                                            
+                                                <dd><p>5.2.0</p></dd>
+                                            
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="setAllCandidateUIDesigner(io.github.sakaki_aruka.customcrafter.ui.AllCandidateUIDesigner)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>setAllCandidateUIDesigner</h4>
+                                        <pre class="methodSignature"> final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a> <a href=CustomCrafterAPI.html#setAllCandidateUIDesigner(io.github.sakaki_aruka.customcrafter.ui.AllCandidateUIDesigner)>setAllCandidateUIDesigner</a>(<a href=ui/AllCandidateUIDesigner.html>AllCandidateUIDesigner</a> designer)</pre>
+                                        <div class="block"><p>Sets the <a href=ui/AllCandidateUIDesigner.html>AllCandidateUIDesigner</a>.</p><p>Throws an exception if the <a href=ui/AllCandidateUIDesigner.Baked.html>AllCandidateUIDesigner.Baked</a> produced by calling <a href=ui/AllCandidateUIDesigner.Companion.html#bakeWithEmptyContext(io.github.sakaki_aruka.customcrafter.ui.AllCandidateUIDesigner)>AllCandidateUIDesigner.bakeWithEmptyContext</a> on <a href=CustomCrafterAPI.html#setAllCandidateUIDesigner(io.github.sakaki_aruka.customcrafter.ui.AllCandidateUIDesigner)>designer</a> fails <a href=ui/AllCandidateUIDesigner.Baked.html#isValid()>AllCandidateUIDesigner.Baked.isValid</a>.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>designer</code> - The new designer to set</dd>
+                                            
+                                            
+                                        
+
+                                        
+
+                                        
+                                            <dt><span class="sinceLabel">Since:</span></dt>
+                                            
+                                                <dd><p>5.2.0</p></dd>
+                                            
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="getVERSION_TYPE()">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockListLast"
+                                          >
+                                    <li class="blockList">
+                                        <h4>getVERSION_TYPE</h4>
+                                        <pre class="methodSignature"> final <a href=CustomCrafterAPI.VersionType.html>CustomCrafterAPI.VersionType</a> <a href=CustomCrafterAPI.html#getVERSION_TYPE()>getVERSION_TYPE</a>()</pre>
+                                        <div class="block"><p>Release stage of the Custom Crafter API.</p></div>
+
+                                        <dl>
+
+                                        
+
+                                        
+
+                                        
+                                            <dt><span class="sinceLabel">Since:</span></dt>
+                                            
+                                                <dd><p>5.2.0</p></dd>
+                                            
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                            </li>
+                        </ul>
+                    </section>
+                    
+                </li>
+            </ul>
+        </div>
+    </div>
+</main>
+<footer role="contentinfo">
+    <nav role="navigation">
+        <!-- ======= START OF BOTTOM NAVBAR ====== -->
+        <div class="bottomNav"><a id="navbar.bottom">
+            <!--   -->
+        </a>
+            <div class="skipNav"><a href="#skip.navbar.bottom" title="Skip navigation links">Skip navigation links</a>
+            </div>
+            <a id="navbar.bottom.firstrow">
+                <!--   -->
+            </a>
+            <ul class="navList" title="Navigation">
+    <li><a href="../../../../index.html">Overview</a></li>
+    
+    <li><a href="package-summary.html">Package</a></li>
+    
+    <li>Class</li>
+    
+    <li><a href="package-tree.html">Tree</a></li>
+    
+    <li><a href="../../../../deprecated.html">Deprecated</a></li>
+    <li><a href="../../../../index-files/index-1.html">Index</a></li>
+    <li>Help</li>
+</ul></div>
+        <a id="skip.navbar.bottom">
+            <!--   -->
+        </a>
+        <div class="subNav">
+<ul class="navList" id="allclasses_navbar_top" style="display: block;">
+    <li><a href="../../../../allclasses.html">All&nbsp;Classes</a></li>
+</ul>
+<div>
+<script type="text/javascript"><!--
+  allClassesLink = document.getElementById("allclasses_navbar_top");
+  if(window==top) {
+    allClassesLink.style.display = "block";
+  }
+  else {
+    allClassesLink.style.display = "none";
+  }
+  //-->
+</script>
+<noscript>
+<div>JavaScript is disabled on your browser.</div>
+</noscript>
+</div>
+<a id="skip.navbar.top">
+<!--   -->
+</a></div><!-- ======== END OF BOTTOM NAVBAR ======= -->
+    </nav>
+</footer><ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content" id="ui-id-1" tabindex="0"
+    style="display: none;"></ul>
+<span role="status" aria-live="assertive" aria-relevant="additions" class="ui-helper-hidden-accessible"></span>
+</body>
+</html>
