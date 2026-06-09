@@ -1,5 +1,12 @@
 # Changelog
 
+# 5.2.1
+
+## ✨ New Features and Enhancements
+
+* **[Enhancement]** Added Javadoc so that Java users can browse API details in a familiar documentation format.
+* **[Enhancement]** Several functions can now be called from Java in a more intuitive way.
+
 # 5.2.0
 
 ## ⚠️ Breaking Changes
