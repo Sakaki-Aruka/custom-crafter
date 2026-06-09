@@ -13,6 +13,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Create deploy directories
+        run: |
+          mkdir -p deploy/kdoc
+          mkdir -p deploy/javadoc
+          mkdir -p deploy/document
+
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
@@ -20,7 +26,10 @@ jobs:
           distribution: 'temurin'
 
       - name: Generate KDoc
-        run: mvn -pl api resources:resources dokka:dokka -ntp
+        run: mvn -pl api resources:resources dokka:dokka -Ddokka.outputDir=$(pwd)/deploy/kdoc -ntp
+
+      - name: Generate Javadoc
+        run: mvn -pl api dokka:javadoc -Ddokka.outputDir=$(pwd)/deploy/javadoc -ntp
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -41,11 +50,7 @@ jobs:
           DEPLOY_BASE: /custom-crafter/document
 
       - name: Assemble deploy directory
-        run: |
-          mkdir -p deploy/kdoc
-          mkdir -p deploy/document
-          cp -r api/docs/. deploy/kdoc/
-          cp -r api/document/dist/. deploy/document/
+        run: cp -r api/document/dist/. deploy/document/
 
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v4

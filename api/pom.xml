@@ -42,6 +42,10 @@
         <url>http://github.com/Sakaki-Aruka/custom-crafter/</url>
     </scm>
 
+    <properties>
+        <dokka.outputDir>${project.basedir}/docs</dokka.outputDir>
+    </properties>
+
     <profiles>
         <profile>
             <id>release</id>
@@ -137,9 +141,7 @@
                 </executions>
                 <configuration>
                     <moduleName>Custom_Crafter</moduleName>
-                    <outputDir>
-                        ${project.basedir}/docs
-                    </outputDir>
+                    <outputDir>${dokka.outputDir}</outputDir>
                     <sourceDirectories>
                         <directory>
                             ${project.basedir}/src/main
