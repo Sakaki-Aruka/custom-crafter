@@ -144,11 +144,19 @@ interface AllCandidateUIDesigner {
          * Executed in an asynchronous context internally; if values cannot be produced within 50 milliseconds,
          * the default values are used instead.
          *
-         * When calling from Java, invoke `AllCandidateUIDesignerKt.bake` instead.
+         * ```kotlin
+         * // Kotlin
+         * val baked = designer.bake(context)
+         * ```
+         * ```java
+         * // Java
+         * Baked baked = AllCandidateUIDesigner.bake(designer, context);
+         * ```
          * @param[context] Context used to resolve designer values
          * @return[Baked] Immutable snapshot of the resolved designer values
          * @since 5.2.0
          */
+        @JvmStatic
         fun AllCandidateUIDesigner.bake(context: Context): Baked {
             return Baked(
                 title = this.title(context),
@@ -164,9 +172,19 @@ interface AllCandidateUIDesigner {
         /**
          * Bakes a context with [Context.emptyContext].
          * Shorthand of `.bake(Context.emptyContext)`
+         *
+         * ```kotlin
+         * // Kotlin
+         * val baked = designer.bakeWithEmptyContext()
+         * ```
+         * ```java
+         * // Java
+         * Baked baked = AllCandidateUIDesigner.bakeWithEmptyContext(designer);
+         * ```
          * @see[Context.emptyContext]
          * @return[Baked] Immutable snapshot of the resolved designer values
          */
+        @JvmStatic
         fun AllCandidateUIDesigner.bakeWithEmptyContext(): Baked {
             return this.bake(Context.emptyContext())
         }

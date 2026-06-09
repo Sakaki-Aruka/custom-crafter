@@ -79,10 +79,20 @@ interface CraftUIDesigner {
 
         /**
          * Bake a designer with specified context.
+         *
+         * ```kotlin
+         * // Kotlin
+         * val baked = designer.bake(context)
+         * ```
+         * ```java
+         * // Java
+         * Baked baked = CraftUIDesigner.bake(designer, context);
+         * ```
          * @param[context] Context for baking
          * @return[Baked] Baked designer
          * @since 5.0.16
          */
+        @JvmStatic
         fun CraftUIDesigner.bake(context: Context): Baked {
             return Baked(
                 title = this.title(context),
@@ -93,9 +103,19 @@ interface CraftUIDesigner {
 
         /**
          * Bake with [Context.NULL_CONTEXT]
+         *
+         * ```kotlin
+         * // Kotlin
+         * val baked = designer.bakeWithNullContext()
+         * ```
+         * ```java
+         * // Java
+         * Baked baked = CraftUIDesigner.bakeWithNullContext(designer);
+         * ```
          * @return[Baked] Baked designer
          * @since 5.2.0
          */
+        @JvmStatic
         fun CraftUIDesigner.bakeWithNullContext(): Baked {
             return this.bake(Context.NULL_CONTEXT)
         }
