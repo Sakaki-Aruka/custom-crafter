@@ -17,8 +17,6 @@ import org.bukkit.World
 import org.bukkit.inventory.CraftingRecipe
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.Recipe
-import org.chocosolver.solver.Model
-import org.chocosolver.solver.variables.IntVar
 import java.util.UUID
 import java.util.concurrent.CompletableFuture
 
@@ -366,178 +364,121 @@ object Search {
     }
 
 
-    private fun getShapelessCandidateCheckResult(
-        input: Map<CoordinateComponent, ItemStack>,
-        recipe: CRecipe
-    ): Map<Int, Set<Triple<Int, Boolean, Boolean>>> {
-        // Key=RecipeSlot, Value=<InputSlot, Checked, CheckResult>
-        val result: MutableMap<Int, Set<Triple<Int, Boolean, Boolean>>> = mutableMapOf()
-        // map init
-        for (x in 0..5) {
-            for (y in 0..5) {
-                val i = x + y*9
-                result[i] = mutableSetOf(Triple(-1, false, false))
-            }
-        }
-
-        for ((r, matter) in recipe.items) {
-            val set: MutableSet<Triple<Int, Boolean, Boolean>> = mutableSetOf()
-            for ((i, item) in input.entries) {
-                if (matter.candidate.contains(item.type)) {
-                    set.add(Triple(i.toIndex(), true, true))
-                } else {
-                    set.add(Triple(i.toIndex(), true, false))
-                }
-            }
-            result[r.toIndex()] = set.toSet()
-        }
-        return result
-    }
-
-
-    private fun getShapelessMatterPredicatesCheckResult(
-        input: Map<CoordinateComponent, ItemStack>,
-        recipe: CRecipe,
-        crafterId: UUID,
-        //isAsync: Boolean = false
-        asyncContext: AsyncContext? = null
-    ): Map<Int, Set<Triple<Int, Boolean, Boolean>>> {
-        // Key=RecipeSlot, Value=<InputSlot, Checked, CheckResult>
-        val result: MutableMap<Int, Set<Triple<Int, Boolean, Boolean>>> = mutableMapOf()
-        // map init
-        for (x in 0..5) {
-            for (y in 0..5) {
-                val i = x + y*9
-                result[i] = mutableSetOf(Triple(-1, false, false))
-            }
-        }
-
-        for ((r, matter) in recipe.items) {
-            val set: MutableSet<Triple<Int, Boolean, Boolean>> = mutableSetOf()
-            for ((i, item) in input.entries) {
-                if (matter.hasPredicates()) {
-                    val ctx = CMatterPredicate.Context(r, matter, item, input, recipe, crafterId, asyncContext)
-                    set.add(Triple(i.toIndex(), true, matter.predicatesResult(ctx)))
-                }
-            }
-            result[r.toIndex()] = set.toSet()
-        }
-        return result
-    }
-
-    private fun getShapelessAmountCheckResult(
-        input: Map<CoordinateComponent, ItemStack>,
-        recipe: CRecipe
-    ): Map<Int, Set<Triple<Int, Boolean, Boolean>>> {
-        // Key=RecipeSlot, Value=<InputSlot, Checked, CheckResult>
-        val result: MutableMap<Int, Set<Triple<Int, Boolean, Boolean>>> = mutableMapOf()
-        // map init
-        for (x in 0..5) {
-            for (y in 0..5) {
-                val i = x + y*9
-                result[i] = mutableSetOf(Triple(-1, false, false))
-            }
-        }
-
-        for ((r, matter) in recipe.items) {
-            val set: MutableSet<Triple<Int, Boolean, Boolean>> = mutableSetOf()
-            for ((i, item) in input.entries) {
-                val amountResult: Boolean =
-                    if (matter.anyAmount) {
-                        item.amount > 0
-                    } else {
-                        item.amount >= matter.amount
-                    }
-                set.add(Triple(i.toIndex(), true, amountResult))
-            }
-            result[r.toIndex()] = set.toSet()
-        }
-        return result
-    }
-
     private fun shapeless(
         view: CraftView,
         recipe: CRecipe,
         crafterId: UUID,
         asyncContext: AsyncContext? = null
     ): MappedRelation? {
-
-        // MapKey=RecipeSlot, MapValue=<InputSlot, Checked, CheckResult>
-        val results: MutableMap<Int, MutableList<Triple<Int, Boolean, Boolean>>> = mutableMapOf()
-
-        fun addResults(resultMap: Map<Int, Set<Triple<Int, Boolean, Boolean>>>) {
-            for ((k, v) in resultMap) {
-                if (!results.containsKey(k)) {
-                    results[k] = v.toMutableList()
-                } else {
-                    results[k]!!.addAll(v)
-                }
-            }
+        // Shapeless matching is a bipartite perfect matching problem:
+        // every recipe slot must be assigned a distinct input slot whose item
+        // passes the slot's candidate, amount and matter-predicate checks.
+        // It is solved with Kuhn's augmenting path algorithm.
+        val recipeEntries: List<Map.Entry<CoordinateComponent, CMatter>> = recipe.items.entries.toList()
+        val inputEntries: List<Map.Entry<CoordinateComponent, ItemStack>> = view.materials.entries.toList()
+        val recipeSlots: Int = recipeEntries.size
+        val inputSlots: Int = inputEntries.size
+        if (recipeSlots == 0 || inputSlots < recipeSlots) {
+            // fewer inputs than recipe slots can never form a full assignment
+            return null
         }
 
-        addResults(getShapelessCandidateCheckResult(view.materials, recipe))
-        addResults(getShapelessMatterPredicatesCheckResult(view.materials, recipe, crafterId, asyncContext))
-        addResults(getShapelessAmountCheckResult(view.materials, recipe))
-
-        val merged: MutableMap<Int, MutableSet<Int>> = mutableMapOf()
-        for ((k, set) in results) {
-            val candidates: MutableSet<Int> = mutableSetOf()
-            val ignored: MutableSet<Int> = mutableSetOf()
-            for ((slot, checked, result) in set) {
-                if (slot in ignored) {
-                    continue
-                } else if (!checked) {
-                    continue
-                } else if (!result) {
-                    candidates.remove(slot)
-                    ignored.add(slot)
+        // Cheap edge mask per recipe slot: bit i is set when input i passes
+        // the candidate and amount checks. Input slot counts never exceed 36
+        // (< 64), so a Long bitmask per slot is sufficient.
+        val cheapEdges = LongArray(recipeSlots)
+        for (r in 0..<recipeSlots) {
+            val matter: CMatter = recipeEntries[r].value
+            var mask = 0L
+            for (i in 0..<inputSlots) {
+                val item: ItemStack = inputEntries[i].value
+                if (item.type !in matter.candidate) {
                     continue
                 }
-
-                candidates.add(slot)
+                val amountResult: Boolean =
+                    if (matter.anyAmount) {
+                        item.amount > 0
+                    } else {
+                        item.amount >= matter.amount
+                    }
+                if (amountResult) {
+                    mask = mask or (1L shl i)
+                }
             }
-            merged[k] = candidates
-        }
-
-        val recipeSlotIndices: Set<Int> = recipe.items.keys.map { it.toIndex() }.toSet()
-        val model = Model("ExactCoverProblem")
-        val assignmentVars: MutableMap<Int, IntVar> = mutableMapOf()
-        for ((key, possible) in merged) {
-            if (key !in recipeSlotIndices) {
-                continue
-            }
-
-            if (possible.isEmpty()) {
+            if (mask == 0L) {
+                // a recipe slot without any usable input can never be assigned
                 return null
             }
-            val domainValues = possible.toIntArray()
-            assignmentVars[key] = model.intVar("Key_$key", domainValues)
-        }
-        val variablesList = assignmentVars.values.toList()
-        if (variablesList.isNotEmpty()) {
-            model.allDifferent(*variablesList.toTypedArray()).post()
+            cheapEdges[r] = mask
         }
 
-        val relationComponents: MutableSet<MappedRelationComponent> = mutableSetOf()
-        if (model.solver.solve()) {
-            // results found
-            for ((k, v) in assignmentVars) {
-                // Key=Recipe, Value=Input
-                relationComponents.add(
-                    MappedRelationComponent(
-                        recipe = CoordinateComponent.fromIndex(k),
-                        input = CoordinateComponent.fromIndex(v.value)
-                    )
-                )
+        // Matter predicates are user code and may be expensive, so they run
+        // lazily: only for edges that pass the cheap checks and are actually
+        // probed by the matching. Results are memoized per (recipe slot,
+        // input slot) pair. 0 = not evaluated, 1 = passed, 2 = failed.
+        val predicateStates = Array(recipeSlots) { ByteArray(inputSlots) }
+
+        fun edgeAllowed(r: Int, i: Int): Boolean {
+            if (cheapEdges[r] and (1L shl i) == 0L) {
+                return false
             }
-        } else {
-            // not found
-            return null
+            val matter: CMatter = recipeEntries[r].value
+            if (!matter.hasPredicates()) {
+                return true
+            }
+            when (predicateStates[r][i].toInt()) {
+                1 -> return true
+                2 -> return false
+            }
+            val ctx = CMatterPredicate.Context(
+                recipeEntries[r].key,
+                matter,
+                inputEntries[i].value,
+                view.materials,
+                recipe,
+                crafterId,
+                asyncContext
+            )
+            val passed: Boolean = matter.predicatesResult(ctx)
+            predicateStates[r][i] = if (passed) 1 else 2
+            return passed
         }
 
-        if (relationComponents.isEmpty()) {
-            return null
+        val inputToRecipe = IntArray(inputSlots) { -1 }
+        val recipeToInput = IntArray(recipeSlots) { -1 }
+
+        fun tryAssign(r: Int, visited: BooleanArray): Boolean {
+            for (i in 0..<inputSlots) {
+                if (visited[i] || !edgeAllowed(r, i)) {
+                    continue
+                }
+                visited[i] = true
+                if (inputToRecipe[i] == -1 || tryAssign(inputToRecipe[i], visited)) {
+                    inputToRecipe[i] = r
+                    recipeToInput[r] = i
+                    return true
+                }
+            }
+            return false
         }
+
+        // most-constrained slots first: fewer cheap edges means fewer options
+        val order: List<Int> = (0..<recipeSlots).sortedBy { cheapEdges[it].countOneBits() }
+        for (r in order) {
+            if (asyncContext?.isInterrupted() == true) {
+                return null
+            }
+            if (!tryAssign(r, BooleanArray(inputSlots))) {
+                return null
+            }
+        }
+
+        val relationComponents: Set<MappedRelationComponent> = (0..<recipeSlots).map { r ->
+            MappedRelationComponent(
+                recipe = recipeEntries[r].key,
+                input = inputEntries[recipeToInput[r]].key
+            )
+        }.toSet()
 
         val relation = MappedRelation(relationComponents)
         val recipePredicateContext = CRecipePredicate.Context(view, crafterId, recipe, relation, asyncContext)
