@@ -6,11 +6,6 @@ title: Getting Started with CustomCrafterAPI
 CustomCrafterAPI is a plugin that provides a foundation for offering recipes ranging from 1×1 to 6×6 in size.
 It supports everything from simple recipes that only check item types — like standard Minecraft recipes — to recipes that leverage data held by the input items or the player, and even recipes whose craftable items are determined by querying external databases or APIs.
 
-## Acknowledgement
-This product includes software developed by the IMT Atlantique.
-
-(This software includes Choco Solver, created by IMT Atlantique.)
-
 ## Important notice
 CustomCrafterAPI treats versions 5.X.X as alpha releases and 6.0.0 and later as stable releases.
 In the 5.X.X range, a single version bump may introduce significant changes to classes and function signatures.
