@@ -123,7 +123,7 @@ object ShapedRecipeProvider {
         val ironBlock: CMatter = CMatterImpl(
             name = "iron block core",
             candidate = setOf(Material.IRON_BLOCK),
-            predicates = setOf(CMatterPredicate { ctx ->
+            predicates = listOf(CMatterPredicate { ctx ->
                 val key = NamespacedKey(Demo.plugin, "infinity_iron_block_count")
                 !ctx.input.itemMeta.persistentDataContainer.has(key, PersistentDataType.LONG)
             })
@@ -180,7 +180,7 @@ object ShapedRecipeProvider {
             matter = CMatterImpl(
                 name = "infinity iron block core",
                 candidate = setOf(Material.IRON_BLOCK),
-                predicates = setOf(CMatterPredicate { ctx ->
+                predicates = listOf(CMatterPredicate { ctx ->
                     ctx.input.itemMeta.persistentDataContainer.has(
                         NamespacedKey(Demo.plugin, "infinity_iron_block_count"),
                         PersistentDataType.INTEGER,

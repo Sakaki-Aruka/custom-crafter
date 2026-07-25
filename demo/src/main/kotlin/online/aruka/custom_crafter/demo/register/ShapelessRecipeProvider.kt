@@ -40,7 +40,7 @@ object ShapelessRecipeProvider {
         val infinityIronBlock: CMatter = CMatterImpl(
             name = "infinity iron block",
             candidate = setOf(Material.IRON_BLOCK),
-            predicates = setOf(CMatterPredicate { ctx ->
+            predicates = listOf(CMatterPredicate { ctx ->
                 ctx.input.itemMeta.persistentDataContainer.has(
                     NamespacedKey(Demo.plugin, "infinity_iron_block_count"),
                     PersistentDataType.INTEGER
