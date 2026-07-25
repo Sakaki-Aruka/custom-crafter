@@ -3,9 +3,29 @@ package io.github.sakaki_aruka.customcrafter.recipe
 /**
  * Combinator functions for composing [CRecipePredicate] instances.
  *
+ * Every combinator derives the composed predicate's [CRecipePredicate.name] from the names of its
+ * operands, so a composed predicate reports its own structure in diagnostic logs.
+ *
  * @see[CRecipePredicate]
  */
 object CRecipePredicates {
+
+    /**
+     * Returns [predicate] carrying [name] as its [CRecipePredicate.name].
+     *
+     * A lambda has no identity of its own, so wrapping it here is what makes an
+     * [io.github.sakaki_aruka.customcrafter.debug.Explainer] able to report this predicate by name
+     * instead of by index.
+     *
+     * @param[name] Label to report this predicate under
+     * @param[predicate] The predicate to label
+     * @return[CRecipePredicate] A predicate behaving as [predicate] and named [name]
+     * @since 5.3.0
+     */
+    @JvmStatic
+    fun named(name: String, predicate: CRecipePredicate): CRecipePredicate {
+        return of(name) { ctx -> predicate.test(ctx) }
+    }
 
     /**
      * Combines this predicate with [other] using logical AND.
@@ -16,7 +36,7 @@ object CRecipePredicates {
      */
     @JvmStatic
     fun CRecipePredicate.and(other: CRecipePredicate): CRecipePredicate {
-        return CRecipePredicate { ctx -> this.test(ctx) && other.test(ctx) }
+        return of("(${this.name()} and ${other.name()})") { ctx -> this.test(ctx) && other.test(ctx) }
     }
 
     /**
@@ -28,7 +48,7 @@ object CRecipePredicates {
      */
     @JvmStatic
     fun CRecipePredicate.or(other: CRecipePredicate): CRecipePredicate {
-        return CRecipePredicate { ctx -> this.test(ctx) || other.test(ctx) }
+        return of("(${this.name()} or ${other.name()})") { ctx -> this.test(ctx) || other.test(ctx) }
     }
 
     /**
@@ -40,7 +60,8 @@ object CRecipePredicates {
      */
     @JvmStatic
     fun CRecipePredicate.allOf(vararg predicates: CRecipePredicate): CRecipePredicate {
-        return CRecipePredicate { ctx -> (predicates.toList() + this).all { it.test(ctx) } }
+        val merged: List<CRecipePredicate> = predicates.toList() + this
+        return of("allOf(${merged.joinToString(", ") { it.name() }})") { ctx -> merged.all { it.test(ctx) } }
     }
 
     /**
@@ -53,6 +74,14 @@ object CRecipePredicates {
      */
     @JvmStatic
     fun CRecipePredicate.nOf(n: Int, vararg predicates: CRecipePredicate): CRecipePredicate {
-        return CRecipePredicate { ctx -> (predicates.toList() + this).count { it.test(ctx) } >= n }
+        val merged: List<CRecipePredicate> = predicates.toList() + this
+        return of("nOf($n, ${merged.joinToString(", ") { it.name() }})") { ctx -> merged.count { it.test(ctx) } >= n }
+    }
+
+    private fun of(name: String, body: (CRecipePredicate.Context) -> Boolean): CRecipePredicate {
+        return object : CRecipePredicate {
+            override fun test(ctx: CRecipePredicate.Context): Boolean = body(ctx)
+            override fun name(): String = name
+        }
     }
 }

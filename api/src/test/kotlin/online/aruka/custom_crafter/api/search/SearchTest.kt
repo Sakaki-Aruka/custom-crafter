@@ -346,7 +346,7 @@ internal object SearchTest {
         val matter = CMatterImpl(
             name = "",
             candidate = setOf(Material.GRAVEL),
-            predicates = setOf(CMatterPredicate { ctx -> ctx.crafterId == NotchID })
+            predicates = listOf(CMatterPredicate { ctx -> ctx.crafterId == NotchID })
         )
         val recipe = CRecipeImpl(
             name = "",

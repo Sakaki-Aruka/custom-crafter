@@ -286,7 +286,7 @@ internal object ShapelessSearchTest {
         val p = CMatterImpl(
             name = "picky",
             candidate = setOf(Material.STONE),
-            predicates = setOf(CMatterPredicate { ctx -> ctx.input.amount == 5 })
+            predicates = listOf(CMatterPredicate { ctx -> ctx.input.amount == 5 })
         )
         val q = CMatterImpl.single(Material.STONE)
         val recipe = CRecipeImpl.shapeless("pred-split", listOf(p, q))
@@ -312,7 +312,7 @@ internal object ShapelessSearchTest {
         val matter = CMatterImpl(
             name = "never",
             candidate = setOf(Material.STONE),
-            predicates = setOf(CMatterPredicate { false })
+            predicates = listOf(CMatterPredicate { false })
         )
         val recipe = CRecipeImpl.shapeless("pred-false", listOf(matter))
         val view = viewOf(0 to ItemStack(Material.STONE))
@@ -329,7 +329,7 @@ internal object ShapelessSearchTest {
         val a = CMatterImpl(
             name = "stone-only",
             candidate = setOf(Material.STONE),
-            predicates = setOf(CMatterPredicate { ctx -> ctx.input.type == Material.STONE })
+            predicates = listOf(CMatterPredicate { ctx -> ctx.input.type == Material.STONE })
         )
         val b = CMatterImpl.single(Material.DIRT)
         val recipe = CRecipeImpl.shapeless("pred-noncandidate", listOf(a, b))
@@ -352,7 +352,7 @@ internal object ShapelessSearchTest {
         val shared = CMatterImpl(
             name = "shared",
             candidate = setOf(Material.STONE),
-            predicates = setOf(CMatterPredicate { ctx -> ctx.input.amount >= 2 })
+            predicates = listOf(CMatterPredicate { ctx -> ctx.input.amount >= 2 })
         )
         val recipe = CRecipeImpl.shapeless("pred-shared", listOf(shared, shared))
 

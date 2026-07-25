@@ -1,6 +1,7 @@
 package io.github.sakaki_aruka.customcrafter.matter
 
 import io.github.sakaki_aruka.customcrafter.recipe.CRecipe
+import io.github.sakaki_aruka.customcrafter.debug.Explainer
 import io.github.sakaki_aruka.customcrafter.objects.AsyncContext
 import io.github.sakaki_aruka.customcrafter.recipe.CoordinateComponent
 import org.bukkit.inventory.ItemStack
@@ -28,6 +29,30 @@ fun interface CMatterPredicate {
     fun test(ctx: Context): Boolean
 
     /**
+     * Returns a label identifying this predicate in diagnostic logs.
+     *
+     * A lambda carries no identity of its own, so the default is [ANONYMOUS] and an
+     * [io.github.sakaki_aruka.customcrafter.debug.Explainer] falls back to reporting the
+     * predicate's index within [CMatter.predicates]. Override it, or wrap the lambda with
+     * [CMatterPredicates.named], to get a readable name instead.
+     *
+     * Combinators in [CMatterPredicates] derive their name from the predicates they combine, so a
+     * composed predicate reports its structure without any extra work.
+     *
+     * @return[String] Label of this predicate (default = [ANONYMOUS])
+     * @since 5.3.0
+     */
+    fun name(): String = ANONYMOUS
+
+    companion object {
+        /**
+         * The [name] of a predicate that has not been given one.
+         * @since 5.3.0
+         */
+        const val ANONYMOUS: String = "anonymous"
+    }
+
+    /**
      * CMatterPredicate context
      *
      * @param[coordinate] Inspection point on a recipe mapping
@@ -37,6 +62,7 @@ fun interface CMatterPredicate {
      * @param[recipe] A CRecipe what contains a CMatterPredicate who receives this
      * @param[crafterId] Crafter UUID
      * @param[asyncContext] Async context. When non-null, [test] implementations should periodically check [AsyncContext.isInterrupted] and return early if true.
+     * @param[explainer] Diagnostic recorder of the running search (since 5.3.0). Non-null only when the caller passed one; write to it to record why this predicate rejected the input.
      * @see[CMatterPredicate]
      */
     class Context @JvmOverloads constructor(
@@ -46,7 +72,8 @@ fun interface CMatterPredicate {
         val mapped: Map<CoordinateComponent, ItemStack>,
         val recipe: CRecipe,
         val crafterId: UUID,
-        val asyncContext: AsyncContext? = null
+        val asyncContext: AsyncContext? = null,
+        val explainer: Explainer? = null
     ) {
         /**
          * Returns whether this inspection is async.
@@ -86,7 +113,8 @@ fun interface CMatterPredicate {
                 mapped = this.mapped,
                 recipe = this.recipe,
                 crafterId = this.crafterId,
-                asyncContext = asyncContext
+                asyncContext = asyncContext,
+                explainer = this.explainer
             )
         }
     }

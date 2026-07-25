@@ -126,6 +126,25 @@ interface CRecipe {
     }
 
     /**
+     * Returns the first [CRecipePredicate] that rejects [context], or `null` when all of them pass.
+     *
+     * Evaluates predicates in order and stops at the first failure, exactly as
+     * [getRecipePredicateResults] does, so this can be used in its place when the caller needs to
+     * report which predicate failed rather than only whether one did. The returned index is the
+     * position within [predicates] and identifies a predicate that did not override
+     * [CRecipePredicate.name].
+     *
+     * @param[context] Context of inspection
+     * @return[IndexedValue] The failing predicate with its index, or `null` when nothing failed
+     * @since 5.3.0
+     */
+    fun firstFailedRecipePredicate(context: CRecipePredicate.Context): IndexedValue<CRecipePredicate>? {
+        return this.predicates
+            ?.withIndex()
+            ?.firstOrNull { (_, predicate) -> !predicate.test(context) }
+    }
+
+    /**
      * Returns [CRecipePredicate] inspection result on async.
      *
      * Each predicate runs on a virtual thread (off the main thread).

@@ -3,9 +3,29 @@ package io.github.sakaki_aruka.customcrafter.matter
 /**
  * Combinator functions for composing [CMatterPredicate] instances.
  *
+ * Every combinator derives the composed predicate's [CMatterPredicate.name] from the names of its
+ * operands, so a composed predicate reports its own structure in diagnostic logs.
+ *
  * @see[CMatterPredicate]
  */
 object CMatterPredicates {
+
+    /**
+     * Returns [predicate] carrying [name] as its [CMatterPredicate.name].
+     *
+     * A lambda has no identity of its own, so wrapping it here is what makes an
+     * [io.github.sakaki_aruka.customcrafter.debug.Explainer] able to report this predicate by name
+     * instead of by index.
+     *
+     * @param[name] Label to report this predicate under
+     * @param[predicate] The predicate to label
+     * @return[CMatterPredicate] A predicate behaving as [predicate] and named [name]
+     * @since 5.3.0
+     */
+    @JvmStatic
+    fun named(name: String, predicate: CMatterPredicate): CMatterPredicate {
+        return of(name) { ctx -> predicate.test(ctx) }
+    }
 
     /**
      * Combines this predicate with [other] using logical AND.
@@ -16,7 +36,7 @@ object CMatterPredicates {
      */
     @JvmStatic
     fun CMatterPredicate.and(other: CMatterPredicate): CMatterPredicate {
-        return CMatterPredicate { ctx -> this.test(ctx) && other.test(ctx) }
+        return of("(${this.name()} and ${other.name()})") { ctx -> this.test(ctx) && other.test(ctx) }
     }
 
     /**
@@ -28,7 +48,7 @@ object CMatterPredicates {
      */
     @JvmStatic
     fun CMatterPredicate.or(other: CMatterPredicate): CMatterPredicate {
-        return CMatterPredicate { ctx -> this.test(ctx) || other.test(ctx) }
+        return of("(${this.name()} or ${other.name()})") { ctx -> this.test(ctx) || other.test(ctx) }
     }
 
     /**
@@ -40,7 +60,8 @@ object CMatterPredicates {
      */
     @JvmStatic
     fun CMatterPredicate.allOf(vararg predicates: CMatterPredicate): CMatterPredicate {
-        return CMatterPredicate { ctx -> (predicates.toList() + this).all { it.test(ctx) } }
+        val merged: List<CMatterPredicate> = predicates.toList() + this
+        return of("allOf(${merged.joinToString(", ") { it.name() }})") { ctx -> merged.all { it.test(ctx) } }
     }
 
     /**
@@ -53,6 +74,14 @@ object CMatterPredicates {
      */
     @JvmStatic
     fun CMatterPredicate.nOf(n: Int, vararg predicates: CMatterPredicate): CMatterPredicate {
-        return CMatterPredicate { ctx -> (predicates.toList() + this).count { it.test(ctx) } >= n }
+        val merged: List<CMatterPredicate> = predicates.toList() + this
+        return of("nOf($n, ${merged.joinToString(", ") { it.name() }})") { ctx -> merged.count { it.test(ctx) } >= n }
+    }
+
+    private fun of(name: String, body: (CMatterPredicate.Context) -> Boolean): CMatterPredicate {
+        return object : CMatterPredicate {
+            override fun test(ctx: CMatterPredicate.Context): Boolean = body(ctx)
+            override fun name(): String = name
+        }
     }
 }

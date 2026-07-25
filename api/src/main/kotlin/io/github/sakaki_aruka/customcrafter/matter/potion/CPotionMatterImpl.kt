@@ -23,7 +23,7 @@ open class CPotionMatterImpl @JvmOverloads constructor(
     override val potionComponents: Set<CPotionComponent>,
     override val amount: Int = 1,
     override val anyAmount: Boolean = false,
-    override val predicates: Set<CMatterPredicate>? = CMatterImpl.defaultMatterPredicates(),
+    override val predicates: List<CMatterPredicate>? = CMatterImpl.defaultMatterPredicates(),
 ): CPotionMatter {
     companion object {
         /**

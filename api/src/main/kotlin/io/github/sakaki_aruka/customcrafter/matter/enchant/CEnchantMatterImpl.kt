@@ -22,7 +22,7 @@ open class CEnchantMatterImpl @JvmOverloads constructor(
     override val enchantComponents: Set<CEnchantComponent>,
     override val amount: Int = 1,
     override val anyAmount: Boolean = false,
-    override val predicates: Set<CMatterPredicate>? = CMatterImpl.defaultMatterPredicates()
+    override val predicates: List<CMatterPredicate>? = CMatterImpl.defaultMatterPredicates()
 ): CEnchantMatter {
     companion object {
         /**

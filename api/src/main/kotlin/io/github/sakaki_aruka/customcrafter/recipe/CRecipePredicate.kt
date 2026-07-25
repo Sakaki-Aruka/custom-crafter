@@ -1,5 +1,6 @@
 package io.github.sakaki_aruka.customcrafter.recipe
 
+import io.github.sakaki_aruka.customcrafter.debug.Explainer
 import io.github.sakaki_aruka.customcrafter.objects.AsyncContext
 import io.github.sakaki_aruka.customcrafter.objects.CraftView
 import io.github.sakaki_aruka.customcrafter.objects.MappedRelation
@@ -21,6 +22,7 @@ fun interface CRecipePredicate {
      * @param[recipe] Recipe
      * @param[relation] Pre-result of inspection
      * @param[asyncContext] Async context (since 5.0.20). When non-null, [test] implementations should periodically check [AsyncContext.isInterrupted] and return early if true.
+     * @param[explainer] Diagnostic recorder of the running search (since 5.3.0). Non-null only when the caller passed one; write to it to record why this predicate rejected the input.
      * @since 5.0.17
      */
     class Context @JvmOverloads constructor(
@@ -28,7 +30,8 @@ fun interface CRecipePredicate {
         val crafterId: UUID,
         val recipe: CRecipe,
         val relation: MappedRelation,
-        val asyncContext: AsyncContext? = null
+        val asyncContext: AsyncContext? = null,
+        val explainer: Explainer? = null
     ) {
         /**
          * Returns whether this inspection is async.
@@ -58,7 +61,7 @@ fun interface CRecipePredicate {
          */
         fun copyWith(asyncContext: AsyncContext? = null): Context {
             val newAsyncContext = asyncContext ?: this.asyncContext
-            return Context(input, crafterId, recipe, relation, newAsyncContext)
+            return Context(input, crafterId, recipe, relation, newAsyncContext, explainer)
         }
     }
 
@@ -74,4 +77,28 @@ fun interface CRecipePredicate {
      * @since 5.0.17
      */
     fun test(ctx: Context): Boolean
+
+    /**
+     * Returns a label identifying this predicate in diagnostic logs.
+     *
+     * A lambda carries no identity of its own, so the default is [ANONYMOUS] and an
+     * [io.github.sakaki_aruka.customcrafter.debug.Explainer] falls back to reporting the
+     * predicate's index within [CRecipe.predicates]. Override it, or wrap the lambda with
+     * [CRecipePredicates.named], to get a readable name instead.
+     *
+     * Combinators in [CRecipePredicates] derive their name from the predicates they combine, so a
+     * composed predicate reports its structure without any extra work.
+     *
+     * @return[String] Label of this predicate (default = [ANONYMOUS])
+     * @since 5.3.0
+     */
+    fun name(): String = ANONYMOUS
+
+    companion object {
+        /**
+         * The [name] of a predicate that has not been given one.
+         * @since 5.3.0
+         */
+        const val ANONYMOUS: String = "anonymous"
+    }
 }

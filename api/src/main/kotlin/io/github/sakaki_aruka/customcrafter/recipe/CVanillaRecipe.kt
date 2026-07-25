@@ -92,12 +92,12 @@ class CVanillaRecipe internal constructor(
             val source: CMatter = CMatterImpl(
                 name = "${recipe.key.namespace}, ${recipe.key.key} input (source)",
                 candidate = choiceToCandidates(recipe.input),
-                predicates = setOf(choiceToPredicate(recipe.input))
+                predicates = listOf(choiceToPredicate(recipe.input))
             )
             val catalyst: CMatter = CMatterImpl(
                 name = "${recipe.key.namespace}, ${recipe.key.key} input (catalyst)",
                 candidate = choiceToCandidates(recipe.material),
-                predicates = setOf(choiceToPredicate(recipe.material))
+                predicates = listOf(choiceToPredicate(recipe.material))
             )
 
             val resultSupplier = ResultSupplier { context ->
@@ -126,7 +126,7 @@ class CVanillaRecipe internal constructor(
                 val matter: CMatter = CMatterImpl(
                     candidates.firstOrNull()?.name ?: "vanilla matter default name",
                     candidate = candidates,
-                    predicates = setOf(choiceToPredicate(choice))
+                    predicates = listOf(choiceToPredicate(choice))
                 )
                 result[CoordinateComponent.fromIndex(index)] = matter
             }
@@ -145,7 +145,7 @@ class CVanillaRecipe internal constructor(
                     val matter: CMatter = CMatterImpl(
                         name = candidates.firstOrNull()?.name ?: "vanilla matter default name",
                         candidate = candidates,
-                        predicates = setOf(choiceToPredicate(choice))
+                        predicates = listOf(choiceToPredicate(choice))
                     )
                     result[CoordinateComponent(x, y)] = matter
                 }

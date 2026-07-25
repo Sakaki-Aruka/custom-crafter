@@ -1,6 +1,7 @@
 package io.github.sakaki_aruka.customcrafter.search
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
+import io.github.sakaki_aruka.customcrafter.debug.Explainer
 import io.github.sakaki_aruka.customcrafter.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.matter.CMatterPredicate
 import io.github.sakaki_aruka.customcrafter.recipe.CRecipe
@@ -208,6 +209,7 @@ object Search {
      * @param[view] View of input slots
      * @param[searchQuery] Query of searching (since 5.0.20)
      * @param[sourceRecipes] Search target recipes (default = [CustomCrafterAPI.getRecipes])
+     * @param[explainer] Logs container instance
      * @return[CompletableFuture] Future task of a search result
      * @throws[IllegalArgumentException] If [view] materials is empty or size exceeds 36
      * @since 5.0.17
@@ -218,7 +220,8 @@ object Search {
         crafterId: UUID,
         view: CraftView,
         searchQuery: SearchQuery = SearchQuery.ASYNC_DEFAULT,
-        sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes()
+        sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes(),
+        explainer: Explainer? = null
     ): CompletableFuture<SearchResult> {
         if (view.materials.isEmpty() || view.materials.size > 36) {
             throw IllegalArgumentException("'view#materials' size must be in range of 1 to 36. (current: ${view.materials.size})")
@@ -227,19 +230,23 @@ object Search {
         val world: World = Bukkit.getPlayer(crafterId)
             ?.world
             ?: Bukkit.getWorlds().first()
-        val vanilla: Recipe? = VanillaSearch.search(world, view)
+        val vanilla: Recipe? = VanillaSearch.search(world, view, explainer)
+        explainer?.writeLog(Explainer.Loglevel.INFO, "[asyncSearch/vanillaSearch] vanilla recipe search done: found=${vanilla != null}")
 
         val mapped: Map<CoordinateComponent, ItemStack> = view.materials
 
-        val recipes: List<CRecipe> = sourceRecipes.filter { recipe ->
+        val (recipes: List<CRecipe>, excluded: List<CRecipe>) = sourceRecipes.partition { recipe ->
             mapped.size in recipe.requiresInputItemAmountMin()..recipe.requiresInputItemAmountMax()
         }
+
+        // write basic data to an explainer
+        explainer?.let { e -> logCandidateFilter(e, "asyncSearch", recipes, excluded, mapped.size) }
 
         val tasks = recipes.map { recipe ->
             CompletableFuture.supplyAsync({
                 when (recipe.type) {
-                    CRecipe.Type.SHAPED -> shaped(view, recipe, crafterId, searchQuery.asyncContext)
-                    CRecipe.Type.SHAPELESS -> shapeless(view, recipe, crafterId, searchQuery.asyncContext)
+                    CRecipe.Type.SHAPED -> shaped(view, recipe, crafterId, searchQuery.asyncContext, explainer)
+                    CRecipe.Type.SHAPELESS -> shapeless(view, recipe, crafterId, searchQuery.asyncContext, explainer)
                 }?.let { mapped -> recipe to mapped }
             }, InternalAPI.executor)
         }
@@ -249,6 +256,7 @@ object Search {
             val derived = tasks.map { task ->
                 task.thenAccept { pair ->
                     if (pair != null && findFirst.complete(pair)) {
+                        explainer?.writeLog(Explainer.Loglevel.INFO, "[asyncSearch/onlyFirst] first match found: recipe=${pair.first.name}, remaining tasks interrupted")
                         searchQuery.asyncContext?.interrupt()
                     }
                 }
@@ -257,12 +265,17 @@ object Search {
                 findFirst.complete(null)
             }
             return findFirst.thenApply { result ->
+                explainer?.writeLog(Explainer.Loglevel.INFO, "[asyncSearch/onlyFirst] search finished: matched=${result != null}, vanillaFound=${vanilla != null}")
                 SearchResult(vanilla, result?.let { listOf(it) } ?: emptyList())
             }
         }
 
         return CompletableFuture.allOf(*tasks.toTypedArray())
-            .thenApply { SearchResult(vanilla, tasks.mapNotNull { it.join() }) }
+            .thenApply {
+                val matched = tasks.mapNotNull { it.join() }
+                explainer?.writeLog(Explainer.Loglevel.INFO, "[asyncSearch/all] search finished: matchedCustoms=${matched.size}, vanillaFound=${vanilla != null}")
+                SearchResult(vanilla, matched)
+            }
     }
 
     /**
@@ -284,32 +297,42 @@ object Search {
         view: CraftView,
         searchQuery: SearchQuery = SearchQuery.DEFAULT,
         sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes(),
+        explainer: Explainer? = null
     ): SearchResult {
         if (view.materials.isEmpty() || view.materials.size > 36) {
             throw IllegalArgumentException("'view#materials' size must be in range of 1 to 36. (current: ${view.materials.size})")
         }
         val mapped: Map<CoordinateComponent, ItemStack> = view.materials
 
+        val (filteredRecipes: List<CRecipe>, excludedRecipes: List<CRecipe>) = sourceRecipes.partition { r ->
+            mapped.size in r.requiresInputItemAmountMin()..r.requiresInputItemAmountMax()
+        }
+        explainer?.let { e -> logCandidateFilter(e, "search", filteredRecipes, excludedRecipes, mapped.size) }
+
         val customs: MutableList<Pair<CRecipe, MappedRelation>> = mutableListOf()
-        for (recipe in sourceRecipes.filter { r -> mapped.size in r.requiresInputItemAmountMin()..r.requiresInputItemAmountMax() }) {
+        for (recipe in filteredRecipes) {
             when (recipe.type) {
-                CRecipe.Type.SHAPED -> shaped(view, recipe, crafterId)
-                CRecipe.Type.SHAPELESS -> shapeless(view, recipe, crafterId)
+                CRecipe.Type.SHAPED -> shaped(view, recipe, crafterId, explainer = explainer)
+                CRecipe.Type.SHAPELESS -> shapeless(view, recipe, crafterId, explainer = explainer)
             }?.let { customs.add(recipe to it) }
 
             if (searchQuery.searchMode == SearchQuery.SearchMode.ONLY_FIRST && customs.isNotEmpty()) {
+                explainer?.writeLog(Explainer.Loglevel.INFO, "[search/onlyFirst] first match found: recipe=${recipe.name}, stop searching")
                 break
             }
         }
 
         val vanilla: Recipe? =
-            if (searchQuery.vanillaSearchMode != SearchQuery.VanillaSearchMode.FORCE && customs.isNotEmpty()) null
-            else {
+            if (searchQuery.vanillaSearchMode != SearchQuery.VanillaSearchMode.FORCE && customs.isNotEmpty()) {
+                explainer?.writeLog(Explainer.Loglevel.DEBUG, "[search/vanillaSearch] vanilla search skipped: vanillaSearchMode=${searchQuery.vanillaSearchMode}, matchedCustoms=${customs.size}")
+                null
+            } else {
                 val world: World = Bukkit.getPlayer(crafterId)
                     ?.world
                     ?: Bukkit.getWorlds().first()
-                VanillaSearch.search(world, view)
+                VanillaSearch.search(world, view, explainer)
             }
+        explainer?.writeLog(Explainer.Loglevel.INFO, "[search] search finished: matchedCustoms=${customs.size}, vanillaFound=${vanilla != null}")
 
         return SearchResult(vanilla, customs)
     }
@@ -318,9 +341,11 @@ object Search {
         view: CraftView,
         recipe: CRecipe,
         crafterId: UUID,
-        asyncContext: AsyncContext? = null
+        asyncContext: AsyncContext? = null,
+        explainer: Explainer? = null
     ): MappedRelation? {
         if (recipe.items.size < view.materials.size) {
+            explainer?.writeLog(Explainer.Loglevel.DEBUG, "[shaped/sizeCheck] recipe=${recipe.name}, recipeSize=${recipe.items.size}, inputSize=${view.materials.size}")
             return null
         }
 
@@ -334,42 +359,106 @@ object Search {
             val matter: CMatter = recipe.items.getValue(recipeCoordinate)
             val input: ItemStack = view.materials[inputCoordinate] ?: ItemStack.empty()
             if (input.type !in matter.candidate) {
+                explainer?.writeLog(Explainer.Loglevel.DEBUG, "[shaped/typeCheck] recipe=${recipe.name}, coordinate=${recipeCoordinate.short()}, inputType=${input.type}, candidate=${matter.candidate}")
                 return null
             }
 
             if (!input.type.isAir) {
                 if (matter.anyAmount && input.amount < 1) {
+                    explainer?.writeLog(Explainer.Loglevel.DEBUG, "[shaped/amountCheck] recipe=${recipe.name}, coordinate=${recipeCoordinate.short()}, anyAmount=true, inputAmount=${input.amount}")
                     return null
                 } else if (!matter.anyAmount && input.amount < matter.amount) {
+                    explainer?.writeLog(Explainer.Loglevel.DEBUG, "[shaped/amountCheck] recipe=${recipe.name}, coordinate=${recipeCoordinate.short()}, requiredAmount=${matter.amount}, inputAmount=${input.amount}")
                     return null
                 }
             }
 
             val matterPredicateContext = CMatterPredicate.Context(recipeCoordinate, matter, input, view.materials, recipe, crafterId,
-                asyncContext = asyncContext
+                asyncContext = asyncContext,
+                explainer = explainer
             )
-            if (!matter.predicatesResult(matterPredicateContext)) {
-                return null
+            if (explainer == null) {
+                if (!matter.predicatesResult(matterPredicateContext)) {
+                    return null
+                }
+            } else {
+                matter.firstFailedPredicate(matterPredicateContext)?.let { (index, predicate) ->
+                    explainer.writeLog(Explainer.Loglevel.DEBUG, "[shaped/matterPredicateCheck] recipe=${recipe.name}, coordinate=${recipeCoordinate.short()}, failed=${predicateLabel(predicate.name(), index, matter.predicates?.size ?: 0)}")
+                    return null
+                }
             }
             components.add(MappedRelationComponent(recipeCoordinate, inputCoordinate))
         }
 
         val relation = MappedRelation(components)
 
-        val recipePredicateContext = CRecipePredicate.Context(view, crafterId, recipe, relation, asyncContext)
-        if (!recipe.getRecipePredicateResults(recipePredicateContext)) {
-            return null
+        val recipePredicateContext = CRecipePredicate.Context(view, crafterId, recipe, relation, asyncContext, explainer)
+        if (explainer == null) {
+            if (!recipe.getRecipePredicateResults(recipePredicateContext)) {
+                return null
+            }
+        } else {
+            recipe.firstFailedRecipePredicate(recipePredicateContext)?.let { (index, predicate) ->
+                explainer.writeLog(Explainer.Loglevel.DEBUG, "[shaped/recipePredicateCheck] recipe=${recipe.name}, failed=${predicateLabel(predicate.name(), index, recipe.predicates?.size ?: 0)}")
+                return null
+            }
         }
 
+        explainer?.writeLog(Explainer.Loglevel.INFO, "[shaped] recipe matched: name=${recipe.name}, relation=${relationString(relation)}")
         return relation
     }
+
+    /**
+     * Records which recipes became candidates and, for those that did not, why the input size ruled them out.
+     *
+     * A recipe that never reaches matching is otherwise invisible in the logs, which makes "my recipe
+     * is never found" impossible to diagnose from the candidate list alone.
+     */
+    private fun logCandidateFilter(
+        explainer: Explainer,
+        caller: String,
+        candidates: List<CRecipe>,
+        excluded: List<CRecipe>,
+        inputSize: Int
+    ) {
+        explainer.writeLog(Explainer.Loglevel.INFO, "[$caller/candidateFilter] candidates filtered by input size: inputSize=$inputSize, sourceRecipes=${candidates.size + excluded.size}, candidates=${candidates.size}, shaped=${candidates.count { it.type == CRecipe.Type.SHAPED }}, shapeless=${candidates.count { it.type == CRecipe.Type.SHAPELESS }}")
+        candidates.withIndex().forEach { (index, recipe) ->
+            explainer.writeLog(Explainer.Loglevel.DEBUG, "[$caller/candidateFilter] candidate($index): name=${recipe.name}, type=${recipe.type}, requires=${recipe.requiresInputItemAmountMin()}..${recipe.requiresInputItemAmountMax()}")
+        }
+        excluded.forEach { recipe ->
+            explainer.writeLog(Explainer.Loglevel.DEBUG, "[$caller/candidateFilter] excluded: name=${recipe.name}, type=${recipe.type}, inputSize=$inputSize not in requires=${recipe.requiresInputItemAmountMin()}..${recipe.requiresInputItemAmountMax()}")
+        }
+    }
+
+    /**
+     * Renders a predicate for a diagnostic log, falling back to its index when it carries no name.
+     */
+    private fun predicateLabel(name: String, index: Int, total: Int): String {
+        val anonymous: Boolean = name == CMatterPredicate.ANONYMOUS || name == CRecipePredicate.ANONYMOUS
+        return if (anonymous) "predicate#$index/$total" else "$name (predicate#$index/$total)"
+    }
+
+    /**
+     * Renders a relation as `recipeCoordinate->inputCoordinate` pairs on one line.
+     */
+    private fun relationString(relation: MappedRelation): String {
+        return relation.components
+            .sortedBy { it.recipe.toIndex() }
+            .joinToString(", ") { c -> "${c.recipe.short()}->${c.input.short()}" }
+    }
+
+    /**
+     * Renders a coordinate as `(x,y)` to keep diagnostic lines readable.
+     */
+    private fun CoordinateComponent.short(): String = "($x,$y)"
 
 
     private fun shapeless(
         view: CraftView,
         recipe: CRecipe,
         crafterId: UUID,
-        asyncContext: AsyncContext? = null
+        asyncContext: AsyncContext? = null,
+        explainer: Explainer? = null
     ): MappedRelation? {
         // Shapeless matching is generalized from a bipartite perfect matching problem into a
         // min/max-bounded assignment problem: recipe slots are partitioned into CRecipe#matchGroups
@@ -385,6 +474,7 @@ object Search {
         val recipeSlots: Int = recipeEntries.size
         val inputSlots: Int = inputEntries.size
         if (recipeSlots == 0) {
+            explainer?.writeLog(Explainer.Loglevel.DEBUG, "[shapeless/emptyCheck] recipe=${recipe.name}, recipeSlots=0")
             return null
         }
 
@@ -392,6 +482,7 @@ object Search {
         val requiredMin: Int = groups.sumOf { it.min }
         if (inputSlots < requiredMin) {
             // fewer inputs than the groups' combined minimum can never be satisfied
+            explainer?.writeLog(Explainer.Loglevel.DEBUG, "[shapeless/minCheck] recipe=${recipe.name}, requiredMin=$requiredMin, inputSlots=$inputSlots")
             return null
         }
 
@@ -448,7 +539,8 @@ object Search {
                 view.materials,
                 recipe,
                 crafterId,
-                asyncContext
+                asyncContext,
+                explainer
             )
             val passed: Boolean = matter.predicatesResult(ctx)
             predicateStates[r][i] = if (passed) 1 else 2
@@ -517,6 +609,41 @@ object Search {
             }
         }
         if (achieved < requiredMin) {
+            explainer?.let { e ->
+                e.writeLog(Explainer.Loglevel.DEBUG, "[shapeless/flowCheck] recipe=${recipe.name}, achieved=$achieved, requiredMin=$requiredMin")
+                if (asyncContext?.isInterrupted() == true) {
+                    // every edge was reported blocked by the interrupt guard, so per-slot reasons would be bogus
+                    e.writeLog(Explainer.Loglevel.INFO, "[shapeless/flowCheck] recipe=${recipe.name}, matching abandoned: async context interrupted")
+                    return@let
+                }
+                for ((groupIndex, group) in groups.withIndex()) {
+                    val memberIndices: List<Int> = group.members.map { coordinateToIndex.getValue(it) }
+                    val matchedCount: Int = memberIndices.count { r -> memberActiveEdge[r].residual == 0 }
+                    if (matchedCount >= group.min) {
+                        continue
+                    }
+                    e.writeLog(Explainer.Loglevel.DEBUG, "[shapeless/flowCheck] recipe=${recipe.name}, group#$groupIndex unsatisfied: matched=$matchedCount < min=${group.min}, members=${group.members.joinToString(",") { it.short() }}")
+                    for (r in memberIndices) {
+                        if (memberActiveEdge[r].residual == 0) {
+                            continue
+                        }
+                        val matter: CMatter = recipeEntries[r].value
+                        val coordinate: CoordinateComponent = recipeEntries[r].key
+                        val amountRequirement: String = if (matter.anyAmount) "amount>=1" else "amount>=${matter.amount}"
+                        val cheapPassed: List<Int> = (0..<inputSlots).filter { i -> cheapEdges[r] and (1L shl i) != 0L }
+                        if (cheapPassed.isEmpty()) {
+                            e.writeLog(Explainer.Loglevel.DEBUG, "[shapeless/flowCheck] recipe=${recipe.name}, slot=${coordinate.short()} unmatched: no input passes candidate=${matter.candidate} $amountRequirement")
+                            continue
+                        }
+                        val allowed: List<Int> = cheapPassed.filter { i -> edgeAllowed(r, i) }
+                        if (allowed.isEmpty()) {
+                            e.writeLog(Explainer.Loglevel.DEBUG, "[shapeless/flowCheck] recipe=${recipe.name}, slot=${coordinate.short()} unmatched: ${cheapPassed.size} input(s) pass candidate/$amountRequirement but all rejected by matter predicates")
+                        } else {
+                            e.writeLog(Explainer.Loglevel.DEBUG, "[shapeless/flowCheck] recipe=${recipe.name}, slot=${coordinate.short()} unmatched: ${allowed.size} acceptable input(s) ${allowed.map { i -> inputEntries[i].key.short() }} all taken by other slots")
+                        }
+                    }
+                }
+            }
             return null
         }
 
@@ -534,11 +661,19 @@ object Search {
         }
 
         val relation = MappedRelation(relationComponents)
-        val recipePredicateContext = CRecipePredicate.Context(view, crafterId, recipe, relation, asyncContext)
-        if (!recipe.getRecipePredicateResults(recipePredicateContext)) {
-            return null
+        val recipePredicateContext = CRecipePredicate.Context(view, crafterId, recipe, relation, asyncContext, explainer)
+        if (explainer == null) {
+            if (!recipe.getRecipePredicateResults(recipePredicateContext)) {
+                return null
+            }
+        } else {
+            recipe.firstFailedRecipePredicate(recipePredicateContext)?.let { (index, predicate) ->
+                explainer.writeLog(Explainer.Loglevel.DEBUG, "[shapeless/recipePredicateCheck] recipe=${recipe.name}, failed=${predicateLabel(predicate.name(), index, recipe.predicates?.size ?: 0)}")
+                return null
+            }
         }
 
+        explainer?.writeLog(Explainer.Loglevel.INFO, "[shapeless] recipe matched: name=${recipe.name}, relation=${relationString(relation)}")
         return relation
     }
 }
