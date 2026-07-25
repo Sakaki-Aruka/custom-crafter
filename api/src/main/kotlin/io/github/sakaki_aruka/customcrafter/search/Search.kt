@@ -11,6 +11,7 @@ import io.github.sakaki_aruka.customcrafter.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.objects.MappedRelationComponent
 import io.github.sakaki_aruka.customcrafter.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.recipe.CVanillaRecipe
+import io.github.sakaki_aruka.customcrafter.recipe.MatchGroup
 import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
 import org.bukkit.Bukkit
 import org.bukkit.World
@@ -370,18 +371,32 @@ object Search {
         crafterId: UUID,
         asyncContext: AsyncContext? = null
     ): MappedRelation? {
-        // Shapeless matching is a bipartite perfect matching problem:
-        // every recipe slot must be assigned a distinct input slot whose item
-        // passes the slot's candidate, amount and matter-predicate checks.
-        // It is solved with Kuhn's augmenting path algorithm.
+        // Shapeless matching is generalized from a bipartite perfect matching problem into a
+        // min/max-bounded assignment problem: recipe slots are partitioned into CRecipe#matchGroups
+        // groups, and each group only needs its member count matched within [min, max] (not every
+        // member). Plain "every slot mandatory" recipes are just the degenerate case where every
+        // group has exactly one member with min == max == 1.
+        //
+        // This is solved as a feasible-flow-with-lower-bounds problem (the standard reduction via a
+        // super source/sink over a max-flow computation), which subsumes Kuhn's augmenting path
+        // matching used previously. See FlowGraph for the underlying max-flow primitive.
         val recipeEntries: List<Map.Entry<CoordinateComponent, CMatter>> = recipe.items.entries.toList()
         val inputEntries: List<Map.Entry<CoordinateComponent, ItemStack>> = view.materials.entries.toList()
         val recipeSlots: Int = recipeEntries.size
         val inputSlots: Int = inputEntries.size
-        if (recipeSlots == 0 || inputSlots < recipeSlots) {
-            // fewer inputs than recipe slots can never form a full assignment
+        if (recipeSlots == 0) {
             return null
         }
+
+        val groups: List<MatchGroup> = recipe.matchGroups()
+        val requiredMin: Int = groups.sumOf { it.min }
+        if (inputSlots < requiredMin) {
+            // fewer inputs than the groups' combined minimum can never be satisfied
+            return null
+        }
+
+        val coordinateToIndex: Map<CoordinateComponent, Int> =
+            recipeEntries.withIndex().associate { (idx, entry) -> entry.key to idx }
 
         // Cheap edge mask per recipe slot: bit i is set when input i passes
         // the candidate and amount checks. Input slot counts never exceed 36
@@ -404,10 +419,6 @@ object Search {
                 if (amountResult) {
                     mask = mask or (1L shl i)
                 }
-            }
-            if (mask == 0L) {
-                // a recipe slot without any usable input can never be assigned
-                return null
             }
             cheapEdges[r] = mask
         }
@@ -444,41 +455,83 @@ object Search {
             return passed
         }
 
-        val inputToRecipe = IntArray(inputSlots) { -1 }
-        val recipeToInput = IntArray(recipeSlots) { -1 }
+        // ---- build the flow network ----
+        // ss/tt: super source/sink for the lower-bound-feasibility reduction.
+        // s/t: the "real" source/sink of the underlying assignment problem.
+        // groupNode(g): one per MatchGroup, capacity-ranged [min, max] from s.
+        // memberIn(r)/memberOut(r): a recipe slot is split so that, even if a
+        //   misbehaving custom CRecipe#matchGroups() lets the same coordinate
+        //   appear in more than one group, the slot can still carry at most 1
+        //   unit of flow overall.
+        // inputNode(i): one per physical input slot, capacity 1 into t.
+        var nextId = 0
+        val ss = nextId++
+        val tt = nextId++
+        val s = nextId++
+        val t = nextId++
+        val groupNodes = IntArray(groups.size) { nextId++ }
+        val memberIn = IntArray(recipeSlots) { nextId++ }
+        val memberOut = IntArray(recipeSlots) { nextId++ }
+        val inputNodes = IntArray(inputSlots) { nextId++ }
 
-        fun tryAssign(r: Int, visited: BooleanArray): Boolean {
+        val graph = FlowGraph(nextId)
+        graph.addEdge(t, s, recipeSlots + inputSlots + 1)
+
+        val memberActiveEdge: Array<FlowGraph.Edge> = Array(recipeSlots) { r ->
+            graph.addEdge(memberIn[r], memberOut[r], 1)
+        }
+
+        for ((groupIndex, group) in groups.withIndex()) {
+            graph.addEdge(ss, groupNodes[groupIndex], group.min)
+            graph.addEdge(s, tt, group.min)
+            graph.addEdge(s, groupNodes[groupIndex], group.max - group.min)
+            for (coordinate in group.members) {
+                val r: Int = coordinateToIndex.getValue(coordinate)
+                graph.addEdge(groupNodes[groupIndex], memberIn[r], 1)
+            }
+        }
+
+        val memberOutOwner = IntArray(nextId) { -1 }
+        for (r in 0..<recipeSlots) {
+            memberOutOwner[memberOut[r]] = r
             for (i in 0..<inputSlots) {
-                if (visited[i] || !edgeAllowed(r, i)) {
-                    continue
-                }
-                visited[i] = true
-                if (inputToRecipe[i] == -1 || tryAssign(inputToRecipe[i], visited)) {
-                    inputToRecipe[i] = r
-                    recipeToInput[r] = i
-                    return true
+                if (cheapEdges[r] and (1L shl i) != 0L) {
+                    graph.addEdge(memberOut[r], inputNodes[i], 1)
                 }
             }
-            return false
         }
 
-        // most-constrained slots first: fewer cheap edges means fewer options
-        val order: List<Int> = (0..<recipeSlots).sortedBy { cheapEdges[it].countOneBits() }
-        for (r in order) {
+        val inputOwner = IntArray(nextId) { -1 }
+        for (i in 0..<inputSlots) {
+            inputOwner[inputNodes[i]] = i
+            graph.addEdge(inputNodes[i], t, 1)
+        }
+
+        val achieved: Int = graph.maxFlow(ss, tt) { from, to ->
             if (asyncContext?.isInterrupted() == true) {
-                return null
-            }
-            if (!tryAssign(r, BooleanArray(inputSlots))) {
-                return null
+                true
+            } else {
+                val r = memberOutOwner[from]
+                val i = inputOwner[to]
+                if (r == -1 || i == -1) false else !edgeAllowed(r, i)
             }
         }
+        if (achieved < requiredMin) {
+            return null
+        }
 
-        val relationComponents: Set<MappedRelationComponent> = (0..<recipeSlots).map { r ->
-            MappedRelationComponent(
-                recipe = recipeEntries[r].key,
-                input = inputEntries[recipeToInput[r]].key
-            )
-        }.toSet()
+        val relationComponents: MutableSet<MappedRelationComponent> = mutableSetOf()
+        for (r in 0..<recipeSlots) {
+            if (memberActiveEdge[r].residual != 0) {
+                // this member was not needed to satisfy its group's minimum
+                continue
+            }
+            val matchedInput: Int = graph.edgesFrom(memberOut[r])
+                .firstOrNull { edge -> !edge.isReverse && inputOwner[edge.to] != -1 && edge.residual == 0 }
+                ?.let { inputOwner[it.to] }
+                ?: continue
+            relationComponents.add(MappedRelationComponent(recipeEntries[r].key, inputEntries[matchedInput].key))
+        }
 
         val relation = MappedRelation(relationComponents)
         val recipePredicateContext = CRecipePredicate.Context(view, crafterId, recipe, relation, asyncContext)
