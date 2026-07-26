@@ -156,6 +156,13 @@ public interface <span class="typeNameLabel"><a href=CMatterPredicate.html>CMatt
                                             <td class="colLast"><p>CMatterPredicate context</p></td>
                                         </tr>
                                         
+                                        <tr class="rowColor">
+                                            <td class="colFirst"><code>public class</code></td>
+                                            <th class="colSecond" scope="row"><code><a href="CMatterPredicate.Companion.html">CMatterPredicate.Companion</a></span></code>
+                                            </th>
+                                            <td class="colLast"></td>
+                                        </tr>
+                                        
                                     </table>
                                 </div>
                             </li>
@@ -260,6 +267,14 @@ public interface <span class="typeNameLabel"><a href=CMatterPredicate.html>CMatt
                                             <td class="colLast">Runs this operation.</td>
                                         </tr>
                                         
+                                        <tr id="i1" class="rowColor">
+                                            <td class="colFirst"><code><a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html>String</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=CMatterPredicate.html#name()>name</a>() </code>
+                                            </th>
+                                            <td class="colLast">Returns a label identifying this predicate in diagnostic logs.</td>
+                                        </tr>
+                                        
                                         </tbody>
                                     </table>
                                 </div>
@@ -308,7 +323,7 @@ public interface <span class="typeNameLabel"><a href=CMatterPredicate.html>CMatt
                                     <!--   -->
                                 </a>
                                 <ul class=
-                                              "blockListLast"
+                                              "blockList"
                                           >
                                     <li class="blockList">
                                         <h4>test</h4>
@@ -335,6 +350,37 @@ public interface <span class="typeNameLabel"><a href=CMatterPredicate.html>CMatt
                                             <dt><span class="sinceLabel">Since:</span></dt>
                                             
                                                 <dd><p>5.0.17</p></dd>
+                                            
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="name()">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockListLast"
+                                          >
+                                    <li class="blockList">
+                                        <h4>name</h4>
+                                        <pre class="methodSignature"> <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html>String</a> <a href=CMatterPredicate.html#name()>name</a>()</pre>
+                                        <div class="block"><p>Returns a label identifying this predicate in diagnostic logs.</p><p>A lambda carries no identity of its own, so the default is <a href=CMatterPredicate.Companion.html#ANONYMOUS>ANONYMOUS</a> and an <a href=../debug/Explainer.html>io.github.sakaki_aruka.customcrafter.debug.Explainer</a> falls back to reporting the predicate's index within CMatter.predicates. Override it, or wrap the lambda with <a href=CMatterPredicates.html#named(java.lang.String,io.github.sakaki_aruka.customcrafter.matter.CMatterPredicate)>CMatterPredicates.named</a>, to get a readable name instead.</p><p>Combinators in <a href=CMatterPredicates.html>CMatterPredicates</a> derive their name from the predicates they combine, so a composed predicate reports its structure without any extra work.</p></div>
+
+                                        <dl>
+
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p><a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-string/index.html>String</a> Label of this predicate (default = <a href=CMatterPredicate.Companion.html#ANONYMOUS>ANONYMOUS</a>)</p></dd>
+                                        
+
+                                        
+                                            <dt><span class="sinceLabel">Since:</span></dt>
+                                            
+                                                <dd><p>5.3.0</p></dd>
                                             
                                         
 

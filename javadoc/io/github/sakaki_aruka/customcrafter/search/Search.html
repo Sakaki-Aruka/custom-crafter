@@ -153,7 +153,7 @@ public class <span class="typeNameLabel"><a href=Search.html>Search</a></span>
                                             <td class="colFirst"><code>public final class</code></td>
                                             <th class="colSecond" scope="row"><code><a href="Search.SearchResult.html">Search.SearchResult</a></span></code>
                                             </th>
-                                            <td class="colLast"><p>A result of <a href=Search.html#search(java.util.UUID,io.github.sakaki_aruka.customcrafter.objects.CraftView,io.github.sakaki_aruka.customcrafter.search.Search.SearchQuery,java.util.List)>Search.search</a>.</p></td>
+                                            <td class="colLast"><p>A result of <a href=Search.html#search(java.util.UUID,io.github.sakaki_aruka.customcrafter.objects.CraftView,io.github.sakaki_aruka.customcrafter.search.Search.SearchQuery,java.util.List,io.github.sakaki_aruka.customcrafter.debug.Explainer)>Search.search</a>.</p></td>
                                         </tr>
                                         
                                         <tr class="rowColor">
@@ -268,7 +268,7 @@ public class <span class="typeNameLabel"><a href=Search.html>Search</a></span>
                                         <tr id="i0" class="altColor">
                                             <td class="colFirst"><code>final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/CompletableFuture.html>CompletableFuture</a>&lt;<a href=Search.SearchResult.html>Search.SearchResult</a>&gt;</code>
                                             </td>
-                                            <th class="colSecond" scope="row"><code><a href=Search.html#asyncSearch(java.util.UUID,io.github.sakaki_aruka.customcrafter.objects.CraftView,io.github.sakaki_aruka.customcrafter.search.Search.SearchQuery,java.util.List)>asyncSearch</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/UUID.html>UUID</a> crafterId, <a href=../objects/CraftView.html>CraftView</a> view, <a href=Search.SearchQuery.html>Search.SearchQuery</a> searchQuery, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=../recipe/CRecipe.html>CRecipe</a>&gt; sourceRecipes) </code>
+                                            <th class="colSecond" scope="row"><code><a href=Search.html#asyncSearch(java.util.UUID,io.github.sakaki_aruka.customcrafter.objects.CraftView,io.github.sakaki_aruka.customcrafter.search.Search.SearchQuery,java.util.List,io.github.sakaki_aruka.customcrafter.debug.Explainer)>asyncSearch</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/UUID.html>UUID</a> crafterId, <a href=../objects/CraftView.html>CraftView</a> view, <a href=Search.SearchQuery.html>Search.SearchQuery</a> searchQuery, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=../recipe/CRecipe.html>CRecipe</a>&gt; sourceRecipes, <a href=../debug/Explainer.html>Explainer</a> explainer) </code>
                                             </th>
                                             <td class="colLast">Returns a CompletableFuture that performs asynchronous searches using the input items and recipes.</td>
                                         </tr>
@@ -276,7 +276,7 @@ public class <span class="typeNameLabel"><a href=Search.html>Search</a></span>
                                         <tr id="i1" class="rowColor">
                                             <td class="colFirst"><code>final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/CompletableFuture.html>CompletableFuture</a>&lt;<a href=Search.SearchResult.html>Search.SearchResult</a>&gt;</code>
                                             </td>
-                                            <th class="colSecond" scope="row"><code><a href=Search.html#asyncSearch(java.util.UUID,io.github.sakaki_aruka.customcrafter.objects.CraftView,io.github.sakaki_aruka.customcrafter.search.Search.SearchQuery,java.util.List)>asyncSearch</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/UUID.html>UUID</a> crafterId, <a href=../objects/CraftView.html>CraftView</a> view, <a href=Search.SearchQuery.html>Search.SearchQuery</a> searchQuery) </code>
+                                            <th class="colSecond" scope="row"><code><a href=Search.html#asyncSearch(java.util.UUID,io.github.sakaki_aruka.customcrafter.objects.CraftView,io.github.sakaki_aruka.customcrafter.search.Search.SearchQuery,java.util.List,io.github.sakaki_aruka.customcrafter.debug.Explainer)>asyncSearch</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/UUID.html>UUID</a> crafterId, <a href=../objects/CraftView.html>CraftView</a> view, <a href=Search.SearchQuery.html>Search.SearchQuery</a> searchQuery, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=../recipe/CRecipe.html>CRecipe</a>&gt; sourceRecipes) </code>
                                             </th>
                                             <td class="colLast">Returns a CompletableFuture that performs asynchronous searches using the input items and recipes.</td>
                                         </tr>
@@ -284,23 +284,23 @@ public class <span class="typeNameLabel"><a href=Search.html>Search</a></span>
                                         <tr id="i2" class="altColor">
                                             <td class="colFirst"><code>final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/CompletableFuture.html>CompletableFuture</a>&lt;<a href=Search.SearchResult.html>Search.SearchResult</a>&gt;</code>
                                             </td>
-                                            <th class="colSecond" scope="row"><code><a href=Search.html#asyncSearch(java.util.UUID,io.github.sakaki_aruka.customcrafter.objects.CraftView,io.github.sakaki_aruka.customcrafter.search.Search.SearchQuery,java.util.List)>asyncSearch</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/UUID.html>UUID</a> crafterId, <a href=../objects/CraftView.html>CraftView</a> view) </code>
+                                            <th class="colSecond" scope="row"><code><a href=Search.html#asyncSearch(java.util.UUID,io.github.sakaki_aruka.customcrafter.objects.CraftView,io.github.sakaki_aruka.customcrafter.search.Search.SearchQuery,java.util.List,io.github.sakaki_aruka.customcrafter.debug.Explainer)>asyncSearch</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/UUID.html>UUID</a> crafterId, <a href=../objects/CraftView.html>CraftView</a> view, <a href=Search.SearchQuery.html>Search.SearchQuery</a> searchQuery) </code>
                                             </th>
                                             <td class="colLast">Returns a CompletableFuture that performs asynchronous searches using the input items and recipes.</td>
                                         </tr>
                                         
                                         <tr id="i3" class="rowColor">
-                                            <td class="colFirst"><code>final static <a href=Search.SearchResult.html>Search.SearchResult</a></code>
+                                            <td class="colFirst"><code>final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/CompletableFuture.html>CompletableFuture</a>&lt;<a href=Search.SearchResult.html>Search.SearchResult</a>&gt;</code>
                                             </td>
-                                            <th class="colSecond" scope="row"><code><a href=Search.html#search(java.util.UUID,io.github.sakaki_aruka.customcrafter.objects.CraftView,io.github.sakaki_aruka.customcrafter.search.Search.SearchQuery,java.util.List)>search</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/UUID.html>UUID</a> crafterId, <a href=../objects/CraftView.html>CraftView</a> view, <a href=Search.SearchQuery.html>Search.SearchQuery</a> searchQuery, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=../recipe/CRecipe.html>CRecipe</a>&gt; sourceRecipes) </code>
+                                            <th class="colSecond" scope="row"><code><a href=Search.html#asyncSearch(java.util.UUID,io.github.sakaki_aruka.customcrafter.objects.CraftView,io.github.sakaki_aruka.customcrafter.search.Search.SearchQuery,java.util.List,io.github.sakaki_aruka.customcrafter.debug.Explainer)>asyncSearch</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/UUID.html>UUID</a> crafterId, <a href=../objects/CraftView.html>CraftView</a> view) </code>
                                             </th>
-                                            <td class="colLast">We will perform recipe searches using a synchronous process.</td>
+                                            <td class="colLast">Returns a CompletableFuture that performs asynchronous searches using the input items and recipes.</td>
                                         </tr>
                                         
                                         <tr id="i4" class="altColor">
                                             <td class="colFirst"><code>final static <a href=Search.SearchResult.html>Search.SearchResult</a></code>
                                             </td>
-                                            <th class="colSecond" scope="row"><code><a href=Search.html#search(java.util.UUID,io.github.sakaki_aruka.customcrafter.objects.CraftView,io.github.sakaki_aruka.customcrafter.search.Search.SearchQuery,java.util.List)>search</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/UUID.html>UUID</a> crafterId, <a href=../objects/CraftView.html>CraftView</a> view, <a href=Search.SearchQuery.html>Search.SearchQuery</a> searchQuery) </code>
+                                            <th class="colSecond" scope="row"><code><a href=Search.html#search(java.util.UUID,io.github.sakaki_aruka.customcrafter.objects.CraftView,io.github.sakaki_aruka.customcrafter.search.Search.SearchQuery,java.util.List,io.github.sakaki_aruka.customcrafter.debug.Explainer)>search</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/UUID.html>UUID</a> crafterId, <a href=../objects/CraftView.html>CraftView</a> view, <a href=Search.SearchQuery.html>Search.SearchQuery</a> searchQuery, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=../recipe/CRecipe.html>CRecipe</a>&gt; sourceRecipes, <a href=../debug/Explainer.html>Explainer</a> explainer) </code>
                                             </th>
                                             <td class="colLast">We will perform recipe searches using a synchronous process.</td>
                                         </tr>
@@ -308,7 +308,23 @@ public class <span class="typeNameLabel"><a href=Search.html>Search</a></span>
                                         <tr id="i5" class="rowColor">
                                             <td class="colFirst"><code>final static <a href=Search.SearchResult.html>Search.SearchResult</a></code>
                                             </td>
-                                            <th class="colSecond" scope="row"><code><a href=Search.html#search(java.util.UUID,io.github.sakaki_aruka.customcrafter.objects.CraftView,io.github.sakaki_aruka.customcrafter.search.Search.SearchQuery,java.util.List)>search</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/UUID.html>UUID</a> crafterId, <a href=../objects/CraftView.html>CraftView</a> view) </code>
+                                            <th class="colSecond" scope="row"><code><a href=Search.html#search(java.util.UUID,io.github.sakaki_aruka.customcrafter.objects.CraftView,io.github.sakaki_aruka.customcrafter.search.Search.SearchQuery,java.util.List,io.github.sakaki_aruka.customcrafter.debug.Explainer)>search</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/UUID.html>UUID</a> crafterId, <a href=../objects/CraftView.html>CraftView</a> view, <a href=Search.SearchQuery.html>Search.SearchQuery</a> searchQuery, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=../recipe/CRecipe.html>CRecipe</a>&gt; sourceRecipes) </code>
+                                            </th>
+                                            <td class="colLast">We will perform recipe searches using a synchronous process.</td>
+                                        </tr>
+                                        
+                                        <tr id="i6" class="altColor">
+                                            <td class="colFirst"><code>final static <a href=Search.SearchResult.html>Search.SearchResult</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=Search.html#search(java.util.UUID,io.github.sakaki_aruka.customcrafter.objects.CraftView,io.github.sakaki_aruka.customcrafter.search.Search.SearchQuery,java.util.List,io.github.sakaki_aruka.customcrafter.debug.Explainer)>search</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/UUID.html>UUID</a> crafterId, <a href=../objects/CraftView.html>CraftView</a> view, <a href=Search.SearchQuery.html>Search.SearchQuery</a> searchQuery) </code>
+                                            </th>
+                                            <td class="colLast">We will perform recipe searches using a synchronous process.</td>
+                                        </tr>
+                                        
+                                        <tr id="i7" class="rowColor">
+                                            <td class="colFirst"><code>final static <a href=Search.SearchResult.html>Search.SearchResult</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=Search.html#search(java.util.UUID,io.github.sakaki_aruka.customcrafter.objects.CraftView,io.github.sakaki_aruka.customcrafter.search.Search.SearchQuery,java.util.List,io.github.sakaki_aruka.customcrafter.debug.Explainer)>search</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/UUID.html>UUID</a> crafterId, <a href=../objects/CraftView.html>CraftView</a> view) </code>
                                             </th>
                                             <td class="colLast">We will perform recipe searches using a synchronous process.</td>
                                         </tr>
@@ -357,6 +373,60 @@ public class <span class="typeNameLabel"><a href=Search.html>Search</a></span>
                             </a>
                                 <h3>Method Detail</h3>
                                 
+                                <a id="asyncSearch(java.util.UUID,io.github.sakaki_aruka.customcrafter.objects.CraftView,io.github.sakaki_aruka.customcrafter.search.Search.SearchQuery,java.util.List,io.github.sakaki_aruka.customcrafter.debug.Explainer)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>asyncSearch</h4>
+                                        <pre class="methodSignature">@<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-overloads/index.html>JvmOverloads</a>() final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/CompletableFuture.html>CompletableFuture</a>&lt;<a href=Search.SearchResult.html>Search.SearchResult</a>&gt; <a href=Search.html#asyncSearch(java.util.UUID,io.github.sakaki_aruka.customcrafter.objects.CraftView,io.github.sakaki_aruka.customcrafter.search.Search.SearchQuery,java.util.List,io.github.sakaki_aruka.customcrafter.debug.Explainer)>asyncSearch</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/UUID.html>UUID</a> crafterId, <a href=../objects/CraftView.html>CraftView</a> view, <a href=Search.SearchQuery.html>Search.SearchQuery</a> searchQuery, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=../recipe/CRecipe.html>CRecipe</a>&gt; sourceRecipes, <a href=../debug/Explainer.html>Explainer</a> explainer)</pre>
+                                        <div class="block"><p>Returns a CompletableFuture that performs asynchronous searches using the input items and recipes.</p><p>Since almost all processing in this search is done asynchronously, exceptions will occur when accessing the world or entities (due to Bukkit API's asynchronous processing limitations).</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>crafterId</code> - Crafter UUID</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>view</code> - View of input slots</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>searchQuery</code> - Query of searching (since 5.0.</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>sourceRecipes</code> - Search target recipes (default = <a href=../CustomCrafterAPI.html#getRecipes()>CustomCrafterAPI.getRecipes</a>)</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>explainer</code> - Logs container instance</dd>
+                                            
+                                            
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p><a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/CompletableFuture.html>CompletableFuture</a> Future task of a search result</p></dd>
+                                        
+
+                                        
+                                            <dt><span class="sinceLabel">Since:</span></dt>
+                                            
+                                                <dd><p>5.0.17</p></dd>
+                                            
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
                                 <a id="asyncSearch(java.util.UUID,io.github.sakaki_aruka.customcrafter.objects.CraftView,io.github.sakaki_aruka.customcrafter.search.Search.SearchQuery,java.util.List)">
                                     <!--   -->
                                 </a>
@@ -365,7 +435,7 @@ public class <span class="typeNameLabel"><a href=Search.html>Search</a></span>
                                           >
                                     <li class="blockList">
                                         <h4>asyncSearch</h4>
-                                        <pre class="methodSignature">@<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-overloads/index.html>JvmOverloads</a>() final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/CompletableFuture.html>CompletableFuture</a>&lt;<a href=Search.SearchResult.html>Search.SearchResult</a>&gt; <a href=Search.html#asyncSearch(java.util.UUID,io.github.sakaki_aruka.customcrafter.objects.CraftView,io.github.sakaki_aruka.customcrafter.search.Search.SearchQuery,java.util.List)>asyncSearch</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/UUID.html>UUID</a> crafterId, <a href=../objects/CraftView.html>CraftView</a> view, <a href=Search.SearchQuery.html>Search.SearchQuery</a> searchQuery, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=../recipe/CRecipe.html>CRecipe</a>&gt; sourceRecipes)</pre>
+                                        <pre class="methodSignature">@<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-overloads/index.html>JvmOverloads</a>() final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/CompletableFuture.html>CompletableFuture</a>&lt;<a href=Search.SearchResult.html>Search.SearchResult</a>&gt; <a href=Search.html#asyncSearch(java.util.UUID,io.github.sakaki_aruka.customcrafter.objects.CraftView,io.github.sakaki_aruka.customcrafter.search.Search.SearchQuery,java.util.List,io.github.sakaki_aruka.customcrafter.debug.Explainer)>asyncSearch</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/UUID.html>UUID</a> crafterId, <a href=../objects/CraftView.html>CraftView</a> view, <a href=Search.SearchQuery.html>Search.SearchQuery</a> searchQuery, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=../recipe/CRecipe.html>CRecipe</a>&gt; sourceRecipes)</pre>
                                         <div class="block"><p>Returns a CompletableFuture that performs asynchronous searches using the input items and recipes.</p><p>Since almost all processing in this search is done asynchronously, exceptions will occur when accessing the world or entities (due to Bukkit API's asynchronous processing limitations).</p></div>
 
                                         <dl>
@@ -415,7 +485,7 @@ public class <span class="typeNameLabel"><a href=Search.html>Search</a></span>
                                           >
                                     <li class="blockList">
                                         <h4>asyncSearch</h4>
-                                        <pre class="methodSignature">@<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-overloads/index.html>JvmOverloads</a>() final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/CompletableFuture.html>CompletableFuture</a>&lt;<a href=Search.SearchResult.html>Search.SearchResult</a>&gt; <a href=Search.html#asyncSearch(java.util.UUID,io.github.sakaki_aruka.customcrafter.objects.CraftView,io.github.sakaki_aruka.customcrafter.search.Search.SearchQuery,java.util.List)>asyncSearch</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/UUID.html>UUID</a> crafterId, <a href=../objects/CraftView.html>CraftView</a> view, <a href=Search.SearchQuery.html>Search.SearchQuery</a> searchQuery)</pre>
+                                        <pre class="methodSignature">@<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-overloads/index.html>JvmOverloads</a>() final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/CompletableFuture.html>CompletableFuture</a>&lt;<a href=Search.SearchResult.html>Search.SearchResult</a>&gt; <a href=Search.html#asyncSearch(java.util.UUID,io.github.sakaki_aruka.customcrafter.objects.CraftView,io.github.sakaki_aruka.customcrafter.search.Search.SearchQuery,java.util.List,io.github.sakaki_aruka.customcrafter.debug.Explainer)>asyncSearch</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/UUID.html>UUID</a> crafterId, <a href=../objects/CraftView.html>CraftView</a> view, <a href=Search.SearchQuery.html>Search.SearchQuery</a> searchQuery)</pre>
                                         <div class="block"><p>Returns a CompletableFuture that performs asynchronous searches using the input items and recipes.</p><p>Since almost all processing in this search is done asynchronously, exceptions will occur when accessing the world or entities (due to Bukkit API's asynchronous processing limitations).</p></div>
 
                                         <dl>
@@ -461,7 +531,7 @@ public class <span class="typeNameLabel"><a href=Search.html>Search</a></span>
                                           >
                                     <li class="blockList">
                                         <h4>asyncSearch</h4>
-                                        <pre class="methodSignature">@<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-overloads/index.html>JvmOverloads</a>() final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/CompletableFuture.html>CompletableFuture</a>&lt;<a href=Search.SearchResult.html>Search.SearchResult</a>&gt; <a href=Search.html#asyncSearch(java.util.UUID,io.github.sakaki_aruka.customcrafter.objects.CraftView,io.github.sakaki_aruka.customcrafter.search.Search.SearchQuery,java.util.List)>asyncSearch</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/UUID.html>UUID</a> crafterId, <a href=../objects/CraftView.html>CraftView</a> view)</pre>
+                                        <pre class="methodSignature">@<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-overloads/index.html>JvmOverloads</a>() final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/CompletableFuture.html>CompletableFuture</a>&lt;<a href=Search.SearchResult.html>Search.SearchResult</a>&gt; <a href=Search.html#asyncSearch(java.util.UUID,io.github.sakaki_aruka.customcrafter.objects.CraftView,io.github.sakaki_aruka.customcrafter.search.Search.SearchQuery,java.util.List,io.github.sakaki_aruka.customcrafter.debug.Explainer)>asyncSearch</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/UUID.html>UUID</a> crafterId, <a href=../objects/CraftView.html>CraftView</a> view)</pre>
                                         <div class="block"><p>Returns a CompletableFuture that performs asynchronous searches using the input items and recipes.</p><p>Since almost all processing in this search is done asynchronously, exceptions will occur when accessing the world or entities (due to Bukkit API's asynchronous processing limitations).</p></div>
 
                                         <dl>
@@ -495,6 +565,53 @@ public class <span class="typeNameLabel"><a href=Search.html>Search</a></span>
                                     </li>
                                 </ul>
                                 
+                                <a id="search(java.util.UUID,io.github.sakaki_aruka.customcrafter.objects.CraftView,io.github.sakaki_aruka.customcrafter.search.Search.SearchQuery,java.util.List,io.github.sakaki_aruka.customcrafter.debug.Explainer)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>search</h4>
+                                        <pre class="methodSignature">@<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-overloads/index.html>JvmOverloads</a>() final static <a href=Search.SearchResult.html>Search.SearchResult</a> <a href=Search.html#search(java.util.UUID,io.github.sakaki_aruka.customcrafter.objects.CraftView,io.github.sakaki_aruka.customcrafter.search.Search.SearchQuery,java.util.List,io.github.sakaki_aruka.customcrafter.debug.Explainer)>search</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/UUID.html>UUID</a> crafterId, <a href=../objects/CraftView.html>CraftView</a> view, <a href=Search.SearchQuery.html>Search.SearchQuery</a> searchQuery, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=../recipe/CRecipe.html>CRecipe</a>&gt; sourceRecipes, <a href=../debug/Explainer.html>Explainer</a> explainer)</pre>
+                                        <div class="block"><p>We will perform recipe searches using a synchronous process.</p><p>If there are many recipes to search or if recipes with complex search conditions exist, it may cause delays in the server's game loop and a decrease in TPS.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>crafterId</code> - a crafter's UUID</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>view</code> - input crafting gui's view</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>searchQuery</code> - Query that controls search behaviour (search mode and vanilla search mode).</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>sourceRecipes</code> - A list of searched recipes.</dd>
+                                            
+                                            
+                                            
+                                            
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p><a href=Search.SearchResult.html>SearchResult</a> A result of a search.</p></dd>
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
                                 <a id="search(java.util.UUID,io.github.sakaki_aruka.customcrafter.objects.CraftView,io.github.sakaki_aruka.customcrafter.search.Search.SearchQuery,java.util.List)">
                                     <!--   -->
                                 </a>
@@ -503,7 +620,7 @@ public class <span class="typeNameLabel"><a href=Search.html>Search</a></span>
                                           >
                                     <li class="blockList">
                                         <h4>search</h4>
-                                        <pre class="methodSignature">@<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-overloads/index.html>JvmOverloads</a>() final static <a href=Search.SearchResult.html>Search.SearchResult</a> <a href=Search.html#search(java.util.UUID,io.github.sakaki_aruka.customcrafter.objects.CraftView,io.github.sakaki_aruka.customcrafter.search.Search.SearchQuery,java.util.List)>search</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/UUID.html>UUID</a> crafterId, <a href=../objects/CraftView.html>CraftView</a> view, <a href=Search.SearchQuery.html>Search.SearchQuery</a> searchQuery, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=../recipe/CRecipe.html>CRecipe</a>&gt; sourceRecipes)</pre>
+                                        <pre class="methodSignature">@<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-overloads/index.html>JvmOverloads</a>() final static <a href=Search.SearchResult.html>Search.SearchResult</a> <a href=Search.html#search(java.util.UUID,io.github.sakaki_aruka.customcrafter.objects.CraftView,io.github.sakaki_aruka.customcrafter.search.Search.SearchQuery,java.util.List,io.github.sakaki_aruka.customcrafter.debug.Explainer)>search</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/UUID.html>UUID</a> crafterId, <a href=../objects/CraftView.html>CraftView</a> view, <a href=Search.SearchQuery.html>Search.SearchQuery</a> searchQuery, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=../recipe/CRecipe.html>CRecipe</a>&gt; sourceRecipes)</pre>
                                         <div class="block"><p>We will perform recipe searches using a synchronous process.</p><p>If there are many recipes to search or if recipes with complex search conditions exist, it may cause delays in the server's game loop and a decrease in TPS.</p></div>
 
                                         <dl>
@@ -548,7 +665,7 @@ public class <span class="typeNameLabel"><a href=Search.html>Search</a></span>
                                           >
                                     <li class="blockList">
                                         <h4>search</h4>
-                                        <pre class="methodSignature">@<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-overloads/index.html>JvmOverloads</a>() final static <a href=Search.SearchResult.html>Search.SearchResult</a> <a href=Search.html#search(java.util.UUID,io.github.sakaki_aruka.customcrafter.objects.CraftView,io.github.sakaki_aruka.customcrafter.search.Search.SearchQuery,java.util.List)>search</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/UUID.html>UUID</a> crafterId, <a href=../objects/CraftView.html>CraftView</a> view, <a href=Search.SearchQuery.html>Search.SearchQuery</a> searchQuery)</pre>
+                                        <pre class="methodSignature">@<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-overloads/index.html>JvmOverloads</a>() final static <a href=Search.SearchResult.html>Search.SearchResult</a> <a href=Search.html#search(java.util.UUID,io.github.sakaki_aruka.customcrafter.objects.CraftView,io.github.sakaki_aruka.customcrafter.search.Search.SearchQuery,java.util.List,io.github.sakaki_aruka.customcrafter.debug.Explainer)>search</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/UUID.html>UUID</a> crafterId, <a href=../objects/CraftView.html>CraftView</a> view, <a href=Search.SearchQuery.html>Search.SearchQuery</a> searchQuery)</pre>
                                         <div class="block"><p>We will perform recipe searches using a synchronous process.</p><p>If there are many recipes to search or if recipes with complex search conditions exist, it may cause delays in the server's game loop and a decrease in TPS.</p></div>
 
                                         <dl>
@@ -589,7 +706,7 @@ public class <span class="typeNameLabel"><a href=Search.html>Search</a></span>
                                           >
                                     <li class="blockList">
                                         <h4>search</h4>
-                                        <pre class="methodSignature">@<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-overloads/index.html>JvmOverloads</a>() final static <a href=Search.SearchResult.html>Search.SearchResult</a> <a href=Search.html#search(java.util.UUID,io.github.sakaki_aruka.customcrafter.objects.CraftView,io.github.sakaki_aruka.customcrafter.search.Search.SearchQuery,java.util.List)>search</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/UUID.html>UUID</a> crafterId, <a href=../objects/CraftView.html>CraftView</a> view)</pre>
+                                        <pre class="methodSignature">@<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-overloads/index.html>JvmOverloads</a>() final static <a href=Search.SearchResult.html>Search.SearchResult</a> <a href=Search.html#search(java.util.UUID,io.github.sakaki_aruka.customcrafter.objects.CraftView,io.github.sakaki_aruka.customcrafter.search.Search.SearchQuery,java.util.List,io.github.sakaki_aruka.customcrafter.debug.Explainer)>search</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/UUID.html>UUID</a> crafterId, <a href=../objects/CraftView.html>CraftView</a> view)</pre>
                                         <div class="block"><p>We will perform recipe searches using a synchronous process.</p><p>If there are many recipes to search or if recipes with complex search conditions exist, it may cause delays in the server's game loop and a decrease in TPS.</p></div>
 
                                         <dl>

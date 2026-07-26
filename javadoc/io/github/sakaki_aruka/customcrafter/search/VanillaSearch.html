@@ -254,7 +254,7 @@ public class <span class="typeNameLabel"><a href=VanillaSearch.html>VanillaSearc
                                         <tr id="i0" class="altColor">
                                             <td class="colFirst"><code>final static <a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/inventory/Recipe.html>Recipe</a></code>
                                             </td>
-                                            <th class="colSecond" scope="row"><code><a href=VanillaSearch.html#search(org.bukkit.World,io.github.sakaki_aruka.customcrafter.objects.CraftView)>search</a>(<a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/World.html>World</a> world, <a href=../objects/CraftView.html>CraftView</a> view) </code>
+                                            <th class="colSecond" scope="row"><code><a href=VanillaSearch.html#search(org.bukkit.World,io.github.sakaki_aruka.customcrafter.objects.CraftView,io.github.sakaki_aruka.customcrafter.debug.Explainer)>search</a>(<a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/World.html>World</a> world, <a href=../objects/CraftView.html>CraftView</a> view, <a href=../debug/Explainer.html>Explainer</a> explainer) </code>
                                             </th>
                                             <td class="colLast">if a recipe found with provided input, returns that.</td>
                                         </tr>
@@ -262,7 +262,23 @@ public class <span class="typeNameLabel"><a href=VanillaSearch.html>VanillaSearc
                                         <tr id="i1" class="rowColor">
                                             <td class="colFirst"><code>final static <a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/inventory/Recipe.html>Recipe</a></code>
                                             </td>
-                                            <th class="colSecond" scope="row"><code><a href=VanillaSearch.html#search(org.bukkit.World,java.util.Map)>search</a>(<a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/World.html>World</a> world, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Map.html>Map</a>&lt;<a href=../recipe/CoordinateComponent.html>CoordinateComponent</a>, <a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/inventory/ItemStack.html>ItemStack</a>&gt; mapped) </code>
+                                            <th class="colSecond" scope="row"><code><a href=VanillaSearch.html#search(org.bukkit.World,io.github.sakaki_aruka.customcrafter.objects.CraftView,io.github.sakaki_aruka.customcrafter.debug.Explainer)>search</a>(<a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/World.html>World</a> world, <a href=../objects/CraftView.html>CraftView</a> view) </code>
+                                            </th>
+                                            <td class="colLast">if a recipe found with provided input, returns that.</td>
+                                        </tr>
+                                        
+                                        <tr id="i2" class="altColor">
+                                            <td class="colFirst"><code>final static <a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/inventory/Recipe.html>Recipe</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=VanillaSearch.html#search(org.bukkit.World,java.util.Map,io.github.sakaki_aruka.customcrafter.debug.Explainer)>search</a>(<a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/World.html>World</a> world, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Map.html>Map</a>&lt;<a href=../recipe/CoordinateComponent.html>CoordinateComponent</a>, <a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/inventory/ItemStack.html>ItemStack</a>&gt; mapped, <a href=../debug/Explainer.html>Explainer</a> explainer) </code>
+                                            </th>
+                                            <td class="colLast">If a recipe found with provided input, returns that.</td>
+                                        </tr>
+                                        
+                                        <tr id="i3" class="rowColor">
+                                            <td class="colFirst"><code>final static <a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/inventory/Recipe.html>Recipe</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=VanillaSearch.html#search(org.bukkit.World,java.util.Map,io.github.sakaki_aruka.customcrafter.debug.Explainer)>search</a>(<a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/World.html>World</a> world, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Map.html>Map</a>&lt;<a href=../recipe/CoordinateComponent.html>CoordinateComponent</a>, <a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/inventory/ItemStack.html>ItemStack</a>&gt; mapped) </code>
                                             </th>
                                             <td class="colLast">If a recipe found with provided input, returns that.</td>
                                         </tr>
@@ -311,6 +327,47 @@ public class <span class="typeNameLabel"><a href=VanillaSearch.html>VanillaSearc
                             </a>
                                 <h3>Method Detail</h3>
                                 
+                                <a id="search(org.bukkit.World,io.github.sakaki_aruka.customcrafter.objects.CraftView,io.github.sakaki_aruka.customcrafter.debug.Explainer)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>search</h4>
+                                        <pre class="methodSignature">@<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-overloads/index.html>JvmOverloads</a>() final static <a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/inventory/Recipe.html>Recipe</a> <a href=VanillaSearch.html#search(org.bukkit.World,io.github.sakaki_aruka.customcrafter.objects.CraftView,io.github.sakaki_aruka.customcrafter.debug.Explainer)>search</a>(<a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/World.html>World</a> world, <a href=../objects/CraftView.html>CraftView</a> view, <a href=../debug/Explainer.html>Explainer</a> explainer)</pre>
+                                        <div class="block"><p>if a recipe found with provided input, returns that. but, there is no recipe to find with provided inputs, returns null.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>world</code> - a crafter exists world</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>view</code> - an input view</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>explainer</code> - Logs container instance (since 5.3.</dd>
+                                            
+                                            
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p><a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/inventory/Recipe.html>Recipe</a> a found recipe</p></dd>
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
                                 <a id="search(org.bukkit.World,io.github.sakaki_aruka.customcrafter.objects.CraftView)">
                                     <!--   -->
                                 </a>
@@ -319,7 +376,7 @@ public class <span class="typeNameLabel"><a href=VanillaSearch.html>VanillaSearc
                                           >
                                     <li class="blockList">
                                         <h4>search</h4>
-                                        <pre class="methodSignature"> final static <a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/inventory/Recipe.html>Recipe</a> <a href=VanillaSearch.html#search(org.bukkit.World,io.github.sakaki_aruka.customcrafter.objects.CraftView)>search</a>(<a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/World.html>World</a> world, <a href=../objects/CraftView.html>CraftView</a> view)</pre>
+                                        <pre class="methodSignature">@<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-overloads/index.html>JvmOverloads</a>() final static <a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/inventory/Recipe.html>Recipe</a> <a href=VanillaSearch.html#search(org.bukkit.World,io.github.sakaki_aruka.customcrafter.objects.CraftView,io.github.sakaki_aruka.customcrafter.debug.Explainer)>search</a>(<a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/World.html>World</a> world, <a href=../objects/CraftView.html>CraftView</a> view)</pre>
                                         <div class="block"><p>if a recipe found with provided input, returns that. but, there is no recipe to find with provided inputs, returns null.</p></div>
 
                                         <dl>
@@ -348,6 +405,52 @@ public class <span class="typeNameLabel"><a href=VanillaSearch.html>VanillaSearc
                                     </li>
                                 </ul>
                                 
+                                <a id="search(org.bukkit.World,java.util.Map,io.github.sakaki_aruka.customcrafter.debug.Explainer)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>search</h4>
+                                        <pre class="methodSignature">@<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-overloads/index.html>JvmOverloads</a>() final static <a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/inventory/Recipe.html>Recipe</a> <a href=VanillaSearch.html#search(org.bukkit.World,java.util.Map,io.github.sakaki_aruka.customcrafter.debug.Explainer)>search</a>(<a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/World.html>World</a> world, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Map.html>Map</a>&lt;<a href=../recipe/CoordinateComponent.html>CoordinateComponent</a>, <a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/inventory/ItemStack.html>ItemStack</a>&gt; mapped, <a href=../debug/Explainer.html>Explainer</a> explainer)</pre>
+                                        <div class="block"><p>If a recipe found with provided input, returns that. But, there is no recipe to find with provided inputs, returns null.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>world</code> - crafter exists world</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>mapped</code> - input items</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>explainer</code> - Logs container instance (since 5.3.</dd>
+                                            
+                                            
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p><a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/inventory/Recipe.html>Recipe</a> a found recipe</p></dd>
+                                        
+
+                                        
+                                            <dt><span class="sinceLabel">Since:</span></dt>
+                                            
+                                                <dd><p>5.0.14</p></dd>
+                                            
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
                                 <a id="search(org.bukkit.World,java.util.Map)">
                                     <!--   -->
                                 </a>
@@ -356,7 +459,7 @@ public class <span class="typeNameLabel"><a href=VanillaSearch.html>VanillaSearc
                                           >
                                     <li class="blockList">
                                         <h4>search</h4>
-                                        <pre class="methodSignature"> final static <a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/inventory/Recipe.html>Recipe</a> <a href=VanillaSearch.html#search(org.bukkit.World,java.util.Map)>search</a>(<a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/World.html>World</a> world, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Map.html>Map</a>&lt;<a href=../recipe/CoordinateComponent.html>CoordinateComponent</a>, <a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/inventory/ItemStack.html>ItemStack</a>&gt; mapped)</pre>
+                                        <pre class="methodSignature">@<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.jvm/-jvm-overloads/index.html>JvmOverloads</a>() final static <a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/inventory/Recipe.html>Recipe</a> <a href=VanillaSearch.html#search(org.bukkit.World,java.util.Map,io.github.sakaki_aruka.customcrafter.debug.Explainer)>search</a>(<a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/World.html>World</a> world, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Map.html>Map</a>&lt;<a href=../recipe/CoordinateComponent.html>CoordinateComponent</a>, <a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/inventory/ItemStack.html>ItemStack</a>&gt; mapped)</pre>
                                         <div class="block"><p>If a recipe found with provided input, returns that. But, there is no recipe to find with provided inputs, returns null.</p></div>
 
                                         <dl>

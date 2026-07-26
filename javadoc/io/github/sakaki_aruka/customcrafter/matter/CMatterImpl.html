@@ -200,7 +200,7 @@ public class <span class="typeNameLabel"><a href=CMatterImpl.html>CMatterImpl</a
                                         </tr>
                                         
                                         <tr class="altColor">
-                                            <td class="colFirst"><code>private final <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html>Set</a>&lt;<a href=CMatterPredicate.html>CMatterPredicate</a>&gt;</code></td>
+                                            <td class="colFirst"><code>private final <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=CMatterPredicate.html>CMatterPredicate</a>&gt;</code></td>
                                             <th class="colSecond" scope="row"><code><a href=CMatterImpl.html#predicates>predicates</a></code></th>
                                             <td class="colLast"></td>
                                         </tr>
@@ -231,7 +231,7 @@ public class <span class="typeNameLabel"><a href=CMatterImpl.html>CMatterImpl</a
                                         
                                             <tr class="altColor">
                                                 <th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a
-                                                        href="#CMatterImpl(java.lang.String,java.util.Set,java.lang.Integer,java.lang.Boolean,java.util.Set)">CMatterImpl</a></span>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html>String</a> name, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html>Set</a>&lt;<a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/Material.html>Material</a>&gt; candidate, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Integer.html>Integer</a> amount, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> anyAmount, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html>Set</a>&lt;<a href=CMatterPredicate.html>CMatterPredicate</a>&gt; predicates)</code></th>
+                                                        href="#CMatterImpl(java.lang.String,java.util.Set,java.lang.Integer,java.lang.Boolean,java.util.List)">CMatterImpl</a></span>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html>String</a> name, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html>Set</a>&lt;<a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/Material.html>Material</a>&gt; candidate, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Integer.html>Integer</a> amount, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> anyAmount, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=CMatterPredicate.html>CMatterPredicate</a>&gt; predicates)</code></th>
                                                 <td class="colLast"></td>
                                             </tr>
                                         
@@ -335,7 +335,7 @@ public class <span class="typeNameLabel"><a href=CMatterImpl.html>CMatterImpl</a
                                         </tr>
                                         
                                         <tr id="i4" class="altColor">
-                                            <td class="colFirst"><code><a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html>Set</a>&lt;<a href=CMatterPredicate.html>CMatterPredicate</a>&gt;</code>
+                                            <td class="colFirst"><code><a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=CMatterPredicate.html>CMatterPredicate</a>&gt;</code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=CMatterImpl.html#getPredicates()>getPredicates</a>() </code>
                                             </th>
@@ -343,7 +343,7 @@ public class <span class="typeNameLabel"><a href=CMatterImpl.html>CMatterImpl</a
                                         </tr>
                                         
                                         <tr id="i5" class="rowColor">
-                                            <td class="colFirst"><code>final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html>Set</a>&lt;<a href=CMatterPredicate.html>CMatterPredicate</a>&gt;</code>
+                                            <td class="colFirst"><code>final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=CMatterPredicate.html>CMatterPredicate</a>&gt;</code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=CMatterImpl.html#defaultMatterPredicates()>defaultMatterPredicates</a>() </code>
                                             </th>
@@ -383,7 +383,7 @@ public class <span class="typeNameLabel"><a href=CMatterImpl.html>CMatterImpl</a
                                             <!--   -->
                                         </a>
                                             <h3>Methods inherited from class&nbsp;io.github.sakaki_aruka.customcrafter.matter.CMatter</h3>
-                                            <code>hasPredicates, isValidMatter, predicatesResult</code></li>
+                                            <code>firstFailedPredicate, hasPredicates, isValidMatter, predicatesResult</code></li>
                                  
                                     <li class="blockList"><a id="methods.inherited.from.class.java.lang.Object">
                                         <!--   -->
@@ -411,11 +411,11 @@ public class <span class="typeNameLabel"><a href=CMatterImpl.html>CMatterImpl</a
                             </a>
                                 <h3>Constructor Detail</h3>
                                 
-                                <a name="CMatterImpl(java.lang.String,java.util.Set,java.lang.Integer,java.lang.Boolean,java.util.Set)"></a>
+                                <a name="CMatterImpl(java.lang.String,java.util.Set,java.lang.Integer,java.lang.Boolean,java.util.List)"></a>
                                 <ul class="blockList">
                                     <li class="blockList">
                                         <h4>CMatterImpl</h4>
-                                        <pre>CMatterImpl(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html>String</a> name, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html>Set</a>&lt;<a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/Material.html>Material</a>&gt; candidate, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Integer.html>Integer</a> amount, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> anyAmount, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html>Set</a>&lt;<a href=CMatterPredicate.html>CMatterPredicate</a>&gt; predicates)</pre>
+                                        <pre>CMatterImpl(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html>String</a> name, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html>Set</a>&lt;<a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/Material.html>Material</a>&gt; candidate, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Integer.html>Integer</a> amount, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> anyAmount, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=CMatterPredicate.html>CMatterPredicate</a>&gt; predicates)</pre>
                                         <div class="block"></div>
                                         
                                         <dl>
@@ -640,7 +640,7 @@ public class <span class="typeNameLabel"><a href=CMatterImpl.html>CMatterImpl</a
                                           >
                                     <li class="blockList">
                                         <h4>getPredicates</h4>
-                                        <pre class="methodSignature"> <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html>Set</a>&lt;<a href=CMatterPredicate.html>CMatterPredicate</a>&gt; <a href=CMatterImpl.html#getPredicates()>getPredicates</a>()</pre>
+                                        <pre class="methodSignature"> <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=CMatterPredicate.html>CMatterPredicate</a>&gt; <a href=CMatterImpl.html#getPredicates()>getPredicates</a>()</pre>
                                         <div class="block"></div>
 
                                         <dl>
@@ -663,7 +663,7 @@ public class <span class="typeNameLabel"><a href=CMatterImpl.html>CMatterImpl</a
                                           >
                                     <li class="blockList">
                                         <h4>defaultMatterPredicates</h4>
-                                        <pre class="methodSignature"> final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html>Set</a>&lt;<a href=CMatterPredicate.html>CMatterPredicate</a>&gt; <a href=CMatterImpl.html#defaultMatterPredicates()>defaultMatterPredicates</a>()</pre>
+                                        <pre class="methodSignature"> final static <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=CMatterPredicate.html>CMatterPredicate</a>&gt; <a href=CMatterImpl.html#defaultMatterPredicates()>defaultMatterPredicates</a>()</pre>
                                         <div class="block"><p>Returns default elements (enchant, enchant storage, potion) predicate set</p></div>
 
                                         <dl>

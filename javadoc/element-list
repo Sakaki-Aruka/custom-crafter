@@ -1,12 +1,16 @@
 $dokka.format:javadoc-v1
 $dokka.linkExtension:html
+$dokka.location:io.github.sakaki_aruka.customcrafter.debug/Explainer.Log///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/debug/Explainer.Log.html
+$dokka.location:io.github.sakaki_aruka.customcrafter.debug/Explainer.Loglevel///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/debug/Explainer.Loglevel.html
 $dokka.location:io.github.sakaki_aruka.customcrafter.event/CustomCrafterAPIPropertiesChangeEvent.Property///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/event/CustomCrafterAPIPropertiesChangeEvent.Property.html
 $dokka.location:io.github.sakaki_aruka.customcrafter.event/CustomCrafterAPIPropertiesChangeEvent.PropertyKey///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/event/CustomCrafterAPIPropertiesChangeEvent.PropertyKey.html
 $dokka.location:io.github.sakaki_aruka.customcrafter.matter.enchant/CEnchantComponent.Strict///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/matter/enchant/CEnchantComponent.Strict.html
 $dokka.location:io.github.sakaki_aruka.customcrafter.matter.potion/CPotionComponent.Strict///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/matter/potion/CPotionComponent.Strict.html
+$dokka.location:io.github.sakaki_aruka.customcrafter.matter/CMatterPredicate.Companion///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/matter/CMatterPredicate.Companion.html
 $dokka.location:io.github.sakaki_aruka.customcrafter.matter/CMatterPredicate.Context///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/matter/CMatterPredicate.Context.html
 $dokka.location:io.github.sakaki_aruka.customcrafter.recipe/AdjacentRecipe.RelationType///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/recipe/AdjacentRecipe.RelationType.html
 $dokka.location:io.github.sakaki_aruka.customcrafter.recipe/CRecipe.Type///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/recipe/CRecipe.Type.html
+$dokka.location:io.github.sakaki_aruka.customcrafter.recipe/CRecipePredicate.Companion///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/recipe/CRecipePredicate.Companion.html
 $dokka.location:io.github.sakaki_aruka.customcrafter.recipe/CRecipePredicate.Context///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/recipe/CRecipePredicate.Context.html
 $dokka.location:io.github.sakaki_aruka.customcrafter.recipe/GroupRecipe.Context///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/recipe/GroupRecipe.Context.html
 $dokka.location:io.github.sakaki_aruka.customcrafter.recipe/GroupRecipe.Matter///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/recipe/GroupRecipe.Matter.html
@@ -32,6 +36,7 @@ $dokka.location:io.github.sakaki_aruka.customcrafter.ui/CraftUIDesigner.Context/
 $dokka.location:io.github.sakaki_aruka.customcrafter/CustomCrafterAPI.NameStrictLevel///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/CustomCrafterAPI.NameStrictLevel.html
 $dokka.location:io.github.sakaki_aruka.customcrafter/CustomCrafterAPI.VersionType///PointingToDeclaration/io/github/sakaki_aruka/customcrafter/CustomCrafterAPI.VersionType.html
 io.github.sakaki_aruka.customcrafter
+io.github.sakaki_aruka.customcrafter.debug
 io.github.sakaki_aruka.customcrafter.event
 io.github.sakaki_aruka.customcrafter.event.failure
 io.github.sakaki_aruka.customcrafter.matter

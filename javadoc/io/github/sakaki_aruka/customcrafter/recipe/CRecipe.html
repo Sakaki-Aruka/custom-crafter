@@ -261,62 +261,78 @@ public interface <span class="typeNameLabel"><a href=CRecipe.html>CRecipe</a></s
                                         </tr>
                                         
                                         <tr id="i1" class="rowColor">
-                                            <td class="colFirst"><code><a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Integer.html>Integer</a></code>
+                                            <td class="colFirst"><code><a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=MatchGroup.html>MatchGroup</a>&gt;</code>
                                             </td>
-                                            <th class="colSecond" scope="row"><code><a href=CVanillaRecipe.html#requiresInputItemAmountMin()>requiresInputItemAmountMin</a>() </code>
+                                            <th class="colSecond" scope="row"><code><a href=GroupRecipe.html#matchGroups()>matchGroups</a>() </code>
                                             </th>
-                                            <td class="colLast">Minimal requires input items amountDefault implementation exists</td>
+                                            <td class="colLast">Groups of recipe slots used by <a href=CRecipe.Type.html#SHAPELESS>CRecipe.Type.SHAPELESS</a> matching.</td>
                                         </tr>
                                         
                                         <tr id="i2" class="altColor">
                                             <td class="colFirst"><code><a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Integer.html>Integer</a></code>
                                             </td>
-                                            <th class="colSecond" scope="row"><code><a href=GroupRecipe.html#requiresInputItemAmountMax()>requiresInputItemAmountMax</a>() </code>
+                                            <th class="colSecond" scope="row"><code><a href=ShapelessGroupRecipe.html#requiresInputItemAmountMin()>requiresInputItemAmountMin</a>() </code>
+                                            </th>
+                                            <td class="colLast">Minimal requires input items amountDefault implementation derives this from <a href=GroupRecipe.html#matchGroups()>matchGroups</a> (sum of each group's <a href=MatchGroup.html#min>MatchGroup.min</a>).</td>
+                                        </tr>
+                                        
+                                        <tr id="i3" class="rowColor">
+                                            <td class="colFirst"><code><a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Integer.html>Integer</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=ShapelessGroupRecipe.html#requiresInputItemAmountMax()>requiresInputItemAmountMax</a>() </code>
                                             </th>
                                             <td class="colLast">Maximum requires input items amount.</td>
                                         </tr>
                                         
-                                        <tr id="i3" class="rowColor">
+                                        <tr id="i4" class="altColor">
                                             <td class="colFirst"><code><a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a></code>
                                             </td>
-                                            <th class="colSecond" scope="row"><code><a href=GroupRecipe.html#getRecipePredicateResults(io.github.sakaki_aruka.customcrafter.recipe.CRecipePredicate.Context,java.lang.Boolean)>getRecipePredicateResults</a>(<a href=CRecipePredicate.Context.html>CRecipePredicate.Context</a> context, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> whenEmptyDefault) </code>
+                                            <th class="colSecond" scope="row"><code><a href=ShapelessGroupRecipe.html#getRecipePredicateResults(io.github.sakaki_aruka.customcrafter.recipe.CRecipePredicate.Context,java.lang.Boolean)>getRecipePredicateResults</a>(<a href=CRecipePredicate.Context.html>CRecipePredicate.Context</a> context, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> whenEmptyDefault) </code>
                                             </th>
                                             <td class="colLast">Returns <a href=CRecipePredicate.html>CRecipePredicate</a> inspection result</td>
                                         </tr>
                                         
-                                        <tr id="i4" class="altColor">
+                                        <tr id="i5" class="rowColor">
+                                            <td class="colFirst"><code><a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-indexed-value/index.html>IndexedValue</a>&lt;<a href=CRecipePredicate.html>CRecipePredicate</a>&gt;</code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=ShapelessGroupRecipe.html#firstFailedRecipePredicate(io.github.sakaki_aruka.customcrafter.recipe.CRecipePredicate.Context)>firstFailedRecipePredicate</a>(<a href=CRecipePredicate.Context.html>CRecipePredicate.Context</a> context) </code>
+                                            </th>
+                                            <td class="colLast">Returns the first <a href=CRecipePredicate.html>CRecipePredicate</a> that rejects <a href=ShapelessGroupRecipe.html#firstFailedRecipePredicate(io.github.sakaki_aruka.customcrafter.recipe.CRecipePredicate.Context)>context</a>, or <code>null</code> when all of them pass.</td>
+                                        </tr>
+                                        
+                                        <tr id="i6" class="altColor">
                                             <td class="colFirst"><code><a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/CompletableFuture.html>CompletableFuture</a>&lt;<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a>&gt;</code>
                                             </td>
-                                            <th class="colSecond" scope="row"><code><a href=GroupRecipe.html#asyncGetRecipePredicateResults(io.github.sakaki_aruka.customcrafter.recipe.CRecipePredicate.Context,java.lang.Boolean)>asyncGetRecipePredicateResults</a>(<a href=CRecipePredicate.Context.html>CRecipePredicate.Context</a> context, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> whenEmptyDefault) </code>
+                                            <th class="colSecond" scope="row"><code><a href=ShapelessGroupRecipe.html#asyncGetRecipePredicateResults(io.github.sakaki_aruka.customcrafter.recipe.CRecipePredicate.Context,java.lang.Boolean)>asyncGetRecipePredicateResults</a>(<a href=CRecipePredicate.Context.html>CRecipePredicate.Context</a> context, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> whenEmptyDefault) </code>
                                             </th>
                                             <td class="colLast">Returns <a href=CRecipePredicate.html>CRecipePredicate</a> inspection result on async.</td>
                                         </tr>
                                         
-                                        <tr id="i5" class="rowColor">
+                                        <tr id="i7" class="rowColor">
                                             <td class="colFirst"><code><a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/inventory/ItemStack.html>ItemStack</a>&gt;</code>
                                             </td>
-                                            <th class="colSecond" scope="row"><code><a href=GroupRecipe.html#getResults(io.github.sakaki_aruka.customcrafter.result.ResultSupplier.Context)>getResults</a>(<a href=../result/ResultSupplier.Context.html>ResultSupplier.Context</a> context) </code>
+                                            <th class="colSecond" scope="row"><code><a href=ShapelessGroupRecipe.html#getResults(io.github.sakaki_aruka.customcrafter.result.ResultSupplier.Context)>getResults</a>(<a href=../result/ResultSupplier.Context.html>ResultSupplier.Context</a> context) </code>
                                             </th>
                                             <td class="colLast">Returns results of suppliers made</td>
                                         </tr>
                                         
-                                        <tr id="i6" class="altColor">
+                                        <tr id="i8" class="altColor">
                                             <td class="colFirst"><code><a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/CompletableFuture.html>CompletableFuture</a>&lt;<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/inventory/ItemStack.html>ItemStack</a>&gt;&gt;</code>
                                             </td>
-                                            <th class="colSecond" scope="row"><code><a href=GroupRecipe.html#asyncGetResults(io.github.sakaki_aruka.customcrafter.result.ResultSupplier.Context)>asyncGetResults</a>(<a href=../result/ResultSupplier.Context.html>ResultSupplier.Context</a> context) </code>
+                                            <th class="colSecond" scope="row"><code><a href=ShapelessGroupRecipe.html#asyncGetResults(io.github.sakaki_aruka.customcrafter.result.ResultSupplier.Context)>asyncGetResults</a>(<a href=../result/ResultSupplier.Context.html>ResultSupplier.Context</a> context) </code>
                                             </th>
                                             <td class="colLast">Returns results of suppliers made asynchronously.</td>
                                         </tr>
                                         
-                                        <tr id="i7" class="rowColor">
+                                        <tr id="i9" class="rowColor">
                                             <td class="colFirst"><code><a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Integer.html>Integer</a></code>
                                             </td>
-                                            <th class="colSecond" scope="row"><code><a href=GroupRecipe.html#getTimes(java.util.Map,io.github.sakaki_aruka.customcrafter.objects.MappedRelation,java.lang.Boolean,java.lang.Boolean)>getTimes</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Map.html>Map</a>&lt;<a href=CoordinateComponent.html>CoordinateComponent</a>, <a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/inventory/ItemStack.html>ItemStack</a>&gt; map, <a href=../objects/MappedRelation.html>MappedRelation</a> relation, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> shift, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> withoutMass) </code>
+                                            <th class="colSecond" scope="row"><code><a href=ShapelessGroupRecipe.html#getTimes(java.util.Map,io.github.sakaki_aruka.customcrafter.objects.MappedRelation,java.lang.Boolean,java.lang.Boolean)>getTimes</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Map.html>Map</a>&lt;<a href=CoordinateComponent.html>CoordinateComponent</a>, <a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/inventory/ItemStack.html>ItemStack</a>&gt; map, <a href=../objects/MappedRelation.html>MappedRelation</a> relation, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> shift, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> withoutMass) </code>
                                             </th>
                                             <td class="colLast">Returns the minimum craft count calculated from input item amounts and recipe requirements.</td>
                                         </tr>
                                         
-                                        <tr id="i8" class="altColor">
+                                        <tr id="i10" class="altColor">
                                             <td class="colFirst"><code>abstract <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html>String</a></code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=CRecipe.html#getName()>getName</a>() </code>
@@ -324,7 +340,7 @@ public interface <span class="typeNameLabel"><a href=CRecipe.html>CRecipe</a></s
                                             <td class="colLast">Name of this recipe.</td>
                                         </tr>
                                         
-                                        <tr id="i9" class="rowColor">
+                                        <tr id="i11" class="rowColor">
                                             <td class="colFirst"><code>abstract <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Map.html>Map</a>&lt;<a href=CoordinateComponent.html>CoordinateComponent</a>, <a href=../matter/CMatter.html>CMatter</a>&gt;</code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=CRecipe.html#getItems()>getItems</a>() </code>
@@ -332,7 +348,7 @@ public interface <span class="typeNameLabel"><a href=CRecipe.html>CRecipe</a></s
                                             <td class="colLast">Mapping of <a href=../matter/CMatter.html>CMatter</a> to their coordinates on the crafting slots.</td>
                                         </tr>
                                         
-                                        <tr id="i10" class="altColor">
+                                        <tr id="i12" class="altColor">
                                             <td class="colFirst"><code>abstract <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=CRecipePredicate.html>CRecipePredicate</a>&gt;</code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=CRecipe.html#getPredicates()>getPredicates</a>() </code>
@@ -340,7 +356,7 @@ public interface <span class="typeNameLabel"><a href=CRecipe.html>CRecipe</a></s
                                             <td class="colLast">List of <a href=CRecipePredicate.html>CRecipePredicate</a> that run during recipe matching.</td>
                                         </tr>
                                         
-                                        <tr id="i11" class="rowColor">
+                                        <tr id="i13" class="rowColor">
                                             <td class="colFirst"><code>abstract <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=../result/ResultSupplier.html>ResultSupplier</a>&gt;</code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=CRecipe.html#getResults()>getResults</a>() </code>
@@ -348,7 +364,7 @@ public interface <span class="typeNameLabel"><a href=CRecipe.html>CRecipe</a></s
                                             <td class="colLast">List of <a href=../result/ResultSupplier.html>ResultSupplier</a> that provide items to players.</td>
                                         </tr>
                                         
-                                        <tr id="i12" class="altColor">
+                                        <tr id="i14" class="altColor">
                                             <td class="colFirst"><code>abstract <a href=CRecipe.Type.html>CRecipe.Type</a></code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=CRecipe.html#getType()>getType</a>() </code>
@@ -433,6 +449,37 @@ recipe.isValidRecipe().exceptionOrNull()?.let{ throw it }</code></pre></div>
                                     </li>
                                 </ul>
                                 
+                                <a id="matchGroups()">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>matchGroups</h4>
+                                        <pre class="methodSignature"> <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=MatchGroup.html>MatchGroup</a>&gt; <a href=GroupRecipe.html#matchGroups()>matchGroups</a>()</pre>
+                                        <div class="block"><p>Groups of recipe slots used by <a href=CRecipe.Type.html#SHAPELESS>CRecipe.Type.SHAPELESS</a> matching.</p><p>Each <a href=MatchGroup.html>MatchGroup</a> states how many of its members must actually be filled by an input item; a slot whose coordinate is not covered is simply never assigned an input, no <code>Material.AIR</code> placeholder candidate required (contrast <a href=GroupRecipe.html>GroupRecipe</a>).</p><p>The default implementation treats every entry of items as its own mandatory group (<code>min == max == 1</code>), which reproduces plain full-matching SHAPELESS behaviour and keeps <a href=ShapelessGroupRecipe.html#requiresInputItemAmountMin()>requiresInputItemAmountMin</a> / <a href=ShapelessGroupRecipe.html#requiresInputItemAmountMax()>requiresInputItemAmountMax</a> correct without any extra overrides. Implementations that override this to express optional/aggregate slots (e.g. <a href=ShapelessGroupRecipe.html>ShapelessGroupRecipe</a>) do not need to separately override those two methods.</p><p>Ignored by <a href=CRecipe.Type.html#SHAPED>CRecipe.Type.SHAPED</a> matching, which stays purely coordinate-based.</p><p>Contract: every <a href=MatchGroup.html#members>MatchGroup.members</a> coordinate returned here must be a key of items; violating this causes an exception during search.</p></div>
+
+                                        <dl>
+
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p><a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-list/index.html>List</a> Match groups covering (all or part of) items.</p></dd>
+                                        
+
+                                        
+                                            <dt><span class="sinceLabel">Since:</span></dt>
+                                            
+                                                <dd><p>5.3.0</p></dd>
+                                            
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
                                 <a id="requiresInputItemAmountMin()">
                                     <!--   -->
                                 </a>
@@ -441,8 +488,8 @@ recipe.isValidRecipe().exceptionOrNull()?.let{ throw it }</code></pre></div>
                                           >
                                     <li class="blockList">
                                         <h4>requiresInputItemAmountMin</h4>
-                                        <pre class="methodSignature"> <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Integer.html>Integer</a> <a href=CVanillaRecipe.html#requiresInputItemAmountMin()>requiresInputItemAmountMin</a>()</pre>
-                                        <div class="block"><p>Minimal requires input items amount</p><p>Default implementation exists</p></div>
+                                        <pre class="methodSignature"> <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Integer.html>Integer</a> <a href=ShapelessGroupRecipe.html#requiresInputItemAmountMin()>requiresInputItemAmountMin</a>()</pre>
+                                        <div class="block"><p>Minimal requires input items amount</p><p>Default implementation derives this from <a href=GroupRecipe.html#matchGroups()>matchGroups</a> (sum of each group's <a href=MatchGroup.html#min>MatchGroup.min</a>).</p></div>
 
                                         <dl>
 
@@ -472,8 +519,8 @@ recipe.isValidRecipe().exceptionOrNull()?.let{ throw it }</code></pre></div>
                                           >
                                     <li class="blockList">
                                         <h4>requiresInputItemAmountMax</h4>
-                                        <pre class="methodSignature"> <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Integer.html>Integer</a> <a href=GroupRecipe.html#requiresInputItemAmountMax()>requiresInputItemAmountMax</a>()</pre>
-                                        <div class="block"><p>Maximum requires input items amount. Inclusive</p><p>Default implementation exists</p></div>
+                                        <pre class="methodSignature"> <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Integer.html>Integer</a> <a href=ShapelessGroupRecipe.html#requiresInputItemAmountMax()>requiresInputItemAmountMax</a>()</pre>
+                                        <div class="block"><p>Maximum requires input items amount. Inclusive</p><p>Default implementation derives this from <a href=GroupRecipe.html#matchGroups()>matchGroups</a> (sum of each group's <a href=MatchGroup.html#max>MatchGroup.max</a>).</p></div>
 
                                         <dl>
 
@@ -503,7 +550,7 @@ recipe.isValidRecipe().exceptionOrNull()?.let{ throw it }</code></pre></div>
                                           >
                                     <li class="blockList">
                                         <h4>getRecipePredicateResults</h4>
-                                        <pre class="methodSignature"> <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> <a href=GroupRecipe.html#getRecipePredicateResults(io.github.sakaki_aruka.customcrafter.recipe.CRecipePredicate.Context,java.lang.Boolean)>getRecipePredicateResults</a>(<a href=CRecipePredicate.Context.html>CRecipePredicate.Context</a> context, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> whenEmptyDefault)</pre>
+                                        <pre class="methodSignature"> <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> <a href=ShapelessGroupRecipe.html#getRecipePredicateResults(io.github.sakaki_aruka.customcrafter.recipe.CRecipePredicate.Context,java.lang.Boolean)>getRecipePredicateResults</a>(<a href=CRecipePredicate.Context.html>CRecipePredicate.Context</a> context, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> whenEmptyDefault)</pre>
                                         <div class="block"><p>Returns <a href=CRecipePredicate.html>CRecipePredicate</a> inspection result</p></div>
 
                                         <dl>
@@ -537,6 +584,44 @@ recipe.isValidRecipe().exceptionOrNull()?.let{ throw it }</code></pre></div>
                                     </li>
                                 </ul>
                                 
+                                <a id="firstFailedRecipePredicate(io.github.sakaki_aruka.customcrafter.recipe.CRecipePredicate.Context)">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>firstFailedRecipePredicate</h4>
+                                        <pre class="methodSignature"> <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-indexed-value/index.html>IndexedValue</a>&lt;<a href=CRecipePredicate.html>CRecipePredicate</a>&gt; <a href=ShapelessGroupRecipe.html#firstFailedRecipePredicate(io.github.sakaki_aruka.customcrafter.recipe.CRecipePredicate.Context)>firstFailedRecipePredicate</a>(<a href=CRecipePredicate.Context.html>CRecipePredicate.Context</a> context)</pre>
+                                        <div class="block"><p>Returns the first <a href=CRecipePredicate.html>CRecipePredicate</a> that rejects <a href=ShapelessGroupRecipe.html#firstFailedRecipePredicate(io.github.sakaki_aruka.customcrafter.recipe.CRecipePredicate.Context)>context</a>, or <code>null</code> when all of them pass.</p><p>Evaluates predicates in order and stops at the first failure, exactly as <a href=ShapelessGroupRecipe.html#getRecipePredicateResults(io.github.sakaki_aruka.customcrafter.recipe.CRecipePredicate.Context,java.lang.Boolean)>getRecipePredicateResults</a> does, so this can be used in its place when the caller needs to report which predicate failed rather than only whether one did. The returned index is the position within predicates and identifies a predicate that did not override <a href=CRecipePredicate.html#name()>CRecipePredicate.name</a>.</p></div>
+
+                                        <dl>
+
+                                        
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>context</code> - Context of inspection</dd>
+                                            
+                                            
+                                        
+
+                                        
+                                            <dt><span class="returnLabel">Returns:</span></dt>
+                                            <dd><p><a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-indexed-value/index.html>IndexedValue</a> The failing predicate with its index, or <code>null</code> when nothing failed</p></dd>
+                                        
+
+                                        
+                                            <dt><span class="sinceLabel">Since:</span></dt>
+                                            
+                                                <dd><p>5.3.0</p></dd>
+                                            
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
                                 <a id="asyncGetRecipePredicateResults(io.github.sakaki_aruka.customcrafter.recipe.CRecipePredicate.Context,java.lang.Boolean)">
                                     <!--   -->
                                 </a>
@@ -545,7 +630,7 @@ recipe.isValidRecipe().exceptionOrNull()?.let{ throw it }</code></pre></div>
                                           >
                                     <li class="blockList">
                                         <h4>asyncGetRecipePredicateResults</h4>
-                                        <pre class="methodSignature"> <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/CompletableFuture.html>CompletableFuture</a>&lt;<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a>&gt; <a href=GroupRecipe.html#asyncGetRecipePredicateResults(io.github.sakaki_aruka.customcrafter.recipe.CRecipePredicate.Context,java.lang.Boolean)>asyncGetRecipePredicateResults</a>(<a href=CRecipePredicate.Context.html>CRecipePredicate.Context</a> context, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> whenEmptyDefault)</pre>
+                                        <pre class="methodSignature"> <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/CompletableFuture.html>CompletableFuture</a>&lt;<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a>&gt; <a href=ShapelessGroupRecipe.html#asyncGetRecipePredicateResults(io.github.sakaki_aruka.customcrafter.recipe.CRecipePredicate.Context,java.lang.Boolean)>asyncGetRecipePredicateResults</a>(<a href=CRecipePredicate.Context.html>CRecipePredicate.Context</a> context, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> whenEmptyDefault)</pre>
                                         <div class="block"><p>Returns <a href=CRecipePredicate.html>CRecipePredicate</a> inspection result on async.</p><p>Each predicate runs on a virtual thread (off the main thread). Even if the given <a href=CRecipePredicate.Context.html#asyncContext>CRecipePredicate.Context.asyncContext</a> is null, an async context is set internally before predicates run.</p></div>
 
                                         <dl>
@@ -587,7 +672,7 @@ recipe.isValidRecipe().exceptionOrNull()?.let{ throw it }</code></pre></div>
                                           >
                                     <li class="blockList">
                                         <h4>getResults</h4>
-                                        <pre class="methodSignature"> <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/inventory/ItemStack.html>ItemStack</a>&gt; <a href=GroupRecipe.html#getResults(io.github.sakaki_aruka.customcrafter.result.ResultSupplier.Context)>getResults</a>(<a href=../result/ResultSupplier.Context.html>ResultSupplier.Context</a> context)</pre>
+                                        <pre class="methodSignature"> <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/inventory/ItemStack.html>ItemStack</a>&gt; <a href=ShapelessGroupRecipe.html#getResults(io.github.sakaki_aruka.customcrafter.result.ResultSupplier.Context)>getResults</a>(<a href=../result/ResultSupplier.Context.html>ResultSupplier.Context</a> context)</pre>
                                         <div class="block"><p>Returns results of suppliers made</p></div>
 
                                         <dl>
@@ -620,7 +705,7 @@ recipe.isValidRecipe().exceptionOrNull()?.let{ throw it }</code></pre></div>
                                           >
                                     <li class="blockList">
                                         <h4>asyncGetResults</h4>
-                                        <pre class="methodSignature"> <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/CompletableFuture.html>CompletableFuture</a>&lt;<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/inventory/ItemStack.html>ItemStack</a>&gt;&gt; <a href=GroupRecipe.html#asyncGetResults(io.github.sakaki_aruka.customcrafter.result.ResultSupplier.Context)>asyncGetResults</a>(<a href=../result/ResultSupplier.Context.html>ResultSupplier.Context</a> context)</pre>
+                                        <pre class="methodSignature"> <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/CompletableFuture.html>CompletableFuture</a>&lt;<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/inventory/ItemStack.html>ItemStack</a>&gt;&gt; <a href=ShapelessGroupRecipe.html#asyncGetResults(io.github.sakaki_aruka.customcrafter.result.ResultSupplier.Context)>asyncGetResults</a>(<a href=../result/ResultSupplier.Context.html>ResultSupplier.Context</a> context)</pre>
                                         <div class="block"><p>Returns results of suppliers made asynchronously.</p><p>Each supplier runs on a virtual thread (off the main thread). Even if <a href=../result/ResultSupplier.Context.html#asyncContext>ResultSupplier.Context.asyncContext</a> is null, an async context is set internally before suppliers run.</p></div>
 
                                         <dl>
@@ -653,7 +738,7 @@ recipe.isValidRecipe().exceptionOrNull()?.let{ throw it }</code></pre></div>
                                           >
                                     <li class="blockList">
                                         <h4>getTimes</h4>
-                                        <pre class="methodSignature"> <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Integer.html>Integer</a> <a href=GroupRecipe.html#getTimes(java.util.Map,io.github.sakaki_aruka.customcrafter.objects.MappedRelation,java.lang.Boolean,java.lang.Boolean)>getTimes</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Map.html>Map</a>&lt;<a href=CoordinateComponent.html>CoordinateComponent</a>, <a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/inventory/ItemStack.html>ItemStack</a>&gt; map, <a href=../objects/MappedRelation.html>MappedRelation</a> relation, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> shift, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> withoutMass)</pre>
+                                        <pre class="methodSignature"> <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Integer.html>Integer</a> <a href=ShapelessGroupRecipe.html#getTimes(java.util.Map,io.github.sakaki_aruka.customcrafter.objects.MappedRelation,java.lang.Boolean,java.lang.Boolean)>getTimes</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Map.html>Map</a>&lt;<a href=CoordinateComponent.html>CoordinateComponent</a>, <a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/inventory/ItemStack.html>ItemStack</a>&gt; map, <a href=../objects/MappedRelation.html>MappedRelation</a> relation, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> shift, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> withoutMass)</pre>
                                         <div class="block"><p>Returns the minimum craft count calculated from input item amounts and recipe requirements.</p></div>
 
                                         <dl>

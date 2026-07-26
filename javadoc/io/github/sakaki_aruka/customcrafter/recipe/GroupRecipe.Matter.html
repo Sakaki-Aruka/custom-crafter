@@ -376,7 +376,7 @@ public final class <span class="typeNameLabel"><a href=GroupRecipe.Matter.html>G
                                             <!--   -->
                                         </a>
                                             <h3>Methods inherited from class&nbsp;io.github.sakaki_aruka.customcrafter.matter.CMatter</h3>
-                                            <code>hasPredicates, predicatesResult</code></li>
+                                            <code>firstFailedPredicate, hasPredicates, predicatesResult</code></li>
                                  
                                     <li class="blockList"><a id="methods.inherited.from.class.java.lang.Object">
                                         <!--   -->
@@ -518,7 +518,7 @@ public final class <span class="typeNameLabel"><a href=GroupRecipe.Matter.html>G
                                     <li class="blockList">
                                         <h4>getPredicates</h4>
                                         <pre class="methodSignature"> <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=../matter/CMatterPredicate.html>CMatterPredicate</a>&gt; <a href=GroupRecipe.Matter.html#getPredicates()>getPredicates</a>()</pre>
-                                        <div class="block"><p>List of additional <a href=../matter/CMatterPredicate.html>CMatterPredicate</a> checks that run during slot matching. <code>null</code> or empty means no additional conditions.</p></div>
+                                        <div class="block"><p>List of additional <a href=../matter/CMatterPredicate.html>CMatterPredicate</a> checks that run during slot matching. <code>null</code> or empty means no additional conditions.</p><p>Ordered, so an unnamed predicate can be reported by its index in diagnostic logs.</p></div>
 
                                         <dl>
 

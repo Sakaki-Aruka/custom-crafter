@@ -217,7 +217,7 @@ public class <span class="typeNameLabel"><a href=CEnchantMatterImpl.html>CEnchan
                                         </tr>
                                         
                                         <tr class="altColor">
-                                            <td class="colFirst"><code>private final <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html>Set</a>&lt;<a href=../CMatterPredicate.html>CMatterPredicate</a>&gt;</code></td>
+                                            <td class="colFirst"><code>private final <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=../CMatterPredicate.html>CMatterPredicate</a>&gt;</code></td>
                                             <th class="colSecond" scope="row"><code><a href=CEnchantMatterImpl.html#predicates>predicates</a></code></th>
                                             <td class="colLast"></td>
                                         </tr>
@@ -248,7 +248,7 @@ public class <span class="typeNameLabel"><a href=CEnchantMatterImpl.html>CEnchan
                                         
                                             <tr class="altColor">
                                                 <th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a
-                                                        href="#CEnchantMatterImpl(java.lang.String,java.util.Set,java.util.Set,java.lang.Integer,java.lang.Boolean,java.util.Set)">CEnchantMatterImpl</a></span>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html>String</a> name, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html>Set</a>&lt;<a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/Material.html>Material</a>&gt; candidate, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html>Set</a>&lt;<a href=CEnchantComponent.html>CEnchantComponent</a>&gt; enchantComponents, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Integer.html>Integer</a> amount, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> anyAmount, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html>Set</a>&lt;<a href=../CMatterPredicate.html>CMatterPredicate</a>&gt; predicates)</code></th>
+                                                        href="#CEnchantMatterImpl(java.lang.String,java.util.Set,java.util.Set,java.lang.Integer,java.lang.Boolean,java.util.List)">CEnchantMatterImpl</a></span>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html>String</a> name, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html>Set</a>&lt;<a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/Material.html>Material</a>&gt; candidate, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html>Set</a>&lt;<a href=CEnchantComponent.html>CEnchantComponent</a>&gt; enchantComponents, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Integer.html>Integer</a> amount, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> anyAmount, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=../CMatterPredicate.html>CMatterPredicate</a>&gt; predicates)</code></th>
                                                 <td class="colLast"></td>
                                             </tr>
                                         
@@ -360,7 +360,7 @@ public class <span class="typeNameLabel"><a href=CEnchantMatterImpl.html>CEnchan
                                         </tr>
                                         
                                         <tr id="i5" class="rowColor">
-                                            <td class="colFirst"><code><a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html>Set</a>&lt;<a href=../CMatterPredicate.html>CMatterPredicate</a>&gt;</code>
+                                            <td class="colFirst"><code><a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=../CMatterPredicate.html>CMatterPredicate</a>&gt;</code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=CEnchantMatterImpl.html#getPredicates()>getPredicates</a>() </code>
                                             </th>
@@ -376,7 +376,7 @@ public class <span class="typeNameLabel"><a href=CEnchantMatterImpl.html>CEnchan
                                             <!--   -->
                                         </a>
                                             <h3>Methods inherited from class&nbsp;io.github.sakaki_aruka.customcrafter.matter.CMatter</h3>
-                                            <code>hasPredicates, isValidMatter, predicatesResult</code></li>
+                                            <code>firstFailedPredicate, hasPredicates, isValidMatter, predicatesResult</code></li>
                                  
                                     <li class="blockList"><a id="methods.inherited.from.class.java.lang.Object">
                                         <!--   -->
@@ -404,11 +404,11 @@ public class <span class="typeNameLabel"><a href=CEnchantMatterImpl.html>CEnchan
                             </a>
                                 <h3>Constructor Detail</h3>
                                 
-                                <a name="CEnchantMatterImpl(java.lang.String,java.util.Set,java.util.Set,java.lang.Integer,java.lang.Boolean,java.util.Set)"></a>
+                                <a name="CEnchantMatterImpl(java.lang.String,java.util.Set,java.util.Set,java.lang.Integer,java.lang.Boolean,java.util.List)"></a>
                                 <ul class="blockList">
                                     <li class="blockList">
                                         <h4>CEnchantMatterImpl</h4>
-                                        <pre>CEnchantMatterImpl(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html>String</a> name, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html>Set</a>&lt;<a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/Material.html>Material</a>&gt; candidate, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html>Set</a>&lt;<a href=CEnchantComponent.html>CEnchantComponent</a>&gt; enchantComponents, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Integer.html>Integer</a> amount, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> anyAmount, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html>Set</a>&lt;<a href=../CMatterPredicate.html>CMatterPredicate</a>&gt; predicates)</pre>
+                                        <pre>CEnchantMatterImpl(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html>String</a> name, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html>Set</a>&lt;<a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/Material.html>Material</a>&gt; candidate, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html>Set</a>&lt;<a href=CEnchantComponent.html>CEnchantComponent</a>&gt; enchantComponents, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Integer.html>Integer</a> amount, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a> anyAmount, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=../CMatterPredicate.html>CMatterPredicate</a>&gt; predicates)</pre>
                                         <div class="block"></div>
                                         
                                         <dl>
@@ -672,7 +672,7 @@ public class <span class="typeNameLabel"><a href=CEnchantMatterImpl.html>CEnchan
                                           >
                                     <li class="blockList">
                                         <h4>getPredicates</h4>
-                                        <pre class="methodSignature"> <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html>Set</a>&lt;<a href=../CMatterPredicate.html>CMatterPredicate</a>&gt; <a href=CEnchantMatterImpl.html#getPredicates()>getPredicates</a>()</pre>
+                                        <pre class="methodSignature"> <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html>List</a>&lt;<a href=../CMatterPredicate.html>CMatterPredicate</a>&gt; <a href=CEnchantMatterImpl.html#getPredicates()>getPredicates</a>()</pre>
                                         <div class="block"></div>
 
                                         <dl>

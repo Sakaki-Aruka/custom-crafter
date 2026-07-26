@@ -207,6 +207,12 @@ public final class <span class="typeNameLabel"><a href=CRecipePredicate.Context.
                                             <td class="colLast"></td>
                                         </tr>
                                         
+                                        <tr class="rowColor">
+                                            <td class="colFirst"><code>private final <a href=../debug/Explainer.html>Explainer</a></code></td>
+                                            <th class="colSecond" scope="row"><code><a href=CRecipePredicate.Context.html#explainer>explainer</a></code></th>
+                                            <td class="colLast"></td>
+                                        </tr>
+                                        
                                     </table>
                                 </div>
                             </li>
@@ -233,11 +239,17 @@ public final class <span class="typeNameLabel"><a href=CRecipePredicate.Context.
                                         
                                             <tr class="altColor">
                                                 <th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a
-                                                        href="#CRecipePredicate.Context(io.github.sakaki_aruka.customcrafter.objects.CraftView,java.util.UUID,io.github.sakaki_aruka.customcrafter.recipe.CRecipe,io.github.sakaki_aruka.customcrafter.objects.MappedRelation,io.github.sakaki_aruka.customcrafter.objects.AsyncContext)">CRecipePredicate.Context</a></span>(<a href=../objects/CraftView.html>CraftView</a> input, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/UUID.html>UUID</a> crafterId, <a href=CRecipe.html>CRecipe</a> recipe, <a href=../objects/MappedRelation.html>MappedRelation</a> relation, <a href=../objects/AsyncContext.html>AsyncContext</a> asyncContext)</code></th>
+                                                        href="#CRecipePredicate.Context(io.github.sakaki_aruka.customcrafter.objects.CraftView,java.util.UUID,io.github.sakaki_aruka.customcrafter.recipe.CRecipe,io.github.sakaki_aruka.customcrafter.objects.MappedRelation,io.github.sakaki_aruka.customcrafter.objects.AsyncContext,io.github.sakaki_aruka.customcrafter.debug.Explainer)">CRecipePredicate.Context</a></span>(<a href=../objects/CraftView.html>CraftView</a> input, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/UUID.html>UUID</a> crafterId, <a href=CRecipe.html>CRecipe</a> recipe, <a href=../objects/MappedRelation.html>MappedRelation</a> relation, <a href=../objects/AsyncContext.html>AsyncContext</a> asyncContext, <a href=../debug/Explainer.html>Explainer</a> explainer)</code></th>
                                                 <td class="colLast"></td>
                                             </tr>
                                         
                                             <tr class="rowColor">
+                                                <th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a
+                                                        href="#CRecipePredicate.Context(io.github.sakaki_aruka.customcrafter.objects.CraftView,java.util.UUID,io.github.sakaki_aruka.customcrafter.recipe.CRecipe,io.github.sakaki_aruka.customcrafter.objects.MappedRelation,io.github.sakaki_aruka.customcrafter.objects.AsyncContext)">CRecipePredicate.Context</a></span>(<a href=../objects/CraftView.html>CraftView</a> input, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/UUID.html>UUID</a> crafterId, <a href=CRecipe.html>CRecipe</a> recipe, <a href=../objects/MappedRelation.html>MappedRelation</a> relation, <a href=../objects/AsyncContext.html>AsyncContext</a> asyncContext)</code></th>
+                                                <td class="colLast"></td>
+                                            </tr>
+                                        
+                                            <tr class="altColor">
                                                 <th class="colConstructorName" scope="row"><code><span class="memberNameLink"><a
                                                         href="#CRecipePredicate.Context(io.github.sakaki_aruka.customcrafter.objects.CraftView,java.util.UUID,io.github.sakaki_aruka.customcrafter.recipe.CRecipe,io.github.sakaki_aruka.customcrafter.objects.MappedRelation)">CRecipePredicate.Context</a></span>(<a href=../objects/CraftView.html>CraftView</a> input, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/UUID.html>UUID</a> crafterId, <a href=CRecipe.html>CRecipe</a> recipe, <a href=../objects/MappedRelation.html>MappedRelation</a> relation)</code></th>
                                                 <td class="colLast"></td>
@@ -333,6 +345,14 @@ public final class <span class="typeNameLabel"><a href=CRecipePredicate.Context.
                                         </tr>
                                         
                                         <tr id="i5" class="rowColor">
+                                            <td class="colFirst"><code>final <a href=../debug/Explainer.html>Explainer</a></code>
+                                            </td>
+                                            <th class="colSecond" scope="row"><code><a href=CRecipePredicate.Context.html#getExplainer()>getExplainer</a>() </code>
+                                            </th>
+                                            <td class="colLast"></td>
+                                        </tr>
+                                        
+                                        <tr id="i6" class="altColor">
                                             <td class="colFirst"><code>final <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Boolean.html>Boolean</a></code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=CRecipePredicate.Context.html#isAsync()>isAsync</a>() </code>
@@ -340,7 +360,7 @@ public final class <span class="typeNameLabel"><a href=CRecipePredicate.Context.
                                             <td class="colLast">Returns whether this inspection is async.</td>
                                         </tr>
                                         
-                                        <tr id="i6" class="altColor">
+                                        <tr id="i7" class="rowColor">
                                             <td class="colFirst"><code>final <a href=CRecipePredicate.Context.html>CRecipePredicate.Context</a></code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=CRecipePredicate.Context.html#toAsync()>toAsync</a>() </code>
@@ -348,7 +368,7 @@ public final class <span class="typeNameLabel"><a href=CRecipePredicate.Context.
                                             <td class="colLast">If no async context exists, returns a newly added one.</td>
                                         </tr>
                                         
-                                        <tr id="i7" class="rowColor">
+                                        <tr id="i8" class="altColor">
                                             <td class="colFirst"><code>final <a href=CRecipePredicate.Context.html>CRecipePredicate.Context</a></code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=CRecipePredicate.Context.html#copyWith(io.github.sakaki_aruka.customcrafter.objects.AsyncContext)>copyWith</a>(<a href=../objects/AsyncContext.html>AsyncContext</a> asyncContext) </code>
@@ -386,6 +406,45 @@ public final class <span class="typeNameLabel"><a href=CRecipePredicate.Context.
                                 <!--   -->
                             </a>
                                 <h3>Constructor Detail</h3>
+                                
+                                <a name="CRecipePredicate.Context(io.github.sakaki_aruka.customcrafter.objects.CraftView,java.util.UUID,io.github.sakaki_aruka.customcrafter.recipe.CRecipe,io.github.sakaki_aruka.customcrafter.objects.MappedRelation,io.github.sakaki_aruka.customcrafter.objects.AsyncContext,io.github.sakaki_aruka.customcrafter.debug.Explainer)"></a>
+                                <ul class="blockList">
+                                    <li class="blockList">
+                                        <h4>CRecipePredicate.Context</h4>
+                                        <pre>CRecipePredicate.Context(<a href=../objects/CraftView.html>CraftView</a> input, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/UUID.html>UUID</a> crafterId, <a href=CRecipe.html>CRecipe</a> recipe, <a href=../objects/MappedRelation.html>MappedRelation</a> relation, <a href=../objects/AsyncContext.html>AsyncContext</a> asyncContext, <a href=../debug/Explainer.html>Explainer</a> explainer)</pre>
+                                        <div class="block"></div>
+                                        
+                                        <dl>
+                                            <dt><span class="paramLabel">Parameters:</span></dt>
+                                            
+                                            
+                                            <dd><code>input</code> - Inspection target</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>crafterId</code> - Crafter UUID</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>recipe</code> - Recipe</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>relation</code> - Pre-result of inspection</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>asyncContext</code> - Async context (since 5.0.20).</dd>
+                                            
+                                            
+                                            
+                                            <dd><code>explainer</code> - Diagnostic recorder of the running search (since 5.3.0).</dd>
+                                            
+                                            
+                                        </dl>
+                                        
+                                    </li>
+                                </ul>
                                 
                                 <a name="CRecipePredicate.Context(io.github.sakaki_aruka.customcrafter.objects.CraftView,java.util.UUID,io.github.sakaki_aruka.customcrafter.recipe.CRecipe,io.github.sakaki_aruka.customcrafter.objects.MappedRelation,io.github.sakaki_aruka.customcrafter.objects.AsyncContext)"></a>
                                 <ul class="blockList">
@@ -567,6 +626,29 @@ public final class <span class="typeNameLabel"><a href=CRecipePredicate.Context.
                                     <li class="blockList">
                                         <h4>getAsyncContext</h4>
                                         <pre class="methodSignature"> final <a href=../objects/AsyncContext.html>AsyncContext</a> <a href=CRecipePredicate.Context.html#getAsyncContext()>getAsyncContext</a>()</pre>
+                                        <div class="block"></div>
+
+                                        <dl>
+
+                                        
+
+                                        
+
+                                        
+
+                                        </dl>
+                                    </li>
+                                </ul>
+                                
+                                <a id="getExplainer()">
+                                    <!--   -->
+                                </a>
+                                <ul class=
+                                              "blockList"
+                                          >
+                                    <li class="blockList">
+                                        <h4>getExplainer</h4>
+                                        <pre class="methodSignature"> final <a href=../debug/Explainer.html>Explainer</a> <a href=CRecipePredicate.Context.html#getExplainer()>getExplainer</a>()</pre>
                                         <div class="block"></div>
 
                                         <dl>

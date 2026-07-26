@@ -398,7 +398,7 @@ groups = [Group1{ (0, 0), (0, 1) }]</code></pre><p><a href=GroupRecipe.html#reci
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=GroupRecipe.html#requiresInputItemAmountMin()>requiresInputItemAmountMin</a>() </code>
                                             </th>
-                                            <td class="colLast">Minimal requires input items amountDefault implementation exists</td>
+                                            <td class="colLast">Minimal requires input items amountDefault implementation derives this from <a href=GroupRecipe.html#matchGroups()>matchGroups</a> (sum of each group's <a href=MatchGroup.html#min>MatchGroup.min</a>).</td>
                                         </tr>
                                         
                                         <tr id="i7" class="rowColor">
@@ -426,7 +426,7 @@ groups = [Group1{ (0, 0), (0, 1) }]</code></pre><p><a href=GroupRecipe.html#reci
                                             <!--   -->
                                         </a>
                                             <h3>Methods inherited from class&nbsp;io.github.sakaki_aruka.customcrafter.recipe.CRecipe</h3>
-                                            <code>asyncGetRecipePredicateResults, asyncGetResults, getRecipePredicateResults, getResults, getTimes, requiresInputItemAmountMax</code></li>
+                                            <code>asyncGetRecipePredicateResults, asyncGetResults, firstFailedRecipePredicate, getRecipePredicateResults, getResults, getTimes, matchGroups, requiresInputItemAmountMax</code></li>
                                  
                                     <li class="blockList"><a id="methods.inherited.from.class.java.lang.Object">
                                         <!--   -->
@@ -707,7 +707,7 @@ groups = [Group1{ (0, 0), (0, 1) }]</code></pre><p><a href=GroupRecipe.html#reci
                                     <li class="blockList">
                                         <h4>requiresInputItemAmountMin</h4>
                                         <pre class="methodSignature"> <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Integer.html>Integer</a> <a href=GroupRecipe.html#requiresInputItemAmountMin()>requiresInputItemAmountMin</a>()</pre>
-                                        <div class="block"><p>Minimal requires input items amount</p><p>Default implementation exists</p></div>
+                                        <div class="block"><p>Minimal requires input items amount</p><p>Default implementation derives this from <a href=GroupRecipe.html#matchGroups()>matchGroups</a> (sum of each group's <a href=MatchGroup.html#min>MatchGroup.min</a>).</p></div>
 
                                         <dl>
 
