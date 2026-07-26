@@ -1,5 +1,28 @@
 # Changelog
 
+# 5.3.0
+
+## ⚠️ Breaking Changes
+
+* **[Dependency Removal]** Removed the **Choco-solver** dependency; shapeless matching now uses an in-house max-flow solver, so the `org.chocosolver` shaded relocation is gone.
+* `CMatter.predicates` changed from `Collection<CMatterPredicate>?` to `List<CMatterPredicate>?`, making predicate order significant.
+* `CMatterImpl.defaultMatterPredicates()` now returns `List<CMatterPredicate>` instead of `Set<CMatterPredicate>`.
+* `CMatterPredicate.Context` and `CRecipePredicate.Context` gained a trailing `explainer` parameter; Kotlin source compatibility is preserved, but binary compatibility is not.
+
+## ✨ New Features and Enhancements
+
+* **[New Feature]** Added `Explainer`: an opt-in, thread-safe diagnostic recorder that reports why each recipe did or did not match during a search.
+* **[New Feature]** Added `MatchGroup` and `CRecipe.matchGroups()`, generalising shapeless matching from "every slot is mandatory" into a min/max bounded assignment.
+* **[New Feature]** Added `ShapelessGroupRecipe`: the shapeless counterpart of `GroupRecipe`, needing no `Material.AIR` placeholder to express an optional slot.
+* **[New Feature]** Added the `CMatterPredicates` and `CRecipePredicates` utility objects, providing the `and`, `or`, `allOf`, and `nOf` combinators.
+* **[New Feature]** Added `named()` and a `name()` default method on both predicate interfaces, so a predicate is reported by name instead of by index (combinators compose names automatically).
+* **[Enhancement]** `CMatterPredicate.Context` and `CRecipePredicate.Context` now expose an `explainer` field, letting a predicate record why it rejected an input.
+* **[Enhancement]** Added `CMatter.firstFailedPredicate()` and `CRecipe.firstFailedRecipePredicate()`, returning the first rejecting predicate instead of only whether one rejected.
+* **[Enhancement]** `Search.search`, `Search.asyncSearch`, `PartialSearch.asyncPartialSearch`, and `VanillaSearch.search` now accept an optional `explainer`.
+* **[Documentation]** Added the "Advanced Debugging for Recipe Search" page (EN / JA) and documented the `Predicates` utilities and predicate naming on the `CRecipePredicate` page.
+
+## 🛠 Fix
+
 # 5.2.1
 
 ## ✨ New Features and Enhancements
