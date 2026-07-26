@@ -1,6 +1,6 @@
 package io.github.sakaki_aruka.customcrafter.internal.listener
 
-import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterUI
+import io.github.sakaki_aruka.customcrafter.internal.ui.CustomCrafterUI
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener

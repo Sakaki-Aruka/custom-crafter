@@ -1,6 +1,6 @@
 package io.github.sakaki_aruka.customcrafter.ui
 
-import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterUI
+import io.github.sakaki_aruka.customcrafter.internal.ui.CustomCrafterUI
 import io.github.sakaki_aruka.customcrafter.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.search.Search

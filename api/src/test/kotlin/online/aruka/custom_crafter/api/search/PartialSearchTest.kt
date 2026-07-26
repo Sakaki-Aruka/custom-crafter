@@ -6,7 +6,7 @@ import io.github.sakaki_aruka.customcrafter.search.PartialSearch
 import io.github.sakaki_aruka.customcrafter.search.Search
 import io.github.sakaki_aruka.customcrafter.matter.CMatterImpl
 import io.github.sakaki_aruka.customcrafter.recipe.CRecipeImpl
-import io.github.sakaki_aruka.customcrafter.internal.gui.crafting.CraftUI
+import io.github.sakaki_aruka.customcrafter.internal.ui.crafting.CraftUI
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import org.junit.jupiter.api.AfterEach

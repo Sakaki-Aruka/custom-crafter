@@ -2,7 +2,7 @@ package io.github.sakaki_aruka.customcrafter.internal
 
 import com.tcoded.folialib.FoliaLib
 import io.github.sakaki_aruka.customcrafter.CustomCrafter
-import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterUI
+import io.github.sakaki_aruka.customcrafter.internal.ui.CustomCrafterUI
 import org.bukkit.Bukkit
 import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.inventory.InventoryHolder
