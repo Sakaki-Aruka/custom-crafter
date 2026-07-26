@@ -1,0 +1,91 @@
+name: Modrinth publish
+
+on:
+  workflow_run:
+    workflows:
+      - build
+    types:
+      - completed
+
+jobs:
+  publish:
+    if: github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+
+    env:
+      ONEWAY_VERSION: "0.1.0"
+      MODRINTH_PROJECT_ID: "lUgVFdcC" # custom-crafter-api
+      GAME_VERSIONS: "1.21.4,1.21.5,1.21.6,1.21.7,1.21.8,1.21.9,1.21.10,1.21.11,26.1,26.1.1,26.1.2"
+      PLATFORMS: "paper,folia,purpur"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@c1e323688fd81a25caa38c78aa6df2d33d3e20d9 # v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: build-jars
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - name: Get project version
+        id: get_version
+        run: |
+          VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          echo "VERSION=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Download Oneway
+        run: curl -sSL -o oneway.jar "https://github.com/Sakaki-Aruka/oneway/releases/download/${ONEWAY_VERSION}/Oneway-${ONEWAY_VERSION}.jar"
+
+      - name: Check for existing Modrinth version
+        id: check_version
+        env:
+          TAG_NAME: ${{ steps.get_version.outputs.VERSION }}
+        run: |
+          set +e
+          java -jar oneway.jar not-exists "$MODRINTH_PROJECT_ID" "$TAG_NAME" -e
+          code=$?
+          set -e
+
+          if [ "$code" -eq 0 ]; then
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          elif [ "$code" -eq 4 ]; then
+            echo "::notice::$TAG_NAME is already released on Modrinth. Skipping publish."
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::error::Failed to check existing Modrinth versions (exit code $code)."
+            exit "$code"
+          fi
+
+      - name: Extract changelog
+        if: steps.check_version.outputs.exists == 'false'
+        run: sed -n '2,${/^# /{:a;n;/^# /q;p;ba}}' CHANGELOG.md > release-note.md
+
+      - name: Publish to Modrinth
+        if: steps.check_version.outputs.exists == 'false'
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          TAG_NAME: ${{ steps.get_version.outputs.VERSION }}
+        run: |
+          java -jar oneway.jar version \
+            --token "$MODRINTH_TOKEN" \
+            -f "api/target/custom-crafter-api-$TAG_NAME.jar" \
+            -V "$TAG_NAME" \
+            --version-name "custom-crafter-api $TAG_NAME" \
+            --changelog release-note.md \
+            -g "$GAME_VERSIONS" \
+            -t release \
+            -l "$PLATFORMS" \
+            -s listed \
+            -p "$MODRINTH_PROJECT_ID" \
+            -e
