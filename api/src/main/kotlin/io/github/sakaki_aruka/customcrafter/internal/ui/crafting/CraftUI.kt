@@ -1,4 +1,4 @@
-package io.github.sakaki_aruka.customcrafter.internal.gui.crafting
+package io.github.sakaki_aruka.customcrafter.internal.ui.crafting
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.event.CreateCustomItemEvent
@@ -16,9 +16,9 @@ import io.github.sakaki_aruka.customcrafter.search.Search
 import io.github.sakaki_aruka.customcrafter.util.Converter.toComponent
 import io.github.sakaki_aruka.customcrafter.util.InventoryUtil.giveItems
 import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
-import io.github.sakaki_aruka.customcrafter.internal.gui.CraftUIState
-import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterUI
-import io.github.sakaki_aruka.customcrafter.internal.gui.allcandidate.AllCandidateUI
+import io.github.sakaki_aruka.customcrafter.internal.ui.CraftUIState
+import io.github.sakaki_aruka.customcrafter.internal.ui.CustomCrafterUI
+import io.github.sakaki_aruka.customcrafter.internal.ui.allcandidate.AllCandidateUI
 import io.github.sakaki_aruka.customcrafter.ui.CraftUIDesigner.Companion.bake
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit

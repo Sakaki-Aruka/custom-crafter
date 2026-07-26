@@ -19,7 +19,7 @@ open class CMatterImpl @JvmOverloads constructor(
     override val candidate: Set<Material>,
     override val amount: Int = 1,
     override val anyAmount: Boolean = false,
-    override val predicates: Set<CMatterPredicate>? = defaultMatterPredicates(),
+    override val predicates: List<CMatterPredicate>? = defaultMatterPredicates(),
 ): CMatter {
     companion object {
         /**
@@ -31,8 +31,8 @@ open class CMatterImpl @JvmOverloads constructor(
          * @since 5.0.15
          */
         @JvmStatic
-        fun defaultMatterPredicates(): Set<CMatterPredicate> {
-            return setOf(
+        fun defaultMatterPredicates(): List<CMatterPredicate> {
+            return listOf(
                 CEnchantMatterImpl.DEFAULT_ENCHANT_CHECKER,
                 CEnchantmentStoreMatterImpl.DEFAULT_ENCHANT_STORE_CHECKER,
                 CPotionMatterImpl.DEFAULT_POTION_CHECKER

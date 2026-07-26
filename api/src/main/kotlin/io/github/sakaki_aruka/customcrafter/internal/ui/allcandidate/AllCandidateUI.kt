@@ -1,4 +1,4 @@
-package io.github.sakaki_aruka.customcrafter.internal.gui.allcandidate
+package io.github.sakaki_aruka.customcrafter.internal.ui.allcandidate
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.event.CreateCustomItemEvent
@@ -11,15 +11,13 @@ import io.github.sakaki_aruka.customcrafter.objects.CraftView
 import io.github.sakaki_aruka.customcrafter.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.search.Search
 import io.github.sakaki_aruka.customcrafter.recipe.CVanillaRecipe
-import io.github.sakaki_aruka.customcrafter.util.Converter.toComponent
 import io.github.sakaki_aruka.customcrafter.util.InventoryUtil.giveItems
 import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
-import io.github.sakaki_aruka.customcrafter.internal.gui.CustomCrafterUI
-import io.github.sakaki_aruka.customcrafter.internal.gui.crafting.CraftUI
+import io.github.sakaki_aruka.customcrafter.internal.ui.CustomCrafterUI
+import io.github.sakaki_aruka.customcrafter.internal.ui.crafting.CraftUI
 import io.github.sakaki_aruka.customcrafter.ui.AllCandidateUIDesigner
 import io.github.sakaki_aruka.customcrafter.ui.AllCandidateUIDesigner.Companion.bake
 import org.bukkit.Bukkit
-import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent

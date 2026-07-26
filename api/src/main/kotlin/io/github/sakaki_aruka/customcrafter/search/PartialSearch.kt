@@ -1,6 +1,7 @@
 package io.github.sakaki_aruka.customcrafter.search
 
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
+import io.github.sakaki_aruka.customcrafter.debug.Explainer
 import io.github.sakaki_aruka.customcrafter.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.matter.CMatterPredicate
 import io.github.sakaki_aruka.customcrafter.recipe.CRecipe
@@ -221,6 +222,7 @@ object PartialSearch {
      *   Defaults to [Search.SearchQuery.ASYNC_DEFAULT].
      * @param[sourceRecipes] The pool of recipes to search.
      *   Defaults to all registered custom recipes via [CustomCrafterAPI.getRecipes].
+     * @param[explainer] Logs container instance (since 5.3.0)
      * @return A [CompletableFuture] that resolves to the list of partial-search results.
      *   The list is empty when no recipe even partially matches the current input.
      * @throws IllegalArgumentException if [view] contains zero items or more than 36 items.
@@ -232,21 +234,36 @@ object PartialSearch {
         crafterId: UUID,
         view: CraftView,
         searchQuery: Search.SearchQuery = Search.SearchQuery.ASYNC_DEFAULT,
-        sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes()
+        sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes(),
+        explainer: Explainer? = null
     ): CompletableFuture<List<PartialSearchResult>> {
         if (view.materials.isEmpty() || view.materials.size > 36) {
             throw IllegalArgumentException("'view#materials' size must be in range of 1 to 36. (current: ${view.materials.size})")
         }
 
-        val recipes: List<CRecipe> = sourceRecipes
+        val unPartialSearchable: List<CRecipe> = sourceRecipes.filter { it is UnPartialSearchableRecipe }
+        val (recipes: List<CRecipe>, tooSmall: List<CRecipe>) = sourceRecipes
             .filter { it !is UnPartialSearchableRecipe }
-            .filter { recipe -> view.materials.size <= recipe.requiresInputItemAmountMax() }
+            .partition { recipe -> view.materials.size <= recipe.requiresInputItemAmountMax() }
+
+        explainer?.let { e ->
+            e.writeLog(Explainer.Loglevel.INFO, "[asyncPartialSearch/candidateFilter] candidates filtered: inputSize=${view.materials.size}, sourceRecipes=${sourceRecipes.size}, candidates=${recipes.size}")
+            recipes.withIndex().forEach { (index, recipe) ->
+                e.writeLog(Explainer.Loglevel.DEBUG, "[asyncPartialSearch/candidateFilter] candidate($index): name=${recipe.name}, type=${recipe.type}")
+            }
+            unPartialSearchable.forEach { recipe ->
+                e.writeLog(Explainer.Loglevel.DEBUG, "[asyncPartialSearch/candidateFilter] excluded: name=${recipe.name}, reason=UnPartialSearchableRecipe")
+            }
+            tooSmall.forEach { recipe ->
+                e.writeLog(Explainer.Loglevel.DEBUG, "[asyncPartialSearch/candidateFilter] excluded: name=${recipe.name}, inputSize=${view.materials.size} exceeds requiresInputItemAmountMax=${recipe.requiresInputItemAmountMax()}")
+            }
+        }
 
         val tasks: List<CompletableFuture<List<PartialSearchResult>>> = recipes.map { recipe ->
             CompletableFuture.supplyAsync({
                 when (recipe.type) {
-                    CRecipe.Type.SHAPED -> shaped(view, recipe, crafterId, searchQuery)
-                    CRecipe.Type.SHAPELESS -> shapeless(view, recipe, crafterId, searchQuery)
+                    CRecipe.Type.SHAPED -> shaped(view, recipe, crafterId, searchQuery, explainer)
+                    CRecipe.Type.SHAPELESS -> shapeless(view, recipe, crafterId, searchQuery, explainer)
                 }
             }, InternalAPI.executor)
         }
@@ -256,6 +273,7 @@ object PartialSearch {
             val derived = tasks.map { task ->
                 task.thenAccept { results ->
                     if (results.isNotEmpty() && findFirst.complete(results)) {
+                        explainer?.writeLog(Explainer.Loglevel.INFO, "[asyncPartialSearch/onlyFirst] first partial match found: recipe=${results.first().recipe.name}, remaining tasks interrupted")
                         searchQuery.asyncContext?.interrupt()
                     }
                 }
@@ -267,16 +285,21 @@ object PartialSearch {
         }
 
         return CompletableFuture.allOf(*tasks.toTypedArray())
-            .thenApply { tasks.flatMap { it.join() } }
+            .thenApply {
+                val results: List<PartialSearchResult> = tasks.flatMap { it.join() }
+                explainer?.writeLog(Explainer.Loglevel.INFO, "[asyncPartialSearch] search finished: results=${results.size}")
+                results
+            }
     }
 
     private fun shaped(
         view: CraftView,
         recipe: CRecipe,
         crafterId: UUID,
-        searchQuery: Search.SearchQuery
+        searchQuery: Search.SearchQuery,
+        explainer: Explainer? = null
     ): List<PartialShapedResult> {
-        val normalCheckResult: Search.SearchResult = Search.search(crafterId, view, searchQuery, listOf(recipe))
+        val normalCheckResult: Search.SearchResult = Search.search(crafterId, view, searchQuery, listOf(recipe), explainer)
         val merged: List<Pair<CRecipe, MappedRelation>> = normalCheckResult.getMergedResults(view)
 
         if (normalCheckResult.size() > 0) {
@@ -357,9 +380,10 @@ object PartialSearch {
         view: CraftView,
         recipe: CRecipe,
         crafterId: UUID,
-        searchQuery: Search.SearchQuery
+        searchQuery: Search.SearchQuery,
+        explainer: Explainer? = null
     ): List<PartialShapelessResult> {
-        val normalCheckResult: Search.SearchResult = Search.search(crafterId, view, searchQuery, listOf(recipe))
+        val normalCheckResult: Search.SearchResult = Search.search(crafterId, view, searchQuery, listOf(recipe), explainer)
         if (normalCheckResult.size() > 0) {
             return normalCheckResult.getMergedResults(view).map { (_, relation) ->
                 val relations: Map<CoordinateComponent, Set<CoordinateComponent>> =

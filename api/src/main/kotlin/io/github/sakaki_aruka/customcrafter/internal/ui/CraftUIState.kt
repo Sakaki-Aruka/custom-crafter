@@ -1,4 +1,4 @@
-package io.github.sakaki_aruka.customcrafter.internal.gui
+package io.github.sakaki_aruka.customcrafter.internal.ui
 
 enum class CraftUIState {
     IDLE,

@@ -6,11 +6,6 @@ title: CustomCrafterAPI 入門
 CustomCrafterAPI は 1 x 1 から 6 x 6 サイズのレシピを提供できる基盤を実装したプラグインです。  
 Minecraft 標準のレシピのようにアイテムの種類だけを参照する単純なものから、入力されたアイテムが持つデータやプレイヤーが持つデータを活用したもの、外部のデータベースや API を参照して作成可能なアイテムを決定するようなレシピを提供することができます。  
 
-## Acknowledgement
-This product includes software developed by the IMT Atlantique.
-
-(このソフトウェアは IMT Atlantique によって作成された Choco Solver を含んでいます。)
-
 ## Important notice
 CustomCrafterAPI はバージョン 5.X.X がアルファ版、 6.0.0 以降が正式版として扱われます。  
 5.X.X では 1 つのバージョンアップでクラスや関数の使用が大幅に変更される可能性があります。  

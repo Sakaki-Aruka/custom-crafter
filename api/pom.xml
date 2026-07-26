@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <version>5.2.1</version>
+        <version>5.3.0</version>
         <groupId>io.github.sakaki-aruka</groupId>
         <artifactId>custom-crafter</artifactId>
     </parent>
@@ -207,10 +207,6 @@
 
                             <relocations>
                                 <relocation>
-                                    <pattern>org.chocosolver</pattern>
-                                    <shadedPattern>io.github.sakaki_aruka.customcrafter.shaded.org.chocosolver</shadedPattern>
-                                </relocation>
-                                <relocation>
                                     <pattern>com.tcoded.folialib</pattern>
                                     <shadedPattern>io.github.sakaki_aruka.customcrafter.shaded.com.tcoded.folialib</shadedPattern>
                                 </relocation>
@@ -272,12 +268,6 @@
         <dependency>
             <groupId>io.papermc.paper</groupId>
             <artifactId>paper-api</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.choco-solver</groupId>
-            <artifactId>choco-solver</artifactId>
-            <version>6.0.1</version>
         </dependency>
 
         <dependency>

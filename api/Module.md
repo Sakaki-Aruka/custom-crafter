@@ -12,14 +12,9 @@ List of elements
   - `result`: Default ResultSupplier implementation class
   - `util`: public utilities
 
-## Acknowledgement
-### choco-solver
-This product includes software developed by the IMT Atlantique.
-
 ## List of libraries used
 - kotlin-stdlib: Kotlin std library
 - paper-api: PaperMC API
-- choco-solver: As a combination solver for Shapeless recipes
 - FoliaLib: For compatibility with the Folia platform
 
 # Package io.github.sakaki_aruka.customcrafter

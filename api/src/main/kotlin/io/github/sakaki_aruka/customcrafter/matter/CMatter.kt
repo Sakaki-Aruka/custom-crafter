@@ -19,8 +19,13 @@ interface CMatter {
     val amount: Int
     /** If `true`, any input amount ≥ 1 is accepted regardless of [amount]. If `false`, input must have at least [amount] items. */
     val anyAmount: Boolean
-    /** List of additional [CMatterPredicate] checks that run during slot matching. `null` or empty means no additional conditions. */
-    val predicates: Collection<CMatterPredicate>?
+    /**
+     * List of additional [CMatterPredicate] checks that run during slot matching. `null` or empty means no additional conditions.
+     *
+     * Ordered, so an unnamed predicate can be reported by its index in diagnostic logs.
+     * @see[CMatterPredicate.name]
+     */
+    val predicates: List<CMatterPredicate>?
 
     /**
      * Returns this [CMatter] is a valid or not.
@@ -73,5 +78,23 @@ interface CMatter {
      */
     fun predicatesResult(ctx: CMatterPredicate.Context): Boolean {
         return predicates?.all { p -> p.test(ctx) } ?: true
+    }
+
+    /**
+     * Returns the first [CMatterPredicate] that rejects [ctx], or `null` when all of them pass.
+     *
+     * Evaluates predicates in order and stops at the first failure, exactly as [predicatesResult]
+     * does, so this can be used in its place when the caller needs to report which predicate failed
+     * rather than only whether one did. The returned index is the position within [predicates] and
+     * identifies a predicate that did not override [CMatterPredicate.name].
+     *
+     * @param[ctx] Context of CMatterPredicate execution
+     * @return[IndexedValue] The failing predicate with its index, or `null` when nothing failed
+     * @since 5.3.0
+     */
+    fun firstFailedPredicate(ctx: CMatterPredicate.Context): IndexedValue<CMatterPredicate>? {
+        return predicates
+            ?.withIndex()
+            ?.firstOrNull { (_, predicate) -> !predicate.test(ctx) }
     }
 }

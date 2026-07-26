@@ -13,7 +13,7 @@ import io.github.sakaki_aruka.customcrafter.matter.enchant.CEnchantMatterImpl
 import io.github.sakaki_aruka.customcrafter.matter.enchant.CEnchantmentStoreMatterImpl
 import io.github.sakaki_aruka.customcrafter.matter.potion.CPotionMatterImpl
 import io.github.sakaki_aruka.customcrafter.recipe.CRecipeImpl
-import io.github.sakaki_aruka.customcrafter.internal.gui.crafting.CraftUI
+import io.github.sakaki_aruka.customcrafter.internal.ui.crafting.CraftUI
 import org.bukkit.Material
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.inventory.ItemStack
@@ -346,7 +346,7 @@ internal object SearchTest {
         val matter = CMatterImpl(
             name = "",
             candidate = setOf(Material.GRAVEL),
-            predicates = setOf(CMatterPredicate { ctx -> ctx.crafterId == NotchID })
+            predicates = listOf(CMatterPredicate { ctx -> ctx.crafterId == NotchID })
         )
         val recipe = CRecipeImpl(
             name = "",

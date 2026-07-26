@@ -68,24 +68,48 @@ interface CRecipe {
     }
 
     /**
+     * Groups of recipe slots used by [CRecipe.Type.SHAPELESS] matching.
+     *
+     * Each [MatchGroup] states how many of its members must actually be filled by an input
+     * item; a slot whose coordinate is not covered is simply never assigned an input, no
+     * `Material.AIR` placeholder candidate required (contrast [GroupRecipe]).
+     *
+     * The default implementation treats every entry of [items] as its own mandatory group
+     * (`min == max == 1`), which reproduces plain full-matching SHAPELESS behaviour and keeps
+     * [requiresInputItemAmountMin] / [requiresInputItemAmountMax] correct without any extra
+     * overrides. Implementations that override this to express optional/aggregate slots
+     * (e.g. [ShapelessGroupRecipe]) do not need to separately override those two methods.
+     *
+     * Ignored by [CRecipe.Type.SHAPED] matching, which stays purely coordinate-based.
+     *
+     * Contract: every [MatchGroup.members] coordinate returned here must be a key of [items];
+     * violating this causes an exception during search.
+     *
+     * @return[List] Match groups covering (all or part of) [items].
+     * @see[MatchGroup]
+     * @since 5.3.0
+     */
+    fun matchGroups(): List<MatchGroup> = this.items.keys.map { MatchGroup.mandatory(it) }
+
+    /**
      * Minimal requires input items amount
      *
-     * Default implementation exists
+     * Default implementation derives this from [matchGroups] (sum of each group's [MatchGroup.min]).
      *
      * @return[Int] Minimal requires input items amount
      * @since 5.0.15
      */
-    fun requiresInputItemAmountMin(): Int = this.items.size
+    fun requiresInputItemAmountMin(): Int = this.matchGroups().sumOf { it.min }
 
     /**
      * Maximum requires input items amount. Inclusive
      *
-     * Default implementation exists
+     * Default implementation derives this from [matchGroups] (sum of each group's [MatchGroup.max]).
      *
      * @return[Int] Maximum requires input items amount
      * @since 5.0.15
      */
-    fun requiresInputItemAmountMax(): Int = this.items.size
+    fun requiresInputItemAmountMax(): Int = this.matchGroups().sumOf { it.max }
 
     /**
      * Returns [CRecipePredicate] inspection result
@@ -99,6 +123,25 @@ interface CRecipe {
         whenEmptyDefault: Boolean = true
     ): Boolean {
         return this.predicates?.let { it.all { predicate -> predicate.test(context) } } ?: whenEmptyDefault
+    }
+
+    /**
+     * Returns the first [CRecipePredicate] that rejects [context], or `null` when all of them pass.
+     *
+     * Evaluates predicates in order and stops at the first failure, exactly as
+     * [getRecipePredicateResults] does, so this can be used in its place when the caller needs to
+     * report which predicate failed rather than only whether one did. The returned index is the
+     * position within [predicates] and identifies a predicate that did not override
+     * [CRecipePredicate.name].
+     *
+     * @param[context] Context of inspection
+     * @return[IndexedValue] The failing predicate with its index, or `null` when nothing failed
+     * @since 5.3.0
+     */
+    fun firstFailedRecipePredicate(context: CRecipePredicate.Context): IndexedValue<CRecipePredicate>? {
+        return this.predicates
+            ?.withIndex()
+            ?.firstOrNull { (_, predicate) -> !predicate.test(context) }
     }
 
     /**
