@@ -42,7 +42,7 @@ export default defineConfig({
                 {
                     label: 'Extra',
                     translations: { ja: '追加要素' },
-                    items: ['extra/craftui-designer', 'extra/allcandidateui-designer'],
+                    items: ['extra/craftui-designer', 'extra/allcandidateui-designer', 'extra/explainer'],
                 },
                 {
                     label: 'Events',

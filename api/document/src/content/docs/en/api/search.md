@@ -37,7 +37,8 @@ fun search(
     crafterId: UUID,
     view: CraftView,
     searchQuery: SearchQuery = SearchQuery.DEFAULT,
-    sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes()
+    sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes(),
+    explainer: Explainer? = null
 ): SearchResult
 ```
 
@@ -51,6 +52,7 @@ In such cases, using `asyncSearch` (described below) is recommended.
 | `view` | The arrangement of input items |
 | `searchQuery` | Controls search behavior (search mode and vanilla search mode). Defaults to `SearchQuery.DEFAULT` |
 | `sourceRecipes` | The list of recipes to search (defaults to all registered recipes) |
+| `explainer` | A diagnostic instance that records how the search proceeded. Defaults to `null`, in which case nothing is recorded (available from 5.3.0 onwards) |
 
 ```kotlin
 val player: Player = /* ... */
@@ -70,7 +72,8 @@ fun asyncSearch(
     crafterId: UUID,
     view: CraftView,
     query: SearchQuery = SearchQuery.ASYNC_DEFAULT,
-    sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes()
+    sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes(),
+    explainer: Explainer? = null
 ): CompletableFuture<SearchResult>
 ```
 
@@ -232,7 +235,8 @@ fun asyncPartialSearch(
     crafterId: UUID,
     view: CraftView,
     searchQuery: SearchQuery = SearchQuery.ASYNC_DEFAULT,
-    sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes()
+    sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes(),
+    explainer: Explainer? = null
 ): CompletableFuture<List<PartialSearchResult>>
 ```
 
@@ -278,3 +282,17 @@ PartialSearch.asyncPartialSearch(player.uniqueId, view).thenAccept { results ->
     }
 }
 ```
+
+---
+
+## Debugging a search
+
+When a recipe does not match as expected, pass an `Explainer` to record which check rejected it.
+
+```kotlin
+val explainer = Explainer("debug", Explainer.Loglevel.DEBUG)
+Search.search(player.uniqueId, view, explainer = explainer)
+explainer.getStringList().forEach { println(it) }
+```
+
+See [Advanced Debugging for Recipe Search](/en/extra/explainer/) for details.

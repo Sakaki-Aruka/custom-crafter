@@ -37,7 +37,8 @@ fun search(
     crafterId: UUID,
     view: CraftView,
     searchQuery: SearchQuery = SearchQuery.DEFAULT,
-    sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes()
+    sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes(),
+    explainer: Explainer? = null
 ): SearchResult
 ```
 
@@ -51,6 +52,7 @@ fun search(
 | `view` | 入力されたアイテムの配置 |
 | `searchQuery` | 検索動作（検索モードおよびバニラ検索モード）を制御する。デフォルトは `SearchQuery.DEFAULT` |
 | `sourceRecipes` | 検索対象のレシピリスト (デフォルトは登録済み全レシピ) |
+| `explainer` | 検索過程を記録する診断用インスタンス。デフォルトは `null` で、その場合は記録を行わない (5.3.0 以降) |
 
 ```kotlin
 val player: Player = /* ... */
@@ -70,7 +72,8 @@ fun asyncSearch(
     crafterId: UUID,
     view: CraftView,
     query: SearchQuery = SearchQuery.ASYNC_DEFAULT,
-    sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes()
+    sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes(),
+    explainer: Explainer? = null
 ): CompletableFuture<SearchResult>
 ```
 
@@ -231,7 +234,8 @@ fun asyncPartialSearch(
     crafterId: UUID,
     view: CraftView,
     searchQuery: SearchQuery = SearchQuery.ASYNC_DEFAULT,
-    sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes()
+    sourceRecipes: List<CRecipe> = CustomCrafterAPI.getRecipes(),
+    explainer: Explainer? = null
 ): CompletableFuture<List<PartialSearchResult>>
 ```
 
@@ -278,3 +282,17 @@ PartialSearch.asyncPartialSearch(player.uniqueId, view).thenAccept { results ->
 }
 ```
 この情報は `ResultSupplier.Context.relation` や `CRecipePredicate.Context.relation` として渡され、どのスロットに何が配置されていたかを追跡するために使用します。
+
+---
+
+## 検索のデバッグ
+
+レシピが意図どおりに合致しない場合は、`Explainer` を渡すことでどの検査で弾かれたかを記録できます。
+
+```kotlin
+val explainer = Explainer("debug", Explainer.Loglevel.DEBUG)
+Search.search(player.uniqueId, view, explainer = explainer)
+explainer.getStringList().forEach { println(it) }
+```
+
+詳しくは [レシピ検索の高度なデバッグ](/ja/extra/explainer/) を参照してください。
