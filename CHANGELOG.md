@@ -21,7 +21,6 @@
 * **[Enhancement]** `Search.search`, `Search.asyncSearch`, `PartialSearch.asyncPartialSearch`, and `VanillaSearch.search` now accept an optional `explainer`.
 * **[Documentation]** Added the "Advanced Debugging for Recipe Search" page (EN / JA) and documented the `Predicates` utilities and predicate naming on the `CRecipePredicate` page.
 
-## 🛠 Fix
 
 # 5.2.1
 
