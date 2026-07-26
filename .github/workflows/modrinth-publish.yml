@@ -15,7 +15,7 @@ jobs:
       actions: read
 
     env:
-      ONEWAY_VERSION: "0.1.0"
+      ONEWAY_VERSION: "0.2.0"
       MODRINTH_PROJECT_ID: "lUgVFdcC" # custom-crafter-api
       GAME_VERSIONS: "1.21.4,1.21.5,1.21.6,1.21.7,1.21.8,1.21.9,1.21.10,1.21.11,26.1,26.1.1,26.1.2"
       PLATFORMS: "paper,folia,purpur"
@@ -87,5 +87,14 @@ jobs:
             -t release \
             -l "$PLATFORMS" \
             -s listed \
+            -p "$MODRINTH_PROJECT_ID" \
+            -e
+
+      - name: Update Modrinth readme
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+        run: |
+          java -jar oneway.jar readme MODRINTH_README.md \
+            --token "$MODRINTH_TOKEN" \
             -p "$MODRINTH_PROJECT_ID" \
             -e
