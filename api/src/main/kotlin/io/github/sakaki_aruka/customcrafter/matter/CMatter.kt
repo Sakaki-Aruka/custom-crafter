@@ -89,12 +89,13 @@ interface CMatter {
      * identifies a predicate that did not override [CMatterPredicate.name].
      *
      * @param[ctx] Context of CMatterPredicate execution
-     * @return[IndexedValue] The failing predicate with its index, or `null` when nothing failed
+     * @return[org.apache.commons.lang3.tuple.Pair] The failing predicate's index paired with the predicate itself, or `null` when nothing failed
      * @since 5.3.0
      */
-    fun firstFailedPredicate(ctx: CMatterPredicate.Context): IndexedValue<CMatterPredicate>? {
+    fun firstFailedPredicate(ctx: CMatterPredicate.Context): org.apache.commons.lang3.tuple.Pair<Int, CMatterPredicate>? {
         return predicates
             ?.withIndex()
             ?.firstOrNull { (_, predicate) -> !predicate.test(ctx) }
+            ?.let { (i, predicate) -> org.apache.commons.lang3.tuple.Pair.of(i, predicate) }
     }
 }
