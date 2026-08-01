@@ -37,7 +37,7 @@ interface CRecipe {
     }
 
     /**
-     * Returns this [CRecipe] is a valid or not.
+     * Validates this [CRecipe].
      *
      * CRecipe's default implementation checks below conditions.
      * - [CRecipe.items] size is in range 1 to 36
@@ -46,24 +46,26 @@ interface CRecipe {
      * ```kotlin
      * // (Usage)
      * val recipe: CRecipe = ~~~
-     * recipe.isValidRecipe().exceptionOrNull()?.let{ throw it }
+     * recipe.isValidRecipe()
      * ```
-     * @return[Result] Result of check
+     * @throws[IllegalStateException] If this recipe is invalid
      * @since 5.0.15
      */
-    fun isValidRecipe(): Result<Unit> {
-        return if (this.items.isEmpty() || this.items.size > 36) {
-            Result.failure(IllegalStateException("'items' must contain 1 to 36 valid CMatters."))
-        } else if (this.items.values.any { matter -> matter.isValidMatter().isFailure }) {
-            val builder = StringBuilder()
-            for ((c, matter) in this.items.entries) {
-                val t: Throwable = matter.isValidMatter().exceptionOrNull()
-                    ?: continue
+    fun isValidRecipe() {
+        if (this.items.isEmpty() || this.items.size > 36) {
+            throw IllegalStateException("'items' must contain 1 to 36 valid CMatters.")
+        }
+
+        val builder = StringBuilder()
+        for ((c, matter) in this.items.entries) {
+            try {
+                matter.isValidMatter()
+            } catch (t: IllegalStateException) {
                 builder.append("[items] x: ${c.x}, y: ${c.y}, ${t.message} ${System.lineSeparator()}")
             }
-            Result.failure(IllegalStateException(builder.toString()))
-        } else {
-            Result.success(Unit)
+        }
+        if (builder.isNotEmpty()) {
+            throw IllegalStateException(builder.toString())
         }
     }
 

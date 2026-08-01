@@ -117,7 +117,7 @@ val baked: AllCandidateUIDesigner.Baked = myDesigner.bake(context)
 
 | メソッド / プロパティ | 型 | 概要 |
 |----------------------|----|------|
-| `isValid()` | `Result<Unit>` | bake された値を検証する。成功なら `Result.success`、失敗なら説明付きの `Result.failure` を返す |
+| `isValid()` | `Unit` | bake された値を検証する。不正な場合は説明付きの `IllegalStateException` をスローする |
 | `ungeneratedIcon(recipe)` | `ItemStack` | `recipe` のプレースホルダーアイコンを返す。生成されたアイテムが表示不可の場合はデフォルトのプレースホルダーへフォールバックする |
 | `recipeSlotsIndex` | `Set<Int>` | `recipeSlots` と同じスロット座標をインデックス (`Set<Int>`) で表したもの |
 

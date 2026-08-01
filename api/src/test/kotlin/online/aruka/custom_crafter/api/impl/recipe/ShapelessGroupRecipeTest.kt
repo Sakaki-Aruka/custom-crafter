@@ -7,6 +7,8 @@ import io.github.sakaki_aruka.customcrafter.recipe.MatchGroup
 import io.github.sakaki_aruka.customcrafter.recipe.ShapelessGroupRecipe
 import org.bukkit.Material
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
+import org.junit.jupiter.api.assertThrows
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
@@ -34,8 +36,7 @@ object ShapelessGroupRecipeTest {
         val g1 = MatchGroup.of(setOf(CoordinateComponent(0, 0)), 1, 1)
         val g2 = MatchGroup.of(setOf(CoordinateComponent(0, 0), CoordinateComponent(1, 0)), 1, 2)
 
-        val result = ShapelessGroupRecipe.isValidGroups(setOf(g1, g2), items)
-        assertTrue(result.isFailure)
+        assertThrows<IllegalArgumentException> { ShapelessGroupRecipe.isValidGroups(setOf(g1, g2), items) }
     }
 
     @Test
@@ -43,8 +44,7 @@ object ShapelessGroupRecipeTest {
         val items = mapOf(CoordinateComponent(0, 0) to stone, CoordinateComponent(1, 0) to stone)
         val g1 = MatchGroup.of(setOf(CoordinateComponent(0, 0)), 1, 1)
 
-        val result = ShapelessGroupRecipe.isValidGroups(setOf(g1), items)
-        assertTrue(result.isFailure)
+        assertThrows<IllegalArgumentException> { ShapelessGroupRecipe.isValidGroups(setOf(g1), items) }
     }
 
     @Test
@@ -52,8 +52,7 @@ object ShapelessGroupRecipeTest {
         val items = mapOf(CoordinateComponent(0, 0) to stone)
         val g1 = MatchGroup.of(setOf(CoordinateComponent(0, 0), CoordinateComponent(5, 5)), 1, 2)
 
-        val result = ShapelessGroupRecipe.isValidGroups(setOf(g1), items)
-        assertTrue(result.isFailure)
+        assertThrows<IllegalArgumentException> { ShapelessGroupRecipe.isValidGroups(setOf(g1), items) }
     }
 
     @Test
@@ -61,8 +60,7 @@ object ShapelessGroupRecipeTest {
         val items = mapOf(CoordinateComponent(0, 0) to stone, CoordinateComponent(1, 0) to stone)
         val g1 = MatchGroup.of(setOf(CoordinateComponent(0, 0), CoordinateComponent(1, 0)), 1, 2)
 
-        val result = ShapelessGroupRecipe.isValidGroups(setOf(g1), items)
-        assertTrue(result.isSuccess)
+        assertDoesNotThrow { ShapelessGroupRecipe.isValidGroups(setOf(g1), items) }
     }
 
     @Test
@@ -73,7 +71,7 @@ object ShapelessGroupRecipeTest {
             items = items,
             groups = setOf(MatchGroup.of(items.keys, min = 1, max = 2))
         )
-        assertTrue(recipe.isValidRecipe().isSuccess)
+        assertDoesNotThrow { recipe.isValidRecipe() }
     }
 
     @Test

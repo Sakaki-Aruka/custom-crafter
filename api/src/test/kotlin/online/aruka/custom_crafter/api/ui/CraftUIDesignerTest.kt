@@ -11,6 +11,8 @@ import org.bukkit.inventory.ItemStack
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
+import org.junit.jupiter.api.assertThrows
 import org.mockbukkit.mockbukkit.MockBukkit
 import org.mockbukkit.mockbukkit.ServerMock
 import org.mockbukkit.mockbukkit.world.WorldMock
@@ -57,7 +59,7 @@ object CraftUIDesignerTest {
                 .containsAll(anonymous.bake(CraftUIDesigner.Context()).craftSlots())
         )
 
-        assertTrue(anonymous.bake(CraftUIDesigner.Context()).isValid().isSuccess)
+        assertDoesNotThrow { anonymous.bake(CraftUIDesigner.Context()).isValid() }
     }
 
     @Test
@@ -68,7 +70,7 @@ object CraftUIDesignerTest {
             blankSlots = emptyMap()
         )
 
-        assertTrue(baked.isValid().isFailure)
+        assertThrows<IllegalStateException> { baked.isValid() }
     }
 
     @Test
@@ -80,7 +82,7 @@ object CraftUIDesignerTest {
                 .associateWith { ItemStack.of(Material.STONE) }
         )
 
-        assertTrue(baked.isValid().isFailure)
+        assertThrows<IllegalStateException> { baked.isValid() }
     }
 
     @Test
@@ -95,7 +97,7 @@ object CraftUIDesignerTest {
                 .map { CoordinateComponent.fromIndex(it) }
                 .associateWith { ItemStack.of(Material.STONE) }
         )
-        assertTrue(baked.isValid().isFailure)
+        assertThrows<IllegalStateException> { baked.isValid() }
     }
 
     @Test
@@ -108,7 +110,7 @@ object CraftUIDesignerTest {
                 .associateWith { ItemStack.empty() }
         )
 
-        assertTrue(baked.isValid().isFailure)
+        assertThrows<IllegalStateException> { baked.isValid() }
     }
 
     @Test
@@ -121,7 +123,7 @@ object CraftUIDesignerTest {
                 .associateWith { ItemStack.of(Material.STONE) }
         )
 
-        assertTrue(baked.isValid().isSuccess)
+        assertDoesNotThrow { baked.isValid() }
     }
 
     @Test

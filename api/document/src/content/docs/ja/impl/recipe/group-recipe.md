@@ -88,10 +88,10 @@ GroupRecipe.Context.default(coordinate: CoordinateComponent): Context
 GroupRecipe.Context.isValidGroups(
     groups: Set<Context>,
     items: Map<CoordinateComponent, CMatter>
-): Result<Unit>
+)
 ```
 
-以下の場合に失敗します:
+以下の場合に `IllegalArgumentException` をスローします:
 - `members` が空の `Context` が存在する
 - `members` に含まれる座標が `items` のキーに存在しない
 - 複数の `Context` に同じ座標が含まれている (重複)

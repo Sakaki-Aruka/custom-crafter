@@ -22,6 +22,7 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.assertDoesNotThrow
 import org.mockbukkit.mockbukkit.MockBukkit
 import org.mockbukkit.mockbukkit.ServerMock
 import org.mockbukkit.mockbukkit.entity.PlayerMock
@@ -517,7 +518,7 @@ internal object CraftUITest {
 
     @Test
     fun designerIsValidTest() {
-        assertTrue(CraftUI().bakedDesigner.isValid().isSuccess)
+        assertDoesNotThrow { CraftUI().bakedDesigner.isValid() }
     }
 
     @Test

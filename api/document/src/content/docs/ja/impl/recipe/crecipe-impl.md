@@ -180,7 +180,9 @@ open class CategorizedRecipe(
 
 ```kotlin
 val recipe = CRecipeImpl(/* ... */)
-recipe.isValidRecipe().exceptionOrNull()?.let { e ->
+try {
+    recipe.isValidRecipe()
+} catch (e: IllegalStateException) {
     println("レシピが無効です: ${e.message}")
     return
 }

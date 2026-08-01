@@ -13,6 +13,8 @@ import org.bukkit.inventory.ItemStack
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
+import org.junit.jupiter.api.assertThrows
 import org.mockbukkit.mockbukkit.MockBukkit
 import org.mockbukkit.mockbukkit.ServerMock
 import org.mockbukkit.mockbukkit.world.WorldMock
@@ -191,13 +193,13 @@ object AdjacentRecipeTest {
     @Test
     fun isValidRecipeRejectsSingleItemTest() {
         val recipe = AdjacentRecipe("test", listOf(stone()))
-        assertTrue(recipe.isValidRecipe().isFailure)
+        assertThrows<IllegalArgumentException> { recipe.isValidRecipe() }
     }
 
     @Test
     fun isValidRecipeAcceptsTwoItemsTest() {
         val recipe = AdjacentRecipe("test", listOf(stone(), stone()))
-        assertTrue(recipe.isValidRecipe().isSuccess)
+        assertDoesNotThrow { recipe.isValidRecipe() }
     }
 
     // -------------------------------------------------------------------------

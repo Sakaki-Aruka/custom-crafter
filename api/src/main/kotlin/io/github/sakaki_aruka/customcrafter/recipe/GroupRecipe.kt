@@ -90,7 +90,7 @@ open class GroupRecipe @JvmOverloads constructor(
                 result.add(Context.default(c))
             }
 
-            Context.isValidGroups(result, items).exceptionOrNull()?.let { throw it }
+            Context.isValidGroups(result, items)
             return result
         }
 
@@ -204,24 +204,24 @@ open class GroupRecipe @JvmOverloads constructor(
             }
 
             /**
-             * Checks specified context set and items mapping are valid or not.
+             * Validates the specified context set against the items mapping.
              *
-             * If those are invalid, returns an Exception what includes error messages.
+             * If those are invalid, throws an exception that includes error messages.
              *
              * @param[groups] Set of [GroupRecipe.Context]
              * @param[items] Item mapping on GroupRecipe
-             * @return[Result] Result of some checks. Use [Result.isSuccess] or [Result.isFailure] to check.
+             * @throws[IllegalArgumentException] If [groups] and [items] are inconsistent
              * @since 5.0.15
              */
             @JvmStatic
             fun isValidGroups(
                 groups: Set<Context>,
                 items: Map<CoordinateComponent, CMatter>
-            ): Result<Unit> {
+            ) {
                 if (groups.isEmpty()) {
-                    return Result.success(Unit)
+                    return
                 } else if (groups.any { it.members.isEmpty() }) {
-                    return Result.failure(IllegalArgumentException("'GroupRecipe.Context' must contains any coordinates."))
+                    throw IllegalArgumentException("'GroupRecipe.Context' must contains any coordinates.")
                 }
 
                 val counts: MutableMap<CoordinateComponent, Int> = mutableMapOf()
@@ -236,14 +236,14 @@ open class GroupRecipe @JvmOverloads constructor(
                     for (notContained in counts.keys - items.keys) {
                         builder.append("  'items' not contains: $notContained ${System.lineSeparator()}")
                     }
-                    return Result.failure(IllegalArgumentException(builder.toString()))
+                    throw IllegalArgumentException(builder.toString())
                 } else if (counts.values.any { it > 1 }) {
                     val builder = StringBuilder()
                     builder.append("GroupRecipe.Context is not allowed to contain duplicate coordinates. ${System.lineSeparator()}")
                     for ((c, count) in counts.filter { (_, c) -> c > 1 }) {
                         builder.append("  duplicated: (${c.x}, ${c.y}), times: $count ${System.lineSeparator()}")
                     }
-                    return Result.failure(IllegalArgumentException(builder.toString()))
+                    throw IllegalArgumentException(builder.toString())
                 }
 
                 for (ctx in groups) {
@@ -251,17 +251,15 @@ open class GroupRecipe @JvmOverloads constructor(
                         items.getValue(c).candidate.any { m -> m.isAir }
                     }
                     if (airContainableCount < ctx.members.size - ctx.min) {
-                        return Result.failure(IllegalArgumentException("There are not enough CMatters that are Air-Containable. (Required: ${ctx.members.size - ctx.min}, Provided: ${airContainableCount})"))
+                        throw IllegalArgumentException("There are not enough CMatters that are Air-Containable. (Required: ${ctx.members.size - ctx.min}, Provided: ${airContainableCount})")
                     }
                 }
 
                 val minCoordinate: CoordinateComponent = items.entries.minBy { (c, _) -> c.toIndex() }.key
 
                 if (items.getValue(minCoordinate).candidate.any { it.isAir }) {
-                    return Result.failure(IllegalArgumentException("The GroupRecipe.Matter with the smallest CoordinateComponent#toIndex in the recipe cannot have an element in candidate that satisfies Material#isAir."))
+                    throw IllegalArgumentException("The GroupRecipe.Matter with the smallest CoordinateComponent#toIndex in the recipe cannot have an element in candidate that satisfies Material#isAir.")
                 }
-
-                return Result.success(Unit)
             }
         }
     }
@@ -310,7 +308,7 @@ open class GroupRecipe @JvmOverloads constructor(
                     original = matter
                 )
 
-                matter.isValidMatter().exceptionOrNull()?.let { throw it }
+                matter.isValidMatter()
                 return matter
             }
 
@@ -329,19 +327,20 @@ open class GroupRecipe @JvmOverloads constructor(
         }
 
         /**
-         * Checks is valid or not.
+         * Validates this matter.
+         * @throws[IllegalStateException] If this matter is invalid
          * @see[CMatter.isValidMatter]
          */
-        override fun isValidMatter(): Result<Unit> {
-            return if (this.candidate.isEmpty()) {
-                Result.failure(IllegalStateException("'candidate' must contain correct materials at least one."))
+        override fun isValidMatter() {
+            if (this.candidate.isEmpty()) {
+                throw IllegalStateException("'candidate' must contain correct materials at least one.")
             } else if (this.candidate.any { !it.isAir && !it.isItem }) {
-                Result.failure(IllegalStateException("'candidate' not allowed to contain materials that are '!Material#isItem'."))
+                throw IllegalStateException("'candidate' not allowed to contain materials that are '!Material#isItem'.")
             } else if (this.amount < 1) {
-                Result.failure(IllegalStateException("'amount' must be 1 or more."))
+                throw IllegalStateException("'amount' must be 1 or more.")
             } else if (this.candidate.all { it.isAir }) {
-                Result.failure(IllegalStateException("GroupMatter#candidate must contain materials what are '!Material#isAir' 1 or more."))
-            }else Result.success(Unit)
+                throw IllegalStateException("GroupMatter#candidate must contain materials what are '!Material#isAir' 1 or more.")
+            }
         }
 
     }
@@ -351,25 +350,27 @@ open class GroupRecipe @JvmOverloads constructor(
         return notGroupedSize + this.groups.sumOf { it.min }
     }
 
-    override fun isValidRecipe(): Result<Unit> {
+    override fun isValidRecipe() {
         if (this.type == CRecipe.Type.SHAPELESS) {
-            return Result.failure(
-                NotImplementedError("GroupRecipe is not implemented for `CRecipe.Type.SHAPELESS`."))
+            throw NotImplementedError("GroupRecipe is not implemented for `CRecipe.Type.SHAPELESS`.")
         } else if (this.items.isEmpty() || this.items.size > 36) {
-            return Result.failure(IllegalStateException("'items' must contain 1 to 36 valid CMatters."))
+            throw IllegalStateException("'items' must contain 1 to 36 valid CMatters.")
         } else if (this.items.entries.minBy { (c, _) -> c.toIndex() }.value.candidate.any { it.isAir }) {
-            return Result.failure(IllegalArgumentException("GroupRecipe must not contain Material.AIR at first coordinate."))
-        } else if (this.items.values.any { it.isValidMatter().isFailure }) {
-            val builder = StringBuilder()
-            for ((c, matter) in this.items.entries) {
-                val t: Throwable = matter.isValidMatter().exceptionOrNull()
-                    ?: continue
-                builder.append("[items] x: ${c.x}, y: ${c.y}, ${t.message} ${System.lineSeparator()}")
-            }
-            return Result.failure(IllegalStateException(builder.toString()))
+            throw IllegalArgumentException("GroupRecipe must not contain Material.AIR at first coordinate.")
         }
 
-        Context.isValidGroups(this.groups, this.items).takeIf { it.isFailure }?.let { return it }
-        return Result.success(Unit)
+        val builder = StringBuilder()
+        for ((c, matter) in this.items.entries) {
+            try {
+                matter.isValidMatter()
+            } catch (t: IllegalStateException) {
+                builder.append("[items] x: ${c.x}, y: ${c.y}, ${t.message} ${System.lineSeparator()}")
+            }
+        }
+        if (builder.isNotEmpty()) {
+            throw IllegalStateException(builder.toString())
+        }
+
+        Context.isValidGroups(this.groups, this.items)
     }
 }

@@ -179,7 +179,9 @@ You can call `CRecipe.isValidRecipe()` to check in advance whether the recipe is
 
 ```kotlin
 val recipe = CRecipeImpl(/* ... */)
-recipe.isValidRecipe().exceptionOrNull()?.let { e ->
+try {
+    recipe.isValidRecipe()
+} catch (e: IllegalStateException) {
     println("Recipe is invalid: ${e.message}")
     return
 }

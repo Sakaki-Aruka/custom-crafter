@@ -55,7 +55,7 @@ open class CRecipeImpl @JvmOverloads constructor(
                 predicates = predicates,
                 results = results,
             )
-            recipe.isValidRecipe().exceptionOrNull()?.let { t -> throw t }
+            recipe.isValidRecipe()
             return recipe
         }
     }

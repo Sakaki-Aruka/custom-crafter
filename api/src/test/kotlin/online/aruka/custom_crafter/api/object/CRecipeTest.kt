@@ -13,13 +13,13 @@ import org.bukkit.inventory.ItemStack
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertNull
+import org.junit.jupiter.api.assertDoesNotThrow
+import org.junit.jupiter.api.assertThrows
 import org.mockbukkit.mockbukkit.MockBukkit
 import org.mockbukkit.mockbukkit.ServerMock
 import org.mockbukkit.mockbukkit.world.WorldMock
 import java.util.UUID
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 object CRecipeTest {
 
@@ -43,8 +43,7 @@ object CRecipeTest {
             items = emptyMap(),
             type = CRecipe.Type.SHAPELESS
         )
-        assertTrue(empty.isValidRecipe().isFailure)
-        assertTrue(empty.isValidRecipe().exceptionOrNull() is IllegalStateException)
+        assertThrows<IllegalStateException> { empty.isValidRecipe() }
     }
 
     @Test
@@ -56,8 +55,7 @@ object CRecipeTest {
                 CoordinateComponent.fromIndex(i) to matter },
             type = CRecipe.Type.SHAPELESS
         )
-        assertTrue(over.isValidRecipe().isFailure)
-        assertTrue(over.isValidRecipe().exceptionOrNull() is IllegalStateException)
+        assertThrows<IllegalStateException> { over.isValidRecipe() }
     }
 
     @Test
@@ -71,8 +69,7 @@ object CRecipeTest {
             items = mapOf(CoordinateComponent(0, 0) to airMatter),
             type = CRecipe.Type.SHAPELESS
         )
-        assertTrue(containsAir.isValidRecipe().isFailure)
-        assertTrue(containsAir.isValidRecipe().exceptionOrNull() is IllegalStateException)
+        assertThrows<IllegalStateException> { containsAir.isValidRecipe() }
     }
 
     @Test
@@ -86,8 +83,8 @@ object CRecipeTest {
             items = mapOf(CoordinateComponent(0, 0) to notItem),
             type = CRecipe.Type.SHAPELESS
         )
-        assertTrue(containsNotItem.isValidRecipe().isFailure)
-        assertTrue(notItem.isValidMatter().exceptionOrNull() is IllegalStateException)
+        assertThrows<IllegalStateException> { containsNotItem.isValidRecipe() }
+        assertThrows<IllegalStateException> { notItem.isValidMatter() }
     }
 
     @Test
@@ -98,8 +95,7 @@ object CRecipeTest {
             items = mapOf(CoordinateComponent(0, 0) to matter),
             type = CRecipe.Type.SHAPELESS
         )
-        assertTrue(recipe.isValidRecipe().isSuccess)
-        assertNull(recipe.isValidRecipe().exceptionOrNull())
+        assertDoesNotThrow { recipe.isValidRecipe() }
     }
 
     @Test

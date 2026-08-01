@@ -47,7 +47,7 @@ open class ShapelessGroupRecipe @JvmOverloads constructor(
          *
          * @param[items] Coordinate and CMatter mapping
          * @param[missingGroups] Set of [MatchGroup]s already created
-         * @throws[IllegalStateException] If the resulting set is invalid.
+         * @throws[IllegalArgumentException] If the resulting set is invalid.
          * @see[ShapelessGroupRecipe.isValidGroups]
          * @return[Set] A [MatchGroup] set usable for [ShapelessGroupRecipe.groups]
          * @since 5.3.0
@@ -63,14 +63,14 @@ open class ShapelessGroupRecipe @JvmOverloads constructor(
                 result.add(MatchGroup.mandatory(c))
             }
 
-            isValidGroups(result, items).exceptionOrNull()?.let { throw it }
+            isValidGroups(result, items)
             return result
         }
 
         /**
-         * Checks the specified group set and items mapping are valid or not.
+         * Validates the specified group set against the items mapping.
          *
-         * If those are invalid, returns an Exception what includes error messages.
+         * If those are invalid, throws an exception that includes error messages.
          *
          * - Every [MatchGroup.members] coordinate must exist as a key in [items].
          * - No coordinate may belong to more than one group.
@@ -78,14 +78,14 @@ open class ShapelessGroupRecipe @JvmOverloads constructor(
          *
          * @param[groups] Set of [MatchGroup]
          * @param[items] Item mapping on [ShapelessGroupRecipe]
-         * @return[Result] Result of some checks. Use [Result.isSuccess] or [Result.isFailure] to check.
+         * @throws[IllegalArgumentException] If [groups] and [items] are inconsistent
          * @since 5.3.0
          */
         @JvmStatic
         fun isValidGroups(
             groups: Set<MatchGroup>,
             items: Map<CoordinateComponent, CMatter>
-        ): Result<Unit> {
+        ) {
             val counts: MutableMap<CoordinateComponent, Int> = mutableMapOf()
             for (group in groups) {
                 for (c in group.members) {
@@ -100,40 +100,41 @@ open class ShapelessGroupRecipe @JvmOverloads constructor(
                 for (notContained in counts.keys - items.keys) {
                     builder.append("  'items' not contains: $notContained ${System.lineSeparator()}")
                 }
-                return Result.failure(IllegalArgumentException(builder.toString()))
+                throw IllegalArgumentException(builder.toString())
             } else if (counts.values.any { it > 1 }) {
                 val builder = StringBuilder()
                 builder.append("A coordinate is not allowed to belong to more than one group. ${System.lineSeparator()}")
                 for ((c, count) in counts.filter { (_, n) -> n > 1 }) {
                     builder.append("  duplicated: (${c.x}, ${c.y}), times: $count ${System.lineSeparator()}")
                 }
-                return Result.failure(IllegalArgumentException(builder.toString()))
+                throw IllegalArgumentException(builder.toString())
             } else if (!counts.keys.containsAll(items.keys)) {
                 val builder = StringBuilder("Every coordinate in 'items' must belong to exactly one group. ${System.lineSeparator()}")
                 for ((x, y) in items.keys - counts.keys) {
                     builder.append("  not covered: ($x, $y) ${System.lineSeparator()}")
                 }
-                return Result.failure(IllegalArgumentException(builder.toString()))
+                throw IllegalArgumentException(builder.toString())
             }
-
-            return Result.success(Unit)
         }
     }
 
-    override fun isValidRecipe(): Result<Unit> {
+    override fun isValidRecipe() {
         if (this.items.isEmpty() || this.items.size > 36) {
-            return Result.failure(IllegalStateException("'items' must contain 1 to 36 valid CMatters."))
-        } else if (this.items.values.any { it.isValidMatter().isFailure }) {
-            val builder = StringBuilder()
-            for ((c, matter) in this.items.entries) {
-                val t: Throwable = matter.isValidMatter().exceptionOrNull()
-                    ?: continue
-                builder.append("[items] x: ${c.x}, y: ${c.y}, ${t.message} ${System.lineSeparator()}")
-            }
-            return Result.failure(IllegalStateException(builder.toString()))
+            throw IllegalStateException("'items' must contain 1 to 36 valid CMatters.")
         }
 
-        isValidGroups(this.groups, this.items).takeIf { it.isFailure }?.let { return it }
-        return Result.success(Unit)
+        val builder = StringBuilder()
+        for ((c, matter) in this.items.entries) {
+            try {
+                matter.isValidMatter()
+            } catch (t: IllegalStateException) {
+                builder.append("[items] x: ${c.x}, y: ${c.y}, ${t.message} ${System.lineSeparator()}")
+            }
+        }
+        if (builder.isNotEmpty()) {
+            throw IllegalStateException(builder.toString())
+        }
+
+        isValidGroups(this.groups, this.items)
     }
 }

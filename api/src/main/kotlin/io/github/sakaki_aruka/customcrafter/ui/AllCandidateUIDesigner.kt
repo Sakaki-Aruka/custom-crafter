@@ -238,45 +238,42 @@ interface AllCandidateUIDesigner {
                 CoordinateComponent.fromIndex(it)
             }.toSet()
 
-            private fun isValidIconItem(item: ItemStack, name: String): Result<Unit>? {
+            private fun isValidIconItem(item: ItemStack, name: String): IllegalStateException? {
                 return if (!item.isEmpty && item.amount >= 1 && item.type.isItem) {
                     null
                 } else {
-                    Result.failure(IllegalStateException("'$name' item must be visible. (Caused: isEmpty = ${item.isEmpty}, notEnoughAmount = ${item.amount < 1}, isNotVisibleItem = ${!item.type.isItem})"))
+                    IllegalStateException("'$name' item must be visible. (Caused: isEmpty = ${item.isEmpty}, notEnoughAmount = ${item.amount < 1}, isNotVisibleItem = ${!item.type.isItem})")
                 }
             }
         }
 
         /**
-         * Validates this [Baked] instance and returns the result.
+         * Validates this [Baked] instance.
          *
-         * Returns [Result.success] if all values are consistent and within the valid range,
-         * or [Result.failure] containing an [IllegalStateException] that describes the first violation found.
-         * Use `isSuccess` / `isFailure` on the returned [Result] to check the outcome.
-         * @return[Result] success if valid; failure with a descriptive exception if not
+         * Throws an [IllegalStateException] describing the first violation found if any value is
+         * inconsistent or out of the valid range.
+         * @throws[IllegalStateException] If this baked instance is invalid
          * @since 5.2.0
          */
-        fun isValid(): Result<Unit> {
+        fun isValid() {
             if (recipeSlots.isEmpty() || recipeSlots.size > (54 - 3)) {
-                return Result.failure(IllegalStateException("'recipeSlots' size must be in range of 1 to 51. (current: ${recipeSlots.size})"))
+                throw IllegalStateException("'recipeSlots' size must be in range of 1 to 51. (current: ${recipeSlots.size})")
             }
 
-            fun validateSlotAndItem(pair: Pair<CoordinateComponent, ItemStack>, name: String): Result<Unit>? {
+            fun validateSlotAndItem(pair: Pair<CoordinateComponent, ItemStack>, name: String): IllegalStateException? {
                 val (coordinate, item) = pair
                 if (coordinate !in validRange) {
-                    return Result.failure(IllegalStateException("'$name' must be in the valid range. (valid range: x=0~8, y=0~5)"))
+                    return IllegalStateException("'$name' must be in the valid range. (valid range: x=0~8, y=0~5)")
                 }
                 if (recipeSlots.contains(coordinate)) {
-                    return Result.failure(IllegalStateException("'$name' coordinate duplicated with 'recipeSlots'. (x: ${coordinate.x}, y: ${coordinate.y})"))
+                    return IllegalStateException("'$name' coordinate duplicated with 'recipeSlots'. (x: ${coordinate.x}, y: ${coordinate.y})")
                 }
 
-                isValidIconItem(item, name)?.let { return it }
-
-                return null
+                return isValidIconItem(item, name)
             }
 
             if (recipeSlots.any { !validRange.contains(it) }) {
-                return Result.failure(IllegalStateException("'recipeSlots' must not contain the invalid range coordinates. (valid range: x=0~8, y=0~5)"))
+                throw IllegalStateException("'recipeSlots' must not contain the invalid range coordinates. (valid range: x=0~8, y=0~5)")
             }
 
             val buttons = setOf(
@@ -286,12 +283,10 @@ interface AllCandidateUIDesigner {
             )
 
             for ((pair, name) in buttons) {
-                validateSlotAndItem(pair, name)?.let { return it }
+                validateSlotAndItem(pair, name)?.let { throw it }
             }
 
-            isValidIconItem(noDisplayableItem, "noDisplayableItem")?.let { return it }
-
-            return Result.success(Unit)
+            isValidIconItem(noDisplayableItem, "noDisplayableItem")?.let { throw it }
         }
 
         /**

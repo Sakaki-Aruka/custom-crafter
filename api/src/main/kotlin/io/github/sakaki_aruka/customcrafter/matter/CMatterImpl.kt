@@ -66,8 +66,7 @@ open class CMatterImpl @JvmOverloads constructor(
                 candidate = materials.toSet()
             )
 
-            val checkResult: Result<Unit> = matter.isValidMatter()
-            checkResult.exceptionOrNull()?.let { t -> throw t }
+            matter.isValidMatter()
             return matter
         }
 

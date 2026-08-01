@@ -5,11 +5,11 @@ import org.bukkit.Material
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertNull
+import org.junit.jupiter.api.assertDoesNotThrow
+import org.junit.jupiter.api.assertThrows
 import org.mockbukkit.mockbukkit.MockBukkit
 import org.mockbukkit.mockbukkit.ServerMock
 import org.mockbukkit.mockbukkit.world.WorldMock
-import kotlin.test.assertTrue
 
 object CMatterTest {
 
@@ -32,8 +32,7 @@ object CMatterTest {
             name = "",
             candidate = emptySet()
         )
-        assertTrue(matter.isValidMatter().isFailure)
-        assertTrue(matter.isValidMatter().exceptionOrNull() is IllegalStateException)
+        assertThrows<IllegalStateException> { matter.isValidMatter() }
     }
 
     @Test
@@ -42,8 +41,7 @@ object CMatterTest {
             name = "",
             candidate = setOf(Material.AIR)
         )
-        assertTrue(air.isValidMatter().isFailure)
-        assertTrue(air.isValidMatter().exceptionOrNull() is IllegalStateException)
+        assertThrows<IllegalStateException> { air.isValidMatter() }
     }
 
     @Test
@@ -52,8 +50,7 @@ object CMatterTest {
             name = "",
             candidate = setOf(Material.WATER)
         )
-        assertTrue(noItem.isValidMatter().isFailure)
-        assertTrue(noItem.isValidMatter().exceptionOrNull() is IllegalStateException)
+        assertThrows<IllegalStateException> { noItem.isValidMatter() }
     }
 
     @Test
@@ -63,8 +60,7 @@ object CMatterTest {
             candidate = setOf(Material.STONE),
             amount = -1
         )
-        assertTrue(minus.isValidMatter().isFailure)
-        assertTrue(minus.isValidMatter().exceptionOrNull() is IllegalStateException)
+        assertThrows<IllegalStateException> { minus.isValidMatter() }
     }
 
     @Test
@@ -74,7 +70,6 @@ object CMatterTest {
             candidate = setOf(Material.STONE),
             amount = 1
         )
-        assertTrue(valid.isValidMatter().isSuccess)
-        assertNull(valid.isValidMatter().exceptionOrNull())
+        assertDoesNotThrow { valid.isValidMatter() }
     }
 }

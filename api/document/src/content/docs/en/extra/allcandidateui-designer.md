@@ -117,7 +117,7 @@ val baked: AllCandidateUIDesigner.Baked = myDesigner.bake(context)
 
 | Method / Property | Type | Description |
 |-------------------|------|-------------|
-| `isValid()` | `Result<Unit>` | Validates the baked values; returns `Result.success` or `Result.failure` with a descriptive exception |
+| `isValid()` | `Unit` | Validates the baked values; throws an `IllegalStateException` with a descriptive message if invalid |
 | `ungeneratedIcon(recipe)` | `ItemStack` | Returns the placeholder icon for `recipe`; falls back to the default placeholder if the produced item is not displayable |
 | `recipeSlotsIndex` | `Set<Int>` | The same slot coordinates as `recipeSlots`, expressed as slot indices |
 

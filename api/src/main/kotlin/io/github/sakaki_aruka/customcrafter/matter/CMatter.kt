@@ -28,7 +28,7 @@ interface CMatter {
     val predicates: List<CMatterPredicate>?
 
     /**
-     * Returns this [CMatter] is a valid or not.
+     * Validates this [CMatter].
      *
      * CMatter's default implementation checks below conditions.
      * - [CMatter.candidate] is not empty
@@ -38,22 +38,22 @@ interface CMatter {
      * ```kotlin
      * // (Usage)
      * val matter: CMatter = ~~~
-     * matter.isValidMatter().exceptionOrNull()?.let { throw it }
+     * matter.isValidMatter()
      * ```
      *
      * This is called from [CRecipe.isValidRecipe].
      *
-     * @return[Result] Result of check
+     * @throws[IllegalStateException] If this matter is invalid
      * @since 5.0.15
      */
-    fun isValidMatter(): Result<Unit> {
-        return if (this.candidate.isEmpty()) {
-            Result.failure(IllegalStateException("'candidate' must contain correct materials at least one."))
+    fun isValidMatter() {
+        if (this.candidate.isEmpty()) {
+            throw IllegalStateException("'candidate' must contain correct materials at least one.")
         } else if (this.candidate.any { m -> m.isAir || !m.isItem }) {
-            Result.failure(IllegalStateException("'candidate' not allowed to contain materials that are 'Material#isAir' or '!Material#isItem'."))
+            throw IllegalStateException("'candidate' not allowed to contain materials that are 'Material#isAir' or '!Material#isItem'.")
         } else if (this.amount < 1) {
-            Result.failure(IllegalStateException("'amount' must be 1 or more."))
-        } else Result.success(Unit)
+            throw IllegalStateException("'amount' must be 1 or more.")
+        }
     }
 
     /**

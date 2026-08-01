@@ -88,10 +88,10 @@ A method that checks whether a set of `Context` instances is consistent with `it
 GroupRecipe.Context.isValidGroups(
     groups: Set<Context>,
     items: Map<CoordinateComponent, CMatter>
-): Result<Unit>
+)
 ```
 
-Fails in the following cases:
+Throws `IllegalArgumentException` in the following cases:
 - A `Context` with an empty `members` set exists
 - A coordinate in `members` does not exist as a key in `items`
 - The same coordinate appears in multiple `Context` instances (duplicate)
