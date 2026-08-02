@@ -137,14 +137,14 @@ interface CRecipe {
      * [CRecipePredicate.name].
      *
      * @param[context] Context of inspection
-     * @return[org.apache.commons.lang3.tuple.Pair] The failing predicate's index paired with the predicate itself, or `null` when nothing failed
+     * @return[Pair] The failing predicate's index paired with the predicate itself, or `null` when nothing failed
      * @since 5.3.0
      */
-    fun firstFailedRecipePredicate(context: CRecipePredicate.Context): org.apache.commons.lang3.tuple.Pair<Int, CRecipePredicate>? {
+    fun firstFailedRecipePredicate(context: CRecipePredicate.Context): Pair<Int, CRecipePredicate>? {
         return this.predicates
             ?.withIndex()
             ?.firstOrNull { (_, predicate) -> !predicate.test(context) }
-            ?.let { (i, predicate) -> org.apache.commons.lang3.tuple.Pair.of(i, predicate) }
+            ?.let { (i, predicate) -> i to predicate }
     }
 
     /**

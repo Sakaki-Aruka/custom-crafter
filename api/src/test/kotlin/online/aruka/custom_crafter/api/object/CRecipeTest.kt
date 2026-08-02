@@ -234,7 +234,7 @@ object CRecipeTest {
 
         val result = recipe.firstFailedRecipePredicate(predicateContext(recipe))
 
-        assertEquals(1, result?.left)
-        assertEquals(failing, result?.right)
+        assertEquals(1, result?.first)
+        assertEquals(failing, result?.second)
     }
 }
