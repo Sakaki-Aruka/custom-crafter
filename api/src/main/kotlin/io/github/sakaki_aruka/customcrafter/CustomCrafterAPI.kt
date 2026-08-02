@@ -71,7 +71,7 @@ object CustomCrafterAPI {
      * @see[API_VERSION]
      * @since 5.2.0
      */
-    const val MINOR_VERSION = 3
+    const val MINOR_VERSION = 4
 
     /**
      * Patch version number of the Custom Crafter API.
@@ -127,7 +127,7 @@ object CustomCrafterAPI {
         level = DeprecationLevel.WARNING
     )
     fun hasFullCompatibility(version: String): Boolean {
-        return version in setOf("5.3.0")
+        return version in setOf("5.4.0")
     }
 
     /**
