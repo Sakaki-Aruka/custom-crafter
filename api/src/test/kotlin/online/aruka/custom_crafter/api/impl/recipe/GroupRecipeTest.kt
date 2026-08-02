@@ -12,6 +12,7 @@ import org.bukkit.inventory.ItemStack
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import org.mockbukkit.mockbukkit.MockBukkit
 import org.mockbukkit.mockbukkit.ServerMock
@@ -105,56 +106,64 @@ object GroupRecipeTest {
 
     @Test
     fun contextIsValidGroupsDetectEmptyTest() {
-        assertTrue(GroupRecipe.Context.isValidGroups(
-            groups = emptySet(),
-            items = emptyMap()
-        ).isSuccess)
+        assertDoesNotThrow {
+            GroupRecipe.Context.isValidGroups(
+                groups = emptySet(),
+                items = emptyMap()
+            )
+        }
     }
 
     @Test
     fun contextIsValidGroupsDetectContainEmptyMembersTest() {
-        assertTrue(GroupRecipe.Context.isValidGroups(
-            groups = setOf(GroupRecipe.Context(members = emptySet(), min = 1)),
-            items = mapOf()
-        ).isFailure)
+        assertThrows<IllegalArgumentException> {
+            GroupRecipe.Context.isValidGroups(
+                groups = setOf(GroupRecipe.Context(members = emptySet(), min = 1)),
+                items = mapOf()
+            )
+        }
     }
 
     @Test
     fun contextIsValidGroupsDetectItemsNotAllMembersContainedTest() {
-        assertTrue(GroupRecipe.Context.isValidGroups(
-            groups = setOf(GroupRecipe.Context.of(
-                members = setOf(
-                    CoordinateComponent(0, 0),
-                    CoordinateComponent(1, 0)
-                ),
-                min = 1
-            )),
-            items = mapOf(
-                CoordinateComponent(0, 1) to CMatterImpl.of(Material.STONE),
+        assertThrows<IllegalArgumentException> {
+            GroupRecipe.Context.isValidGroups(
+                groups = setOf(GroupRecipe.Context.of(
+                    members = setOf(
+                        CoordinateComponent(0, 0),
+                        CoordinateComponent(1, 0)
+                    ),
+                    min = 1
+                )),
+                items = mapOf(
+                    CoordinateComponent(0, 1) to CMatterImpl.of(Material.STONE),
+                )
             )
-        ).isFailure)
+        }
     }
 
     @Test
     fun contextIsValidGroupsDetectContextMembersDuplicateTest() {
-        assertTrue(GroupRecipe.Context.isValidGroups(
-            groups = setOf(
-                GroupRecipe.Context.of(
-                    members = setOf(
-                        CoordinateComponent(0, 1)
-                    ),
-                    min = 1),
+        assertThrows<IllegalArgumentException> {
+            GroupRecipe.Context.isValidGroups(
+                groups = setOf(
+                    GroupRecipe.Context.of(
+                        members = setOf(
+                            CoordinateComponent(0, 1)
+                        ),
+                        min = 1),
 
-                GroupRecipe.Context.of(
-                    members = setOf(
-                        CoordinateComponent(0, 1)
-                    ),
-                    min = 1)
-            ),
-            items = mapOf(
-                CoordinateComponent(0, 0) to CMatterImpl.of(Material.STONE),
+                    GroupRecipe.Context.of(
+                        members = setOf(
+                            CoordinateComponent(0, 1)
+                        ),
+                        min = 1)
+                ),
+                items = mapOf(
+                    CoordinateComponent(0, 0) to CMatterImpl.of(Material.STONE),
+                )
             )
-        ).isFailure)
+        }
     }
 
     @Test
@@ -180,7 +189,7 @@ object GroupRecipeTest {
             CoordinateComponent(0, 2) to CMatterImpl.of(Material.STONE)
         )
 
-        assertTrue(GroupRecipe.Context.isValidGroups(groups, items).isFailure)
+        assertThrows<IllegalArgumentException> { GroupRecipe.Context.isValidGroups(groups, items) }
     }
 
     @Test
@@ -206,7 +215,7 @@ object GroupRecipeTest {
             CoordinateComponent(0, 2) to stoneAir
         )
 
-        assertTrue(GroupRecipe.Context.isValidGroups(groups, items).isFailure)
+        assertThrows<IllegalArgumentException> { GroupRecipe.Context.isValidGroups(groups, items) }
     }
 
     private fun marbleRecipe(): CRecipe {

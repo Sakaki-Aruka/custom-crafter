@@ -290,7 +290,7 @@ PartialSearch.asyncPartialSearch(player.uniqueId, view).thenAccept { results ->
 When a recipe does not match as expected, pass an `Explainer` to record which check rejected it.
 
 ```kotlin
-val explainer = Explainer("debug", Explainer.Loglevel.DEBUG)
+val explainer = Explainer(Explainer.Loglevel.DEBUG, "debug")
 Search.search(player.uniqueId, view, explainer = explainer)
 explainer.getStringList().forEach { println(it) }
 ```

@@ -76,4 +76,3 @@ jobs:
             --target master \
             --title "v$TAG_NAME release" \
             --notes-file release-note \
-            --draft

@@ -71,7 +71,7 @@ object CustomCrafterAPI {
      * @see[API_VERSION]
      * @since 5.2.0
      */
-    const val MINOR_VERSION = 3
+    const val MINOR_VERSION = 4
 
     /**
      * Patch version number of the Custom Crafter API.
@@ -127,7 +127,7 @@ object CustomCrafterAPI {
         level = DeprecationLevel.WARNING
     )
     fun hasFullCompatibility(version: String): Boolean {
-        return version in setOf("5.3.0")
+        return version in setOf("5.4.0")
     }
 
     /**
@@ -399,7 +399,7 @@ object CustomCrafterAPI {
     fun setCraftUIDesigner(designer: CraftUIDesigner, calledAsync: Boolean = false) {
         val nullContext = CraftUIDesigner.Context(player = null)
         val baked: CraftUIDesigner.Baked = designer.bake(nullContext)
-        baked.isValid().exceptionOrNull()?.let { throw it }
+        baked.isValid()
 
         val currentValue: CraftUIDesigner = CRAFT_UI_DESIGNER.getAndSet(designer)
         CustomCrafterAPIPropertiesChangeEvent(
@@ -644,16 +644,20 @@ object CustomCrafterAPI {
         if (getRecipeNameStrictLevel().hasDuplicate(recipes.map { it.name })) {
             throw IllegalArgumentException("'recipes' has duplicated name recipes. (current strict level: ${getRecipeNameStrictLevel().name})")
         }
-        if (recipes.any { it.isValidRecipe().isFailure }) {
-            val builder = StringBuilder()
-            builder.append(System.lineSeparator())
-            recipes.forEach { recipe ->
-                recipe.isValidRecipe().exceptionOrNull()?.let { e ->
-                    val name: String = recipe.name.takeIf { name -> name.isNotBlank() } ?: "(Empty Name)"
-                    builder.append("Recipe: $name, Error: ${e.message ?: "(Empty Error Message)"}")
-                    builder.append(System.lineSeparator())
-                }
+        val builder = StringBuilder()
+        builder.append(System.lineSeparator())
+        var hasInvalid = false
+        recipes.forEach { recipe ->
+            try {
+                recipe.isValidRecipe()
+            } catch (e: Throwable) {
+                hasInvalid = true
+                val name: String = recipe.name.takeIf { name -> name.isNotBlank() } ?: "(Empty Name)"
+                builder.append("Recipe: $name, Error: ${e.message ?: "(Empty Error Message)"}")
+                builder.append(System.lineSeparator())
             }
+        }
+        if (hasInvalid) {
             throw IllegalStateException(builder.toString())
         }
 
@@ -765,10 +769,7 @@ object CustomCrafterAPI {
      */
     @JvmStatic
     fun setAllCandidateUIDesigner(designer: AllCandidateUIDesigner) {
-        val validationResult = designer.bakeWithEmptyContext().isValid()
-        if (validationResult.isFailure) {
-            validationResult.exceptionOrNull()?.let { throw it }
-        }
+        designer.bakeWithEmptyContext().isValid()
         val oldDesigner = allCandidateUIDesigner.getAndSet(designer)
         CustomCrafterAPIPropertiesChangeEvent(
             propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.ALL_CANDIDATE_UI_DESIGNER.name,

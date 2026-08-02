@@ -17,7 +17,7 @@ There are seven customizable elements:
 | `backToCraftUIButton(context)` | Slot coordinate and icon item for the back-to-CraftUI button |
 | `recipeSlots(context)` | Set of slot coordinates available for recipe icons |
 | `noDisplayableItem(context)` | Icon shown when a recipe cannot produce a displayable item |
-| `ungeneratedIconPlaceholderItem(context)` | Factory lambda producing a placeholder icon while a recipe icon is being generated |
+| `ungeneratedIconPlaceholderItem(context)` | A `java.util.function.Function<CRecipe, ItemStack>` factory producing a placeholder icon while a recipe icon is being generated |
 
 All methods have default implementations, so only the parts that need customization must be overridden.
 All methods receive an `AllCandidateUIDesigner.Context` that exposes `context.searchResult` and `context.crafterId`.
@@ -117,7 +117,7 @@ val baked: AllCandidateUIDesigner.Baked = myDesigner.bake(context)
 
 | Method / Property | Type | Description |
 |-------------------|------|-------------|
-| `isValid()` | `Result<Unit>` | Validates the baked values; returns `Result.success` or `Result.failure` with a descriptive exception |
+| `isValid()` | `Unit` | Validates the baked values; throws an `IllegalStateException` with a descriptive message if invalid |
 | `ungeneratedIcon(recipe)` | `ItemStack` | Returns the placeholder icon for `recipe`; falls back to the default placeholder if the produced item is not displayable |
 | `recipeSlotsIndex` | `Set<Int>` | The same slot coordinates as `recipeSlots`, expressed as slot indices |
 

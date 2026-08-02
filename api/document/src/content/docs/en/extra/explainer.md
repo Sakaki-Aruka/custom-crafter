@@ -18,7 +18,7 @@ Passing an `Explainer` to a search method records each decision the search made,
 Pass an instance to the `explainer` parameter of `Search.search` or `Search.asyncSearch`, then read the lines back with `getStringList()`.
 
 ```kotlin
-val explainer = Explainer("debug", Explainer.Loglevel.DEBUG)
+val explainer = Explainer(Explainer.Loglevel.DEBUG, "debug")
 
 val result: Search.SearchResult = Search.search(
     crafterId = player.uniqueId,
@@ -41,7 +41,7 @@ Once you are done debugging, simply drop the argument (or pass `null`) to return
 
 ## Log levels
 
-The second constructor parameter, `verbosity`, controls how much detail is recorded.
+The first constructor parameter, `verbosity`, controls how much detail is recorded.
 
 | Level | What gets recorded |
 |-------|--------------------|
@@ -61,13 +61,13 @@ When tracking down a cause, specify `DEBUG`.
 
 ```kotlin
 // record everything, down to the concrete values
-val explainer = Explainer("debug", Explainer.Loglevel.DEBUG)
+val explainer = Explainer(Explainer.Loglevel.DEBUG, "debug")
 
-// omitting the second parameter gives you INFO
-val infoOnly = Explainer("debug")
+// omitting the first parameter gives you INFO
+val infoOnly = Explainer(name = "debug")
 ```
 
-The first parameter, `name`, is a label for telling instances apart. It defaults to a random UUID.
+The second parameter, `name`, is a label for telling instances apart. It defaults to a random UUID.
 
 ---
 

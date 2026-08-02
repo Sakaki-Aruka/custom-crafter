@@ -17,7 +17,7 @@ title: AllCandidateUIDesigner について
 | `backToCraftUIButton(context)` | クラフト画面へ戻るボタンのスロット座標とアイコンアイテム |
 | `recipeSlots(context)` | レシピアイコンを配置できるスロット座標の集合 |
 | `noDisplayableItem(context)` | 表示可能なアイテムを提供できないレシピのスロットに表示されるアイコン |
-| `ungeneratedIconPlaceholderItem(context)` | レシピアイコン生成中に使用するプレースホルダーアイコンを作成するラムダ |
+| `ungeneratedIconPlaceholderItem(context)` | レシピアイコン生成中に使用するプレースホルダーアイコンを作成する `java.util.function.Function<CRecipe, ItemStack>` |
 
 すべてのメソッドにデフォルト実装が存在するため、カスタマイズが必要な部分だけをオーバーライドすれば足ります。
 すべてのメソッドは `AllCandidateUIDesigner.Context` を受け取り、`context.searchResult` と `context.crafterId` を参照できます。
@@ -117,7 +117,7 @@ val baked: AllCandidateUIDesigner.Baked = myDesigner.bake(context)
 
 | メソッド / プロパティ | 型 | 概要 |
 |----------------------|----|------|
-| `isValid()` | `Result<Unit>` | bake された値を検証する。成功なら `Result.success`、失敗なら説明付きの `Result.failure` を返す |
+| `isValid()` | `Unit` | bake された値を検証する。不正な場合は説明付きの `IllegalStateException` をスローする |
 | `ungeneratedIcon(recipe)` | `ItemStack` | `recipe` のプレースホルダーアイコンを返す。生成されたアイテムが表示不可の場合はデフォルトのプレースホルダーへフォールバックする |
 | `recipeSlotsIndex` | `Set<Int>` | `recipeSlots` と同じスロット座標をインデックス (`Set<Int>`) で表したもの |
 

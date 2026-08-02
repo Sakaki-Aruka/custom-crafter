@@ -45,13 +45,13 @@ mvn -pl demo package
 
 ## 対応環境
 
-| Custom_Crafter Version               | Paper Version            |
-|:--------------------------------------|:--------------------------|
-| **5.3.0 (最新)**                       | 1.21.4 ~ 1.21.11, 26.1.x |
-| 5.0.13 ~ 5.0.21, 5.1.0, 5.2.0, 5.2.1  | 1.21.4 ~ 1.21.11, 26.1.x |
-| 5.0.0 ~ 5.0.11                        | 1.21.3                    |
-| 4.3 (レガシー)                          | 1.21.3                    |
-| 4.2 (レガシー)                          | 1.20.1 ~ 1.20.4           |
+| Custom_Crafter Version         | Paper Version            |
+|:-------------------------------|:--------------------------|
+| **5.4.0 (最新)**               | 1.21.4 ~ 1.21.11, 26.1.x |
+| 5.0.13 ~ 5.0.21, 5.1.0 ~ 5.3.0 | 1.21.4 ~ 1.21.11, 26.1.x |
+| 5.0.0 ~ 5.0.11                 | 1.21.3                    |
+| 4.3 (レガシー)                 | 1.21.3                    |
+| 4.2 (レガシー)                 | 1.20.1 ~ 1.20.4           |
 
 対応する Paper の下限バージョンは更新のたびに変わることは少ないため、最新版の利用を推奨する。
 
@@ -87,7 +87,7 @@ depend:
 
 ---
 
-最新バージョン: 5.3.0 ([Maven Central](https://central.sonatype.com/artifact/io.github.sakaki-aruka/custom-crafter-api/versions))
+最新バージョン: 5.4.0 ([Maven Central](https://central.sonatype.com/artifact/io.github.sakaki-aruka/custom-crafter-api/versions))
 
 CustomCrafter プラグインは実行時に存在することを前提とするため、依存関係のスコープはコンパイル時のみに設定する。Kotlin でプラグインを書く場合は kotlin-stdlib も同様にコンパイル時のみとする。
 
@@ -102,7 +102,7 @@ CustomCrafter プラグインは実行時に存在することを前提とする
 <dependency>
     <groupId>io.github.sakaki-aruka</groupId>
     <artifactId>custom-crafter-api</artifactId>
-    <version>5.3.0</version>
+    <version>5.4.0</version>
     <scope>provided</scope>
 </dependency>
 
@@ -121,7 +121,7 @@ CustomCrafter プラグインは実行時に存在することを前提とする
 
 ```groovy
 dependencies {
-    compileOnly 'io.github.sakaki-aruka:custom-crafter-api:5.3.0'
+    compileOnly 'io.github.sakaki-aruka:custom-crafter-api:5.4.0'
     compileOnly 'org.jetbrains.kotlin:kotlin-stdlib:2.3.0' // Kotlin 利用時のみ
 }
 ```
@@ -132,7 +132,7 @@ dependencies {
 
 ```kotlin
 dependencies {
-    compileOnly("io.github.sakaki-aruka:custom-crafter-api:5.3.0")
+    compileOnly("io.github.sakaki-aruka:custom-crafter-api:5.4.0")
     compileOnly("org.jetbrains.kotlin:kotlin-stdlib:2.3.0") // Kotlin 利用時のみ
 }
 ```

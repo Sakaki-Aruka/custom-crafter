@@ -1,8 +1,10 @@
 package online.aruka.custom_crafter.api.`object`
 
 import io.github.sakaki_aruka.customcrafter.recipe.CRecipe
+import io.github.sakaki_aruka.customcrafter.recipe.CRecipePredicate
 import io.github.sakaki_aruka.customcrafter.result.ResultSupplier
 import io.github.sakaki_aruka.customcrafter.objects.AsyncContext
+import io.github.sakaki_aruka.customcrafter.objects.CraftView
 import io.github.sakaki_aruka.customcrafter.objects.MappedRelation
 import io.github.sakaki_aruka.customcrafter.objects.MappedRelationComponent
 import io.github.sakaki_aruka.customcrafter.recipe.CoordinateComponent
@@ -13,13 +15,14 @@ import org.bukkit.inventory.ItemStack
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertNull
+import org.junit.jupiter.api.assertDoesNotThrow
+import org.junit.jupiter.api.assertThrows
 import org.mockbukkit.mockbukkit.MockBukkit
 import org.mockbukkit.mockbukkit.ServerMock
 import org.mockbukkit.mockbukkit.world.WorldMock
 import java.util.UUID
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
+import kotlin.test.assertNull
 
 object CRecipeTest {
 
@@ -43,8 +46,7 @@ object CRecipeTest {
             items = emptyMap(),
             type = CRecipe.Type.SHAPELESS
         )
-        assertTrue(empty.isValidRecipe().isFailure)
-        assertTrue(empty.isValidRecipe().exceptionOrNull() is IllegalStateException)
+        assertThrows<IllegalStateException> { empty.isValidRecipe() }
     }
 
     @Test
@@ -56,8 +58,7 @@ object CRecipeTest {
                 CoordinateComponent.fromIndex(i) to matter },
             type = CRecipe.Type.SHAPELESS
         )
-        assertTrue(over.isValidRecipe().isFailure)
-        assertTrue(over.isValidRecipe().exceptionOrNull() is IllegalStateException)
+        assertThrows<IllegalStateException> { over.isValidRecipe() }
     }
 
     @Test
@@ -71,8 +72,7 @@ object CRecipeTest {
             items = mapOf(CoordinateComponent(0, 0) to airMatter),
             type = CRecipe.Type.SHAPELESS
         )
-        assertTrue(containsAir.isValidRecipe().isFailure)
-        assertTrue(containsAir.isValidRecipe().exceptionOrNull() is IllegalStateException)
+        assertThrows<IllegalStateException> { containsAir.isValidRecipe() }
     }
 
     @Test
@@ -86,8 +86,8 @@ object CRecipeTest {
             items = mapOf(CoordinateComponent(0, 0) to notItem),
             type = CRecipe.Type.SHAPELESS
         )
-        assertTrue(containsNotItem.isValidRecipe().isFailure)
-        assertTrue(notItem.isValidMatter().exceptionOrNull() is IllegalStateException)
+        assertThrows<IllegalStateException> { containsNotItem.isValidRecipe() }
+        assertThrows<IllegalStateException> { notItem.isValidMatter() }
     }
 
     @Test
@@ -98,8 +98,7 @@ object CRecipeTest {
             items = mapOf(CoordinateComponent(0, 0) to matter),
             type = CRecipe.Type.SHAPELESS
         )
-        assertTrue(recipe.isValidRecipe().isSuccess)
-        assertNull(recipe.isValidRecipe().exceptionOrNull())
+        assertDoesNotThrow { recipe.isValidRecipe() }
     }
 
     @Test
@@ -199,5 +198,43 @@ object CRecipeTest {
         val resultList = future.get()
 
         assertEquals(1, resultList.size)
+    }
+
+    private fun predicateContext(recipe: CRecipe): CRecipePredicate.Context {
+        return CRecipePredicate.Context(
+            input = CraftView(materials = emptyMap()),
+            crafterId = UUID.randomUUID(),
+            recipe = recipe,
+            relation = MappedRelation(components = emptySet())
+        )
+    }
+
+    @Test
+    fun firstFailedRecipePredicateReturnsNullWhenAllPassTest() {
+        val matter = CMatterImpl.single(Material.STONE)
+        val recipe = CRecipeImpl(
+            name = "",
+            items = mapOf(CoordinateComponent(0, 0) to matter),
+            type = CRecipe.Type.SHAPELESS,
+            predicates = listOf(CRecipePredicate { true }, CRecipePredicate { true })
+        )
+        assertNull(recipe.firstFailedRecipePredicate(predicateContext(recipe)))
+    }
+
+    @Test
+    fun firstFailedRecipePredicateReturnsIndexAndPredicateOfFirstFailureTest() {
+        val matter = CMatterImpl.single(Material.STONE)
+        val failing = CRecipePredicate { false }
+        val recipe = CRecipeImpl(
+            name = "",
+            items = mapOf(CoordinateComponent(0, 0) to matter),
+            type = CRecipe.Type.SHAPELESS,
+            predicates = listOf(CRecipePredicate { true }, failing, CRecipePredicate { false })
+        )
+
+        val result = recipe.firstFailedRecipePredicate(predicateContext(recipe))
+
+        assertEquals(1, result?.first)
+        assertEquals(failing, result?.second)
     }
 }

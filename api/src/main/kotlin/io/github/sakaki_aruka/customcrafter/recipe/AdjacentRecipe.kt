@@ -186,22 +186,23 @@ class AdjacentRecipe @JvmOverloads constructor(
     /**
      * Validates this recipe's configuration.
      *
-     * Returns [Result.failure] with [IllegalArgumentException] if fewer than 2 items are
-     * registered, since a single item can never satisfy any adjacency condition.
+     * Throws [IllegalArgumentException] if fewer than 2 items are registered, since a single
+     * item can never satisfy any adjacency condition.
      * Otherwise, delegates to [CRecipe.isValidRecipe].
      *
-     * @return [Result.success] if the recipe is valid, [Result.failure] otherwise.
+     * @throws[IllegalArgumentException] If fewer than 2 items are registered
+     * @throws[IllegalStateException] If the item count exceeds [RelationType.maxCount], or the recipe is otherwise invalid
      * @since 5.1.0
      */
-    override fun isValidRecipe(): Result<Unit> {
+    override fun isValidRecipe() {
         if (this.items.size < 2) {
-            return Result.failure(IllegalArgumentException("'items' size must be at least 2. (actual: ${this.items.size})"))
+            throw IllegalArgumentException("'items' size must be at least 2. (actual: ${this.items.size})")
         }
 
         if (this.items.size > this.relationType.maxCount()) {
             val relType = this.relationType
             val max = relType.maxCount()
-            return Result.failure(IllegalStateException(
+            throw IllegalStateException(
                 buildString {
                     appendLine("This AdjacentRecipe exceeds the maximum item count for '${relType}'.")
                     appendLine("  Current : ${this@AdjacentRecipe.items.size}")
@@ -211,9 +212,9 @@ class AdjacentRecipe @JvmOverloads constructor(
                     relType.maxPatternString().lines().forEach { appendLine("  │  $it") }
                     append(  "  └────────────────────────────────────────────────────────┘")
                 }
-            ))
+            )
         }
 
-        return super.isValidRecipe()
+        super.isValidRecipe()
     }
 }

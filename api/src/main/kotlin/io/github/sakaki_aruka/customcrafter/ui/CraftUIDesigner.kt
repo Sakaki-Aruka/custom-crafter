@@ -177,20 +177,20 @@ interface CraftUIDesigner {
         }
 
         /**
-         * Returns is this valid or not.
+         * Validates this baked designer.
          *
-         * @return[Result] Check result
+         * @throws[IllegalStateException] If this baked designer is invalid
          * @since 5.0.16
          */
-        fun isValid(): Result<Unit> {
+        fun isValid() {
             val craftSlots: List<CoordinateComponent> = craftSlots()
             val leftTop: Int = craftSlots.minBy { it.toIndex() }.toIndex()
 
             if (craftSlots.size != 36
                 || !CoordinateComponent.squareFill(6).containsAll(craftSlots.map { CoordinateComponent.fromIndex(it.toIndex() - leftTop) })) {
-                return Result.failure(IllegalStateException(
+                throw IllegalStateException(
                     """
-                        
+
                         CraftSlots must be 36 size and 6x6 square.
                         Current Slot Size: ${craftSlots.size}
                         Current Coordinates: ('_': Blank, Result or MakeButton Slots, '#': Craft Slots)
@@ -199,14 +199,12 @@ interface CraftUIDesigner {
                             + CoordinateComponent.getComponentsShapeString(
                         (0..<54).map { CoordinateComponent.fromIndex(it) }
                             .minus(craftSlots.toSet()))
-                ))
+                )
             }
 
             if (blankSlots.values.any { it.type.isAir }) {
-                return Result.failure(IllegalStateException("'blankSlots' must not contain any 'Material#isAir' icons."))
+                throw IllegalStateException("'blankSlots' must not contain any 'Material#isAir' icons.")
             }
-
-            return Result.success(Unit)
         }
     }
 }

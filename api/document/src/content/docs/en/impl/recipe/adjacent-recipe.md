@@ -206,4 +206,4 @@ The table below shows the maximum number of items that can be placed in a 6×6 g
 | `DIAGONAL` | 18 | Fill cells where both x and y are even, or both are odd |
 | `BOTH` | 36 | No constraint — all 36 cells are valid |
 
-If `matters` exceeds this limit and `isValidRecipe()` is called, an error is returned together with a visual placement pattern for reference.
+If `matters` exceeds this limit and `isValidRecipe()` is called, an exception is thrown together with a visual placement pattern for reference.

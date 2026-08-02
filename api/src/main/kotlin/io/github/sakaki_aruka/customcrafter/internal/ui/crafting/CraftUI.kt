@@ -57,7 +57,7 @@ internal class CraftUI(
         val designContext = CraftUIDesigner.Context(player = caller)
         bakedDesigner = baked ?: CustomCrafterAPI.getCraftUIDesigner().bake(designContext)
 
-        bakedDesigner.isValid().exceptionOrNull()?.let { throw it }
+        bakedDesigner.isValid()
 
         inventory = Bukkit.createInventory(
             this,

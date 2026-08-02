@@ -74,7 +74,7 @@ internal object SearchExplainerTest {
             listOf(CMatterImpl.single(Material.STONE), CMatterImpl.single(Material.STONE))
         )
         val view = viewOf(0 to ItemStack(Material.STONE))
-        val explainer = Explainer("t", Explainer.Loglevel.DEBUG)
+        val explainer = Explainer(Explainer.Loglevel.DEBUG, "t")
 
         val result = search(view, listOf(recipe), explainer)
 
@@ -90,7 +90,7 @@ internal object SearchExplainerTest {
             listOf(CMatterImpl.single(Material.STONE), CMatterImpl.single(Material.IRON_INGOT))
         )
         val view = viewOf(0 to ItemStack(Material.STONE), 1 to ItemStack(Material.DIRT))
-        val explainer = Explainer("t", Explainer.Loglevel.DEBUG)
+        val explainer = Explainer(Explainer.Loglevel.DEBUG, "t")
 
         val result = search(view, listOf(recipe), explainer)
 
@@ -114,7 +114,7 @@ internal object SearchExplainerTest {
             )
         )
         val view = viewOf(0 to ItemStack(Material.STONE))
-        val explainer = Explainer("t", Explainer.Loglevel.DEBUG)
+        val explainer = Explainer(Explainer.Loglevel.DEBUG, "t")
 
         val result = search(view, listOf(recipe), explainer)
 
@@ -138,7 +138,7 @@ internal object SearchExplainerTest {
             )
         )
         val view = viewOf(0 to ItemStack(Material.STONE))
-        val explainer = Explainer("t", Explainer.Loglevel.DEBUG)
+        val explainer = Explainer(Explainer.Loglevel.DEBUG, "t")
 
         val result = search(view, listOf(recipe), explainer)
 
@@ -155,7 +155,7 @@ internal object SearchExplainerTest {
             predicates = listOf(CRecipePredicate { true }, CRecipePredicate { false })
         )
         val view = viewOf(0 to ItemStack(Material.STONE))
-        val explainer = Explainer("t", Explainer.Loglevel.DEBUG)
+        val explainer = Explainer(Explainer.Loglevel.DEBUG, "t")
 
         val result = search(view, listOf(recipe), explainer)
 
@@ -176,7 +176,7 @@ internal object SearchExplainerTest {
             predicates = listOf(predicate)
         )
         val view = viewOf(0 to ItemStack(Material.STONE))
-        val explainer = Explainer("t", Explainer.Loglevel.DEBUG)
+        val explainer = Explainer(Explainer.Loglevel.DEBUG, "t")
 
         val result = search(view, listOf(recipe), explainer)
 
@@ -205,7 +205,7 @@ internal object SearchExplainerTest {
             )
         )
         val view = viewOf(0 to ItemStack(Material.STONE))
-        val explainer = Explainer("t", Explainer.Loglevel.DEBUG)
+        val explainer = Explainer(Explainer.Loglevel.DEBUG, "t")
 
         val result = search(view, listOf(recipe), explainer)
 
@@ -217,7 +217,7 @@ internal object SearchExplainerTest {
     fun matchedRecipeReportsItsRelation() {
         val recipe = CRecipeImpl.shapeless("ok", listOf(CMatterImpl.single(Material.STONE)))
         val view = viewOf(0 to ItemStack(Material.STONE))
-        val explainer = Explainer("t", Explainer.Loglevel.INFO)
+        val explainer = Explainer(Explainer.Loglevel.INFO, "t")
 
         val result = search(view, listOf(recipe), explainer)
 

@@ -8,10 +8,10 @@ import org.bukkit.inventory.ItemStack
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.mockbukkit.mockbukkit.MockBukkit
 import org.mockbukkit.mockbukkit.ServerMock
 import org.mockbukkit.mockbukkit.world.WorldMock
-import kotlin.test.assertTrue
 
 object AllCandidateUIDesignerTest {
     private lateinit var server: ServerMock
@@ -35,7 +35,7 @@ object AllCandidateUIDesignerTest {
             }
         }
 
-        assertTrue(empty.bakeWithEmptyContext().isValid().isFailure)
+        assertThrows<IllegalStateException> { empty.bakeWithEmptyContext().isValid() }
     }
 
     @Test
@@ -46,7 +46,7 @@ object AllCandidateUIDesignerTest {
             }
         }
 
-        assertTrue(oversize.bakeWithEmptyContext().isValid().isFailure)
+        assertThrows<IllegalStateException> { oversize.bakeWithEmptyContext().isValid() }
     }
 
     @Test
@@ -56,7 +56,7 @@ object AllCandidateUIDesignerTest {
                 return CoordinateComponent(-1, 0) to ItemStack.of(Material.STONE)
             }
         }
-        assertTrue(previous.bakeWithEmptyContext().isValid().isFailure)
+        assertThrows<IllegalStateException> { previous.bakeWithEmptyContext().isValid() }
     }
 
     @Test
@@ -73,6 +73,6 @@ object AllCandidateUIDesignerTest {
         // recipe slots set contains (0, 0)
         // and previous button placed (0, 0)
 
-        assertTrue(duplicated.bakeWithEmptyContext().isValid().isFailure)
+        assertThrows<IllegalStateException> { duplicated.bakeWithEmptyContext().isValid() }
     }
 }

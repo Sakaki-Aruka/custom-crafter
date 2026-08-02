@@ -180,7 +180,9 @@ You can check whether a recipe is in a registrable state using `CRecipeImpl.isVa
 
 ```kotlin
 val recipe = CRecipeImpl(/* ... */)
-recipe.isValidRecipe().exceptionOrNull()?.let { e ->
+try {
+    recipe.isValidRecipe()
+} catch (e: IllegalStateException) {
     println("Recipe is invalid: ${e.message}")
     return
 }

@@ -51,8 +51,12 @@ internal class AllCandidateUI(
             .completeOnTimeout(AllCandidateUIDesigner.BAKED_DEFAULT, 50, TimeUnit.MILLISECONDS)
             .get()
             .let {
-                if (it.isValid().isFailure) AllCandidateUIDesigner.BAKED_DEFAULT
-                else it
+                try {
+                    it.isValid()
+                    it
+                } catch (_: IllegalStateException) {
+                    AllCandidateUIDesigner.BAKED_DEFAULT
+                }
             }
 
     private val inventory: Inventory = Bukkit.createInventory(

@@ -1,5 +1,18 @@
 # Changelog
 
+# 5.4.0
+
+## ⚠️ Breaking Changes
+
+* `CMatter.isValidMatter()`, `CRecipe.isValidRecipe()`, `CraftUIDesigner.Baked.isValid()`, and `AllCandidateUIDesigner.Baked.isValid()` no longer return `Result<Unit>`; they now throw `IllegalStateException` directly on failure and return nothing on success.
+* `CMatter.firstFailedPredicate()` and `CRecipe.firstFailedRecipePredicate()` now return `kotlin.Pair<Int, CMatterPredicate>` / `kotlin.Pair<Int, CRecipePredicate>` instead of `IndexedValue`.
+* `AllCandidateUIDesigner.Baked.ungeneratedIconPlaceholderItem` changed from the Kotlin function type `(CRecipe) -> ItemStack` to `java.util.function.Function<CRecipe, ItemStack>`.
+* `Explainer`'s constructor parameter order changed from `(name, verbosity)` to `(verbosity, name)`, since controlling the log level without naming the instance is the more common use case.
+
+## ✨ New Features and Enhancements
+
+* **[Enhancement]** Improved Java interoperability across the public API by replacing Kotlin-only return types (`Result`, `IndexedValue`) and lambda parameter types with plain exceptions and `java.util.function.Function`.
+
 # 5.3.0
 
 ## ⚠️ Breaking Changes

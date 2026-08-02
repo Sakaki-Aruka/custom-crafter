@@ -1,15 +1,24 @@
 package online.aruka.custom_crafter.api.`object`
 
+import io.github.sakaki_aruka.customcrafter.matter.CMatter
 import io.github.sakaki_aruka.customcrafter.matter.CMatterImpl
+import io.github.sakaki_aruka.customcrafter.matter.CMatterPredicate
+import io.github.sakaki_aruka.customcrafter.recipe.CRecipe
+import io.github.sakaki_aruka.customcrafter.recipe.CRecipeImpl
+import io.github.sakaki_aruka.customcrafter.recipe.CoordinateComponent
 import org.bukkit.Material
+import org.bukkit.inventory.ItemStack
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertNull
+import org.junit.jupiter.api.assertDoesNotThrow
+import org.junit.jupiter.api.assertThrows
 import org.mockbukkit.mockbukkit.MockBukkit
 import org.mockbukkit.mockbukkit.ServerMock
 import org.mockbukkit.mockbukkit.world.WorldMock
-import kotlin.test.assertTrue
+import java.util.UUID
+import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 object CMatterTest {
 
@@ -32,8 +41,7 @@ object CMatterTest {
             name = "",
             candidate = emptySet()
         )
-        assertTrue(matter.isValidMatter().isFailure)
-        assertTrue(matter.isValidMatter().exceptionOrNull() is IllegalStateException)
+        assertThrows<IllegalStateException> { matter.isValidMatter() }
     }
 
     @Test
@@ -42,8 +50,7 @@ object CMatterTest {
             name = "",
             candidate = setOf(Material.AIR)
         )
-        assertTrue(air.isValidMatter().isFailure)
-        assertTrue(air.isValidMatter().exceptionOrNull() is IllegalStateException)
+        assertThrows<IllegalStateException> { air.isValidMatter() }
     }
 
     @Test
@@ -52,8 +59,7 @@ object CMatterTest {
             name = "",
             candidate = setOf(Material.WATER)
         )
-        assertTrue(noItem.isValidMatter().isFailure)
-        assertTrue(noItem.isValidMatter().exceptionOrNull() is IllegalStateException)
+        assertThrows<IllegalStateException> { noItem.isValidMatter() }
     }
 
     @Test
@@ -63,8 +69,7 @@ object CMatterTest {
             candidate = setOf(Material.STONE),
             amount = -1
         )
-        assertTrue(minus.isValidMatter().isFailure)
-        assertTrue(minus.isValidMatter().exceptionOrNull() is IllegalStateException)
+        assertThrows<IllegalStateException> { minus.isValidMatter() }
     }
 
     @Test
@@ -74,7 +79,47 @@ object CMatterTest {
             candidate = setOf(Material.STONE),
             amount = 1
         )
-        assertTrue(valid.isValidMatter().isSuccess)
-        assertNull(valid.isValidMatter().exceptionOrNull())
+        assertDoesNotThrow { valid.isValidMatter() }
+    }
+
+    private fun context(matter: CMatter): CMatterPredicate.Context {
+        val recipe: CRecipe = CRecipeImpl(
+            name = "",
+            items = mapOf(CoordinateComponent(0, 0) to matter),
+            type = CRecipe.Type.SHAPED
+        )
+        return CMatterPredicate.Context(
+            coordinate = CoordinateComponent(0, 0),
+            matter = matter,
+            input = ItemStack.of(Material.STONE),
+            mapped = mapOf(CoordinateComponent(0, 0) to ItemStack.of(Material.STONE)),
+            recipe = recipe,
+            crafterId = UUID.randomUUID()
+        )
+    }
+
+    @Test
+    fun firstFailedPredicateReturnsNullWhenAllPassTest() {
+        val matter = CMatterImpl(
+            name = "",
+            candidate = setOf(Material.STONE),
+            predicates = listOf(CMatterPredicate { true }, CMatterPredicate { true })
+        )
+        assertNull(matter.firstFailedPredicate(context(matter)))
+    }
+
+    @Test
+    fun firstFailedPredicateReturnsIndexAndPredicateOfFirstFailureTest() {
+        val failing = CMatterPredicate { false }
+        val matter = CMatterImpl(
+            name = "",
+            candidate = setOf(Material.STONE),
+            predicates = listOf(CMatterPredicate { true }, failing, CMatterPredicate { false })
+        )
+
+        val result = matter.firstFailedPredicate(context(matter))
+
+        assertEquals(1, result?.first)
+        assertEquals(failing, result?.second)
     }
 }
