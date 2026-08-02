@@ -112,7 +112,7 @@
 </tr>
 <tr>
 <td><code dir="auto">ungeneratedIconPlaceholderItem(context)</code></td>
-<td>レシピアイコン生成中に使用するプレースホルダーアイコンを作成するラムダ</td>
+<td>レシピアイコン生成中に使用するプレースホルダーアイコンを作成する <code dir="auto">java.util.function.Function&lt;CRecipe, ItemStack&gt;</code></td>
 </tr>
 </tbody>
 </table>
@@ -161,8 +161,8 @@
 <tbody>
 <tr>
 <td><code dir="auto">isValid()</code></td>
-<td><code dir="auto">Result&lt;Unit&gt;</code></td>
-<td>bake された値を検証する。成功なら <code dir="auto">Result.success</code>、失敗なら説明付きの <code dir="auto">Result.failure</code> を返す</td>
+<td><code dir="auto">Unit</code></td>
+<td>bake された値を検証する。不正な場合は説明付きの <code dir="auto">IllegalStateException</code> をスローする</td>
 </tr>
 <tr>
 <td><code dir="auto">ungeneratedIcon(recipe)</code></td>

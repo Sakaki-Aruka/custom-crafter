@@ -253,11 +253,11 @@ public interface <span class="typeNameLabel"><a href=CRecipe.html>CRecipe</a></s
                                         </tr>
                                         
                                         <tr id="i0" class="altColor">
-                                            <td class="colFirst"><code><a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-result/index.html>Result</a>&lt;<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a>&gt;</code>
+                                            <td class="colFirst"><code><a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a></code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=CVanillaRecipe.html#isValidRecipe()>isValidRecipe</a>() </code>
                                             </th>
-                                            <td class="colLast">Returns this <a href=CRecipe.html>CRecipe</a> is a valid or not.</td>
+                                            <td class="colLast">Validates this <a href=CRecipe.html>CRecipe</a>.</td>
                                         </tr>
                                         
                                         <tr id="i1" class="rowColor">
@@ -293,7 +293,7 @@ public interface <span class="typeNameLabel"><a href=CRecipe.html>CRecipe</a></s
                                         </tr>
                                         
                                         <tr id="i5" class="rowColor">
-                                            <td class="colFirst"><code><a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-indexed-value/index.html>IndexedValue</a>&lt;<a href=CRecipePredicate.html>CRecipePredicate</a>&gt;</code>
+                                            <td class="colFirst"><code><a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-pair/index.html>Pair</a>&lt;<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Integer.html>Integer</a>, <a href=CRecipePredicate.html>CRecipePredicate</a>&gt;</code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=ShapelessGroupRecipe.html#firstFailedRecipePredicate(io.github.sakaki_aruka.customcrafter.recipe.CRecipePredicate.Context)>firstFailedRecipePredicate</a>(<a href=CRecipePredicate.Context.html>CRecipePredicate.Context</a> context) </code>
                                             </th>
@@ -424,18 +424,15 @@ public interface <span class="typeNameLabel"><a href=CRecipe.html>CRecipe</a></s
                                           >
                                     <li class="blockList">
                                         <h4>isValidRecipe</h4>
-                                        <pre class="methodSignature"> <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-result/index.html>Result</a>&lt;<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a>&gt; <a href=CVanillaRecipe.html#isValidRecipe()>isValidRecipe</a>()</pre>
-                                        <div class="block"><p>Returns this <a href=CRecipe.html>CRecipe</a> is a valid or not.</p><p>CRecipe's default implementation checks below conditions.</p><ul><li><p>CRecipe.items size is in range 1 to 36</p></li><li><p>All contained <a href=../matter/CMatter.html>CMatter</a> pass <a href=../matter/potion/CPotionMatterImpl.html#isValidMatter()>CMatter.isValidMatter</a></p></li></ul><pre><code>// (Usage)
+                                        <pre class="methodSignature"> <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a> <a href=CVanillaRecipe.html#isValidRecipe()>isValidRecipe</a>()</pre>
+                                        <div class="block"><p>Validates this <a href=CRecipe.html>CRecipe</a>.</p><p>CRecipe's default implementation checks below conditions.</p><ul><li><p>CRecipe.items size is in range 1 to 36</p></li><li><p>All contained <a href=../matter/CMatter.html>CMatter</a> pass <a href=../matter/potion/CPotionMatterImpl.html#isValidMatter()>CMatter.isValidMatter</a></p></li></ul><pre><code>// (Usage)
 val recipe: CRecipe = ~~~
-recipe.isValidRecipe().exceptionOrNull()?.let{ throw it }</code></pre></div>
+recipe.isValidRecipe()</code></pre></div>
 
                                         <dl>
 
                                         
 
-                                        
-                                            <dt><span class="returnLabel">Returns:</span></dt>
-                                            <dd><p><a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-result/index.html>Result</a> Result of check</p></dd>
                                         
 
                                         
@@ -592,7 +589,7 @@ recipe.isValidRecipe().exceptionOrNull()?.let{ throw it }</code></pre></div>
                                           >
                                     <li class="blockList">
                                         <h4>firstFailedRecipePredicate</h4>
-                                        <pre class="methodSignature"> <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-indexed-value/index.html>IndexedValue</a>&lt;<a href=CRecipePredicate.html>CRecipePredicate</a>&gt; <a href=ShapelessGroupRecipe.html#firstFailedRecipePredicate(io.github.sakaki_aruka.customcrafter.recipe.CRecipePredicate.Context)>firstFailedRecipePredicate</a>(<a href=CRecipePredicate.Context.html>CRecipePredicate.Context</a> context)</pre>
+                                        <pre class="methodSignature"> <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-pair/index.html>Pair</a>&lt;<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Integer.html>Integer</a>, <a href=CRecipePredicate.html>CRecipePredicate</a>&gt; <a href=ShapelessGroupRecipe.html#firstFailedRecipePredicate(io.github.sakaki_aruka.customcrafter.recipe.CRecipePredicate.Context)>firstFailedRecipePredicate</a>(<a href=CRecipePredicate.Context.html>CRecipePredicate.Context</a> context)</pre>
                                         <div class="block"><p>Returns the first <a href=CRecipePredicate.html>CRecipePredicate</a> that rejects <a href=ShapelessGroupRecipe.html#firstFailedRecipePredicate(io.github.sakaki_aruka.customcrafter.recipe.CRecipePredicate.Context)>context</a>, or <code>null</code> when all of them pass.</p><p>Evaluates predicates in order and stops at the first failure, exactly as <a href=ShapelessGroupRecipe.html#getRecipePredicateResults(io.github.sakaki_aruka.customcrafter.recipe.CRecipePredicate.Context,java.lang.Boolean)>getRecipePredicateResults</a> does, so this can be used in its place when the caller needs to report which predicate failed rather than only whether one did. The returned index is the position within predicates and identifies a predicate that did not override <a href=CRecipePredicate.html#name()>CRecipePredicate.name</a>.</p></div>
 
                                         <dl>
@@ -608,7 +605,7 @@ recipe.isValidRecipe().exceptionOrNull()?.let{ throw it }</code></pre></div>
 
                                         
                                             <dt><span class="returnLabel">Returns:</span></dt>
-                                            <dd><p><a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-indexed-value/index.html>IndexedValue</a> The failing predicate with its index, or <code>null</code> when nothing failed</p></dd>
+                                            <dd><p><a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-pair/index.html>Pair</a> The failing predicate's index paired with the predicate itself, or <code>null</code> when nothing failed</p></dd>
                                         
 
                                         

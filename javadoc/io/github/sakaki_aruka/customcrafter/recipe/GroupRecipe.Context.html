@@ -317,11 +317,11 @@ public final class <span class="typeNameLabel"><a href=GroupRecipe.Context.html>
                                         </tr>
                                         
                                         <tr id="i6" class="altColor">
-                                            <td class="colFirst"><code>final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-result/index.html>Result</a>&lt;<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a>&gt;</code>
+                                            <td class="colFirst"><code>final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a></code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=GroupRecipe.Context.html#isValidGroups(java.util.Set,java.util.Map)>isValidGroups</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html>Set</a>&lt;<a href=GroupRecipe.Context.html>GroupRecipe.Context</a>&gt; groups, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Map.html>Map</a>&lt;<a href=CoordinateComponent.html>CoordinateComponent</a>, <a href=../matter/CMatter.html>CMatter</a>&gt; items) </code>
                                             </th>
-                                            <td class="colLast">Checks specified context set and items mapping are valid or not.</td>
+                                            <td class="colLast">Validates the specified context set against the items mapping.</td>
                                         </tr>
                                         
                                         </tbody>
@@ -599,8 +599,8 @@ val context = GroupRecipe.Context.of(
                                           >
                                     <li class="blockList">
                                         <h4>isValidGroups</h4>
-                                        <pre class="methodSignature"> final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-result/index.html>Result</a>&lt;<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a>&gt; <a href=GroupRecipe.Context.html#isValidGroups(java.util.Set,java.util.Map)>isValidGroups</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html>Set</a>&lt;<a href=GroupRecipe.Context.html>GroupRecipe.Context</a>&gt; groups, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Map.html>Map</a>&lt;<a href=CoordinateComponent.html>CoordinateComponent</a>, <a href=../matter/CMatter.html>CMatter</a>&gt; items)</pre>
-                                        <div class="block"><p>Checks specified context set and items mapping are valid or not.</p><p>If those are invalid, returns an Exception what includes error messages.</p></div>
+                                        <pre class="methodSignature"> final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a> <a href=GroupRecipe.Context.html#isValidGroups(java.util.Set,java.util.Map)>isValidGroups</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html>Set</a>&lt;<a href=GroupRecipe.Context.html>GroupRecipe.Context</a>&gt; groups, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Map.html>Map</a>&lt;<a href=CoordinateComponent.html>CoordinateComponent</a>, <a href=../matter/CMatter.html>CMatter</a>&gt; items)</pre>
+                                        <div class="block"><p>Validates the specified context set against the items mapping.</p><p>If those are invalid, throws an exception that includes error messages.</p></div>
 
                                         <dl>
 
@@ -617,9 +617,6 @@ val context = GroupRecipe.Context.of(
                                             
                                         
 
-                                        
-                                            <dt><span class="returnLabel">Returns:</span></dt>
-                                            <dd><p><a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-result/index.html>Result</a> Result of some checks. Use <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-result/is-success.html>Result.isSuccess</a> or <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-result/is-failure.html>Result.isFailure</a> to check.</p></dd>
                                         
 
                                         

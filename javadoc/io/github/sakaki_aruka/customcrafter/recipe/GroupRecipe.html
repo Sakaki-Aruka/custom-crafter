@@ -402,11 +402,11 @@ groups = [Group1{ (0, 0), (0, 1) }]</code></pre><p><a href=GroupRecipe.html#reci
                                         </tr>
                                         
                                         <tr id="i7" class="rowColor">
-                                            <td class="colFirst"><code><a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-result/index.html>Result</a>&lt;<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a>&gt;</code>
+                                            <td class="colFirst"><code><a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a></code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=GroupRecipe.html#isValidRecipe()>isValidRecipe</a>() </code>
                                             </th>
-                                            <td class="colLast">Returns this <a href=CRecipe.html>CRecipe</a> is a valid or not.</td>
+                                            <td class="colLast">Validates this <a href=CRecipe.html>CRecipe</a>.</td>
                                         </tr>
                                         
                                         <tr id="i8" class="altColor">
@@ -737,18 +737,15 @@ groups = [Group1{ (0, 0), (0, 1) }]</code></pre><p><a href=GroupRecipe.html#reci
                                           >
                                     <li class="blockList">
                                         <h4>isValidRecipe</h4>
-                                        <pre class="methodSignature"> <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-result/index.html>Result</a>&lt;<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a>&gt; <a href=GroupRecipe.html#isValidRecipe()>isValidRecipe</a>()</pre>
-                                        <div class="block"><p>Returns this <a href=CRecipe.html>CRecipe</a> is a valid or not.</p><p>CRecipe's default implementation checks below conditions.</p><ul><li><p>CRecipe.items size is in range 1 to 36</p></li><li><p>All contained <a href=../matter/CMatter.html>CMatter</a> pass <a href=../matter/potion/CPotionMatterImpl.html#isValidMatter()>CMatter.isValidMatter</a></p></li></ul><pre><code>// (Usage)
+                                        <pre class="methodSignature"> <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a> <a href=GroupRecipe.html#isValidRecipe()>isValidRecipe</a>()</pre>
+                                        <div class="block"><p>Validates this <a href=CRecipe.html>CRecipe</a>.</p><p>CRecipe's default implementation checks below conditions.</p><ul><li><p>CRecipe.items size is in range 1 to 36</p></li><li><p>All contained <a href=../matter/CMatter.html>CMatter</a> pass <a href=../matter/potion/CPotionMatterImpl.html#isValidMatter()>CMatter.isValidMatter</a></p></li></ul><pre><code>// (Usage)
 val recipe: CRecipe = ~~~
-recipe.isValidRecipe().exceptionOrNull()?.let{ throw it }</code></pre></div>
+recipe.isValidRecipe()</code></pre></div>
 
                                         <dl>
 
                                         
 
-                                        
-                                            <dt><span class="returnLabel">Returns:</span></dt>
-                                            <dd><p><a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-result/index.html>Result</a> Result of check</p></dd>
                                         
 
                                         

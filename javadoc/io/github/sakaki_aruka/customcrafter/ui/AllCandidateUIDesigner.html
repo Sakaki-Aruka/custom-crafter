@@ -320,11 +320,11 @@ public interface <span class="typeNameLabel"><a href=AllCandidateUIDesigner.html
                                         </tr>
                                         
                                         <tr id="i6" class="altColor">
-                                            <td class="colFirst"><code>Function1&lt;<a href=../recipe/CRecipe.html>CRecipe</a>, <a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/inventory/ItemStack.html>ItemStack</a>&gt;</code>
+                                            <td class="colFirst"><code><a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/function/Function.html>Function</a>&lt;<a href=../recipe/CRecipe.html>CRecipe</a>, <a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/inventory/ItemStack.html>ItemStack</a>&gt;</code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=AllCandidateUIDesigner.html#ungeneratedIconPlaceholderItem(io.github.sakaki_aruka.customcrafter.ui.AllCandidateUIDesigner.Context)>ungeneratedIconPlaceholderItem</a>(<a href=AllCandidateUIDesigner.Context.html>AllCandidateUIDesigner.Context</a> context) </code>
                                             </th>
-                                            <td class="colLast">Returns a lambda that produces a placeholder icon for recipe slots whose result item has not yet been generated.</td>
+                                            <td class="colLast">Returns a factory that produces a placeholder icon for recipe slots whose result item has not yet been generated.</td>
                                         </tr>
                                         
                                         </tbody>
@@ -607,8 +607,8 @@ public interface <span class="typeNameLabel"><a href=AllCandidateUIDesigner.html
                                           >
                                     <li class="blockList">
                                         <h4>ungeneratedIconPlaceholderItem</h4>
-                                        <pre class="methodSignature"> Function1&lt;<a href=../recipe/CRecipe.html>CRecipe</a>, <a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/inventory/ItemStack.html>ItemStack</a>&gt; <a href=AllCandidateUIDesigner.html#ungeneratedIconPlaceholderItem(io.github.sakaki_aruka.customcrafter.ui.AllCandidateUIDesigner.Context)>ungeneratedIconPlaceholderItem</a>(<a href=AllCandidateUIDesigner.Context.html>AllCandidateUIDesigner.Context</a> context)</pre>
-                                        <div class="block"><p>Returns a lambda that produces a placeholder icon for recipe slots whose result item has not yet been generated.</p><p>The lambda receives the <a href=../recipe/CRecipe.html>CRecipe</a> being displayed and returns the icon <a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/inventory/ItemStack.html>ItemStack</a> to show in its slot.</p></div>
+                                        <pre class="methodSignature"> <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/function/Function.html>Function</a>&lt;<a href=../recipe/CRecipe.html>CRecipe</a>, <a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/inventory/ItemStack.html>ItemStack</a>&gt; <a href=AllCandidateUIDesigner.html#ungeneratedIconPlaceholderItem(io.github.sakaki_aruka.customcrafter.ui.AllCandidateUIDesigner.Context)>ungeneratedIconPlaceholderItem</a>(<a href=AllCandidateUIDesigner.Context.html>AllCandidateUIDesigner.Context</a> context)</pre>
+                                        <div class="block"><p>Returns a factory that produces a placeholder icon for recipe slots whose result item has not yet been generated.</p><p>The factory receives the <a href=../recipe/CRecipe.html>CRecipe</a> being displayed and returns the icon <a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/inventory/ItemStack.html>ItemStack</a> to show in its slot.</p></div>
 
                                         <dl>
 
@@ -623,7 +623,7 @@ public interface <span class="typeNameLabel"><a href=AllCandidateUIDesigner.html
 
                                         
                                             <dt><span class="returnLabel">Returns:</span></dt>
-                                            <dd><p>(CRecipe) -&gt; ItemStack factory that builds a placeholder icon for the given recipe</p></dd>
+                                            <dd><p><a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/function/Function.html>Function</a> factory that builds a placeholder icon for the given recipe</p></dd>
                                         
 
                                         

@@ -251,11 +251,11 @@ public interface <span class="typeNameLabel"><a href=CMatter.html>CMatter</a></s
                                         </tr>
                                         
                                         <tr id="i0" class="altColor">
-                                            <td class="colFirst"><code><a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-result/index.html>Result</a>&lt;<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a>&gt;</code>
+                                            <td class="colFirst"><code><a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a></code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=potion/CPotionMatterImpl.html#isValidMatter()>isValidMatter</a>() </code>
                                             </th>
-                                            <td class="colLast">Returns this <a href=CMatter.html>CMatter</a> is a valid or not.</td>
+                                            <td class="colLast">Validates this <a href=CMatter.html>CMatter</a>.</td>
                                         </tr>
                                         
                                         <tr id="i1" class="rowColor">
@@ -275,7 +275,7 @@ public interface <span class="typeNameLabel"><a href=CMatter.html>CMatter</a></s
                                         </tr>
                                         
                                         <tr id="i3" class="rowColor">
-                                            <td class="colFirst"><code><a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-indexed-value/index.html>IndexedValue</a>&lt;<a href=CMatterPredicate.html>CMatterPredicate</a>&gt;</code>
+                                            <td class="colFirst"><code><a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-pair/index.html>Pair</a>&lt;<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Integer.html>Integer</a>, <a href=CMatterPredicate.html>CMatterPredicate</a>&gt;</code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=../recipe/GroupRecipe.Matter.html#firstFailedPredicate(io.github.sakaki_aruka.customcrafter.matter.CMatterPredicate.Context)>firstFailedPredicate</a>(<a href=CMatterPredicate.Context.html>CMatterPredicate.Context</a> ctx) </code>
                                             </th>
@@ -374,18 +374,15 @@ public interface <span class="typeNameLabel"><a href=CMatter.html>CMatter</a></s
                                           >
                                     <li class="blockList">
                                         <h4>isValidMatter</h4>
-                                        <pre class="methodSignature"> <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-result/index.html>Result</a>&lt;<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a>&gt; <a href=potion/CPotionMatterImpl.html#isValidMatter()>isValidMatter</a>()</pre>
-                                        <div class="block"><p>Returns this <a href=CMatter.html>CMatter</a> is a valid or not.</p><p>CMatter's default implementation checks below conditions.</p><ul><li><p>CMatter.candidate is not empty</p></li><li><p>CMatter.candidate does not contain <a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/Material.html#isAir-->Material.isAir</a> and !<a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/Material.html#isItem-->Material.isItem</a></p></li><li><p>CMatter.amount is 1 or more</p></li></ul><pre><code>// (Usage)
+                                        <pre class="methodSignature"> <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a> <a href=potion/CPotionMatterImpl.html#isValidMatter()>isValidMatter</a>()</pre>
+                                        <div class="block"><p>Validates this <a href=CMatter.html>CMatter</a>.</p><p>CMatter's default implementation checks below conditions.</p><ul><li><p>CMatter.candidate is not empty</p></li><li><p>CMatter.candidate does not contain <a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/Material.html#isAir-->Material.isAir</a> and !<a href=https://jd.papermc.io/paper/1.21.4/org/bukkit/Material.html#isItem-->Material.isItem</a></p></li><li><p>CMatter.amount is 1 or more</p></li></ul><pre><code>// (Usage)
 val matter: CMatter = ~~~
-matter.isValidMatter().exceptionOrNull()?.let { throw it }</code></pre><p>This is called from <a href=../recipe/CVanillaRecipe.html#isValidRecipe()>CRecipe.isValidRecipe</a>.</p></div>
+matter.isValidMatter()</code></pre><p>This is called from <a href=../recipe/CVanillaRecipe.html#isValidRecipe()>CRecipe.isValidRecipe</a>.</p></div>
 
                                         <dl>
 
                                         
 
-                                        
-                                            <dt><span class="returnLabel">Returns:</span></dt>
-                                            <dd><p><a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-result/index.html>Result</a> Result of check</p></dd>
                                         
 
                                         
@@ -469,7 +466,7 @@ fun predicatesResult(ctx: CMatterPredicate.Context): Boolean {
                                           >
                                     <li class="blockList">
                                         <h4>firstFailedPredicate</h4>
-                                        <pre class="methodSignature"> <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-indexed-value/index.html>IndexedValue</a>&lt;<a href=CMatterPredicate.html>CMatterPredicate</a>&gt; <a href=../recipe/GroupRecipe.Matter.html#firstFailedPredicate(io.github.sakaki_aruka.customcrafter.matter.CMatterPredicate.Context)>firstFailedPredicate</a>(<a href=CMatterPredicate.Context.html>CMatterPredicate.Context</a> ctx)</pre>
+                                        <pre class="methodSignature"> <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-pair/index.html>Pair</a>&lt;<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Integer.html>Integer</a>, <a href=CMatterPredicate.html>CMatterPredicate</a>&gt; <a href=../recipe/GroupRecipe.Matter.html#firstFailedPredicate(io.github.sakaki_aruka.customcrafter.matter.CMatterPredicate.Context)>firstFailedPredicate</a>(<a href=CMatterPredicate.Context.html>CMatterPredicate.Context</a> ctx)</pre>
                                         <div class="block"><p>Returns the first <a href=CMatterPredicate.html>CMatterPredicate</a> that rejects <a href=../recipe/GroupRecipe.Matter.html#firstFailedPredicate(io.github.sakaki_aruka.customcrafter.matter.CMatterPredicate.Context)>ctx</a>, or <code>null</code> when all of them pass.</p><p>Evaluates predicates in order and stops at the first failure, exactly as <a href=../recipe/GroupRecipe.Matter.html#predicatesResult(io.github.sakaki_aruka.customcrafter.matter.CMatterPredicate.Context)>predicatesResult</a> does, so this can be used in its place when the caller needs to report which predicate failed rather than only whether one did. The returned index is the position within predicates and identifies a predicate that did not override <a href=CMatterPredicate.html#name()>CMatterPredicate.name</a>.</p></div>
 
                                         <dl>
@@ -485,7 +482,7 @@ fun predicatesResult(ctx: CMatterPredicate.Context): Boolean {
 
                                         
                                             <dt><span class="returnLabel">Returns:</span></dt>
-                                            <dd><p><a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin.collections/-indexed-value/index.html>IndexedValue</a> The failing predicate with its index, or <code>null</code> when nothing failed</p></dd>
+                                            <dd><p><a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-pair/index.html>Pair</a> The failing predicate's index paired with the predicate itself, or <code>null</code> when nothing failed</p></dd>
                                         
 
                                         

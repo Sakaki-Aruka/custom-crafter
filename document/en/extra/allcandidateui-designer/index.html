@@ -112,7 +112,7 @@ By registering your implemented designer via <code dir="auto">CustomCrafterAPI.s
 </tr>
 <tr>
 <td><code dir="auto">ungeneratedIconPlaceholderItem(context)</code></td>
-<td>Factory lambda producing a placeholder icon while a recipe icon is being generated</td>
+<td>A <code dir="auto">java.util.function.Function&lt;CRecipe, ItemStack&gt;</code> factory producing a placeholder icon while a recipe icon is being generated</td>
 </tr>
 </tbody>
 </table>
@@ -161,8 +161,8 @@ Obtained by calling <code dir="auto">designer.bake(context)</code> or <code dir=
 <tbody>
 <tr>
 <td><code dir="auto">isValid()</code></td>
-<td><code dir="auto">Result&lt;Unit&gt;</code></td>
-<td>Validates the baked values; returns <code dir="auto">Result.success</code> or <code dir="auto">Result.failure</code> with a descriptive exception</td>
+<td><code dir="auto">Unit</code></td>
+<td>Validates the baked values; throws an <code dir="auto">IllegalStateException</code> with a descriptive message if invalid</td>
 </tr>
 <tr>
 <td><code dir="auto">ungeneratedIcon(recipe)</code></td>

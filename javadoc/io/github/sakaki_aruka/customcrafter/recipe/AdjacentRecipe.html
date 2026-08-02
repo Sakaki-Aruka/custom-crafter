@@ -379,7 +379,7 @@ _ _ _ _ _ _</code></pre><p>At least 2 items are required; <a href=AdjacentRecipe
                                         </tr>
                                         
                                         <tr id="i6" class="altColor">
-                                            <td class="colFirst"><code><a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-result/index.html>Result</a>&lt;<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a>&gt;</code>
+                                            <td class="colFirst"><code><a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a></code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=AdjacentRecipe.html#isValidRecipe()>isValidRecipe</a>() </code>
                                             </th>
@@ -706,16 +706,13 @@ _ _ _ _ _ _</code></pre><p>At least 2 items are required; <a href=AdjacentRecipe
                                           >
                                     <li class="blockList">
                                         <h4>isValidRecipe</h4>
-                                        <pre class="methodSignature"> <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-result/index.html>Result</a>&lt;<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a>&gt; <a href=AdjacentRecipe.html#isValidRecipe()>isValidRecipe</a>()</pre>
-                                        <div class="block"><p>Validates this recipe's configuration.</p><p>Returns <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-result/-companion/failure.html>Result.failure</a> with <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-illegal-argument-exception/index.html>IllegalArgumentException</a> if fewer than 2 items are registered, since a single item can never satisfy any adjacency condition. Otherwise, delegates to <a href=CVanillaRecipe.html#isValidRecipe()>CRecipe.isValidRecipe</a>.</p></div>
+                                        <pre class="methodSignature"> <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a> <a href=AdjacentRecipe.html#isValidRecipe()>isValidRecipe</a>()</pre>
+                                        <div class="block"><p>Validates this recipe's configuration.</p><p>Throws <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-illegal-argument-exception/index.html>IllegalArgumentException</a> if fewer than 2 items are registered, since a single item can never satisfy any adjacency condition. Otherwise, delegates to <a href=CVanillaRecipe.html#isValidRecipe()>CRecipe.isValidRecipe</a>.</p></div>
 
                                         <dl>
 
                                         
 
-                                        
-                                            <dt><span class="returnLabel">Returns:</span></dt>
-                                            <dd><p><a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-result/-companion/success.html>Result.success</a> if the recipe is valid, <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-result/-companion/failure.html>Result.failure</a> otherwise.</p></dd>
                                         
 
                                         

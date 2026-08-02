@@ -369,11 +369,11 @@ public class <span class="typeNameLabel"><a href=ShapelessGroupRecipe.html>Shape
                                         </tr>
                                         
                                         <tr id="i7" class="rowColor">
-                                            <td class="colFirst"><code><a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-result/index.html>Result</a>&lt;<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a>&gt;</code>
+                                            <td class="colFirst"><code><a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a></code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=ShapelessGroupRecipe.html#isValidRecipe()>isValidRecipe</a>() </code>
                                             </th>
-                                            <td class="colLast">Returns this <a href=CRecipe.html>CRecipe</a> is a valid or not.</td>
+                                            <td class="colLast">Validates this <a href=CRecipe.html>CRecipe</a>.</td>
                                         </tr>
                                         
                                         <tr id="i8" class="altColor">
@@ -385,11 +385,11 @@ public class <span class="typeNameLabel"><a href=ShapelessGroupRecipe.html>Shape
                                         </tr>
                                         
                                         <tr id="i9" class="rowColor">
-                                            <td class="colFirst"><code>final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-result/index.html>Result</a>&lt;<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a>&gt;</code>
+                                            <td class="colFirst"><code>final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a></code>
                                             </td>
                                             <th class="colSecond" scope="row"><code><a href=ShapelessGroupRecipe.html#isValidGroups(java.util.Set,java.util.Map)>isValidGroups</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html>Set</a>&lt;<a href=MatchGroup.html>MatchGroup</a>&gt; groups, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Map.html>Map</a>&lt;<a href=CoordinateComponent.html>CoordinateComponent</a>, <a href=../matter/CMatter.html>CMatter</a>&gt; items) </code>
                                             </th>
-                                            <td class="colLast">Checks the specified group set and items mapping are valid or not.</td>
+                                            <td class="colLast">Validates the specified group set against the items mapping.</td>
                                         </tr>
                                         
                                         </tbody>
@@ -712,18 +712,15 @@ public class <span class="typeNameLabel"><a href=ShapelessGroupRecipe.html>Shape
                                           >
                                     <li class="blockList">
                                         <h4>isValidRecipe</h4>
-                                        <pre class="methodSignature"> <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-result/index.html>Result</a>&lt;<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a>&gt; <a href=ShapelessGroupRecipe.html#isValidRecipe()>isValidRecipe</a>()</pre>
-                                        <div class="block"><p>Returns this <a href=CRecipe.html>CRecipe</a> is a valid or not.</p><p>CRecipe's default implementation checks below conditions.</p><ul><li><p>CRecipe.items size is in range 1 to 36</p></li><li><p>All contained <a href=../matter/CMatter.html>CMatter</a> pass <a href=../matter/potion/CPotionMatterImpl.html#isValidMatter()>CMatter.isValidMatter</a></p></li></ul><pre><code>// (Usage)
+                                        <pre class="methodSignature"> <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a> <a href=ShapelessGroupRecipe.html#isValidRecipe()>isValidRecipe</a>()</pre>
+                                        <div class="block"><p>Validates this <a href=CRecipe.html>CRecipe</a>.</p><p>CRecipe's default implementation checks below conditions.</p><ul><li><p>CRecipe.items size is in range 1 to 36</p></li><li><p>All contained <a href=../matter/CMatter.html>CMatter</a> pass <a href=../matter/potion/CPotionMatterImpl.html#isValidMatter()>CMatter.isValidMatter</a></p></li></ul><pre><code>// (Usage)
 val recipe: CRecipe = ~~~
-recipe.isValidRecipe().exceptionOrNull()?.let{ throw it }</code></pre></div>
+recipe.isValidRecipe()</code></pre></div>
 
                                         <dl>
 
                                         
 
-                                        
-                                            <dt><span class="returnLabel">Returns:</span></dt>
-                                            <dd><p><a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-result/index.html>Result</a> Result of check</p></dd>
                                         
 
                                         
@@ -787,8 +784,8 @@ recipe.isValidRecipe().exceptionOrNull()?.let{ throw it }</code></pre></div>
                                           >
                                     <li class="blockList">
                                         <h4>isValidGroups</h4>
-                                        <pre class="methodSignature"> final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-result/index.html>Result</a>&lt;<a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a>&gt; <a href=ShapelessGroupRecipe.html#isValidGroups(java.util.Set,java.util.Map)>isValidGroups</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html>Set</a>&lt;<a href=MatchGroup.html>MatchGroup</a>&gt; groups, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Map.html>Map</a>&lt;<a href=CoordinateComponent.html>CoordinateComponent</a>, <a href=../matter/CMatter.html>CMatter</a>&gt; items)</pre>
-                                        <div class="block"><p>Checks the specified group set and items mapping are valid or not.</p><p>If those are invalid, returns an Exception what includes error messages.</p><ul><li><p>Every <a href=MatchGroup.html#members>MatchGroup.members</a> coordinate must exist as a key in <a href=ShapelessGroupRecipe.html#isValidGroups(java.util.Set,java.util.Map)>items</a>.</p></li><li><p>No coordinate may belong to more than one group.</p></li><li><p>Every coordinate in <a href=ShapelessGroupRecipe.html#isValidGroups(java.util.Set,java.util.Map)>items</a> must belong to exactly one group (no gaps).</p></li></ul></div>
+                                        <pre class="methodSignature"> final static <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-unit/index.html>Unit</a> <a href=ShapelessGroupRecipe.html#isValidGroups(java.util.Set,java.util.Map)>isValidGroups</a>(<a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Set.html>Set</a>&lt;<a href=MatchGroup.html>MatchGroup</a>&gt; groups, <a href=https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Map.html>Map</a>&lt;<a href=CoordinateComponent.html>CoordinateComponent</a>, <a href=../matter/CMatter.html>CMatter</a>&gt; items)</pre>
+                                        <div class="block"><p>Validates the specified group set against the items mapping.</p><p>If those are invalid, throws an exception that includes error messages.</p><ul><li><p>Every <a href=MatchGroup.html#members>MatchGroup.members</a> coordinate must exist as a key in <a href=ShapelessGroupRecipe.html#isValidGroups(java.util.Set,java.util.Map)>items</a>.</p></li><li><p>No coordinate may belong to more than one group.</p></li><li><p>Every coordinate in <a href=ShapelessGroupRecipe.html#isValidGroups(java.util.Set,java.util.Map)>items</a> must belong to exactly one group (no gaps).</p></li></ul></div>
 
                                         <dl>
 
@@ -805,9 +802,6 @@ recipe.isValidRecipe().exceptionOrNull()?.let{ throw it }</code></pre></div>
                                             
                                         
 
-                                        
-                                            <dt><span class="returnLabel">Returns:</span></dt>
-                                            <dd><p><a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-result/index.html>Result</a> Result of some checks. Use <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-result/is-success.html>Result.isSuccess</a> or <a href=https://kotlinlang.org/api/core/kotlin-stdlib/kotlin/-result/is-failure.html>Result.isFailure</a> to check.</p></dd>
                                         
 
                                         
