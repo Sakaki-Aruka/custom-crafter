@@ -18,7 +18,7 @@ title: レシピ検索の高度なデバッグ
 `Search.search` および `Search.asyncSearch` の `explainer` 引数にインスタンスを渡し、検索後に `getStringList()` で読み出します。
 
 ```kotlin
-val explainer = Explainer("debug", Explainer.Loglevel.DEBUG)
+val explainer = Explainer(Explainer.Loglevel.DEBUG, "debug")
 
 val result: Search.SearchResult = Search.search(
     crafterId = player.uniqueId,
@@ -41,7 +41,7 @@ explainer.getStringList().forEach { println(it) }
 
 ## ログレベル
 
-コンストラクタの第2引数 `verbosity` で、どこまで詳細に記録するかを指定します。
+コンストラクタの第1引数 `verbosity` で、どこまで詳細に記録するかを指定します。
 
 | レベル | 記録される内容 |
 |--------|----------------|
@@ -61,13 +61,13 @@ explainer.getStringList().forEach { println(it) }
 
 ```kotlin
 // 具体的な値まですべて記録する
-val explainer = Explainer("debug", Explainer.Loglevel.DEBUG)
+val explainer = Explainer(Explainer.Loglevel.DEBUG, "debug")
 
-// 第2引数を省略すると INFO になる
-val infoOnly = Explainer("debug")
+// 第1引数を省略すると INFO になる
+val infoOnly = Explainer(name = "debug")
 ```
 
-第1引数の `name` は複数のインスタンスを区別するためのラベルです。省略するとランダムな UUID が設定されます。
+第2引数の `name` は複数のインスタンスを区別するためのラベルです。省略するとランダムな UUID が設定されます。
 
 ---
 

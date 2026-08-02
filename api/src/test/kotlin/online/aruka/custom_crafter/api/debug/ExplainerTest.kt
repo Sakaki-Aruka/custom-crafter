@@ -11,7 +11,7 @@ object ExplainerTest {
     @Test
     fun writeLogRejectsMoreVerboseThanConfigured() {
         // configured verbosity = INFO -> DEBUG (more verbose) must be rejected
-        val explainer = Explainer("t", Explainer.Loglevel.INFO)
+        val explainer = Explainer(Explainer.Loglevel.INFO, "t")
         explainer.writeLog(Explainer.Loglevel.DEBUG, "debug message")
         assertTrue(explainer.getLogs().isEmpty())
     }
@@ -19,7 +19,7 @@ object ExplainerTest {
     @Test
     fun writeLogAcceptsSameOrLessVerboseThanConfigured() {
         // configured verbosity = INFO -> INFO (same) and WARN (less verbose) must be accepted
-        val explainer = Explainer("t", Explainer.Loglevel.INFO)
+        val explainer = Explainer(Explainer.Loglevel.INFO, "t")
         explainer.writeLog(Explainer.Loglevel.INFO, "info message")
         explainer.writeLog(Explainer.Loglevel.WARN, "warn message")
 
@@ -32,7 +32,7 @@ object ExplainerTest {
     @Test
     fun omittedVerbosityDefaultsToInfo() {
         // no verbosity passed -> behaves as if INFO was configured
-        val explainer = Explainer("t")
+        val explainer = Explainer(name = "t")
         explainer.writeLog(Explainer.Loglevel.DEBUG, "debug message")
         explainer.writeLog(Explainer.Loglevel.INFO, "info message")
         explainer.writeLog(Explainer.Loglevel.WARN, "warn message")
@@ -53,7 +53,7 @@ object ExplainerTest {
     @Test
     fun getLogsPreservesInsertionOrder() {
         // configured verbosity = DEBUG (most verbose) -> every level passes through
-        val explainer = Explainer("t", Explainer.Loglevel.DEBUG)
+        val explainer = Explainer(Explainer.Loglevel.DEBUG, "t")
         explainer.writeLog(Explainer.Loglevel.INFO, "first")
         explainer.writeLog(Explainer.Loglevel.DEBUG, "second")
         explainer.writeLog(Explainer.Loglevel.WARN, "third")
@@ -69,7 +69,7 @@ object ExplainerTest {
 
     @Test
     fun getStringListRendersEveryLevelWhenNoTargetGiven() {
-        val explainer = Explainer("t", Explainer.Loglevel.DEBUG)
+        val explainer = Explainer(Explainer.Loglevel.DEBUG, "t")
         explainer.writeLog(Explainer.Loglevel.INFO, "first")
         explainer.writeLog(Explainer.Loglevel.DEBUG, "second")
 
@@ -79,7 +79,7 @@ object ExplainerTest {
     @Test
     fun getStringListFiltersByExactLevel() {
         // unlike the write-time threshold, this keeps only the levels asked for
-        val explainer = Explainer("t", Explainer.Loglevel.DEBUG)
+        val explainer = Explainer(Explainer.Loglevel.DEBUG, "t")
         explainer.writeLog(Explainer.Loglevel.INFO, "info message")
         explainer.writeLog(Explainer.Loglevel.DEBUG, "debug message")
         explainer.writeLog(Explainer.Loglevel.WARN, "warn message")
@@ -94,7 +94,7 @@ object ExplainerTest {
     @Test
     fun concurrentWritesLoseNoLines() {
         // asyncSearch writes to one instance from every worker thread
-        val explainer = Explainer("t", Explainer.Loglevel.DEBUG)
+        val explainer = Explainer(Explainer.Loglevel.DEBUG, "t")
         val threads = 8
         val perThread = 2000
         val tasks = (0..<threads).map { t ->

@@ -21,13 +21,13 @@ import java.util.concurrent.ConcurrentLinkedQueue
  * Every line carries the recipe it belongs to, and the recorded order is a faithful trace of the
  * actual execution order.
  *
- * @param[name] Label for this instance. Only used to tell instances apart. (default = a random UUID)
  * @param[verbosity] The most verbose level to keep. (default = [Loglevel.INFO])
+ * @param[name] Label for this instance. Only used to tell instances apart. (default = a random UUID)
  * @since 5.3.0
  */
 class Explainer @JvmOverloads constructor(
-    val name: String = UUID.randomUUID().toString(),
-    val verbosity: Loglevel = Loglevel.INFO
+    val verbosity: Loglevel = Loglevel.INFO,
+    val name: String = UUID.randomUUID().toString()
 ) {
     private val logs: ConcurrentLinkedQueue<Log> = ConcurrentLinkedQueue()
 
@@ -99,7 +99,6 @@ class Explainer @JvmOverloads constructor(
      * @return[List] Rendered lines
      * @since 5.3.0
      */
-    @JvmOverloads
     fun getStringList(vararg targetLevels: Loglevel): List<String> {
         val targets: Set<Loglevel> = targetLevels.toSet()
             .takeIf { it.isNotEmpty() }

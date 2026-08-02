@@ -290,7 +290,7 @@ PartialSearch.asyncPartialSearch(player.uniqueId, view).thenAccept { results ->
 レシピが意図どおりに合致しない場合は、`Explainer` を渡すことでどの検査で弾かれたかを記録できます。
 
 ```kotlin
-val explainer = Explainer("debug", Explainer.Loglevel.DEBUG)
+val explainer = Explainer(Explainer.Loglevel.DEBUG, "debug")
 Search.search(player.uniqueId, view, explainer = explainer)
 explainer.getStringList().forEach { println(it) }
 ```
