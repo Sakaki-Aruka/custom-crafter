@@ -17,7 +17,7 @@ title: AllCandidateUIDesigner について
 | `backToCraftUIButton(context)` | クラフト画面へ戻るボタンのスロット座標とアイコンアイテム |
 | `recipeSlots(context)` | レシピアイコンを配置できるスロット座標の集合 |
 | `noDisplayableItem(context)` | 表示可能なアイテムを提供できないレシピのスロットに表示されるアイコン |
-| `ungeneratedIconPlaceholderItem(context)` | レシピアイコン生成中に使用するプレースホルダーアイコンを作成するラムダ |
+| `ungeneratedIconPlaceholderItem(context)` | レシピアイコン生成中に使用するプレースホルダーアイコンを作成する `java.util.function.Function<CRecipe, ItemStack>` |
 
 すべてのメソッドにデフォルト実装が存在するため、カスタマイズが必要な部分だけをオーバーライドすれば足ります。
 すべてのメソッドは `AllCandidateUIDesigner.Context` を受け取り、`context.searchResult` と `context.crafterId` を参照できます。

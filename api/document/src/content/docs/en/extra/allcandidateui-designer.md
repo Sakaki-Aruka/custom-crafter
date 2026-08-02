@@ -17,7 +17,7 @@ There are seven customizable elements:
 | `backToCraftUIButton(context)` | Slot coordinate and icon item for the back-to-CraftUI button |
 | `recipeSlots(context)` | Set of slot coordinates available for recipe icons |
 | `noDisplayableItem(context)` | Icon shown when a recipe cannot produce a displayable item |
-| `ungeneratedIconPlaceholderItem(context)` | Factory lambda producing a placeholder icon while a recipe icon is being generated |
+| `ungeneratedIconPlaceholderItem(context)` | A `java.util.function.Function<CRecipe, ItemStack>` factory producing a placeholder icon while a recipe icon is being generated |
 
 All methods have default implementations, so only the parts that need customization must be overridden.
 All methods receive an `AllCandidateUIDesigner.Context` that exposes `context.searchResult` and `context.crafterId`.

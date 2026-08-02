@@ -9,6 +9,7 @@ import net.kyori.adventure.text.Component
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 import java.util.UUID
+import java.util.function.Function
 
 /**
  * Interface for customizing the AllCandidateUI, which displays all craft recipe candidates.
@@ -102,15 +103,15 @@ interface AllCandidateUIDesigner {
     }
 
     /**
-     * Returns a lambda that produces a placeholder icon for recipe slots whose result item has not yet been generated.
+     * Returns a factory that produces a placeholder icon for recipe slots whose result item has not yet been generated.
      *
-     * The lambda receives the [CRecipe] being displayed and returns the icon [ItemStack] to show in its slot.
+     * The factory receives the [CRecipe] being displayed and returns the icon [ItemStack] to show in its slot.
      * @param[context] Context provided at bake time
-     * @return[(CRecipe) -> ItemStack] factory that builds a placeholder icon for the given recipe
+     * @return[Function] factory that builds a placeholder icon for the given recipe
      * @since 5.2.0
      */
-    fun ungeneratedIconPlaceholderItem(context: Context): (CRecipe) -> ItemStack {
-        return { recipe ->
+    fun ungeneratedIconPlaceholderItem(context: Context): Function<CRecipe, ItemStack> {
+        return Function { recipe ->
             val item = ItemStack.of(Material.BARRIER)
             item.editMeta { meta ->
                 meta.displayName("UN-GENERATED".toComponent())
@@ -229,7 +230,7 @@ interface AllCandidateUIDesigner {
         val nextPageButton: Pair<CoordinateComponent, ItemStack>,
         val backToCraftUIButton: Pair<CoordinateComponent, ItemStack>,
         val noDisplayableItem: ItemStack,
-        val ungeneratedIconPlaceholderItem: (CRecipe) -> ItemStack
+        val ungeneratedIconPlaceholderItem: Function<CRecipe, ItemStack>
     ) {
         val recipeSlotsIndex: Set<Int> = recipeSlots.map { it.toIndex() }.toSet()
 
@@ -299,9 +300,9 @@ interface AllCandidateUIDesigner {
          * @since 5.2.0
          */
         fun ungeneratedIcon(recipe: CRecipe): ItemStack {
-            return this.ungeneratedIconPlaceholderItem(recipe)
+            return this.ungeneratedIconPlaceholderItem.apply(recipe)
                 .takeUnless { it.isEmpty || it.amount < 1 || !it.type.isItem }
-                ?: BAKED_DEFAULT.ungeneratedIconPlaceholderItem(recipe)
+                ?: BAKED_DEFAULT.ungeneratedIconPlaceholderItem.apply(recipe)
         }
     }
 }
