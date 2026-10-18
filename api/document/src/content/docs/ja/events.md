@@ -113,8 +113,8 @@ class CreateItemListener : Listener {
 `Property<T>` から型安全に値を取り出すには `PropertyKey<T>` を使用します。
 
 ```kotlin
-val key = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK
-val value: Material? = event.newValue.getOrNull(key)
+val key = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK_SIDE
+val value: Int? = event.newValue.getOrNull(key)
 ```
 
 定義済みの `PropertyKey` は以下のとおりです：
@@ -122,28 +122,28 @@ val value: Material? = event.newValue.getOrNull(key)
 | キー | 対応する型 | 対応するプロパティ |
 |------|-----------|----------------|
 | `RESULT_GIVE_CANCEL` | `Boolean` | ResultGiveCancel |
-| `BASE_BLOCK` | `Material` | BaseBlock |
 | `USE_MULTIPLE_RESULT_CANDIDATE_FEATURE` | `Boolean` | UseMultipleResultCandidateFeature |
 | `USE_CUSTOM_CRAFT_UI` | `Boolean` | UseCustomCraftUI |
 | `BASE_BLOCK_SIDE` | `Int` | BaseBlockSide |
 | `CRAFT_UI_DESIGNER` | `CraftUIDesigner` | CraftUIDesigner |
 | `ALL_CANDIDATE_UI_DESIGNER` | `AllCandidateUIDesigner` | AllCandidateUIDesigner |
+| `BASE_BLOCK_CHECKER` | `BiFunction<UUID, Set<Block>, Boolean>` | BaseBlockChecker |
 
-### 実装例: ベースブロックの変更を検知する
+### 実装例: ベースブロックの一辺のサイズの変更を検知する
 
 ```kotlin
 class PropertiesChangeListener : Listener {
     @EventHandler
     fun <T> onPropertiesChange(event: CustomCrafterAPIPropertiesChangeEvent<T>) {
-        val key = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK
+        val key = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK_SIDE
 
         // プロパティ名で対象のイベントだけ絞り込む
         if (event.propertyName != key.name) return
 
-        val oldBlock: Material = event.oldValue.getOrNull(key) ?: return
-        val newBlock: Material = event.newValue.getOrNull(key) ?: return
+        val oldSide: Int = event.oldValue.getOrNull(key) ?: return
+        val newSide: Int = event.newValue.getOrNull(key) ?: return
 
-        println("ベースブロックが ${oldBlock.name} から ${newBlock.name} に変更されました。")
+        println("ベースブロックの一辺のサイズが $oldSide から $newSide に変更されました。")
     }
 }
 ```
@@ -157,11 +157,11 @@ class AllPropertiesChangeListener : Listener {
     @EventHandler
     fun <T> onPropertiesChange(event: CustomCrafterAPIPropertiesChangeEvent<T>) {
         when (event.propertyName) {
-            CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK.name -> {
+            CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK_SIDE.name -> {
                 val newValue = event.newValue.getOrNull(
-                    CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK
+                    CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK_SIDE
                 )
-                println("ベースブロック変更: $newValue")
+                println("ベースブロックの一辺のサイズ変更: $newValue")
             }
             CustomCrafterAPIPropertiesChangeEvent.PropertyKey.USE_CUSTOM_CRAFT_UI.name -> {
                 val newValue = event.newValue.getOrNull(

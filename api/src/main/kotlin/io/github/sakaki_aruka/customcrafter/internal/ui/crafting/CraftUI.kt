@@ -81,14 +81,13 @@ internal class CraftUI(
                 ?: return false
             val underCenter: Block = clicked.getRelative(0, -1, 0)
             val half: Int = CustomCrafterAPI.getBaseBlockSideSize() / 2
+            val targetBlocks: MutableSet<Block> = mutableSetOf()
             for (dx in (-half..half)) {
                 for (dz in (-half..half)) {
-                    if (underCenter.getRelative(dx, 0, dz).type != CustomCrafterAPI.getBaseBlock()) {
-                        return false
-                    }
+                    targetBlocks.add(underCenter.getRelative(dx, 0, dz))
                 }
             }
-            return true
+            return CustomCrafterAPI.getBaseBlockChecker().apply(event.player.uniqueId, targetBlocks)
         }
 
         override fun open(event: PlayerInteractEvent) {

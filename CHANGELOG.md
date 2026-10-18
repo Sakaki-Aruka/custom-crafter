@@ -4,7 +4,13 @@
 
 ## ⚠️ Breaking Changes
 
-* Removed the recipe name restriction from `CustomCrafterAPI.registerRecipe`; recipes sharing the same name can now always be registered.
+* The recipe name restriction in `CustomCrafterAPI.registerRecipe` has been removed; recipes sharing the same name can now always be registered. If you need to avoid duplicate names, use `CustomCrafterAPI.getRegisteredRecipeNames()` to check them before registering.
+* `CustomCrafterAPI.getBaseBlock()`, `setBaseBlock()`, `DEFAULT_BASE_BLOCK`, and `CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK` have been removed. Use `getBaseBlockChecker()`, `setBaseBlockChecker()`, `DEFAULT_BASE_BLOCK_CHECKER`, and `PropertyKey.BASE_BLOCK_CHECKER` instead. 
+* The `/cc get base-block` command has been removed. 
+
+## ✨ New Features and Enhancements
+
+* **[New Feature]** Added `BaseBlockChecker` (`getBaseBlockChecker()`, `setBaseBlockChecker()`, `DEFAULT_BASE_BLOCK_CHECKER`, `PropertyKey.BASE_BLOCK_CHECKER`): a `BiFunction<UUID, Set<Block>, Boolean>` that receives the clicking player's UUID and the blocks beneath the crafting table and decides whether the Custom Craft UI opens.
 
 # 5.4.0
 

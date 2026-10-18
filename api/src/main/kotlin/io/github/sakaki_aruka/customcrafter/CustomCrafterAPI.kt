@@ -9,6 +9,7 @@ import io.github.sakaki_aruka.customcrafter.ui.AllCandidateUIDesigner
 import io.github.sakaki_aruka.customcrafter.ui.AllCandidateUIDesigner.Companion.bakeWithEmptyContext
 import io.github.sakaki_aruka.customcrafter.ui.CraftUIDesigner.Companion.bake
 import org.bukkit.Material
+import org.bukkit.block.Block
 import org.bukkit.plugin.java.JavaPlugin
 import java.util.Collections
 import java.util.UUID
@@ -16,6 +17,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
+import java.util.function.BiFunction
 
 object CustomCrafterAPI {
     /**
@@ -181,49 +183,63 @@ object CustomCrafterAPI {
     }
 
     /**
-     * @suppress
-     * @see[CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK]
-     */
-    private var BASE_BLOCK: AtomicReference<Material> = AtomicReference(Material.GOLD_BLOCK)
-
-    /**
-     * Default value of base-block.
-     * @see[setBaseBlock]
-     * @since 5.2.0
+     * Default value of base-block-checker.
+     *
+     * Returns `true` only when all given blocks are [Material.GOLD_BLOCK].
+     * @see[setBaseBlockChecker]
+     * @since 5.5.0
      */
     @JvmField
-    val DEFAULT_BASE_BLOCK = Material.GOLD_BLOCK
+    val DEFAULT_BASE_BLOCK_CHECKER: BiFunction<UUID, Set<Block>, Boolean> = BiFunction { _, blocks ->
+        return@BiFunction blocks.all { b -> b.type == Material.GOLD_BLOCK }
+    }
 
     /**
-     * Gets a base block type.
-     * @return[Material] base block type
-     * @since 5.0.9
+     * @suppress
+     * @see[CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK_CHECKER]
+     */
+    private var BASE_BLOCK_CHECKER: AtomicReference<BiFunction<UUID, Set<Block>, Boolean>> = AtomicReference(DEFAULT_BASE_BLOCK_CHECKER)
+
+    /**
+     * Returns a current base block checker.
+     *
+     * The checker receives the UUID of the player who clicked a crafting table
+     * and the blocks placed directly beneath it (`side size × side size`, see [getBaseBlockSideSize]),
+     * and returns whether the Custom Craft UI should be opened.
+     * @return[BiFunction] current base block checker (`BiFunction<UUID, Set<Block>, Boolean>`)
+     * @since 5.5.0
      */
     @JvmStatic
-    fun getBaseBlock(): Material = BASE_BLOCK.get()
+    fun getBaseBlockChecker(): BiFunction<UUID, Set<Block>, Boolean> = BASE_BLOCK_CHECKER.get()
 
     /**
-     * Sets base block with given material.
+     * Sets a base block checker.
      *
-     * If a given material is not a block type, throws [IllegalArgumentException].
-     * @param[type] base block type
+     * The checker receives the UUID of the player who clicked a crafting table
+     * and the blocks placed directly beneath it (`side size × side size`, see [getBaseBlockSideSize]),
+     * and returns whether the Custom Craft UI should be opened.
+     *
+     * ```kotlin
+     * // Opens the UI only when all base blocks are diamond blocks.
+     * CustomCrafterAPI.setBaseBlockChecker { _, blocks ->
+     *     blocks.all { b -> b.type == Material.DIAMOND_BLOCK }
+     * }
+     * ```
+     *
+     * Default = [DEFAULT_BASE_BLOCK_CHECKER] (all blocks are [Material.GOLD_BLOCK])
+     * @param[checker] New base block checker
      * @param[calledAsync] Called from async processing or not. (Default = false)
-     * @throws[IllegalArgumentException] when specified not a block type
-     * @since 5.0.9
+     * @since 5.5.0
      */
     @JvmStatic
     @JvmOverloads
-    fun setBaseBlock(type: Material, calledAsync: Boolean = false) {
-        if (!type.isBlock || type.isAir) {
-            throw IllegalArgumentException("'type' must meet 'Material#isBlock'.")
-        }
-
-        val currentValue: Material = BASE_BLOCK.getAndSet(type)
-        if (type != currentValue) {
+    fun setBaseBlockChecker(checker: BiFunction<UUID, Set<Block>, Boolean>, calledAsync: Boolean = false) {
+        val currentValue: BiFunction<UUID, Set<Block>, Boolean> = BASE_BLOCK_CHECKER.getAndSet(checker)
+        if (checker != currentValue) {
             CustomCrafterAPIPropertiesChangeEvent(
-                propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK.name,
+                propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK_CHECKER.name,
                 oldValue = CustomCrafterAPIPropertiesChangeEvent.Property(currentValue),
-                newValue = CustomCrafterAPIPropertiesChangeEvent.Property(type),
+                newValue = CustomCrafterAPIPropertiesChangeEvent.Property(checker),
                 isAsync = calledAsync
             ).callEvent()
         }

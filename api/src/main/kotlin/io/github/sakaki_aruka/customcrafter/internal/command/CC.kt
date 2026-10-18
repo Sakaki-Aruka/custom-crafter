@@ -24,7 +24,6 @@ internal object CC {
      *   - RELEASE_STAGE
      *   - AUTHORS
      *   - RESULT_GIVE_CANCEL
-     *   - BASE_BLOCK
      *   - USE_MULTIPLE_RESULT_CANDIDATE_FEATURE
      *   - BASE_BLOCK_SIDE
      *   - (5.0.13) REGISTERED_RECIPE_NAMES
@@ -65,11 +64,6 @@ internal object CC {
         ).then(Commands.literal("result-give-cancel")
             .executes { ctx ->
                 ctx.msg("RESULT_GIVE_CANCEL: ${CustomCrafterAPI.getResultGiveCancel()}")
-                return@executes SINGLE_SUCCESS
-            }
-        ).then(Commands.literal("base-block")
-            .executes { ctx ->
-                ctx.msg("BASE_BLOCK: ${CustomCrafterAPI.getBaseBlock().name}")
                 return@executes SINGLE_SUCCESS
             }
         ).then(Commands.literal("use-multiple-result-candidates-feature")
@@ -119,12 +113,12 @@ internal object CC {
             .then(Commands.argument("block", ArgumentTypes.itemStack())
                 .executes { ctx ->
                     val material: Material = ctx.getArgument("block", ItemStack::class.java).type
-                    try {
-                        CustomCrafterAPI.setBaseBlock(material)
-                        ctx.msg("<green>base-block change successful. (${material.name})")
-                    } catch (_: Exception) {
+                    if (!material.isBlock || material.isAir) {
                         ctx.msg("<red>Failed to set base-block. 'block' must be a block.")
+                        return@executes SINGLE_SUCCESS
                     }
+                    CustomCrafterAPI.setBaseBlockChecker({ _, blocks -> blocks.all { b -> b.type == material } })
+                    ctx.msg("<green>base-block change successful. (${material.name})")
                     return@executes SINGLE_SUCCESS
                 }
             )

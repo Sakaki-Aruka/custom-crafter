@@ -10,6 +10,7 @@ import io.github.sakaki_aruka.customcrafter.recipe.CoordinateComponent
 import io.github.sakaki_aruka.customcrafter.util.Converter.toComponent
 import net.kyori.adventure.text.Component
 import org.bukkit.Material
+import org.bukkit.block.Block
 import org.bukkit.inventory.ItemStack
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
@@ -21,7 +22,10 @@ import org.mockbukkit.mockbukkit.MockBukkit
 import org.mockbukkit.mockbukkit.ServerMock
 import org.mockbukkit.mockbukkit.plugin.PluginMock
 import org.mockbukkit.mockbukkit.world.WorldMock
+import java.util.UUID
+import java.util.function.BiFunction
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 
 internal object CustomCrafterAPITest {
 
@@ -54,20 +58,27 @@ internal object CustomCrafterAPITest {
     }
 
     @Test
-    fun baseBlockTypeTest() {
-        assertThrows<IllegalArgumentException> {
-            CustomCrafterAPI.setBaseBlock(Material.AIR)
+    fun baseBlockCheckerTest() {
+        assertTrue(CustomCrafterAPI.getBaseBlockChecker() === CustomCrafterAPI.DEFAULT_BASE_BLOCK_CHECKER)
+
+        val world = server.addSimpleWorld("base_block_checker_test")
+        val gold = world.getBlockAt(0, 0, 0).apply { type = Material.GOLD_BLOCK }
+        val diamond = world.getBlockAt(1, 0, 0).apply { type = Material.DIAMOND_BLOCK }
+        val id = UUID.randomUUID()
+
+        assertTrue(CustomCrafterAPI.getBaseBlockChecker().apply(id, setOf(gold)))
+        assertFalse(CustomCrafterAPI.getBaseBlockChecker().apply(id, setOf(gold, diamond)))
+
+        val checker: BiFunction<UUID, Set<Block>, Boolean> = BiFunction { _, blocks ->
+            blocks.all { b -> b.type == Material.DIAMOND_BLOCK }
         }
+        CustomCrafterAPI.setBaseBlockChecker(checker)
+        assertTrue(CustomCrafterAPI.getBaseBlockChecker() === checker)
+        assertTrue(CustomCrafterAPI.getBaseBlockChecker().apply(id, setOf(diamond)))
+        assertFalse(CustomCrafterAPI.getBaseBlockChecker().apply(id, setOf(gold)))
 
-        assertThrows<IllegalArgumentException> {
-            CustomCrafterAPI.setBaseBlock(Material.GOLD_INGOT)
-        }
-
-        CustomCrafterAPI.setBaseBlock(Material.DIAMOND_BLOCK)
-        assertTrue(CustomCrafterAPI.getBaseBlock() == Material.DIAMOND_BLOCK)
-
-        CustomCrafterAPI.setBaseBlock(CustomCrafterAPI.DEFAULT_BASE_BLOCK)
-        assertTrue(CustomCrafterAPI.getBaseBlock() == Material.GOLD_BLOCK)
+        CustomCrafterAPI.setBaseBlockChecker(CustomCrafterAPI.DEFAULT_BASE_BLOCK_CHECKER)
+        assertTrue(CustomCrafterAPI.getBaseBlockChecker() === CustomCrafterAPI.DEFAULT_BASE_BLOCK_CHECKER)
     }
 
     @Test

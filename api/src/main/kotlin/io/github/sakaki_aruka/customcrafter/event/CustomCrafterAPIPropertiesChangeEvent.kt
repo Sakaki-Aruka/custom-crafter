@@ -3,9 +3,11 @@ package io.github.sakaki_aruka.customcrafter.event
 import io.github.sakaki_aruka.customcrafter.CustomCrafterAPI
 import io.github.sakaki_aruka.customcrafter.ui.AllCandidateUIDesigner
 import io.github.sakaki_aruka.customcrafter.ui.CraftUIDesigner
-import org.bukkit.Material
+import org.bukkit.block.Block
 import org.bukkit.event.Event
 import org.bukkit.event.HandlerList
+import java.util.UUID
+import java.util.function.BiFunction
 
 /**
  * Called when [CustomCrafterAPI] changeable properties changed.
@@ -19,12 +21,12 @@ import org.bukkit.event.HandlerList
  * object PropertiesChangeListener: Listener {
  *     @EventHandler
  *     fun <T> CustomCrafterAPIPropertiesChangeEvent<T>.onChange() {
- *         val baseKey = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK
- *         if (this.propertyName != baseKey.name) {
+ *         val sideKey = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK_SIDE
+ *         if (this.propertyName != sideKey.name) {
  *             return
  *         }
- *         val baseTypeOld: Material = this.oldValue.getOrNull(baseKey) ?: return
- *         CustomCrafterAPI.setBaseBlock(baseTypeOld)
+ *         val sideOld: Int = this.oldValue.getOrNull(sideKey) ?: return
+ *         CustomCrafterAPI.setBaseBlockSideSize(sideOld)
  *         println("I rejected new setting... Hahaha!!!")
  *     }
  * }
@@ -34,15 +36,15 @@ import org.bukkit.event.HandlerList
  * public class PropertiesChangeListener implements Listener {
  *     @EventHandler
  *     public void <T> onChange(CustomCrafterAPIPropertiesChangeEvent<T> event) {
- *         String baseKey = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK;
- *         if (!event.getPropertyName().equals(baseKey.getName())) {
+ *         CustomCrafterAPIPropertiesChangeEvent.PropertyKey<Integer> sideKey = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.BASE_BLOCK_SIDE;
+ *         if (!event.getPropertyName().equals(sideKey.getName())) {
  *             return;
  *         }
- *         Material baseTypeOld = event.getOldValue().getOrNull(baseKey);
- *         if (baseTypeOld == null) {
+ *         Integer sideOld = event.getOldValue().getOrNull(sideKey);
+ *         if (sideOld == null) {
  *             return;
  *         }
- *         CustomCrafterAPI.setBaseBlock(baseTypeOld);
+ *         CustomCrafterAPI.setBaseBlockSideSize(sideOld);
  *         System.out.println("I rejected new setting... Hahaha!!!");
  *     }
  * }
@@ -103,8 +105,6 @@ class CustomCrafterAPIPropertiesChangeEvent<T> (
             @JvmField
             val RESULT_GIVE_CANCEL = PropertyKey<Boolean>("RESULT_GIVE_CANCEL")
             @JvmField
-            val BASE_BLOCK = PropertyKey<Material>("BASE_BLOCK")
-            @JvmField
             val USE_MULTIPLE_RESULT_CANDIDATE_FEATURE = PropertyKey<Boolean>("USE_MULTIPLE_CANDIDATE_FEATURE")
             @JvmField
             val USE_CUSTOM_CRAFT_UI = PropertyKey<Boolean>("USE_CUSTOM_CRAFT_UI")
@@ -114,6 +114,8 @@ class CustomCrafterAPIPropertiesChangeEvent<T> (
             val CRAFT_UI_DESIGNER = PropertyKey<CraftUIDesigner>("CRAFT_UI_DESIGNER")
             @JvmField
             val ALL_CANDIDATE_UI_DESIGNER = PropertyKey<AllCandidateUIDesigner>("ALL_CANDIDATE_UI_DESIGNER")
+            @JvmField
+            val BASE_BLOCK_CHECKER = PropertyKey<BiFunction<UUID, Set<Block>, Boolean>>("BASE_BLOCK_CHECKER")
         }
     }
 

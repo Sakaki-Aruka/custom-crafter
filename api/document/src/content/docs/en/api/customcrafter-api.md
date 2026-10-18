@@ -134,25 +134,28 @@ Each configuration property has a corresponding `DEFAULT_XXX` constant.
 To reset a property to its default value, pass the constant to the `set` method:
 
 ```kotlin
-CustomCrafterAPI.setBaseBlock(CustomCrafterAPI.DEFAULT_BASE_BLOCK)
+CustomCrafterAPI.setBaseBlockChecker(CustomCrafterAPI.DEFAULT_BASE_BLOCK_CHECKER)
 ```
 
 When a configuration value is changed, `CustomCrafterAPIPropertiesChangeEvent` is fired.
 The second argument of `setXxx(value, calledAsync = false)` should be set to `true` when calling from an asynchronous thread.
 
-### BaseBlock
+### BaseBlockChecker
 
-The type of block that, when placed directly beneath a crafting table, triggers the dedicated UI to open.
-Default: `Material.GOLD_BLOCK` (`DEFAULT_BASE_BLOCK`).
-If a non-block `Material` is specified, an `IllegalArgumentException` is thrown.
+A `BiFunction<UUID, Set<Block>, Boolean>` that decides whether the dedicated UI opens when a player right-clicks a crafting table.
+It receives the UUID of the clicking player and the blocks placed directly beneath the crafting table (`BaseBlockSide × BaseBlockSide`), and returns `true` to open the UI.
+Default: returns `true` only when all blocks are `Material.GOLD_BLOCK` (`DEFAULT_BASE_BLOCK_CHECKER`).
 
 ```kotlin
-val current: Material = CustomCrafterAPI.getBaseBlock()
+val current: BiFunction<UUID, Set<Block>, Boolean> = CustomCrafterAPI.getBaseBlockChecker()
 
-CustomCrafterAPI.setBaseBlock(Material.DIAMOND_BLOCK)
+// Open the UI only when all base blocks are diamond blocks
+CustomCrafterAPI.setBaseBlockChecker { _, blocks ->
+    blocks.all { b -> b.type == Material.DIAMOND_BLOCK }
+}
 
 // Reset to default
-CustomCrafterAPI.setBaseBlock(CustomCrafterAPI.DEFAULT_BASE_BLOCK)
+CustomCrafterAPI.setBaseBlockChecker(CustomCrafterAPI.DEFAULT_BASE_BLOCK_CHECKER)
 ```
 
 ### BaseBlockSide

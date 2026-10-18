@@ -134,25 +134,28 @@ CustomCrafterAPI.unregisterAllRecipes()
 デフォルト値に戻すには、定数を `set` メソッドに渡してください。
 
 ```kotlin
-CustomCrafterAPI.setBaseBlock(CustomCrafterAPI.DEFAULT_BASE_BLOCK)
+CustomCrafterAPI.setBaseBlockChecker(CustomCrafterAPI.DEFAULT_BASE_BLOCK_CHECKER)
 ```
 
 設定変更時には `CustomCrafterAPIPropertiesChangeEvent` が発火します。
 `setXxx(value, calledAsync = false)` の第 2 引数は非同期スレッドから呼び出す際に `true` を指定します。
 
-### BaseBlock
+### BaseBlockChecker
 
-作業台の真下に置かれることで専用 UI を開くトリガーとなるブロックの種類です。
-デフォルト: `Material.GOLD_BLOCK` (`DEFAULT_BASE_BLOCK`)。
-ブロック以外の `Material` を指定した場合は `IllegalArgumentException` がスローされます。
+プレイヤーが作業台を右クリックした際に専用 UI を開くかどうかを判定する `BiFunction<UUID, Set<Block>, Boolean>` です。
+クリックしたプレイヤーの UUID と作業台の真下に置かれたブロック (`BaseBlockSide × BaseBlockSide`) を受け取り、`true` を返すと UI が開きます。
+デフォルト: すべてのブロックが `Material.GOLD_BLOCK` の場合のみ `true` を返します (`DEFAULT_BASE_BLOCK_CHECKER`)。
 
 ```kotlin
-val current: Material = CustomCrafterAPI.getBaseBlock()
+val current: BiFunction<UUID, Set<Block>, Boolean> = CustomCrafterAPI.getBaseBlockChecker()
 
-CustomCrafterAPI.setBaseBlock(Material.DIAMOND_BLOCK)
+// 真下のブロックがすべてダイヤモンドブロックの場合のみ UI を開く
+CustomCrafterAPI.setBaseBlockChecker { _, blocks ->
+    blocks.all { b -> b.type == Material.DIAMOND_BLOCK }
+}
 
 // デフォルトに戻す
-CustomCrafterAPI.setBaseBlock(CustomCrafterAPI.DEFAULT_BASE_BLOCK)
+CustomCrafterAPI.setBaseBlockChecker(CustomCrafterAPI.DEFAULT_BASE_BLOCK_CHECKER)
 ```
 
 ### BaseBlockSide
