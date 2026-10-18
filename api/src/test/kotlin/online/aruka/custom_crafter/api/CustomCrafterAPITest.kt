@@ -22,7 +22,6 @@ import org.mockbukkit.mockbukkit.ServerMock
 import org.mockbukkit.mockbukkit.plugin.PluginMock
 import org.mockbukkit.mockbukkit.world.WorldMock
 import kotlin.test.assertEquals
-import kotlin.test.assertFalse
 
 internal object CustomCrafterAPITest {
 
@@ -100,57 +99,6 @@ internal object CustomCrafterAPITest {
         CustomCrafterAPI.setCraftUIDesigner(CustomCrafterAPI.DEFAULT_CRAFT_UI_DESIGNER)
     }
 
-    @Test
-    fun nameStrictLevelMatchTest() {
-        assertFalse(CustomCrafterAPI.NameStrictLevel.NOTHING.matches("abc", "abc"))
-        assertFalse(CustomCrafterAPI.NameStrictLevel.NOTHING.matches("abc", "a b c"))
-
-        assertTrue(CustomCrafterAPI.NameStrictLevel.WEAK.matches("abc", "abc"))
-        assertFalse(CustomCrafterAPI.NameStrictLevel.WEAK.matches("abc", "a b c"))
-
-        assertTrue(CustomCrafterAPI.NameStrictLevel.STRICT.matches("abc", "abc"))
-        assertTrue(CustomCrafterAPI.NameStrictLevel.STRICT.matches("abc", "a b c"))
-    }
-
-    @Test
-    fun nameStrictLevelContainsTest() {
-        val target = setOf("abc")
-        val source1 = setOf("abc")
-        val source2 = setOf("a b c")
-        val source3 = setOf("ABC")
-
-        assertFalse(CustomCrafterAPI.NameStrictLevel.NOTHING.contains(target, source1))
-        assertFalse(CustomCrafterAPI.NameStrictLevel.NOTHING.contains(target, source2))
-        assertFalse(CustomCrafterAPI.NameStrictLevel.NOTHING.contains(target, source3))
-
-        assertTrue(CustomCrafterAPI.NameStrictLevel.WEAK.contains(target, source1))
-        assertFalse(CustomCrafterAPI.NameStrictLevel.WEAK.contains(target, source2))
-        assertFalse(CustomCrafterAPI.NameStrictLevel.WEAK.contains(target, source3))
-
-        assertTrue(CustomCrafterAPI.NameStrictLevel.STRICT.contains(target, source1))
-        assertTrue(CustomCrafterAPI.NameStrictLevel.STRICT.contains(target, source2))
-        assertFalse(CustomCrafterAPI.NameStrictLevel.STRICT.contains(target, source3))
-    }
-
-    @Test
-    fun nameStrictLevelHasDuplicateTest() {
-        val list1 = listOf("abc", "a b c")
-        val list2 = listOf("abc", "abc")
-        val list3 = listOf("abc", "ABC")
-
-        assertFalse(CustomCrafterAPI.NameStrictLevel.NOTHING.hasDuplicate(list1))
-        assertFalse(CustomCrafterAPI.NameStrictLevel.NOTHING.hasDuplicate(list2))
-        assertFalse(CustomCrafterAPI.NameStrictLevel.NOTHING.hasDuplicate(list3))
-
-        assertFalse(CustomCrafterAPI.NameStrictLevel.WEAK.hasDuplicate(list1))
-        assertTrue(CustomCrafterAPI.NameStrictLevel.WEAK.hasDuplicate(list2))
-        assertFalse(CustomCrafterAPI.NameStrictLevel.WEAK.hasDuplicate(list3))
-
-        assertTrue(CustomCrafterAPI.NameStrictLevel.STRICT.hasDuplicate(list1))
-        assertTrue(CustomCrafterAPI.NameStrictLevel.STRICT.hasDuplicate(list2))
-        assertFalse(CustomCrafterAPI.NameStrictLevel.STRICT.hasDuplicate(list3))
-    }
-
     private fun registerFiftyRecipes() {
         val items: Map<CoordinateComponent, CMatter> = mapOf(
             CoordinateComponent(0, 0) to CMatterImpl.of(Material.STONE)
@@ -167,7 +115,7 @@ internal object CustomCrafterAPITest {
     }
 
     @Test
-    fun ignoreDuplicatedNamedRecipes() {
+    fun allowDuplicatedNamedRecipes() {
         val items: Map<CoordinateComponent, CMatter> = mapOf(
             CoordinateComponent(0, 0) to CMatterImpl.of(Material.STONE)
         )
@@ -177,21 +125,15 @@ internal object CustomCrafterAPITest {
         val space0 = CRecipeImpl("abc", items, CRecipe.Type.SHAPED)
         val space1 = CRecipeImpl("a b c", items, CRecipe.Type.SHAPED)
 
-        CustomCrafterAPI.setRecipeNameStrictLevel(CustomCrafterAPI.NameStrictLevel.NOTHING)
         assertDoesNotThrow { CustomCrafterAPI.registerRecipe(listOf(same0, same1), plugin) }
         assertDoesNotThrow { CustomCrafterAPI.registerRecipe(listOf(space0, space1), plugin) }
-        CustomCrafterAPI.unregisterAllRecipes()
+        assertEquals(4, CustomCrafterAPI.getRecipes().size)
+        assertEquals(2, CustomCrafterAPI.getRegisteredRecipeFromName("0").size)
 
-        CustomCrafterAPI.setRecipeNameStrictLevel(CustomCrafterAPI.NameStrictLevel.WEAK)
-        assertThrows<IllegalArgumentException> { CustomCrafterAPI.registerRecipe(listOf(same0, same1), plugin) }
-        assertDoesNotThrow { CustomCrafterAPI.registerRecipe(listOf(space0, space1), plugin) }
+        // duplicates of already registered names are also accepted
+        assertDoesNotThrow { CustomCrafterAPI.registerRecipe(listOf(same0), plugin) }
+        assertEquals(3, CustomCrafterAPI.getRegisteredRecipeFromName("0").size)
         CustomCrafterAPI.unregisterAllRecipes()
-
-        CustomCrafterAPI.setRecipeNameStrictLevel(CustomCrafterAPI.NameStrictLevel.STRICT)
-        assertThrows<IllegalArgumentException> { CustomCrafterAPI.registerRecipe(listOf(same0, same1), plugin) }
-        assertThrows<IllegalArgumentException> { CustomCrafterAPI.registerRecipe(listOf(space0, space1), plugin) }
-        CustomCrafterAPI.unregisterAllRecipes()
-        CustomCrafterAPI.setRecipeNameStrictLevelDefault()
     }
 
     @Test

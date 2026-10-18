@@ -10,7 +10,6 @@ import io.github.sakaki_aruka.customcrafter.ui.AllCandidateUIDesigner.Companion.
 import io.github.sakaki_aruka.customcrafter.ui.CraftUIDesigner.Companion.bake
 import org.bukkit.Material
 import org.bukkit.plugin.java.JavaPlugin
-import org.jetbrains.annotations.VisibleForTesting
 import java.util.Collections
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
@@ -411,102 +410,6 @@ object CustomCrafterAPI {
     }
 
 
-    /**
-     * Restriction level for recipe name duplication, applied during recipe registration.
-     *
-     * Introduced to prevent confusion when multiple recipes are displayed simultaneously.
-     *
-     * - [NOTHING]: No restriction.
-     * - [WEAK]: A recipe cannot be registered if an existing recipe has an exactly matching name.
-     * - [STRICT]: A recipe cannot be registered if its name, with all whitespace removed, matches an existing recipe name.
-     *
-     * @since 5.2.0
-     */
-    enum class NameStrictLevel(private val priority: Int) {
-        NOTHING(3),
-        WEAK(2),
-        STRICT(1);
-
-        /**
-         * Returns whether [targets] contains any element from [sources],
-         * evaluated at the level on which this method is called.
-         *
-         * @param[targets] Set of strings to check against
-         * @param[sources] Set of strings to look for
-         * @return[Boolean] `true` if any element of [sources] is matched in [targets] under this level
-         * @since 5.2.0
-         */
-        fun contains(targets: Set<String>, sources: Set<String>): Boolean {
-            return when (this) {
-                NOTHING -> false
-                WEAK -> targets.any { sources.contains(it) }
-                STRICT -> {
-                    fun removeSpaces(set: Set<String>): Set<String> {
-                        return set.map { entry -> entry.filterNot { c -> c.isWhitespace() } }.toSet()
-                    }
-                    removeSpaces(targets).any { e -> removeSpaces(sources).contains(e) }
-                }
-            }
-        }
-
-        /**
-         * Used by [CustomCrafterAPI.setRecipeNameStrictLevel] to determine whether the level
-         * can be changed from the current level to [tryValue].
-         * The level can only move in the stricter direction; loosening is not allowed.
-         *
-         * @param[tryValue] The target level to attempt to change to
-         * @return[NameStrictLevel] [tryValue] if the change is permitted, or the current level if not
-         * @since 5.2.0
-         */
-        fun tryChange(tryValue: NameStrictLevel): NameStrictLevel {
-            return if (this.priority > tryValue.priority) {
-                tryValue
-            } else {
-                this
-            }
-        }
-
-        /**
-         * Returns whether [pattern] matches [target], evaluated at the level on which this method is called.
-         * @param[target] The string to test
-         * @param[pattern] The string to match against
-         * @return[Boolean] `true` if [pattern] matches [target] under this level
-         * @since 5.2.0
-         */
-        fun matches(target: String, pattern: String): Boolean {
-            return when (this) {
-                NOTHING -> false
-                WEAK -> target == pattern
-                STRICT -> target.filterNot { it.isWhitespace() } == pattern.filterNot { it.isWhitespace() }
-            }
-        }
-
-        /**
-         * Returns whether [target] contains duplicate names according to this level.
-         *
-         * @param[target] List of strings to check for duplicates
-         * @return[Boolean] `true` if any duplicates are detected under this level
-         * @since 5.2.0
-         */
-        fun hasDuplicate(target: List<String>): Boolean {
-            if (this == NOTHING) {
-                return false
-            }
-
-            if (target.size != target.toSet().size) {
-                return true
-            }
-            if (this == WEAK) {
-                return false
-            }
-
-            val spaceRemoved: List<String> = target.map { str ->
-                str.filterNot { it.isWhitespace() }
-            }
-            return target.size != spaceRemoved.toSet().size
-        }
-    }
-
     internal class CRecipeWrapper(
         val recipe: CRecipe,
         val pluginJarFileHash: Int,
@@ -562,53 +465,6 @@ object CustomCrafterAPI {
             .map { it.recipe }
     }
 
-
-    /**
-     * Default value of recipe-name-strict-level.
-     * @see[setRecipeNameStrictLevel]
-     * @since 5.2.0
-     */
-    @JvmField
-    val DEFAULT_RECIPE_NAME_STRICT_LEVEL = NameStrictLevel.NOTHING
-    private var recipeNameStrictLevel: AtomicReference<NameStrictLevel> = AtomicReference(DEFAULT_RECIPE_NAME_STRICT_LEVEL)
-
-    /**
-     * Returns current recipe-name-strict-level
-     * @return[NameStrictLevel] current level
-     * @since 5.2.0
-     */
-    @JvmStatic
-    fun getRecipeNameStrictLevel(): NameStrictLevel = recipeNameStrictLevel.get()
-
-    @VisibleForTesting
-    internal fun setRecipeNameStrictLevelDefault() {
-        recipeNameStrictLevel.set(DEFAULT_RECIPE_NAME_STRICT_LEVEL)
-    }
-
-    /**
-     * Sets the recipe name strict level.
-     *
-     * The level can only change in the stricter direction; loosening is not permitted.
-     * @param[level] Target strict level to apply
-     * @param[calledAsync] Called from async processing or not. (Default = false)
-     * @see[NameStrictLevel]
-     * @since 5.2.0
-     */
-    @JvmStatic
-    @JvmOverloads
-    fun setRecipeNameStrictLevel(level: NameStrictLevel, calledAsync: Boolean = false) {
-        val newLevel = recipeNameStrictLevel.get().tryChange(level)
-        val oldValue = recipeNameStrictLevel.getAndSet(newLevel)
-        if (newLevel != oldValue) {
-            CustomCrafterAPIPropertiesChangeEvent(
-                propertyName = CustomCrafterAPIPropertiesChangeEvent.PropertyKey.RECIPE_NAME_STRICT_LEVEL.name,
-                oldValue = CustomCrafterAPIPropertiesChangeEvent.Property(oldValue),
-                newValue = CustomCrafterAPIPropertiesChangeEvent.Property(newLevel),
-                isAsync = calledAsync
-            ).callEvent()
-        }
-    }
-
     /**
      * Returns an immutable list of all registered recipes.
      *
@@ -628,7 +484,6 @@ object CustomCrafterAPI {
      * @param[recipes] Recipes to register
      * @param[plugin] Plugin instance registering the recipes
      * @param[calledAsync] Called from async processing or not. (Default = false)
-     * @throws[IllegalArgumentException] if [recipes] contains duplicate names under the current strict level
      * @throws[IllegalStateException] if any recipe in [recipes] is invalid
      */
     @JvmStatic
@@ -640,9 +495,6 @@ object CustomCrafterAPI {
     ) {
         if (recipes.isEmpty()) {
             return
-        }
-        if (getRecipeNameStrictLevel().hasDuplicate(recipes.map { it.name })) {
-            throw IllegalArgumentException("'recipes' has duplicated name recipes. (current strict level: ${getRecipeNameStrictLevel().name})")
         }
         val builder = StringBuilder()
         builder.append(System.lineSeparator())
@@ -662,9 +514,6 @@ object CustomCrafterAPI {
         }
 
         synchronized(this.recipes) {
-            if (getRecipeNameStrictLevel().contains(this.recipes.keys, recipes.map { it.name }.toSet())) {
-                throw IllegalArgumentException("Duplicated name found. (current strict level: ${getRecipeNameStrictLevel().name}")
-            }
             for (r in recipes) {
                 val wrapper = CRecipeWrapper(r, plugin.hashCode())
                 this.recipes[r.name]?.add(wrapper)

@@ -114,8 +114,6 @@ class CustomCrafterAPIPropertiesChangeEvent<T> (
             val CRAFT_UI_DESIGNER = PropertyKey<CraftUIDesigner>("CRAFT_UI_DESIGNER")
             @JvmField
             val ALL_CANDIDATE_UI_DESIGNER = PropertyKey<AllCandidateUIDesigner>("ALL_CANDIDATE_UI_DESIGNER")
-            @JvmField
-            val RECIPE_NAME_STRICT_LEVEL = PropertyKey<CustomCrafterAPI.NameStrictLevel>("RECIPE_NAME_STRICT_LEVEL")
         }
     }
 

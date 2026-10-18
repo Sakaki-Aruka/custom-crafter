@@ -128,7 +128,6 @@ val value: Material? = event.newValue.getOrNull(key)
 | `BASE_BLOCK_SIDE` | `Int` | BaseBlockSide |
 | `CRAFT_UI_DESIGNER` | `CraftUIDesigner` | CraftUIDesigner |
 | `ALL_CANDIDATE_UI_DESIGNER` | `AllCandidateUIDesigner` | AllCandidateUIDesigner |
-| `RECIPE_NAME_STRICT_LEVEL` | `CustomCrafterAPI.NameStrictLevel` | RecipeNameStrictLevel |
 
 ### 実装例: ベースブロックの変更を検知する
 

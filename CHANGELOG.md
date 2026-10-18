@@ -1,5 +1,11 @@
 # Changelog
 
+# 5.5.0
+
+## ⚠️ Breaking Changes
+
+* Removed the recipe name restriction from `CustomCrafterAPI.registerRecipe`; recipes sharing the same name can now always be registered.
+
 # 5.4.0
 
 ## ⚠️ Breaking Changes

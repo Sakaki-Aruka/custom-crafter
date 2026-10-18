@@ -86,7 +86,7 @@ val mine: List<CRecipe> = CustomCrafterAPI.getRegisteredRecipeFromPlugin(this)
 Use `registerRecipe(recipes: List<CRecipe>, plugin: JavaPlugin)` to register recipes.
 
 - Validation via `CRecipe.isValidRecipe()` is performed at registration time; an `IllegalStateException` is thrown if validation fails.
-- If the current `RecipeNameStrictLevel` detects a duplicate name, an `IllegalArgumentException` is thrown.
+- Recipe names are not restricted; multiple recipes may share the same name.
 - After a successful registration, `RegisterCustomRecipeEvent` is fired.
 
 ```kotlin
@@ -204,24 +204,6 @@ CustomCrafterAPI.setUseMultipleResultCandidateFeature(true)
 
 // Reset to default
 CustomCrafterAPI.setUseMultipleResultCandidateFeature(CustomCrafterAPI.DEFAULT_USE_MULTIPLE_RESULT_CANDIDATE_FEATURE)
-```
-
-### RecipeNameStrictLevel
-
-Controls how strictly duplicate recipe names are checked during registration.
-The level can only be changed in the stricter direction; loosening is not permitted.
-Default: `NameStrictLevel.NOTHING` (`DEFAULT_RECIPE_NAME_STRICT_LEVEL`).
-
-| Level | Behavior |
-|-------|----------|
-| `NOTHING` | No duplicate check |
-| `WEAK` | Rejects a recipe if its name exactly matches an already-registered name |
-| `STRICT` | Rejects a recipe if its name, with whitespace removed, matches an already-registered name |
-
-```kotlin
-CustomCrafterAPI.setRecipeNameStrictLevel(CustomCrafterAPI.NameStrictLevel.WEAK)
-
-val current: CustomCrafterAPI.NameStrictLevel = CustomCrafterAPI.getRecipeNameStrictLevel()
 ```
 
 ### CraftUIDesigner
