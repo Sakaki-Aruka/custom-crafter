@@ -186,7 +186,7 @@ val combined = CMatterPredicates.named("isIron") { /* ... */ }
 合成した predicate は全体で1つとして扱われるため、内側のどちらが弾いたかまでは分かりません。
 そこまで特定したい場合は、合成せずに個別の predicate としてリストに並べてください。
 
-`named` やコンビネータの詳細は [CRecipePredicate について](/ja/recipe/predicate/) を参照してください。
+`named` やコンビネータの詳細は [CRecipePredicate について](../../recipe/predicate/) を参照してください。
 
 ---
 

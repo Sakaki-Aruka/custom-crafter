@@ -4,7 +4,7 @@ title: About recipe
 
 ## Recipes in CustomCrafterAPI
 
-As written on the [Getting Started page](/en/getting-started/), recipes in CustomCrafterAPI are entirely separate from Minecraft's standard recipe system and are composed of completely different components.
+As written on the [Getting Started page](../../getting-started/), recipes in CustomCrafterAPI are entirely separate from Minecraft's standard recipe system and are composed of completely different components.
 
 The fields of `CRecipe` are defined as follows:
 ```kotlin
@@ -55,7 +55,7 @@ is sufficient. With this specification, placing items at:
 ```
 will also pass the check, since it is the same shape.
 
-`CoordinateComponent` provides factory methods for efficiently generating sets of coordinates. For details, see the [CoordinateComponent page](/en/extra/coordinate-component/).
+`CoordinateComponent` provides factory methods for efficiently generating sets of coordinates. For details, see the [CoordinateComponent page](../../extra/coordinate-component/).
 
 ---
 
@@ -194,7 +194,7 @@ If even one predicate returns `false`, the recipe containing it is excluded from
 Set this to `null` if you do not need this feature.
 
 :::note
-For details, see the [CRecipePredicate page](/en/recipe/predicate/).
+For details, see the [CRecipePredicate page](../predicate/).
 :::
 
 ## results (Nullable)
@@ -203,5 +203,5 @@ In addition to generating result items, you can also use this as a function exec
 Like `predicates`, set this to `null` if you do not need it.
 
 :::note
-For details, see the [Result items page](/en/recipe/result/).
+For details, see the [Result items page](../result/).
 :::

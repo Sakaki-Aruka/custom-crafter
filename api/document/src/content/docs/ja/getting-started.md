@@ -78,12 +78,12 @@ CustomCrafterAPI では基本的に名前が `Impl` で終わるクラスがイ�
 それらを利用することでレシピの検索に細かい条件を設けたり、クラフト画面をプレイヤーごとにカスタムすることが可能です。
 
 代表的な追加要素は以下のとおりです。
-- [`CMatterPredicate`](/ja/recipe/matter/#predicates) — 個別スロットのアイテムに対して任意の検査ロジックを追加できる
-- [`CRecipePredicate`](/ja/recipe/predicate/) — レシピ全体を対象にプレイヤー情報などを含めた検査を追加できる
-- [`CraftUIDesigner`](/ja/extra/craftui-designer/) — クラフト UI のタイトルやスロットレイアウトをカスタマイズできる
+- [`CMatterPredicate`](../recipe/matter/#predicates) — 個別スロットのアイテムに対して任意の検査ロジックを追加できる
+- [`CRecipePredicate`](../recipe/predicate/) — レシピ全体を対象にプレイヤー情報などを含めた検査を追加できる
+- [`CraftUIDesigner`](../extra/craftui-designer/) — クラフト UI のタイトルやスロットレイアウトをカスタマイズできる
 
 ## イベント
 CustomCrafterAPI はレシピ以外に、アイテムを作成したことを通知するものなどいくつかのイベントを発行します。
 これらは Bukkit の Event を実装するクラスであるため、 Minecraft 標準のイベントを扱うイベントリスナーと同じようにリッスン・ハンドリングすることができます。
 
-詳細は[イベントのページ](/ja/events/)を参照してください。
+詳細は[イベントのページ](../events/)を参照してください。

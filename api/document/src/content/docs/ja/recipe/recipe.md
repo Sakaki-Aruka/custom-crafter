@@ -4,7 +4,7 @@ title: レシピについて
 
 ## CustomCrafterAPI におけるレシピ
 
-[入門ページ](/ja/getting-started/)に書いたとおり、 CustomCrafterAPI でのレシピは Minecraft 標準のレシピとは区別され、完全に異なるコンポーネントによって構成されます。  
+[入門ページ](../../getting-started/)に書いたとおり、 CustomCrafterAPI でのレシピは Minecraft 標準のレシピとは区別され、完全に異なるコンポーネントによって構成されます。  
 
 `CRecipe` のフィールドは以下のように定義されています。  
 ```kotlin
@@ -56,7 +56,7 @@ items はアイテムの配置を表し、レシピでの座標を示す `Coordi
 ```
 にアイテムが配置されても同一の形であるとして検査を通過します。
 
-`CoordinateComponent` には座標の集合を効率よく生成するためのファクトリメソッドが用意されています。詳細は [CoordinateComponent のページ](/ja/extra/coordinate-component/) を参照してください。
+`CoordinateComponent` には座標の集合を効率よく生成するためのファクトリメソッドが用意されています。詳細は [CoordinateComponent のページ](../../extra/coordinate-component/) を参照してください。
 
 ---
 
@@ -195,7 +195,7 @@ predicates には、レシピと入力されたアイテムなどを利用して
 これらを利用しない場合には `Null` を指定します。
 
 :::note
-詳細は [CRecipePredicate のページ](/ja/recipe/predicate/) を参照してください。
+詳細は [CRecipePredicate のページ](../predicate/) を参照してください。
 :::
 
 ## results (Null 許容)
@@ -204,5 +204,5 @@ results にはレシピが入力されるアイテムに合致した際にクラ
 predicates と同じく、これらを利用しない場合には `Null` を指定します。
 
 :::note
-詳細は [成果物のページ](/ja/recipe/result/) を参照してください。
+詳細は [成果物のページ](../result/) を参照してください。
 :::

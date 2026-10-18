@@ -212,7 +212,7 @@ CustomCrafterAPI.setUseMultipleResultCandidateFeature(CustomCrafterAPI.DEFAULT_U
 ### CraftUIDesigner
 
 クラフト UI の外観をカスタマイズするデザイナーを設定します。
-詳細は [CraftUIDesigner のページ](/ja/extra/craftui-designer/) を参照してください。
+詳細は [CraftUIDesigner のページ](../../extra/craftui-designer/) を参照してください。
 デフォルト: `CraftUIDesigner.DEFAULT` (`DEFAULT_CRAFT_UI_DESIGNER`)。
 
 ```kotlin
@@ -229,7 +229,7 @@ CustomCrafterAPI.setCraftUIDesigner(CustomCrafterAPI.DEFAULT_CRAFT_UI_DESIGNER)
 ### AllCandidateUIDesigner
 
 AllCandidateUI の外観をカスタマイズするデザイナーを設定します。
-詳細は [AllCandidateUIDesigner のページ](/ja/extra/allcandidateui-designer/) を参照してください。
+詳細は [AllCandidateUIDesigner のページ](../../extra/allcandidateui-designer/) を参照してください。
 デフォルト: `AllCandidateUIDesigner.DEFAULT` (`DEFAULT_ALL_CANDIDATE_UI_DESIGNER`)。
 
 ```kotlin

@@ -140,7 +140,7 @@ val predicate = object : CRecipePredicate {
 ```
 
 :::tip
-For concrete examples of how named predicates appear, and for how to track down why a search failed, see [Advanced Debugging for Recipe Search](/en/extra/explainer/).
+For concrete examples of how named predicates appear, and for how to track down why a search failed, see [Advanced Debugging for Recipe Search](../../extra/explainer/).
 :::
 
 ---

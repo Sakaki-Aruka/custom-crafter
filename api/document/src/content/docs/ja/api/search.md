@@ -295,4 +295,4 @@ Search.search(player.uniqueId, view, explainer = explainer)
 explainer.getStringList().forEach { println(it) }
 ```
 
-詳しくは [レシピ検索の高度なデバッグ](/ja/extra/explainer/) を参照してください。
+詳しくは [レシピ検索の高度なデバッグ](../../extra/explainer/) を参照してください。

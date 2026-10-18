@@ -140,7 +140,7 @@ val predicate = object : CRecipePredicate {
 ```
 
 :::tip
-名前を付けた predicate の実際の表示例や、検索が失敗した原因の追跡方法については [レシピ検索の高度なデバッグ](/ja/extra/explainer/) を参照してください。
+名前を付けた predicate の実際の表示例や、検索が失敗した原因の追跡方法については [レシピ検索の高度なデバッグ](../../extra/explainer/) を参照してください。
 :::
 
 ---

@@ -212,7 +212,7 @@ CustomCrafterAPI.setUseMultipleResultCandidateFeature(CustomCrafterAPI.DEFAULT_U
 ### CraftUIDesigner
 
 Sets the designer that customizes the appearance of the crafting UI.
-See the [CraftUIDesigner page](/en/extra/craftui-designer/) for details.
+See the [CraftUIDesigner page](../../extra/craftui-designer/) for details.
 Default: `CraftUIDesigner.DEFAULT` (`DEFAULT_CRAFT_UI_DESIGNER`).
 
 ```kotlin
@@ -229,7 +229,7 @@ CustomCrafterAPI.setCraftUIDesigner(CustomCrafterAPI.DEFAULT_CRAFT_UI_DESIGNER)
 ### AllCandidateUIDesigner
 
 Sets the designer that customizes the appearance of the AllCandidateUI.
-See the [AllCandidateUIDesigner page](/en/extra/allcandidateui-designer/) for details.
+See the [AllCandidateUIDesigner page](../../extra/allcandidateui-designer/) for details.
 Default: `AllCandidateUIDesigner.DEFAULT` (`DEFAULT_ALL_CANDIDATE_UI_DESIGNER`).
 
 ```kotlin

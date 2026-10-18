@@ -186,7 +186,7 @@ val combined = CMatterPredicates.named("isIron") { /* ... */ }
 A composed predicate is treated as a single unit, so the log cannot tell you which of the inner predicates rejected the input.
 If you need that level of detail, list them as separate predicates instead of composing them.
 
-For details on `named` and the combinators, see [About CRecipePredicate](/en/recipe/predicate/).
+For details on `named` and the combinators, see [About CRecipePredicate](../../recipe/predicate/).
 
 ---
 
