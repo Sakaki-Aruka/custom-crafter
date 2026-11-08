@@ -1,8 +1,10 @@
 package io.github.sakaki_aruka.customcrafter
 
+import com.tcoded.folialib.FoliaLib
 import io.github.sakaki_aruka.customcrafter.event.CustomCrafterAPIPropertiesChangeEvent
 import io.github.sakaki_aruka.customcrafter.event.RegisterCustomRecipeEvent
 import io.github.sakaki_aruka.customcrafter.event.UnregisterCustomRecipeEvent
+import io.github.sakaki_aruka.customcrafter.internal.InternalAPI
 import io.github.sakaki_aruka.customcrafter.recipe.CRecipe
 import io.github.sakaki_aruka.customcrafter.ui.CraftUIDesigner
 import io.github.sakaki_aruka.customcrafter.ui.AllCandidateUIDesigner
@@ -642,4 +644,13 @@ object CustomCrafterAPI {
             newValue = CustomCrafterAPIPropertiesChangeEvent.Property(designer)
         ).callEvent()
     }
+
+    /**
+     * Returns AsyncAPI (FoliaLib) instance.
+     *
+     * @return[FoliaLib] AsyncAPI (FoliaLib) instance
+     * @since 5.5.0
+     */
+    @JvmStatic
+    fun getAsyncAPIInstance(): FoliaLib = InternalAPI.foliaLib
 }

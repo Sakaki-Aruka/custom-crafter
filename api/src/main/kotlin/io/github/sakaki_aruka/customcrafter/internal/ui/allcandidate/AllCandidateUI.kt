@@ -17,6 +17,7 @@ import io.github.sakaki_aruka.customcrafter.internal.ui.CustomCrafterUI
 import io.github.sakaki_aruka.customcrafter.internal.ui.crafting.CraftUI
 import io.github.sakaki_aruka.customcrafter.ui.AllCandidateUIDesigner
 import io.github.sakaki_aruka.customcrafter.ui.AllCandidateUIDesigner.Companion.bake
+import io.github.sakaki_aruka.customcrafter.util.AsyncUtil
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
@@ -113,10 +114,10 @@ internal class AllCandidateUI(
             return
         }
 
-        InternalAPI.foliaLib.scheduler.runAtEntity(this.player) {
+        AsyncUtil.runAs(this.player) {
             this.player.openInventory.topInventory.let { opening ->
                 if (opening.holder !is AllCandidateUI) {
-                    return@runAtEntity
+                    return@runAs //@runAtEntity
                 }
                 pages[pageNum]?.let { contents ->
                     contents.entries.forEach { (slot, pair) ->
@@ -124,7 +125,7 @@ internal class AllCandidateUI(
                     }
                 }
             }
-        }.get()
+        } //.get()
     }
 
     fun pageContentsAt(pageNumber: Int): Map<Int, ItemStack> {
@@ -247,14 +248,14 @@ internal class AllCandidateUI(
                     )
                     val results: List<ItemStack> = recipe.asyncGetResults(resultSupplierContext).get()
 
-                    InternalAPI.foliaLib.scheduler.runAtEntity(player) {
+                    AsyncUtil.runAs(player) {
                         CreateCustomItemEvent(player, this.view, this.result, event.isShiftClick, isAsync = false).callEvent()
-                    }.get()
+                    } //.get()
 
                     if (player.isOnline) {
-                        InternalAPI.foliaLib.scheduler.runAtEntity(player) {
+                        AsyncUtil.runAs(player) {
                             player.giveItems(saveLimit = true, *results.toTypedArray())
-                        }.get()
+                        } //.get()
                     } else {
                         ResultItemGiveFailEvent(results, resultSupplierContext, true).callEvent()
                     }

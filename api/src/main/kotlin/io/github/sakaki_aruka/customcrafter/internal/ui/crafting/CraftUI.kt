@@ -20,6 +20,7 @@ import io.github.sakaki_aruka.customcrafter.internal.ui.CraftUIState
 import io.github.sakaki_aruka.customcrafter.internal.ui.CustomCrafterUI
 import io.github.sakaki_aruka.customcrafter.internal.ui.allcandidate.AllCandidateUI
 import io.github.sakaki_aruka.customcrafter.ui.CraftUIDesigner.Companion.bake
+import io.github.sakaki_aruka.customcrafter.util.AsyncUtil
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -298,11 +299,11 @@ internal class CraftUI(
             bakedCraftUIDesigner = this.bakedDesigner
         )
 
-        InternalAPI.foliaLib.scheduler.runAtEntity(player) {
+        AsyncUtil.runAs(player) {
             if (!this.isClosed.get()) {
                 player.openInventory(allUI.inventory)
             }
-        }.get()
+        } //.get()
     }
 
     private fun giveCustomRecipeResults(
@@ -318,9 +319,9 @@ internal class CraftUI(
         val amount: Int = recipe.getTimes(view.materials, relate, shiftUsed)
         val decrementedView: CraftView = view.clone().getDecremented(shiftUsed, recipe, relate)
 
-        InternalAPI.foliaLib.scheduler.runAtEntity(player) {
+        AsyncUtil.runAs(player) {
             CreateCustomItemEvent(player, view, result, shiftUsed, isAsync = false).callEvent()
-        }.get()
+        } //.get()
 
         val resultCtx: AsyncContext = AsyncContext.ofTurnOff()
         asyncContext.set(resultCtx)
@@ -344,13 +345,13 @@ internal class CraftUI(
         }
 
         // Decrement and give are in one atomic tick; no interaction can interleave here.
-        InternalAPI.foliaLib.scheduler.runAtEntity(player) {
+        AsyncUtil.runAs(player) {
             decrementedView.materials.forEach { (c, item) ->
                 this.inventory.setItem(c.toIndex(), item)
             }
             player.giveItems(saveLimit = true, *results.toTypedArray())
             uiState.set(CraftUIState.IDLE)
-        }.get()
+        } //.get()
     }
 
     private fun giveVanillaRecipeResults(
@@ -374,7 +375,7 @@ internal class CraftUI(
             return
         }
 
-        InternalAPI.foliaLib.scheduler.runAtEntity(player) {
+        AsyncUtil.runAs(player) {
             bakedDesigner.craftSlots()
                 .filter { c -> this.inventory.getItem(c.toIndex())?.takeIf { i -> !i.type.isEmpty } != null }
                 .forEach { c ->
@@ -385,7 +386,7 @@ internal class CraftUI(
                 player.giveItems(saveLimit = true, item)
             }
             uiState.set(CraftUIState.IDLE)
-        }.get()
+        } //.get()
     }
 
     override fun getInventory(): Inventory = this.inventory
